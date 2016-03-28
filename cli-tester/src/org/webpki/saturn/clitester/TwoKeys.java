@@ -15,7 +15,7 @@
  *
  */
 
-package org.webpki.saturn.test;
+package org.webpki.saturn.clitester;
 
 import org.webpki.saturn.common.KeyStoreEnumerator;
 
@@ -25,10 +25,10 @@ public class TwoKeys {
     KeyStoreEnumerator badKey;
 
     public TwoKeys(String keyProperty) throws Exception {
-        String keyName = (String) Test.properties.get(keyProperty) + (String) Test.properties.get("keyfilext");
-        String password = (String) Test.properties.get("keypassword");
-        goodKey = new KeyStoreEnumerator(Test.getResource(keyName), password);
-        badKey = new KeyStoreEnumerator(Test.getResource("wrongkeys/" + keyName), password);
+        String keyName = (String) CliTester.properties.get(keyProperty) + (String) CliTester.properties.get("keyfilext");
+        String password = (String) CliTester.properties.get("keypassword");
+        goodKey = new KeyStoreEnumerator(CliTester.getResource(keyName), password);
+        badKey = new KeyStoreEnumerator(CliTester.getResource("wrongkeys/" + keyName), password);
     }
     
     public KeyStoreEnumerator getKey(boolean goodFlag) {

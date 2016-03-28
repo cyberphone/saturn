@@ -18,7 +18,7 @@
 		<link>
 			<name>common</name>
 			<type>2</type>
-			<locationURI>copy_PARENT/webpayment.client/common</locationURI>
+			<locationURI>copy_PARENT/resources/common</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>

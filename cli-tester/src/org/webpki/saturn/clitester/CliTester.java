@@ -15,7 +15,7 @@
  *
  */
 
-package org.webpki.saturn.test;
+package org.webpki.saturn.clitester;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -58,7 +58,7 @@ import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 
-public class Test {
+public class CliTester {
     
     enum STEP {payee2payeebank, payee2payerbank};
     
@@ -101,7 +101,7 @@ public class Test {
             System.exit(3);
         }
         try {
-            Test t = new Test();
+            CliTester t = new CliTester();
             t.execute();
         } catch (Exception e) {
             e.printStackTrace();

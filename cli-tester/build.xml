@@ -4,7 +4,7 @@
 
   <property name="temp.dir" location=".tmp" />
   <property name="src.dir" value="src"/>
-  <property name="client.package.dir" value="org/webpki/saturn/test"/>
+  <property name="client.package.dir" value="org/webpki/saturn/clitester"/>
   <property name="wrongkey.dir" location="wrongkeys"/>
   <property name="dist.dir" value="dist"/>
   <property name="javaversion" value="1.7" />
@@ -53,7 +53,7 @@
       <zipfileset dir="${wrongkey.dir}" prefix="${client.package.dir}/wrongkeys"/>
       <zipfileset file="../resources/common.properties" prefix="${client.package.dir}"/>
       <manifest>
-        <attribute name="Main-Class" value="${client.package.dir}.Test"/>
+        <attribute name="Main-Class" value="${client.package.dir}.CliTester"/>
         <attribute name="Class-path" value="./lib/${webpki-libext.jar} ./lib/${bcprovider.jar}"/>
       </manifest>
     </jar>

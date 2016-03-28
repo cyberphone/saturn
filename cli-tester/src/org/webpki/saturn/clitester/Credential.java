@@ -15,7 +15,7 @@
  *
  */
 
-package org.webpki.saturn.test;
+package org.webpki.saturn.clitester;
 
 import org.webpki.saturn.common.KeyStoreEnumerator;
 
@@ -30,7 +30,7 @@ public class Credential {
     public Credential(String cardType) throws Exception {
         signatureKey = new TwoKeys("clientkey_" + cardType);
         encryptionKey = new TwoKeys("encryptionkey_ec");
-        accountId = (String) Test.properties.get("account_id_" + cardType);
+        accountId = (String) CliTester.properties.get("account_id_" + cardType);
     }
 
     public String getAccountId(boolean goodFlag) {
