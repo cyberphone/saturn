@@ -33,13 +33,13 @@ const ByteArray = require('webpki.org').ByteArray;
 const JsonUtil = require('webpki.org').JsonUtil;
 const Logging = require('webpki.org').Logging;
 
-const ServerCertificateSigner = require('../webpayment.nodejs-common/ServerCertificateSigner');
-const BaseProperties = require('../webpayment.nodejs-common/BaseProperties');
-const Authority = require('../webpayment.nodejs-common/AuthorityObject');
-const Expires = require('../webpayment.nodejs-common/Expires');
-const ErrorReturn = require('../webpayment.nodejs-common/ErrorReturn');
-const FinalizeRequest = require('../webpayment.nodejs-common/FinalizeRequest');
-const FinalizeResponse = require('../webpayment.nodejs-common/FinalizeResponse');
+const ServerCertificateSigner = require('../nodejs-common/ServerCertificateSigner');
+const BaseProperties = require('../nodejs-common/BaseProperties');
+const Authority = require('../nodejs-common/AuthorityObject');
+const Expires = require('../nodejs-common/Expires');
+const ErrorReturn = require('../nodejs-common/ErrorReturn');
+const FinalizeRequest = require('../nodejs-common/FinalizeRequest');
+const FinalizeResponse = require('../nodejs-common/FinalizeResponse');
 
 const Config = require('./config/config');
 
