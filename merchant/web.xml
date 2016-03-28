@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <context-param>
+        <description>Merchant Key Password</description>
+        <param-name>key_password</param-name>
+        <param-value>@key-password@</param-value>
+    </context-param>
+ 
+    <context-param>
+        <description>Merchant Key</description>
+        <param-name>merchant_key</param-name>
+        <param-value>@merchant-key@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Payment Network Root Certificate</description>
+        <param-name>payment_root</param-name>
+        <param-value>@payment-root@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Server Port Mapping (may be undefined)</description>
+        <param-name>server_port_map</param-name>
+        <param-value>@server-port-map@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Acquirer Authority URL</description>
+        <param-name>acquirer_authority_url</param-name>
+        <param-value>@acquirer-authority-url@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Currency</description>
+        <param-name>currency</param-name>
+        <param-value>@currency@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Add the 'Unusual' card</description>
+        <param-name>add_unusual_card</param-name>
+        <param-value>@add-unusual-card@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Force media type error</description>
+        <param-name>err_media_type</param-name>
+        <param-value>@err-media-type@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Web2Native Bridge wallet name</description>
+        <param-name>w2nb_wallet</param-name>
+        <param-value>@w2nb-wallet@</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.webpki.saturn.merchant.MerchantService</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.HomeServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ShoppingServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.ShoppingServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>UserPaymentServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.UserPaymentServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>TransactionServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.TransactionServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>DebugServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.DebugServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>ErrorServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.ErrorServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>NFCLauncherServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.NFCLauncherServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HomeServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ShoppingServlet</servlet-name>
+        <url-pattern>/shop</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>UserPaymentServlet</servlet-name>
+        <url-pattern>/userpay</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>TransactionServlet</servlet-name>
+        <url-pattern>/transact</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>DebugServlet</servlet-name>
+        <url-pattern>/debug</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ErrorServlet</servlet-name>
+        <url-pattern>/error</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>NFCLauncherServlet</servlet-name>
+        <url-pattern>/nfc</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>The app</web-resource-name>
+        <url-pattern>/*</url-pattern>
+      </web-resource-collection>
+      <user-data-constraint>
+        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+    </security-constraint>
+
+</web-app>

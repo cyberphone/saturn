@@ -1,0 +1,202 @@
+<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Payment Agent (Wallet) Tester</title></head>
+<body onload="getTargetDimensions()"><script>
+
+"use strict";
+
+function setString(rawString) {
+  var text = "";
+  for (var n = 0; n < rawString.length; n++) {
+    var c = rawString.charAt(n);
+    if (c == "<") {
+      c = "&lt;";
+    } else if (c == ">") {
+      c = "&gt;";
+    } else if  (c == "&") {
+      c = "&amp;";
+    }
+    text += c;
+  }
+  document.getElementById("response").innerHTML = text;
+}
+
+var nativePort = null;
+
+var normalRequest = {
+  "@context": "http://xmlns.webpki.org/webpay/v1",
+  "@qualifier": "WalletRequest",
+  acceptedAccountTypes: ["https://nosuchcard.com","https://supercard.com","https://bankdirect.net"],
+  paymentRequest: {
+    payee: {
+      commonName: "Demo Merchant",
+      id: "86344"
+    },
+    amount: "306.25",
+    currency: "USD",
+    referenceId: "#6100004",
+    timeStamp: "2016-03-28T12:04:26Z",
+    expires: "2030-09-14T00:00:00Z",
+    software: {
+      name: "WebPKI.org - Merchant",
+      version: "1.00"
+    },
+    signature: {
+      algorithm: "ES256",
+      publicKey: {
+        type: "EC",
+        curve: "P-256",
+        x: "67f720OvQfRJaolZjIz_l-5qkCCJ0wK9MljNCOga-00",
+        y: "rDase7PLLOrppIfJpSHdj8vIjVz1BAi8tIFR0fmeyLY"
+      },
+      value: "m3BBKZoXeMBZsOrGRwj7JWPLPiHS3T_QyOwKdEO6GVT77l9kQsvqK0ARPtZTKu8ze4FOXeQQrOkRhove6sChaw"
+    }
+  }
+};
+
+// All our cards/accounts should match during the discovery phase...
+var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
+scrollMatchingRequest.acceptedAccountTypes = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
+
+// No card/account should match during the discovery phase...
+var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
+nonMatchingRequest.acceptedAccountTypes = ["https://nosuchcard.com"];
+
+// Note the modified "payee" property...
+var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
+badSignatureRequest.paymentRequest.payee= "DEmo Merchant";
+
+var badMessageRequest = {"hi":"there!"};
+
+function closeExtension() {
+  if (nativePort) {
+    nativePort.disconnect();
+    nativePort = null;
+  }
+}
+
+function sendMessageConditional(message) {
+  if (nativePort) {
+    nativePort.postMessage(message);
+  }
+}
+
+function activateExtension() {
+  if (nativePort) {
+    closeExtension();
+  }
+  setString("");
+  var initMode = true;
+  var test = document.forms.shoot.test.value;
+  if (!navigator.nativeConnect) {
+    alert('"navigator.nativeConnect" not found, \ncheck Chrome Web2Native Bridge extension settings');
+    return;
+  }
+  navigator.nativeConnect("org.webpki.webpay.wallet3",
+                          document.getElementById("positionWallet").checked ?
+                            setExtensionPosition("Right", "Top", "wallet") :
+                            setExtensionPosition("Center", "Center")).then(function(port) {
+    nativePort = port;
+    port.addMessageListener(function(message) {
+      if (message["@context"] != "http://xmlns.webpki.org/webpay/v1") {
+        setString("Missing or wrong \"@context\"");
+        return;
+      }
+      var qualifier = message["@qualifier"];
+      if ((initMode && qualifier != "WalletInitialized" ) ||
+          (!initMode && qualifier != "PayerAuthorization")) {
+        setString("Wrong or missing \"@qualifier\"");
+        closeExtension();
+        return;
+      }
+      if (initMode) {
+        initMode = false;
+        if (document.getElementById("positionWallet").checked) {
+          document.getElementById("wallet").style.width = message.window.width + 'px';
+          document.getElementById("wallet").style.height = message.window.height + 'px';
+        }
+        if (test == "Normal") {
+          sendMessageConditional(normalRequest);
+        } else if (test == "Slow") {
+          setTimeout(function() {
+            sendMessageConditional(normalRequest);
+          }, 2000);
+        } else if (test == "Scroll") {
+          sendMessageConditional(scrollMatchingRequest);
+        } else if (test == "NonMatching") {
+          sendMessageConditional(nonMatchingRequest);
+        } else if (test == "Timeout") {
+          setTimeout(function() {
+            sendMessageConditional(normalRequest);
+          }, 20000);
+        } else if (test == "Syntax") {
+          sendMessageConditional(badMessageRequest);
+        } else if (test == "Signature") {
+          sendMessageConditional(badSignatureRequest);
+        } else {
+          alert("Not implemented: " + test);
+        }
+      } else {
+        setTimeout(function() {
+          setString(JSON.stringify(message));
+          closeExtension();
+        }, 1000);
+      }
+    });
+    port.addDisconnectListener(function() {
+      if (nativePort) {
+        setString("Application Unexpectedly disconnected");
+      }
+      nativePort = null;
+    });
+  }, function(err) {
+    console.debug(err);
+  });
+}
+
+window.addEventListener("beforeunload", function(event) {
+  closeExtension();
+});
+
+var targetWidth;
+var targetHeight;
+function getTargetDimensions() {
+  targetWidth = document.getElementById("wallet").style.width;
+  targetHeight = document.getElementById("wallet").style.height;
+}
+
+function setTargetState() {
+  document.getElementById("wallet").style.visibility = document.getElementById("positionWallet").checked ? 'visible' : 'hidden';
+  document.getElementById("wallet").style.width = targetWidth;
+  document.getElementById("wallet").style.height = targetHeight;
+}
+
+function setExtensionPosition(hAlign, vAlign, optionalId) {
+  var result = {horizontalAlignment:hAlign, verticalAlignment:vAlign}
+  if (optionalId) {
+    var input = document.getElementById(optionalId).getBoundingClientRect();
+    var rectangle = {};
+    rectangle.left = input.left;
+    rectangle.top = input.top;
+    rectangle.width = input.width;
+    rectangle.height = input.height;
+    result.targetRectangle = rectangle;
+  }
+  return result;
+}
+
+</script>
+<h2>Web2Native Bridge &quot;Emulator&quot; - Payment Agent (Wallet) Tester</h2>
+<input type="button" style="margin-bottom:10pt;width:50pt" value="Run!" onclick="activateExtension()">
+<form name="shoot">
+<input type="radio" name="test" value="Normal" checked>Normal<br>
+<input type="radio" name="test" value="Slow">Slow (but legal) response<br>
+<input type="radio" name="test" value="Scroll">Many matching cards (=scroll view)<br>
+<input type="radio" name="test" value="NonMatching">No card should match<br>
+<input type="radio" name="test" value="Timeout">Timeouted response<br>
+<input type="radio" name="test" value="Syntax">Bad message syntax<br>
+<input type="radio" name="test" value="Signature">Bad signature<br>
+</form>
+<input type="checkbox" id="positionWallet" style="margin-top:10pt" onchange="setTargetState()">Position/update target element (default is centered)
+<div style="margin-top:10pt;margin-bottom:10pt">Result:</div>
+<div id="response" style="font-family:courier;font-size:10pt;word-wrap:break-word;width:800pt"></div>
+<div id="wallet" style="position:absolute;top:50px;background:yellow;right:50px;z-index:5;visibility:hidden">The wallet should launch in this<br>corner and update width+height</div>
+</body></html>

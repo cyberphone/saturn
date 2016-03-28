@@ -1,0 +1,74 @@
+<project name="desktop webpayment client" default="build" basedir=".">
+
+  <!-- set global properties for this build -->
+
+  <property name="temp.dir" location=".tmp" />
+  <property name="src.dir" value="src"/>
+  <property name="image.dir" value="images"/>
+  <property name="client.package.dir" value="org/webpki/saturn/w2nb/desktopclient"/>
+  <property name="javaversion" value="1.7" />
+  <property name="debug" value="on"/>
+
+  <property file="../resources/common.properties"/>
+
+  <condition property="install.dir.found">
+      <available file="${common.app.dir}" type="dir"/>
+  </condition>
+  <fail message="&quot;common.app.dir&quot; does not point to a valid installation directory!" unless="install.dir.found"/>
+
+  <path id="compile.classpath">
+	 <fileset dir="${common.lib.dir}">
+	   <include name="*.jar"/>
+    </fileset>
+  </path>
+  
+  <target name="clean">
+    <delete dir="${temp.dir}"/>
+    <delete dir="${common.app.dir}/${w2nb.webwallet}"/>
+  </target>
+  
+  <target name="build" depends="clean">
+    <echo message="${src.dir}:${common.src.dir}"/>
+	<loadresource property="java.dotted.path">
+	  <propertyresource name="client.package.dir"/>
+	  <filterchain>
+	    <tokenfilter>
+	      <filetokenizer/>
+	      <replacestring from="/" to="."/>
+	    </tokenfilter>
+	  </filterchain>
+	</loadresource>
+    <mkdir dir="${temp.dir}" />
+    <mkdir dir="${common.app.dir}/${w2nb.webwallet}" />
+    <fixcrlf srcdir="${src.dir}"
+       tab="remove"
+       tablength="4"
+       eol="lf"
+       eof="remove"
+       includes="**/*.java"/>
+    <javac debug="${debug}"
+           source="${javaversion}"
+           target="${javaversion}"
+           srcdir="${src.dir}:${common.src.dir}"
+           destdir="${temp.dir}" 
+           classpathref="compile.classpath"
+           includeAntRuntime="false">
+	       <include name="**/Wallet.java"/>
+    </javac>
+    <jar jarfile="${common.app.dir}/${w2nb.webwallet}/${w2nb.webwallet}.jar">
+      <fileset dir="${temp.dir}">
+        <exclude name="**/AccountTypes.class"/>
+        <exclude name="**/DecryptionKeyHolder.class"/>
+      </fileset>
+      <zipfileset dir="${image.dir}" prefix="${client.package.dir}"/>
+      <zipfileset dir="${credentials.dir}" prefix="${client.package.dir}">
+        <include name="${credentials_store}"/>
+      </zipfileset>
+      <manifest>
+        <attribute name="Main-Class" value="${java.dotted.path}.Wallet"/>
+        <attribute name="Class-path" value="../../libs/${webpki-libext.jar} ../../libs/${bcprovider.jar} ../../libs/proxy-support.jar"/>
+      </manifest>
+    </jar>
+  </target>
+  
+</project>

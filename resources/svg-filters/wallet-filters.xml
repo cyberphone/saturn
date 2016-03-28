@@ -1,0 +1,9 @@
+ <defs>
+  <filter height="150%" width="150%" y="-25%" x="-25%" id="actorsBlur">
+   <feGaussianBlur stdDeviation="3"/>
+  </filter>
+  <filter width="200%" height="200%" x="-50%" y="-50%" id="messageBlur">
+   <feGaussianBlur stdDeviation="2"/>
+  </filter> 
+ </defs>
+ 

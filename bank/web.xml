@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <context-param>
+        <description>Key Password</description>
+        <param-name>key_password</param-name>
+        <param-value>@key-password@</param-value>
+    </context-param>
+ 
+    <context-param>
+        <description>Bank EE Certificate</description>
+        <param-name>bank_eecert</param-name>
+        <param-value>@bank-eecert@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Bank Host</description>
+        <param-name>bank_host</param-name>
+        <param-value>@bank-host@</param-value>
+    </context-param>
+    
+    <context-param>
+        <description>Bank Decryption Key #1</description>
+        <param-name>bank_decryptionkey1</param-name>
+        <param-value>@bank-decryptionkey1@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Bank Decryption Key #2</description>
+        <param-name>bank_decryptionkey2</param-name>
+        <param-value>@bank-decryptionkey2@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Merchant Key</description>
+        <param-name>merchant_key</param-name>
+        <param-value>@merchant-key@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Bank Accounts</description>
+        <param-name>bank_account_db</param-name>
+        <param-value>@bank-account-db@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Server Port Mapping (may be undefined)</description>
+        <param-name>server_port_map</param-name>
+        <param-value>@server-port-map@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Force media type error</description>
+        <param-name>err_media_type</param-name>
+        <param-value>@err-media-type@</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.webpki.saturn.bank.BankService</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>TransactionServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.TransactionServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>AuthorityPublisherServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.AuthorityPublisherServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>TransactionServlet</servlet-name>
+        <url-pattern>/transact</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AuthorityPublisherServlet</servlet-name>
+        <url-pattern>/authority</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>The app</web-resource-name>
+        <url-pattern>/*</url-pattern>
+      </web-resource-collection>
+      <user-data-constraint>
+        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+    </security-constraint>
+
+</web-app>

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <context-param>
+        <description>Version Check</description>
+        <param-name>logotype</param-name>
+        <param-value>@logotype@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Version Check</description>
+        <param-name>version_check</param-name>
+        <param-value>@version-check@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Key Password</description>
+        <param-name>key_password</param-name>
+        <param-value>@key-password@</param-value>
+    </context-param>
+ 
+    <context-param>
+        <description>Bank Host</description>
+        <param-name>bank_host</param-name>
+        <param-value>@bank-host@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Key Provider Host</description>
+        <param-name>keyprov_host</param-name>
+        <param-value>@keyprov-host@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Server Port Mapping (may be undefined)</description>
+        <param-name>server_port_map</param-name>
+        <param-value>@server-port-map@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Payment Credential</description>
+        <param-name>paycred1</param-name>
+        <param-value>@paycred1@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Payment Credential</description>
+        <param-name>paycred2</param-name>
+        <param-value>@paycred2@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Payment Credential</description>
+        <param-name>paycred3</param-name>
+        <param-value>@paycred3@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Key Management Key</description>
+        <param-name>keyprov_kmk</param-name>
+        <param-value>@keyprov-kmk@</param-value>
+    </context-param>
+
+    <listener>
+        <listener-class>org.webpki.saturn.keyprovider.KeyProviderService</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>KeyProviderServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.keyprovider.KeyProviderServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>KeyProviderInitServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.keyprovider.KeyProviderInitServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>KeyProviderServlet</servlet-name>
+        <url-pattern>/getkeys</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>KeyProviderInitServlet</servlet-name>
+        <url-pattern>/init</url-pattern>
+    </servlet-mapping>
+@security@
+</web-app>

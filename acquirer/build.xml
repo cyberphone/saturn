@@ -1,0 +1,208 @@
+<project name="Acquirer Server" default="help" basedir=".">
+
+  <!-- set properties for this build -->
+  <property name="src.dir" value="src"/>
+  <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/acquirer"/>
+  
+  <property name="appcorename" value="webpay-acquirer"/>
+  <property name="application" value="${appcorename}.war"/>
+  <property name="merchant.dn" value="CN=Demo Merchant,2.5.4.5=#1306383936333235,C=DE"/>
+  
+  <property name="debug" value="on"/>
+  <property environment="env"/>
+
+  <property name="catalina.home" value="${env.CATALINA_HOME}"/>
+
+  <resources id="w2nb_application.xml">
+<string><![CDATA[    <!-- Web2 Payment Demo -->
+    <module>
+        <web>
+            <web-uri>${application}</web-uri>
+            <context-root>/${appcorename}</context-root>
+        </web>
+    </module>
+</application>]]></string>
+  </resources>
+
+  <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
+
+  <condition property="storetype" value="PKCS12" else="JKS">
+    <matches pattern=".*\.p12$" string="${keyfilext}"/>
+  </condition>
+
+  <target name="help">
+    <echo message="tomcat [-Dmerchant.dn=something] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+  </target>
+
+  <target name="_init" unless="app_path">
+    <!-- Set up where application should reside --> 
+    <condition property="tomcat_app_root_set">
+      <isset property="env.CATALINA_HOME"/>
+    </condition>
+    <fail message="CATALINA_HOME must be set to environment!" unless="tomcat_app_root_set"/>
+
+    <!-- Set path to application.  -->
+    <property name="dist.dir" value="dist"/>
+  </target>
+
+  <target name="_build">
+    <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
+    <fixcrlf srcdir="${src.dir}"
+       tab="remove"
+       tablength="4"
+       eol="lf"
+       eof="remove"
+       includes="**/*.java"/>
+    <fixcrlf srcdir="${compile.common.src.dir}"
+       tab="remove"
+       tablength="4"
+       eol="lf"
+       eof="remove"
+       includes="**/*.java"/>
+    <copy file="web.xml" todir="${temp.dir}"/>
+    <javac debug="${debug}"
+           source="${javaversion}"
+           target="${javaversion}"
+           srcdir="${src.dir}:${compile.common.src.dir}"
+           destdir="${temp.dir}"
+           classpath="${compile.classpath}"
+           includeAntRuntime="false"/>
+    <replace file="${temp.dir}/web.xml">
+      <replacefilter token="@key-password@" value="${keypassword}"/>
+	  <replacefilter token="@acquirer-eecert@" value="${acquirersignaturekey}${keyfilext}"/>
+      <replacefilter token="@acquirer-decryptionkey1@" value="${acquirerencryptionkey_ec}${keyfilext}"/>
+      <replacefilter token="@acquirer-decryptionkey2@" value="${acquirerencryptionkey_rsa}${keyfilext}"/>
+      <replacefilter token="@acquirer-host@" value="${acquirer.host}"/>
+      <replacefilter token="@merchant-dn@" value="${merchant.dn}"/>
+      <replacefilter token="@merchant-root@" value="${merchant.var.root}.cer"/>
+	  <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
+    </replace>
+    <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
+      <classes dir="${temp.dir}">
+         <exclude name="web.xml"/>
+      </classes>
+      <lib dir="${zip.common.lib.dir}">
+         <include name="${webpki-libext.jar}"/>
+      </lib>
+       <lib dir="${zip.common.lib.dir}">
+         <include name="${bcprovider.jar}"/>
+       </lib>
+      <lib dir="${zip.common.lib.dir}">
+         <include name="${webpki-webutil.jar}"/>
+      </lib>
+      <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
+         <include name="${acquirerencryptionkey_rsa}${keyfilext}"/>
+         <include name="${acquirerencryptionkey_ec}${keyfilext}"/>
+         <include name="${acquirersignaturekey}${keyfilext}"/>
+         <include name="${payment.var.root}.cer"/>
+         <include name="${merchant.var.root}.cer"/>
+      </zipfileset>
+      <fileset dir="web"/>
+    </war>
+  </target>
+
+  <target name="tomcat" depends="_init">
+     <property file="../resources/common.properties"/>
+     <property name="temp.dir" value=".tmp"/>
+     <delete dir="${temp.dir}"/>
+     <condition property="payment_root" value="${merchantroot}" else="${paymentroot}">
+       <isset property="err.payment.root"/>
+     </condition>
+     <path id="tomcat.compile.classpath">
+       <fileset dir="${common.lib.dir}">
+         <include name="*.jar"/>
+       </fileset>
+       <fileset dir="${reference.lib.dir}">
+         <include name="*.jar"/>
+       </fileset>
+     </path>
+     <antcall target="_build">
+       <param name="card.font" value="Arial Unicode MS"/>
+       <param name="javaversion" value="1.7"/>
+
+       <param name="compile.common.src.dir" value="${common.src.dir}"/>
+       
+       <param name="compile.classpath" refid="tomcat.compile.classpath"/>
+       
+       <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
+       
+       <param name="zip.key.dir" value="${key.dir}"/>
+       
+       <param name="merchant.var.root" value="${merchantroot}"/>
+       <param name="payment.var.root" value="${payment_root}"/>
+       </antcall>
+     <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
+  </target>
+  
+  <!-- mobilepki using EJBCA plugin mode -->
+  <target name="mobilepki-ejbca">
+     <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Acquirer Plugin"/>
+     <property name="acquirer.host" value="https://mobilepki.org/webpay-acquirer"/>
+     <property file="common.properties"/>
+     <property name="temp.dir" value="${ejbca.tmp.path}"/>
+     <property name="dist.dir" value="${ejbca.gen.path}"/>
+     <path id="ejbca.compile.classpath">
+	    <fileset dir="${plugin.ejbca.ant.custom.enrollment_plugin_directory}/lib.common">
+           <include name="*.jar"/>
+        </fileset>
+        <pathelement path="${ejbca.classpath}"/>
+	 </path>
+     <antcall target="_build">
+        <param name="javaversion" value="1.6"/>
+
+       <param name="compile.common.src.dir" value="common.src"/>
+       
+       <param name="compile.classpath" refid="ejbca.compile.classpath"/>
+       
+       <param name="zip.common.lib.dir" value="empty.lib"/>
+       
+       <param name="zip.key.dir" value="keys"/>
+
+       <param name="payment.var.root" value="${paymentroot}"/>
+       <param name="merchant.var.root" value="${merchantroot}"/>
+       </antcall>
+     <!-- Update application.xml -->
+     <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">
+	    <replacetoken><![CDATA[</application>]]></replacetoken>
+     </replace>
+  </target>
+  
+  <target name="localhost-ejbca">
+     <echo message="Web2Native Bridge &quot;localhost&quot; Acquirer Plugin"/>
+     <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
+     <antcall target="mobilepki-ejbca"/>
+  </target>
+  
+  <target name="_unzipit" if="uu">
+    <delete dir="${dd}/${appcorename}"/>
+    <unzip src="${dd}/${appcorename}.zip" dest="${dd}"/>
+  </target>
+  
+  <target name="zip-distribution">
+    <fail unless="dd" message="-&#10;
+***************************************************************&#10;
+ You must define a distribution directory using the -D option:&#10;
+ ant zip-distribution -Ddd=the_path_to_the_directory.&#10;
+ Optionally you can specify -Duu=0 which deletes ${appcorename}&#10;
+ and replaces the directory with the unzipped content&#10;
+***************************************************************&#10;"/>
+	<echo message="Producing ${appcorename} .zip and .zip.SHA1 files..."/> 
+    <property file="../resources/common.properties"/>
+	<delete file="${dd}/${appcorename}.zip" failonerror="false"/>
+    <zip destfile="${dd}/${appcorename}.zip">
+      <zipfileset dir="." prefix="${appcorename}">
+       	<exclude name="/**/.*"/>
+        <exclude name="/.tmp/**"/>
+       	<exclude name="**/.settings/**"/>
+       	<exclude name="**/bin/**"/>
+       	<exclude name="dist/**"/>
+      </zipfileset>
+      <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
+      <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>
+      <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>
+    </zip>
+    <checksum file="${dd}/${appcorename}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
+    <antcall target="_unzipit"/>
+  </target>
+   
+</project>

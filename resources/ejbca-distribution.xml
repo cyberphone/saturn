@@ -1,0 +1,16 @@
+<project name="WebPayment EJBCA Distribution" default="zip-distribution" basedir=".">
+  
+  <target name="zip-distribution">
+    <fail unless="dd" message="-&#10;
+***************************************************************&#10;
+ You must define a distribution directory using the -D option:&#10;
+ ant zip-distribution -Ddd=the_path_to_the_directory.&#10;
+***************************************************************&#10;"/>
+	<echo message="Producing WebPayment EJBCA .zip and .zip.SHA1 files..."/>
+    <ant dir="../acquirer" target="zip-distribution"/>
+    <ant dir="../bank" target="zip-distribution"/>
+    <ant dir="../merchant" target="zip-distribution"/>
+    <ant dir="../keyprovider" target="zip-distribution"/>
+  </target>
+   
+</project>

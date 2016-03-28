@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <context-param>
+        <description>Key Password</description>
+        <param-name>key_password</param-name>
+        <param-value>@key-password@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Acquirer EE Certificate</description>
+        <param-name>acquirer_eecert</param-name>
+        <param-value>@acquirer-eecert@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Acquirer Decryption Key #1 (PUBLISHED)</description>
+        <param-name>acquirer_decryptionkey1</param-name>
+        <param-value>@acquirer-decryptionkey1@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Acquirer Decryption Key #2</description>
+        <param-name>acquirer_decryptionkey2</param-name>
+        <param-value>@acquirer-decryptionkey2@</param-value>
+    </context-param>
+ 
+    <context-param>
+        <description>Acquirer Host</description>
+        <param-name>acquirer_host</param-name>
+        <param-value>@acquirer-host@</param-value>
+    </context-param>
+    
+    <context-param>
+        <description>Merchant DN (we just have one...)</description>
+        <param-name>merchant_dn</param-name>
+        <param-value>@merchant-dn@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Mechant Network Root Certificate</description>
+        <param-name>merchant_root</param-name>
+        <param-value>@merchant-root@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Payment Network Root Certificate</description>
+        <param-name>payment_root</param-name>
+        <param-value>@payment-root@</param-value>
+    </context-param>
+   
+    <listener>
+        <listener-class>org.webpki.saturn.acquirer.AcquirerService</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>AuthorityPublisherServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.acquirer.AuthorityPublisherServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>TransactionServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.acquirer.TransactionServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AuthorityPublisherServlet</servlet-name>
+        <url-pattern>/authority</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>TransactionServlet</servlet-name>
+        <url-pattern>/transact</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>The app</web-resource-name>
+        <url-pattern>/*</url-pattern>
+      </web-resource-collection>
+      <user-data-constraint>
+        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+    </security-constraint>
+
+</web-app>
