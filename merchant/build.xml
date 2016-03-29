@@ -123,9 +123,6 @@
        <fileset dir="${common.lib.dir}">
          <include name="*.jar"/>
        </fileset>
-       <fileset dir="${common.lib.dir}">
-         <include name="*.jar"/>
-       </fileset>
        <fileset dir="${reference.lib.dir}">
          <include name="*.jar"/>
        </fileset>
@@ -163,7 +160,10 @@
 	    <fileset dir="${plugin.ejbca.ant.custom.enrollment_plugin_directory}/lib.common">
            <include name="*.jar"/>
         </fileset>
-        <pathelement path="${ejbca.classpath}"/>
+	    <fileset dir="extra.lib">
+           <include name="*.jar"/>
+        </fileset>
+	    <pathelement path="${ejbca.classpath}"/>
 	 </path>
      <antcall target="_build">
        <param name="card.font" value="Arial Unicode MS"/>
@@ -221,7 +221,7 @@
       <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
       <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>
       <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>
-      <zipfileset file="${common.lib.dir}/proxy-support.jar" prefix="extra.lib"/>
+      <zipfileset file="${common.lib.dir}/proxy-support.jar" prefix="${appcorename}/extra.lib"/>
       </zip>
     <checksum file="${dd}/${appcorename}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
     <antcall target="_unzipit"/>
