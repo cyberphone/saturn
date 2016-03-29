@@ -1,0 +1,112 @@
+<project name="TLS Certificates" default="help" basedir=".">
+
+  <!-- set properties for this build -->
+  
+  <property file="../resources/common.properties"/>
+    
+  <condition property="storetype" value="PKCS12" else="JKS">
+    <matches pattern=".*\.p12$" string="${keyfilext}"/>
+  </condition>
+  
+  <property name="rootfile" value="tlsroot"/>
+  <property name="root.dir" value="root"/>
+  <property name="server.dir" value="server"/>
+  
+  <path id="compile.classpath">
+     <fileset dir="${common.lib.dir}">
+       <include name="*.jar"/>
+    </fileset>
+  </path>
+  
+  <target name="help">
+      <echo message="createroot createcert -Dserver=HostNameOrIpAddress"/>
+  </target>
+ 
+  <target name="_createcert">
+  	<java fork="yes"
+  		  classname="org.webpki.ca.CommandLineCA"
+  		  dir="${target.dir}"
+		  failonerror="true">
+  		<classpath>
+  			 <fileset dir="${common.lib.dir}">
+  		        <include name="*.jar"/>
+  			 </fileset>
+  		</classpath>
+  	    <arg line="${cmd} -out/keyalias mykey"/>
+  	</java>
+  </target>
+
+  <target name="createcert">
+    <fail unless="server" message="-&#10;
+************************************************************************&#10;
+* You must define a hostname or IP-address for the server certificate: *&#10;
+* -Dserver=argument                                                    *&#10;
+************************************************************************&#10;"/>
+    <property name="the.ca.file" location="${root.dir}/${rootfile}${keyfilext}"/>
+	<condition property="ipaddress">
+  	 <matches pattern="^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$" string="${server}"/>
+    </condition>
+	<condition property="san.ext" value="-extension/ip">
+  	  <isset property="ipaddress"/>
+    </condition>
+	<condition property="san.ext" value="-extension/dns">
+	  <not>
+  	    <isset property="ipaddress"/>
+  	  </not>
+    </condition>
+    <antcall target="_createcert">
+       <param name="target.dir" value="${server.dir}"/>
+       <param name="cmd" value="-ca/keypass ${keypassword} -ca/storetype ${storetype} -ca/storepass ${keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} -subject &quot;CN=TLS certificate for ${server}&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${server}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
+    </antcall>
+  	<java fork="yes"
+  		  classname="org.webpki.tools.KeyStore2PEMConverter"
+  		  dir="${server.dir}"
+		  failonerror="true">
+  		<classpath>
+  			 <fileset dir="${common.lib.dir}">
+  		        <include name="*.jar"/>
+  			 </fileset>
+  		</classpath>
+  	    <arg line="${server}${keyfilext} ${keypassword} ${server}.cert.pem certificate"/>
+  	</java>
+  	<java fork="yes"
+  		  classname="org.webpki.tools.KeyStore2PEMConverter"
+  		  dir="${server.dir}"
+		  failonerror="true">
+  		<classpath>
+  			 <fileset dir="${common.lib.dir}">
+  		        <include name="*.jar"/>
+  			 </fileset>
+  		</classpath>
+  	    <arg line="${server}${keyfilext} ${keypassword} ${server}.key.pem private"/>
+  	</java>
+  </target>
+<!-- 
+keystore-file password PEM-file qualifier
+qualifier = [public private certificate trust]
+ -->  
+  <target name="createroot">
+    <delete dir="${root.dir}"/>
+    <mkdir dir="${root.dir}"/>
+    <mkdir dir="${server.dir}"/>
+    <antcall target="_createcert">
+       <param name="target.dir" value="${root.dir}"/>
+       <param name="cmd" value="-selfsigned -entity/ca -subject &quot;CN=WebPKI.org TLS Root CA&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${rootfile}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 4096 -sigalg RSA_SHA512 -serial 1"/>
+    </antcall>
+	<exec executable="keytool" failonerror="true" dir="${root.dir}">
+	  <arg line="-exportcert -keystore ${rootfile}${keyfilext} -alias mykey -storepass ${keypassword} -storetype ${storetype} -file ${rootfile}.cer"/>
+	</exec>
+  	<java fork="yes"
+  		  classname="org.webpki.tools.KeyStore2PEMConverter"
+  		  dir="${root.dir}"
+		  failonerror="true">
+  		<classpath>
+  			 <fileset dir="${common.lib.dir}">
+  		        <include name="*.jar"/>
+  			 </fileset>
+  		</classpath>
+  	    <arg line="${rootfile}${keyfilext} ${keypassword} ${rootfile}.pem certificate"/>
+  	</java>
+  </target>
+
+</project>
