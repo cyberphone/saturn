@@ -231,10 +231,10 @@ Https.createServer(options, (request, response) => {
     });
     request.on('end', () => {
       try {
-	    if (request.headers['content-type'] != BaseProperties.JSON_CONTENT_TYPE) {
-	      serverError(response, 'Content type must be: ' + BaseProperties.JSON_CONTENT_TYPE);
-	      return;
-	    }
+        if (request.headers['content-type'] != BaseProperties.JSON_CONTENT_TYPE) {
+          serverError(response, 'Content type must be: ' + BaseProperties.JSON_CONTENT_TYPE);
+          return;
+        }
         var jsonReader = new JsonUtil.ObjectReader(JSON.parse(Buffer.concat(chunks).toString('utf8')));
         successLog('Received data', request, jsonReader);
         returnJsonData(request, response, jsonPostProcessors[pathname](jsonReader));
