@@ -133,7 +133,7 @@ const jsonPostProcessors = {
       throw new TypeError('Unknown merchant: ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
     }
     if (payeeBank != 'CN=mybank.com,2.5.4.5=#130434353031,C=FR') {
-      throw new TypeError("Merchant: ID=" + payee.getId() + ' does not match bank: ' + payeeBank);
+      throw new TypeError('Merchant: ID=' + payee.getId() + ' does not match bank: ' + payeeBank);
     }
 
     // We got an authentic request.  Now we need to check available funds etc.

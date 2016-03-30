@@ -73,8 +73,6 @@
       <replacefilter token="@acquirer-decryptionkey1@" value="${acquirerencryptionkey_ec}${keyfilext}"/>
       <replacefilter token="@acquirer-decryptionkey2@" value="${acquirerencryptionkey_rsa}${keyfilext}"/>
       <replacefilter token="@acquirer-host@" value="${acquirer.host}"/>
-      <replacefilter token="@merchant-dn@" value="${merchant.dn}"/>
-      <replacefilter token="@merchant-root@" value="${merchant.var.root}.cer"/>
 	  <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
@@ -95,7 +93,6 @@
          <include name="${acquirerencryptionkey_ec}${keyfilext}"/>
          <include name="${acquirersignaturekey}${keyfilext}"/>
          <include name="${payment.var.root}.cer"/>
-         <include name="${merchant.var.root}.cer"/>
       </zipfileset>
       <fileset dir="web"/>
     </war>
@@ -128,7 +125,6 @@
        
        <param name="zip.key.dir" value="${key.dir}"/>
        
-       <param name="merchant.var.root" value="${merchantroot}"/>
        <param name="payment.var.root" value="${payment_root}"/>
        </antcall>
      <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
@@ -159,7 +155,6 @@
        <param name="zip.key.dir" value="keys"/>
 
        <param name="payment.var.root" value="${paymentroot}"/>
-       <param name="merchant.var.root" value="${merchantroot}"/>
        </antcall>
      <!-- Update application.xml -->
      <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">

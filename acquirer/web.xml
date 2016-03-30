@@ -35,18 +35,6 @@
     </context-param>
     
     <context-param>
-        <description>Merchant DN (we just have one...)</description>
-        <param-name>merchant_dn</param-name>
-        <param-value>@merchant-dn@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Mechant Network Root Certificate</description>
-        <param-name>merchant_root</param-name>
-        <param-value>@merchant-root@</param-value>
-    </context-param>
-
-    <context-param>
         <description>Payment Network Root Certificate</description>
         <param-name>payment_root</param-name>
         <param-value>@payment-root@</param-value>

@@ -61,20 +61,15 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static final String DECRYPTION_KEY1       = "acquirer_decryptionkey1";  // PUBLISHED
     static final String DECRYPTION_KEY2       = "acquirer_decryptionkey2";
 
-    static final String MERCHANT_ROOT         = "merchant_root";
-    static final String MERCHANT_DN           = "merchant_dn";  // The acquirer's only customer...
-
     static final String PAYMENT_ROOT          = "payment_root";
     
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
-
-    static JSONX509Verifier merchantRoot;
 
     static JSONX509Verifier paymentRoot;
 
     static ServerX509Signer acquirerKey;
     
-    static String merchantDN;
+    static String payeeId;
     
     static byte[] publishedAuthorityData;
     
@@ -112,13 +107,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
             acquirerKey = new ServerX509Signer(new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD)));
-//TODO
-/*
-            merchantRoot = getRoot(MERCHANT_ROOT);
-            merchantDN = getPropertyString(MERCHANT_DN);
-*/
-            paymentRoot = getRoot(PAYMENT_ROOT);
 
+            paymentRoot = getRoot(PAYMENT_ROOT);
 
             addDecryptionKey(DECRYPTION_KEY1);
             addDecryptionKey(DECRYPTION_KEY2);

@@ -38,6 +38,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.ErrorReturn;
 import org.webpki.saturn.common.FinalizeResponse;
+import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.ReserveOrDebitResponse;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PaymentRequest;
@@ -78,23 +79,28 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
             // Verify that the provider's signature belongs to a valid payment provider trust network
             embeddedResponse.getSignatureDecoder().verify(AcquirerService.paymentRoot);
-
+            String payeeBank =
+                 embeddedResponse.getSignatureDecoder().getCertificatePath()[0].getSubjectX500Principal().getName();
+ 
             // Get the the account data we sent encrypted through the merchant 
             logger.info("Protected Account Data:\n" +
                 embeddedResponse.getProtectedAccountData(AcquirerService.decryptionKeys));
 
             // The original request contains some required data like currency
             PaymentRequest paymentRequest = embeddedResponse.getPaymentRequest();
+            Payee payee = paymentRequest.getPayee();
 
-            // Verify that the merchant is one of our customers.  Simplistic "database": a single customer
-//TODO
-/*
-            paymentRequest.getSignatureDecoder().verify(AcquirerService.merchantRoot);
-            String merchantDn = paymentRequest.getSignatureDecoder().getCertificatePath()[0].getSubjectX500Principal().getName();
-            if (!merchantDn.equals(AcquirerService.merchantDN)) {
-                throw new IOException ("Unknown merchant: " + merchantDn);
+            // Verify that the merchant is one of our customers.
+            // Rudimentary customer "database": a single customer!
+            // Note that since a payee (merchant) is vouched for by a bank it is the combination
+            // of a payee ID and the name of the certifying bank that comprise a valid customer.
+            // The payee's public key is only of interest to the certifying bank.
+            if (!payee.getId().equals("86344")) {
+              throw new IOException("Unknown merchant: ID=" + payee.getId() + ", Common Name=" + payee.getCommonName());
             }
-*/
+            if (!payeeBank.equals("CN=mybank.com,2.5.4.5=#130434353031,C=FR")) {
+              throw new IOException("Merchant: ID=" + payee.getId() + " does not match bank: " + payeeBank);
+            }
 
             ////////////////////////////////////////////////////////////////////////////
             // We got an authentic request.  Now we need to check available funds etc.//
