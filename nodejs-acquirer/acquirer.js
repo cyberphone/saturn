@@ -220,23 +220,22 @@ Https.createServer(options, (request, response) => {
     }
     return;
   }
-  request.setEncoding('utf8');
   if (request.method != 'POST') {
     serverError(response, '"POST" method expected');
     return;
   }
   if (pathname in jsonPostProcessors) {
-    if (request.headers['content-type'] != BaseProperties.JSON_CONTENT_TYPE) {
-      serverError(response, 'Content type must be: ' + BaseProperties.JSON_CONTENT_TYPE);
-      return;
-    }
-    var jsonIn = '';
+    var chunks = [];
     request.on('data', (chunk) => {
-      jsonIn += chunk;
+      chunks.push(chunk);
     });
     request.on('end', () => {
       try {
-        var jsonReader = new JsonUtil.ObjectReader(JSON.parse(jsonIn));
+	    if (request.headers['content-type'] != BaseProperties.JSON_CONTENT_TYPE) {
+	      serverError(response, 'Content type must be: ' + BaseProperties.JSON_CONTENT_TYPE);
+	      return;
+	    }
+        var jsonReader = new JsonUtil.ObjectReader(JSON.parse(Buffer.concat(chunks).toString('utf8')));
         successLog('Received data', request, jsonReader);
         returnJsonData(request, response, jsonPostProcessors[pathname](jsonReader));
       } catch (e) {
