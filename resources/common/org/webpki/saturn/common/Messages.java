@@ -24,34 +24,71 @@ import org.webpki.json.JSONObjectWriter;
 
 public enum Messages {
 
-    WALLET_INITIALIZED        ("WalletInitialized"),       // Wallet to payee web page message
+    WALLET_IS_READY           ("WalletIsReady"),           // Wallet to payee Web page message
     WALLET_REQUEST            ("WalletRequest"),           // Payee payment request + other data
     PAYER_AUTHORIZATION       ("PayerAuthorization"),      // Created by the Wallet
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // One-step payment operation in Account2Account mode
-    DIRECT_DEBIT_REQUEST      ("DirectDebitRequest"),      // Payee request to provider
-    DIRECT_DEBIT_RESPONSE     ("DirectDebitResponse"),     // Provider response to the above
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    BASIC_CREDIT_REQUEST      ("BasicCreditRequest",       // Payee request to Payee provider
+                               false, true),
+    TRANSACTION_REQUEST       ("TransactionRequest"),      // Payee provider to Payer provider
+    TRANSACTION_RESPONSE      ("TransactionResponse"),     // Payer provider response
+    BASIC_CREDIT_RESPONSE     ("BasicCreditResponse",      // Payee provider response
+                               false, true),
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+ 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Two-step payment operation in the Account2Account mode
+    //
+    // First step - Payee to Payee provider
+    RESERVE_CREDIT_REQUEST    ("ReserveCreditRequest",     // Reserve debit funds at provider
+                               false, false),
+    // TRANSACTION_REQUEST/TRANSACTION_RESPONSE pair like in the one-step mode
+    RESERVE_CREDIT_RESPONSE   ("ReserveCreditResponse",    // Provider response to request
+                               false, false),
+    //
+    // Second step - Payee to Payee provider
+    FINALIZE_CREDIT_REQUEST   ("FinalizeCreditRequest",    // Perform the actual payment operation
+                               false, false),
+    // TRANSACTION_REQUEST/TRANSACTION_RESPONSE pair like in the one-step mode
+    FINALIZE_CREDIT_RESPONSE  ("FinalizeCreditResponse",   // Provider response
+                               false, false),
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Two-step payment operation in Account2Account or Acquirer mode
+    // Two-step payment operation in the Card payment mode
     //
-    // First step - Payee to Provider
-    RESERVE_FUNDS_REQUEST     ("ReserveFundsRequest"),     // Reserve funds at provider
-    RESERVE_FUNDS_RESPONSE    ("ReserveFundsResponse"),    // Provider response to request
+    // First step - Payee to Payee provider.  Note that Payee provider may be = Acquirer
+    RESERVE_CARDPAY_REQUEST   ("ReserveCardpayRequest",    // Reserve funds at provider
+                               true, false),
+    // TRANSACTION_REQUEST/TRANSACTION_RESPONSE pair like in the one-step mode
+    RESERVE_CARDPAY_RESPONSE  ("ReserveCardpayResponse",   // Provider response to request
+                               true, false),
     //
-    // Second step - Payee to Provider (Account2Account mode) or Acquirer (Acquirer mode)
-    FINALIZE_REQUEST          ("FinalizeRequest"),         // Perform the actual payment operation
-    FINALIZE_RESPONSE         ("FinalizeResponse"),        // Provider or Acquirer response to request
+    // Second step - Payee to Acquirer
+    FINALIZE_CARDPAY_REQUEST  ("FinalizeCardpayRequest",   // Perform the actual payment operation
+                               true, false),
+    FINALIZE_CARDPAY_RESPONSE ("FinalizeCardpayResponse",  // Acquirer response
+                               true, false),
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     AUTHORITY                 ("Authority");               // Published entity data
-
+    
     String qualifier;
+    
+    Boolean cardPayment;
+    Boolean basicCredit;
+
+    Messages(String qualifier, Boolean cardPayment, Boolean basicCredit) {
+        this.qualifier = qualifier;
+        this.cardPayment = cardPayment;
+        this.basicCredit = basicCredit;
+    }
 
     Messages(String qualifier) {
-        this.qualifier = qualifier;
+        this(qualifier, null, null);
     }
 
     @Override
@@ -59,20 +96,36 @@ public enum Messages {
         return qualifier;
     }
 
-    public static JSONObjectWriter createBaseMessage(Messages message) throws IOException {
-        return new JSONObjectWriter()
-           .setString(JSONDecoderCache.CONTEXT_JSON, BaseProperties.W2NB_WEB_PAY_CONTEXT_URI)
-           .setString(JSONDecoderCache.QUALIFIER_JSON, message.toString());
+    public boolean isBasicCredit() {
+        return basicCredit;
     }
 
-    public static JSONObjectReader parseBaseMessage(Messages expected_message,
-                                                    JSONObjectReader request_object) throws IOException {
-        if (!request_object.getString(JSONDecoderCache.CONTEXT_JSON).equals(BaseProperties.W2NB_WEB_PAY_CONTEXT_URI)) {
-            throw new IOException("Unknown context: " + request_object.getString(JSONDecoderCache.CONTEXT_JSON));
+    public boolean isCardPayment() {
+        return cardPayment;
+    }
+
+    public static JSONObjectWriter createBaseMessage(Messages message) throws IOException {
+        return new JSONObjectWriter()
+          .setString(JSONDecoderCache.CONTEXT_JSON, BaseProperties.W2NB_WEB_PAY_CONTEXT_URI)  
+          .setString(JSONDecoderCache.QUALIFIER_JSON, message.toString());
+    }
+
+    public static Messages parseBaseMessage(Messages expectedMessage,
+                                            JSONObjectReader requestObject) throws IOException {
+        return parseBaseMessage(new Messages[]{expectedMessage}, requestObject);
+    }
+
+    public static Messages parseBaseMessage(Messages[] expectedMessages,
+                                            JSONObjectReader requestObject) throws IOException {
+        if (!requestObject.getString(JSONDecoderCache.CONTEXT_JSON).equals(BaseProperties.W2NB_WEB_PAY_CONTEXT_URI)) {
+            throw new IOException("Unknown context: " + requestObject.getString(JSONDecoderCache.CONTEXT_JSON));
         }
-        if (!request_object.getString(JSONDecoderCache.QUALIFIER_JSON).equals(expected_message.toString())) {
-            throw new IOException("Unexpected qualifier: " + request_object.getString(JSONDecoderCache.QUALIFIER_JSON));
+        String qualifier = requestObject.getString(JSONDecoderCache.QUALIFIER_JSON);
+        for (Messages message : expectedMessages) {
+            if (qualifier.equals(message.toString())) {
+                return message;
+            }
         }
-        return request_object;
+        throw new IOException("Unexpected qualifier: " + qualifier);
     }
 }

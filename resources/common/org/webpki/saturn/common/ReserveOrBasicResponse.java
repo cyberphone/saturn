@@ -32,7 +32,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Signer;
 
-public class ReserveOrDebitResponse implements BaseProperties {
+public class ReserveOrBasicResponse implements BaseProperties {
     
     public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
     public static final String SOFTWARE_VERSION = "1.00";
@@ -47,7 +47,7 @@ public class ReserveOrDebitResponse implements BaseProperties {
         return errorReturn.write(header(directDebit));
     }
 
-    public static JSONObjectWriter encode(ReserveOrDebitRequest request,
+    public static JSONObjectWriter encode(ReserveOrBasicRequest request,
                                           PaymentRequest paymentRequest,
                                           AccountDescriptor accountDescriptor,
                                           JSONObjectWriter encryptedAccountData,
@@ -70,7 +70,7 @@ public class ReserveOrDebitResponse implements BaseProperties {
             if (directDebit) {
                 throw new IOException("\""+ PROTECTED_ACCOUNT_DATA_JSON + "\" not applicable for directDebit");
             }
-            ReserveOrDebitRequest.zeroTest(PAYEE_ACCOUNT_JSON, payeeAccount);
+            ReserveOrBasicRequest.zeroTest(PAYEE_ACCOUNT_JSON, payeeAccount);
             wr.setObject(PROTECTED_ACCOUNT_DATA_JSON, encryptedAccountData);
         }
         wr.setString(REFERENCE_ID_JSON, referenceId);
@@ -86,7 +86,7 @@ public class ReserveOrDebitResponse implements BaseProperties {
 
     JSONObjectReader root;
     
-    public ReserveOrDebitResponse(JSONObjectReader rd) throws IOException {
+    public ReserveOrBasicResponse(JSONObjectReader rd) throws IOException {
         directDebit = rd.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.DIRECT_DEBIT_RESPONSE.toString());
         root = Messages.parseBaseMessage(directDebit ?
                       Messages.DIRECT_DEBIT_RESPONSE : Messages.RESERVE_FUNDS_RESPONSE, rd);

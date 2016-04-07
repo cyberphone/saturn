@@ -1097,7 +1097,7 @@ public class Wallet {
         // it more look like a Web application.  Note that this measurement
         // lacks the 'px' part; you have to add it in the Web application.
         try {
-            JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.WALLET_INITIALIZED);
+            JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.WALLET_IS_READY);
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)
                     .setDouble(BaseProperties.WIDTH_JSON, extWidth)

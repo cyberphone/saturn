@@ -28,14 +28,17 @@ import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
 
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 public class FinalizeRequest implements BaseProperties {
     
+    static final Messages[] valid = {Messages.FINALIZE_DEBIT_REQUEST, Messages.FINALIZE_DEBIT_REQUEST};
+    
     public FinalizeRequest(JSONObjectReader rd) throws IOException, GeneralSecurityException {
-        root = Messages.parseBaseMessage(Messages.FINALIZE_REQUEST, rd);
-        embeddedResponse = new ReserveOrDebitResponse(rd.getObject(PROVIDER_AUTHORIZATION_JSON));
+        message = Messages.parseBaseMessage(valid, root = rd);
+        embeddedResponse = new ReserveOrBasicResponse(rd.getObject(PROVIDER_AUTHORIZATION_JSON));
         amount = rd.getBigDecimal(AMOUNT_JSON,
                                   embeddedResponse.getPaymentRequest().getCurrency().getDecimals());
         referenceId = rd.getString(REFERENCE_ID_JSON);
@@ -43,7 +46,7 @@ public class FinalizeRequest implements BaseProperties {
         software = new Software(rd);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         PaymentRequest paymentRequest = embeddedResponse.getPaymentRequest();
-        ReserveOrDebitRequest.comparePublicKeys(outerPublicKey, paymentRequest);
+        ReserveOrBasicRequest.comparePublicKeys(outerPublicKey, paymentRequest);
         if (amount.compareTo(paymentRequest.getAmount()) > 0) {
             throw new IOException("Final amount must be less or equal to reserved amount");
         }
@@ -58,8 +61,10 @@ public class FinalizeRequest implements BaseProperties {
     
     JSONObjectReader root;
     
-    ReserveOrDebitResponse embeddedResponse;
-    public ReserveOrDebitResponse getEmbeddedResponse() {
+    Messages message;
+    
+    ReserveOrBasicResponse embeddedResponse;
+    public ReserveOrBasicResponse getEmbeddedResponse() {
         return embeddedResponse;
     }
 
@@ -73,7 +78,7 @@ public class FinalizeRequest implements BaseProperties {
         return referenceId;
     }
 
-    public static JSONObjectWriter encode(ReserveOrDebitResponse providerResponse,
+    public static JSONObjectWriter encode(ReserveOrBasicResponse providerResponse,
                                           BigDecimal amount,  // Less or equal the reserved amount
                                           String referenceId,
                                           ServerAsymKeySigner signer)

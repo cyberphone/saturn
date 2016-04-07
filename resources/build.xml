@@ -89,7 +89,7 @@
         <arg value="${jcspaper}"/>
         <arg value="${logotype}"/>
         <arg value="${merchantkey}${keyfilext}"/>
-        <arg value="${bankkey}${keyfilext}"/>
+        <arg value="${payerbankkey}${keyfilext}"/>
         <arg value="${keypassword}"/>
     </java>
   </target>
@@ -232,7 +232,7 @@
        <param name="card.type" value="SUPER_CARD"/>
        <param name="card.number" value="${account_id_super}"/>
        <param name="card.image" value="supercard.png"/>
-       <param name="sks.encryption" value="${encryptionkey_ec}"/>
+       <param name="sks.encryption" value="${payerbankenckey_ec}"/>
     </antcall>
     <antcall target="_import">
        <param name="sks.certificate" value="${clientkey_bankdir}"/>
@@ -240,7 +240,7 @@
        <param name="card.type" value="BANK_DIRECT"/>
        <param name="card.number" value="!${account_id_bankdir}"/>
        <param name="card.image" value="bankdirect.png"/>
-       <param name="sks.encryption" value="${encryptionkey_ec}"/>
+       <param name="sks.encryption" value="${payerbankenckey_ec}"/>
      </antcall>
      <antcall target="_import">
        <param name="sks.certificate" value="${clientkey_other}"/>
@@ -253,7 +253,7 @@
        <param name="card.type" value="UNUSUAL_CARD"/>
        <param name="card.number" value="${account_id_unusual}"/>
        <param name="card.image" value="unusualcard.png"/>
-       <param name="sks.encryption" value="${encryptionkey_ec}"/>
+       <param name="sks.encryption" value="${payerbankenckey_ec}"/>
      </antcall>
   </target>
   
@@ -314,9 +314,12 @@
        <param name="cmd" value="-ca/keypass ${keypassword} -ca/storetype ${storetype} -ca/storepass ${keypassword} -ca/keystore ${paymentroot}${keyfilext} -entity/ca -subject &quot;CN=Payment Network Sub CA3, C=EU&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype ${storetype} -out/keystore temp-subca${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg RSA_SHA512 -serial 3"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value=" -ca/addpath all -ca/keypass ${keypassword} -ca/storetype ${storetype} -ca/storepass ${keypassword} -ca/keystore temp-subca${keyfilext} -entity/ee -extension/ku digitalSignature -subject &quot;CN=mybank.com, serialNumber=4501, C=FR&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${bankkey}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value=" -ca/addpath all -ca/keypass ${keypassword} -ca/storetype ${storetype} -ca/storepass ${keypassword} -ca/keystore temp-subca${keyfilext} -entity/ee -extension/ku digitalSignature -subject &quot;CN=mybank.com, serialNumber=4501, C=FR&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${payerbankkey}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
-  </target>
+    <antcall target="_createcert">
+       <param name="cmd" value=" -ca/addpath all -ca/keypass ${keypassword} -ca/storetype ${storetype} -ca/storepass ${keypassword} -ca/keystore temp-subca${keyfilext} -entity/ee -extension/ku digitalSignature -subject &quot;CN=Big Bank, serialNumber=896640, C=DE&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${payeebankkey}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+    </antcall>
+    </target>
 
   <target name="_certacquirernetwork">
     <antcall target="_createcert">
@@ -363,20 +366,32 @@
     </antcall>
   </target>
 
-  <target name="_authencryption">
+  <target name="_bankencryption">
     <antcall target="_createcert">
-       <param name="cmd" value="-selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${encryptionkey_rsa}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${payerbankenckey_rsa}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${encryptionkey_rsa}"/>
+       <param name="rootfile" value="${payerbankenckey_rsa}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${encryptionkey_ec}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${payerbankenckey_ec}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${encryptionkey_ec}"/>
+       <param name="rootfile" value="${payerbankenckey_ec}"/>
     </antcall>
-  </target>
+    <antcall target="_createcert">
+       <param name="cmd" value="-selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${payeebankenckey_rsa}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA256 -serial 1"/>
+    </antcall>
+    <antcall target="_getroot">
+       <param name="rootfile" value="${payeebankenckey_rsa}"/>
+    </antcall>
+    <antcall target="_createcert">
+       <param name="cmd" value="-selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype ${storetype} -out/keystore ${payeebankenckey_ec}${keyfilext} -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+    </antcall>
+    <antcall target="_getroot">
+       <param name="rootfile" value="${payeebankenckey_ec}"/>
+    </antcall>
+   </target>
   
   <target name="_kg2kmkey">
     <antcall target="_createcert">
@@ -389,7 +404,7 @@
     <antcall target="_certacquirernetwork"/>
     <antcall target="_merchantkey"/>
     <antcall target="_clientkeys"/>
-    <antcall target="_authencryption"/>
+    <antcall target="_bankencryption"/>
     <antcall target="_kg2kmkey"/>
     <delete>
   	  <fileset dir="${key.dir}">

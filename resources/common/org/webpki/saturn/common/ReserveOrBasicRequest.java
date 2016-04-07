@@ -29,49 +29,51 @@ import org.webpki.crypto.AlgorithmPreferences;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
-import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.util.ArrayUtil;
 
-public class ReserveOrDebitRequest implements BaseProperties {
+public class ReserveOrBasicRequest implements BaseProperties {
     
-    public ReserveOrDebitRequest(JSONObjectReader rd) throws IOException {
-        directDebit = rd.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.DIRECT_DEBIT_REQUEST.toString());
-        Messages.parseBaseMessage(directDebit ?
-                Messages.DIRECT_DEBIT_REQUEST : Messages.RESERVE_FUNDS_REQUEST, rd);
+    static final Messages[] valid = {Messages.BASIC_CREDIT_REQUEST,
+                                     Messages.RESERVE_CREDIT_REQUEST,
+                                     Messages.RESERVE_CARDPAY_REQUEST};
+    
+    public ReserveOrBasicRequest(JSONObjectReader rd) throws IOException {
+        message = Messages.parseBaseMessage(valid, rd);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         encryptedAuthorizationData = EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON));
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
-        if (!directDebit) {
+        if (!message.isBasicCredit()) {
             expires = rd.getDateTime(EXPIRES_JSON);
         }
-        Vector<AccountDescriptor> accounts = new Vector<AccountDescriptor> ();
-        if (!directDebit && rd.hasProperty(ACQUIRER_AUTHORITY_URL_JSON)) {
+        if (message.isCardPayment()) {
             acquirerAuthorityUrl = rd.getString(ACQUIRER_AUTHORITY_URL_JSON);
         } else {
+            Vector<AccountDescriptor> accounts = new Vector<AccountDescriptor> ();
             JSONArrayReader ar = rd.getArray(PAYEE_ACCOUNTS_JSON);
             do {
                 accounts.add(new AccountDescriptor(ar.getObject()));
             } while (ar.hasMore());
+            this.accounts = accounts.toArray(new AccountDescriptor[0]);
         }
-        this.accounts = accounts.toArray(new AccountDescriptor[0]);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         rd.checkForUnread();
     }
 
+
     PayerAccountTypes accountType;
-    
+
     GregorianCalendar dateTime;
 
     Software software;
-    
+
     PublicKey outerPublicKey;
-    
+
     EncryptedData encryptedAuthorizationData;
 
     AccountDescriptor[] accounts;
@@ -84,9 +86,9 @@ public class ReserveOrDebitRequest implements BaseProperties {
         return expires;
     }
 
-    boolean directDebit;
-    public boolean isDirectDebit() {
-        return directDebit;
+    Messages message;
+    public Messages getMessage() {
+        return message;
     }
 
     String acquirerAuthorityUrl;
@@ -114,8 +116,8 @@ public class ReserveOrDebitRequest implements BaseProperties {
                                           Date expires,
                                           ServerAsymKeySigner signer)
         throws IOException, GeneralSecurityException {
-        JSONObjectWriter wr = Messages.createBaseMessage(directDebit ?
-                                       Messages.DIRECT_DEBIT_REQUEST : Messages.RESERVE_FUNDS_REQUEST)
+        JSONObjectWriter wr = Messages.createBaseMessage(directDebit ? Messages.BASIC_CREDIT_REQUEST : 
+            acquirerAuthorityUrl == null ? Messages.RESERVE_CREDIT_REQUEST : Messages.RESERVE_CARDPAY_REQUEST)
             .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
             .setObject(AUTHORIZATION_DATA_JSON, encryptedAuthorizationData)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)

@@ -3,8 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="common"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="../proxy/install/libs/bcprov-jdk16-145.jar"/>
-	<classpathentry kind="lib" path="../proxy/install/libs/webpki.org-libext-1.00.jar"/>
-	<classpathentry kind="lib" path="../proxy/install/libs/proxy-support.jar"/>
+	<classpathentry kind="lib" path="common.lib/bcprov-jdk16-145.jar"/>
+	<classpathentry kind="lib" path="common.lib/webpki.org-libext-1.00.jar"/>
+	<classpathentry kind="lib" path="common.lib/proxy-support.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

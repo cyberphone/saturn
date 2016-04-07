@@ -66,8 +66,8 @@
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
 	  <replacefilter token="@key-password@" value="${keypassword}"/>
 	  <replacefilter token="@bank-eecert@" value="${bankkey}${keyfilext}"/>
-      <replacefilter token="@bank-decryptionkey1@" value="${encryptionkey_ec}${keyfilext}"/>
-	  <replacefilter token="@bank-decryptionkey2@" value="${encryptionkey_rsa}${keyfilext}"/>
+      <replacefilter token="@bank-decryptionkey1@" value="${payerbankenckey_ec}${keyfilext}"/>
+	  <replacefilter token="@bank-decryptionkey2@" value="${payerbankenckey_rsa}${keyfilext}"/>
       <replacefilter token="@merchant-key@" value="${merchantkey}.cer"/>
       <replacefilter token="@bank-host@" value="${bank.host}"/>
       <replacefilter token="@bank-account-db@" value="${credentials_db}"/>
@@ -87,8 +87,8 @@
          <include name="${webpki-webutil.jar}"/>
       </lib>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
-         <include name="${encryptionkey_rsa}${keyfilext}"/>
-         <include name="${encryptionkey_ec}${keyfilext}"/>
+         <include name="${payerbankenckey_rsa}${keyfilext}"/>
+         <include name="${payerbankenckey_ec}${keyfilext}"/>
          <include name="${bankkey}${keyfilext}"/>
          <include name="${clientroot}.cer"/>
          <include name="${merchantkey}.cer"/>

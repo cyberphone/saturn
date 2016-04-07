@@ -411,7 +411,7 @@ public class HTML {
                     "        return;\n" +
                     "      }\n" +
                     "      var qualifier = message[\"@qualifier\"];\n" +
-                    "      if ((initMode && qualifier != \"" + Messages.WALLET_INITIALIZED.toString() + "\")  ||\n" +
+                    "      if ((initMode && qualifier != \"" + Messages.WALLET_IS_READY.toString() + "\")  ||\n" +
                     "          (!initMode && qualifier != \"" +  Messages.PAYER_AUTHORIZATION.toString() + "\")) {\n" +  
                     "        setFail(\"Wrong or missing \\\"@qualifier\\\"\");\n" +
                     "        return;\n" +
