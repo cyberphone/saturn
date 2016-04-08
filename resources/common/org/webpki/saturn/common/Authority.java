@@ -54,7 +54,7 @@ public class Authority implements BaseProperties {
     }
 
     public Authority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
-        root = Messages.parseBaseMessage(Messages.AUTHORITY, rd);
+        Messages.parseBaseMessage(Messages.AUTHORITY, root = rd);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         if (!authorityUrl.equals(expectedAuthorityUrl)) {
             throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +

@@ -32,14 +32,14 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Signer;
 
-public class ReserveOrBasicResponse implements BaseProperties {
+public class TransactionResponse implements BaseProperties {
     
     public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
     public static final String SOFTWARE_VERSION = "1.00";
 
     private static JSONObjectWriter header(boolean basicCredit) throws IOException {
         return Messages.createBaseMessage(basicCredit ?
-                       Messages.FINALIZE_CREDIT_REQUEST : Messages.PAYER_AUTHORIZATION);
+                       Messages.FINALIZE_CREDIT_RESPONSE : Messages.BASIC_CREDIT_REQUEST);
     }
 
     public static JSONObjectWriter encode(boolean basicCredit,
@@ -86,10 +86,10 @@ public class ReserveOrBasicResponse implements BaseProperties {
 
     JSONObjectReader root;
     
-    public ReserveOrBasicResponse(JSONObjectReader rd) throws IOException {
-        basicCredit = rd.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.FINALIZE_CREDIT_REQUEST.toString());
+    public TransactionResponse(JSONObjectReader rd) throws IOException {
+        basicCredit = rd.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.BASIC_CREDIT_REQUEST.toString());
         Messages.parseBaseMessage(basicCredit ?
-                      Messages.BASIC_CREDIT_REQUEST : Messages.FINALIZE_CREDIT_REQUEST, root = rd);
+                      Messages.BASIC_CREDIT_REQUEST : Messages.BASIC_CREDIT_REQUEST, root = rd);
         if (rd.hasProperty(ERROR_CODE_JSON)) {
             errorReturn = new ErrorReturn(rd);
             return;

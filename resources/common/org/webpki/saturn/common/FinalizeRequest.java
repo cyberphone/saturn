@@ -34,7 +34,7 @@ import org.webpki.json.JSONObjectWriter;
 
 public class FinalizeRequest implements BaseProperties {
     
-    static final Messages[] valid = {Messages.FINALIZE_DEBIT_REQUEST, Messages.FINALIZE_DEBIT_REQUEST};
+    static final Messages[] valid = {Messages.FINALIZE_CREDIT_REQUEST, Messages.FINALIZE_CREDIT_REQUEST};
     
     public FinalizeRequest(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         message = Messages.parseBaseMessage(valid, root = rd);
@@ -83,7 +83,7 @@ public class FinalizeRequest implements BaseProperties {
                                           String referenceId,
                                           ServerAsymKeySigner signer)
     throws IOException, GeneralSecurityException {
-        return Messages.createBaseMessage(Messages.FINALIZE_REQUEST)
+        return Messages.createBaseMessage(Messages.FINALIZE_CREDIT_REQUEST)
             .setBigDecimal(AMOUNT_JSON,
                            amount,
                            providerResponse.getPaymentRequest().getCurrency().getDecimals())

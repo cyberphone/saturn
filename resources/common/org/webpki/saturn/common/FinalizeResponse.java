@@ -34,7 +34,7 @@ public class FinalizeResponse implements BaseProperties {
     public static final String SOFTWARE_VERSION = "1.00";
 
     public FinalizeResponse(JSONObjectReader rd) throws IOException, GeneralSecurityException {
-        Messages.parseBaseMessage(Messages.FINALIZE_RESPONSE, rd);
+        Messages.parseBaseMessage(Messages.FINALIZE_CREDIT_RESPONSE, rd);
         if (rd.hasProperty(ERROR_CODE_JSON)) {
             errorReturn = new ErrorReturn(rd);
             return;
@@ -83,14 +83,14 @@ public class FinalizeResponse implements BaseProperties {
 
     public static JSONObjectWriter encode(ErrorReturn errorReturn)
     throws IOException, GeneralSecurityException {
-        return errorReturn.write(Messages.createBaseMessage(Messages.FINALIZE_RESPONSE));
+        return errorReturn.write(Messages.createBaseMessage(Messages.FINALIZE_CARDPAY_RESPONSE));
     }
 
     public static JSONObjectWriter encode(FinalizeRequest finalizeRequest,
                                           String referenceId, 
                                           ServerX509Signer signer)
     throws IOException, GeneralSecurityException {
-        return Messages.createBaseMessage(Messages.FINALIZE_RESPONSE)
+        return Messages.createBaseMessage(Messages.FINALIZE_CREDIT_RESPONSE)
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
                 .setString(JSONSignatureDecoder.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
                 .setBinary(JSONSignatureDecoder.VALUE_JSON, 

@@ -188,7 +188,7 @@
     <property name="sks.encryption" value="@"/>
     <property name="card.path" location="${cardimage.dir}/${card.image}"/>
     <property name="sks.path" location="${credentials.dir}/${credentials_store}"/>
-    <property name="db.path" location="${credentials.dir}/${credentials_db}"/>
+    <property name="db.path" location="${credentials.dir}/${bankpath}.json"/>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitWallet"
           dir="${key.dir}"
@@ -206,7 +206,7 @@
         <arg value="${sks.pin}"/>
         <arg value="${card.type}"/>
         <arg value="${card.number}"/>
-        <arg value="${bank.host}/webpay-bank/authority"/>
+        <arg value="${bank.host}/${bankpath}"/>
         <arg value="${sks.encryption}.cer"/>
         <arg value="${card.path}"/>
     </java>
@@ -214,7 +214,9 @@
 
   <target name="initwallet">
     <delete file="${credentials.dir}/${credentials_store}"/>
-    <delete file="${credentials.dir}/${credentials_db}"/>
+    <delete dir="${credentials.dir}">
+        <include name="*.json"/>
+    </delete>
     <mkdir dir="${credentials.dir}"/>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
@@ -232,6 +234,7 @@
        <param name="card.type" value="SUPER_CARD"/>
        <param name="card.number" value="${account_id_super}"/>
        <param name="card.image" value="supercard.png"/>
+       <param name="bankpath" value="${payerbankpath}"/>
        <param name="sks.encryption" value="${payerbankenckey_ec}"/>
     </antcall>
     <antcall target="_import">
@@ -240,9 +243,11 @@
        <param name="card.type" value="BANK_DIRECT"/>
        <param name="card.number" value="!${account_id_bankdir}"/>
        <param name="card.image" value="bankdirect.png"/>
+       <param name="bankpath" value="${payerbankpath}"/>
        <param name="sks.encryption" value="${payerbankenckey_ec}"/>
      </antcall>
      <antcall target="_import">
+       <param name="bankpath" value="${payerbankpath}"/>
        <param name="sks.certificate" value="${clientkey_other}"/>
        <param name="sks.pin" value="1234"/>
        <param name="card.type" value="@"/>
@@ -253,7 +258,8 @@
        <param name="card.type" value="UNUSUAL_CARD"/>
        <param name="card.number" value="${account_id_unusual}"/>
        <param name="card.image" value="unusualcard.png"/>
-       <param name="sks.encryption" value="${payerbankenckey_ec}"/>
+       <param name="bankpath" value="${payeebankpath}"/>
+       <param name="sks.encryption" value="${payeebankenckey_ec}"/>
      </antcall>
   </target>
   

@@ -12,19 +12,6 @@
 
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
-  <resources id="w2nb_application.xml">
-<string><![CDATA[    <!-- Web2 Payment Demo -->
-    <module>
-        <web>
-            <web-uri>${application}</web-uri>
-            <context-root>/${appcorename}</context-root>
-        </web>
-    </module>
-</application>]]></string>
-  </resources>
-
-  <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
-
   <condition property="storetype" value="PKCS12" else="JKS">
     <matches pattern=".*\.p12$" string="${keyfilext}"/>
   </condition>
@@ -166,6 +153,17 @@
        <param name="merchant.var.root" value="${merchantroot}"/>
      </antcall>
      <!-- Update application.xml -->
+     <resources id="w2nb_application.xml">
+<string><![CDATA[    <!-- Web2 Payment Demo -->
+    <module>
+        <web>
+            <web-uri>${application}</web-uri>
+            <context-root>/${appcorename}</context-root>
+        </web>
+    </module>
+</application>]]></string>
+     </resources>
+     <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
      <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">
 	    <replacetoken><![CDATA[</application>]]></replacetoken>
      </replace>
@@ -179,37 +177,37 @@
   </target>
   
   <target name="_unzipit" if="uu">
-    <delete dir="${dd}/${appcorename}"/>
-    <unzip src="${dd}/${appcorename}.zip" dest="${dd}"/>
+    <delete dir="${dd}/${payerbankpath}"/>
+    <unzip src="${dd}/${payerbankpath}.zip" dest="${dd}"/>
   </target>
   
   <target name="zip-distribution">
+    <property file="../resources/common.properties"/>
     <fail unless="dd" message="-&#10;
 ***************************************************************&#10;
  You must define a distribution directory using the -D option:&#10;
  ant zip-distribution -Ddd=the_path_to_the_directory.&#10;
- Optionally you can specify -Duu=0 which deletes ${appcorename}&#10;
+ Optionally you can specify -Duu=0 which deletes ${payerbankpath}&#10;
  and replaces the directory with the unzipped content&#10;
 ***************************************************************&#10;"/>
-	<echo message="Producing ${appcorename} .zip and .zip.SHA1 files..."/> 
-    <property file="../resources/common.properties"/>
-	<delete file="${dd}/${appcorename}.zip" failonerror="false"/>
-    <zip destfile="${dd}/${appcorename}.zip">
-      <zipfileset dir="." prefix="${appcorename}">
+	<echo message="Producing ${payerbankpath} .zip and .zip.SHA1 files..."/> 
+	<delete file="${dd}/${payerbankpath}.zip" failonerror="false"/>
+    <zip destfile="${dd}/${payerbankpath}.zip">
+      <zipfileset dir="." prefix="${payerbankpath}">
        	<exclude name="/**/.*"/>
         <exclude name="/.tmp/**"/>
        	<exclude name="**/.settings/**"/>
        	<exclude name="**/bin/**"/>
        	<exclude name="dist/**"/>
       </zipfileset>
-      <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
-      <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>
-      <zipfileset dir="${credentials.dir}" prefix="${appcorename}/credentials">
+      <zipfileset dir="${common.src.dir}" prefix="${payerbankpath}/common.src"/>
+      <zipfileset dir="${key.dir}" prefix="${payerbankpath}/keys"/>
+      <zipfileset dir="${credentials.dir}" prefix="${payerbankpath}/credentials">
         <include name="${credentials_db}"/>
       </zipfileset>
-      <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>
+      <zipfileset file="../resources/common.properties" prefix="${payerbankpath}"/>
     </zip>
-    <checksum file="${dd}/${appcorename}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
+    <checksum file="${dd}/${payerbankpath}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
     <antcall target="_unzipit"/>
   </target>
    

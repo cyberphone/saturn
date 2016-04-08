@@ -19,6 +19,7 @@
 
 package org.webpki.saturn.resources;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,6 +35,7 @@ import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyAlgorithms;
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
@@ -188,10 +190,13 @@ public class InitWallet {
                 }
                 throw new Exception(e);
             }
-            aw.setObject()
-              .setObject(BaseProperties.PAYER_ACCOUNT_JSON,
-                         JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)).getObject(BaseProperties.PAYER_ACCOUNT_JSON))
-              .setPublicKey(sks.getKeyAttributes(ek.getKeyHandle()).getCertificatePath()[0].getPublicKey());
+            JSONObjectReader rd = JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION));
+            String url = rd.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON);
+            if (args[1].substring(args[1].lastIndexOf(File.separator) + 1)
+                    .startsWith(url.substring(url.lastIndexOf('/') + 1))) {
+                aw.setObject(new JSONObjectWriter(rd)
+                    .setPublicKey(sks.getKeyAttributes(ek.getKeyHandle()).getCertificatePath()[0].getPublicKey()));
+            }
         }
         ArrayUtil.writeFile(args[1], aw.serializeJSONArray(JSONOutputFormats.PRETTY_PRINT));
 

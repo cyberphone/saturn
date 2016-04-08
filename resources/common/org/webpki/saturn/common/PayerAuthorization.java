@@ -27,7 +27,8 @@ import org.webpki.json.JSONObjectWriter;
 public class PayerAuthorization implements BaseProperties {
     
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
-        EncryptedData.parse(Messages.parseBaseMessage(Messages.PAYER_AUTHORIZATION, rd).getObject(AUTHORIZATION_DATA_JSON));
+        Messages.parseBaseMessage(Messages.PAYER_AUTHORIZATION, rd);
+        EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         authorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
