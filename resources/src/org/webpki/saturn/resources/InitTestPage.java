@@ -69,10 +69,10 @@ public class InitTestPage implements BaseProperties {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 4) {
+        if (args.length != 6) {
             System.out.println("\nUsage: " +
                                InitTestPage.class.getCanonicalName() +
-                               "testpage merchantCertFile certFilePassword w2nbName");
+                               "testpage merchantCertFile certFilePassword merchantCn merchantId w2nbName");
             System.exit(-3);
         }
         CustomCryptoProvider.forcedLoad(true);
@@ -84,7 +84,7 @@ public class InitTestPage implements BaseProperties {
 
         // Create signed payment request
         JSONObjectWriter standardRequest = 
-            PaymentRequest.encode(Payee.init("Demo Merchant","86344"),
+            PaymentRequest.encode(Payee.init(args[3], args[4]),
                                   new BigDecimal("306.25"),
                                   Currencies.USD,
                                   "#6100004",
@@ -170,7 +170,7 @@ public class InitTestPage implements BaseProperties {
               "    return;\n" +
               "  }\n" +
               "  navigator.nativeConnect(\"");
-        write(args[3]);
+        write(args[5]);
         write("\",\n" +
               "                          document.getElementById(\"positionWallet\").checked ?\n" +
               "                            ");

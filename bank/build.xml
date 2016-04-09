@@ -32,7 +32,7 @@
     <property name="bank.host" value="https://localhost:8442/"/>
     <property name="server.port.map" value=""/>
     <property name="errormedia" value="false"/>
-    <property name="credentials.db" value="${appcorename}.json"/>
+    <property name="credentials.db" value="users.${appcorename}.json"/>
     <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa${keyfilext}"/>
     <property name="enc.key.ec" value="${appcorename}-enc-key-ec${keyfilext}"/>
     <property name="cert.key" value="${appcorename}-eecert${keyfilext}"/>

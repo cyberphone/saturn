@@ -9,7 +9,9 @@
   <property name="nodejscryptotest.dir" location="nodejscryptotest"/>
   
   <property file="../resources/common.properties"/>
-    
+  <property file="../resources/users.properties"/>
+  <property file="../resources/merchants.properties"/>
+
   <condition property="bank.host" value="https://localhost:8442" else="https://mobilepki.org">
     <isset property="localhost"/>
   </condition>
@@ -59,6 +61,8 @@
         <arg value="${testpage}"/>
         <arg value="${merchantkey}${keyfilext}"/>
         <arg value="${keypassword}"/>
+        <arg value="${merchantcn}"/>
+        <arg value="${merchantid}"/>
         <arg value="${w2nb.webwallet}"/>
     </java>
   </target>
@@ -188,7 +192,7 @@
     <property name="sks.encryption" value="@"/>
     <property name="card.path" location="${cardimage.dir}/${card.image}"/>
     <property name="sks.path" location="${credentials.dir}/${credentials_store}"/>
-    <property name="db.path" location="${credentials.dir}/${bankpath}.json"/>
+    <property name="db.path" location="${credentials.dir}/users.${bankpath}.json"/>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitWallet"
           dir="${key.dir}"
@@ -214,9 +218,6 @@
 
   <target name="initwallet">
     <delete file="${credentials.dir}/${credentials_store}"/>
-    <delete dir="${credentials.dir}">
-        <include name="*.json"/>
-    </delete>
     <mkdir dir="${credentials.dir}"/>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>

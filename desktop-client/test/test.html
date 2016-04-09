@@ -33,7 +33,7 @@ var normalRequest = {
     amount: "306.25",
     currency: "USD",
     referenceId: "#6100004",
-    timeStamp: "2016-03-28T12:04:26Z",
+    timeStamp: "2016-04-09T16:16:08Z",
     expires: "2030-09-14T00:00:00Z",
     software: {
       name: "WebPKI.org - Merchant",
@@ -44,10 +44,10 @@ var normalRequest = {
       publicKey: {
         type: "EC",
         curve: "P-256",
-        x: "67f720OvQfRJaolZjIz_l-5qkCCJ0wK9MljNCOga-00",
-        y: "rDase7PLLOrppIfJpSHdj8vIjVz1BAi8tIFR0fmeyLY"
+        x: "rZ344aiTaOATmLBOdfYThvnQu_zyB1aJZrbbbks2P9I",
+        y: "lKOvfJdgN8WqEbXMDYPRSMsPicm0Tk10pmer9LxvxLg"
       },
-      value: "m3BBKZoXeMBZsOrGRwj7JWPLPiHS3T_QyOwKdEO6GVT77l9kQsvqK0ARPtZTKu8ze4FOXeQQrOkRhove6sChaw"
+      value: "ajlSJJMPt-1iB3zH-pfTmYAdfpUGoy9DN82SsmcZki-m_bwYUDWqWuCEjSjYMRBHb22Ow4-e64YWHmsGS31mag"
     }
   }
 };
@@ -101,7 +101,7 @@ function activateExtension() {
         return;
       }
       var qualifier = message["@qualifier"];
-      if ((initMode && qualifier != "WalletInitialized" ) ||
+      if ((initMode && qualifier != "WalletIsReady" ) ||
           (!initMode && qualifier != "PayerAuthorization")) {
         setString("Wrong or missing \"@qualifier\"");
         closeExtension();
