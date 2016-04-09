@@ -25,8 +25,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+
 import java.security.PublicKey;
+
 import java.security.interfaces.RSAPublicKey;
+
 import java.util.EnumSet;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -34,17 +37,21 @@ import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyAlgorithms;
+
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+
 import org.webpki.keygen2.KeyGen2URIs;
+
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Encryption;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PayerAccountTypes;
+
 import org.webpki.sks.AppUsage;
 import org.webpki.sks.BiometricProtection;
 import org.webpki.sks.DeleteProtection;
@@ -57,12 +64,14 @@ import org.webpki.sks.PassphraseFormat;
 import org.webpki.sks.PatternRestriction;
 import org.webpki.sks.SKSException;
 import org.webpki.sks.SecureKeyStore;
+
 import org.webpki.sks.test.Device;
 import org.webpki.sks.test.GenKey;
 import org.webpki.sks.test.KeySpecifier;
 import org.webpki.sks.test.PINPol;
 import org.webpki.sks.test.ProvSess;
 import org.webpki.sks.test.SKSReferenceImplementation;
+
 import org.webpki.util.ArrayUtil;
 
 public class InitWallet {

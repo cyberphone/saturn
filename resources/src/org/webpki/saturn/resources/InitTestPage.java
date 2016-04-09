@@ -21,11 +21,14 @@ package org.webpki.saturn.resources;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+
 import java.math.BigDecimal;
 
 import org.webpki.crypto.CustomCryptoProvider;
+
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -34,7 +37,9 @@ import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ServerAsymKeySigner;
+
 import org.webpki.util.ISODateTime;
+
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class InitTestPage implements BaseProperties {

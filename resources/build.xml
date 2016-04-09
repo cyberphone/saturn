@@ -93,7 +93,7 @@
         <arg value="${jcspaper}"/>
         <arg value="${logotype}"/>
         <arg value="${merchantkey}${keyfilext}"/>
-        <arg value="${payerbankkey}${keyfilext}"/>
+        <arg value="${payerbankpath}-eecert${keyfilext}"/>
         <arg value="${keypassword}"/>
     </java>
   </target>

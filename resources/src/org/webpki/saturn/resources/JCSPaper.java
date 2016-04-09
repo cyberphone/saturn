@@ -22,8 +22,11 @@ package org.webpki.saturn.resources;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import java.security.PublicKey;
+
 import java.security.cert.X509Certificate;
+
 import java.util.Date;
 import java.util.Vector;
 
@@ -32,6 +35,7 @@ import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.SignatureWrapper;
+
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONDecoderCache;
@@ -40,11 +44,13 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ServerX509Signer;
+
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 import org.webpki.util.ISODateTime;
