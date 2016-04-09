@@ -14,7 +14,7 @@
   </condition>
 
   <target name="help">
-      <echo message="tomcat [-Dpayeebank=0] [-Derr.merchant.root=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+      <echo message="tomcat [-Dpayeebank=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -32,6 +32,10 @@
     <property name="bank.host" value="https://localhost:8442/"/>
     <property name="server.port.map" value=""/>
     <property name="errormedia" value="false"/>
+    <property name="credentials.db" value="${appcorename}.json"/>
+    <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa${keyfilext}"/>
+    <property name="enc.key.ec" value="${appcorename}-enc-key-ec${keyfilext}"/>
+    <property name="cert.key" value="${appcorename}-eecert${keyfilext}"/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
        tablength="4"
@@ -49,15 +53,15 @@
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
 	  <replacefilter token="@key-password@" value="${keypassword}"/>
-	  <replacefilter token="@bank-eecert@" value="${bankkey}${keyfilext}"/>
-      <replacefilter token="@bank-decryptionkey1@" value="${payerbankenckey_ec}${keyfilext}"/>
-	  <replacefilter token="@bank-decryptionkey2@" value="${payerbankenckey_rsa}${keyfilext}"/>
+	  <replacefilter token="@bank-eecert@" value="${cert.key}"/>
+      <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
+	  <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
       <replacefilter token="@merchant-key@" value="${merchantkey}.cer"/>
       <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
-      <replacefilter token="@bank-account-db@" value="${credentials_db}"/>
+      <replacefilter token="@user-account-db@" value="${credentials.db}"/>
       <replacefilter token="@err-media-type@" value="${errormedia}"/>
     </replace>
-    <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
+    <war destfile="${dist.dir}/${appcorename}.war" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
@@ -71,29 +75,26 @@
          <include name="${webpki-webutil.jar}"/>
       </lib>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
-         <include name="${payerbankenckey_rsa}${keyfilext}"/>
-         <include name="${payerbankenckey_ec}${keyfilext}"/>
-         <include name="${bankkey}${keyfilext}"/>
+         <include name="${enc.key.rsa}"/>
+         <include name="${enc.key.ec}"/>
+         <include name="${cert.key}"/>
          <include name="${clientroot}.cer"/>
          <include name="${merchantkey}.cer"/>
       </zipfileset>
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
-         <include name="${credentials_db}"/>
+         <include name="${credentials.db}"/>
       </zipfileset>
       <fileset dir="web"/>
     </war>
   </target>
 
   <target name="tomcat" depends="_init">
+     <property file="../resources/common.properties"/>
      <condition property="appcorename" value="${payeebankpath}" else="${payerbankpath}">
         <isset property="payeebank"/>
      </condition>
-     <property file="../resources/common.properties"/>
      <property name="temp.dir" value=".tmp"/>
      <delete dir="${temp.dir}"/>
-     <condition property="merchant_root" value="${paymentroot}" else="${merchantroot}">
-       <isset property="err.merchant.root"/>
-     </condition>
      <condition property="errormedia" value="true">
        <isset property="err.media"/>
      </condition>
@@ -117,10 +118,8 @@
        <param name="zip.key.dir" value="${key.dir}"/>
 
        <param name="zip.credentials.dir" value="${credentials.dir}"/>
-       
-       <param name="merchant.var.root" value="${merchant_root}"/>
      </antcall>
-     <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
+     <copy file="${dist.dir}/${appcorename}.war" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
   </target>
   
   <!-- mobilepki using EJBCA plugin mode -->
@@ -152,8 +151,6 @@
        <param name="zip.key.dir" value="keys"/>
 
        <param name="zip.credentials.dir" value="credentials"/>
-       
-       <param name="merchant.var.root" value="${merchantroot}"/>
      </antcall>
      <!-- Update application.xml -->
      <resources id="w2nb_application.xml">

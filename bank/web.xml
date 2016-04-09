@@ -35,15 +35,15 @@
     </context-param>
 
     <context-param>
-        <description>Merchant Key</description>
+        <description>Optional Merchant Key</description>
         <param-name>merchant_key</param-name>
         <param-value>@merchant-key@</param-value>
     </context-param>
 
     <context-param>
-        <description>Bank Accounts</description>
-        <param-name>bank_account_db</param-name>
-        <param-value>@bank-account-db@</param-value>
+        <description>User Accounts</description>
+        <param-name>user_account_db</param-name>
+        <param-value>@user-account-db@</param-value>
     </context-param>
 
     <context-param>

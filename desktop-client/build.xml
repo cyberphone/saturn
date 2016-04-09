@@ -11,6 +11,8 @@
 
   <property file="../resources/common.properties"/>
 
+  <!-- The following MUST be set to match your installation/setup -->
+  <property name="common.app.dir" location="../../web2native-bridge/proxy/install/apps"/>
   <condition property="install.dir.found">
       <available file="${common.app.dir}" type="dir"/>
   </condition>
@@ -28,7 +30,6 @@
   </target>
   
   <target name="build" depends="clean">
-    <echo message="${src.dir}:${common.src.dir}"/>
 	<loadresource property="java.dotted.path">
 	  <propertyresource name="client.package.dir"/>
 	  <filterchain>

@@ -177,7 +177,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                             ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
                                             "943").serializeJSONObject(JSONOutputFormats.NORMALIZED);
 
-            logger.info("Web2Native Bridge Merchant-server initiated");
+            logger.info("Saturn Merchant-server initiated");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }

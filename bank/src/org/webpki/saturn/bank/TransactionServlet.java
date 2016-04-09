@@ -53,9 +53,9 @@ import org.webpki.saturn.common.ErrorReturn;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.FinalizeResponse;
 import org.webpki.saturn.common.AccountDescriptor;
-import org.webpki.saturn.common.ReserveOrDebitRequest;
+import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.AuthorizationData;
-import org.webpki.saturn.common.ReserveOrDebitResponse;
+import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
@@ -92,10 +92,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return "#" + (referenceId++);
     }
 
-    JSONObjectWriter processReserveOrDebitRequest(JSONObjectReader payeeRequest)
+    JSONObjectWriter processReserveOrBasicRequest(JSONObjectReader payeeRequest)
     throws IOException, GeneralSecurityException {
         // Read the by the user and merchant attested payment request
-       ReserveOrDebitRequest attestedPaymentRequest = new ReserveOrDebitRequest(payeeRequest);
+       ReserveOrBasicRequest attestedPaymentRequest = new ReserveOrBasicRequest(payeeRequest);
 
        // Decrypt the encrypted user authorization
        AuthorizationData authorizationData =
@@ -110,16 +110,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
        // Verify that the there is an account matching the received public key
        String accountId = authorizationData.getAccountDescriptor().getAccountId();
        String accountType = authorizationData.getAccountDescriptor().getAccountType();
-       AccountEntry account = BankService.accountDb.get(accountId);
+       UserAccountEntry account = BankService.userAccountDb.get(accountId);
        if (account == null) {
            logger.info("No such account ID: " + accountId);
            throw new IOException("No such user account ID");
        }
-       if (!account.type.equals(accountType)) {
+       if (!account.getType().equals(accountType)) {
            logger.info("Wrong account type: " + accountType + " for account ID: " + accountId);
            throw new IOException("Wrong user account type");
        }
-       if (!account.publicKey.equals(authorizationData.getPublicKey())) {
+       if (!account.getPublicKey().equals(authorizationData.getPublicKey())) {
            logger.info("Wrong public key for account ID: " + accountId);
            throw new IOException("Wrong user public key");
        }
@@ -144,7 +144,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
        // Sorry but you don't appear to have a million bucks :-)
        if (!acquirerBased && paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
-           return ReserveOrDebitResponse.encode(attestedPaymentRequest.isDirectDebit(),
+           return ReserveOrBasicResponse.encode(attestedPaymentRequest.getMessage().isBasicCredit(),
                                                 new ErrorReturn(ErrorReturn.ERRORS.INSUFFICIENT_FUNDS));
        }
 
@@ -177,7 +177,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             payeeAccount = attestedPaymentRequest.getPayeeAccountDescriptors()[0];
         }
 
-       return ReserveOrDebitResponse.encode(attestedPaymentRequest,
+       return ReserveOrBasicResponse.encode(attestedPaymentRequest,
                                             paymentRequest,
                                             authorizationData.getAccountDescriptor(),
                                             encryptedCardData,
@@ -192,7 +192,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         FinalizeRequest payeeFinalizationRequest = new FinalizeRequest(payeeRequest);
 
         // Get the embedded authorization presumably made by ourselves :-)
-        ReserveOrDebitResponse embeddedResponse = payeeFinalizationRequest.getEmbeddedResponse();
+        ReserveOrBasicResponse embeddedResponse = payeeFinalizationRequest.getEmbeddedResponse();
 
         // Verify that the provider's signature really belongs to us
         CertificatePathCompare.compareCertificatePaths(embeddedResponse.getSignatureDecoder().getCertificatePath(),
@@ -219,8 +219,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             // We rationalize here by using a single end-point for both reserve/debit and finalize //
             /////////////////////////////////////////////////////////////////////////////////////////
             JSONObjectWriter providerResponse = 
-                payeeRequest.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.FINALIZE_REQUEST.toString()) ?
-                    processFinalizeRequest(payeeRequest) : processReserveOrDebitRequest(payeeRequest);
+                payeeRequest.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.FINALIZE_CREDIT_REQUEST.toString()) ?
+                    processFinalizeRequest(payeeRequest) : processReserveOrBasicRequest(payeeRequest);
             logger.info("Returned to caller:\n" + providerResponse);
 
             /////////////////////////////////////////////////////////////////////////////////////////

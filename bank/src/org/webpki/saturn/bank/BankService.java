@@ -70,7 +70,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final String MERCHANT_KEY          = "merchant_key";
 
-    static final String ACCOUNT_DB            = "bank_account_db";
+    static final String USER_ACCOUNT_DB            = "user_account_db";
     
     static final String ERR_MEDIA             = "err_media_type";
 
@@ -80,7 +80,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static PublicKey merchantKey;
     
-    static LinkedHashMap<String,AccountEntry> accountDb = new LinkedHashMap<String,AccountEntry>();
+    static LinkedHashMap<String,UserAccountEntry> userAccountDb = new LinkedHashMap<String,UserAccountEntry>();
     
     static ServerX509Signer bankKey;
     
@@ -137,14 +137,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_KEY))).getPublicKey();
 
             JSONArrayReader accounts = JSONParser.parse(
-                                          ArrayUtil.getByteArrayFromInputStream (getResource(ACCOUNT_DB))
+                                          ArrayUtil.getByteArrayFromInputStream (getResource(USER_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
-                JSONObjectReader account = accounts.getObject();
-                accountDb.put(account.getObject(BaseProperties.PAYER_ACCOUNT_JSON).getString(BaseProperties.ID_JSON), 
-                    new AccountEntry(account.getPublicKey(),
-                                     account.getObject(BaseProperties.PAYER_ACCOUNT_JSON)
-                                         .getString(BaseProperties.TYPE_JSON)));
+                UserAccountEntry account = new UserAccountEntry(accounts.getObject());
+                userAccountDb.put(account.getId(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -162,7 +159,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 jsonMediaType = "text/html";
             }
 
-            logger.info("Web2Native Bridge Bank-server initiated");
+            logger.info("Saturn Bank-server initiated");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }

@@ -121,7 +121,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                  Expires.inDays(365),
                                  acquirerKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
 
-            logger.info("Web2Native Bridge Acquirer-server initiated");
+            logger.info("Saturn Acquirer-server initiated");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }
