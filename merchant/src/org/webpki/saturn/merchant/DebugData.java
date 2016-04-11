@@ -32,13 +32,13 @@ public class DebugData implements Serializable {
 
     public JSONObjectReader providerAuthority;
 
-    public boolean directDebit;
+    public boolean basicCredit;
     
-    public boolean softReserveOrDebitError;
+    public boolean softReserveOrBasicError;
     
-    public byte[] reserveOrDebitRequest;
+    public byte[] reserveOrBasicRequest;
     
-    public JSONObjectReader reserveOrDebitResponse;
+    public JSONObjectReader reserveOrBasicResponse;
     
     public boolean acquirerMode;
     

@@ -138,7 +138,7 @@ public class ReserveOrBasicResponse implements BaseProperties {
     }
 
     boolean basicCredit;
-    public boolean isDirectDebit() {
+    public boolean isBasicCredit() {
         return basicCredit;
     }
 

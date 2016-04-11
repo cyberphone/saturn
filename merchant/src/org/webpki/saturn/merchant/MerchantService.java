@@ -60,35 +60,39 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static Set<PayerAccountTypes> acceptedAccountTypes = EnumSet.noneOf(PayerAccountTypes.class);
   
-    static final String KEYSTORE_PASSWORD      = "key_password";
-
-    static final String PAYMENT_ROOT           = "payment_root";
+    static final String MERCHANT_KEY                 = "merchant_key";
     
-    static final String MERCHANT_KEY           = "merchant_key";
+    static final String KEYSTORE_PASSWORD            = "key_password";
+
+    static final String PAYMENT_ROOT                 = "payment_root";
     
-    static final String ACQUIRER_AUTHORITY_URL = "acquirer_authority_url";
+    static final String ACQUIRER_AUTHORITY_URL       = "acquirer_authority_url";
 
-    static final String SERVER_PORT_MAP        = "server_port_map";
+    static final String PAYEE_PROVIDER_AUTHORITY_URL = "payee_provider_authority_url";
+
+    static final String SERVER_PORT_MAP              = "server_port_map";
     
-    static final String CURRENCY               = "currency";
+    static final String CURRENCY                     = "currency";
 
-    static final String ADD_UNUSUAL_CARD       = "add_unusual_card";
+    static final String ADD_UNUSUAL_CARD             = "add_unusual_card";
 
-    static final String ERR_MEDIA              = "err_media_type";
+    static final String ERR_MEDIA                    = "err_media_type";
     
-    static final String W2NB_WALLET            = "w2nb_wallet";
+    static final String W2NB_WALLET                  = "w2nb_wallet";
     
-    static final String USER_AUTH_SAMPLE       = "user-authorization.json";
+    static final String USER_AUTH_SAMPLE             = "user-authorization.json";
 
-    static final String SUPERCARD_AUTH_SAMPLE  = "wallet-supercard-auth.png";
+    static final String SUPERCARD_AUTH_SAMPLE        = "wallet-supercard-auth.png";
 
-    static final String BANKDIRECT_AUTH_SAMPLE = "wallet-bankdirect-auth.png";
+    static final String BANKDIRECT_AUTH_SAMPLE       = "wallet-bankdirect-auth.png";
 
     static JSONX509Verifier paymentRoot;
     
     static ServerAsymKeySigner merchantKey;
     
     static String acquirerAuthorityUrl;
+    
+    static String payeeProviderAuthorityUrl;
 
     static Integer serverPortMapping;
     
@@ -158,6 +162,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             w2nbWalletName = getPropertyString(W2NB_WALLET);
 
             acquirerAuthorityUrl = getPropertyString(ACQUIRER_AUTHORITY_URL);
+
+            payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
             if (getPropertyBoolean(ERR_MEDIA)) {
                 jsonMediaType = "text/html";

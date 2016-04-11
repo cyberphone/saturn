@@ -177,7 +177,7 @@ class DebugPrintout implements BaseProperties {
             "exchanged between the " +
             "<b>Merchant</b> (Payee), the <b>Wallet</b> (Payer), and the user's <b>Bank</b> (Payment provider).&nbsp;&nbsp;" +
             "For traditional card payments there is also an <b>Acquirer</b> (aka &quot;card processor&quot;) involved.</p><p>Current mode: <i>" +
-            (debugData.acquirerMode ? "Card payment" : "Account-2-Account payment using " + (debugData.directDebit ? "direct debit" : "reserve+finalize")) +
+            (debugData.acquirerMode ? "Card payment" : "Account-2-Account payment using " + (debugData.basicCredit ? "direct debit" : "reserve+finalize")) +
             "</i></p>" +
             point+
             "<p>The user performs &quot;Checkout&quot; (after <i>optionally</i> selecting payment method), " +
@@ -242,7 +242,7 @@ class DebugPrintout implements BaseProperties {
             keyWord(ACQUIRER_AUTHORITY_URL_JSON) : "an account-2-account transaction, " +
             keyWord(PAYEE_ACCOUNTS_JSON) + "holding an array [1..n] of <b>Merchant</b> receiver accounts") + " is also supplied:</p>");
 
-        fancyBox(debugData.reserveOrDebitRequest);
+        fancyBox(debugData.reserveOrBasicRequest);
 
         if (debugData.acquirerMode) {
             description(point +
@@ -254,7 +254,7 @@ class DebugPrintout implements BaseProperties {
             "the called <b>Bank</b> invokes the local payment backend (to verify the account, check funds, etc.) " +
             "<i>which is outside of this specification and implementation</i>.</p><p>" +
             point +
-            "</p><p>" + (debugData.softReserveOrDebitError? errorDescription(true):
+            "</p><p>" + (debugData.softReserveOrBasicError? errorDescription(true):
             "If the operation is successful, the <b>Bank</b> responds with a <i>signed</i> message containing both the original <b>Merchant</b> " +
             keyWord(PAYMENT_REQUEST_JSON) + " as well as a minimal set of user account data.</p>" +
             (debugData.acquirerMode ?
@@ -263,15 +263,15 @@ class DebugPrintout implements BaseProperties {
                                     :
                  "Also note the inclusion of the (by the <b>Bank</b>) selected <b>Merchant</b> receiver account (" +
                  keyWord(PAYEE_ACCOUNT_JSON) + ")") +
-                     (debugData.directDebit?
+                     (debugData.basicCredit?
                              ".<p>This is the final interaction in the direct debit mode:</p>"
                                            :
                              ":")));
 
-        fancyBox(debugData.reserveOrDebitResponse);
+        fancyBox(debugData.reserveOrBasicResponse);
 
-        if (!debugData.softReserveOrDebitError) {
-            if (!debugData.directDebit) {
+        if (!debugData.softReserveOrBasicError) {
+            if (!debugData.basicCredit) {
                 description(point +
                      "<p>For finalization of the payment, the <b>Merchant</b> sets an " + keyWord(AMOUNT_JSON) + 
                      " which must be <i>equal or lower</i> than in the original request, <i>counter-signs</i> the request, " +

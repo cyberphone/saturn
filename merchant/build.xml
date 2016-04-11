@@ -42,6 +42,7 @@
 
   <target name="_build">
     <property name="acquirer.host" value="https://localhost:8442"/>
+    <property name="payee_provider.host" value="https://localhost:8442"/>
     <property name="server.port.map" value=""/>
     <property name="errormedia" value="false"/>
     <property name="unusualcard" value="false"/>
@@ -72,6 +73,7 @@
 	  <replacefilter token="@merchant-key@" value="${merchantkey}.p12"/>
       <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
       <replacefilter token="@acquirer-authority-url@" value="${acquirer.host}/webpay-acquirer/authority"/>
+      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payeebankpath}/authority"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>
       <replacefilter token="@err-media-type@" value="${errormedia}"/>
@@ -104,7 +106,8 @@
 
   <target name="tomcat" depends="_init">
      <property file="../resources/common.properties"/>
-      <property name="temp.dir" value=".tmp"/>
+     <property file="../resources/merchants.properties"/>
+     <property name="temp.dir" value=".tmp"/>
      <delete dir="${temp.dir}"/>
      <condition property="payment_root" value="${merchantroot}" else="${paymentroot}">
        <isset property="err.payment.root"/>
@@ -148,8 +151,10 @@
   <target name="mobilepki-ejbca">
      <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Merchant Plugin"/>
      <property name="acquirer.host" value="https://mobilepki.org"/>
+     <property name="payee_provider.host" value="https://mobilepki.org"/>
      <property name="server.port.map" value="8442"/>
      <property file="common.properties"/>
+     <property file="merchants.properties"/>
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
      <property name="dist.dir" value="${ejbca.gen.path}"/>
      <path id="ejbca.compile.classpath">
@@ -186,6 +191,7 @@
   <target name="localhost-ejbca">
      <echo message="Web2Native Bridge &quot;localhost&quot; Merchant Plugin"/>
      <property name="acquirer.host" value="https://localhost:8442"/>
+     <property name="payee_provider.host" value="https://localhost:8442"/>
      <property name="server.port.map" value=""/>
      <antcall target="mobilepki-ejbca"/>
   </target>
@@ -196,6 +202,7 @@
   </target>
   
   <target name="zip-distribution">
+    <property file="../resources/common.properties"/>
     <fail unless="dd" message="-&#10;
 ***************************************************************&#10;
  You must define a distribution directory using the -D option:&#10;
@@ -204,7 +211,6 @@
  and replaces the directory with the unzipped content&#10;
 ***************************************************************&#10;"/>
 	<echo message="Producing ${appcorename} .zip and .zip.SHA1 files..."/> 
-    <property file="../resources/common.properties"/>
 	<delete file="${dd}/${appcorename}.zip" failonerror="false"/>
     <zip destfile="${dd}/${appcorename}.zip">
       <zipfileset dir="." prefix="${appcorename}">
@@ -217,8 +223,9 @@
       <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
       <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>
       <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>
+      <zipfileset file="../resources/merchants.properties" prefix="${appcorename}"/>
       <zipfileset file="${common.lib.dir}/proxy-support.jar" prefix="${appcorename}/extra.lib"/>
-      </zip>
+    </zip>
     <checksum file="${dd}/${appcorename}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
     <antcall target="_unzipit"/>
   </target>

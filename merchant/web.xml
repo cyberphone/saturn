@@ -35,6 +35,12 @@
     </context-param>
 
     <context-param>
+        <description>Payee Provider Authority URL</description>
+        <param-name>payee_provider_authority_url</param-name>
+        <param-value>@payee-provider-authority-url@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Currency</description>
         <param-name>currency</param-name>
         <param-value>@currency@</param-value>

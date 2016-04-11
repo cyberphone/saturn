@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.net.URL;
 
 import java.security.GeneralSecurityException;
-import java.util.logging.Level;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -43,6 +43,7 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.CertificatePathCompare;
 import org.webpki.saturn.common.ErrorReturn;
+import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
@@ -52,8 +53,8 @@ import org.webpki.saturn.common.FinalizeResponse;
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.RequestHash;
-import org.webpki.saturn.common.ReserveOrDebitResponse;
-import org.webpki.saturn.common.ReserveOrDebitRequest;
+import org.webpki.saturn.common.ReserveOrBasicResponse;
+import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PayerAuthorization;
 
@@ -123,6 +124,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             this.url = url;
         }
     }
+    
+    Authority payeeProviderAuthority;
+    
+    synchronized void updatePayeeProviderAuthority(URLHolder urlHolder) throws IOException {
+        JSONObjectReader resultMessage = getData(urlHolder);
+        logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
+        payeeProviderAuthority = new Authority(resultMessage, urlHolder.getUrl());
+        // Verify that the claimed authority belongs to a known payment provider network
+        payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
+    }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         URLHolder urlHolder = new URLHolder();
@@ -156,34 +167,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             if (!ArrayUtil.compare(requestHash, paymentRequest.getRequestHash())) {
                 throw new IOException("Incorrect \"" + REQUEST_HASH_JSON + "\"");
             }
-
-            // Lookup indicated authority (Payment Provider)
-            urlHolder.setUrl(payerAuthorization.getAuthorityUrl());
-
-            // Ugly patch allowing the wallet to work with a local system as well
-            if (request.getServerName().equals("localhost")) {
-                URL orig = new URL(urlHolder.getUrl());
-                urlHolder.setUrl(new URL(request.isSecure() ? "https": "http",
-                                        "localhost", 
-                                        request.getServerPort(),
-                                        orig.getFile()).toExternalForm());
-            }
-
-            // In a production setup you would cache authority objects since they are long-lived
-            Authority providerAuthority = new Authority(getData(urlHolder), urlHolder.getUrl());
-
-            // Verify that the claimed authority belongs to a known payment provider network
-            providerAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
-
-            // Direct debit is only applicable to account2account operations
+           
+            // Basic credit is only applicable to account2account operations
             boolean acquirerBased = payerAuthorization.getAccountType().isAcquirerBased();
-            boolean directDebit = !UserPaymentServlet.getOption(session, HomeServlet.RESERVE_MODE_SESSION_ATTR) &&
+            boolean basicCredit = !UserPaymentServlet.getOption(session, HomeServlet.RESERVE_MODE_SESSION_ATTR) &&
                                   !acquirerBased;
-
-            if (debug) {
-                debugData.providerAuthority = providerAuthority.getRoot();
-                debugData.directDebit = directDebit;
-            }
 
             // Should be external data but this is a demo you know...
             AccountDescriptor[] accounts = {new AccountDescriptor("http://ultragiro.fr", "35964640"),
@@ -193,59 +181,70 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
             // Attest the user's encrypted authorization to show "intent"
             JSONObjectWriter providerRequest =
-                ReserveOrDebitRequest.encode(directDebit,
+                ReserveOrBasicRequest.encode(basicCredit,
                                              payerAuthorization.getAccountType(),
                                              userAuthorization.getObject(AUTHORIZATION_DATA_JSON),
                                              request.getRemoteAddr(),
                                              paymentRequest,
                                              acquirerBased ? MerchantService.acquirerAuthorityUrl : null,
                                              acquirerBased ? null : accounts,
-                                             directDebit ? null : Expires.inMinutes(30),
+                                             basicCredit ? null : Expires.inMinutes(30),
                                              MerchantService.merchantKey);
-            urlHolder.setUrl(providerAuthority.getTransactionUrl());
-            logger.info("About to send to payment provider [" + urlHolder.getUrl() + "]:\n" + providerRequest);
 
-            // Call the payment provider (which is the only party that can deal with
-            // encrypted user authorizations)
-            byte[] bankRequest = providerRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED);
-            JSONObjectReader resultMessage = postData(urlHolder, bankRequest);
-            logger.info("Returned from payment provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
+            // Now we need to find out where to send the request
+            urlHolder.setUrl(MerchantService.payeeProviderAuthorityUrl);
+            if (payeeProviderAuthority == null) {
+               updatePayeeProviderAuthority(urlHolder);
+            }
 
             if (debug) {
-                debugData.reserveOrDebitRequest = bankRequest;
-                debugData.reserveOrDebitResponse = resultMessage;
+                debugData.providerAuthority = payeeProviderAuthority.getRoot();
+                debugData.basicCredit = basicCredit;
+            }
+
+            urlHolder.setUrl(payeeProviderAuthority.getTransactionUrl());
+            logger.info("About to send to payee provider [" + urlHolder.getUrl() + "]:\n" + providerRequest);
+
+            // Call the payee bank
+            byte[] providerRequestBlob = providerRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED);
+            JSONObjectReader resultMessage = postData(urlHolder, providerRequestBlob);
+            logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
+
+            if (debug) {
+                debugData.reserveOrBasicRequest = providerRequestBlob;
+                debugData.reserveOrBasicResponse = resultMessage;
             }
 
             // Additional consistency checking
-            ReserveOrDebitResponse bankResponse = new ReserveOrDebitResponse(resultMessage);
-            if (bankResponse.isDirectDebit() != directDebit) {
-                throw new IOException("Response debit/reserve mode doesn't match request");
+            ReserveOrBasicResponse reserveOrBasicResponse = new ReserveOrBasicResponse(resultMessage);
+            if (reserveOrBasicResponse.isBasicCredit() != basicCredit) {
+                throw new IOException("Response basic/reserve mode doesn't match request");
             }
 
             // In addition to hard errors, there are a few "normal" errors which preferably would
             // be dealt with in more user-oriented fashion.
-            if (!bankResponse.success()) {
+            if (!reserveOrBasicResponse.success()) {
                 if (debug) {
-                    debugData.softReserveOrDebitError = true;
+                    debugData.softReserveOrBasicError = true;
                 }
-                HTML.paymentError(response, debug, bankResponse.getErrorReturn());
+                HTML.paymentError(response, debug, reserveOrBasicResponse.getErrorReturn());
                 return;
             }
 
-            if (!bankResponse.getAccountType().equals(payerAuthorization.getAccountType().getTypeUri())) {
+            if (!reserveOrBasicResponse.getAccountType().equals(payerAuthorization.getAccountType().getTypeUri())) {
                 throw new IOException("Response account type doesn't match request");
             }
 
             // No error return, then we can verify the response fully
-            bankResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
+            reserveOrBasicResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
 
-            if (!ArrayUtil.compare(bankResponse.getPaymentRequest().getRequestHash(), requestHash)) {
+            if (!ArrayUtil.compare(reserveOrBasicResponse.getPaymentRequest().getRequestHash(), requestHash)) {
                 throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
             }
             
-            if (!bankResponse.isDirectDebit()) {
+            if (!reserveOrBasicResponse.isBasicCredit()) {
                 // Two-phase operation: perform the final step
-                ErrorReturn errorReturn = processFinalize (bankResponse, urlHolder, debugData);
+                ErrorReturn errorReturn = processFinalize (reserveOrBasicResponse, urlHolder, debugData);
 
                 // Is there a soft error?  Return it to the user
                 if (errorReturn != null) {
@@ -257,15 +256,15 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                 }
             }
 
-            logger.info("Successful authorization of request: " + bankResponse.getPaymentRequest().getReferenceId());
+            logger.info("Successful authorization of request: " + reserveOrBasicResponse.getPaymentRequest().getReferenceId());
             HTML.resultPage(response,
                             debug,
-                            bankResponse.getPaymentRequest(),
-                            PayerAccountTypes.fromTypeUri(bankResponse.getAccountType()),
+                            reserveOrBasicResponse.getPaymentRequest(),
+                            PayerAccountTypes.fromTypeUri(reserveOrBasicResponse.getAccountType()),
                             acquirerBased ? // = Card
-                                AuthorizationData.formatCardNumber(bankResponse.getAccountReference())
+                                AuthorizationData.formatCardNumber(reserveOrBasicResponse.getAccountReference())
                                                           :
-                                bankResponse.getAccountReference());  // Currently "unmoderated" account
+                                                              reserveOrBasicResponse.getAccountReference());  // Currently "unmoderated" account
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
@@ -274,7 +273,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         }
     }
 
-    ErrorReturn processFinalize(ReserveOrDebitResponse bankResponse, URLHolder urlHolder, DebugData debugData)
+    ErrorReturn processFinalize(ReserveOrBasicResponse bankResponse, URLHolder urlHolder, DebugData debugData)
     throws IOException, GeneralSecurityException {
         String target = "provider";
         Authority acquirerAuthority = null;

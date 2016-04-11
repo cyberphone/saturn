@@ -106,7 +106,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
         return paymentRequest;
     }
 
-    public static JSONObjectWriter encode(boolean directDebit,
+    public static JSONObjectWriter encode(boolean basicCredit,
                                           PayerAccountTypes accountType,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
@@ -116,13 +116,13 @@ public class ReserveOrBasicRequest implements BaseProperties {
                                           Date expires,
                                           ServerAsymKeySigner signer)
         throws IOException, GeneralSecurityException {
-        JSONObjectWriter wr = Messages.createBaseMessage(directDebit ? Messages.BASIC_CREDIT_REQUEST : 
+        JSONObjectWriter wr = Messages.createBaseMessage(basicCredit ? Messages.BASIC_CREDIT_REQUEST : 
             acquirerAuthorityUrl == null ? Messages.RESERVE_CREDIT_REQUEST : Messages.RESERVE_CARDPAY_REQUEST)
             .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
             .setObject(AUTHORIZATION_DATA_JSON, encryptedAuthorizationData)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root);
-        if (directDebit || acquirerAuthorityUrl == null) {
+        if (basicCredit || acquirerAuthorityUrl == null) {
             JSONArrayWriter aw = wr.setArray(PAYEE_ACCOUNTS_JSON);
             for (AccountDescriptor account : accounts) {
                 aw.setObject(account.writeObject());
@@ -131,7 +131,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
             zeroTest(PAYEE_ACCOUNTS_JSON, accounts);
             wr.setString(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
         }
-        if (directDebit) {
+        if (basicCredit) {
             zeroTest(EXPIRES_JSON, expires);
             zeroTest(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
         } else {

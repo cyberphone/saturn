@@ -201,6 +201,7 @@ public class InitWallet {
             }
             JSONObjectReader rd = JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION));
             String url = rd.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON);
+            url = url.substring(0, url.lastIndexOf('/'));  // Remove "/authority"
             if (args[1].substring(args[1].lastIndexOf(File.separator) + 7)
                     .startsWith(url.substring(url.lastIndexOf('/') + 1))) {
                 aw.setObject(new JSONObjectWriter(rd)

@@ -206,7 +206,7 @@
         <arg value="${sks.pin}"/>
         <arg value="${card.type}"/>
         <arg value="${card.number}"/>
-        <arg value="${bank.host}/${bankpath}"/>
+        <arg value="${bank.host}/${bankpath}/authority"/>
         <arg value="${sks.encryption}.cer"/>
         <arg value="${card.path}"/>
     </java>
