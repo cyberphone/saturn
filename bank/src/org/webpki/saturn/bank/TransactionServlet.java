@@ -25,6 +25,8 @@ import java.net.URL;
 
 import java.security.GeneralSecurityException;
 
+import java.util.HashSet;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -72,6 +74,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     private static final long serialVersionUID = 1L;
     
     static Logger logger = Logger.getLogger(TransactionServlet.class.getCanonicalName());
+    
+    static HashSet<String> pass1Requests = new HashSet<String>();
+    
+    static {
+        pass1Requests.add(Messages.BASIC_CREDIT_REQUEST.toString());
+        pass1Requests.add(Messages.RESERVE_CREDIT_REQUEST.toString());
+        pass1Requests.add(Messages.RESERVE_CARDPAY_REQUEST.toString());
+    }
     
     static final int TIMEOUT_FOR_REQUEST = 5000;
 
@@ -214,14 +224,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
             }
             JSONObjectReader payeeRequest = JSONParser.parse(ServletUtil.getData(request));
-            logger.info("Received:\n" + payeeRequest);
+            logger.info("Received from [" + request.getRemoteAddr() + "]:\n" + payeeRequest);
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // We rationalize here by using a single end-point for both reserve/debit and finalize //
+            // We rationalize here by using a single end-point for both reserve/basic and finalize //
             /////////////////////////////////////////////////////////////////////////////////////////
             JSONObjectWriter providerResponse = 
-                payeeRequest.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.FINALIZE_CREDIT_REQUEST.toString()) ?
-                    processFinalizeRequest(payeeRequest) : processReserveOrBasicRequest(payeeRequest);
+                pass1Requests.contains(payeeRequest.getString(JSONDecoderCache.QUALIFIER_JSON)) ?
+                    processReserveOrBasicRequest(payeeRequest) : processFinalizeRequest(payeeRequest);
             logger.info("Returned to caller:\n" + providerResponse);
 
             /////////////////////////////////////////////////////////////////////////////////////////
