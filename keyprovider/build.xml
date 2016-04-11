@@ -40,10 +40,6 @@
     </resources> 
   <property name="security.internal" refid="security.external"/> 
     
-  <condition property="storetype" value="PKCS12" else="JKS">
-    <matches pattern=".*\.p12$" string="${keyfilext}"/>
-  </condition>
-
   <target name="help">
       <echo message="tomcat [-Derr.merchant.root=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
@@ -88,12 +84,12 @@
       <replacefilter token="@version-check@" value="${plugin.ejbca.ant.custom.logon.version-check}"/>
       <replacefilter token="@security@" value="${security.actual}"/>
       <replacefilter token="@paycred1@"
-        value="${clientkey_super}${keyfilext},SUPER_CARD,${account_id_super},supercard.png,${payerbankenckey_rsa}.cer"/>
+        value="${clientkey_super}.p12,SUPER_CARD,${account_id_super},supercard.png,${payerbankenckey_rsa}.cer"/>
       <replacefilter token="@paycred2@"
-        value="${clientkey_bankdir}${keyfilext},BANK_DIRECT,!${account_id_bankdir},bankdirect.png,${payerbankenckey_ec}.cer"/>
+        value="${clientkey_bankdir}.p12,BANK_DIRECT,!${account_id_bankdir},bankdirect.png,${payerbankenckey_ec}.cer"/>
       <replacefilter token="@paycred3@"
-        value="${clientkey_unusual}${keyfilext},UNUSUAL_CARD,${account_id_unusual},unusualcard.png,${payerbankenckey_ec}.cer"/>
-      <replacefilter token="@keyprov-kmk@" value="${kg2kmkey_ec}${keyfilext}"/>
+        value="${clientkey_unusual}.p12,UNUSUAL_CARD,${account_id_unusual},unusualcard.png,${payerbankenckey_ec}.cer"/>
+      <replacefilter token="@keyprov-kmk@" value="${kg2kmkey_ec}.p12"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
@@ -111,10 +107,10 @@
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
          <include name="${payerbankenckey_rsa}.cer"/>
          <include name="${payerbankenckey_ec}.cer"/>
-         <include name="${clientkey_super}${keyfilext}"/>
-         <include name="${clientkey_bankdir}${keyfilext}"/>
-         <include name="${clientkey_unusual}${keyfilext}"/>
-         <include name="${kg2kmkey_ec}${keyfilext}"/>
+         <include name="${clientkey_super}.p12"/>
+         <include name="${clientkey_bankdir}.p12"/>
+         <include name="${clientkey_unusual}.p12"/>
+         <include name="${kg2kmkey_ec}.p12"/>
       </zipfileset>
       <zipfileset dir="${zip.card-images.dir}" prefix="${class_war_path}"/>
       <zipfileset dir="${zip.logotype.dir}" prefix="${class_war_path}"/>
@@ -126,9 +122,6 @@
      <property file="../resources/common.properties"/>
      <property name="temp.dir" value=".tmp"/>
      <delete dir="${temp.dir}"/>
-     <condition property="merchant_root" value="${paymentroot}" else="${merchantroot}">
-       <isset property="err.merchant.root"/>
-     </condition>
      <condition property="errormedia" value="true">
        <isset property="err.media"/>
      </condition>

@@ -1,4 +1,4 @@
-<project name="Payment Server" default="help" basedir=".">
+<project name="Bank Server" default="help" basedir=".">
 
   <!-- set properties for this build -->
   <property name="src.dir" value="src"/>
@@ -8,10 +8,6 @@
   <property environment="env"/>
 
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
-
-  <condition property="storetype" value="PKCS12" else="JKS">
-    <matches pattern=".*\.p12$" string="${keyfilext}"/>
-  </condition>
 
   <target name="help">
       <echo message="tomcat [-Dpayeebank=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
@@ -32,10 +28,11 @@
     <property name="bank.host" value="https://localhost:8442/"/>
     <property name="server.port.map" value=""/>
     <property name="errormedia" value="false"/>
-    <property name="credentials.db" value="users.${appcorename}.json"/>
-    <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa${keyfilext}"/>
-    <property name="enc.key.ec" value="${appcorename}-enc-key-ec${keyfilext}"/>
-    <property name="cert.key" value="${appcorename}-eecert${keyfilext}"/>
+    <property name="users.db" value="users.${appcorename}.json"/>
+    <property name="merchants.db" value="merchants.${appcorename}.json"/>
+    <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa.p12"/>
+    <property name="enc.key.ec" value="${appcorename}-enc-key-ec.p12"/>
+    <property name="cert.key" value="${appcorename}-eecert.p12"/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
        tablength="4"
@@ -56,9 +53,9 @@
 	  <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
 	  <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
-      <replacefilter token="@merchant-key@" value="${merchantkey}.cer"/>
       <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
-      <replacefilter token="@user-account-db@" value="${credentials.db}"/>
+      <replacefilter token="@user-account-db@" value="${users.db}"/>
+      <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@err-media-type@" value="${errormedia}"/>
     </replace>
     <war destfile="${dist.dir}/${appcorename}.war" webxml="${temp.dir}/web.xml">
@@ -79,10 +76,10 @@
          <include name="${enc.key.ec}"/>
          <include name="${cert.key}"/>
          <include name="${clientroot}.cer"/>
-         <include name="${merchantkey}.cer"/>
       </zipfileset>
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
-         <include name="${credentials.db}"/>
+         <include name="${users.db}"/>
+         <include name="${merchants.db}"/>
       </zipfileset>
       <fileset dir="web"/>
     </war>
@@ -203,7 +200,7 @@
       <zipfileset dir="${common.src.dir}" prefix="${payerbankpath}/common.src"/>
       <zipfileset dir="${key.dir}" prefix="${payerbankpath}/keys"/>
       <zipfileset dir="${credentials.dir}" prefix="${payerbankpath}/credentials">
-        <include name="${credentials_db}"/>
+        <include name="*.json"/>
       </zipfileset>
       <zipfileset file="../resources/common.properties" prefix="${payerbankpath}"/>
     </zip>

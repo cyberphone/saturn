@@ -26,10 +26,6 @@
 
   <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
 
-  <condition property="storetype" value="PKCS12" else="JKS">
-    <matches pattern=".*\.p12$" string="${keyfilext}"/>
-  </condition>
-
   <target name="help">
     <echo message="tomcat [-Dmerchant.dn=something] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
@@ -69,9 +65,9 @@
            includeAntRuntime="false"/>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@key-password@" value="${keypassword}"/>
-	  <replacefilter token="@acquirer-eecert@" value="${acquirersignaturekey}${keyfilext}"/>
-      <replacefilter token="@acquirer-decryptionkey1@" value="${acquirerencryptionkey_ec}${keyfilext}"/>
-      <replacefilter token="@acquirer-decryptionkey2@" value="${acquirerencryptionkey_rsa}${keyfilext}"/>
+	  <replacefilter token="@acquirer-eecert@" value="${acquirersignaturekey}.p12"/>
+      <replacefilter token="@acquirer-decryptionkey1@" value="${acquirerencryptionkey_ec}.p12"/>
+      <replacefilter token="@acquirer-decryptionkey2@" value="${acquirerencryptionkey_rsa}.p12"/>
       <replacefilter token="@acquirer-host@" value="${acquirer.host}"/>
 	  <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
     </replace>
@@ -89,9 +85,9 @@
          <include name="${webpki-webutil.jar}"/>
       </lib>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
-         <include name="${acquirerencryptionkey_rsa}${keyfilext}"/>
-         <include name="${acquirerencryptionkey_ec}${keyfilext}"/>
-         <include name="${acquirersignaturekey}${keyfilext}"/>
+         <include name="${acquirerencryptionkey_rsa}.p12"/>
+         <include name="${acquirerencryptionkey_ec}.p12"/>
+         <include name="${acquirersignaturekey}.p12"/>
          <include name="${payment.var.root}.cer"/>
       </zipfileset>
       <fileset dir="web"/>

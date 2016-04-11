@@ -14,15 +14,13 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.bank;
+package org.webpki.saturn.common;
 
 import java.io.IOException;
 
 import java.security.PublicKey;
 
 import org.webpki.json.JSONObjectReader;
-
-import org.webpki.saturn.common.BaseProperties;
 
 public class UserAccountEntry implements BaseProperties {
     PublicKey publicKey;

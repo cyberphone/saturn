@@ -59,6 +59,7 @@ import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
+import org.webpki.saturn.common.UserAccountEntry;
 
 import org.webpki.webutil.ServletUtil;
 

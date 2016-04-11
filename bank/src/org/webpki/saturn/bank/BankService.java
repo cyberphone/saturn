@@ -24,6 +24,7 @@ import java.security.KeyStore;
 import java.security.PublicKey;
 
 import java.security.cert.X509Certificate;
+
 import java.security.interfaces.RSAPublicKey;
 
 import java.util.LinkedHashMap;
@@ -40,7 +41,6 @@ import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
@@ -53,7 +53,9 @@ import org.webpki.saturn.common.DecryptionKeyHolder;
 import org.webpki.saturn.common.Encryption;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.KeyStoreEnumerator;
+import org.webpki.saturn.common.MerchantAccountEntry;
 import org.webpki.saturn.common.ServerX509Signer;
+import org.webpki.saturn.common.UserAccountEntry;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -68,10 +70,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String DECRYPTION_KEY1       = "bank_decryptionkey1";
     static final String DECRYPTION_KEY2       = "bank_decryptionkey2";
     
-    static final String MERCHANT_KEY          = "merchant_key";
-
-    static final String USER_ACCOUNT_DB            = "user_account_db";
+    static final String USER_ACCOUNT_DB       = "user_account_db";
     
+    static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
+
     static final String ERR_MEDIA             = "err_media_type";
 
     static final String SERVER_PORT_MAP       = "server_port_map";
@@ -82,6 +84,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static LinkedHashMap<String,UserAccountEntry> userAccountDb = new LinkedHashMap<String,UserAccountEntry>();
     
+    static LinkedHashMap<String,MerchantAccountEntry> merchantAccountDb = new LinkedHashMap<String,MerchantAccountEntry>();
+
     static ServerX509Signer bankKey;
     
     static X509Certificate[] bankCertificatePath;
@@ -133,15 +137,20 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             bankCertificatePath = bankcreds.getCertificatePath();
             bankKey = new ServerX509Signer(bankcreds);
 
-            merchantKey = CertificateUtil.getCertificateFromBlob (
-                ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_KEY))).getPublicKey();
-
             JSONArrayReader accounts = JSONParser.parse(
                                           ArrayUtil.getByteArrayFromInputStream (getResource(USER_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
                 UserAccountEntry account = new UserAccountEntry(accounts.getObject());
                 userAccountDb.put(account.getId(), account);
+            }
+
+            accounts = JSONParser.parse(
+                                   ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
+                                       ).getJSONArrayReader();
+            while (accounts.hasMore()) {
+                MerchantAccountEntry account = new MerchantAccountEntry(accounts.getObject());
+                merchantAccountDb.put(account.getId(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);

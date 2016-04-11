@@ -35,9 +35,9 @@
     </context-param>
 
     <context-param>
-        <description>Optional Merchant Key</description>
-        <param-name>merchant_key</param-name>
-        <param-value>@merchant-key@</param-value>
+        <description>Merchant Accounts</description>
+        <param-name>merchant_account_db</param-name>
+        <param-value>@merchant-account-db@</param-value>
     </context-param>
 
     <context-param>
