@@ -10,7 +10,7 @@
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-      <echo message="tomcat [-Dpayeebank=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+      <echo message="both tomcat [-Dpayeebank=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -83,6 +83,13 @@
       </zipfileset>
       <fileset dir="web"/>
     </war>
+  </target>
+  
+  <target name="both">
+      <ant inheritAll="false" target="tomcat"/>
+      <ant inheritAll="false" target="tomcat">
+		<property name="payeebank" value="true"/>      
+      </ant>
   </target>
 
   <target name="tomcat" depends="_init">
