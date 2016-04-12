@@ -25,7 +25,7 @@ import java.net.URL;
 
 import java.security.GeneralSecurityException;
 
-import java.util.HashSet;
+import java.util.HashMap;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -75,12 +75,21 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     
     static Logger logger = Logger.getLogger(TransactionServlet.class.getCanonicalName());
     
-    static HashSet<String> pass1Requests = new HashSet<String>();
+    static HashMap<String,Integer> requestTypes = new HashMap<String,Integer>();
+    
+    static final int REQTYPE_PAYEE_INITIAL = 0;
+    static final int REQTYPE_PAYEE_FINAL   = 1;
+    static final int REQTYPE_TRANSACTION   = 2;
     
     static {
-        pass1Requests.add(Messages.BASIC_CREDIT_REQUEST.toString());
-        pass1Requests.add(Messages.RESERVE_CREDIT_REQUEST.toString());
-        pass1Requests.add(Messages.RESERVE_CARDPAY_REQUEST.toString());
+        requestTypes.put(Messages.BASIC_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_INITIAL);
+        requestTypes.put(Messages.RESERVE_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_INITIAL);
+        requestTypes.put(Messages.RESERVE_CARDPAY_REQUEST.toString(), REQTYPE_PAYEE_INITIAL);
+
+        requestTypes.put(Messages.FINALIZE_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_FINAL);
+        requestTypes.put(Messages.FINALIZE_CARDPAY_REQUEST.toString(), REQTYPE_PAYEE_FINAL);
+
+        requestTypes.put(Messages.TRANSACTION_REQUEST.toString(), REQTYPE_TRANSACTION);
     }
     
     static final int TIMEOUT_FOR_REQUEST = 5000;
@@ -101,6 +110,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
     static String getReferenceId() {
         return "#" + (referenceId++);
+    }
+
+    JSONObjectWriter processTransactionRequest(JSONObjectReader providerRequest) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     JSONObjectWriter processReserveOrBasicRequest(JSONObjectReader payeeRequest)
@@ -223,16 +237,34 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             if (!contentType.equals(JSON_CONTENT_TYPE)) {
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
             }
-            JSONObjectReader payeeRequest = JSONParser.parse(ServletUtil.getData(request));
-            logger.info("Received from [" + request.getRemoteAddr() + "]:\n" + payeeRequest);
+            String callerAddress = request.getRemoteAddr();
+            JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
+            logger.info("Received from [" + callerAddress + "]:\n" + providerRequest);
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // We rationalize here by using a single end-point for both reserve/basic and finalize //
+            // We rationalize here by using a single end-point for all requests                    //
             /////////////////////////////////////////////////////////////////////////////////////////
-            JSONObjectWriter providerResponse = 
-                pass1Requests.contains(payeeRequest.getString(JSONDecoderCache.QUALIFIER_JSON)) ?
-                    processReserveOrBasicRequest(payeeRequest) : processFinalizeRequest(payeeRequest);
-            logger.info("Returned to caller:\n" + providerResponse);
+            Integer requestType = requestTypes.get(providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
+            if (requestType == null) {
+                throw new IOException("Unexpected \"" + JSONDecoderCache.QUALIFIER_JSON + "\" :" + 
+                                       providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
+            }
+
+            JSONObjectWriter providerResponse; 
+            switch (requestType) {
+                case REQTYPE_PAYEE_INITIAL:
+                    providerResponse = processReserveOrBasicRequest(providerRequest);
+                    break;
+
+                case REQTYPE_PAYEE_FINAL:
+                    providerResponse = processFinalizeRequest(providerRequest);
+                    break;
+                    
+                default:
+                    providerResponse = processTransactionRequest(providerRequest);
+                    
+            }
+            logger.info("Returned to caller ["  + callerAddress + "]:\n" + providerResponse);
 
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
