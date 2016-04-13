@@ -106,37 +106,11 @@ public class TransactionRequest implements BaseProperties {
         return paymentRequest;
     }
 
-    public static JSONObjectWriter encode(boolean directDebit,
-                                          PayerAccountTypes accountType,
-                                          JSONObjectReader encryptedAuthorizationData,
-                                          String clientIpAddress,
-                                          PaymentRequest paymentRequest,
-                                          String acquirerAuthorityUrl,
-                                          AccountDescriptor[] accounts,
-                                          Date expires,
-                                          ServerAsymKeySigner signer)
+    public static JSONObjectWriter encode(ReserveOrBasicRequest reserveOrBasicRequest,
+                                          ServerX509Signer signer)
         throws IOException, GeneralSecurityException {
-        JSONObjectWriter wr = Messages.createBaseMessage(directDebit ? Messages.BASIC_CREDIT_REQUEST : 
-            acquirerAuthorityUrl == null ? Messages.RESERVE_CREDIT_REQUEST : Messages.RESERVE_CARDPAY_REQUEST)
-            .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
-            .setObject(AUTHORIZATION_DATA_JSON, encryptedAuthorizationData)
-            .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
-            .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root);
-        if (directDebit || acquirerAuthorityUrl == null) {
-            JSONArrayWriter aw = wr.setArray(PAYEE_ACCOUNTS_JSON);
-            for (AccountDescriptor account : accounts) {
-                aw.setObject(account.writeObject());
-            }
-        } else {
-            zeroTest(PAYEE_ACCOUNTS_JSON, accounts);
-            wr.setString(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
-        }
-        if (directDebit) {
-            zeroTest(EXPIRES_JSON, expires);
-            zeroTest(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
-        } else {
-            wr.setDateTime(EXPIRES_JSON, expires, true);
-        }
+        JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
+            .setObject(EMBEDDED_REQUEST_JSON, reserveOrBasicRequest.root);
         wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
           .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME,
                                                     PaymentRequest.SOFTWARE_VERSION))

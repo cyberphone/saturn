@@ -43,7 +43,6 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.CertificatePathCompare;
 import org.webpki.saturn.common.ErrorReturn;
-import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
@@ -173,21 +172,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             boolean basicCredit = !UserPaymentServlet.getOption(session, HomeServlet.RESERVE_MODE_SESSION_ATTR) &&
                                   !acquirerBased;
 
-            // Should be external data but this is a demo you know...
-            AccountDescriptor[] accounts = {new AccountDescriptor("http://ultragiro.fr", "35964640"),
-                                            new AccountDescriptor("http://mybank.com", 
-                                                                  "J-399.962",
-                                                                  new String[]{"enterprise"})};
-
             // Attest the user's encrypted authorization to show "intent"
             JSONObjectWriter providerRequest =
                 ReserveOrBasicRequest.encode(basicCredit,
+                                             payerAuthorization.getProviderAuthorityUrl(),
                                              payerAuthorization.getAccountType(),
                                              userAuthorization.getObject(AUTHORIZATION_DATA_JSON),
                                              request.getRemoteAddr(),
                                              paymentRequest,
-                                             acquirerBased ? MerchantService.acquirerAuthorityUrl : null,
-                                             acquirerBased ? null : accounts,
                                              basicCredit ? null : Expires.inMinutes(30),
                                              MerchantService.merchantKey);
 

@@ -80,8 +80,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
     
-    static PublicKey merchantKey;
-    
     static LinkedHashMap<String,UserAccountEntry> userAccountDb = new LinkedHashMap<String,UserAccountEntry>();
     
     static LinkedHashMap<String,MerchantAccountEntry> merchantAccountDb = new LinkedHashMap<String,MerchantAccountEntry>();

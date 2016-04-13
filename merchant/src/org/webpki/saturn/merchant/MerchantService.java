@@ -66,8 +66,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String PAYMENT_ROOT                 = "payment_root";
     
-    static final String ACQUIRER_AUTHORITY_URL       = "acquirer_authority_url";
-
     static final String PAYEE_PROVIDER_AUTHORITY_URL = "payee_provider_authority_url";
 
     static final String SERVER_PORT_MAP              = "server_port_map";
@@ -160,8 +158,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             currency = Currencies.valueOf(getPropertyString(CURRENCY));
 
             w2nbWalletName = getPropertyString(W2NB_WALLET);
-
-            acquirerAuthorityUrl = getPropertyString(ACQUIRER_AUTHORITY_URL);
 
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 

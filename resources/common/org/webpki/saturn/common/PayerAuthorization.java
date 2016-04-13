@@ -30,14 +30,14 @@ public class PayerAuthorization implements BaseProperties {
         Messages.parseBaseMessage(Messages.PAYER_AUTHORIZATION, rd);
         EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
-        authorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
+        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         rd.checkForUnread();
     }
     
-    String authorityUrl;
-    public String getAuthorityUrl() {
-        return authorityUrl;
+    String providerAuthorityUrl;
+    public String getProviderAuthorityUrl() {
+        return providerAuthorityUrl;
     }
 
     PayerAccountTypes accountType;
@@ -52,13 +52,13 @@ public class PayerAuthorization implements BaseProperties {
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           JSONObjectWriter unencryptedAuthorizationData,
-                                          String authorityUrl,
+                                          String providerAuthorityUrl,
                                           String accountType,
                                           String dataEncryptionAlgorithm,
                                           PublicKey keyEncryptionKey,
                                           String keyEncryptionAlgorithm) throws IOException, GeneralSecurityException {
         return Messages.createBaseMessage(Messages.PAYER_AUTHORIZATION)
-            .setString(PROVIDER_AUTHORITY_URL_JSON, authorityUrl)
+            .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(AUTHORIZATION_DATA_JSON,

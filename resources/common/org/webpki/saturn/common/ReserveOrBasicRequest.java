@@ -27,8 +27,6 @@ import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
 
-import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
@@ -41,7 +39,8 @@ public class ReserveOrBasicRequest implements BaseProperties {
                                      Messages.RESERVE_CARDPAY_REQUEST};
     
     public ReserveOrBasicRequest(JSONObjectReader rd) throws IOException {
-        message = Messages.parseBaseMessage(valid, rd);
+        message = Messages.parseBaseMessage(valid, root = rd);
+        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         encryptedAuthorizationData = EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON));
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
@@ -49,24 +48,12 @@ public class ReserveOrBasicRequest implements BaseProperties {
         if (!message.isBasicCredit()) {
             expires = rd.getDateTime(EXPIRES_JSON);
         }
-        if (message.isCardPayment()) {
-            acquirerAuthorityUrl = rd.getString(ACQUIRER_AUTHORITY_URL_JSON);
-        } else {
-            Vector<AccountDescriptor> accounts = new Vector<AccountDescriptor> ();
-            JSONArrayReader ar = rd.getArray(PAYEE_ACCOUNTS_JSON);
-            do {
-                accounts.add(new AccountDescriptor(ar.getObject()));
-            } while (ar.hasMore());
-            this.accounts = accounts.toArray(new AccountDescriptor[0]);
-        }
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         rd.checkForUnread();
     }
 
-
-    PayerAccountTypes accountType;
 
     GregorianCalendar dateTime;
 
@@ -76,9 +63,11 @@ public class ReserveOrBasicRequest implements BaseProperties {
 
     EncryptedData encryptedAuthorizationData;
 
-    AccountDescriptor[] accounts;
-    public AccountDescriptor[] getPayeeAccountDescriptors() {
-        return accounts;
+    JSONObjectReader root;
+
+    PayerAccountTypes accountType;
+    public PayerAccountTypes getPayerAccountType() {
+        return accountType;
     }
 
     GregorianCalendar expires;
@@ -91,9 +80,9 @@ public class ReserveOrBasicRequest implements BaseProperties {
         return message;
     }
 
-    String acquirerAuthorityUrl;
-    public String getAcquirerAuthorityUrl() {
-        return acquirerAuthorityUrl;
+    String providerAuthorityUrl;
+    public String getProviderAuthorityUrl() {
+        return providerAuthorityUrl;
     }
  
     String clientIpAddress;
@@ -107,33 +96,23 @@ public class ReserveOrBasicRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(boolean basicCredit,
+                                          String providerAuthorityUrl,
                                           PayerAccountTypes accountType,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          String acquirerAuthorityUrl,
-                                          AccountDescriptor[] accounts,
                                           Date expires,
                                           ServerAsymKeySigner signer)
         throws IOException, GeneralSecurityException {
         JSONObjectWriter wr = Messages.createBaseMessage(basicCredit ? Messages.BASIC_CREDIT_REQUEST : 
-            acquirerAuthorityUrl == null ? Messages.RESERVE_CREDIT_REQUEST : Messages.RESERVE_CARDPAY_REQUEST)
+            accountType.isAcquirerBased() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
+            .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
             .setObject(AUTHORIZATION_DATA_JSON, encryptedAuthorizationData)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root);
-        if (basicCredit || acquirerAuthorityUrl == null) {
-            JSONArrayWriter aw = wr.setArray(PAYEE_ACCOUNTS_JSON);
-            for (AccountDescriptor account : accounts) {
-                aw.setObject(account.writeObject());
-            }
-        } else {
-            zeroTest(PAYEE_ACCOUNTS_JSON, accounts);
-            wr.setString(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
-        }
         if (basicCredit) {
             zeroTest(EXPIRES_JSON, expires);
-            zeroTest(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
         } else {
             wr.setDateTime(EXPIRES_JSON, expires, true);
         }

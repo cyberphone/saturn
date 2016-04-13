@@ -28,6 +28,7 @@ public interface BaseProperties {
     String PAYEE_ACCOUNT_JSON                = "payeeAccount";          // Selected payee Account2Account
     String PAYER_ACCOUNT_JSON                = "payerAccount";          // Selected payer Account2Account or Card
     String EXPIRES_JSON                      = "expires";               // Object expiration time
+    String EMBEDDED_REQUEST_JSON             = "embeddedRequest";
     String AUTHORITY_URL_JSON                = "authorityUrl";
     String TRANSACTION_URL_JSON              = "transactionUrl";
     String PROVIDER_AUTHORIZATION_JSON       = "providerAuthorization";
