@@ -70,6 +70,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String DECRYPTION_KEY1       = "bank_decryptionkey1";
     static final String DECRYPTION_KEY2       = "bank_decryptionkey2";
     
+    static final String PAYMENT_ROOT          = "payment_root";
+
     static final String USER_ACCOUNT_DB       = "user_account_db";
     
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
@@ -85,6 +87,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static LinkedHashMap<String,MerchantAccountEntry> merchantAccountDb = new LinkedHashMap<String,MerchantAccountEntry>();
 
     static ServerX509Signer bankKey;
+    
+    static JSONX509Verifier paymentRoot;
     
     static X509Certificate[] bankCertificatePath;
     
@@ -134,6 +138,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                                                   getPropertyString(KEYSTORE_PASSWORD));
             bankCertificatePath = bankcreds.getCertificatePath();
             bankKey = new ServerX509Signer(bankcreds);
+
+            paymentRoot = getRoot(PAYMENT_ROOT);
 
             JSONArrayReader accounts = JSONParser.parse(
                                           ArrayUtil.getByteArrayFromInputStream (getResource(USER_ACCOUNT_DB))

@@ -102,8 +102,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
                                           Date expires,
-                                          ServerAsymKeySigner signer)
-        throws IOException, GeneralSecurityException {
+                                          ServerAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(basicCredit ? Messages.BASIC_CREDIT_REQUEST : 
             accountType.isAcquirerBased() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)

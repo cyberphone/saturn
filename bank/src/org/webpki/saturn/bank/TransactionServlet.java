@@ -54,6 +54,7 @@ import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.TransactionRequest;
+import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.webutil.ServletUtil;
 
@@ -69,9 +70,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     
     static HashMap<String,Integer> requestTypes = new HashMap<String,Integer>();
     
-    static final int REQTYPE_PAYEE_INITIAL = 0;
-    static final int REQTYPE_PAYEE_FINAL   = 1;
-    static final int REQTYPE_TRANSACTION   = 2;
+    static final int REQTYPE_PAYEE_INITIAL          = 0;
+    static final int REQTYPE_PAYEE_FINAL            = 1;
+    static final int REQTYPE_TRANSACTION            = 2;
+    static final int REQTYPE_FINALIZE_TRANSACTION   = 3;
     
     static {
         requestTypes.put(Messages.BASIC_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_INITIAL);
@@ -82,6 +84,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         requestTypes.put(Messages.FINALIZE_CARDPAY_REQUEST.toString(), REQTYPE_PAYEE_FINAL);
 
         requestTypes.put(Messages.TRANSACTION_REQUEST.toString(), REQTYPE_TRANSACTION);
+
+        requestTypes.put(Messages.FINALIZE_TRANSACTION_REQUEST.toString(), REQTYPE_FINALIZE_TRANSACTION);
     }
     
     static final int TIMEOUT_FOR_REQUEST = 5000;
@@ -100,7 +104,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                        url2.getFile()).toExternalForm(); 
     }
 
-    JSONObjectReader fetchJSONData(HTTPSWrapper wrap) throws IOException {
+    JSONObjectReader fetchJSONData(HTTPSWrapper wrap, URLHolder urlHolder) throws IOException {
         if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
             throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
                                   (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
@@ -109,24 +113,29 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         if (!wrap.getRawContentType().equals(JSON_CONTENT_TYPE)) {
             throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + wrap.getRawContentType());
         }
-        return JSONParser.parse(wrap.getData());        
+        JSONObjectReader result = JSONParser.parse(wrap.getData());
+        logger.info("Call to " + urlHolder.getUrl() + urlHolder.callerAddress +
+                    "returned:\n" + result);
+        return result;
     }
 
-    JSONObjectReader postData(URLHolder urlHolder, byte[] data) throws IOException {
+    JSONObjectReader postData(URLHolder urlHolder, JSONObjectWriter request) throws IOException {
+        logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress + "with data:\n" + request);
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setHeader("Content-Type", JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), data);
-        return fetchJSONData(wrap);
+        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+        return fetchJSONData(wrap, urlHolder);
     }
 
     JSONObjectReader getData(URLHolder urlHolder) throws IOException {
+        logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress);
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setRequireSuccess(false);
         wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
-        return fetchJSONData(wrap);
+        return fetchJSONData(wrap, urlHolder);
     }
 
     // The purpose of this class is to enable URL information in exceptions
@@ -139,7 +148,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         URLHolder(String remoteAddress, String contextPath) {
             this.remoteAddress = remoteAddress;
             this.contextPath = contextPath;
-            callerAddress = remoteAddress + " from " + contextPath;
+            callerAddress = " [Origin=" + remoteAddress + ", Context=" + contextPath + "] ";
         }
 
         private String url;
@@ -157,22 +166,26 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return "#" + (referenceId++);
     }
 
-    JSONObjectWriter processTransactionRequest(JSONObjectReader payeeRequest, URLHolder urlHolder) throws IOException, GeneralSecurityException {
-/*
-        // Read the by the user and merchant attested payment request
-        ReserveOrBasicRequest attestedPaymentRequest = new ReserveOrBasicRequest(payeeRequest);
+    JSONObjectWriter processTransactionRequest(JSONObjectReader request, URLHolder urlHolder)
+    throws IOException, GeneralSecurityException {
+
+        // Decode transaction request message
+        TransactionRequest transactionRequest = new TransactionRequest(request);
+        
+        // Verify that the transaction request is signed by a payment partner
+        transactionRequest.getSignatureDecoder().verify(BankService.paymentRoot);
+
+        // Get the embedded by the user and merchant attested payment request
+        ReserveOrBasicRequest attestedPaymentRequest = transactionRequest.getReserveOrBasicRequest();
+
+        // Merchant provides the client's IP address which can be used for RBA
+        String clientIpAddress = attestedPaymentRequest.getClientIpAddress();
 
         // Decrypt the encrypted user authorization
         AuthorizationData authorizationData =
                attestedPaymentRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
-        // The merchant is the only entity who can provide the client's IP address
-        String clientIpAddress = attestedPaymentRequest.getClientIpAddress();
-
-        // Client IP could be used for risk-based authentication, here it is only logged
-        logger.info("Client address: " + clientIpAddress);
-
-        // Verify that the there is an account matching the received public key
+        // Verify that the there is a matching user account
         String accountId = authorizationData.getAccountDescriptor().getAccountId();
         String accountType = authorizationData.getAccountDescriptor().getAccountType();
         UserAccountEntry account = BankService.userAccountDb.get(accountId);
@@ -188,7 +201,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             logger.info("Wrong public key for account ID: " + accountId);
             throw new IOException("Wrong user public key");
         }
-
+        logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType);
+/*
         // Get the embedded (counter-signed) payment request
         PaymentRequest paymentRequest = attestedPaymentRequest.getPaymentRequest();
 
@@ -249,13 +263,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                              getReferenceId(),
                                              BankService.bankKey);
 */
-        return new JSONObjectWriter().setString("SPUNK", "Anders was here...");
+        return TransactionResponse.encode(transactionRequest, BankService.bankKey);
  }
 
-    JSONObjectWriter processReserveOrBasicRequest(JSONObjectReader payeeRequest, URLHolder urlHolder)
+    JSONObjectWriter processReserveOrBasicRequest(JSONObjectReader request, URLHolder urlHolder)
     throws IOException, GeneralSecurityException {
         // Read the by the user and merchant attested payment request
-        ReserveOrBasicRequest attestedPaymentRequest = new ReserveOrBasicRequest(payeeRequest);
+        ReserveOrBasicRequest attestedPaymentRequest = new ReserveOrBasicRequest(request);
 
        // The merchant is the only entity who can provide the client's IP address
        String clientIpAddress = attestedPaymentRequest.getClientIpAddress();
@@ -287,24 +301,23 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
        // We got an authentic request.  Now we need to get an attestation by     //
        // the payer's bank that user is authentic and have the required funds... //
        ////////////////////////////////////////////////////////////////////////////
-       
+
+       // Should be external data but this is a demo you know...
+       AccountDescriptor[] accounts = {new AccountDescriptor("http://ultragiro.fr", "35964640"),
+                                       new AccountDescriptor("http://mybank.com", 
+                                                             "J-399.962",
+                                                             new String[]{"enterprise"})};
+     
        urlHolder.setUrl(providerAuthority.getTransactionUrl());
        JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
+                                                                       accounts,
                                                                        BankService.bankKey);
-       logger.info("About to send [" + urlHolder.callerAddress + "] to " + urlHolder.getUrl() +
-                   ":\n" + transactionRequest);
-       return new JSONObjectWriter(
-       postData(urlHolder, transactionRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED)));
+       
+       // Decode response
+       TransactionResponse transactionResponse = new TransactionResponse(postData(urlHolder, transactionRequest));
 
-/*
-       return ReserveOrBasicResponse.encode(attestedPaymentRequest,
-                                            paymentRequest,
-                                            authorizationData.getAccountDescriptor(),
-                                            encryptedCardData,
-                                            payeeAccount,
-                                            getReferenceId(),
+       return ReserveOrBasicResponse.encode(transactionResponse,
                                             BankService.bankKey);
-*/
     }
 
     JSONObjectWriter processFinalizeRequest(JSONObjectReader payeeRequest, URLHolder urlHolder) throws IOException, GeneralSecurityException {
@@ -335,7 +348,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
             }
             JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
-            logger.info("Received from [" + urlHolder.callerAddress + "]:\n" + providerRequest);
+            logger.info("Call from" + urlHolder.callerAddress + "with data:\n" + providerRequest);
 
             /////////////////////////////////////////////////////////////////////////////////////////
             // We rationalize here by using a single end-point for all requests                    //
@@ -356,11 +369,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                     providerResponse = processFinalizeRequest(providerRequest, urlHolder);
                     break;
                     
-                default:
+                case REQTYPE_TRANSACTION:
                     providerResponse = processTransactionRequest(providerRequest, urlHolder);
+                    break;
                     
+                default:
+                    throw new IOException("Not implemented");
             }
-            logger.info("Returned to caller ["  + urlHolder.callerAddress + "]:\n" + providerResponse);
+            logger.info("Responded to caller"  + urlHolder.callerAddress + "with data:\n" + providerResponse);
 
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //

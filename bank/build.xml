@@ -53,7 +53,8 @@
 	  <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
 	  <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
-      <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
+      <replacefilter token="@payment-root@" value="${paymentroot}.cer"/>
+	  <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@err-media-type@" value="${errormedia}"/>
@@ -75,7 +76,7 @@
          <include name="${enc.key.rsa}"/>
          <include name="${enc.key.ec}"/>
          <include name="${cert.key}"/>
-         <include name="${clientroot}.cer"/>
+         <include name="${paymentroot}.cer"/>
       </zipfileset>
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
          <include name="${users.db}"/>

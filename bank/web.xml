@@ -35,6 +35,12 @@
     </context-param>
 
     <context-param>
+        <description>Payment Network Root Certificate</description>
+        <param-name>payment_root</param-name>
+        <param-value>@payment-root@</param-value>
+    </context-param>
+    
+    <context-param>
         <description>Merchant Accounts</description>
         <param-name>merchant_account_db</param-name>
         <param-value>@merchant-account-db@</param-value>

@@ -39,6 +39,7 @@ public class FinalizeRequest implements BaseProperties {
     public FinalizeRequest(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         message = Messages.parseBaseMessage(valid, root = rd);
         embeddedResponse = new ReserveOrBasicResponse(rd.getObject(PROVIDER_AUTHORIZATION_JSON));
+/*
         amount = rd.getBigDecimal(AMOUNT_JSON,
                                   embeddedResponse.getPaymentRequest().getCurrency().getDecimals());
         referenceId = rd.getString(REFERENCE_ID_JSON);
@@ -50,6 +51,7 @@ public class FinalizeRequest implements BaseProperties {
         if (amount.compareTo(paymentRequest.getAmount()) > 0) {
             throw new IOException("Final amount must be less or equal to reserved amount");
         }
+*/
         rd.checkForUnread();
     }
 
@@ -84,9 +86,11 @@ public class FinalizeRequest implements BaseProperties {
                                           ServerAsymKeySigner signer)
     throws IOException, GeneralSecurityException {
         return Messages.createBaseMessage(Messages.FINALIZE_CREDIT_REQUEST)
-            .setBigDecimal(AMOUNT_JSON,
+/*
+                .setBigDecimal(AMOUNT_JSON,
                            amount,
                            providerResponse.getPaymentRequest().getCurrency().getDecimals())
+*/
             .setObject(PROVIDER_AUTHORIZATION_JSON, providerResponse.root)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)

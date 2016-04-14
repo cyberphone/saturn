@@ -18,9 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.security.GeneralSecurityException;
-import java.security.PublicKey;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
@@ -31,113 +28,70 @@ import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-
-import org.webpki.util.ArrayUtil;
+import org.webpki.json.JSONSignatureDecoder;
+import org.webpki.json.JSONSignatureTypes;
 
 public class TransactionRequest implements BaseProperties {
     
-    static final Messages[] valid = {Messages.BASIC_CREDIT_REQUEST,
-                                     Messages.RESERVE_CREDIT_REQUEST,
-                                     Messages.RESERVE_CARDPAY_REQUEST};
-    
+    public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
+    public static final String SOFTWARE_VERSION = "1.00";
+
     public TransactionRequest(JSONObjectReader rd) throws IOException {
-        message = Messages.parseBaseMessage(valid, rd);
-        accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
-        encryptedAuthorizationData = EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON));
-        clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
-        paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
-        if (!message.isBasicCredit()) {
-            expires = rd.getDateTime(EXPIRES_JSON);
-        }
-        if (message.isCardPayment()) {
-            acquirerAuthorityUrl = rd.getString(ACQUIRER_AUTHORITY_URL_JSON);
+        Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, root = rd);
+        embeddedRequest = new ReserveOrBasicRequest(rd.getObject(EMBEDDED_REQUEST_JSON));
+        if (embeddedRequest.message.isCardPayment()) {
+            
         } else {
-            Vector<AccountDescriptor> accounts = new Vector<AccountDescriptor> ();
+            Vector<AccountDescriptor> accounts = new Vector<AccountDescriptor>();
             JSONArrayReader ar = rd.getArray(PAYEE_ACCOUNTS_JSON);
             do {
                 accounts.add(new AccountDescriptor(ar.getObject()));
             } while (ar.hasMore());
-            this.accounts = accounts.toArray(new AccountDescriptor[0]);
+            accountDescriptors = accounts.toArray(new AccountDescriptor[0]);
         }
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
-        outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
+        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
+        signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
 
-
-    PayerAccountTypes accountType;
-
+    JSONObjectReader root;
+    
+    Software software;
+    
     GregorianCalendar dateTime;
 
-    Software software;
-
-    PublicKey outerPublicKey;
-
-    EncryptedData encryptedAuthorizationData;
-
-    AccountDescriptor[] accounts;
+    AccountDescriptor[] accountDescriptors;
     public AccountDescriptor[] getPayeeAccountDescriptors() {
-        return accounts;
+        return accountDescriptors;
     }
 
-    GregorianCalendar expires;
-    public GregorianCalendar getExpires() {
-        return expires;
+    JSONSignatureDecoder signatureDecoder;
+    public JSONSignatureDecoder getSignatureDecoder() {
+        return signatureDecoder;
     }
 
-    Messages message;
-    public Messages getMessage() {
-        return message;
-    }
-
-    String acquirerAuthorityUrl;
-    public String getAcquirerAuthorityUrl() {
-        return acquirerAuthorityUrl;
-    }
- 
-    String clientIpAddress;
-    public String getClientIpAddress() {
-        return clientIpAddress;
-    }
-
-    PaymentRequest paymentRequest;
-    public PaymentRequest getPaymentRequest() {
-        return paymentRequest;
+    ReserveOrBasicRequest embeddedRequest;
+    public ReserveOrBasicRequest getReserveOrBasicRequest() {
+        return embeddedRequest;
     }
 
     public static JSONObjectWriter encode(ReserveOrBasicRequest reserveOrBasicRequest,
-                                          ServerX509Signer signer)
-        throws IOException, GeneralSecurityException {
+                                          AccountDescriptor[] accountDescriptors,
+                                          ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
             .setObject(EMBEDDED_REQUEST_JSON, reserveOrBasicRequest.root);
+        if (reserveOrBasicRequest.message.isCardPayment()) {
+        } else {
+            JSONArrayWriter aw = wr.setArray(PAYEE_ACCOUNTS_JSON);
+            for (AccountDescriptor account : accountDescriptors) {
+                aw.setObject(account.writeObject());
+            }
+        }
         wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
-          .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME,
-                                                    PaymentRequest.SOFTWARE_VERSION))
+          .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
           .setSignature(signer);
         return wr;
-    }
-
-    static void zeroTest(String name, Object object) throws IOException {
-        if (object != null) {
-            throw new IOException("Argument error, parameter \"" + name + "\" must be \"null\"");
-        }
-    }
-
-    public static void comparePublicKeys(PublicKey publicKey, PaymentRequest paymentRequest) throws IOException {
-        if (!publicKey.equals(paymentRequest.getPublicKey())) {
-            throw new IOException("Outer and inner public key differ");
-        }
-    }
-
-    public AuthorizationData getDecryptedAuthorizationData(Vector<DecryptionKeyHolder> decryptionKeys)
-    throws IOException, GeneralSecurityException {
-        AuthorizationData authorizationData =
-            new AuthorizationData(encryptedAuthorizationData.getDecryptedData(decryptionKeys));
-        comparePublicKeys (outerPublicKey, paymentRequest);
-        if (!ArrayUtil.compare(authorizationData.getRequestHash(), paymentRequest.getRequestHash())) {
-            throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
-        }
-        return authorizationData;
     }
 }

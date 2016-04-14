@@ -17,16 +17,12 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.net.URL;
-
 import java.security.GeneralSecurityException;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,11 +32,8 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-
 import org.webpki.net.HTTPSWrapper;
-
 import org.webpki.util.ArrayUtil;
-
 import org.webpki.saturn.common.CertificatePathCompare;
 import org.webpki.saturn.common.ErrorReturn;
 import org.webpki.saturn.common.PayerAccountTypes;
@@ -56,6 +49,8 @@ import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PayerAuthorization;
+import org.webpki.saturn.common.TransactionRequest;
+import org.webpki.saturn.common.TransactionResponse;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -209,12 +204,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
             // Additional consistency checking
             ReserveOrBasicResponse reserveOrBasicResponse = new ReserveOrBasicResponse(resultMessage);
+/*
             if (reserveOrBasicResponse.isBasicCredit() != basicCredit) {
                 throw new IOException("Response basic/reserve mode doesn't match request");
             }
-
+*/
             // In addition to hard errors, there are a few "normal" errors which preferably would
             // be dealt with in more user-oriented fashion.
+/*
             if (!reserveOrBasicResponse.success()) {
                 if (debug) {
                     debugData.softReserveOrBasicError = true;
@@ -226,14 +223,18 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             if (!reserveOrBasicResponse.getAccountType().equals(payerAuthorization.getAccountType().getTypeUri())) {
                 throw new IOException("Response account type doesn't match request");
             }
-
+*/
             // No error return, then we can verify the response fully
             reserveOrBasicResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
-
-            if (!ArrayUtil.compare(reserveOrBasicResponse.getPaymentRequest().getRequestHash(), requestHash)) {
+            
+            TransactionResponse transactionResponse = reserveOrBasicResponse.getTransactionResponse();
+            TransactionRequest transactionRequest = transactionResponse.getTransactionRequest();
+            ReserveOrBasicRequest reserveOrBasicRequest = transactionRequest.getReserveOrBasicRequest();
+            if (!ArrayUtil.compare(reserveOrBasicRequest.getPaymentRequest().getRequestHash(), requestHash)) {
                 throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
             }
-            
+            /*
+
             if (!reserveOrBasicResponse.isBasicCredit()) {
                 // Two-phase operation: perform the final step
                 ErrorReturn errorReturn = processFinalize (reserveOrBasicResponse, urlHolder, debugData);
@@ -247,12 +248,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                     return;
                 }
             }
+*/            
 
-            logger.info("Successful authorization of request: " + reserveOrBasicResponse.getPaymentRequest().getReferenceId());
+            logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
             HTML.resultPage(response,
                             debug,
-                            reserveOrBasicResponse.getPaymentRequest(),
-                            PayerAccountTypes.fromTypeUri(reserveOrBasicResponse.getAccountType()),
+                            paymentRequest,
+                            PayerAccountTypes.fromTypeUri(reserveOrBasicRequest.getAccountType()),
                             acquirerBased ? // = Card
                                 AuthorizationData.formatCardNumber(reserveOrBasicResponse.getAccountReference())
                                                           :
@@ -267,6 +269,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
     ErrorReturn processFinalize(ReserveOrBasicResponse bankResponse, URLHolder urlHolder, DebugData debugData)
     throws IOException, GeneralSecurityException {
+/*
         String target = "provider";
         Authority acquirerAuthority = null;
         if (!bankResponse.isAccount2Account()) {
@@ -314,6 +317,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         if (!ArrayUtil.compare(RequestHash.getRequestHash(sentFinalize), finalizeResponse.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
         }
+*/
         return null;
     }
 

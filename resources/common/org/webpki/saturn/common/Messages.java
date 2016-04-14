@@ -24,57 +24,60 @@ import org.webpki.json.JSONObjectWriter;
 
 public enum Messages {
 
-    WALLET_IS_READY           ("WalletIsReady"),           // Wallet to payee Web page message
-    WALLET_REQUEST            ("WalletRequest"),           // Payee payment request + other data
-    PAYER_AUTHORIZATION       ("PayerAuthorization"),      // Created by the Wallet
+    WALLET_IS_READY               ("WalletIsReady"),                 // Wallet to payee Web page message
+    WALLET_REQUEST                ("WalletRequest"),                 // Payee payment request + other data
+    PAYER_AUTHORIZATION           ("PayerAuthorization"),            // Created by the Wallet
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // One-step payment operation in Account2Account mode
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    BASIC_CREDIT_REQUEST      ("BasicCreditRequest",       // Payee request to Payee provider
-                               false, true),
-    TRANSACTION_REQUEST       ("TransactionRequest"),      // Payee provider to Payer provider
-    TRANSACTION_RESPONSE      ("TransactionResponse"),     // Payer provider response
-    BASIC_CREDIT_RESPONSE     ("BasicCreditResponse",      // Payee provider response
-                               false, true),
+    BASIC_CREDIT_REQUEST          ("BasicCreditRequest",             // Payee request to Payee provider
+                                   false, true),
+    TRANSACTION_REQUEST           ("TransactionRequest"),            // Payee provider to Payer provider
+    TRANSACTION_RESPONSE          ("TransactionResponse"),           // Payer provider response
+    BASIC_CREDIT_RESPONSE         ("BasicCreditResponse",            // Payee provider response
+                                   false, true),
     ///////////////////////////////////////////////////////////////////////////////////////////////
- 
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Two-step payment operation in the Account2Account mode
     //
     // First step - Payee to Payee provider
-    RESERVE_CREDIT_REQUEST    ("ReserveCreditRequest",     // Reserve debit funds at provider
-                               false, false),
+    RESERVE_CREDIT_REQUEST        ("ReserveCreditRequest",           // Reserve debit funds at provider
+                                   false, false),
     // TRANSACTION_REQUEST/TRANSACTION_RESPONSE pair like in the one-step mode
-    RESERVE_CREDIT_RESPONSE   ("ReserveCreditResponse",    // Provider response to request
-                               false, false),
+    RESERVE_CREDIT_RESPONSE       ("ReserveCreditResponse",          // Provider response to request
+                                   false, false),
     //
     // Second step - Payee to Payee provider
-    FINALIZE_CREDIT_REQUEST   ("FinalizeCreditRequest",    // Perform the actual payment operation
-                               false, false),
-    // TRANSACTION_REQUEST/TRANSACTION_RESPONSE pair like in the one-step mode
-    FINALIZE_CREDIT_RESPONSE  ("FinalizeCreditResponse",   // Provider response
-                               false, false),
+    FINALIZE_CREDIT_REQUEST       ("FinalizeCreditRequest",          // Perform the actual payment operation
+                                   false, false),
+    FINALIZE_TRANSACTION_REQUEST  ("FinalizeTransactionRequest",     // Payee provider to Payer provider
+                                   false, false),
+    FINALIZE_TRANSACTION_RESPONSE ("FinalizeTransactionResponse",    // Payer provider response
+                                   false, false),
+    FINALIZE_CREDIT_RESPONSE      ("FinalizeCreditResponse",         // Provider response
+                                   false, false),
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Two-step payment operation in the Card payment mode
     //
     // First step - Payee to Payee provider.  Note that Payee provider may be = Acquirer
-    RESERVE_CARDPAY_REQUEST   ("ReserveCardpayRequest",    // Reserve funds at provider
-                               true, false),
+    RESERVE_CARDPAY_REQUEST       ("ReserveCardpayRequest",          // Reserve funds at provider
+                                   true, false),
     // TRANSACTION_REQUEST/TRANSACTION_RESPONSE pair like in the one-step mode
-    RESERVE_CARDPAY_RESPONSE  ("ReserveCardpayResponse",   // Provider response to request
-                               true, false),
+    RESERVE_CARDPAY_RESPONSE      ("ReserveCardpayResponse",         // Provider response to request
+                                   true, false),
     //
     // Second step - Payee to Acquirer
-    FINALIZE_CARDPAY_REQUEST  ("FinalizeCardpayRequest",   // Perform the actual payment operation
-                               true, false),
-    FINALIZE_CARDPAY_RESPONSE ("FinalizeCardpayResponse",  // Acquirer response
-                               true, false),
+    FINALIZE_CARDPAY_REQUEST      ("FinalizeCardpayRequest",         // Perform the actual payment operation
+                                   true, false),
+    FINALIZE_CARDPAY_RESPONSE     ("FinalizeCardpayResponse",        // Acquirer response
+                                   true, false),
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    AUTHORITY                 ("Authority");               // Published entity data
+    AUTHORITY                     ("Authority");                     // Published entity data
     
     String qualifier;
     
