@@ -254,11 +254,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             HTML.resultPage(response,
                             debug,
                             paymentRequest,
-                            PayerAccountTypes.fromTypeUri(reserveOrBasicRequest.getAccountType()),
+                            reserveOrBasicRequest.getPayerAccountType(),
                             acquirerBased ? // = Card
-                                AuthorizationData.formatCardNumber(reserveOrBasicResponse.getAccountReference())
+                                AuthorizationData.formatCardNumber(transactionResponse.getPayerAccountReference())
                                                           :
-                                                              reserveOrBasicResponse.getAccountReference());  // Currently "unmoderated" account
+                                transactionResponse.getPayerAccountReference());  // Currently "unmoderated" account
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();

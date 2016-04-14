@@ -176,14 +176,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         transactionRequest.getSignatureDecoder().verify(BankService.paymentRoot);
 
         // Get the embedded by the user and merchant attested payment request
-        ReserveOrBasicRequest attestedPaymentRequest = transactionRequest.getReserveOrBasicRequest();
+        ReserveOrBasicRequest reserveOrBasicRequest = transactionRequest.getReserveOrBasicRequest();
 
         // Merchant provides the client's IP address which can be used for RBA
-        String clientIpAddress = attestedPaymentRequest.getClientIpAddress();
+        String clientIpAddress = reserveOrBasicRequest.getClientIpAddress();
 
         // Decrypt the encrypted user authorization
         AuthorizationData authorizationData =
-               attestedPaymentRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
+               reserveOrBasicRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         // Verify that the there is a matching user account
         String accountId = authorizationData.getAccountDescriptor().getAccountId();
@@ -202,10 +202,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             throw new IOException("Wrong user public key");
         }
         logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType);
-/*
-        // Get the embedded (counter-signed) payment request
-        PaymentRequest paymentRequest = attestedPaymentRequest.getPaymentRequest();
 
+        // Get the embedded (counter-signed) payment request
+        PaymentRequest paymentRequest = reserveOrBasicRequest.getPaymentRequest();
+
+        /*
         // Verify that the merchant's signature belongs to a for us known merchant
         // To simply things we only recognize a single merchant...
         if (!paymentRequest.getPublicKey().equals(BankService.merchantKey)) {
@@ -226,12 +227,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             return ReserveOrBasicResponse.encode(attestedPaymentRequest.getMessage().isBasicCredit(),
                                                 new ErrorReturn(ErrorReturn.ERRORS.INSUFFICIENT_FUNDS));
         }
-
+*/
         // Separate credit-card and account2account payments
         AccountDescriptor payeeAccount = null;
         JSONObjectWriter encryptedCardData = null;
-        if (acquirerBased) {
-            String authorityUrl = attestedPaymentRequest.getAcquirerAuthorityUrl();
+        if (reserveOrBasicRequest.getMessage().isCardPayment()) {
+//TODO
+            String authorityUrl = null;
+//            String authorityUrl = reserveOrBasicRequest.getAcquirerAuthorityUrl();
             HTTPSWrapper wrap = new HTTPSWrapper();
             wrap.setTimeout(TIMEOUT_FOR_REQUEST);
             wrap.setRequireSuccess(true);
@@ -253,8 +256,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                                     authority.getKeyEncryptionAlgorithm());
         } else {
             // We simply take the first account in the list
-            payeeAccount = attestedPaymentRequest.getPayeeAccountDescriptors()[0];
+            payeeAccount = transactionRequest.getPayeeAccountDescriptors()[0];
         }
+/*
         return ReserveOrBasicResponse.encode(attestedPaymentRequest,
                                              paymentRequest,
                                              authorizationData.getAccountDescriptor(),
@@ -263,7 +267,17 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                              getReferenceId(),
                                              BankService.bankKey);
 */
-        return TransactionResponse.encode(transactionRequest, BankService.bankKey);
+
+        StringBuffer payerAccountReference = new StringBuffer();
+        int q = accountId.length() - 4;
+        for (char c : accountId.toCharArray()) {
+            payerAccountReference.append((--q < 0) ? c : '*');
+        }
+        
+        return TransactionResponse.encode(transactionRequest,
+                                          payeeAccount,
+                                          payerAccountReference.toString(),
+                                          BankService.bankKey);
  }
 
     JSONObjectWriter processReserveOrBasicRequest(JSONObjectReader request, URLHolder urlHolder)

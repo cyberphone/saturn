@@ -28,7 +28,7 @@ public interface BaseProperties {
     String PAYEE_ACCOUNT_JSON                = "payeeAccount";          // Selected payee Account2Account
     String PAYER_ACCOUNT_JSON                = "payerAccount";          // Selected payer Account2Account or Card
     String EXPIRES_JSON                      = "expires";               // Object expiration time
-    String EMBEDDED_REQUEST_JSON             = "embeddedRequest";
+    String EMBEDDED_JSON                     = "@embedded";
     String AUTHORITY_URL_JSON                = "authorityUrl";
     String TRANSACTION_URL_JSON              = "transactionUrl";
     String PROVIDER_AUTHORIZATION_JSON       = "providerAuthorization";
@@ -49,7 +49,7 @@ public interface BaseProperties {
     String ACCOUNT_HOLDER_JSON               = "accountHolder";         // Card holder
     String ACCOUNT_SECURITY_CODE_JSON        = "accountSecurityCode";   // CCV
     String CARD_FORMAT_ACCOUNT_ID_JSON       = "cardFormatAccountId";   // Display formatting like cards or not
-    String ACCOUNT_REFERENCE_JSON            = "accountReference";      // Account/Card number for payee (like ************5678)
+    String PAYER_ACCOUNT_REFERENCE_JSON      = "payerAccountReference"; // Account/Card number for payee (like ************5678)
     String PROTECTED_ACCOUNT_DATA_JSON       = "protectedAccountData";  // Account data that (only) an acquirer needs
     String REQUEST_HASH_JSON                 = "requestHash";
     String DOMAIN_NAME_JSON                  = "domainName";

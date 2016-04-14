@@ -32,7 +32,13 @@ public class TransactionResponse implements BaseProperties {
     
     public TransactionResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.TRANSACTION_RESPONSE, root = rd);
-        embeddedRequest = new TransactionRequest(rd.getObject(EMBEDDED_REQUEST_JSON));
+        transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
+        payerAccountReference = rd.getString(PAYER_ACCOUNT_REFERENCE_JSON);
+        if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
+            
+        } else {
+            accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
+        }
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -46,30 +52,42 @@ public class TransactionResponse implements BaseProperties {
     
     GregorianCalendar dateTime;
 
+    AccountDescriptor accountDescriptor;
+    public AccountDescriptor getPayeeAccountDescriptor() {
+        return accountDescriptor;
+    }
+
+    String payerAccountReference;
+    public String getPayerAccountReference() {
+        return payerAccountReference;
+    }
+
     JSONSignatureDecoder signatureDecoder;
     public JSONSignatureDecoder getSignatureDecoder() {
         return signatureDecoder;
     }
 
-    TransactionRequest embeddedRequest;
+    TransactionRequest transactionRequest;
     public TransactionRequest getTransactionRequest() {
-        return embeddedRequest;
+        return transactionRequest;
     }
 
     public static JSONObjectWriter encode(TransactionRequest transactionRequest,
+                                          AccountDescriptor payeeAccount,
+                                          String payerAccountReference,
                                           ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
-            .setObject(EMBEDDED_REQUEST_JSON, transactionRequest.root);
+            .setObject(EMBEDDED_JSON, transactionRequest.root)
+            .setString(PAYER_ACCOUNT_REFERENCE_JSON, payerAccountReference);
+        if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
+            
+        } else {
+            wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
+        }
         wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
           .setObject(SOFTWARE_JSON, Software.encode(TransactionRequest.SOFTWARE_NAME,
                                                     TransactionRequest.SOFTWARE_VERSION))
           .setSignature(signer);
         return wr;
-    }
-
-    static void zeroTest(String name, Object object) throws IOException {
-        if (object != null) {
-            throw new IOException("Argument error, parameter \"" + name + "\" must be \"null\"");
-        }
     }
 }

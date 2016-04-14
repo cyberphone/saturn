@@ -31,8 +31,8 @@ import org.webpki.json.JSONX509Signer;
 
 public class ReserveOrBasicResponse implements BaseProperties {
 
-    static Messages matching(Messages message) {
-        switch (message) {
+    static Messages matching(TransactionResponse transactionResponse) {
+        switch (transactionResponse.transactionRequest.reserveOrBasicRequest.message) {
             case BASIC_CREDIT_REQUEST:
                 return Messages.BASIC_CREDIT_RESPONSE;
 
@@ -46,8 +46,8 @@ public class ReserveOrBasicResponse implements BaseProperties {
     
     public static JSONObjectWriter encode(TransactionResponse transactionResponse,
                                           JSONX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(matching(transactionResponse.embeddedRequest.embeddedRequest.message))
-            .setObject(EMBEDDED_REQUEST_JSON, transactionResponse.root)
+        return Messages.createBaseMessage(matching(transactionResponse))
+            .setObject(EMBEDDED_JSON, transactionResponse.root)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(TransactionRequest.SOFTWARE_NAME,
                                                       TransactionRequest.SOFTWARE_VERSION))
@@ -59,8 +59,8 @@ public class ReserveOrBasicResponse implements BaseProperties {
     GregorianCalendar timeStamp;
     
     public ReserveOrBasicResponse(JSONObjectReader rd) throws IOException {
-        transactionResponse = new TransactionResponse(rd.getObject(EMBEDDED_REQUEST_JSON));
-        Messages.parseBaseMessage(matching(transactionResponse.embeddedRequest.embeddedRequest.message), root = rd);
+        transactionResponse = new TransactionResponse(rd.getObject(EMBEDDED_JSON));
+        Messages.parseBaseMessage(matching(transactionResponse), root = rd);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);

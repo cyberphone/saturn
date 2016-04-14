@@ -38,8 +38,8 @@ public class TransactionRequest implements BaseProperties {
 
     public TransactionRequest(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, root = rd);
-        embeddedRequest = new ReserveOrBasicRequest(rd.getObject(EMBEDDED_REQUEST_JSON));
-        if (embeddedRequest.message.isCardPayment()) {
+        reserveOrBasicRequest = new ReserveOrBasicRequest(rd.getObject(EMBEDDED_JSON));
+        if (reserveOrBasicRequest.message.isCardPayment()) {
             
         } else {
             Vector<AccountDescriptor> accounts = new Vector<AccountDescriptor>();
@@ -72,16 +72,16 @@ public class TransactionRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    ReserveOrBasicRequest embeddedRequest;
+    ReserveOrBasicRequest reserveOrBasicRequest;
     public ReserveOrBasicRequest getReserveOrBasicRequest() {
-        return embeddedRequest;
+        return reserveOrBasicRequest;
     }
 
     public static JSONObjectWriter encode(ReserveOrBasicRequest reserveOrBasicRequest,
                                           AccountDescriptor[] accountDescriptors,
                                           ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
-            .setObject(EMBEDDED_REQUEST_JSON, reserveOrBasicRequest.root);
+            .setObject(EMBEDDED_JSON, reserveOrBasicRequest.root);
         if (reserveOrBasicRequest.message.isCardPayment()) {
         } else {
             JSONArrayWriter aw = wr.setArray(PAYEE_ACCOUNTS_JSON);
