@@ -90,8 +90,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     
     static final int TIMEOUT_FOR_REQUEST = 5000;
 
-    static int referenceId = 164006;
-
     static String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
         if (BankService.serverPortMapping == null) {
@@ -163,7 +161,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     }
     
     static String getReferenceId() {
-        return "#" + (referenceId++);
+        return "#" + (BankService.referenceId++);
     }
 
     JSONObjectWriter processTransactionRequest(JSONObjectReader request, URLHolder urlHolder)
@@ -268,15 +266,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                              BankService.bankKey);
 */
 
-        StringBuffer payerAccountReference = new StringBuffer();
+        StringBuffer accountReference = new StringBuffer();
         int q = accountId.length() - 4;
         for (char c : accountId.toCharArray()) {
-            payerAccountReference.append((--q < 0) ? c : '*');
+            accountReference.append((--q < 0) ? c : '*');
         }
         
         return TransactionResponse.encode(transactionRequest,
+                                          accountReference.toString(),
                                           payeeAccount,
-                                          payerAccountReference.toString(),
+                                          getReferenceId(),
                                           BankService.bankKey);
  }
 
@@ -325,6 +324,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
        urlHolder.setUrl(providerAuthority.getTransactionUrl());
        JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
                                                                        accounts,
+                                                                       getReferenceId(),
                                                                        BankService.bankKey);
        
        // Decode response
@@ -395,7 +395,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            response.setContentType(BankService.jsonMediaType);
+            response.setContentType(JSON_CONTENT_TYPE);
             response.setHeader("Pragma", "No-Cache");
             response.setDateHeader("EXPIRES", 0);
             response.getOutputStream().write(providerResponse.serializeJSONObject(JSONOutputFormats.NORMALIZED));

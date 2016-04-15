@@ -10,7 +10,7 @@
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-      <echo message="both tomcat [-Dpayeebank=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+      <echo message="both tomcat [-Dpayeebank=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -27,12 +27,14 @@
   <target name="_build">
     <property name="bank.host" value="https://localhost:8442/"/>
     <property name="server.port.map" value=""/>
-    <property name="errormedia" value="false"/>
     <property name="users.db" value="users.${appcorename}.json"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
     <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa.p12"/>
     <property name="enc.key.ec" value="${appcorename}-enc-key-ec.p12"/>
     <property name="cert.key" value="${appcorename}-eecert.p12"/>
+    <condition property="reference.id.start" value="120004" else="96744">
+      <equals arg1="${payeebankpath}" arg2="${appcorename}"/>
+    </condition>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
        tablength="4"
@@ -53,11 +55,11 @@
 	  <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
 	  <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
-      <replacefilter token="@payment-root@" value="${paymentroot}.cer"/>
+	  <replacefilter token="@bank-reference-id-start@" value="${reference.id.start}"/>
+	  <replacefilter token="@payment-root@" value="${paymentroot}.cer"/>
 	  <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
-      <replacefilter token="@err-media-type@" value="${errormedia}"/>
     </replace>
     <war destfile="${dist.dir}/${appcorename}.war" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
@@ -100,9 +102,6 @@
      </condition>
      <property name="temp.dir" value=".tmp"/>
      <delete dir="${temp.dir}"/>
-     <condition property="errormedia" value="true">
-       <isset property="err.media"/>
-     </condition>
      <path id="tomcat.compile.classpath">
        <fileset dir="${common.lib.dir}">
          <include name="*.jar"/>

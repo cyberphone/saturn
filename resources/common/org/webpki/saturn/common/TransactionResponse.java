@@ -22,7 +22,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
@@ -33,12 +32,13 @@ public class TransactionResponse implements BaseProperties {
     public TransactionResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.TRANSACTION_RESPONSE, root = rd);
         transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
-        payerAccountReference = rd.getString(PAYER_ACCOUNT_REFERENCE_JSON);
+        accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
             
         } else {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
+        referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -57,9 +57,14 @@ public class TransactionResponse implements BaseProperties {
         return accountDescriptor;
     }
 
-    String payerAccountReference;
-    public String getPayerAccountReference() {
-        return payerAccountReference;
+    String referenceId;
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    String accountReference;
+    public String getAccountReference() {
+        return accountReference;
     }
 
     JSONSignatureDecoder signatureDecoder;
@@ -73,18 +78,20 @@ public class TransactionResponse implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(TransactionRequest transactionRequest,
+                                          String accountReference,
                                           AccountDescriptor payeeAccount,
-                                          String payerAccountReference,
+                                          String referenceId,
                                           ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
             .setObject(EMBEDDED_JSON, transactionRequest.root)
-            .setString(PAYER_ACCOUNT_REFERENCE_JSON, payerAccountReference);
+            .setString(ACCOUNT_REFERENCE_JSON, accountReference);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
             
         } else {
             wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
         }
-        wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
+        wr.setString(REFERENCE_ID_JSON, referenceId)
+          .setDateTime(TIME_STAMP_JSON, new Date(), true)
           .setObject(SOFTWARE_JSON, Software.encode(TransactionRequest.SOFTWARE_NAME,
                                                     TransactionRequest.SOFTWARE_VERSION))
           .setSignature(signer);

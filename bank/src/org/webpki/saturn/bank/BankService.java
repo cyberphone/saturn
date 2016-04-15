@@ -21,7 +21,6 @@ import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.PublicKey;
 
 import java.security.cert.X509Certificate;
 
@@ -69,14 +68,13 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String BANK_HOST             = "bank_host";
     static final String DECRYPTION_KEY1       = "bank_decryptionkey1";
     static final String DECRYPTION_KEY2       = "bank_decryptionkey2";
+    static final String REFERENCE_ID_START    = "bank_reference_id_start";
     
     static final String PAYMENT_ROOT          = "payment_root";
 
     static final String USER_ACCOUNT_DB       = "user_account_db";
     
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
-
-    static final String ERR_MEDIA             = "err_media_type";
 
     static final String SERVER_PORT_MAP       = "server_port_map";
     
@@ -92,11 +90,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static X509Certificate[] bankCertificatePath;
     
-    static String jsonMediaType = BaseProperties.JSON_CONTENT_TYPE;
-
     static byte[] publishedAuthorityData;
 
     static Integer serverPortMapping;
+    
+    static int referenceId;
 
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -159,7 +157,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             addDecryptionKey(DECRYPTION_KEY1);
             addDecryptionKey(DECRYPTION_KEY2);
-            
+
+            referenceId = getPropertyInt(REFERENCE_ID_START);
+
             String bankHost = getPropertyString(BANK_HOST);
             publishedAuthorityData =
                 Authority.encode(bankHost + "/authority",
@@ -167,10 +167,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                  decryptionKeys.get(0).getPublicKey(),
                                  Expires.inDays(365),
                                  bankKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
-
-            if (getPropertyBoolean(ERR_MEDIA)) {
-                jsonMediaType = "text/html";
-            }
 
             logger.info("Saturn Bank-server initiated");
         } catch (Exception e) {

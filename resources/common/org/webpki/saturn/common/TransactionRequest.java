@@ -17,13 +17,11 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
-
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
@@ -49,6 +47,7 @@ public class TransactionRequest implements BaseProperties {
             } while (ar.hasMore());
             accountDescriptors = accounts.toArray(new AccountDescriptor[0]);
         }
+        referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -61,6 +60,11 @@ public class TransactionRequest implements BaseProperties {
     Software software;
     
     GregorianCalendar dateTime;
+
+    String referenceId;
+    public String getReferenceId() {
+        return referenceId;
+    }
 
     AccountDescriptor[] accountDescriptors;
     public AccountDescriptor[] getPayeeAccountDescriptors() {
@@ -79,6 +83,7 @@ public class TransactionRequest implements BaseProperties {
 
     public static JSONObjectWriter encode(ReserveOrBasicRequest reserveOrBasicRequest,
                                           AccountDescriptor[] accountDescriptors,
+                                          String referenceId,
                                           ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
             .setObject(EMBEDDED_JSON, reserveOrBasicRequest.root);
@@ -89,7 +94,8 @@ public class TransactionRequest implements BaseProperties {
                 aw.setObject(account.writeObject());
             }
         }
-        wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
+        wr.setString(REFERENCE_ID_JSON, referenceId)
+          .setDateTime(TIME_STAMP_JSON, new Date(), true)
           .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
           .setSignature(signer);
         return wr;

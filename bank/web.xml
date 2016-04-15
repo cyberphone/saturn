@@ -35,6 +35,12 @@
     </context-param>
 
     <context-param>
+        <description>Bank Reference ID Start</description>
+        <param-name>bank_reference_id_start</param-name>
+        <param-value>@bank-reference-id-start@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Payment Network Root Certificate</description>
         <param-name>payment_root</param-name>
         <param-value>@payment-root@</param-value>
@@ -56,12 +62,6 @@
         <description>Server Port Mapping (may be undefined)</description>
         <param-name>server_port_map</param-name>
         <param-value>@server-port-map@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Force media type error</description>
-        <param-name>err_media_type</param-name>
-        <param-value>@err-media-type@</param-value>
     </context-param>
 
     <listener>
