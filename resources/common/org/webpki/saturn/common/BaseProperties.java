@@ -17,18 +17,24 @@
 package org.webpki.saturn.common;
 
 public interface BaseProperties {
+    String EMBEDDED_JSON                     = "@embedded";
+
     String WINDOW_JSON                       = "window";
     String HEIGHT_JSON                       = "height";
     String WIDTH_JSON                        = "width";
     String COMMON_NAME_JSON                  = "commonName";
     String NAME_JSON                         = "name";
+
+    String TEXT_JSON                         = "text";                  // UserMessageResponse
+    String INPUT_FIELDS_JSON                 = "inputFields";           // UserMessageResponse
+    String LABEL_JSON                        = "label";                 // UserMessageResponse
+    String LENGTH_JSON                       = "length";                // UserMessageResponse
+
     String PAYMENT_REQUEST_JSON              = "paymentRequest";
     String ACQUIRER_AUTHORITY_URL_JSON       = "acquirerAuthorityUrl";  // For CreditCard payments
     String PAYEE_ACCOUNTS_JSON               = "payeeAccounts";         // For Account2Account payments
     String PAYEE_ACCOUNT_JSON                = "payeeAccount";          // Selected payee Account2Account
-    String PAYER_ACCOUNT_JSON                = "payerAccount";          // Selected payer Account2Account or Card
     String EXPIRES_JSON                      = "expires";               // Object expiration time
-    String EMBEDDED_JSON                     = "@embedded";
     String AUTHORITY_URL_JSON                = "authorityUrl";
     String TRANSACTION_URL_JSON              = "transactionUrl";
     String PROVIDER_AUTHORIZATION_JSON       = "providerAuthorization";
@@ -45,6 +51,7 @@ public interface BaseProperties {
     String AUTHORIZATION_DATA_JSON           = "authorizationData";     // Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON       = "providerAuthorityUrl";  // URL to payment provider
     String ACCEPTED_ACCOUNT_TYPES_JSON       = "acceptedAccountTypes";  // List of ACCOUNT_TYPE_JSON
+    String ACCOUNT_JSON                      = "account";               // Payer Account2Account or Card
     String ACCOUNT_REFERENCE_JSON            = "accountReference";      // Account/Card number for payee (like ************5678)
     String ACCOUNT_TYPE_JSON                 = "accountType";           // Account/Card type in the form of a URI
     String ACCOUNT_HOLDER_JSON               = "accountHolder";         // Card holder
