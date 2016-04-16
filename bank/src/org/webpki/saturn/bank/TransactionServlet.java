@@ -113,13 +113,18 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + wrap.getRawContentType());
         }
         JSONObjectReader result = JSONParser.parse(wrap.getData());
-        logger.info("Call to " + urlHolder.getUrl() + urlHolder.callerAddress +
-                    "returned:\n" + result);
+        if (BankService.logging) {
+            logger.info("Call to " + urlHolder.getUrl() + urlHolder.callerAddress +
+                        "returned:\n" + result);
+        }
         return result;
     }
 
     JSONObjectReader postData(URLHolder urlHolder, JSONObjectWriter request) throws IOException {
-        logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress + "with data:\n" + request);
+        if (BankService.logging) {
+            logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress +
+                        "with data:\n" + request);
+        }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setHeader("Content-Type", JSON_CONTENT_TYPE);
@@ -129,7 +134,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     }
 
     JSONObjectReader getData(URLHolder urlHolder) throws IOException {
-        logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress);
+        if (BankService.logging) {
+            logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress);
+        }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setRequireSuccess(false);
@@ -189,15 +196,15 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         String accountType = authorizationData.getAccountDescriptor().getAccountType();
         UserAccountEntry account = BankService.userAccountDb.get(accountId);
         if (account == null) {
-            logger.info("No such account ID: " + accountId);
+            logger.severe("No such account ID: " + accountId);
             throw new IOException("No such user account ID");
         }
         if (!account.getType().equals(accountType)) {
-            logger.info("Wrong account type: " + accountType + " for account ID: " + accountId);
+            logger.severe("Wrong account type: " + accountType + " for account ID: " + accountId);
             throw new IOException("Wrong user account type");
         }
         if (!account.getPublicKey().equals(authorizationData.getPublicKey())) {
-            logger.info("Wrong public key for account ID: " + accountId);
+            logger.severe("Wrong public key for account ID: " + accountId);
             throw new IOException("Wrong user public key");
         }
         logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType);
@@ -219,17 +226,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         AccountDescriptor payeeAccount = null;
         JSONObjectWriter encryptedCardData = null;
         if (reserveOrBasicRequest.getMessage().isCardPayment()) {
-//TODO
-            String authorityUrl = null;
-//            String authorityUrl = reserveOrBasicRequest.getAcquirerAuthorityUrl();
-            HTTPSWrapper wrap = new HTTPSWrapper();
-            wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-            wrap.setRequireSuccess(true);
-            wrap.makeGetRequest(portFilter(authorityUrl));
-            if (!wrap.getContentType().equals(JSON_CONTENT_TYPE)) {
-                throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + wrap.getContentType());
-            }
-            Authority authority = new Authority(JSONParser.parse(wrap.getData()), authorityUrl);
+
+            // Lookup of payee's acquirer.  You would typically cache such information
+            urlHolder.setUrl(reserveOrBasicRequest.getAcquirerAuthorityUrl());
+            Authority acquirerAuthority = new Authority(getData(urlHolder), urlHolder.getUrl());
 
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
@@ -238,22 +238,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                             ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
                                             "943");
             encryptedCardData = EncryptedData.encode(protectedAccountData,
-                                                    authority.getDataEncryptionAlgorithm(),
-                                                    authority.getPublicKey(),
-                                                    authority.getKeyEncryptionAlgorithm());
+                                                     acquirerAuthority.getDataEncryptionAlgorithm(),
+                                                     acquirerAuthority.getPublicKey(),
+                                                     acquirerAuthority.getKeyEncryptionAlgorithm());
         } else {
             // We simply take the first account in the list
             payeeAccount = transactionRequest.getPayeeAccountDescriptors()[0];
         }
-/*
-        return ReserveOrBasicResponse.encode(attestedPaymentRequest,
-                                             paymentRequest,
-                                             authorizationData.getAccountDescriptor(),
-                                             encryptedCardData,
-                                             payeeAccount,
-                                             getReferenceId(),
-                                             BankService.bankKey);
-*/
 
         StringBuffer accountReference = new StringBuffer();
         int q = accountId.length() - 4;
@@ -264,6 +255,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return TransactionResponse.encode(transactionRequest,
                                           accountReference.toString(),
                                           payeeAccount,
+                                          encryptedCardData,
                                           getReferenceId(),
                                           BankService.bankKey);
  }
@@ -355,7 +347,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
             }
             JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
-            logger.info("Call from" + urlHolder.callerAddress + "with data:\n" + providerRequest);
+            if (BankService.logging) {
+                logger.info("Call from" + urlHolder.callerAddress + "with data:\n" + providerRequest);
+            }
 
             /////////////////////////////////////////////////////////////////////////////////////////
             // We rationalize here by using a single end-point for all requests                    //
@@ -383,7 +377,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                 default:
                     throw new IOException("Not implemented");
             }
-            logger.info("Responded to caller"  + urlHolder.callerAddress + "with data:\n" + providerResponse);
+            if (BankService.logging) {
+                logger.info("Responded to caller"  + urlHolder.callerAddress + "with data:\n" + providerResponse);
+            }
 
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //

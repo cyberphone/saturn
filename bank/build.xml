@@ -25,6 +25,7 @@
   </target>
 
   <target name="_build">
+    <property name="logging" value="false"/>
     <property name="bank.host" value="https://localhost:8442/"/>
     <property name="server.port.map" value=""/>
     <property name="users.db" value="users.${appcorename}.json"/>
@@ -60,6 +61,7 @@
 	  <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
+      <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${appcorename}.war" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
@@ -89,9 +91,13 @@
   </target>
   
   <target name="both">
-      <ant inheritAll="false" target="tomcat"/>
+      <property name="logging" value="false"/>    
       <ant inheritAll="false" target="tomcat">
-		<property name="payeebank" value="true"/>      
+		<property name="logging" value="${logging}"/>    
+      </ant>
+      <ant inheritAll="false" target="tomcat">
+		<property name="payeebank" value="true"/>    
+		<property name="logging" value="${logging}"/>    
       </ant>
   </target>
 
@@ -131,6 +137,9 @@
      <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Bank Plugin"/>
      <condition property="appcorename" value="${payeebankpath}" else="${payerbankpath}">
         <isset property="plugin.ejbca.ant.custom.payee"/>
+     </condition>
+     <condition property="logging" value="true" else="false">
+        <isset property="plugin.ejbca.ant.custom.logging"/>
      </condition>
      <property name="bank.host" value="https://mobilepki.org/"/>
      <property name="server.port.map" value="8442"/>

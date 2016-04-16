@@ -68,6 +68,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static final String PAYEE_PROVIDER_AUTHORITY_URL = "payee_provider_authority_url";
 
+    static final String ACQUIRER_AUTHORITY_URL       = "acquirer_authority_url";
+
     static final String SERVER_PORT_MAP              = "server_port_map";
     
     static final String CURRENCY                     = "currency";
@@ -83,6 +85,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String SUPERCARD_AUTH_SAMPLE        = "wallet-supercard-auth.png";
 
     static final String BANKDIRECT_AUTH_SAMPLE       = "wallet-bankdirect-auth.png";
+
+    static final String LOGGING                      = "logging";
 
     static JSONX509Verifier paymentRoot;
     
@@ -109,6 +113,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String wallet_supercard_auth;
 
     static String wallet_bankdirect_auth;
+    
+    static boolean logging;
 
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -161,6 +167,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
+            acquirerAuthorityUrl = getPropertyString(ACQUIRER_AUTHORITY_URL);
+
             if (getPropertyBoolean(ERR_MEDIA)) {
                 jsonMediaType = "text/html";
             }
@@ -178,6 +186,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                             "Luke Skywalker",
                                             ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
                                             "943").serializeJSONObject(JSONOutputFormats.NORMALIZED);
+
+            logging = getPropertyBoolean(LOGGING);
 
             logger.info("Saturn Merchant-server initiated");
         } catch (Exception e) {

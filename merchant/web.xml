@@ -41,6 +41,12 @@
     </context-param>
 
     <context-param>
+        <description>Acquirer Authority URL</description>
+        <param-name>acquirer_authority_url</param-name>
+        <param-value>@acquirer-authority-url@</param-value>
+    </context-param>
+    
+    <context-param>
         <description>Currency</description>
         <param-name>currency</param-name>
         <param-value>@currency@</param-value>
@@ -62,6 +68,12 @@
         <description>Web2Native Bridge wallet name</description>
         <param-name>w2nb_wallet</param-name>
         <param-value>@w2nb-wallet@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Logging</description>
+        <param-name>logging</param-name>
+        <param-value>@logging@</param-value>
     </context-param>
 
     <listener>

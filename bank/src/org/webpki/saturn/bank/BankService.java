@@ -78,6 +78,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static final String SERVER_PORT_MAP       = "server_port_map";
     
+    static final String LOGGING               = "logging";
+
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
     
     static LinkedHashMap<String,UserAccountEntry> userAccountDb = new LinkedHashMap<String,UserAccountEntry>();
@@ -95,6 +97,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static Integer serverPortMapping;
     
     static int referenceId;
+    
+    static boolean logging;
 
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -167,6 +171,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                  decryptionKeys.get(0).getPublicKey(),
                                  Expires.inDays(365),
                                  bankKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
+
+            logging = getPropertyBoolean(LOGGING);
 
             logger.info("Saturn Bank-server initiated");
         } catch (Exception e) {

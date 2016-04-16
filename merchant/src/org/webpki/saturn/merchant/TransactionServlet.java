@@ -126,7 +126,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     
     synchronized void updatePayeeProviderAuthority(URLHolder urlHolder) throws IOException {
         JSONObjectReader resultMessage = getData(urlHolder);
-        logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
+        if (MerchantService.logging) {
+            logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
+        }
         payeeProviderAuthority = new Authority(resultMessage, urlHolder.getUrl());
         // Verify that the claimed authority belongs to a known payment provider network
         payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
@@ -145,7 +147,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             byte[] requestHash = (byte[]) session.getAttribute(UserPaymentServlet.REQUEST_HASH_SESSION_ATTR);
             request.setCharacterEncoding("UTF-8");
             JSONObjectReader userAuthorization = JSONParser.parse(request.getParameter(UserPaymentServlet.AUTHDATA_FORM_ATTR));
-            logger.info("Received from wallet:\n" + userAuthorization);
+            if (MerchantService.logging) {
+                logger.info("Received from wallet:\n" + userAuthorization);
+            }
 
             // Do we have web debug mode?
             DebugData debugData = null;
@@ -178,7 +182,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                              userAuthorization.getObject(AUTHORIZATION_DATA_JSON),
                                              request.getRemoteAddr(),
                                              paymentRequest,
-                                             basicCredit ? null : Expires.inMinutes(30),
+                                             MerchantService.acquirerAuthorityUrl, // Card only
+                                             Expires.inMinutes(30), // Reserve only
                                              MerchantService.merchantKey);
 
             // Now we need to find out where to send the request
@@ -193,12 +198,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             }
 
             urlHolder.setUrl(payeeProviderAuthority.getTransactionUrl());
-            logger.info("About to send to payee provider [" + urlHolder.getUrl() + "]:\n" + providerRequest);
+            if (MerchantService.logging) {
+                logger.info("About to send to payee provider [" + urlHolder.getUrl() + "]:\n" + providerRequest);
+            }
 
             // Call the payee bank
             byte[] providerRequestBlob = providerRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED);
             JSONObjectReader resultMessage = postData(urlHolder, providerRequestBlob);
-            logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
+            if (MerchantService.logging) {
+                logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
+            }
 
             if (debug) {
                 debugData.reserveOrBasicRequest = providerRequestBlob;

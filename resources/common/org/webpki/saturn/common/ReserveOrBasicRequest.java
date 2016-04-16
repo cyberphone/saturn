@@ -45,6 +45,9 @@ public class ReserveOrBasicRequest implements BaseProperties {
         encryptedAuthorizationData = EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON));
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
+        if (message.isCardPayment()) {
+            acquirerAuthorityUrl = rd.getString(ACQUIRER_AUTHORITY_URL_JSON);
+        }
         if (!message.isBasicCredit()) {
             expires = rd.getDateTime(EXPIRES_JSON);
         }
@@ -80,6 +83,11 @@ public class ReserveOrBasicRequest implements BaseProperties {
         return message;
     }
 
+    String acquirerAuthorityUrl;
+    public String getAcquirerAuthorityUrl() {
+        return acquirerAuthorityUrl;
+    }
+
     String providerAuthorityUrl;
     public String getProviderAuthorityUrl() {
         return providerAuthorityUrl;
@@ -101,6 +109,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
+                                          String acquirerAuthorityUrl,
                                           Date expires,
                                           ServerAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(basicCredit ? Messages.BASIC_CREDIT_REQUEST : 
@@ -110,9 +119,10 @@ public class ReserveOrBasicRequest implements BaseProperties {
             .setObject(AUTHORIZATION_DATA_JSON, encryptedAuthorizationData)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root);
-        if (basicCredit) {
-            zeroTest(EXPIRES_JSON, expires);
-        } else {
+        if (accountType.isAcquirerBased()) {
+            wr.setString(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
+        }
+        if (!basicCredit) {
             wr.setDateTime(EXPIRES_JSON, expires, true);
         }
         wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
@@ -120,12 +130,6 @@ public class ReserveOrBasicRequest implements BaseProperties {
                                                     PaymentRequest.SOFTWARE_VERSION))
           .setSignature(signer);
         return wr;
-    }
-
-    static void zeroTest(String name, Object object) throws IOException {
-        if (object != null) {
-            throw new IOException("Argument error, parameter \"" + name + "\" must be \"null\"");
-        }
     }
 
     public static void comparePublicKeys(PublicKey publicKey, PaymentRequest paymentRequest) throws IOException {

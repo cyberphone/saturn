@@ -17,12 +17,10 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
@@ -35,7 +33,7 @@ public class TransactionResponse implements BaseProperties {
         transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
-            
+            EncryptedData.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON));
         } else {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
@@ -81,13 +79,14 @@ public class TransactionResponse implements BaseProperties {
     public static JSONObjectWriter encode(TransactionRequest transactionRequest,
                                           String accountReference,
                                           AccountDescriptor payeeAccount,
+                                          JSONObjectWriter encryptedCardData,
                                           String referenceId,
                                           ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
             .setObject(EMBEDDED_JSON, transactionRequest.root)
             .setString(ACCOUNT_REFERENCE_JSON, accountReference);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
-            
+            wr.setObject(PROTECTED_ACCOUNT_DATA_JSON, encryptedCardData);
         } else {
             wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
         }
