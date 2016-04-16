@@ -31,7 +31,7 @@ public class ProtectedAccountData implements BaseProperties {
                                           Date expires,
                                           String accountSecurityCode) throws IOException {
         return new JSONObjectWriter()
-            .setObject(PAYER_ACCOUNT_JSON, accountDescriptor.writeObject())
+            .setObject(ACCOUNT_JSON, accountDescriptor.writeObject())
             .setString(ACCOUNT_HOLDER_JSON, accountHolder)
             .setDateTime(EXPIRES_JSON, expires, true)
             .setString(ACCOUNT_SECURITY_CODE_JSON, accountSecurityCode);
@@ -41,7 +41,7 @@ public class ProtectedAccountData implements BaseProperties {
 
     public ProtectedAccountData(JSONObjectReader rd) throws IOException {
         root = rd;
-        accountDescriptor = new AccountDescriptor(rd.getObject(PAYER_ACCOUNT_JSON));
+        accountDescriptor = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
         accountHolder = rd.getString(ACCOUNT_HOLDER_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         accountSecurityCode = rd.getString(ACCOUNT_SECURITY_CODE_JSON);

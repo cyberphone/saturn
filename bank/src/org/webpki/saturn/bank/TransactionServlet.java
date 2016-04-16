@@ -56,6 +56,7 @@ import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.UserAccountEntry;
+import org.webpki.saturn.common.UserMessageResponse;
 import org.webpki.webutil.ServletUtil;
 
 //////////////////////////////////////////////////////////////////////////
@@ -204,28 +205,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // Get the embedded (counter-signed) payment request
         PaymentRequest paymentRequest = reserveOrBasicRequest.getPaymentRequest();
 
-        /*
-        // Verify that the merchant's signature belongs to a for us known merchant
-        // To simply things we only recognize a single merchant...
-        if (!paymentRequest.getPublicKey().equals(BankService.merchantKey)) {
-            throw new IOException("Unknown merchant");
-        }
-
-        // We need to separate credit-card and account-2-account payments
-        boolean acquirerBased = PayerAccountTypes.fromTypeUri(authorizationData.getAccountDescriptor().getAccountType()).isAcquirerBased();
-        logger.info("Kind of operation: " + (acquirerBased ? "credit-card" : "account-2-account"));
-
         ////////////////////////////////////////////////////////////////////////////
         // We got an authentic request.  Now we need to check available funds etc.//
         // Since we don't have a real bank this part is rather simplistic :-)     //
         ////////////////////////////////////////////////////////////////////////////
 
         // Sorry but you don't appear to have a million bucks :-)
-        if (!acquirerBased && paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
-            return ReserveOrBasicResponse.encode(attestedPaymentRequest.getMessage().isBasicCredit(),
-                                                new ErrorReturn(ErrorReturn.ERRORS.INSUFFICIENT_FUNDS));
+        if (!reserveOrBasicRequest.getMessage().isCardPayment() && paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
+            return UserMessageResponse.encode("You don't have this money!", null);
         }
-*/
+
         // Separate credit-card and account2account payments
         AccountDescriptor payeeAccount = null;
         JSONObjectWriter encryptedCardData = null;
@@ -328,7 +317,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                                                        BankService.bankKey);
        
        // Decode response
-       TransactionResponse transactionResponse = new TransactionResponse(postData(urlHolder, transactionRequest));
+       JSONObjectReader response = postData(urlHolder, transactionRequest);
+       if (response.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.USER_MESSAGE_RESPONSE.toString())) {
+           return new JSONObjectWriter(response);
+       }
+       TransactionResponse transactionResponse = new TransactionResponse(response);
 
        return ReserveOrBasicResponse.encode(transactionResponse,
                                             BankService.bankKey);

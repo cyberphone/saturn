@@ -873,7 +873,7 @@ public class Wallet {
         void collectPotentialCard(int keyHandle,
                                   JSONObjectReader cardProperties,
                                   String[] accountTypes) throws IOException {
-            AccountDescriptor cardAccount = new AccountDescriptor(cardProperties.getObject(BaseProperties.PAYER_ACCOUNT_JSON));
+            AccountDescriptor cardAccount = new AccountDescriptor(cardProperties.getObject(BaseProperties.ACCOUNT_JSON));
             for (String accountType : accountTypes) {
                 if (cardAccount.getAccountType().equals(accountType)) {
                     Account card =

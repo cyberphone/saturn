@@ -27,6 +27,8 @@ public enum Messages {
     WALLET_IS_READY               ("WalletIsReady"),                 // Wallet to payee Web page message
     WALLET_REQUEST                ("WalletRequest"),                 // Payee payment request + other data
     PAYER_AUTHORIZATION           ("PayerAuthorization"),            // Created by the Wallet
+    
+    USER_MESSAGE_RESPONSE         ("userMessageResponse"),           // May replace any RESPONSE message
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // One-step payment operation in Account2Account mode

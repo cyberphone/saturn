@@ -34,8 +34,8 @@ public class UserAccountEntry implements BaseProperties {
     String keyEncryptionAlgorithm;
 
     public UserAccountEntry(JSONObjectReader rd) throws IOException {
-        type = rd.getObject(PAYER_ACCOUNT_JSON).getString(TYPE_JSON);
-        id = rd.getObject(PAYER_ACCOUNT_JSON).getString(ID_JSON);
+        type = rd.getObject(ACCOUNT_JSON).getString(TYPE_JSON);
+        id = rd.getObject(ACCOUNT_JSON).getString(ID_JSON);
         cardFormatAccountId = rd.getBoolean(CARD_FORMAT_ACCOUNT_ID_JSON);
         signatureAlgorithm = rd.getString(SIGNATURE_ALGORITHM_JSON);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);

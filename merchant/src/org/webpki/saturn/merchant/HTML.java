@@ -514,13 +514,13 @@ public class HTML {
         HTML.output(response, HTML.getHTML(clean ? null : STICK_TO_HOME_URL, null,s.toString()));
     }
 
-    public static void paymentError(HttpServletResponse response, boolean debugMode, ErrorReturn errorReturn)
+    public static void paymentError(HttpServletResponse response, boolean debugMode, String errorReturn)
                                     throws IOException, ServletException {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
                  "<table>" +
                  "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL +
                  "\">Payment Failure&nbsp;<br></td></tr><tr><td style=\"text-align:center\">")
-         .append(errorReturn.getClearText())
+         .append(errorReturn)
          .append("</td></tr>");
         if (debugMode) {
             s.append("<tr><td style=\"text-align:center;padding-top:20pt\"><a href=\"debug\">Show Debug Info</a></td></tr>");

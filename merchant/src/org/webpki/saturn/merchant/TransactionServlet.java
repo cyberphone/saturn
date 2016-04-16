@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
@@ -36,6 +37,7 @@ import org.webpki.net.HTTPSWrapper;
 import org.webpki.util.ArrayUtil;
 import org.webpki.saturn.common.CertificatePathCompare;
 import org.webpki.saturn.common.ErrorReturn;
+import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
@@ -51,6 +53,7 @@ import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
+import org.webpki.saturn.common.UserMessageResponse;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -202,6 +205,15 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                 debugData.reserveOrBasicResponse = resultMessage;
             }
 
+            if (resultMessage.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.USER_MESSAGE_RESPONSE.toString())) {
+                if (debug) {
+                    debugData.softReserveOrBasicError = true;
+                }
+                UserMessageResponse userMessageResponse = new UserMessageResponse(resultMessage);
+                HTML.paymentError(response, debug, userMessageResponse.getText());
+                return;
+            }
+        
             // Additional consistency checking
             ReserveOrBasicResponse reserveOrBasicResponse = new ReserveOrBasicResponse(resultMessage);
 /*

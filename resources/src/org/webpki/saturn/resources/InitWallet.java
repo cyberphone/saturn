@@ -150,7 +150,7 @@ public class InitWallet {
                 accountId = accountId.substring(1);
             }
             ow = new JSONObjectWriter()
-                 .setObject(BaseProperties.PAYER_ACCOUNT_JSON, 
+                 .setObject(BaseProperties.ACCOUNT_JSON, 
                             new AccountDescriptor(accountType.getTypeUri(),
                                                   accountId).writeObject())
                  .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON, cardFormatted)

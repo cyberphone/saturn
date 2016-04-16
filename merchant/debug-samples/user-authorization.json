@@ -3,8 +3,8 @@
     "algorithm": "S256",
     "value": "Rwf6Le39NkfowF6tCW_Fqv9L55lprWQ73-BYRfbJANg"
   },
-  "domainName": "localhost",
-  "payerAccount": {
+  "domainName": "merchant.com",
+  "account": {
     "type": "https://bankdirect.net",
     "id": "8645-7800239403"
   },
@@ -18,9 +18,9 @@
     "publicKey": {
       "type": "EC",
       "curve": "P-256",
-      "x": "U64Cl00RUFDtw9dtBSFGr0UB0ihS1zZ3VJY4eWJUDcE",
-      "y": "RN9sSaX9b7k2_Z5SPeYoa9GDiiUEHmznljWn4oQFjiw"
+      "x": "vlYxD4dtFJOp1_8_QUcieWCW-4KrLMmFL2rpkY1bQDs",
+      "y": "fxEF70yJenP3SPHM9hv-EnvhG6nXr3_S-fDqoj-F6yM"
     },
-    "value": "vpo_1-Ki8sY5pY4BdsOKdLZllH4efxnlxeHpomlhpkrfYFAvKRIGOX31MFQT1DtrX9QEImulE-U6JvleIvNzJw"
+    "value": "_WJzczYHeW4XqffSh_YjTIIYPR6LwC8DcnfyPZEk2BJ8iL7W4n2AqyiJbe3ateXNtWkjEpkRgQnvpmpnLYf40g"
   }
 }
