@@ -17,6 +17,8 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
+
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
@@ -95,10 +97,15 @@ public class TransactionRequest implements BaseProperties {
                 aw.setObject(account.writeObject());
             }
         }
-        wr.setString(REFERENCE_ID_JSON, referenceId)
-          .setDateTime(TIME_STAMP_JSON, new Date(), true)
-          .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
-          .setSignature(signer);
-        return wr;
+        return wr.setString(REFERENCE_ID_JSON, referenceId)
+                 .setDateTime(TIME_STAMP_JSON, new Date(), true)
+                 .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
+                 .setSignature(signer);
+    }
+
+    void compareCertificates(JSONSignatureDecoder signatureDecoder) throws IOException {
+        if (!Arrays.equals(this.signatureDecoder.getCertificatePath(), signatureDecoder.getCertificatePath())) {
+            throw new IOException("Outer and inner certificates differ");
+        }
     }
 }

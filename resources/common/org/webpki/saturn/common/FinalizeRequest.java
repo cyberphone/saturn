@@ -28,30 +28,59 @@ import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
 
-import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 public class FinalizeRequest implements BaseProperties {
     
-    static final Messages[] valid = {Messages.FINALIZE_CREDIT_REQUEST, Messages.FINALIZE_CREDIT_REQUEST};
-    
+    static Messages matching(ReserveOrBasicResponse reserveOrBasicResponse) throws IOException {
+        switch (reserveOrBasicResponse.message) {
+            case RESERVE_CREDIT_RESPONSE:
+                return Messages.FINALIZE_CREDIT_REQUEST;
+
+            case RESERVE_CARDPAY_RESPONSE:
+                return Messages.FINALIZE_CARDPAY_REQUEST;
+
+            default:
+                throw new IOException("Unexpected message type: " + reserveOrBasicResponse.message.toString());
+        }
+    }
+
+    static BigDecimal checkAmount(BigDecimal amount, ReserveOrBasicResponse reserveOrBasicResponse) throws IOException {
+        BigDecimal reservedAmount = reserveOrBasicResponse
+            .transactionResponse
+                .transactionRequest
+                     .reserveOrBasicRequest.getPaymentRequest().amount;
+        if (amount.compareTo(reservedAmount) > 0) {
+            throw new IOException("The requested amount exceeds the reserved amount");
+        }
+        return amount;
+    }
+
+    static int getDecimals(ReserveOrBasicResponse reserveOrBasicResponse) {
+        return reserveOrBasicResponse
+                   .transactionResponse
+                       .transactionRequest
+                           .reserveOrBasicRequest
+                               .paymentRequest
+                                   .currency.getDecimals();
+    }
+
     public FinalizeRequest(JSONObjectReader rd) throws IOException, GeneralSecurityException {
-        message = Messages.parseBaseMessage(valid, root = rd);
-        embeddedResponse = new ReserveOrBasicResponse(rd.getObject(PROVIDER_AUTHORIZATION_JSON));
-/*
-        amount = rd.getBigDecimal(AMOUNT_JSON,
-                                  embeddedResponse.getPaymentRequest().getCurrency().getDecimals());
+        reserveOrBasicResponse = new ReserveOrBasicResponse(rd.getObject(EMBEDDED_JSON));
+        message = Messages.parseBaseMessage(matching(reserveOrBasicResponse), root = rd);
+        amount = checkAmount(rd.getBigDecimal(AMOUNT_JSON, 
+                                              getDecimals(reserveOrBasicResponse)),
+                             reserveOrBasicResponse);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
-        PaymentRequest paymentRequest = embeddedResponse.getPaymentRequest();
-        ReserveOrBasicRequest.comparePublicKeys(outerPublicKey, paymentRequest);
-        if (amount.compareTo(paymentRequest.getAmount()) > 0) {
-            throw new IOException("Final amount must be less or equal to reserved amount");
-        }
-*/
+        ReserveOrBasicRequest.comparePublicKeys(outerPublicKey,
+                                                reserveOrBasicResponse
+                                                    .transactionResponse
+                                                        .transactionRequest
+                                                            .reserveOrBasicRequest.getPaymentRequest());
         rd.checkForUnread();
     }
 
@@ -65,9 +94,9 @@ public class FinalizeRequest implements BaseProperties {
     
     Messages message;
     
-    ReserveOrBasicResponse embeddedResponse;
-    public ReserveOrBasicResponse getEmbeddedResponse() {
-        return embeddedResponse;
+    ReserveOrBasicResponse reserveOrBasicResponse;
+    public ReserveOrBasicResponse getReserveOrBasicResponse() {
+        return reserveOrBasicResponse;
     }
 
     BigDecimal amount;
@@ -80,22 +109,20 @@ public class FinalizeRequest implements BaseProperties {
         return referenceId;
     }
 
-    public static JSONObjectWriter encode(ReserveOrBasicResponse providerResponse,
-                                          BigDecimal amount,  // Less or equal the reserved amount
+    public static JSONObjectWriter encode(ReserveOrBasicResponse reserveOrBasicResponse,
+                                          BigDecimal amount,
                                           String referenceId,
                                           ServerAsymKeySigner signer)
     throws IOException, GeneralSecurityException {
-        return Messages.createBaseMessage(Messages.FINALIZE_CREDIT_REQUEST)
-/*
-                .setBigDecimal(AMOUNT_JSON,
-                           amount,
-                           providerResponse.getPaymentRequest().getCurrency().getDecimals())
-*/
-            .setObject(PROVIDER_AUTHORIZATION_JSON, providerResponse.root)
+        return Messages.createBaseMessage(matching(reserveOrBasicResponse))
+            .setBigDecimal(AMOUNT_JSON,
+                           checkAmount(amount, reserveOrBasicResponse),
+                           getDecimals(reserveOrBasicResponse))
+            .setObject(EMBEDDED_JSON, reserveOrBasicResponse.root)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME,
-                                                      PaymentRequest.SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(TransactionRequest.SOFTWARE_NAME,
+                                                      TransactionRequest.SOFTWARE_VERSION))
             .setSignature(signer);
     }
 }

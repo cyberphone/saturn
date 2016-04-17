@@ -19,6 +19,7 @@ package org.webpki.saturn.merchant;
 import java.io.Serializable;
 
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONObjectWriter;
 
 public class DebugData implements Serializable {
 
@@ -36,7 +37,7 @@ public class DebugData implements Serializable {
     
     public boolean softReserveOrBasicError;
     
-    public byte[] reserveOrBasicRequest;
+    public JSONObjectWriter reserveOrBasicRequest;
     
     public JSONObjectReader reserveOrBasicResponse;
     

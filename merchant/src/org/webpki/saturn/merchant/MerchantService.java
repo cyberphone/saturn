@@ -76,8 +76,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String ADD_UNUSUAL_CARD             = "add_unusual_card";
 
-    static final String ERR_MEDIA                    = "err_media_type";
-    
     static final String W2NB_WALLET                  = "w2nb_wallet";
     
     static final String USER_AUTH_SAMPLE             = "user-authorization.json";
@@ -99,8 +97,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static Integer serverPortMapping;
     
     static Currencies currency;
-
-    static String jsonMediaType = BaseProperties.JSON_CONTENT_TYPE;
 
     // Web2Native Bridge constants
     static String w2nbWalletName;
@@ -168,10 +164,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
             acquirerAuthorityUrl = getPropertyString(ACQUIRER_AUTHORITY_URL);
-
-            if (getPropertyBoolean(ERR_MEDIA)) {
-                jsonMediaType = "text/html";
-            }
 
             new AuthorizationData(JSONParser.parse(user_authorization =
                     ArrayUtil.getByteArrayFromInputStream (this.getClass().getResourceAsStream(USER_AUTH_SAMPLE))));

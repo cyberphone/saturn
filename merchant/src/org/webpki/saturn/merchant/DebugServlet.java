@@ -145,6 +145,10 @@ class DebugPrintout implements BaseProperties {
         fancyBox(json.serializeJSONObject(JSONOutputFormats.NORMALIZED));
     }
 
+    void fancyBox(JSONObjectWriter json) throws IOException, GeneralSecurityException {
+        fancyBox(json.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+    }
+
     void description(String string) {
         s.append("<div style=\"word-wrap:break-word;width:800pt;margin-bottom:10pt;margin-top:20pt\">" + string + "</div>");
     }

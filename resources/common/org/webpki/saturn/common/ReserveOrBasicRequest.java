@@ -52,15 +52,12 @@ public class ReserveOrBasicRequest implements BaseProperties {
             expires = rd.getDateTime(EXPIRES_JSON);
         }
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
-        software = new Software(rd);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         rd.checkForUnread();
     }
 
 
     GregorianCalendar dateTime;
-
-    Software software;
 
     PublicKey outerPublicKey;
 
@@ -125,16 +122,13 @@ public class ReserveOrBasicRequest implements BaseProperties {
         if (!basicCredit) {
             wr.setDateTime(EXPIRES_JSON, expires, true);
         }
-        wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
-          .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME,
-                                                    PaymentRequest.SOFTWARE_VERSION))
-          .setSignature(signer);
-        return wr;
+        return wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
+                 .setSignature(signer);
     }
 
     public static void comparePublicKeys(PublicKey publicKey, PaymentRequest paymentRequest) throws IOException {
         if (!publicKey.equals(paymentRequest.getPublicKey())) {
-            throw new IOException("Outer and inner public key differ");
+            throw new IOException("Outer and inner public keys differ");
         }
     }
 

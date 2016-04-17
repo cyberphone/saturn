@@ -26,7 +26,6 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
-import org.webpki.json.JSONSignatureTypes;
 import org.webpki.json.JSONX509Signer;
 
 public class ReserveOrBasicResponse implements BaseProperties {
@@ -43,43 +42,38 @@ public class ReserveOrBasicResponse implements BaseProperties {
                 return Messages.RESERVE_CARDPAY_RESPONSE;
         }
     }
-    
+
     public static JSONObjectWriter encode(TransactionResponse transactionResponse,
                                           JSONX509Signer signer) throws IOException {
         return Messages.createBaseMessage(matching(transactionResponse))
             .setObject(EMBEDDED_JSON, transactionResponse.root)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(TransactionRequest.SOFTWARE_NAME,
-                                                      TransactionRequest.SOFTWARE_VERSION))
             .setSignature (signer);
     }
 
     JSONObjectReader root;
-    
+
     GregorianCalendar timeStamp;
-    
+
+    Messages message;
+
     public ReserveOrBasicResponse(JSONObjectReader rd) throws IOException {
         transactionResponse = new TransactionResponse(rd.getObject(EMBEDDED_JSON));
-        Messages.parseBaseMessage(matching(transactionResponse), root = rd);
+        message = Messages.parseBaseMessage(matching(transactionResponse), root = rd);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
-        software = new Software(rd);
-        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
-        signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
+        transactionResponse
+            .transactionRequest
+                .compareCertificates(signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE));
         rd.checkForUnread();
-    }
-
-    TransactionResponse transactionResponse;
-    public TransactionResponse getTransactionResponse() {
-        return transactionResponse;
-    }
-    
-    Software software;
-    public Software getSoftware() {
-        return software;
     }
 
     JSONSignatureDecoder signatureDecoder;
     public JSONSignatureDecoder getSignatureDecoder() {
         return signatureDecoder;
+    }
+
+    TransactionResponse transactionResponse;
+    public TransactionResponse getTransactionResponse() {
+        return transactionResponse;
     }
 }

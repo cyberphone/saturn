@@ -37,7 +37,6 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.net.HTTPSWrapper;
 import org.webpki.util.ISODateTime;
-import org.webpki.saturn.common.CertificatePathCompare;
 import org.webpki.saturn.common.MerchantAccountEntry;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Authority;
@@ -324,13 +323,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // Decode the finalize request message which the one which lifts money
         FinalizeRequest payeeFinalizationRequest = new FinalizeRequest(payeeRequest);
 
-        // Get the embedded authorization presumably made by ourselves :-)
-        ReserveOrBasicResponse embeddedResponse = payeeFinalizationRequest.getEmbeddedResponse();
-
-        // Verify that the provider's signature really belongs to us
-        CertificatePathCompare.compareCertificatePaths(embeddedResponse.getSignatureDecoder().getCertificatePath(),
-                                                       BankService.bankCertificatePath);
-
         //////////////////////////////////////////////////////////////////////////////
         // Since we don't have a real bank we simply return success...              //
         //////////////////////////////////////////////////////////////////////////////
@@ -357,7 +349,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             Integer requestType = requestTypes.get(providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
             if (requestType == null) {
                 throw new IOException("Unexpected \"" + JSONDecoderCache.QUALIFIER_JSON + "\" :" + 
-                                       providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
+                                      providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
             }
 
             JSONObjectWriter providerResponse; 

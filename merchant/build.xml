@@ -26,7 +26,7 @@
   <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
 
   <target name="help">
-    <echo message="tomcat [-Derr.payment.ca=0] [-Dunusual.card=0] [-Dcurrency=XYZ] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+    <echo message="tomcat [-Derr.payment.ca=0] [-Dunusual.card=0] [-Dcurrency=XYZ] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -45,7 +45,6 @@
     <property name="acquirer.host" value="https://localhost:8442"/>
     <property name="payee_provider.host" value="https://localhost:8442"/>
     <property name="server.port.map" value=""/>
-    <property name="errormedia" value="false"/>
     <property name="unusualcard" value="false"/>
     <property name="currency" value="USD"/>
     <fixcrlf srcdir="${src.dir}"
@@ -77,7 +76,6 @@
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payeebankpath}/authority"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>
-      <replacefilter token="@err-media-type@" value="${errormedia}"/>
       <replacefilter token="@w2nb-wallet@" value="${w2nb.webwallet}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
@@ -116,9 +114,6 @@
      </condition>
      <condition property="unusualcard" value="true">
        <isset property="unusual.card"/>
-     </condition>
-     <condition property="errormedia" value="true">
-       <isset property="err.media"/>
      </condition>
      <path id="tomcat.compile.classpath">
        <fileset dir="${common.lib.dir}">

@@ -59,12 +59,6 @@
     </context-param>
 
     <context-param>
-        <description>Force media type error</description>
-        <param-name>err_media_type</param-name>
-        <param-value>@err-media-type@</param-value>
-    </context-param>
-
-    <context-param>
         <description>Web2Native Bridge wallet name</description>
         <param-name>w2nb_wallet</param-name>
         <param-value>@w2nb-wallet@</param-value>

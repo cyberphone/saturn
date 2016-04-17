@@ -35,10 +35,9 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.net.HTTPSWrapper;
 import org.webpki.util.ArrayUtil;
-import org.webpki.saturn.common.CertificatePathCompare;
+
 import org.webpki.saturn.common.ErrorReturn;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.AuthorizationData;
@@ -79,7 +78,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                        url2.getFile()).toExternalForm(); 
     }
     
-    JSONObjectReader fetchJSONData(HTTPSWrapper wrap) throws IOException {
+    JSONObjectReader fetchJSONData(HTTPSWrapper wrap, URLHolder urlHolder) throws IOException {
         if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
             throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
                                   (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
@@ -88,25 +87,36 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         if (!wrap.getRawContentType().equals(JSON_CONTENT_TYPE)) {
             throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + wrap.getRawContentType());
         }
-        return JSONParser.parse(wrap.getData());        
+        JSONObjectReader result = JSONParser.parse(wrap.getData());
+        if (MerchantService.logging) {
+            logger.info("Call to " + urlHolder.getUrl() + " returned:\n" + result);
+        }
+        return result;
     }
 
-    JSONObjectReader postData(URLHolder urlHolder, byte[] data) throws IOException {
+    JSONObjectReader postData(URLHolder urlHolder, JSONObjectWriter request) throws IOException {
+        if (MerchantService.logging) {
+            logger.info("About to call " + urlHolder.getUrl() + " with data:\n" + request);
+        }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader("Content-Type", MerchantService.jsonMediaType);
+        wrap.setHeader("Content-Type", JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), data);
-        return fetchJSONData(wrap);
+        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+        return fetchJSONData(wrap, urlHolder);
     }
 
     JSONObjectReader getData(URLHolder urlHolder) throws IOException {
+        if (MerchantService.logging) {
+            logger.info("About to call " + urlHolder.getUrl());
+        }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setRequireSuccess(false);
         wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
-        return fetchJSONData(wrap);
+        return fetchJSONData(wrap, urlHolder);
     }
+
 
     // The purpose of this class is to enable URL information in exceptions
 
@@ -203,14 +213,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             }
 
             // Call the payee bank
-            byte[] providerRequestBlob = providerRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED);
-            JSONObjectReader resultMessage = postData(urlHolder, providerRequestBlob);
+            JSONObjectReader resultMessage = postData(urlHolder, providerRequest);
             if (MerchantService.logging) {
                 logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
             }
 
             if (debug) {
-                debugData.reserveOrBasicRequest = providerRequestBlob;
+                debugData.reserveOrBasicRequest = providerRequest;
                 debugData.reserveOrBasicResponse = resultMessage;
             }
 
