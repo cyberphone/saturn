@@ -26,7 +26,7 @@ public class Software implements BaseProperties {
     String name;
     String version;
     
-    public Software (JSONObjectReader rd) throws IOException {
+    public Software(JSONObjectReader rd) throws IOException {
         rd = rd.getObject(SOFTWARE_JSON);
         name = rd.getString(NAME_JSON);
         version = rd.getString(VERSION_JSON);

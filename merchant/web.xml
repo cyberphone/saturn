@@ -41,12 +41,6 @@
     </context-param>
 
     <context-param>
-        <description>Acquirer Authority URL</description>
-        <param-name>acquirer_authority_url</param-name>
-        <param-value>@acquirer-authority-url@</param-value>
-    </context-param>
-    
-    <context-param>
         <description>Currency</description>
         <param-name>currency</param-name>
         <param-value>@currency@</param-value>

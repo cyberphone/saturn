@@ -18,14 +18,20 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+
 import java.math.BigDecimal;
+
 import java.net.URL;
+
 import java.security.GeneralSecurityException;
+
 import java.util.HashMap;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,8 +41,12 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+
 import org.webpki.net.HTTPSWrapper;
+
 import org.webpki.util.ISODateTime;
+
+import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.FinalizeTransactionRequest;
 import org.webpki.saturn.common.FinalizeTransactionResponse;
@@ -52,11 +62,11 @@ import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
-import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.UserMessageResponse;
+
 import org.webpki.webutil.ServletUtil;
 
 //////////////////////////////////////////////////////////////////////////
@@ -348,6 +358,19 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                              BankService.bankKey);
     }
 
+    JSONObjectWriter processFinalizeCardpayRequest(JSONObjectReader payeeRequest, UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+
+        // Decode the finalize cardpay request
+        FinalizeRequest finalizeRequest = new FinalizeRequest(payeeRequest);
+
+        // Here we are supposed to talk to the card payment network....
+
+        // It appears that we succeeded
+        return FinalizeCardpayResponse.encode(finalizeRequest,
+                                              getReferenceId(),
+                                              BankService.bankKey);
+    }
+
     JSONObjectWriter processFinalizeTransactionRequest(JSONObjectReader payeeRequest, UrlHolder urlHolder) throws IOException, GeneralSecurityException {
 
         // Decode the finalize transaction request
@@ -383,7 +406,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                       providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
             }
 
-            JSONObjectWriter providerResponse; 
+            JSONObjectWriter providerResponse = null; 
             switch (requestType) {
                 case REQTYPE_PAYEE_INITIAL:
                     providerResponse = processReserveOrBasicRequest(providerRequest, urlHolder);
@@ -397,12 +420,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                     providerResponse = processFinalizeCreditRequest(providerRequest, urlHolder);
                     break;
                     
+                case REQTYPE_PAYEE_FINALIZE_CARDPAY:
+                    providerResponse = processFinalizeCardpayRequest(providerRequest, urlHolder);
+                    break;
+ 
                 case REQTYPE_FINALIZE_TRANSACTION:
                     providerResponse = processFinalizeTransactionRequest(providerRequest, urlHolder);
                     break;
-                    
-                default:
-                    throw new IOException("Not implemented");
             }
             if (BankService.logging) {
                 logger.info("Responded to caller"  + urlHolder.callerAddress + "with data:\n" + providerResponse);
