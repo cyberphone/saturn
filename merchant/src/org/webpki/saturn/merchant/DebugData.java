@@ -45,7 +45,7 @@ public class DebugData implements Serializable {
     
     public JSONObjectReader acquirerAuthority;
     
-    public byte[] finalizeRequest;
+    public JSONObjectWriter finalizeRequest;
 
     public JSONObjectReader finalizeResponse;
 

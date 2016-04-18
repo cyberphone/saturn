@@ -24,41 +24,25 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
-public class FinalizeResponse implements BaseProperties {
+public class FinalizeCreditResponse implements BaseProperties {
     
-    public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
-    public static final String SOFTWARE_VERSION = "1.00";
-
-    public FinalizeResponse(JSONObjectReader rd) throws IOException, GeneralSecurityException {
+    public FinalizeCreditResponse(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         Messages.parseBaseMessage(Messages.FINALIZE_CREDIT_RESPONSE, rd);
-        if (rd.hasProperty(ERROR_CODE_JSON)) {
-            errorReturn = new ErrorReturn(rd);
-            return;
-        }
-        requestHash = RequestHash.parse(rd);
+        finalizeTransactionResponse = new FinalizeTransactionResponse(rd.getObject(EMBEDDED_JSON));
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
-        software = new Software(rd);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
         rd.checkForUnread();
     }
 
-    ErrorReturn errorReturn;
-    public boolean success() {
-        return errorReturn == null;
-    }
-
-    public ErrorReturn getErrorReturn() {
-        return errorReturn;
-    }
-
-    byte[] requestHash;
-    public byte[] getRequestHash() throws IOException {
-        return requestHash;
+    FinalizeTransactionResponse finalizeTransactionResponse;
+    public FinalizeTransactionResponse getFinalizeTransactionResponse() throws IOException {
+        return finalizeTransactionResponse;
     }
     
     JSONSignatureDecoder signatureDecoder;
@@ -76,28 +60,14 @@ public class FinalizeResponse implements BaseProperties {
         return timeStamp;
     }
 
-    Software software;
-    public Software getSoftware() {
-        return software;
-    }
-
-    public static JSONObjectWriter encode(ErrorReturn errorReturn)
-    throws IOException, GeneralSecurityException {
-        return errorReturn.write(Messages.createBaseMessage(Messages.FINALIZE_CARDPAY_RESPONSE));
-    }
-
-    public static JSONObjectWriter encode(FinalizeRequest finalizeRequest,
+    public static JSONObjectWriter encode(FinalizeTransactionResponse finalizeTransactionResponse,
                                           String referenceId, 
                                           ServerX509Signer signer)
     throws IOException, GeneralSecurityException {
         return Messages.createBaseMessage(Messages.FINALIZE_CREDIT_RESPONSE)
-            .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
-                .setString(JSONSignatureDecoder.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
-                .setBinary(JSONSignatureDecoder.VALUE_JSON, 
-                           RequestHash.getRequestHash(new JSONObjectWriter(finalizeRequest.root))))
+            .setObject(EMBEDDED_JSON, finalizeTransactionResponse.root)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
     }
 }

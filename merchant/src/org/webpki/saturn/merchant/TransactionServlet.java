@@ -17,12 +17,18 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
+import java.math.BigDecimal;
+
 import java.net.URL;
+
 import java.security.GeneralSecurityException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,25 +39,22 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+
 import org.webpki.net.HTTPSWrapper;
+
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.ErrorReturn;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.Expires;
-import org.webpki.saturn.common.FinalizeResponse;
-import org.webpki.saturn.common.AccountDescriptor;
+import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.RequestHash;
 import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PayerAuthorization;
-import org.webpki.saturn.common.TransactionRequest;
-import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.UserMessageResponse;
 
 //////////////////////////////////////////////////////////////////////////
@@ -78,7 +81,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                        url2.getFile()).toExternalForm(); 
     }
     
-    JSONObjectReader fetchJSONData(HTTPSWrapper wrap, URLHolder urlHolder) throws IOException {
+    JSONObjectReader fetchJSONData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
         if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
             throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
                                   (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
@@ -94,7 +97,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return result;
     }
 
-    JSONObjectReader postData(URLHolder urlHolder, JSONObjectWriter request) throws IOException {
+    JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
         if (MerchantService.logging) {
             logger.info("About to call " + urlHolder.getUrl() + " with data:\n" + request);
         }
@@ -106,7 +109,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return fetchJSONData(wrap, urlHolder);
     }
 
-    JSONObjectReader getData(URLHolder urlHolder) throws IOException {
+    JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
         if (MerchantService.logging) {
             logger.info("About to call " + urlHolder.getUrl());
         }
@@ -117,10 +120,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return fetchJSONData(wrap, urlHolder);
     }
 
-
     // The purpose of this class is to enable URL information in exceptions
 
-    class URLHolder {
+    class UrlHolder {
         private String url;
 
         public String getUrl() {
@@ -134,7 +136,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     
     Authority payeeProviderAuthority;
     
-    synchronized void updatePayeeProviderAuthority(URLHolder urlHolder) throws IOException {
+    synchronized void updatePayeeProviderAuthority(UrlHolder urlHolder) throws IOException {
         JSONObjectReader resultMessage = getData(urlHolder);
         if (MerchantService.logging) {
             logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
@@ -145,7 +147,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        URLHolder urlHolder = new URLHolder();
+        UrlHolder urlHolder = new UrlHolder();
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {
@@ -185,7 +187,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                   !acquirerBased;
 
             // Attest the user's encrypted authorization to show "intent"
-            JSONObjectWriter providerRequest =
+            JSONObjectWriter reserveOrBasicRequest =
                 ReserveOrBasicRequest.encode(basicCredit,
                                              payerAuthorization.getProviderAuthorityUrl(),
                                              payerAuthorization.getAccountType(),
@@ -207,19 +209,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                 debugData.basicCredit = basicCredit;
             }
 
-            urlHolder.setUrl(payeeProviderAuthority.getTransactionUrl());
-            if (MerchantService.logging) {
-                logger.info("About to send to payee provider [" + urlHolder.getUrl() + "]:\n" + providerRequest);
-            }
 
             // Call the payee bank
-            JSONObjectReader resultMessage = postData(urlHolder, providerRequest);
-            if (MerchantService.logging) {
-                logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
-            }
+            urlHolder.setUrl(payeeProviderAuthority.getTransactionUrl());
+            JSONObjectReader resultMessage = postData(urlHolder, reserveOrBasicRequest);
 
             if (debug) {
-                debugData.reserveOrBasicRequest = providerRequest;
+                debugData.reserveOrBasicRequest = reserveOrBasicRequest;
                 debugData.reserveOrBasicResponse = resultMessage;
             }
 
@@ -234,61 +230,28 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         
             // Additional consistency checking
             ReserveOrBasicResponse reserveOrBasicResponse = new ReserveOrBasicResponse(resultMessage);
-/*
-            if (reserveOrBasicResponse.isBasicCredit() != basicCredit) {
-                throw new IOException("Response basic/reserve mode doesn't match request");
-            }
-*/
-            // In addition to hard errors, there are a few "normal" errors which preferably would
-            // be dealt with in more user-oriented fashion.
-/*
-            if (!reserveOrBasicResponse.success()) {
-                if (debug) {
-                    debugData.softReserveOrBasicError = true;
-                }
-                HTML.paymentError(response, debug, reserveOrBasicResponse.getErrorReturn());
-                return;
-            }
 
-            if (!reserveOrBasicResponse.getAccountType().equals(payerAuthorization.getAccountType().getTypeUri())) {
-                throw new IOException("Response account type doesn't match request");
-            }
-*/
             // No error return, then we can verify the response fully
             reserveOrBasicResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
-            
-            TransactionResponse transactionResponse = reserveOrBasicResponse.getTransactionResponse();
-            TransactionRequest transactionRequest = transactionResponse.getTransactionRequest();
-            ReserveOrBasicRequest reserveOrBasicRequest = transactionRequest.getReserveOrBasicRequest();
-            if (!ArrayUtil.compare(reserveOrBasicRequest.getPaymentRequest().getRequestHash(), requestHash)) {
-                throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
+       
+            // Two-phase operation: perform the final step
+            if (!basicCredit) {
+                processFinalize(reserveOrBasicResponse,
+                                paymentRequest.getAmount(),
+                                urlHolder,
+                                acquirerBased,
+                                debugData);
             }
-            /*
-
-            if (!reserveOrBasicResponse.isBasicCredit()) {
-                // Two-phase operation: perform the final step
-                ErrorReturn errorReturn = processFinalize (reserveOrBasicResponse, urlHolder, debugData);
-
-                // Is there a soft error?  Return it to the user
-                if (errorReturn != null) {
-                    if (debug) {
-                        debugData.softFinalizeError = true;
-                    }
-                    HTML.paymentError(response, debug, errorReturn);
-                    return;
-                }
-            }
-*/            
-
+ 
             logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
             HTML.resultPage(response,
                             debug,
                             paymentRequest,
-                            reserveOrBasicRequest.getPayerAccountType(),
+                            reserveOrBasicResponse.getPayerAccountType(),
                             acquirerBased ? // = Card
-                                AuthorizationData.formatCardNumber(transactionResponse.getAccountReference())
+                                AuthorizationData.formatCardNumber(reserveOrBasicResponse.getAccountReference())
                                                           :
-                                transactionResponse.getAccountReference());  // Currently "unmoderated" account
+                                reserveOrBasicResponse.getAccountReference());  // Currently "unmoderated" account
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
@@ -297,16 +260,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         }
     }
 
-    ErrorReturn processFinalize(ReserveOrBasicResponse bankResponse, URLHolder urlHolder, DebugData debugData)
+    void processFinalize(ReserveOrBasicResponse reserveOrBasicResponse,
+                         BigDecimal actualAmount,
+                         UrlHolder urlHolder,
+                         boolean acquirerBased,
+                         DebugData debugData)
     throws IOException, GeneralSecurityException {
-/*
-        String target = "provider";
-        Authority acquirerAuthority = null;
-        if (!bankResponse.isAccount2Account()) {
-            target = "acquirer";
-            // Lookup indicated acquirer authority
+        if (acquirerBased) {
+            // Lookup of configured acquirer authority.  This information is preferably cached
             urlHolder.setUrl(MerchantService.acquirerAuthorityUrl);
-            acquirerAuthority = new Authority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
+            Authority acquirerAuthority = new Authority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
             urlHolder.setUrl(acquirerAuthority.getTransactionUrl());
             if (debugData != null) {
                 debugData.acquirerMode = true;
@@ -314,41 +277,20 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             }
         }
 
-        JSONObjectWriter finalizeRequest = FinalizeRequest.encode(bankResponse,
-                                                                  bankResponse.getPaymentRequest().getAmount(),
+        JSONObjectWriter finalizeRequest = FinalizeRequest.encode(reserveOrBasicResponse,
+                                                                  actualAmount,
                                                                   UserPaymentServlet.getReferenceId(),
                                                                   MerchantService.merchantKey);
-        logger.info("About to send to " + target + " [" + urlHolder.getUrl() + "]:\n" + finalizeRequest);
-
         // Call the payment provider or acquirer
-        byte[] sentFinalize = finalizeRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED);
-        JSONObjectReader response = postData(urlHolder, sentFinalize);
-        logger.info("Received from " + target + " [" + urlHolder.getUrl() + "]:\n" + response);
+        JSONObjectReader response = postData(urlHolder, finalizeRequest);
 
         if (debugData != null) {
-            debugData.finalizeRequest = sentFinalize;
+            debugData.finalizeRequest = finalizeRequest;
             debugData.finalizeResponse = response;
         }
         
-        FinalizeResponse finalizeResponse = new FinalizeResponse(response);
+  //      FinalizeResponse finalizeResponse = new FinalizeResponse(response);
 
-        // Is there a soft error?  Then there is no more to do
-        if (!finalizeResponse.success()) {
-            return finalizeResponse.getErrorReturn();
-        }
-
-        // Check signature origins
-        CertificatePathCompare.compareCertificatePaths(bankResponse.isAccount2Account() ?
-                                                bankResponse.getSignatureDecoder().getCertificatePath()
-                                                                                        :
-                                                acquirerAuthority.getSignatureDecoder().getCertificatePath(),                                         
-                                                      finalizeResponse.getSignatureDecoder().getCertificatePath());
-
-        if (!ArrayUtil.compare(RequestHash.getRequestHash(sentFinalize), finalizeResponse.getRequestHash())) {
-            throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
-        }
-*/
-        return null;
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

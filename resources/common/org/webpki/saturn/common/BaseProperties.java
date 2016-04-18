@@ -38,9 +38,7 @@ public interface BaseProperties {
     String AUTHORITY_URL_JSON                = "authorityUrl";
     String TRANSACTION_URL_JSON              = "transactionUrl";
     String AMOUNT_JSON                       = "amount";
-    String DESCRIPTION_JSON                  = "description";
     String CURRENCY_JSON                     = "currency";
-    String ERROR_CODE_JSON                   = "errorCode";
     String TIME_STAMP_JSON                   = "timeStamp";
     String TRANSACTION_ID_JSON               = "transactionId";
     String CLIENT_IP_ADDRESS_JSON            = "clientIpAddress";       // Security data for the payment provider
@@ -66,7 +64,7 @@ public interface BaseProperties {
     String SOFTWARE_JSON                     = "software";
     String ID_JSON                           = "id";
     String TYPE_JSON                         = "type";
-    String FIELD1_JSON                       = "field1";                //Used for "additional" account data 
+    String FIELD1_JSON                       = "field1";                // Used for "additional" account data 
     String FIELD2_JSON                       = "field2";
     String FIELD3_JSON                       = "field3";
     String VERSION_JSON                      = "version";

@@ -37,14 +37,14 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.net.HTTPSWrapper;
 import org.webpki.util.ISODateTime;
+import org.webpki.saturn.common.FinalizeCreditResponse;
+import org.webpki.saturn.common.FinalizeTransactionRequest;
+import org.webpki.saturn.common.FinalizeTransactionResponse;
 import org.webpki.saturn.common.MerchantAccountEntry;
-import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.EncryptedData;
-import org.webpki.saturn.common.ErrorReturn;
 import org.webpki.saturn.common.FinalizeRequest;
-import org.webpki.saturn.common.FinalizeResponse;
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.AuthorizationData;
@@ -52,6 +52,7 @@ import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
+import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.UserAccountEntry;
@@ -71,17 +72,19 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     static HashMap<String,Integer> requestTypes = new HashMap<String,Integer>();
     
     static final int REQTYPE_PAYEE_INITIAL          = 0;
-    static final int REQTYPE_PAYEE_FINAL            = 1;
-    static final int REQTYPE_TRANSACTION            = 2;
-    static final int REQTYPE_FINALIZE_TRANSACTION   = 3;
+    static final int REQTYPE_TRANSACTION            = 1;
+    static final int REQTYPE_PAYEE_FINALIZE_CREDIT  = 2;
+    static final int REQTYPE_PAYEE_FINALIZE_CARDPAY = 3;
+    static final int REQTYPE_FINALIZE_TRANSACTION   = 4;
     
     static {
         requestTypes.put(Messages.BASIC_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_INITIAL);
         requestTypes.put(Messages.RESERVE_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_INITIAL);
         requestTypes.put(Messages.RESERVE_CARDPAY_REQUEST.toString(), REQTYPE_PAYEE_INITIAL);
 
-        requestTypes.put(Messages.FINALIZE_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_FINAL);
-        requestTypes.put(Messages.FINALIZE_CARDPAY_REQUEST.toString(), REQTYPE_PAYEE_FINAL);
+        requestTypes.put(Messages.FINALIZE_CREDIT_REQUEST.toString(), REQTYPE_PAYEE_FINALIZE_CREDIT);
+
+        requestTypes.put(Messages.FINALIZE_CARDPAY_REQUEST.toString(), REQTYPE_PAYEE_FINALIZE_CARDPAY);
 
         requestTypes.put(Messages.TRANSACTION_REQUEST.toString(), REQTYPE_TRANSACTION);
 
@@ -102,7 +105,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                        url2.getFile()).toExternalForm(); 
     }
 
-    JSONObjectReader fetchJSONData(HTTPSWrapper wrap, URLHolder urlHolder) throws IOException {
+    static JSONObjectReader fetchJSONData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
         if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
             throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
                                   (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
@@ -119,7 +122,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return result;
     }
 
-    JSONObjectReader postData(URLHolder urlHolder, JSONObjectWriter request) throws IOException {
+    static JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
         if (BankService.logging) {
             logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress +
                         "with data:\n" + request);
@@ -132,7 +135,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return fetchJSONData(wrap, urlHolder);
     }
 
-    JSONObjectReader getData(URLHolder urlHolder) throws IOException {
+    static JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
         if (BankService.logging) {
             logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress);
         }
@@ -145,12 +148,12 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
     // The purpose of this class is to enable URL information in exceptions
 
-    class URLHolder {
+    class UrlHolder {
         String remoteAddress;
         String contextPath;
         String callerAddress;
         
-        URLHolder(String remoteAddress, String contextPath) {
+        UrlHolder(String remoteAddress, String contextPath) {
             this.remoteAddress = remoteAddress;
             this.contextPath = contextPath;
             callerAddress = " [Origin=" + remoteAddress + ", Context=" + contextPath + "] ";
@@ -170,8 +173,12 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     static String getReferenceId() {
         return "#" + (BankService.referenceId++);
     }
+    
+    static Authority getAuthority(UrlHolder urlHolder) throws IOException {
+        return new Authority(getData(urlHolder), urlHolder.getUrl());
+    }
 
-    JSONObjectWriter processTransactionRequest(JSONObjectReader request, URLHolder urlHolder)
+    JSONObjectWriter processTransactionRequest(JSONObjectReader request, UrlHolder urlHolder)
     throws IOException, GeneralSecurityException {
 
         // Decode transaction request message
@@ -228,7 +235,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
             // Lookup of payee's acquirer.  You would typically cache such information
             urlHolder.setUrl(reserveOrBasicRequest.getAcquirerAuthorityUrl());
-            Authority acquirerAuthority = new Authority(getData(urlHolder), urlHolder.getUrl());
+            Authority acquirerAuthority = getAuthority(urlHolder);
 
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
@@ -257,83 +264,107 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                           encryptedCardData,
                                           getReferenceId(),
                                           BankService.bankKey);
- }
+    }
 
-    JSONObjectWriter processReserveOrBasicRequest(JSONObjectReader request, URLHolder urlHolder)
+    JSONObjectWriter processReserveOrBasicRequest(JSONObjectReader request, UrlHolder urlHolder)
     throws IOException, GeneralSecurityException {
         // Read the by the user and merchant attested payment request
         ReserveOrBasicRequest attestedPaymentRequest = new ReserveOrBasicRequest(request);
 
-       // The merchant is the only entity who can provide the client's IP address
-       String clientIpAddress = attestedPaymentRequest.getClientIpAddress();
+        // The merchant is the only entity who can provide the client's IP address
+        String clientIpAddress = attestedPaymentRequest.getClientIpAddress();
 
-       // Client IP could be used for risk-based authentication
-       logger.info("Client address: " + clientIpAddress);
+        // Client IP could be used for risk-based authentication
+        logger.info("Client address: " + clientIpAddress);
 
-       // Get the embedded (counter-signed) payment request
-       PaymentRequest paymentRequest = attestedPaymentRequest.getPaymentRequest();
+        // Get the embedded (counter-signed) payment request
+        PaymentRequest paymentRequest = attestedPaymentRequest.getPaymentRequest();
 
-       // Verify that the merchant's signature belongs to a for us known merchant
-       MerchantAccountEntry merchantAccountEntry = BankService.merchantAccountDb.get(paymentRequest.getPayee().getId());
-       if (merchantAccountEntry == null) {
-           throw new IOException("Unknown merchant: " + paymentRequest.getPayee().writeObject().toString());
-       }
-       if (!merchantAccountEntry.getPublicKey().equals(paymentRequest.getPublicKey())) {
-           throw new IOException("Public key doesn't match merchant: " + paymentRequest.getPayee().writeObject().toString());
-       }
+        // Verify that the merchant's signature belongs to a for us known merchant
+        MerchantAccountEntry merchantAccountEntry = BankService.merchantAccountDb.get(paymentRequest.getPayee().getId());
+        if (merchantAccountEntry == null) {
+            throw new IOException("Unknown merchant: " + paymentRequest.getPayee().writeObject().toString());
+        }
+        if (!merchantAccountEntry.getPublicKey().equals(paymentRequest.getPublicKey())) {
+            throw new IOException("Public key doesn't match merchant: " + paymentRequest.getPayee().writeObject().toString());
+        }
 
-       // Lookup of payer's bank.  You would typically cache such information
-       urlHolder.setUrl(attestedPaymentRequest.getProviderAuthorityUrl());
-       Authority providerAuthority = new Authority(getData(urlHolder), urlHolder.getUrl());
+        // Lookup of payer's bank.  You would typically cache such information
+        urlHolder.setUrl(attestedPaymentRequest.getProviderAuthorityUrl());
+        Authority providerAuthority = getAuthority(urlHolder);
 
-       // We need to separate credit-card and account-2-account payments
-       boolean acquirerBased = attestedPaymentRequest.getPayerAccountType().isAcquirerBased();
-       logger.info("Kind of operation: " + (acquirerBased ? "credit-card" : "account-2-account"));
+        // We need to separate credit-card and account-2-account payments
+        boolean acquirerBased = attestedPaymentRequest.getPayerAccountType().isAcquirerBased();
+        logger.info("Kind of operation: " + (acquirerBased ? "credit-card" : "account-2-account"));
 
-       ////////////////////////////////////////////////////////////////////////////
-       // We got an authentic request.  Now we need to get an attestation by     //
-       // the payer's bank that user is authentic and have the required funds... //
-       ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+        // We got an authentic request.  Now we need to get an attestation by     //
+        // the payer's bank that user is authentic and have the required funds... //
+        ////////////////////////////////////////////////////////////////////////////
 
-       // Should be external data but this is a demo you know...
-       AccountDescriptor[] accounts = {new AccountDescriptor("http://ultragiro.fr", "35964640"),
-                                       new AccountDescriptor("http://mybank.com", 
-                                                             "J-399.962",
-                                                             new String[]{"enterprise"})};
+        // Should be external data but this is a demo you know...
+        AccountDescriptor[] accounts = {new AccountDescriptor("http://ultragiro.fr", "35964640"),
+                                        new AccountDescriptor("http://mybank.com", 
+                                                              "J-399.962",
+                                                              new String[]{"enterprise"})};
      
-       urlHolder.setUrl(providerAuthority.getTransactionUrl());
-       JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
-                                                                       accounts,
-                                                                       getReferenceId(),
-                                                                       BankService.bankKey);
+        urlHolder.setUrl(providerAuthority.getTransactionUrl());
+        JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
+                                                                        accounts,
+                                                                        getReferenceId(),
+                                                                        BankService.bankKey);
        
-       // Decode response
-       JSONObjectReader response = postData(urlHolder, transactionRequest);
-       if (response.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.USER_MESSAGE_RESPONSE.toString())) {
-           return new JSONObjectWriter(response);
-       }
-       TransactionResponse transactionResponse = new TransactionResponse(response);
+        // Decode response
+        JSONObjectReader response = postData(urlHolder, transactionRequest);
+        if (response.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.USER_MESSAGE_RESPONSE.toString())) {
+            return new JSONObjectWriter(response);
+        }
 
-       return ReserveOrBasicResponse.encode(transactionResponse,
-                                            BankService.bankKey);
+        // Success
+        return ReserveOrBasicResponse.encode(new TransactionResponse(response),
+                                             BankService.bankKey);
     }
 
-    JSONObjectWriter processFinalizeRequest(JSONObjectReader payeeRequest, URLHolder urlHolder) throws IOException, GeneralSecurityException {
+    JSONObjectWriter processFinalizeCreditRequest(JSONObjectReader payeeRequest, UrlHolder urlHolder) throws IOException, GeneralSecurityException {
 
-        // Decode the finalize request message which the one which lifts money
-        FinalizeRequest payeeFinalizationRequest = new FinalizeRequest(payeeRequest);
+        // Decode the finalize credit request
+        FinalizeRequest finalizeRequest = new FinalizeRequest(payeeRequest);
+
+        // Lookup of payer's bank.  You would typically cache such information
+        urlHolder.setUrl(finalizeRequest.getProviderAuthorityUrl());
+        Authority providerAuthority = getAuthority(urlHolder);
+
+        // This message is the one which finally actually lifts money
+        urlHolder.setUrl(providerAuthority.getTransactionUrl());
+        FinalizeTransactionResponse finalizeTransactionResponse = 
+            new FinalizeTransactionResponse(postData(urlHolder,
+                                                     FinalizeTransactionRequest.encode(finalizeRequest,
+                                                                                       getReferenceId(),
+                                                                                       BankService.bankKey)));
+
+        // It appears that we succeeded
+        return FinalizeCreditResponse.encode(finalizeTransactionResponse,
+                                             getReferenceId(),
+                                             BankService.bankKey);
+    }
+
+    JSONObjectWriter processFinalizeTransactionRequest(JSONObjectReader payeeRequest, UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+
+        // Decode the finalize transaction request
+        FinalizeTransactionRequest finalizeTransactionRequest = new FinalizeTransactionRequest(payeeRequest);
 
         //////////////////////////////////////////////////////////////////////////////
         // Since we don't have a real bank we simply return success...              //
         //////////////////////////////////////////////////////////////////////////////
-        return FinalizeResponse.encode(payeeFinalizationRequest,
-                                       getReferenceId(),
-                                       BankService.bankKey);
+        return FinalizeTransactionResponse.encode(finalizeTransactionRequest,
+                                                  getReferenceId(),
+                                                  BankService.bankKey);
     }
-        
+
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        UrlHolder urlHolder = null;
         try {
-            URLHolder urlHolder = new URLHolder(request.getRemoteAddr(), request.getContextPath());
+            urlHolder = new UrlHolder(request.getRemoteAddr(), request.getContextPath());
             String contentType = request.getContentType();
             if (!contentType.equals(JSON_CONTENT_TYPE)) {
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
@@ -358,12 +389,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                     providerResponse = processReserveOrBasicRequest(providerRequest, urlHolder);
                     break;
 
-                case REQTYPE_PAYEE_FINAL:
-                    providerResponse = processFinalizeRequest(providerRequest, urlHolder);
-                    break;
-                    
                 case REQTYPE_TRANSACTION:
                     providerResponse = processTransactionRequest(providerRequest, urlHolder);
+                    break;
+
+                case REQTYPE_PAYEE_FINALIZE_CREDIT:
+                    providerResponse = processFinalizeCreditRequest(providerRequest, urlHolder);
+                    break;
+                    
+                case REQTYPE_FINALIZE_TRANSACTION:
+                    providerResponse = processFinalizeTransactionRequest(providerRequest, urlHolder);
                     break;
                     
                 default:
@@ -388,10 +423,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
             /////////////////////////////////////////////////////////////////////////////////////////
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            String message = (urlHolder == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
+            logger.log(Level.SEVERE, message, e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = response.getWriter();
-            writer.print(e.getMessage());
+            writer.print(message);
             writer.flush();
         }
     }

@@ -76,4 +76,13 @@ public class ReserveOrBasicResponse implements BaseProperties {
     public TransactionResponse getTransactionResponse() {
         return transactionResponse;
     }
+
+    // Convenience methods
+    public PayerAccountTypes getPayerAccountType() {
+        return transactionResponse.transactionRequest.reserveOrBasicRequest.accountType;
+    }
+
+    public String getAccountReference() {
+        return transactionResponse.accountReference;
+    }
 }

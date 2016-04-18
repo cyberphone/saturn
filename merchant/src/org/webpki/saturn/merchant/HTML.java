@@ -26,7 +26,6 @@ import org.webpki.util.HTMLEncoder;
 
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.ErrorReturn;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 
@@ -34,8 +33,6 @@ import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML {
 
-    static final int PAYMENT_TIMEOUT_INIT            = 5000;
-    
     static final String STICK_TO_HOME_URL            =
                     "history.pushState(null, null, 'home');\n" +
                     "window.addEventListener('popstate', function(event) {\n" +

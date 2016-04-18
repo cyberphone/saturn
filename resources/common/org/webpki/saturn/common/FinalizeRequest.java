@@ -109,16 +109,25 @@ public class FinalizeRequest implements BaseProperties {
         return referenceId;
     }
 
+    // Convenience method
+    public String getProviderAuthorityUrl() {
+        return reserveOrBasicResponse
+            .transactionResponse
+                .transactionRequest
+                    .reserveOrBasicRequest
+                        .providerAuthorityUrl;
+    }
+
     public static JSONObjectWriter encode(ReserveOrBasicResponse reserveOrBasicResponse,
                                           BigDecimal amount,
                                           String referenceId,
                                           ServerAsymKeySigner signer)
     throws IOException, GeneralSecurityException {
         return Messages.createBaseMessage(matching(reserveOrBasicResponse))
+            .setObject(EMBEDDED_JSON, reserveOrBasicResponse.root)
             .setBigDecimal(AMOUNT_JSON,
                            checkAmount(amount, reserveOrBasicResponse),
                            getDecimals(reserveOrBasicResponse))
-            .setObject(EMBEDDED_JSON, reserveOrBasicResponse.root)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(TransactionRequest.SOFTWARE_NAME,
