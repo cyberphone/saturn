@@ -36,10 +36,7 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.ErrorReturn;
-import org.webpki.saturn.common.FinalizeResponse;
 import org.webpki.saturn.common.Payee;
-import org.webpki.saturn.common.ReserveOrDebitResponse;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PaymentRequest;
 

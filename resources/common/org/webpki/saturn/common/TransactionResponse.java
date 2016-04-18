@@ -17,6 +17,7 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -34,7 +35,7 @@ public class TransactionResponse implements BaseProperties {
         transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
-            EncryptedData.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON));
+            encryptedCardData = EncryptedData.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON));
         } else {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
@@ -51,6 +52,8 @@ public class TransactionResponse implements BaseProperties {
     Software software;
     
     GregorianCalendar dateTime;
+
+    EncryptedData encryptedCardData;
 
     AccountDescriptor accountDescriptor;
     public AccountDescriptor getPayeeAccountDescriptor() {

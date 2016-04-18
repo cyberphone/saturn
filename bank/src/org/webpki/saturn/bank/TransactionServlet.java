@@ -362,6 +362,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         // Decode the finalize cardpay request
         FinalizeRequest finalizeRequest = new FinalizeRequest(payeeRequest);
+        
+        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(BankService.decryptionKeys));
 
         // Here we are supposed to talk to the card payment network....
 

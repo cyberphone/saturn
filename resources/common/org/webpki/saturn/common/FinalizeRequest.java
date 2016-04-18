@@ -25,6 +25,7 @@ import java.security.PublicKey;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
 
@@ -109,13 +110,20 @@ public class FinalizeRequest implements BaseProperties {
         return referenceId;
     }
 
-    // Convenience method
+    // Convenience methods
     public String getProviderAuthorityUrl() {
         return reserveOrBasicResponse
             .transactionResponse
                 .transactionRequest
                     .reserveOrBasicRequest
                         .providerAuthorityUrl;
+    }
+
+    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
+    throws IOException, GeneralSecurityException {
+        return new ProtectedAccountData(reserveOrBasicResponse
+                                            .transactionResponse
+                                                 .encryptedCardData.getDecryptedData(decryptionKeys));
     }
 
     public static JSONObjectWriter encode(ReserveOrBasicResponse reserveOrBasicResponse,
