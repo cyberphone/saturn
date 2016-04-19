@@ -24,6 +24,7 @@ import java.security.KeyStore;
 
 import java.security.interfaces.RSAPublicKey;
 
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -36,7 +37,9 @@ import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
+import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONOutputFormats;
+import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.util.ArrayUtil;
@@ -64,7 +67,13 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static final String PAYMENT_ROOT          = "payment_root";
     
+    static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
+
+    static final String LOGGING               = "logging";
+
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
+
+    static LinkedHashMap<String,MerchantAccountEntry> merchantAccountDb = new LinkedHashMap<String,MerchantAccountEntry>();
 
     static JSONX509Verifier paymentRoot;
 
@@ -73,6 +82,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static String payeeId;
     
     static byte[] publishedAuthorityData;
+    
+    static boolean logging;
     
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -111,6 +122,14 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
+            JSONArrayReader accounts = JSONParser.parse(
+                    ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
+                                                       ).getJSONArrayReader();
+            while (accounts.hasMore()) {
+                MerchantAccountEntry account = new MerchantAccountEntry(accounts.getObject());
+                merchantAccountDb.put(account.getId(), account);
+            }
+
             addDecryptionKey(DECRYPTION_KEY1);
             addDecryptionKey(DECRYPTION_KEY2);
             
@@ -121,6 +140,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                  decryptionKeys.get(0).getPublicKey(),
                                  Expires.inDays(365),
                                  acquirerKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
+
+            logging = getPropertyBoolean(LOGGING);
 
             logger.info("Saturn Acquirer-server initiated");
         } catch (Exception e) {

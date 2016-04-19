@@ -41,7 +41,9 @@
   </target>
 
   <target name="_build">
+    <property name="logging" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
+    <property name="merchants.db" value="merchants.${appcorename}.json"/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
        tablength="4"
@@ -91,6 +93,9 @@
          <include name="${acquirersignaturekey}.p12"/>
          <include name="${payment.var.root}.cer"/>
       </zipfileset>
+      <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
+         <include name="${merchants.db}"/>
+      </zipfileset>
       <fileset dir="web"/>
     </war>
   </target>
@@ -123,13 +128,18 @@
        <param name="zip.key.dir" value="${key.dir}"/>
        
        <param name="payment.var.root" value="${payment_root}"/>
-       </antcall>
+
+       <param name="zip.credentials.dir" value="${credentials.dir}"/>
+     </antcall>
      <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
   </target>
   
   <!-- mobilepki using EJBCA plugin mode -->
   <target name="mobilepki-ejbca">
      <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Acquirer Plugin"/>
+      <condition property="logging" value="true" else="false">
+        <isset property="plugin.ejbca.ant.custom.logging"/>
+     </condition>
      <property name="acquirer.host" value="https://mobilepki.org/webpay-acquirer"/>
      <property file="common.properties"/>
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
@@ -152,7 +162,10 @@
        <param name="zip.key.dir" value="keys"/>
 
        <param name="payment.var.root" value="${paymentroot}"/>
-       </antcall>
+
+       <param name="zip.credentials.dir" value="credentials"/>
+       
+     </antcall>
      <!-- Update application.xml -->
      <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">
 	    <replacetoken><![CDATA[</application>]]></replacetoken>
@@ -191,6 +204,9 @@
       </zipfileset>
       <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
       <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>
+      <zipfileset dir="${credentials.dir}" prefix="${appcorename}/credentials">
+        <include name="*.json"/>
+      </zipfileset>
       <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>
     </zip>
     <checksum file="${dd}/${appcorename}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>

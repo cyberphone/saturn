@@ -77,8 +77,8 @@ public class FinalizeRequest implements BaseProperties {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
-        outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
-        ReserveOrBasicRequest.comparePublicKeys(outerPublicKey,
+        publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
+        ReserveOrBasicRequest.comparePublicKeys(publicKey,
                                                 reserveOrBasicResponse
                                                     .transactionResponse
                                                         .transactionRequest
@@ -89,8 +89,6 @@ public class FinalizeRequest implements BaseProperties {
     GregorianCalendar timeStamp;
 
     Software software;
-    
-    PublicKey outerPublicKey;
     
     JSONObjectReader root;
     
@@ -109,6 +107,11 @@ public class FinalizeRequest implements BaseProperties {
     String referenceId;
     public String getReferenceId() {
         return referenceId;
+    }
+
+    PublicKey publicKey;
+    public PublicKey getPublicKey() {
+        return publicKey;
     }
 
     // Convenience method
@@ -130,12 +133,22 @@ public class FinalizeRequest implements BaseProperties {
 
     // Convenience method
     public String getMerchantKeyIssuer() throws IOException {
-        return reserveOrBasicResponse.signatureDecoder.getCertificatePath()[0].getSubjectX500Principal().getName();
+        return reserveOrBasicResponse
+            .signatureDecoder.getCertificatePath()[0].getSubjectX500Principal().getName();
     }
 
     // Convenience method
     public void verifyMerchantBank(JSONX509Verifier verifier) throws IOException {
         reserveOrBasicResponse.signatureDecoder.verify(verifier);
+    }
+
+    // Convenience method
+    public Payee getPayee() {
+        return reserveOrBasicResponse
+            .transactionResponse
+                .transactionRequest
+                    .reserveOrBasicRequest
+                        .paymentRequest.getPayee();
     }
 
     public static JSONObjectWriter encode(ReserveOrBasicResponse reserveOrBasicResponse,
