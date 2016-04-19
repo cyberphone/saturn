@@ -47,7 +47,6 @@ import org.webpki.json.JSONX509Verifier;
 import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.Authority;
-import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.DecryptionKeyHolder;
 import org.webpki.saturn.common.Encryption;
 import org.webpki.saturn.common.Expires;

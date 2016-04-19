@@ -31,6 +31,7 @@ import org.webpki.crypto.AlgorithmPreferences;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONX509Verifier;
 
 public class FinalizeRequest implements BaseProperties {
     
@@ -110,7 +111,7 @@ public class FinalizeRequest implements BaseProperties {
         return referenceId;
     }
 
-    // Convenience methods
+    // Convenience method
     public String getProviderAuthorityUrl() {
         return reserveOrBasicResponse
             .transactionResponse
@@ -119,11 +120,22 @@ public class FinalizeRequest implements BaseProperties {
                         .providerAuthorityUrl;
     }
 
+    // Convenience method
     public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
         return new ProtectedAccountData(reserveOrBasicResponse
                                             .transactionResponse
                                                  .encryptedCardData.getDecryptedData(decryptionKeys));
+    }
+
+    // Convenience method
+    public String getMerchantKeyIssuer() throws IOException {
+        return reserveOrBasicResponse.signatureDecoder.getCertificatePath()[0].getSubjectX500Principal().getName();
+    }
+
+    // Convenience method
+    public void verifyMerchantBank(JSONX509Verifier verifier) throws IOException {
+        reserveOrBasicResponse.signatureDecoder.verify(verifier);
     }
 
     public static JSONObjectWriter encode(ReserveOrBasicResponse reserveOrBasicResponse,

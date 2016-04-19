@@ -6,7 +6,6 @@
   
   <property name="appcorename" value="webpay-acquirer"/>
   <property name="application" value="${appcorename}.war"/>
-  <property name="merchant.dn" value="CN=Demo Merchant,2.5.4.5=#1306383936333235,C=DE"/>
   
   <property name="debug" value="on"/>
   <property environment="env"/>
@@ -27,7 +26,7 @@
   <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
 
   <target name="help">
-    <echo message="tomcat [-Dmerchant.dn=something] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+    <echo message="tomcat mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -70,7 +69,9 @@
       <replacefilter token="@acquirer-decryptionkey2@" value="${acquirerencryptionkey_rsa}.p12"/>
       <replacefilter token="@acquirer-host@" value="${acquirer.host}"/>
 	  <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
-    </replace>
+      <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
+      <replacefilter token="@logging@" value="${logging}"/>
+	</replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>

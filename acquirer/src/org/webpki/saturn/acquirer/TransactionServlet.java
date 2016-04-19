@@ -19,13 +19,10 @@ package org.webpki.saturn.acquirer;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import java.math.BigDecimal;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,12 +31,11 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PaymentRequest;
-
 import org.webpki.webutil.ServletUtil;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -68,50 +64,22 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             JSONObjectReader payeeRequest = JSONParser.parse(ServletUtil.getData(request));
             logger.info("Received:\n" + payeeRequest);
 
-            // Decode the finalize request message
-            FinalizeRequest payeeFinalizationRequest = new FinalizeRequest(payeeRequest);
+            // Decode the finalize cardpay request
+            FinalizeRequest finalizeRequest = new FinalizeRequest(payeeRequest);
+            
+            // Verify that the merchant's bank is known
+            finalizeRequest.verifyMerchantBank(AcquirerService.paymentRoot);
+            logger.info("Issuer: " + finalizeRequest.getMerchantKeyIssuer());
 
-            // Get the embedded authorization from the payer's payment provider (bank)
-            ReserveOrDebitResponse embeddedResponse = payeeFinalizationRequest.getEmbeddedResponse();
+            logger.info("Card data: " + finalizeRequest.getProtectedAccountData(AcquirerService.decryptionKeys));
 
-            // Verify that the provider's signature belongs to a valid payment provider trust network
-            embeddedResponse.getSignatureDecoder().verify(AcquirerService.paymentRoot);
-            String payeeBank =
-                 embeddedResponse.getSignatureDecoder().getCertificatePath()[0].getSubjectX500Principal().getName();
- 
-            // Get the the account data we sent encrypted through the merchant 
-            logger.info("Protected Account Data:\n" +
-                embeddedResponse.getProtectedAccountData(AcquirerService.decryptionKeys));
+            // Here we are supposed to talk to the card payment network....
 
-            // The original request contains some required data like currency
-            PaymentRequest paymentRequest = embeddedResponse.getPaymentRequest();
-            Payee payee = paymentRequest.getPayee();
+            // It appears that we succeeded
+            acquirerResponse = FinalizeCardpayResponse.encode(finalizeRequest,
+                                                              getReferenceId(),
+                                                              AcquirerService.acquirerKey);
 
-            // Verify that the merchant is one of our customers.
-            // Rudimentary customer "database": a single customer!
-            // Note that since a payee (merchant) is vouched for by a bank it is the combination
-            // of a payee ID and the name of the certifying bank that comprise a valid customer.
-            // The payee's public key is only of interest to the certifying bank.
-            if (!payee.getId().equals("86344")) {
-              throw new IOException("Unknown merchant: ID=" + payee.getId() + ", Common Name=" + payee.getCommonName());
-            }
-            if (!payeeBank.equals("CN=mybank.com,2.5.4.5=#130434353031,C=FR")) {
-              throw new IOException("Merchant: ID=" + payee.getId() + " does not match bank: " + payeeBank);
-            }
-
-            ////////////////////////////////////////////////////////////////////////////
-            // We got an authentic request.  Now we need to check available funds etc.//
-            // Since we don't have a real acquirer this part is rather simplistic :-) //
-            ////////////////////////////////////////////////////////////////////////////
-
-            // Sorry but you don't appear to have a million bucks :-)
-            if (paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
-                acquirerResponse = FinalizeResponse.encode(new ErrorReturn(ErrorReturn.ERRORS.INSUFFICIENT_FUNDS));
-            } else {
-                acquirerResponse = FinalizeResponse.encode(payeeFinalizationRequest,
-                                                           getReferenceId(),
-                                                           AcquirerService.acquirerKey);
-            }
             logger.info("Returned to caller:\n" + acquirerResponse);
 
             /////////////////////////////////////////////////////////////////////////////////////////

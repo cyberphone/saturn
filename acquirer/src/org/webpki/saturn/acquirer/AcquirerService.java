@@ -45,6 +45,7 @@ import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.DecryptionKeyHolder;
 import org.webpki.saturn.common.Encryption;
 import org.webpki.saturn.common.Expires;
+import org.webpki.saturn.common.MerchantAccountEntry;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerX509Signer;
 
