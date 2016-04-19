@@ -449,7 +449,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
             /////////////////////////////////////////////////////////////////////////////////////////
-            String message = (urlHolder == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
+            String message = (urlHolder == null ? "" : "From" + urlHolder.callerAddress +
+                              (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl()) + "\n") + e.getMessage();
             logger.log(Level.SEVERE, message, e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = response.getWriter();
