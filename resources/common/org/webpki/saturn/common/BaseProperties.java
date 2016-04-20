@@ -22,7 +22,7 @@ public interface BaseProperties {
     String WINDOW_JSON                       = "window";
     String HEIGHT_JSON                       = "height";
     String WIDTH_JSON                        = "width";
-    String COMMON_NAME_JSON                  = "commonName";
+    String COMMON_NAME_JSON                  = "commonName";            // Common name of payee to be used in UIs
     String NAME_JSON                         = "name";
 
     String TEXT_JSON                         = "text";                  // UserMessageResponse
@@ -44,7 +44,7 @@ public interface BaseProperties {
     String CLIENT_IP_ADDRESS_JSON            = "clientIpAddress";       // Security data for the payment provider
     String CLIENT_GEO_LOCATION_JSON          = "clientGeoLocation";     // Optional security data that client devices may supply
     String REFERENCE_ID_JSON                 = "referenceId";
-    String PAYEE_JSON                        = "payee";                 // Common name of payee to be used in UIs
+    String PAYEE_JSON                        = "payee";                 // Payee object
     String AUTHORIZATION_DATA_JSON           = "authorizationData";     // Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON       = "providerAuthorityUrl";  // URL to payment provider
     String ACCEPTED_ACCOUNT_TYPES_JSON       = "acceptedAccountTypes";  // List of ACCOUNT_TYPE_JSON
