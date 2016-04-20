@@ -126,7 +126,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
             key.addExtension(BaseProperties.W2NB_WEB_PAY_CONTEXT_URI,
                              new JSONObjectWriter()
-                .setObject(BaseProperties.PAYER_ACCOUNT_JSON, 
+                .setObject(BaseProperties.ACCOUNT_JSON, 
                            new AccountDescriptor(paymentCredential.accountType,
                                                  paymentCredential.accountId).writeObject())
                 .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON,

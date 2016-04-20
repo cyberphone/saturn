@@ -135,6 +135,7 @@
   <!-- mobilepki using EJBCA plugin mode -->
   <target name="mobilepki-ejbca">
      <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Bank Plugin"/>
+     <property file="common.properties"/>
      <condition property="appcorename" value="${payeebankpath}" else="${payerbankpath}">
         <isset property="plugin.ejbca.ant.custom.payee"/>
      </condition>
@@ -190,37 +191,38 @@
   </target>
   
   <target name="_unzipit" if="uu">
-    <delete dir="${dd}/${payerbankpath}"/>
-    <unzip src="${dd}/${payerbankpath}.zip" dest="${dd}"/>
+    <delete dir="${dd}/${banksourcepath}"/>
+    <unzip src="${dd}/${banksourcepath}.zip" dest="${dd}"/>
   </target>
   
   <target name="zip-distribution">
+    <property name="banksourcepath" value="webpay-bank"/>
     <property file="../resources/common.properties"/>
     <fail unless="dd" message="-&#10;
 ***************************************************************&#10;
  You must define a distribution directory using the -D option:&#10;
  ant zip-distribution -Ddd=the_path_to_the_directory.&#10;
- Optionally you can specify -Duu=0 which deletes ${payerbankpath}&#10;
+ Optionally you can specify -Duu=0 which deletes ${banksourcepath}&#10;
  and replaces the directory with the unzipped content&#10;
 ***************************************************************&#10;"/>
-	<echo message="Producing ${payerbankpath} .zip and .zip.SHA1 files..."/> 
-	<delete file="${dd}/${payerbankpath}.zip" failonerror="false"/>
-    <zip destfile="${dd}/${payerbankpath}.zip">
-      <zipfileset dir="." prefix="${payerbankpath}">
+	<echo message="Producing ${banksourcepath} .zip and .zip.SHA1 files..."/> 
+	<delete file="${dd}/${banksourcepath}.zip" failonerror="false"/>
+    <zip destfile="${dd}/${banksourcepath}.zip">
+      <zipfileset dir="." prefix="${banksourcepath}">
        	<exclude name="/**/.*"/>
         <exclude name="/.tmp/**"/>
        	<exclude name="**/.settings/**"/>
        	<exclude name="**/bin/**"/>
        	<exclude name="dist/**"/>
       </zipfileset>
-      <zipfileset dir="${common.src.dir}" prefix="${payerbankpath}/common.src"/>
-      <zipfileset dir="${key.dir}" prefix="${payerbankpath}/keys"/>
-      <zipfileset dir="${credentials.dir}" prefix="${payerbankpath}/credentials">
+      <zipfileset dir="${common.src.dir}" prefix="${banksourcepath}/common.src"/>
+      <zipfileset dir="${key.dir}" prefix="${banksourcepath}/keys"/>
+      <zipfileset dir="${credentials.dir}" prefix="${banksourcepath}/credentials">
         <include name="*.json"/>
       </zipfileset>
-      <zipfileset file="../resources/common.properties" prefix="${payerbankpath}"/>
+      <zipfileset file="../resources/common.properties" prefix="${banksourcepath}"/>
     </zip>
-    <checksum file="${dd}/${payerbankpath}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
+    <checksum file="${dd}/${banksourcepath}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
     <antcall target="_unzipit"/>
   </target>
    

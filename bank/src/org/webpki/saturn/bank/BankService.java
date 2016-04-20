@@ -102,7 +102,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
     }
-    
+
     void addDecryptionKey(String name) throws IOException {
         KeyStoreEnumerator keyStoreEnumerator = new KeyStoreEnumerator(getResource(name),
                                                                        getPropertyString(KEYSTORE_PASSWORD));
@@ -120,7 +120,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            ArrayUtil.getByteArrayFromInputStream (getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
-    
+
     @Override
     public void contextDestroyed(ServletContextEvent event) {
     }
