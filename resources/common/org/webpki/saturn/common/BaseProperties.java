@@ -69,7 +69,7 @@ public interface BaseProperties {
     String FIELD3_JSON                       = "field3";
     String VERSION_JSON                      = "version";
     
-    String W2NB_WEB_PAY_CONTEXT_URI          = "http://xmlns.webpki.org/webpay/v1";
+    String W2NB_WEB_PAY_CONTEXT_URI          = "http://xmlns.webpki.org/webpay/v2";
 
     String JSON_CONTENT_TYPE                 = "application/json";
 }
