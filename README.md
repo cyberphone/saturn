@@ -1,3 +1,5 @@
-![Saturn is great](saturn-small.png)
+![Saturn is great](resources/logotype/saturn-small.png)
 
-A (potentially) Universal Payment System
+##A (potentially) Universal Payment System
+
+More information to come :-)
