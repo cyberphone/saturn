@@ -103,15 +103,12 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             Payee payee = finalizeRequest.getPayee();
             MerchantAccountEntry merchantAccountEntry = AcquirerService.merchantAccountDb.get(payee.getId());
             if (merchantAccountEntry == null) {
-                logger.severe("Unknown merchant Id: " + payee.getId());
                 throw new IOException("Unknown merchant Id: " + payee.getId());
             }
             if (!merchantAccountEntry.getPublicKey().equals(finalizeRequest.getPublicKey())) {
-                logger.severe("Non-matching public key for merchant Id: " + payee.getId());
                 throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
             }
             if (!finalizeRequest.getMerchantKeyIssuer().equals(merchantAccountEntry.getIssuer())) {
-                logger.severe("Non-matching issuer for merchant Id: " + payee.getId());
                 throw new IOException("Non-matching issuer for merchant Id: " + payee.getId());
             }
 
@@ -143,10 +140,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
             /////////////////////////////////////////////////////////////////////////////////////////
-            logger.log(Level.SEVERE, e.getMessage(), e);
+            String message = (urlHolder == null ? "" : "Source" + urlHolder.callerAddress) + e.getMessage();
+            logger.log(Level.SEVERE, message, e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = response.getWriter();
-            writer.print(e.getMessage());
+            writer.print(message);
             writer.flush();
         }
     }
