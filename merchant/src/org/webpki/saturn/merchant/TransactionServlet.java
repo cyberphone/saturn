@@ -295,7 +295,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             finalizeCardpayResponse.getSignatureDecoder().verify(MerchantService.acquirerRoot);
         } else {
             FinalizeCreditResponse finalizeCreditResponse = new FinalizeCreditResponse(response);
-            finalizeCreditResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
         }
     }
 
