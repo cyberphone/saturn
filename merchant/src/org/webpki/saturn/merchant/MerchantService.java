@@ -45,7 +45,6 @@ import org.webpki.util.ISODateTime;
 
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
-import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -65,6 +64,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String KEYSTORE_PASSWORD            = "key_password";
 
     static final String PAYMENT_ROOT                 = "payment_root";
+    
+    static final String ACQUIRER_ROOT                = "acquirer_root";
     
     static final String PAYEE_PROVIDER_AUTHORITY_URL = "payee_provider_authority_url";
 
@@ -87,6 +88,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String LOGGING                      = "logging";
 
     static JSONX509Verifier paymentRoot;
+    
+    static JSONX509Verifier acquirerRoot;
     
     static ServerAsymKeySigner merchantKey;
     
@@ -150,6 +153,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                                                          getPropertyString(KEYSTORE_PASSWORD)));
 
             paymentRoot = getRoot(PAYMENT_ROOT);
+
+            acquirerRoot = getRoot(ACQUIRER_ROOT);
 
             for (PayerAccountTypes card : PayerAccountTypes.values()) {
                 if (card != PayerAccountTypes.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {

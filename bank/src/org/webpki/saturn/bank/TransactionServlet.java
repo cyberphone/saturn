@@ -234,7 +234,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         ////////////////////////////////////////////////////////////////////////////
 
         // Sorry but you don't appear to have a million bucks :-)
-        if (!reserveOrBasicRequest.getMessage().isCardPayment() && paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
+        if (!reserveOrBasicRequest.getMessage().isCardPayment() &&
+            paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
             return UserMessageResponse.encode("You don't have this money!", null);
         }
 

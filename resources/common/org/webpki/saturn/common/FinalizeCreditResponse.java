@@ -36,7 +36,13 @@ public class FinalizeCreditResponse implements BaseProperties {
         finalizeTransactionResponse = new FinalizeTransactionResponse(rd.getObject(EMBEDDED_JSON));
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
-        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
+        finalizeTransactionResponse
+            .finalizeTransactionRequest
+                .finalizeRequest
+                    .reserveOrBasicResponse
+                        .transactionResponse
+                            .transactionRequest
+            .compareCertificates(signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE));
         rd.checkForUnread();
     }
 

@@ -44,6 +44,7 @@ import org.webpki.net.HTTPSWrapper;
 
 import org.webpki.util.ArrayUtil;
 
+import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
@@ -289,8 +290,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             debugData.finalizeResponse = response;
         }
         
-  //      FinalizeResponse finalizeResponse = new FinalizeResponse(response);
-
+        if (acquirerBased) {
+            FinalizeCardpayResponse finalizeCardpayResponse = new FinalizeCardpayResponse(response);
+            finalizeCardpayResponse.getSignatureDecoder().verify(MerchantService.acquirerRoot);
+        } else {
+            FinalizeCreditResponse finalizeCreditResponse = new FinalizeCreditResponse(response);
+            finalizeCreditResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
+        }
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

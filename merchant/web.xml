@@ -23,6 +23,12 @@
     </context-param>
 
     <context-param>
+        <description>Acquirer Network Root Certificate</description>
+        <param-name>acquirer_root</param-name>
+        <param-value>@acquirer-root@</param-value>
+    </context-param>
+    
+    <context-param>
         <description>Server Port Mapping (may be undefined)</description>
         <param-name>server_port_map</param-name>
         <param-value>@server-port-map@</param-value>

@@ -72,6 +72,7 @@
       <replacefilter token="@key-password@" value="${keypassword}"/>
 	  <replacefilter token="@merchant-key@" value="${merchantkey}.p12"/>
       <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
+      <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
       <replacefilter token="@acquirer-authority-url@" value="${acquirer.host}/${acquirerpath}/authority"/>
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payeebankpath}/authority"/>
       <replacefilter token="@currency@" value="${currency}"/>
@@ -98,6 +99,7 @@
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
          <include name="${merchantkey}.p12"/>
          <include name="${payment.var.root}.cer"/>
+         <include name="${acquirerroot}.cer"/>
       </zipfileset>
       <zipfileset dir="debug-samples" prefix="${class_war_path}"/>
       <fileset dir="web"/>
