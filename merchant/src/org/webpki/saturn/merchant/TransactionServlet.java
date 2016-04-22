@@ -138,11 +138,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     Authority payeeProviderAuthority;
     
     synchronized void updatePayeeProviderAuthority(UrlHolder urlHolder) throws IOException {
-        JSONObjectReader resultMessage = getData(urlHolder);
-        if (MerchantService.logging) {
-            logger.info("Returned from payee provider [" + urlHolder.getUrl() + "]:\n" + resultMessage);
-        }
-        payeeProviderAuthority = new Authority(resultMessage, urlHolder.getUrl());
+        payeeProviderAuthority = new Authority(getData(urlHolder), urlHolder.getUrl());
         // Verify that the claimed authority belongs to a known payment provider network
         payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
     }
