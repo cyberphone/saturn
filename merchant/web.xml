@@ -90,6 +90,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>ChoosePaymentServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.ChoosePaymentServlet</servlet-class>
+    </servlet>
+    
+    <servlet>
         <servlet-name>TransactionServlet</servlet-name>
         <servlet-class>org.webpki.saturn.merchant.TransactionServlet</servlet-class>
     </servlet>
@@ -124,6 +129,11 @@
         <url-pattern>/userpay</url-pattern>
     </servlet-mapping>
 
+    <servlet-mapping>
+        <servlet-name>ChoosePaymentServlet</servlet-name>
+        <url-pattern>/choose</url-pattern>
+    </servlet-mapping>
+    
     <servlet-mapping>
         <servlet-name>TransactionServlet</servlet-name>
         <url-pattern>/transact</url-pattern>

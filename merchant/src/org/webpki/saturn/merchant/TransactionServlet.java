@@ -276,7 +276,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         JSONObjectWriter finalizeRequest = FinalizeRequest.encode(reserveOrBasicResponse,
                                                                   actualAmount,
-                                                                  UserPaymentServlet.getReferenceId(),
+                                                                  MerchantService.getReferenceId(),
                                                                   MerchantService.merchantKey);
         // Call the payment provider or acquirer
         JSONObjectReader response = postData(urlHolder, finalizeRequest);

@@ -287,7 +287,7 @@ public class HTML {
             "</table></td></tr>" +
             "<tr><td style=\"text-align:center;padding-top:10pt\" id=\"pay\"><input class=\"stdbtn\" type=\"button\" value=\"Checkout..\" title=\"Paying time has come...\" onclick=\"userPay()\"></td></tr>" +
             "</table>" +
-            "<form name=\"shoot\" method=\"POST\" action=\"userpay\">" +
+            "<form name=\"shoot\" method=\"POST\" action=\"choose\">" +
             "<input type=\"hidden\" name=\"" + UserPaymentServlet.SHOPPING_CART_FORM_ATTR + "\" id=\"" + UserPaymentServlet.SHOPPING_CART_FORM_ATTR + "\">" +
             "</form></td></tr>");
          temp_string.insert(0,
@@ -309,47 +309,53 @@ public class HTML {
             page_data.toString()));
     }
 
+    static StringBuffer currentOrder(SavedShoppingCart savedShoppingCart) {
+        StringBuffer s = new StringBuffer(
+                "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+                "<table>" +
+                "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
+                + FONT_ARIAL + "\">Current Order<br>&nbsp;</td></tr>" +
+                "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
+                "<tr><th>Description</th><th>Price</th><th>Quantity</th><th>Sum</th></tr>");
+            for (String sku : savedShoppingCart.items.keySet()) {
+                ProductEntry product_entry = ShoppingServlet.products.get(sku);
+                s.append("<tr style=\"text-align:center\"><td>")
+                 .append(product_entry.name)
+                 .append("</td><td style=\"text-align:right\">")
+                 .append(price(product_entry.priceX100))
+                 .append("</td><td>")
+                 .append(savedShoppingCart.items.get(sku).intValue())
+                 .append("</td><td style=\"text-align:right\">")
+                 .append(price(product_entry.priceX100 * savedShoppingCart.items.get(sku).intValue()))
+                 .append("</td></tr>");                
+            }
+            s.append(
+                 "<tr><td colspan=\"4\" style=\"height:1px;padding:0px\"></td></tr>" +
+                 "<tr><td colspan=\"3\" style=\"text-align:right\">Total</td><td style=\"text-align:right\">")
+             .append(price(savedShoppingCart.total))
+             .append("</td></tr>" +
+                 "<tr><td colspan=\"3\" style=\"text-align:right\">Tax (10%)</td><td style=\"text-align:right\">")
+             .append(price(savedShoppingCart.tax))
+             .append("</td></tr>" +
+                "</table></td></tr><tr><td style=\"padding-top:10pt\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\"><tr><th style=\"text-align:center\">Amount to Pay</th><td style=\"text-align:right\" id=\"total\">")
+             .append(price(savedShoppingCart.roundedPaymentAmount))
+             .append("</td></tr></table></td></tr>");
+       return s;
+    }
+
     public static void userPayPage(HttpServletResponse response,
                                    SavedShoppingCart savedShoppingCart, 
                                    boolean tapConnectMode,
                                    boolean debugMode,
                                    String walletRequest) throws IOException, ServletException {
         String connectMethod = tapConnectMode ? "tapConnect" : "nativeConnect";
-        StringBuffer s = new StringBuffer(
-            "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-            "<table>" +
-            "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
-            + FONT_ARIAL + "\">Current Order<br>&nbsp;</td></tr>" +
-            "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
-            "<tr><th>Description</th><th>Price</th><th>Quantity</th><th>Sum</th></tr>");
-        for (String sku : savedShoppingCart.items.keySet()) {
-            ProductEntry product_entry = ShoppingServlet.products.get(sku);
-            s.append("<tr style=\"text-align:center\"><td>")
-             .append(product_entry.name)
-             .append("</td><td style=\"text-align:right\">")
-             .append(price(product_entry.priceX100))
-             .append("</td><td>")
-             .append(savedShoppingCart.items.get(sku).intValue())
-             .append("</td><td style=\"text-align:right\">")
-             .append(price(product_entry.priceX100 * savedShoppingCart.items.get(sku).intValue()))
-             .append("</td></tr>");                
-        }
-        s.append(
-             "<tr><td colspan=\"4\" style=\"height:1px;padding:0px\"></td></tr>" +
-             "<tr><td colspan=\"3\" style=\"text-align:right\">Total</td><td style=\"text-align:right\">")
-         .append(price(savedShoppingCart.total))
-         .append("</td></tr>" +
-             "<tr><td colspan=\"3\" style=\"text-align:right\">Tax (10%)</td><td style=\"text-align:right\">")
-         .append(price(savedShoppingCart.tax))
-         .append("</td></tr>" +
-            "</table></td></tr><tr><td style=\"padding-top:10pt\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\"><tr><th style=\"text-align:center\">Amount to Pay</th><td style=\"text-align:right\" id=\"total\">")
-         .append(price(savedShoppingCart.roundedPaymentAmount))
-         .append("</td></tr></table></td></tr><tr>");
+        StringBuffer s = currentOrder(savedShoppingCart);
+      
         if (tapConnectMode) {
-            s.append("<td align=\"center\"><img id=\"state\" title=\"Please tap your mobile wallet!\" " +
+            s.append("<tr><td align=\"center\"><img id=\"state\" title=\"Please tap your mobile wallet!\" " +
                      "src=\"images/NFC-N-Mark-Logo.svg\" style=\"height:120pt;margin-top:10pt\"></td>");
         } else {
-            s.append("<td style=\"padding:20pt\" id=\"wallet\">&nbsp;</td>");
+            s.append("<tr><td style=\"padding:20pt\" id=\"wallet\">&nbsp;</td>");
         }
         s.append("</tr></table>" +
                  "<form name=\"shoot\" method=\"POST\" action=\"transact\">" +
@@ -537,5 +543,34 @@ public class HTML {
          .append(HTMLEncoder.encodeWithLineBreaks(error.getBytes("UTF-8")))
          .append("</td></tr></table></td></tr>");
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null,s.toString()));
+    }
+
+    public static void userChoosePage(HttpServletResponse response, SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
+        StringBuffer s = currentOrder(savedShoppingCart)
+            .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
+                    "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:"
+                + FONT_ARIAL + "\">Select Payment Method</td></tr>" +
+                    "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"document.forms.shoot.submit()\"></td></tr>" +
+                    "<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod()\"></td></tr>" +
+                    "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod()\"></td></tr>" +
+                    "<tr><td style=\"text-align:center;padding:15pt\"><input class=\"stdbtn\" type=\"button\" value=\"Return to shop..\" title=\"Changed your mind?\" onclick=\"document.forms.restore.submit()\"></td></tr>" +
+                    "</table></td></tr></table>" +
+             "<form name=\"shoot\" method=\"POST\" action=\"userpay\"></form>" +
+             "<form name=\"restore\" method=\"POST\" action=\"shop\">" +
+             "</form></td></tr>");
+
+        HTML.output(response, HTML.getHTML(
+                STICK_TO_HOME_URL +
+                "\nfunction noSuchMethod() {\n" +
+                        "    document.getElementById('notimplemented').style.top = ((window.innerHeight - document.getElementById('notimplemented').offsetHeight) / 2) + 'px';\n" +
+                        "    document.getElementById('notimplemented').style.left = ((window.innerWidth - document.getElementById('notimplemented').offsetWidth) / 2) + 'px';\n" +
+                        "    document.getElementById('notimplemented').style.visibility = 'visible';\n" +
+                        "    setTimeout(function() {\n" +
+                        "        document.getElementById('notimplemented').style.visibility = 'hidden';\n" +
+                        "    }, 1000);\n" +
+                        "}\n\n",
+                "><div id=\"notimplemented\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
+                FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">This demo only supports Saturn!</div",
+                s.toString()));
     }
 }

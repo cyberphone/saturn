@@ -14,9 +14,18 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package org.webpki.saturn.merchant;
 
-public class Version {
-    public final static String PROTOCOL = "0.50";
-    public final static String DATE     = "2016-04-22";
+public interface MerchantProperties {
+
+    public String REQUEST_HASH_SESSION_ATTR  = "REQHASH";
+    public String REQUEST_REFID_SESSION_ATTR = "REQREFID";
+    public String DEBUG_DATA_SESSION_ATTR    = "DBGDATA";
+    public String SHOPPING_CART_SESSION_ATTR = "SHOPCART";
+
+    
+    public String AUTHDATA_FORM_ATTR         = "authdata";
+    public String INITMSG_FORM_ATTR          = "initmsg";
+    public String SHOPPING_CART_FORM_ATTR    = "shopcart";
+
 }

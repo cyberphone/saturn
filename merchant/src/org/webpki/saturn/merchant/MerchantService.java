@@ -18,13 +18,10 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-
 import java.util.EnumSet;
 import java.util.Set;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,15 +31,12 @@ import javax.servlet.ServletContextListener;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
-
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
-
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 import org.webpki.util.ISODateTime;
-
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.PayerAccountTypes;
@@ -50,7 +44,6 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.ServerAsymKeySigner;
-
 import org.webpki.webutil.InitPropertyReader;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
@@ -114,6 +107,12 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String wallet_bankdirect_auth;
     
     static boolean logging;
+
+    static int referenceId = 1000000;
+
+    static String getReferenceId() {
+        return "#" + (referenceId++);
+    }
 
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));

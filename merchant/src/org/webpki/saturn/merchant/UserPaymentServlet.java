@@ -46,30 +46,15 @@ import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.RequestHash;
 
-public class UserPaymentServlet extends HttpServlet implements BaseProperties {
+public class UserPaymentServlet extends HttpServlet implements BaseProperties, MerchantProperties {
 
     private static final long serialVersionUID = 1L;
     
-    static final String REQUEST_HASH_SESSION_ATTR  = "REQHASH";
-    static final String REQUEST_REFID_SESSION_ATTR = "REQREFID";
-    static final String DEBUG_DATA_SESSION_ATTR    = "DBGDATA";
-    static final String SHOPPING_CART_SESSION_ATTR = "SHOPCART";
-
-    
-    static final String AUTHDATA_FORM_ATTR         = "authdata";
-    static final String INITMSG_FORM_ATTR          = "initmsg";
-    static final String SHOPPING_CART_FORM_ATTR    = "shopcart";
-    
+   
     static Logger logger = Logger.getLogger(UserPaymentServlet.class.getName());
     
     static boolean getOption(HttpSession session, String name) {
         return session.getAttribute(name) != null && (Boolean)session.getAttribute(name);
-    }
-
-    static int referenceId = 1000000;
-    
-    static String getReferenceId() {
-        return "#" + (referenceId++);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -78,34 +63,14 @@ public class UserPaymentServlet extends HttpServlet implements BaseProperties {
             ErrorServlet.sessionTimeout(response);
             return;
          }
-        JSONArrayReader ar = JSONParser.parse(request.getParameter(SHOPPING_CART_FORM_ATTR)).getJSONArrayReader();
-        SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
-        long total = 0;
-        while (ar.hasMore()) {
-            JSONObjectReader or = ar.getObject();
-            int quantity = or.getInt("quantity");
-            if (quantity != 0) {
-                String sku = or.getString("sku");
-                savedShoppingCart.items.put(sku, quantity);
-                logger.info("SKU=" + sku + " Quantity=" + quantity);
-                total += quantity * or.getLong("priceX100");
-            }
-        }
-        savedShoppingCart.total = total;
-
-        // We add a fictitious 10% sales tax as well
-        savedShoppingCart.tax = total / 10;
-
-        // Then we round up to the nearest 25 centimes, cents, or pennies
-        savedShoppingCart.roundedPaymentAmount = ((savedShoppingCart.tax + total + 24) / 25) * 25;
         boolean debugMode = getOption(session, HomeServlet.DEBUG_MODE_SESSION_ATTR);
         DebugData debugData = null;
         if (debugMode) {
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
         }
-        session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
+        SavedShoppingCart savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
 
-        String currReferenceId = getReferenceId();
+        String currReferenceId = MerchantService.getReferenceId();
         JSONObjectWriter paymentRequest =
             PaymentRequest.encode(Payee.init("Demo Merchant","86344"),
                                   new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount), 2),
