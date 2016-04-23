@@ -62,7 +62,7 @@ import org.webpki.saturn.common.UserMessageResponse;
 // This servlet does all Merchant backend payment transaction work      //
 //////////////////////////////////////////////////////////////////////////
 
-public class TransactionServlet extends HttpServlet implements BaseProperties {
+public class TransactionServlet extends HttpServlet implements BaseProperties, MerchantProperties {
 
     private static final long serialVersionUID = 1L;
     
@@ -162,7 +162,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
             // Do we have web debug mode?
             DebugData debugData = null;
-            boolean debug = UserPaymentServlet.getOption(session, HomeServlet.DEBUG_MODE_SESSION_ATTR);
+            boolean debug = UserPaymentServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             if (debug) {
                 debugData = (DebugData) session.getAttribute(UserPaymentServlet.DEBUG_DATA_SESSION_ATTR);
                 debugData.WalletInitialized = request.getParameter(UserPaymentServlet.INITMSG_FORM_ATTR).getBytes("UTF-8");
@@ -180,7 +180,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
            
             // Basic credit is only applicable to account2account operations
             boolean acquirerBased = payerAuthorization.getAccountType().isAcquirerBased();
-            boolean basicCredit = !UserPaymentServlet.getOption(session, HomeServlet.RESERVE_MODE_SESSION_ATTR) &&
+            boolean basicCredit = !UserPaymentServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
                                   !acquirerBased;
 
             // Attest the user's encrypted authorization to show "intent"

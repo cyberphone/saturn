@@ -34,8 +34,8 @@ public class ErrorServlet extends HttpServlet {
     
     static Logger logger = Logger.getLogger(ErrorServlet.class.getName());
 
-    static final String ERROR="Error";
-    static final String SYSTEM="System";
+    private static final String ERROR="Error";
+    private static final String SYSTEM="System";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HTML.errorPage(response, request.getParameter(ERROR), request.getParameter(SYSTEM) != null);

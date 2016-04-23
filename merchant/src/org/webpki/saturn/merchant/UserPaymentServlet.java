@@ -63,7 +63,7 @@ public class UserPaymentServlet extends HttpServlet implements BaseProperties, M
             ErrorServlet.sessionTimeout(response);
             return;
          }
-        boolean debugMode = getOption(session, HomeServlet.DEBUG_MODE_SESSION_ATTR);
+        boolean debugMode = getOption(session, DEBUG_MODE_SESSION_ATTR);
         DebugData debugData = null;
         if (debugMode) {
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
@@ -99,7 +99,7 @@ public class UserPaymentServlet extends HttpServlet implements BaseProperties, M
         
         HTML.userPayPage(response,
                          savedShoppingCart,
-                         getOption(session, HomeServlet.TAP_CONNECT_MODE_SESSION_ATTR),
+                         getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
                          debugMode,
                          new String(invokeRequest.serializeJSONObject(JSONOutputFormats.PRETTY_JS_NATIVE), "UTF-8"));
     }

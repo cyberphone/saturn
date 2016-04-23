@@ -25,14 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-public class HomeServlet extends HttpServlet {
+public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
     
-    static final String RESERVE_MODE_SESSION_ATTR     = "rsrvmd";
-    static final String DEBUG_MODE_SESSION_ATTR       = "debug";
-    static final String TAP_CONNECT_MODE_SESSION_ATTR = "tapcon";
-
     boolean isTapConnect() {
         return false;
     }

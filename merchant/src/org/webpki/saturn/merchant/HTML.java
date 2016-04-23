@@ -31,7 +31,7 @@ import org.webpki.saturn.common.PaymentRequest;
 
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
-public class HTML {
+public class HTML implements MerchantProperties {
 
     static final String STICK_TO_HOME_URL            =
                     "history.pushState(null, null, 'home');\n" +
@@ -46,7 +46,7 @@ public class HTML {
         "<!DOCTYPE html>"+
         "<html><head><meta charset=\"UTF-8\"><link rel=\"shortcut icon\" href=\"favicon.ico\">"+
 //        "<meta name=\"viewport\" content=\"initial-scale=1.0\"/>" +
-        "<title>W2NB Payment Demo</title>"+
+        "<title>Saturn Payment Demo</title>"+
         "<style type=\"text/css\">html {overflow:auto}\n"+
         ".point {text-align:center;font-family:courier;font-weight:bold;font-size:10pt;border-radius:3pt;border-width:1px;border-style:solid;border-color:#B0B0B0;display:inline-block;padding:1.5pt 3pt 1pt 3pt}\n" +
         ".tftable {border-collapse:collapse;box-shadow:3pt 3pt 3pt #D0D0D0}\n" +
@@ -54,7 +54,7 @@ public class HTML {
           "linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
           "border-width:1px;padding:4pt 10pt 4pt 10pt;border-style:solid;border-color:#a9a9a9;" +
           "text-align:center;font-family:" + FONT_ARIAL + "}\n" +
-        ".tftable td {background-color:#FFFFE0;font-size:10pt;border-width:1px;padding:4pt 8pt 4pt 8pt;border-style:solid;border-color:#a9a9a9;font-family:" + FONT_ARIAL + "}\n" +
+        ".tftable td {background-color:#FFFFE0;font-size:11pt;border-width:1px;padding:4pt 8pt 4pt 8pt;border-style:solid;border-color:#a9a9a9;font-family:" + FONT_ARIAL + "}\n" +
         "body {font-size:10pt;color:#000000;font-family:" + FONT_VERDANA + ";background-color:white}\n" +
         "a {font-weight:bold;font-size:8pt;color:blue;font-family:" + FONT_ARIAL + ";text-decoration:none}\n" +
         "td {font-size:8pt;font-family:" + FONT_VERDANA + "}\n" +
@@ -80,7 +80,7 @@ public class HTML {
             + "text-align:center;background: radial-gradient(ellipse at center, rgba(255,255,255,1) "
             + "0%,rgba(242,243,252,1) 38%,rgba(196,210,242,1) 100%);border-radius:8pt;border-width:1px;"
             + "border-style:solid;border-color:#B0B0B0;box-shadow:3pt 3pt 3pt #D0D0D0;}\">"
-            + "Web2Native Bridge<br><span style=\"font-size:8pt\">Payment Demo Home</span></div>"
+            + "Saturn<br><span style=\"font-size:8pt\">Payment Demo</span></div>"
             + "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
          .append(box)
          .append("</table></body></html>");
@@ -100,13 +100,16 @@ public class HTML {
         HTML.output(response, HTML.getHTML(null, null,
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
-                   "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Web2Native Bridge - Web Payment Demo<br>&nbsp;</td></tr>" +
-                   "<tr><td style=\"text-align:left\">This application is a demo of what a &quot;Wallet&quot; based on the Web2Native Bridge " +
-                   "could offer for <span style=\"color:red\">Decentralized Web Payments</span>.&nbsp; Primary features:<ul>" +
-                   "<li>All messages are <i>digitally signed</i> enabling a security level comparable to a PIN-code terminal and chip-card in a brick-and-mortar shop</li>" +
+                   "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Saturn - Web Payment Demo<br>&nbsp;</td></tr>" +
+                   "<tr><td style=\"text-align:left\">This application is a demo of the Saturn payment scheme.&nbsp; " +
+                   "Using Saturn the client is supposed to have a native &quot;Wallet&quot; based on the Web2Native Bridge" +
+                   ".&nbsp; Primary Saturn features:<ul>" +
+                   "<li>Fully <i>decentralized</i> operation (no depency on a central registry like 3D Secure)</li>" +
+                   "<li>All messages are <i>digitally signed</i> enabling a protocol-level security comparable to a PIN-code terminal and chip-card in a brick-and-mortar shop</li>" +
                    "<li>Tunneling encrypted data (like in SET) hides senstive customer data from merchants without using &quot;tokenization&quot;</li>" +
-                   "<li>Needs an &quot;extra pipe to the bank&quot; like 3D Secure but without a central registry</li>" +
                    "<li>Equally applicable for traditional card payment (&quot;pull&quot;) networks  as for bank-2-bank (&quot;push&quot;) schemes</li>" +
+                   "<li>In addition to the Web, Saturn is also intended to be usable in traditional scenarios " +
+                   "including with POS teminals and gas pumps</li>" +
                    "<li>All messages are coded in JSON</li>" +
                    "<li>Consumers only deal with payment instruments visualized as cards (like they did <i>before</i> the Web)</li>" +
                    "<li>Designed to also work in an NFC/BLE setup where the wallet resides in a mobile device and payments are " +
@@ -122,17 +125,17 @@ public class HTML {
                      "\">Go To Merchant</a></td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
                    "<form name=\"options\" method=\"POST\"><tr>" +
                    "<td style=\"text-align:center\"><input type=\"checkbox\" name=\"" + 
-                   HomeServlet.RESERVE_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
+                   RESERVE_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (reserveMode ? " checked" : "") +
                    "></td><td>Reserve+Finalize Payment Mode</td></tr>" +
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
-                   HomeServlet.DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
+                   DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (debugMode ? " checked" : "") +
                    "></td><td>Debug (JSON Message Dump) Option</td></form></tr>" +
                     "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
+                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"http://xmlns.webpki.org/webpay/v2\">Payment System</a>&nbsp;&nbsp;</td><td>State Diagram Etc.</td></tr>" +
+                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Demo Source Code</a></td><td>For Nerds...</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/web2native-bridge.pdf\">Web2Native Bridge</a></td><td>&quot;Executive Level&quot; Description</td></tr>" +
-                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"http://xmlns.webpki.org/webpay/v1\">Payment System</a>&nbsp;&nbsp;</td><td>State Diagram Etc.</td></tr>" +
-                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge\">Demo Source Code</a></td><td>For Nerds...</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://mobilepki.org/jcs\">JCS</a></td><td>JSON Cleartext Signature</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/keygen2.html\">KeyGen2</a></td><td>Wallet Enrollment Protocol</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/sks-api-arch.pdf\">SKS</a></td><td>Wallet Credential Store</td></tr>" +

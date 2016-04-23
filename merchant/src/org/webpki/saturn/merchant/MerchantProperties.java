@@ -18,14 +18,17 @@ package org.webpki.saturn.merchant;
 
 public interface MerchantProperties {
 
-    public String REQUEST_HASH_SESSION_ATTR  = "REQHASH";
-    public String REQUEST_REFID_SESSION_ATTR = "REQREFID";
-    public String DEBUG_DATA_SESSION_ATTR    = "DBGDATA";
-    public String SHOPPING_CART_SESSION_ATTR = "SHOPCART";
+    public String REQUEST_HASH_SESSION_ATTR     = "REQHASH";
+    public String REQUEST_REFID_SESSION_ATTR    = "REQREFID";
+    public String DEBUG_DATA_SESSION_ATTR       = "DBGDATA";
+    public String SHOPPING_CART_SESSION_ATTR    = "SHOPCART";
 
+    public String RESERVE_MODE_SESSION_ATTR     = "rsrvmd";
+    public String DEBUG_MODE_SESSION_ATTR       = "debug";
+    public String TAP_CONNECT_MODE_SESSION_ATTR = "tapcon";
     
-    public String AUTHDATA_FORM_ATTR         = "authdata";
-    public String INITMSG_FORM_ATTR          = "initmsg";
-    public String SHOPPING_CART_FORM_ATTR    = "shopcart";
+    public String AUTHDATA_FORM_ATTR            = "authdata";
+    public String INITMSG_FORM_ATTR             = "initmsg";
+    public String SHOPPING_CART_FORM_ATTR       = "shopcart";
 
 }
