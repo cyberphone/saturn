@@ -58,6 +58,7 @@ public class HTML implements MerchantProperties {
         "body {font-size:10pt;color:#000000;font-family:" + FONT_VERDANA + ";background-color:white}\n" +
         "a {font-weight:bold;font-size:8pt;color:blue;font-family:" + FONT_ARIAL + ";text-decoration:none}\n" +
         "td {font-size:8pt;font-family:" + FONT_VERDANA + "}\n" +
+        "li {padding-top:5pt}\n" +
         ".quantity {text-align:right;font-weight:normal;font-size:10pt;font-family:" + FONT_ARIAL + "}\n" +
         ".stdbtn {font-weight:normal;font-size:10pt;font-family:" + FONT_ARIAL + "}\n" +
         ".updnbtn {vertical-align:middle;text-align:center;font-weight:normal;font-size:8px;font-family:" + FONT_VERDANA + ";margin:0px;border-spacing:0px;padding:2px 3px 2px 3px}\n";
@@ -104,16 +105,14 @@ public class HTML implements MerchantProperties {
                    "<tr><td style=\"text-align:left\">This application is a demo of the Saturn payment scheme.&nbsp; " +
                    "Using Saturn the client is supposed to have a native &quot;Wallet&quot; based on the Web2Native Bridge" +
                    ".&nbsp; Primary Saturn features:<ul>" +
-                   "<li>Fully <i>decentralized</i> operation (no depency on a central registry like 3D Secure)</li>" +
-                   "<li>All messages are <i>digitally signed</i> enabling a protocol-level security comparable to a PIN-code terminal and chip-card in a brick-and-mortar shop</li>" +
+                   "<li style=\"padding-top:0pt\">Fully <i>decentralized</i> operation (no dependency on central registries like 3D Secure)</li>" +
+                   "<li><i>Digitally signed</i> messages enable a protocol-level security comparable to a PIN-code terminal and chip-card in a physical shop</li>" +
                    "<li>Tunneling encrypted data (like in SET) hides senstive customer data from merchants without using &quot;tokenization&quot;</li>" +
-                   "<li>Equally applicable for traditional card payment (&quot;pull&quot;) networks  as for bank-2-bank (&quot;push&quot;) schemes</li>" +
-                   "<li>In addition to the Web, Saturn is also intended to be usable in traditional scenarios " +
-                   "including with POS teminals and gas pumps</li>" +
+                   "<li>Equally applicable for legacy card payment (&quot;pull&quot;) networks as for bank-2-bank (&quot;push&quot;) schemes</li>" +
+                   "<li>In addition to supporting Web payments, Saturn is <i>intended to also be usable in traditional payment scenarios " +
+                   "including with POS teminals and gas pumps using an NFC/BLE connection to the Wallet</i></li>" +
                    "<li>All messages are coded in JSON</li>" +
                    "<li>Consumers only deal with payment instruments visualized as cards (like they did <i>before</i> the Web)</li>" +
-                   "<li>Designed to also work in an NFC/BLE setup where the wallet resides in a mobile device and payments are " +
-                   "performed locally as well as on the Web (through Web-NFC)</li>" +
                    "</ul>" +
                    "Note that the Wallet is <i>pre-configured</i> with payment credentials requiring no signup etc.&nbsp;&nbsp;" +
                    "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">Install Wallet</a>." +
@@ -135,7 +134,7 @@ public class HTML implements MerchantProperties {
                     "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"http://xmlns.webpki.org/webpay/v2\">Payment System</a>&nbsp;&nbsp;</td><td>State Diagram Etc.</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Demo Source Code</a></td><td>For Nerds...</td></tr>" +
-                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/web2native-bridge.pdf\">Web2Native Bridge</a></td><td>&quot;Executive Level&quot; Description</td></tr>" +
+                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/web2native-bridge.pdf\">Web2Native Bridge</a>&nbsp;&nbsp;&nbsp;</td><td>&quot;Executive Level&quot; Description</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://mobilepki.org/jcs\">JCS</a></td><td>JSON Cleartext Signature</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/keygen2.html\">KeyGen2</a></td><td>Wallet Enrollment Protocol</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/sks-api-arch.pdf\">SKS</a></td><td>Wallet Credential Store</td></tr>" +
