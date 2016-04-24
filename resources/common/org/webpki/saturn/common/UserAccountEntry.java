@@ -32,6 +32,8 @@ public class UserAccountEntry implements BaseProperties {
     PublicKey encryptionKey;
     String dataEncryptionAlgorithm;
     String keyEncryptionAlgorithm;
+    
+    RiskBasedAuthentication riskBasedAuthentication = new RiskBasedAuthentication();
 
     public UserAccountEntry(JSONObjectReader rd) throws IOException {
         type = rd.getObject(ACCOUNT_JSON).getString(TYPE_JSON);
@@ -57,5 +59,9 @@ public class UserAccountEntry implements BaseProperties {
 
     public String getType() {
         return type;
+    }
+
+    public RiskBasedAuthentication getRiskBasedAuthentication() {
+        return riskBasedAuthentication;
     }
 }

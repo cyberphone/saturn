@@ -164,8 +164,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             DebugData debugData = null;
             boolean debug = UserPaymentServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             if (debug) {
-                debugData = (DebugData) session.getAttribute(UserPaymentServlet.DEBUG_DATA_SESSION_ATTR);
-                debugData.WalletInitialized = request.getParameter(UserPaymentServlet.INITMSG_FORM_ATTR).getBytes("UTF-8");
+                debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
+                debugData.WalletInitialized = request.getParameter(INITMSG_FORM_ATTR).getBytes("UTF-8");
                 debugData.walletResponse = userAuthorization.serializeJSONObject(JSONOutputFormats.NORMALIZED);
             }
 
