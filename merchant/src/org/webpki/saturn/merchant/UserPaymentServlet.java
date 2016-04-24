@@ -32,11 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Payee;
@@ -49,7 +46,6 @@ import org.webpki.saturn.common.RequestHash;
 public class UserPaymentServlet extends HttpServlet implements BaseProperties, MerchantProperties {
 
     private static final long serialVersionUID = 1L;
-    
    
     static Logger logger = Logger.getLogger(UserPaymentServlet.class.getName());
     

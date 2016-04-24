@@ -17,8 +17,9 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
+import java.io.Serializable;
 
-public enum PayerAccountTypes {
+public enum PayerAccountTypes implements Serializable {
 
     SUPER_CARD   (true,  "https://supercard.com",   "SuperCard"), 
     BANK_DIRECT  (false, "https://bankdirect.net",  "Bank Direct"),

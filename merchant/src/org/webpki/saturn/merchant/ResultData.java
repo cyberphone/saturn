@@ -16,18 +16,24 @@
  */
 package org.webpki.saturn.merchant;
 
-public interface MerchantProperties {
+import java.io.Serializable;
+import java.math.BigDecimal;
 
-    public String REQUEST_HASH_SESSION_ATTR     = "REQHASH";
-    public String REQUEST_REFID_SESSION_ATTR    = "REQREFID";
-    public String DEBUG_DATA_SESSION_ATTR       = "DBGDATA";
-    public String SHOPPING_CART_SESSION_ATTR    = "SHOPCART";
-    public String RESULT_DATA_SESSION_ATTR      = "RESDAT";
+import org.webpki.saturn.common.Currencies;
+import org.webpki.saturn.common.PayerAccountTypes;
 
-    public String RESERVE_MODE_SESSION_ATTR     = "rsrvmd";
-    public String DEBUG_MODE_SESSION_ATTR       = "debug";
-    public String TAP_CONNECT_MODE_SESSION_ATTR = "tapcon";
+public class ResultData implements Serializable {
     
-    public String SHOPPING_CART_FORM_ATTR       = "shopcart";
+    private static final long serialVersionUID = 1L;
 
+    public BigDecimal amount;
+
+    public Currencies currency;
+
+    public String referenceId;
+
+    public String accountReference;
+
+    public PayerAccountTypes accountType;
+    
 }

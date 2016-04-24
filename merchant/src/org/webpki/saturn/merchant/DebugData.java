@@ -29,7 +29,7 @@ public class DebugData implements Serializable {
 
     public byte[] InvokeWallet;
     
-    public byte[] walletResponse;
+    public JSONObjectReader walletResponse;
 
     public JSONObjectReader providerAuthority;
 

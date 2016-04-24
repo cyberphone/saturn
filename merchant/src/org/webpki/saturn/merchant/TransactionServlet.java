@@ -17,33 +17,28 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.net.URL;
-
 import java.security.GeneralSecurityException;
-
+import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-
 import org.webpki.net.HTTPSWrapper;
-
 import org.webpki.util.ArrayUtil;
-
+import org.webpki.webutil.ServletUtil;
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Authority;
@@ -69,6 +64,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
     static Logger logger = Logger.getLogger(TransactionServlet.class.getCanonicalName());
     
     static final int TIMEOUT_FOR_REQUEST = 5000;
+    
+    static final byte[] NORMAL_RETURN = {'{','}'};
 
     static String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
@@ -143,7 +140,21 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
     }
 
+    void returnJsonData(HttpServletResponse response, byte[] data) throws IOException {
+        response.setContentType(JSON_CONTENT_TYPE);
+        response.setHeader("Pragma", "No-Cache");
+        response.setDateHeader("EXPIRES", 0);
+        response.getOutputStream().write(data);
+    }
+
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        Enumeration<String> headerNames = request.getHeaderNames();
+        String headers = "Headers:";
+        while (headerNames.hasMoreElements()) {
+            String header = headerNames.nextElement();
+            headers += "\n\"" + header + "\":" + request.getHeader(header);
+         }
+        logger.info(headers);
         UrlHolder urlHolder = new UrlHolder();
         try {
             HttpSession session = request.getSession(false);
@@ -152,12 +163,15 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 return;
              }
 
-            // Reading the wallet response which is FORM POSTed
+            // Reading the Wallet response
+            String contentType = request.getContentType();
+            if (!contentType.equals(JSON_CONTENT_TYPE)) {
+                throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
+            }
+            JSONObjectReader walletResponse = JSONParser.parse(ServletUtil.getData(request));
             byte[] requestHash = (byte[]) session.getAttribute(UserPaymentServlet.REQUEST_HASH_SESSION_ATTR);
-            request.setCharacterEncoding("UTF-8");
-            JSONObjectReader userAuthorization = JSONParser.parse(request.getParameter(UserPaymentServlet.AUTHDATA_FORM_ATTR));
             if (MerchantService.logging) {
-                logger.info("Received from wallet:\n" + userAuthorization);
+                logger.info("Received from wallet:\n" + walletResponse);
             }
 
             // Do we have web debug mode?
@@ -165,12 +179,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             boolean debug = UserPaymentServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             if (debug) {
                 debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
-                debugData.WalletInitialized = request.getParameter(INITMSG_FORM_ATTR).getBytes("UTF-8");
-                debugData.walletResponse = userAuthorization.serializeJSONObject(JSONOutputFormats.NORMALIZED);
+                debugData.walletResponse = walletResponse;
             }
 
             // Decode the user's authorization.  The encrypted data is only parsed for correctness
-            PayerAuthorization payerAuthorization = new PayerAuthorization(userAuthorization);
+            PayerAuthorization payerAuthorization = new PayerAuthorization(walletResponse);
 
             // Get the original payment request
             PaymentRequest paymentRequest = payerAuthorization.getPaymentRequest();
@@ -188,7 +201,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 ReserveOrBasicRequest.encode(basicCredit,
                                              payerAuthorization.getProviderAuthorityUrl(),
                                              payerAuthorization.getAccountType(),
-                                             userAuthorization.getObject(AUTHORIZATION_DATA_JSON),
+                                             walletResponse.getObject(AUTHORIZATION_DATA_JSON),
                                              request.getRemoteAddr(),
                                              paymentRequest,
                                              MerchantService.acquirerAuthorityUrl, // Card only
@@ -221,7 +234,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                     debugData.softReserveOrBasicError = true;
                 }
                 UserMessageResponse userMessageResponse = new UserMessageResponse(resultMessage);
-                HTML.paymentError(response, debug, userMessageResponse.getText());
+                returnJsonData(response,
+                               userMessageResponse.getRoot().serializeJSONObject(JSONOutputFormats.NORMALIZED));
                 return;
             }
         
@@ -231,6 +245,18 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             // No error return, then we can verify the response fully
             reserveOrBasicResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
        
+            // Create a viewable response
+            ResultData resultData = new ResultData();
+            resultData.amount = paymentRequest.getAmount();
+            resultData.referenceId = paymentRequest.getReferenceId();
+            resultData.currency = paymentRequest.getCurrency();
+            resultData.accountType = reserveOrBasicResponse.getPayerAccountType();
+            resultData.accountReference =  acquirerBased ? // = Card
+                    AuthorizationData.formatCardNumber(reserveOrBasicResponse.getAccountReference())
+                                                 :
+                        reserveOrBasicResponse.getAccountReference();  // Currently "unmoderated" account
+            session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
+
             // Two-phase operation: perform the final step
             if (!basicCredit) {
                 processFinalize(reserveOrBasicResponse,
@@ -241,14 +267,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             }
  
             logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
-            HTML.resultPage(response,
-                            debug,
-                            paymentRequest,
-                            reserveOrBasicResponse.getPayerAccountType(),
-                            acquirerBased ? // = Card
-                                AuthorizationData.formatCardNumber(reserveOrBasicResponse.getAccountReference())
-                                                          :
-                                reserveOrBasicResponse.getAccountReference());  // Currently "unmoderated" account
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Normal return                                                                       //
+            /////////////////////////////////////////////////////////////////////////////////////////
+            returnJsonData(response, NORMAL_RETURN);
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();

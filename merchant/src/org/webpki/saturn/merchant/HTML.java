@@ -360,12 +360,6 @@ public class HTML implements MerchantProperties {
             s.append("<tr><td style=\"padding:20pt\" id=\"wallet\">&nbsp;</td>");
         }
         s.append("</tr></table>" +
-                 "<form name=\"shoot\" method=\"POST\" action=\"transact\">" +
-                 "<input type=\"hidden\" name=\"" + UserPaymentServlet.AUTHDATA_FORM_ATTR + "\" id=\"" + UserPaymentServlet.AUTHDATA_FORM_ATTR + "\">");
-        if (debugMode) {
-            s.append("<input type=\"hidden\" name=\"" + UserPaymentServlet.INITMSG_FORM_ATTR + "\" id=\"" + UserPaymentServlet.INITMSG_FORM_ATTR + "\">");
-        }
-        s.append("</form>" +
                  "<form name=\"restore\" method=\"POST\" action=\"shop\">" +
                  "</form></td></tr>");
         
@@ -424,7 +418,7 @@ public class HTML implements MerchantProperties {
                     "      if (initMode) {\n");
        if (debugMode) {
            temp_string.append(
-                    "        document.getElementById(\"" + UserPaymentServlet.INITMSG_FORM_ATTR + "\").value = JSON.stringify(message);\n");
+                    "        console.debug(JSON.stringify(message));\n");
        }
        if (!tapConnectMode) {
            temp_string.append(
@@ -435,8 +429,27 @@ public class HTML implements MerchantProperties {
                     "        initMode = false;\n" +
                     "        nativePort.postMessage(invocationData);\n" +
                     "      } else {\n" +
-                    "        document.getElementById(\"" + UserPaymentServlet.AUTHDATA_FORM_ATTR + "\").value = JSON.stringify(message);\n" +
-                    "        document.forms.shoot.submit();\n" +
+                    "        fetch('transact', {\n" +
+                    "           headers: {\n" +
+                    "             'Content-Type': 'application/json'\n" +
+                    "           },\n" +
+                    "           method: 'POST',\n" +
+                    "           credentials: 'same-origin',\n" +
+                    "           body: JSON.stringify(message)\n" +
+                    "        }).then(function (response) {\n" +
+                    "          return response.json();\n" +
+                    "        }).then(function (json) {\n" +
+                    "          if (typeof json == 'object' && !Array.isArray(json)) {\n" +
+                    "            if (Object.keys(json).length == 0) {\n" +
+                    "              document.location.href='result';\n" +
+                    "            } else {\n" +
+                    "              console.log(json);\n" +
+                    "            }\n" +
+                    "          } else {\n" +
+                    "          }\n" +
+                    "        }).catch (function (error) {\n" +
+                    "          console.log('Request failed', error);\n" +
+                    "        });\n" +                           
                     "      }\n"+
                     "    });\n");
        if (tapConnectMode) {
@@ -480,26 +493,24 @@ public class HTML implements MerchantProperties {
 
     public static void resultPage(HttpServletResponse response,
                                   boolean debugMode,
-                                  PaymentRequest paymentRequest, 
-                                  PayerAccountTypes accountType,
-                                  String accountReference) throws IOException, ServletException {
+                                  ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
         s.append("<table>" +
                  "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Order Status<br>&nbsp;</td></tr>" +
                  "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">Dear customer, your order has been successfully processed!</td></tr>" +
                  "<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
-         .append(accountType.isAcquirerBased() ? "Card" : "Account")
+         .append(resultData.accountType.isAcquirerBased() ? "Card" : "Account")
          .append(" Type</th><th>")
-         .append(accountType.isAcquirerBased() ? "Card Reference" : "Account Number")
+         .append(resultData.accountType.isAcquirerBased() ? "Card Reference" : "Account Number")
          .append("</th></tr>" +
                  "<tr><td style=\"text-align:center\">")
-         .append(paymentRequest.getReferenceId())
+         .append(resultData.referenceId)
          .append("</td><td style=\"text-align:center\">")
-         .append(paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()))
+         .append(resultData.currency.amountToDisplayString(resultData.amount))
          .append("</td><td style=\"text-align:center\">")
-         .append(accountType.getCommonName())
+         .append(resultData.accountType.getCommonName())
          .append("</td><td style=\"text-align:center\">")
-         .append(accountReference)
+         .append(resultData.accountReference)
          .append("</td></tr></table></td></tr>");
         if (debugMode) {
             s.append("<tr><td style=\"text-align:center;padding-top:20pt\"><a href=\"debug\">Show Debug Info</a></td></tr>");
@@ -518,21 +529,6 @@ public class HTML implements MerchantProperties {
           .append("</td></tr></table></td></tr>");
         HTML.output(response, HTML.getHTML(clean ? null : STICK_TO_HOME_URL, null,s.toString()));
     }
-
-    public static void paymentError(HttpServletResponse response, boolean debugMode, String errorReturn)
-                                    throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
-                 "<table>" +
-                 "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL +
-                 "\">Payment Failure&nbsp;<br></td></tr><tr><td style=\"text-align:center\">")
-         .append(errorReturn)
-         .append("</td></tr>");
-        if (debugMode) {
-            s.append("<tr><td style=\"text-align:center;padding-top:20pt\"><a href=\"debug\">Show Debug Info</a></td></tr>");
-        }
-        s.append("</table></td></tr>");
-        HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null,s.toString()));
-     }
 
     public static void errorPage(HttpServletResponse response, String error, boolean system)
                                  throws IOException, ServletException {

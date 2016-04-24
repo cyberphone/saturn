@@ -18,9 +18,11 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.io.Serializable;
+
 import java.math.BigDecimal;
 
-public enum Currencies {
+public enum Currencies implements Serializable {
 
     USD ("$\u200a",       true,  2), 
     EUR ("\u2009\u20ac",  false, 2),

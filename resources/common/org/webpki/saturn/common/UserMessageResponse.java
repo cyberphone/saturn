@@ -30,7 +30,7 @@ import org.webpki.json.JSONObjectWriter;
 public class UserMessageResponse implements BaseProperties {
     
     public UserMessageResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.USER_MESSAGE_RESPONSE, rd);
+        Messages.parseBaseMessage(Messages.USER_MESSAGE_RESPONSE, root = rd);
         text = rd.getString(TEXT_JSON);
         if (rd.hasProperty(INPUT_FIELDS_JSON)) {
             LinkedHashMap<String,InputField> fields = new LinkedHashMap<String,InputField>();
@@ -51,6 +51,11 @@ public class UserMessageResponse implements BaseProperties {
     
     GregorianCalendar dateTime;
 
+    JSONObjectReader root;
+    public JSONObjectReader getRoot() {
+        return root;
+    }
+    
     String text;
     public String getText() {
         return text;
