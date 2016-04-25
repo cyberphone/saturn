@@ -17,28 +17,35 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.net.URL;
+
 import java.security.GeneralSecurityException;
-import java.util.Enumeration;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+
 import org.webpki.net.HTTPSWrapper;
+
 import org.webpki.util.ArrayUtil;
+
 import org.webpki.webutil.ServletUtil;
+
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Authority;
@@ -51,7 +58,7 @@ import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PayerAuthorization;
-import org.webpki.saturn.common.UserMessageResponse;
+import org.webpki.saturn.common.ProviderUserResponse;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -148,18 +155,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Enumeration<String> headerNames = request.getHeaderNames();
-        String headers = "Headers:";
-        while (headerNames.hasMoreElements()) {
-            String header = headerNames.nextElement();
-            headers += "\n\"" + header + "\":" + request.getHeader(header);
-         }
-        logger.info(headers);
         UrlHolder urlHolder = new UrlHolder();
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {
-                ErrorServlet.sessionTimeout(response);
+                returnJsonData(response, NORMAL_RETURN);
                 return;
              }
 
@@ -229,11 +229,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 debugData.reserveOrBasicResponse = resultMessage;
             }
 
-            if (resultMessage.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.USER_MESSAGE_RESPONSE.toString())) {
+            if (resultMessage.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.PROVIDER_USER_RESPONSE.toString())) {
                 if (debug) {
                     debugData.softReserveOrBasicError = true;
                 }
-                UserMessageResponse userMessageResponse = new UserMessageResponse(resultMessage);
+                ProviderUserResponse userMessageResponse = new ProviderUserResponse(resultMessage);
                 returnJsonData(response,
                                userMessageResponse.getRoot().serializeJSONObject(JSONOutputFormats.NORMALIZED));
                 return;

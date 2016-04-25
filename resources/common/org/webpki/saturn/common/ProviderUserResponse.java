@@ -27,10 +27,10 @@ import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-public class UserMessageResponse implements BaseProperties {
+public class ProviderUserResponse implements BaseProperties {
     
-    public UserMessageResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.USER_MESSAGE_RESPONSE, root = rd);
+    public ProviderUserResponse(JSONObjectReader rd) throws IOException {
+        Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, root = rd);
         text = rd.getString(TEXT_JSON);
         if (rd.hasProperty(INPUT_FIELDS_JSON)) {
             LinkedHashMap<String,InputField> fields = new LinkedHashMap<String,InputField>();
@@ -68,7 +68,7 @@ public class UserMessageResponse implements BaseProperties {
 
     public static JSONObjectWriter encode(String text,
                                           InputField[] optionalInputFields) throws IOException {
-        JSONObjectWriter wr = Messages.createBaseMessage(Messages.USER_MESSAGE_RESPONSE)
+        JSONObjectWriter wr = Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
             .setString(TEXT_JSON, text);
         if (optionalInputFields != null && optionalInputFields.length > 0) {
             JSONArrayWriter aw = wr.setArray(INPUT_FIELDS_JSON);

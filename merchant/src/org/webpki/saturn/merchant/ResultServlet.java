@@ -17,47 +17,21 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.net.URL;
-import java.security.GeneralSecurityException;
-import java.util.Enumeration;
-import java.util.logging.Level;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.json.JSONArrayWriter;
-import org.webpki.json.JSONDecoderCache;
-import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
-import org.webpki.net.HTTPSWrapper;
-import org.webpki.util.ArrayUtil;
-import org.webpki.webutil.ServletUtil;
-import org.webpki.saturn.common.FinalizeCardpayResponse;
-import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.Authority;
-import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.AuthorizationData;
-import org.webpki.saturn.common.Expires;
-import org.webpki.saturn.common.FinalizeCreditResponse;
-import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.ReserveOrBasicResponse;
-import org.webpki.saturn.common.ReserveOrBasicRequest;
-import org.webpki.saturn.common.FinalizeRequest;
-import org.webpki.saturn.common.PayerAuthorization;
-import org.webpki.saturn.common.UserMessageResponse;
-
 //////////////////////////////////////////////////////////////////////////
-// This servlet does all Merchant backend payment transaction work      //
+// This servlet shows the result of a transaction to the user           //
 //////////////////////////////////////////////////////////////////////////
 
-public class ResultServlet extends HttpServlet implements BaseProperties, MerchantProperties {
+public class ResultServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
     

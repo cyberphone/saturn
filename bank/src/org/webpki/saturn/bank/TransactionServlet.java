@@ -65,7 +65,7 @@ import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.UserAccountEntry;
-import org.webpki.saturn.common.UserMessageResponse;
+import org.webpki.saturn.common.ProviderUserResponse;
 
 import org.webpki.webutil.ServletUtil;
 
@@ -236,7 +236,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // Sorry but you don't appear to have a million bucks :-)
         if (!reserveOrBasicRequest.getMessage().isCardPayment() &&
             paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
-            return UserMessageResponse.encode("You don't have this money!", null);
+            return ProviderUserResponse.encode("You don't have this money!", null);
         }
 
         // Separate credit-card and account2account payments
@@ -327,7 +327,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
        
         // Decode response
         JSONObjectReader response = postData(urlHolder, transactionRequest);
-        if (response.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.USER_MESSAGE_RESPONSE.toString())) {
+        if (response.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.PROVIDER_USER_RESPONSE.toString())) {
             return new JSONObjectWriter(response);
         }
 
