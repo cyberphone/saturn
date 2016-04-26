@@ -357,7 +357,7 @@ public class HTML implements MerchantProperties {
             s.append("<tr><td align=\"center\"><img id=\"state\" title=\"Please tap your mobile wallet!\" " +
                      "src=\"images/NFC-N-Mark-Logo.svg\" style=\"height:120pt;margin-top:10pt\"></td>");
         } else {
-            s.append("<tr><td style=\"padding:20pt\" id=\"wallet\">&nbsp;</td>");
+            s.append("<tr><td style=\"padding:20pt;text-align:center\" id=\"wallet\"><img src=\"images/waiting.gif\"></td>");
         }
         s.append("</tr></table>" +
                  "<form name=\"restore\" method=\"POST\" action=\"shop\">" +
