@@ -17,6 +17,7 @@
 package org.webpki.saturn.common;
 
 public interface BaseProperties {
+
     String EMBEDDED_JSON                     = "@embedded";
 
     String WINDOW_JSON                       = "window";
@@ -25,10 +26,12 @@ public interface BaseProperties {
     String COMMON_NAME_JSON                  = "commonName";            // Common name of providers to be used in UIs
     String NAME_JSON                         = "name";
 
-    String TEXT_JSON                         = "text";                  // UserMessageResponse
-    String INPUT_FIELDS_JSON                 = "inputFields";           // UserMessageResponse
-    String LABEL_JSON                        = "label";                 // UserMessageResponse
-    String LENGTH_JSON                       = "length";                // UserMessageResponse
+    String TEXT_JSON                         = "text";                  // ProviderUserResponse
+    String CHALLENGE_FIELDS_JSON             = "challengeFields";       // ProviderUserResponse
+    String LABEL_JSON                        = "label";                 // ProviderUserResponse
+    String LENGTH_JSON                       = "length";                // ProviderUserResponse
+
+    String CHALLENGE_RESULTS_JSON            = "challengeResults";      // Result of ProviderUserResponse 
 
     String PAYMENT_REQUEST_JSON              = "paymentRequest";
     String ACQUIRER_AUTHORITY_URL_JSON       = "acquirerAuthorityUrl";  // For CreditCard payments

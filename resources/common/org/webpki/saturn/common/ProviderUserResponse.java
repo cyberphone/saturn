@@ -33,16 +33,16 @@ public class ProviderUserResponse implements BaseProperties {
         Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, root = rd);
         commonName = rd.getString(COMMON_NAME_JSON);
         text = rd.getString(TEXT_JSON);
-        if (rd.hasProperty(INPUT_FIELDS_JSON)) {
-            LinkedHashMap<String,InputField> fields = new LinkedHashMap<String,InputField>();
-            JSONArrayReader ar = rd.getArray(INPUT_FIELDS_JSON);
+        if (rd.hasProperty(CHALLENGE_FIELDS_JSON)) {
+            LinkedHashMap<String,ChallengeField> fields = new LinkedHashMap<String,ChallengeField>();
+            JSONArrayReader ar = rd.getArray(CHALLENGE_FIELDS_JSON);
              do {
-                InputField inputField = new InputField(ar.getObject());
-                if (fields.put(inputField.getId(), inputField) != null) {
-                    throw new IOException("Duplicate: " + inputField.getId());
+                ChallengeField challengeField = new ChallengeField(ar.getObject());
+                if (fields.put(challengeField.getId(), challengeField) != null) {
+                    throw new IOException("Duplicate: " + challengeField.getId());
                 }
             } while (ar.hasMore());
-            optionalInputFields = fields.values().toArray(new InputField[0]);
+            optionalChallengeFields = fields.values().toArray(new ChallengeField[0]);
         }
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         rd.checkForUnread();
@@ -65,21 +65,21 @@ public class ProviderUserResponse implements BaseProperties {
         return text;
     }
 
-    InputField[] optionalInputFields;
-    public InputField[] getOptionalInputFields() {
-        return optionalInputFields;
+    ChallengeField[] optionalChallengeFields;
+    public ChallengeField[] getOptionalChallengeFields() {
+        return optionalChallengeFields;
     }
 
     public static JSONObjectWriter encode(String commonName,
                                           String text,
-                                          InputField[] optionalInputFields) throws IOException {
+                                          ChallengeField[] optionalChallengeFields) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
             .setString(COMMON_NAME_JSON, commonName)
             .setString(TEXT_JSON, text);
-        if (optionalInputFields != null && optionalInputFields.length > 0) {
-            JSONArrayWriter aw = wr.setArray(INPUT_FIELDS_JSON);
-            for (InputField inputField : optionalInputFields) {
-                aw.setObject(inputField.writeObject());
+        if (optionalChallengeFields != null && optionalChallengeFields.length > 0) {
+            JSONArrayWriter aw = wr.setArray(CHALLENGE_FIELDS_JSON);
+            for (ChallengeField challengeField : optionalChallengeFields) {
+                aw.setObject(challengeField.writeObject());
             }
         }
         return wr.setDateTime(TIME_STAMP_JSON, new Date(), true);

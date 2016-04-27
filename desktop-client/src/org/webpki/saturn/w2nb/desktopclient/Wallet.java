@@ -51,6 +51,7 @@ import java.security.Security;
 import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.Vector;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -92,12 +93,14 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.ChallengeResult;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.Encryption;
 import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.ChallengeField;
 import org.webpki.saturn.common.WalletAlertMessage;
 
 import org.webpki.w2nbproxy.BrowserWindow;
@@ -152,6 +155,7 @@ public class Wallet {
 
     static final String BUTTON_OK              = "OK";
     static final String BUTTON_CANCEL          = "Cancel";
+    static final String BUTTON_SUBMIT          = "Submit";
 
     static final int TIMEOUT_FOR_REQUEST       = 10000;
     
@@ -292,7 +296,7 @@ public class Wallet {
         SecureKeyStore sks;
         int keyHandle;
         Account selectedCard;
- 
+        
         PaymentRequest paymentRequest;
         
         JSONObjectWriter resultMessage;
@@ -462,8 +466,8 @@ public class Wallet {
             ((CardLayout)views.getLayout()).show(views, VIEW_SELECTION);
         }
 
-        void userPayEvent() {
-            if (userAuthorizationSucceeded()) {
+        void userPayEvent(ChallengeResult[] challengeResults) {
+            if (userAuthorizationSucceeded(challengeResults)) {
 
                 // The user have done his/her part, now it is up to the rest of
                 // the infrastructure carry out the user's request.  This may take
@@ -608,7 +612,7 @@ public class Wallet {
             authorizationOkButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    userPayEvent();
+                    userPayEvent(null);
                 }
             });
 
@@ -714,6 +718,7 @@ public class Wallet {
         }
 
         void showProviderDialog (ProviderUserResponse providerUserResonse) {
+            final LinkedHashMap<String,JTextField> challengeTextFields = new LinkedHashMap<String,JTextField>();
             final JDialog dialog =
                 new JDialog(frame, "Message from: " + providerUserResonse.getCommonName(), true);
             Container pane = dialog.getContentPane();
@@ -723,14 +728,25 @@ public class Wallet {
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
             pane.add(getImageLabel("warning.png"), c);
-            JLabel errorLabel = new JLabel(providerUserResonse.getText());
-            errorLabel.setFont(standardFont);
-            c.anchor = GridBagConstraints.CENTER;
+            JLabel messageText = new JLabel(providerUserResonse.getText());
+            messageText.setFont(standardFont);
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
             c.gridy = 1;
-            pane.add(errorLabel, c);
-            JButton okOrSubmitButton = new JButtonSlave(BUTTON_OK, authorizationCancelButton);
+            pane.add(messageText, c);
+            final boolean hasSubmit = providerUserResonse.getOptionalChallengeFields() != null;
+            if (hasSubmit) {
+                c.insets = new Insets(fontSize, fontSize * 2, 0, fontSize * 2);
+                for (ChallengeField challengeField : providerUserResonse.getOptionalChallengeFields()) {
+                    c.gridy++;
+                    JPasswordField submitData = new JPasswordField(challengeField.getLength());
+                    submitData.setFont(standardFont);
+                    pane.add(submitData, c);
+                    challengeTextFields.put(challengeField.getId(), submitData);
+                }
+            }
+            JButton okOrSubmitButton = hasSubmit ? new JButton(BUTTON_SUBMIT) : new JButtonSlave(BUTTON_OK, authorizationCancelButton);
             okOrSubmitButton.setFont(standardFont);
+            c.anchor = GridBagConstraints.CENTER;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
             c.gridy++;
             pane.add(okOrSubmitButton, c);
@@ -746,7 +762,13 @@ public class Wallet {
                 public void actionPerformed(ActionEvent event) {
                     dialog.setVisible(false);
                     windowAdapter.windowClosing(null);
-                    userPayEvent();
+                    if (hasSubmit) {
+                        Vector<ChallengeResult> results = new Vector<ChallengeResult>();
+                        for (String id : challengeTextFields.keySet()) {
+                            results.add(new ChallengeResult(id, challengeTextFields.get(id).getText()));
+                        }
+                        userPayEvent(results.toArray(new ChallengeResult[0]));
+                    }
                 }
             });
             dialog.setVisible(true);
@@ -981,7 +1003,7 @@ public class Wallet {
             return false;
         }
 
-        boolean userAuthorizationSucceeded() {
+        boolean userAuthorizationSucceeded(ChallengeResult[] challengeResults) {
             try {
                 if (pinBlockCheck()) {
                     return false;
@@ -993,6 +1015,7 @@ public class Wallet {
                         paymentRequest,
                         domainName,
                         selectedCard.accountDescriptor,
+                        challengeResults,
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
                             @Override

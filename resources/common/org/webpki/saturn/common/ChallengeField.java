@@ -21,11 +21,11 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-public class InputField implements BaseProperties {
+public class ChallengeField implements BaseProperties {
 
     public static enum TYPE {NUMERIC, ALPHANUMERIC};
 
-    public InputField(String id,
+    public ChallengeField(String id,
                       TYPE type,
                       int length,
                       String optionalLabel) {
@@ -66,7 +66,7 @@ public class InputField implements BaseProperties {
         return optionalLabel;
     }
 
-    public InputField(JSONObjectReader rd) throws IOException {
+    public ChallengeField(JSONObjectReader rd) throws IOException {
         id = rd.getString(ID_JSON);
         type = TYPE.valueOf(rd.getString(TYPE_JSON));
         length = rd.getInt(LENGTH_JSON);

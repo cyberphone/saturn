@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
 
 import java.security.PublicKey;
 
@@ -27,6 +28,8 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.AsymKeySignerInterface;
 
+import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONAsymKeySigner;
@@ -40,27 +43,37 @@ public class AuthorizationData implements BaseProperties {
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
                                           AccountDescriptor accountDescriptor,
+                                          ChallengeResult[] optionalChallengeResults,
                                           Date timeStamp,
                                           JSONAsymKeySigner signer) throws IOException {
-        return new JSONObjectWriter()
+        JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
                 .setString(JSONSignatureDecoder.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
                 .setBinary(JSONSignatureDecoder.VALUE_JSON, paymentRequest.getRequestHash()))
             .setString(DOMAIN_NAME_JSON, domainName)
-            .setObject(ACCOUNT_JSON, accountDescriptor.writeObject())
-            .setDateTime(TIME_STAMP_JSON, timeStamp, false)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
-            .setSignature (signer);
+            .setObject(ACCOUNT_JSON, accountDescriptor.writeObject());
+        if (optionalChallengeResults != null && optionalChallengeResults.length > 0) {
+            JSONArrayWriter aw = wr.setArray(CHALLENGE_RESULTS_JSON);
+            for (ChallengeResult challengeResult : optionalChallengeResults) {
+                aw.setObject(challengeResult.writeObject());
+            }
+            
+        }
+        return wr.setDateTime(TIME_STAMP_JSON, timeStamp, false)
+                 .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
+                 .setSignature (signer);
     }
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
                                           AccountDescriptor accountDescriptor,
+                                          ChallengeResult[] optionalChallengeResults,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
                       domainName,
                       accountDescriptor,
+                      optionalChallengeResults,
                       new Date(),
                       new JSONAsymKeySigner(signer)
                           .setSignatureAlgorithm(signatureAlgorithm)
@@ -84,10 +97,27 @@ public class AuthorizationData implements BaseProperties {
         requestHash = RequestHash.parse(rd);
         domainName = rd.getString(DOMAIN_NAME_JSON);
         accountDescriptor = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
+        if (rd.hasProperty(CHALLENGE_RESULTS_JSON)) {
+            LinkedHashMap<String,ChallengeResult> results = new LinkedHashMap<String,ChallengeResult>();
+            JSONArrayReader ar = rd.getArray(CHALLENGE_RESULTS_JSON);
+             do {
+                 ChallengeResult challengeResult = new ChallengeResult(ar.getObject());
+                if (results.put(challengeResult.getId(), challengeResult) != null) {
+                    throw new IOException("Duplicate: " + challengeResult.getId());
+                }
+            } while (ar.hasMore());
+            optionalChallengeResults = results.values().toArray(new ChallengeResult[0]);
+        }
+        
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         rd.checkForUnread();
+    }
+
+    ChallengeResult[] optionalChallengeResults;
+    public ChallengeResult[] getOptionalChallengeResults() {
+        return optionalChallengeResults;
     }
 
     byte[] requestHash;

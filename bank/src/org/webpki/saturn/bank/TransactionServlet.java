@@ -50,6 +50,7 @@ import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.FinalizeTransactionRequest;
 import org.webpki.saturn.common.FinalizeTransactionResponse;
+import org.webpki.saturn.common.ChallengeField;
 import org.webpki.saturn.common.MerchantAccountEntry;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
@@ -78,6 +79,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     private static final long serialVersionUID = 1L;
     
     static Logger logger = Logger.getLogger(TransactionServlet.class.getCanonicalName());
+    
+    static final String RBA_PARM_MOTHER            = "mother";
     
     static HashMap<String,Integer> requestTypes = new HashMap<String,Integer>();
     
@@ -239,6 +242,22 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             return ProviderUserResponse.encode(BankService.bankCommonName,
                                                "You don't have this money!",
                                                null);
+        }
+
+        // RBA v0.001...
+        if (!reserveOrBasicRequest.getMessage().isCardPayment() &&
+            paymentRequest.getAmount().compareTo(new BigDecimal("100000.00")) >= 0 &&
+            (authorizationData.getOptionalChallengeResults() == null ||
+             !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
+            return ProviderUserResponse.encode(BankService.bankCommonName,
+                                               "<html>This transaction requires additional information to " +
+                                               "be performed.<br>Please enter your mother's maiden name and " +
+                                               "click on the designated button.<br>Since <i>this is a demo</i> " +
+                                               "the right answer is set to &quot;garbo&quot; :-)",
+                                               new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
+                                                                               ChallengeField.TYPE.ALPHANUMERIC,
+                                                                               20,
+                                                                               null)});
         }
 
         // Separate credit-card and account2account payments
