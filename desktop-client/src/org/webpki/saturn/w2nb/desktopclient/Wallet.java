@@ -462,6 +462,20 @@ public class Wallet {
             ((CardLayout)views.getLayout()).show(views, VIEW_SELECTION);
         }
 
+        void userPayEvent() {
+            if (userAuthorizationSucceeded()) {
+
+                // The user have done his/her part, now it is up to the rest of
+                // the infrastructure carry out the user's request.  This may take
+                // a few seconds so we put up the "Waiting" sign again.
+                waitingText.setText("Payment processing - Please wait");
+                ((CardLayout)views.getLayout()).show(views, VIEW_WAITING);
+
+                // This is a multi-threaded application, yes!
+                new PerformPayment().start();
+            }
+        }
+
         void initAuthorizationView() {
             // Mastering "GridBagLayout"? Not really...  
             JPanel authorizationView = new JPanel();
@@ -594,17 +608,7 @@ public class Wallet {
             authorizationOkButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (userAuthorizationSucceeded()) {
-
-                        // The user have done his/her part, now it is up to the rest of
-                        // the infrastructure carry out the user's request.  This may take
-                        // a few seconds so we put up the "Waiting" sign again.
-                        waitingText.setText("Payment processing - Please wait");
-                        ((CardLayout)views.getLayout()).show(views, VIEW_WAITING);
-
-                        // This is a multi-threaded application, yes!
-                        new PerformPayment().start();
-                    }
+                    userPayEvent();
                 }
             });
 
@@ -688,7 +692,7 @@ public class Wallet {
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
             c.gridy = 1;
             pane.add(errorLabel, c);
-            JButtonSlave okButton = new JButtonSlave(BUTTON_OK, authorizationCancelButton);
+            JButton okButton = new JButtonSlave(BUTTON_OK, authorizationCancelButton);
             okButton.setFont(standardFont);
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
             c.gridy = 2;
@@ -725,11 +729,11 @@ public class Wallet {
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
             c.gridy = 1;
             pane.add(errorLabel, c);
-            JButtonSlave okButton = new JButtonSlave(BUTTON_OK, authorizationCancelButton);
-            okButton.setFont(standardFont);
+            JButton okOrSubmitButton = new JButtonSlave(BUTTON_OK, authorizationCancelButton);
+            okOrSubmitButton.setFont(standardFont);
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
-            c.gridy = 2;
-            pane.add(okButton, c);
+            c.gridy++;
+            pane.add(okOrSubmitButton, c);
             dialog.setResizable(false);
             dialog.pack();
             dialog.setAlwaysOnTop(true);
@@ -737,11 +741,12 @@ public class Wallet {
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             final WindowAdapter windowAdapter = new WindowAdapter() {};
             dialog.addWindowListener(windowAdapter);
-            okButton.addActionListener(new ActionListener() {
+            okOrSubmitButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent event) {
                     dialog.setVisible(false);
                     windowAdapter.windowClosing(null);
+                    userPayEvent();
                 }
             });
             dialog.setVisible(true);
@@ -906,7 +911,8 @@ public class Wallet {
             try {
                 while (true) {
                     JSONObjectReader optionalMessage = stdin.readJSONObject();
-                    if (!optionalMessage.toString().equals("{}")) {
+                    try {
+                        logger.info("Received from browser:\n" + optionalMessage);
                         Messages message = Messages.parseBaseMessage(new Messages[]{Messages.PROVIDER_USER_RESPONSE,
                                                                                     Messages.WALLET_ALERT},
                                                                      optionalMessage);
@@ -916,6 +922,8 @@ public class Wallet {
                         } else {
                             terminatingError(new WalletAlertMessage(optionalMessage).getText());
                         }
+                    } catch (Exception e) {
+                        terminatingError(e.getMessage());
                     }
                 }
             } catch (IOException e) {
