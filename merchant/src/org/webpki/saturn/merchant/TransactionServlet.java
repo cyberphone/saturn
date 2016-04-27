@@ -59,6 +59,7 @@ import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.WalletAlertMessage;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -275,7 +276,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
             logger.log(Level.SEVERE, message, e);
-            ErrorServlet.systemFail(response, message);
+            JSONObjectWriter userError = WalletAlertMessage.encode("<html>A technical error occurred.<br>" +
+                                                                   "Please try again or contact support.</html>");
+            returnJsonData(response, userError.serializeJSONObject(JSONOutputFormats.NORMALIZED));
         }
     }
 

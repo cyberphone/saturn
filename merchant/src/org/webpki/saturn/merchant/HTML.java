@@ -443,7 +443,7 @@ public class HTML implements MerchantProperties {
                     "            if (Object.keys(json).length == 0) {\n" +
                     "              document.location.href='result';\n" +
                     "            } else {\n" +
-                    "              console.log(json);\n" +
+                    "              nativePort.postMessage(json);\n" +
                     "            }\n" +
                     "          } else {\n" +
                     "          }\n" +

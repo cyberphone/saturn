@@ -47,8 +47,6 @@ public class ProviderUserResponse implements BaseProperties {
         rd.checkForUnread();
     }
 
-    Software software;
-    
     GregorianCalendar dateTime;
 
     JSONObjectReader root;
