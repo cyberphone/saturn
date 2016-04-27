@@ -97,6 +97,8 @@ import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.Encryption;
+import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.WalletAlertMessage;
 
 import org.webpki.w2nbproxy.BrowserWindow;
 import org.webpki.w2nbproxy.ExtensionPositioning;
@@ -864,7 +866,22 @@ public class Wallet {
             }
             // Catching the disconnect...returns success to proxy
             try {
-                stdin.readJSONObject();
+                while (true) {
+                    JSONObjectReader optionalMessage = stdin.readJSONObject();
+                    if (!optionalMessage.toString().equals("{}")) {
+                        Messages message = Messages.parseBaseMessage(new Messages[]{Messages.PROVIDER_USER_RESPONSE,
+                                                                                    Messages.WALLET_ALERT},
+                                                                     optionalMessage);
+                        ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
+                        if (message == Messages.PROVIDER_USER_RESPONSE) {
+                            showProblemDialog(false, 
+                                              new ProviderUserResponse(optionalMessage).getText(),
+                                              new WindowAdapter() {});
+                        } else {
+                            terminatingError(new WalletAlertMessage(optionalMessage).getText());
+                        }
+                    }
+                }
             } catch (IOException e) {
                 System.exit(0);
             }
