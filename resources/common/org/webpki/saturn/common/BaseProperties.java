@@ -22,7 +22,7 @@ public interface BaseProperties {
     String WINDOW_JSON                       = "window";
     String HEIGHT_JSON                       = "height";
     String WIDTH_JSON                        = "width";
-    String COMMON_NAME_JSON                  = "commonName";            // Common name of payee to be used in UIs
+    String COMMON_NAME_JSON                  = "commonName";            // Common name of providers to be used in UIs
     String NAME_JSON                         = "name";
 
     String TEXT_JSON                         = "text";                  // UserMessageResponse

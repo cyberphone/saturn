@@ -709,6 +709,44 @@ public class Wallet {
             dialog.setVisible(true);
         }
 
+        void showProviderDialog (ProviderUserResponse providerUserResonse) {
+            final JDialog dialog =
+                new JDialog(frame, "Message from: " + providerUserResonse.getCommonName(), true);
+            Container pane = dialog.getContentPane();
+            pane.setLayout(new GridBagLayout());
+            pane.setBackground(Color.WHITE);
+            GridBagConstraints c = new GridBagConstraints();
+            c.anchor = GridBagConstraints.WEST;
+            c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
+            pane.add(getImageLabel("warning.png"), c);
+            JLabel errorLabel = new JLabel(providerUserResonse.getText());
+            errorLabel.setFont(standardFont);
+            c.anchor = GridBagConstraints.CENTER;
+            c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
+            c.gridy = 1;
+            pane.add(errorLabel, c);
+            JButtonSlave okButton = new JButtonSlave(BUTTON_OK, authorizationCancelButton);
+            okButton.setFont(standardFont);
+            c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
+            c.gridy = 2;
+            pane.add(okButton, c);
+            dialog.setResizable(false);
+            dialog.pack();
+            dialog.setAlwaysOnTop(true);
+            dialog.setLocationRelativeTo(null);
+            dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+            final WindowAdapter windowAdapter = new WindowAdapter() {};
+            dialog.addWindowListener(windowAdapter);
+            okButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent event) {
+                    dialog.setVisible(false);
+                    windowAdapter.windowClosing(null);
+                }
+            });
+            dialog.setVisible(true);
+        }
+
         void terminatingError(String error) {
             showProblemDialog(true, error, new WindowAdapter() {
                 @Override
@@ -874,9 +912,7 @@ public class Wallet {
                                                                      optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
-                            showProblemDialog(false, 
-                                              new ProviderUserResponse(optionalMessage).getText(),
-                                              new WindowAdapter() {});
+                            showProviderDialog(new ProviderUserResponse(optionalMessage));
                         } else {
                             terminatingError(new WalletAlertMessage(optionalMessage).getText());
                         }

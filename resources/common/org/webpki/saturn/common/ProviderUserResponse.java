@@ -31,6 +31,7 @@ public class ProviderUserResponse implements BaseProperties {
     
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, root = rd);
+        commonName = rd.getString(COMMON_NAME_JSON);
         text = rd.getString(TEXT_JSON);
         if (rd.hasProperty(INPUT_FIELDS_JSON)) {
             LinkedHashMap<String,InputField> fields = new LinkedHashMap<String,InputField>();
@@ -53,7 +54,12 @@ public class ProviderUserResponse implements BaseProperties {
     public JSONObjectReader getRoot() {
         return root;
     }
-    
+
+    String commonName;
+    public String getCommonName() {
+        return commonName;
+    }
+
     String text;
     public String getText() {
         return text;
@@ -64,9 +70,11 @@ public class ProviderUserResponse implements BaseProperties {
         return optionalInputFields;
     }
 
-    public static JSONObjectWriter encode(String text,
+    public static JSONObjectWriter encode(String commonName,
+                                          String text,
                                           InputField[] optionalInputFields) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
+            .setString(COMMON_NAME_JSON, commonName)
             .setString(TEXT_JSON, text);
         if (optionalInputFields != null && optionalInputFields.length > 0) {
             JSONArrayWriter aw = wr.setArray(INPUT_FIELDS_JSON);

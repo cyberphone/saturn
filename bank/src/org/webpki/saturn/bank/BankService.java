@@ -63,6 +63,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final String KEYSTORE_PASSWORD     = "key_password";
 
+    static final String BANK_NAME             = "bank_name";
     static final String BANK_EECERT           = "bank_eecert";
     static final String BANK_HOST             = "bank_host";
     static final String DECRYPTION_KEY1       = "bank_decryptionkey1";
@@ -84,6 +85,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static LinkedHashMap<String,UserAccountEntry> userAccountDb = new LinkedHashMap<String,UserAccountEntry>();
     
     static LinkedHashMap<String,MerchantAccountEntry> merchantAccountDb = new LinkedHashMap<String,MerchantAccountEntry>();
+    
+    static String bankCommonName;
 
     static ServerX509Signer bankKey;
     
@@ -134,7 +137,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
             }
-            
+
+            bankCommonName = getPropertyString(BANK_NAME);
+
             KeyStoreEnumerator bankcreds = new KeyStoreEnumerator(getResource(BANK_EECERT),
                                                                   getPropertyString(KEYSTORE_PASSWORD));
             bankCertificatePath = bankcreds.getCertificatePath();
@@ -173,7 +178,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             logging = getPropertyBoolean(LOGGING);
 
-            logger.info("Saturn Bank-server initiated");
+            logger.info("Saturn \"" + bankCommonName + "\" server initiated");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }

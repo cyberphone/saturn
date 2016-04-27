@@ -9,7 +9,13 @@
         <param-name>key_password</param-name>
         <param-value>@key-password@</param-value>
     </context-param>
- 
+
+    <context-param>
+        <description>Bank Common Name</description>
+        <param-name>bank_name</param-name>
+        <param-value>@bank-name@</param-value>
+    </context-param>
+
     <context-param>
         <description>Bank EE Certificate</description>
         <param-name>bank_eecert</param-name>
