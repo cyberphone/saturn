@@ -1078,10 +1078,9 @@ public class Wallet {
                 try {
                     // The Wallet finishes by sending the encrypted authorization message through the
                     // Web2Native Bridge interface to the invoking Merchant (Payee) web page which in
-                    // turn posts it to the Merchant server.  The latter should return a new web-page
-                    // which causes the Wallet to unload (disappear).
-                    // Any further communication with the user (including "insufficient funds") is
-                    // supposed to be performed using standard web technology.
+                    // turn posts it to the Merchant server.  The latter should return JSON response
+                    // which either is {} meaning success, or message that is interpreted by the
+                    // Wallet.
                     stdout.writeJSONObject(resultMessage);
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Communication error", e);

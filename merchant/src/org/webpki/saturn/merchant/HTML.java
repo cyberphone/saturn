@@ -104,6 +104,7 @@ public class HTML implements MerchantProperties {
                    "<li style=\"padding-top:0pt\">Fully <i>decentralized</i> operation (no dependency on central registries like 3D Secure)</li>" +
                    "<li><i>Digitally signed</i> messages enable a protocol-level security comparable to a PIN-code terminal and chip-card in a physical shop</li>" +
                    "<li>Tunneling encrypted data (like in SET) hides senstive customer data from merchants without using &quot;tokenization&quot;</li>" +
+                   "<li>Private messaging through the payment system makes it easy applying RBA (Risk Based Authentication) for high-value transactions</li>" +
                    "<li>Equally applicable for legacy card payment (&quot;pull&quot;) networks as for bank-2-bank (&quot;push&quot;) schemes</li>" +
                    "<li>In addition to supporting Web payments, Saturn is <i>intended to also be usable in traditional payment scenarios " +
                    "including with POS teminals and gas pumps using an NFC/BLE connection to the Wallet</i></li>" +
