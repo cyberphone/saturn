@@ -18,11 +18,6 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
-import java.util.Vector;
-
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -34,17 +29,9 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.Payee;
-import org.webpki.saturn.common.PayerAccountTypes;
-import org.webpki.saturn.common.Expires;
-import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.RequestHash;
 
 public class ChoosePaymentServlet extends HttpServlet implements BaseProperties, MerchantProperties {
 
@@ -71,7 +58,6 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
             if (quantity != 0) {
                 String sku = or.getString("sku");
                 savedShoppingCart.items.put(sku, quantity);
-                logger.info("SKU=" + sku + " Quantity=" + quantity);
                 total += quantity * or.getLong("priceX100");
             }
         }

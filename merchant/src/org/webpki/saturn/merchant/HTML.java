@@ -17,18 +17,14 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.util.HTMLEncoder;
-
-import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.PaymentRequest;
-
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -163,7 +159,7 @@ public class HTML implements MerchantProperties {
                                              ProductEntry product_entry,
                                              String sku,
                                              SavedShoppingCart savedShoppingCart,
-                                             int index) {
+                                             int index) throws IOException {
         int quantity = savedShoppingCart.items.containsKey(sku) ? savedShoppingCart.items.get(sku): 0;
         StringBuffer s = new StringBuffer(
             "<tr style=\"text-align:center\"><td><img src=\"images/")
@@ -204,12 +200,11 @@ public class HTML implements MerchantProperties {
         return s;
     }
 
-    private static String price(long priceX100) {
-        return (MerchantService.currency.symbolFirst ? MerchantService.currency.symbol : "")
-               + String.valueOf(priceX100 / 100) + "."
-               + String.valueOf((priceX100 % 100) / 10)
-               + String.valueOf(priceX100 % 10)
-               + (MerchantService.currency.symbolFirst ? "" : MerchantService.currency.symbol);
+    private static String price(long priceX100) throws IOException {
+        BigDecimal amount = new BigDecimal(priceX100);
+        amount.setScale(MerchantService.currency.getDecimals());
+        amount = amount.divide(new BigDecimal(100));
+        return MerchantService.currency.amountToDisplayString(amount);
     }
     
     public static void merchantPage(HttpServletResponse response,
@@ -242,13 +237,21 @@ public class HTML implements MerchantProperties {
             "}\n\n" +
             "function getPriceString() {\n" +
             "    var priceX100 = getTotal();\n" +
+            "    var intPart = Math.floor(priceX100 / 100).toString();\n" +
+            "    var adjusted='';\n" +
+            "    for (var i = 0; i < intPart.length; i++) {\n" +
+            "      adjusted += intPart.charAt(i);\n" +
+            "      if (i < intPart.length - 1 && (intPart.length - i - 1) % 3 == 0) {\n" +
+            "        adjusted += ',';\n" +
+            "      }\n" +
+            "    }\n" +
             "    return ");
         if (MerchantService.currency.symbolFirst) {
             temp_string.append('\'')
                        .append(MerchantService.currency.symbol)
                        .append("' + ");
         }
-        temp_string.append("Math.floor(priceX100 / 100) + '.' +  Math.floor((priceX100 % 100) / 10) +  Math.floor(priceX100 % 10)");
+        temp_string.append("adjusted + '.' +  Math.floor((priceX100 % 100) / 10) +  Math.floor(priceX100 % 10)");
         if (!MerchantService.currency.symbolFirst) {
             temp_string.append(" + '")
                        .append(MerchantService.currency.symbol)
@@ -311,7 +314,7 @@ public class HTML implements MerchantProperties {
             page_data.toString()));
     }
 
-    static StringBuffer currentOrder(SavedShoppingCart savedShoppingCart) {
+    static StringBuffer currentOrder(SavedShoppingCart savedShoppingCart) throws IOException {
         StringBuffer s = new StringBuffer(
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table>" +
@@ -405,14 +408,14 @@ public class HTML implements MerchantProperties {
         temp_string.append(").then(function(port) {\n" +
                     "    nativePort = port;\n" +
                     "    port.addMessageListener(function(message) {\n" +
-                    "      if (message[\"@context\"] != \"" + BaseProperties.W2NB_WEB_PAY_CONTEXT_URI + "\") {\n" +
-                    "        setFail(\"Missing or wrong \\\"@context\\\"\");\n" +
+                    "      if (message['@context'] != '" + BaseProperties.W2NB_WEB_PAY_CONTEXT_URI + "') {\n" +
+                    "        setFail('Missing or wrong \"@context\"');\n" +
                     "        return;\n" +
                     "      }\n" +
-                    "      var qualifier = message[\"@qualifier\"];\n" +
-                    "      if ((initMode && qualifier != \"" + Messages.WALLET_IS_READY.toString() + "\")  ||\n" +
-                    "          (!initMode && qualifier != \"" +  Messages.PAYER_AUTHORIZATION.toString() + "\")) {\n" +  
-                    "        setFail(\"Wrong or missing \\\"@qualifier\\\"\");\n" +
+                    "      var qualifier = message['@qualifier'];\n" +
+                    "      if ((initMode && qualifier != '" + Messages.WALLET_IS_READY.toString() + "')  ||\n" +
+                    "          (!initMode && qualifier != '" +  Messages.PAYER_AUTHORIZATION.toString() + "')) {\n" +  
+                    "        setFail('Wrong or missing \"@qualifier\"');\n" +
                     "        return;\n" +
                     "      }\n" +
                     "      if (initMode) {\n");
@@ -422,13 +425,14 @@ public class HTML implements MerchantProperties {
        }
        if (!tapConnectMode) {
            temp_string.append(
-                    "        document.getElementById(\"wallet\").style.height = message." + 
+                    "        document.getElementById('wallet').style.height = message." + 
                                          BaseProperties.WINDOW_JSON + "." + BaseProperties.HEIGHT_JSON + " + 'px';\n");
        }
        temp_string.append(
                     "        initMode = false;\n" +
                     "        nativePort.postMessage(invocationData);\n" +
                     "      } else {\n" +
+                    "// This is it...transfer the Wallet authorization data back to the Merchant server\n" +
                     "        fetch('transact', {\n" +
                     "           headers: {\n" +
                     "             'Content-Type': 'application/json'\n" +
@@ -438,14 +442,17 @@ public class HTML implements MerchantProperties {
                     "           body: JSON.stringify(message)\n" +
                     "        }).then(function (response) {\n" +
                     "          return response.json();\n" +
-                    "        }).then(function (json) {\n" +
-                    "          if (typeof json == 'object' && !Array.isArray(json)) {\n" +
-                    "            if (Object.keys(json).length == 0) {\n" +
+                    "        }).then(function (resultData) {\n" +
+                    "          if (typeof resultData == 'object' && !Array.isArray(resultData)) {\n" +
+                    "            if (Object.keys(resultData).length == 0) {\n" +
+                    "// \"Normal\" return\n" +
                     "              document.location.href='result';\n" +
                     "            } else {\n" +
-                    "              nativePort.postMessage(json);\n" +
+                    "// \"Exceptional\" return with error or RBA\n" +
+                    "              nativePort.postMessage(resultData);\n" +
                     "            }\n" +
                     "          } else {\n" +
+                    "            setFail('Unexpected wallet return data');\n" +
                     "          }\n" +
                     "        }).catch (function (error) {\n" +
                     "          console.log('Request failed', error);\n" +
@@ -456,7 +463,7 @@ public class HTML implements MerchantProperties {
            temp_string.append(
                    "    port.addConnectionListener(function(initialize) {\n" +
                    "      if (initialize) {\n" +
-                   "        document.getElementById(\"state\").src = \"images/loading-gears-animation-3.gif\";\n" +
+                   "        document.getElementById('state').src = 'images/loading-gears-animation-3.gif';\n" +
                    "      } else {\n" +
                    "        if (initMode) console.debug('Wallet prematurely closed!');\n" +
                    "        nativePort = null;\n" +
@@ -483,7 +490,7 @@ public class HTML implements MerchantProperties {
        }
 
        temp_string.append(
-                    "window.addEventListener(\"beforeunload\", function(event) {\n" +
+                    "window.addEventListener('beforeunload', function(event) {\n" +
                     "  closeWallet();\n" +
                     "});\n\n");
         HTML.output(response, HTML.getHTML(temp_string.toString(),

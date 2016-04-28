@@ -155,7 +155,7 @@ public class Wallet {
 
     static final String BUTTON_OK              = "OK";
     static final String BUTTON_CANCEL          = "Cancel";
-    static final String BUTTON_SUBMIT          = "Submit";
+    static final String BUTTON_VALIDATE        = "Validate";
 
     static final int TIMEOUT_FOR_REQUEST       = 10000;
     
@@ -727,7 +727,7 @@ public class Wallet {
             GridBagConstraints c = new GridBagConstraints();
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
-            pane.add(getImageLabel("warning.png"), c);
+            pane.add(getImageLabel("information.png"), c);
             JLabel messageText = new JLabel(providerUserResonse.getText());
             messageText.setFont(standardFont);
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
@@ -744,7 +744,7 @@ public class Wallet {
                     challengeTextFields.put(challengeField.getId(), submitData);
                 }
             }
-            JButton okOrSubmitButton = hasSubmit ? new JButton(BUTTON_SUBMIT) : new JButtonSlave(BUTTON_OK, authorizationCancelButton);
+            JButton okOrSubmitButton = hasSubmit ? new JButton(BUTTON_VALIDATE) : new JButtonSlave(BUTTON_OK, authorizationCancelButton);
             okOrSubmitButton.setFont(standardFont);
             c.anchor = GridBagConstraints.CENTER;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);

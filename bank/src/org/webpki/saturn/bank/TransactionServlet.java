@@ -240,7 +240,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         if (!reserveOrBasicRequest.getMessage().isCardPayment() &&
             paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "You don't have this money!",
+                                               "<html>Your request for " + 
+            paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()) +
+                                               " appears to be<br>slightly out of your current capabilities...</html>",
                                                null);
         }
 
@@ -250,10 +252,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "<html>This transaction requires additional information to " +
-                                               "be performed.<br>Please enter your mother's maiden name and " +
-                                               "click on the designated button.<br>Since <i>this is a demo</i> " +
-                                               "the right answer is set to &quot;garbo&quot; :-)",
+                                               "<html>This transaction requires additional information to<br> " +
+                                               "be performed.  Please enter your <font color=\"blue\">mother's maiden<br>name</font> " +
+                                               "and click the validate button.<br>&nbsp;<br>Since <i>this is a demo</i>, " +
+                                               "answer <font color=\"red\">garbo</font>&nbsp; :-)",
                                                new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
                                                                                ChallengeField.TYPE.ALPHANUMERIC,
                                                                                20,

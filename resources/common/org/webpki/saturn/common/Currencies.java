@@ -44,6 +44,15 @@ public enum Currencies implements Serializable {
 
     public String amountToDisplayString(BigDecimal amount) throws IOException {
         String amountString = amount.setScale(decimals).toPlainString();
-        return symbolFirst ? symbol + amountString : amountString + symbol;
+        int dp = amountString.indexOf('.');
+        StringBuffer amountString2 = new StringBuffer();
+        for (int i = 0; i < dp; i++) {
+            amountString2.append(amountString.charAt(i));
+            if (i < dp - 1 && (dp - i - 1) % 3 == 0) {
+                amountString2.append(',');
+            }
+        }
+        amountString2.append(amountString.substring(dp));
+        return symbolFirst ? symbol + amountString2.toString() : amountString2.toString() + symbol;
     }
 }
