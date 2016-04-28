@@ -234,9 +234,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 if (debug) {
                     debugData.softReserveOrBasicError = true;
                 }
-                ProviderUserResponse userMessageResponse = new ProviderUserResponse(resultMessage);
+                // Parse for syntax only
+                new ProviderUserResponse(resultMessage);
                 returnJsonData(response,
-                               userMessageResponse.getRoot().serializeJSONObject(JSONOutputFormats.NORMALIZED));
+                               resultMessage.serializeJSONObject(JSONOutputFormats.NORMALIZED));
                 return;
             }
         

@@ -35,7 +35,7 @@ public class TransactionResponse implements BaseProperties {
         transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
-            encryptedCardData = EncryptedData.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON));
+            encryptedCardData = EncryptedData.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON), false);
         } else {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }

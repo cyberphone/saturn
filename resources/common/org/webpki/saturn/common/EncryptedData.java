@@ -73,27 +73,40 @@ public class EncryptedData {
         return keyEncryptionAlgorithm.contains("RSA");
     }
     
-    public static EncryptedData parse(JSONObjectReader rd) throws IOException {
-        return new EncryptedData(rd);
+    public static EncryptedData parse(JSONObjectReader rd, boolean sharedSecret) throws IOException {
+        return new EncryptedData(rd, sharedSecret);
     }
 
-    private EncryptedData(JSONObjectReader encryptionObject) throws IOException {
+    private EncryptedData(JSONObjectReader encryptionObject, boolean sharedSecret) throws IOException {
         JSONObjectReader rd = encryptionObject.getObject(ENCRYPTED_DATA_JSON);
         dataEncryptionAlgorithm = rd.getString(JSONSignatureDecoder.ALGORITHM_JSON);
         iv = rd.getBinary(IV_JSON);
         tag = rd.getBinary(TAG_JSON);
-        JSONObjectReader encryptedKey = rd.getObject(ENCRYPTED_KEY_JSON);
-        authenticatedData = encryptedKey.serializeJSONObject(JSONOutputFormats.NORMALIZED);
-        keyEncryptionAlgorithm = encryptedKey.getString(JSONSignatureDecoder.ALGORITHM_JSON);
-        if (isRsaKey(keyEncryptionAlgorithm)) {
-            publicKey = encryptedKey.getPublicKey(AlgorithmPreferences.JOSE);
-            encryptedKeyData = encryptedKey.getBinary(CIPHER_TEXT_JSON);
+        if (sharedSecret) {
+            authenticatedData = dataEncryptionAlgorithm.getBytes("UTF-8");
         } else {
-            publicKey = encryptedKey.getObject(STATIC_KEY_JSON).getPublicKey(AlgorithmPreferences.JOSE);
-            ephemeralPublicKey = 
-                (ECPublicKey) encryptedKey.getObject(EPHEMERAL_KEY_JSON).getPublicKey(AlgorithmPreferences.JOSE);
+            JSONObjectReader encryptedKey = rd.getObject(ENCRYPTED_KEY_JSON);
+            authenticatedData = encryptedKey.serializeJSONObject(JSONOutputFormats.NORMALIZED);
+            keyEncryptionAlgorithm = encryptedKey.getString(JSONSignatureDecoder.ALGORITHM_JSON);
+            if (isRsaKey(keyEncryptionAlgorithm)) {
+                publicKey = encryptedKey.getPublicKey(AlgorithmPreferences.JOSE);
+                encryptedKeyData = encryptedKey.getBinary(CIPHER_TEXT_JSON);
+            } else {
+                publicKey = encryptedKey.getObject(STATIC_KEY_JSON).getPublicKey(AlgorithmPreferences.JOSE);
+                ephemeralPublicKey = 
+                    (ECPublicKey) encryptedKey.getObject(EPHEMERAL_KEY_JSON).getPublicKey(AlgorithmPreferences.JOSE);
+            }
         }
         encryptedData = rd.getBinary(CIPHER_TEXT_JSON);
+    }
+
+    public JSONObjectReader getDecryptedData(byte[] dataDecryptionKey) throws IOException, GeneralSecurityException {
+        return JSONParser.parse(Encryption.contentDecryption(dataEncryptionAlgorithm,
+                                                             dataDecryptionKey,
+                                                             encryptedData,
+                                                             iv,
+                                                             authenticatedData,
+                                                             tag));
     }
 
     public JSONObjectReader getDecryptedData(Vector<DecryptionKeyHolder> decryptionKeys)
@@ -103,21 +116,15 @@ public class EncryptedData {
             if (decryptionKey.publicKey.equals(publicKey)) {
                 notFound = false;
                 if (decryptionKey.keyEncryptionAlgorithm.equals(keyEncryptionAlgorithm)) {
-                    return JSONParser.parse(
-                        Encryption.contentDecryption(dataEncryptionAlgorithm,
-                                                     isRsaKey(keyEncryptionAlgorithm) ?
-                                 Encryption.rsaDecryptKey(keyEncryptionAlgorithm,
-                                                          encryptedKeyData,
-                                                          decryptionKey.privateKey)
-                                                     :
-                                 Encryption.receiverKeyAgreement(keyEncryptionAlgorithm,
-                                                                 dataEncryptionAlgorithm,
-                                                                 ephemeralPublicKey,
-                                                                 decryptionKey.privateKey),
-                                                     encryptedData,
-                                                     iv,
-                                                     authenticatedData,
-                                                     tag));
+                    return getDecryptedData(isRsaKey(keyEncryptionAlgorithm) ?
+                         Encryption.rsaDecryptKey(keyEncryptionAlgorithm,
+                                                  encryptedKeyData,
+                                                  decryptionKey.privateKey)
+                                             :
+                         Encryption.receiverKeyAgreement(keyEncryptionAlgorithm,
+                                                         dataEncryptionAlgorithm,
+                                                         ephemeralPublicKey,
+                                                         decryptionKey.privateKey));
                 }
             }
         }
@@ -129,9 +136,7 @@ public class EncryptedData {
                                           PublicKey keyEncryptionKey,
                                           String keyEncryptionAlgorithm)
     throws IOException, GeneralSecurityException {
-        JSONObjectWriter encryptionObject = new JSONObjectWriter();
-        JSONObjectWriter encryptedData = encryptionObject.setObject(ENCRYPTED_DATA_JSON);
-        JSONObjectWriter encryptedKey = encryptedData.setObject(ENCRYPTED_KEY_JSON)
+        JSONObjectWriter encryptedKey = new JSONObjectWriter()
             .setString(JSONSignatureDecoder.ALGORITHM_JSON, keyEncryptionAlgorithm);
         byte[] dataEncryptionKey = null;
         if (EncryptedData.isRsaKey(keyEncryptionAlgorithm)) {
@@ -152,15 +157,43 @@ public class EncryptedData {
             encryptedKey.setObject(EPHEMERAL_KEY_JSON)
                 .setPublicKey(result.getEphemeralKey(), AlgorithmPreferences.JOSE);
         }
+        return encode(unencryptedData,
+                      dataEncryptionAlgorithm,
+                      dataEncryptionKey,
+                      encryptedKey);
+    }
+
+    public static JSONObjectWriter encode(JSONObjectWriter unencryptedData,
+                                          String dataEncryptionAlgorithm,
+                                          byte[] dataEncryptionKey)
+    throws IOException, GeneralSecurityException {
+        return encode(unencryptedData, dataEncryptionAlgorithm, dataEncryptionKey, null);
+    }
+    
+
+    private static JSONObjectWriter encode(JSONObjectWriter unencryptedData,
+                                           String dataEncryptionAlgorithm,
+                                           byte[] dataEncryptionKey,
+                                           JSONObjectWriter encryptedKey)
+    throws IOException, GeneralSecurityException {
+        JSONObjectWriter encryptionObject = new JSONObjectWriter();
+        JSONObjectWriter encryptedData = encryptionObject.setObject(ENCRYPTED_DATA_JSON);
+        byte[] authenticatedData = null;
+        if (encryptedKey == null) {
+            authenticatedData = dataEncryptionAlgorithm.getBytes("UTF-8");
+        } else {
+            encryptedData.setObject(ENCRYPTED_KEY_JSON, encryptedKey);
+            authenticatedData = encryptedKey.serializeJSONObject(JSONOutputFormats.NORMALIZED);
+        }
         Encryption.AuthEncResult result =
             Encryption.contentEncryption(dataEncryptionAlgorithm,
                                          dataEncryptionKey,
                                          unencryptedData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
-                                         encryptedKey.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+                                         authenticatedData);
         encryptedData.setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm)
-                     .setBinary(IV_JSON, result.getIv())
-                     .setBinary(TAG_JSON, result.getTag())
-                     .setBinary(CIPHER_TEXT_JSON, result.getCipherText());
+            .setBinary(IV_JSON, result.getIv())
+            .setBinary(TAG_JSON, result.getTag())
+            .setBinary(CIPHER_TEXT_JSON, result.getCipherText());
         return encryptionObject;
     }
 }

@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
@@ -28,11 +30,44 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 public class ProviderUserResponse implements BaseProperties {
-    
+
+    public class PrivateMessage {
+        
+        private PrivateMessage() {}
+
+        GregorianCalendar dateTime;
+
+        String commonName;
+        public String getCommonName() {
+            return commonName;
+        }
+
+        String text;
+        public String getText() {
+            return text;
+        }
+
+        ChallengeField[] optionalChallengeFields;
+        public ChallengeField[] getOptionalChallengeFields() {
+            return optionalChallengeFields;
+        }
+    }
+
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, root = rd);
-        commonName = rd.getString(COMMON_NAME_JSON);
-        text = rd.getString(TEXT_JSON);
+        Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, rd);
+        encryptedData = EncryptedData.parse(rd.getObject(PRIVATE_MESSAGE_JSON), true);
+        rd.checkForUnread();
+    }
+
+    EncryptedData encryptedData;
+    
+    public PrivateMessage getPrivateMessage(byte[] dataEncryptionKey,
+                                            String dataEncryptionAlgorithm)
+    throws IOException, GeneralSecurityException {
+        PrivateMessage privateMessage = new PrivateMessage();
+        JSONObjectReader rd = encryptedData.getDecryptedData(dataEncryptionKey); 
+        privateMessage.commonName = rd.getString(COMMON_NAME_JSON);
+        privateMessage.text = rd.getString(TEXT_JSON);
         if (rd.hasProperty(CHALLENGE_FIELDS_JSON)) {
             LinkedHashMap<String,ChallengeField> fields = new LinkedHashMap<String,ChallengeField>();
             JSONArrayReader ar = rd.getArray(CHALLENGE_FIELDS_JSON);
@@ -42,38 +77,19 @@ public class ProviderUserResponse implements BaseProperties {
                     throw new IOException("Duplicate: " + challengeField.getId());
                 }
             } while (ar.hasMore());
-            optionalChallengeFields = fields.values().toArray(new ChallengeField[0]);
+             privateMessage.optionalChallengeFields = fields.values().toArray(new ChallengeField[0]);
         }
-        dateTime = rd.getDateTime(TIME_STAMP_JSON);
+        privateMessage.dateTime = rd.getDateTime(TIME_STAMP_JSON);
         rd.checkForUnread();
-    }
-
-    GregorianCalendar dateTime;
-
-    JSONObjectReader root;
-    public JSONObjectReader getRoot() {
-        return root;
-    }
-
-    String commonName;
-    public String getCommonName() {
-        return commonName;
-    }
-
-    String text;
-    public String getText() {
-        return text;
-    }
-
-    ChallengeField[] optionalChallengeFields;
-    public ChallengeField[] getOptionalChallengeFields() {
-        return optionalChallengeFields;
+        return privateMessage;
     }
 
     public static JSONObjectWriter encode(String commonName,
                                           String text,
-                                          ChallengeField[] optionalChallengeFields) throws IOException {
-        JSONObjectWriter wr = Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
+                                          ChallengeField[] optionalChallengeFields,
+                                          byte[] dataEncryptionKey,
+                                          String dataEncryptionAlgorithm) throws IOException, GeneralSecurityException {
+        JSONObjectWriter wr = new JSONObjectWriter()
             .setString(COMMON_NAME_JSON, commonName)
             .setString(TEXT_JSON, text);
         if (optionalChallengeFields != null && optionalChallengeFields.length > 0) {
@@ -82,6 +98,8 @@ public class ProviderUserResponse implements BaseProperties {
                 aw.setObject(challengeField.writeObject());
             }
         }
-        return wr.setDateTime(TIME_STAMP_JSON, new Date(), true);
+        wr.setDateTime(TIME_STAMP_JSON, new Date(), true);
+        return Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
+            .setObject(PRIVATE_MESSAGE_JSON, EncryptedData.encode(wr, dataEncryptionAlgorithm, dataEncryptionKey));
      }
 }

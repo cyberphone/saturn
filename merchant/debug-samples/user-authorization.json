@@ -1,14 +1,18 @@
 {
   "requestHash": {
     "algorithm": "S256",
-    "value": "Rwf6Le39NkfowF6tCW_Fqv9L55lprWQ73-BYRfbJANg"
+    "value": "eYqbGYkHfAsOUTJiuqfU98Rou_mfn0etWUkvDVOF_Fw"
   },
-  "domainName": "merchant.com",
+  "domainName": "localhost",
   "account": {
     "type": "https://bankdirect.net",
     "id": "8645-7800239403"
   },
-  "timeStamp": "2016-02-17T22:25:59+01:00",
+  "encryptionParameters": {
+    "algorithm": "A128CBC-HS256",
+    "value": "Ivq5sSrtNNpOvN9t9_pRCfc6dqT3IuVg6H2h9NlHULs"
+  },
+  "timeStamp": "2016-04-28T20:37:18+02:00",
   "software": {
     "name": "WebPKI.org - Wallet",
     "version": "1.00"
@@ -18,9 +22,9 @@
     "publicKey": {
       "type": "EC",
       "curve": "P-256",
-      "x": "vlYxD4dtFJOp1_8_QUcieWCW-4KrLMmFL2rpkY1bQDs",
-      "y": "fxEF70yJenP3SPHM9hv-EnvhG6nXr3_S-fDqoj-F6yM"
+      "x": "rQ4WXMB6_wQKHSiY_mbJ4QkGpfWLssF7hvIiiFpDEx8",
+      "y": "Fh2rl0LGTtvaomOuhuRNo9Drz9o0--WXV2ITvdVQFRY"
     },
-    "value": "_WJzczYHeW4XqffSh_YjTIIYPR6LwC8DcnfyPZEk2BJ8iL7W4n2AqyiJbe3ateXNtWkjEpkRgQnvpmpnLYf40g"
+    "value": "ef3Uc03sYRLpU2uLo5CBdaTVc6XmE2390wj3R4KtDLzTZGnr9Sfz2sx0EXuUvosZ7gDzR0AGHUieHS4a5PbdXQ"
   }
 }

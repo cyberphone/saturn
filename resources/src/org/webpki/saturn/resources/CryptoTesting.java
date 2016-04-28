@@ -175,6 +175,14 @@ public class CryptoTesting {
         if (!ArrayUtil.compare(p, pout)) {
             throw new IOException ("pout 2");
         }
+        byte[] dataEncryptionKey = Encryption.generateDataEncryptionKey(Encryption.JOSE_A128CBC_HS256_ALG_ID);
+        JSONObjectReader json = JSONParser.parse(aliceKey);
+        String encrec = EncryptedData.encode(new JSONObjectWriter(json),
+                                             Encryption.JOSE_A128CBC_HS256_ALG_ID,
+                                             dataEncryptionKey).toString();
+        if (!EncryptedData.parse(JSONParser.parse(encrec), true).getDecryptedData(dataEncryptionKey).toString().equals(json.toString())) {
+            throw new IOException("Symmetric");
+        }
         System.out.println("ECDH begin");
         KeyPair bob = getKeyPair(bobKey);
         KeyPair alice = getKeyPair(aliceKey);
@@ -208,14 +216,14 @@ public class CryptoTesting {
                                               Encryption.JOSE_A128CBC_HS256_ALG_ID,
                                               bob.getPublic(),
                                               Encryption.JOSE_ECDH_ES_ALG_ID).toString();
-        if (!unEncJson.toString().equals(EncryptedData.parse(JSONParser.parse(encJson)).getDecryptedData(decryptionKeys).toString())) {
+        if (!unEncJson.toString().equals(EncryptedData.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys).toString())) {
             throw new IOException("Bad JOSE ECDH");
         }
         encJson = EncryptedData.encode(new JSONObjectWriter(unEncJson),
                                        Encryption.JOSE_A128CBC_HS256_ALG_ID,
                                        malletKeys.getPublic(),
                                        Encryption.JOSE_RSA_OAEP_256_ALG_ID).toString();
-        if (!unEncJson.toString().equals(EncryptedData.parse(JSONParser.parse(encJson)).getDecryptedData(decryptionKeys).toString())) {
+        if (!unEncJson.toString().equals(EncryptedData.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys).toString())) {
             throw new IOException("Bad JOSE ECDH");
         }
         KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH", "BC");

@@ -28,7 +28,7 @@ public class PayerAuthorization implements BaseProperties {
     
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.PAYER_AUTHORIZATION, rd);
-        EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON));
+        EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON), false);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));

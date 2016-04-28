@@ -243,7 +243,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                                "<html>Your request for " + 
             paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()) +
                                                " appears to be<br>slightly out of your current capabilities...</html>",
-                                               null);
+                                               null,
+                                               authorizationData.getDataEncryptionKey(),
+                                               authorizationData.getDataEncryptionAlgorithm());
         }
 
         // RBA v0.001...
@@ -257,9 +259,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                                "and click the validate button.<br>&nbsp;<br>Since <i>this is a demo</i>, " +
                                                "answer <font color=\"red\">garbo</font>&nbsp; :-)",
                                                new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
-                                                                               ChallengeField.TYPE.ALPHANUMERIC,
-                                                                               20,
-                                                                               null)});
+                                                                        ChallengeField.TYPE.ALPHANUMERIC,
+                                                                    20,
+                                                                    null)},
+                                               authorizationData.getDataEncryptionKey(),
+                                               authorizationData.getDataEncryptionAlgorithm());
         }
 
         // Separate credit-card and account2account payments
@@ -351,6 +355,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // Decode response
         JSONObjectReader response = postData(urlHolder, transactionRequest);
         if (response.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.PROVIDER_USER_RESPONSE.toString())) {
+            // Parse for syntax only
+            new ProviderUserResponse(response);
             return new JSONObjectWriter(response);
         }
 

@@ -186,6 +186,8 @@ public class Wallet {
 
     static LinkedHashMap<Integer,Account> cardCollection = new LinkedHashMap<Integer,Account>();
 
+    static byte[] dataEncryptionKey;
+
     static class ScalingIcon extends ImageIcon {
  
         private static final long serialVersionUID = 1L;
@@ -717,10 +719,10 @@ public class Wallet {
             dialog.setVisible(true);
         }
 
-        void showProviderDialog (ProviderUserResponse providerUserResonse) {
+        void showProviderDialog (ProviderUserResponse.PrivateMessage privateMessage) {
             final LinkedHashMap<String,JTextField> challengeTextFields = new LinkedHashMap<String,JTextField>();
             final JDialog dialog =
-                new JDialog(frame, "Message from: " + providerUserResonse.getCommonName(), true);
+                new JDialog(frame, "Message from: " + privateMessage.getCommonName(), true);
             Container pane = dialog.getContentPane();
             pane.setLayout(new GridBagLayout());
             pane.setBackground(Color.WHITE);
@@ -728,15 +730,15 @@ public class Wallet {
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
             pane.add(getImageLabel("information.png"), c);
-            JLabel messageText = new JLabel(providerUserResonse.getText());
+            JLabel messageText = new JLabel(privateMessage.getText());
             messageText.setFont(standardFont);
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
             c.gridy = 1;
             pane.add(messageText, c);
-            final boolean hasSubmit = providerUserResonse.getOptionalChallengeFields() != null;
+            final boolean hasSubmit = privateMessage.getOptionalChallengeFields() != null;
             if (hasSubmit) {
                 c.insets = new Insets(fontSize, fontSize * 2, 0, fontSize * 2);
-                for (ChallengeField challengeField : providerUserResonse.getOptionalChallengeFields()) {
+                for (ChallengeField challengeField : privateMessage.getOptionalChallengeFields()) {
                     c.gridy++;
                     JPasswordField submitData = new JPasswordField(challengeField.getLength());
                     submitData.setFont(standardFont);
@@ -940,7 +942,9 @@ public class Wallet {
                                                                      optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
-                            showProviderDialog(new ProviderUserResponse(optionalMessage));
+                            showProviderDialog(new ProviderUserResponse(optionalMessage)
+                                                   .getPrivateMessage(dataEncryptionKey,
+                                                                      Encryption.JOSE_A128CBC_HS256_ALG_ID));
                         } else {
                             terminatingError(new WalletAlertMessage(optionalMessage).getText());
                         }
@@ -1015,6 +1019,8 @@ public class Wallet {
                         paymentRequest,
                         domainName,
                         selectedCard.accountDescriptor,
+                        dataEncryptionKey,
+                        Encryption.JOSE_A128CBC_HS256_ALG_ID,
                         challengeResults,
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
@@ -1181,6 +1187,7 @@ public class Wallet {
         // it more look like a Web application.  Note that this measurement
         // lacks the 'px' part; you have to add it in the Web application.
         try {
+            dataEncryptionKey = Encryption.generateDataEncryptionKey(Encryption.JOSE_A128CBC_HS256_ALG_ID);
             JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.WALLET_IS_READY);
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)

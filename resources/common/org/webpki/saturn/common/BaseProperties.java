@@ -30,6 +30,7 @@ public interface BaseProperties {
     String CHALLENGE_FIELDS_JSON             = "challengeFields";       // ProviderUserResponse
     String LABEL_JSON                        = "label";                 // ProviderUserResponse
     String LENGTH_JSON                       = "length";                // ProviderUserResponse
+    String PRIVATE_MESSAGE_JSON              = "privateMessage";        // ProviderUserResponse
 
     String CHALLENGE_RESULTS_JSON            = "challengeResults";      // Result of ProviderUserResponse 
 
