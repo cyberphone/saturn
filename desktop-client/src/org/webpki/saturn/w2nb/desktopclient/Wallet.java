@@ -730,7 +730,9 @@ public class Wallet {
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
             pane.add(getImageLabel("information.png"), c);
-            JLabel messageText = new JLabel(privateMessage.getText());
+            JLabel messageText = new JLabel("<html>" + privateMessage.getText()
+                    .replace("${width}", String.valueOf(fontSize * 20))
+                    .replace("${submit}", "validate") + "</html>");
             messageText.setFont(standardFont);
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
             c.gridy = 1;
@@ -942,9 +944,10 @@ public class Wallet {
                                                                      optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
-                            showProviderDialog(new ProviderUserResponse(optionalMessage)
-                                                   .getPrivateMessage(dataEncryptionKey,
-                                                                      Encryption.JOSE_A128CBC_HS256_ALG_ID));
+                            ProviderUserResponse.PrivateMessage privateMessage = new ProviderUserResponse(optionalMessage)
+                                .getPrivateMessage(dataEncryptionKey, Encryption.JOSE_A128CBC_HS256_ALG_ID);
+                            logger.info("Decrypted private message:\n" + privateMessage.getRoot());
+                            showProviderDialog(privateMessage);
                         } else {
                             terminatingError(new WalletAlertMessage(optionalMessage).getText());
                         }

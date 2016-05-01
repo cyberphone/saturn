@@ -240,9 +240,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         if (!reserveOrBasicRequest.getMessage().isCardPayment() &&
             paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "<html>Your request for " + 
+                                               "<div style=\"width:${width}px\">Your request for " + 
             paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()) +
-                                               " appears to be<br>slightly out of your current capabilities...</html>",
+                                               " appears to be slightly out of your current capabilities...</div>",
                                                null,
                                                authorizationData.getDataEncryptionKey(),
                                                authorizationData.getDataEncryptionAlgorithm());
@@ -254,10 +254,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "<html>This transaction requires additional information to<br> " +
-                                               "be performed.  Please enter your <font color=\"blue\">mother's maiden<br>name</font> " +
-                                               "and click the validate button.<br>&nbsp;<br>Since <i>this is a demo</i>, " +
-                                               "answer <font color=\"red\">garbo</font>&nbsp; :-)",
+                                               "<div style=\"width:${width}px\">This transaction requires additional information to " +
+                                               "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span> " +
+                                               "and click the ${submit} button.<br>&nbsp;<br>" +
+                                               "Since <i>this is a demo</i>, " +
+                                               "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</div>",
                                                new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
                                                                         ChallengeField.TYPE.ALPHANUMERIC,
                                                                     20,
