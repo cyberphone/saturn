@@ -79,6 +79,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static final String[] CREDENTIALS         = {"paycred1", "paycred2", "paycred3"};
     
+    static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
+
     static KeyStoreEnumerator keyManagemenentKey;
     
     static String keygen2EnrollmentUrl;
@@ -155,7 +157,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
         try {
-            CustomCryptoProvider.forcedLoad (false);
+            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Logotype

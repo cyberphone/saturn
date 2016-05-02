@@ -78,6 +78,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static final String SERVER_PORT_MAP       = "server_port_map";
     
+    static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
+
     static final String LOGGING               = "logging";
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
@@ -132,7 +134,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
          try {
-            CustomCryptoProvider.forcedLoad (false);
+             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);

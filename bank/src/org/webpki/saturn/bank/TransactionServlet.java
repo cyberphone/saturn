@@ -237,8 +237,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         ////////////////////////////////////////////////////////////////////////////
 
         // Sorry but you don't appear to have a million bucks :-)
-        if (!reserveOrBasicRequest.getMessage().isCardPayment() &&
-            paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
+        if (paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
                                                "<div style=\"width:${width}px\">Your request for " + 
             paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()) +
@@ -249,8 +248,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         }
 
         // RBA v0.001...
-        if (!reserveOrBasicRequest.getMessage().isCardPayment() &&
-            paymentRequest.getAmount().compareTo(new BigDecimal("100000.00")) >= 0 &&
+        if (paymentRequest.getAmount().compareTo(new BigDecimal("100000.00")) >= 0 &&
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,

@@ -64,6 +64,12 @@
         <param-value>@keyprov-kmk@</param-value>
     </context-param>
 
+    <context-param>
+        <description>Loading of Bouncycastle (EJBCA or Tomcat)</description>
+        <param-name>bouncycastle_first</param-name>
+        <param-value>@bouncycastle-first@</param-value>
+    </context-param>
+
     <listener>
         <listener-class>org.webpki.saturn.keyprovider.KeyProviderService</listener-class>
     </listener>

@@ -367,6 +367,14 @@ public class Wallet {
                 card.accountDescriptor.getAccountId();
         }
 
+        String processExternalHtml(String simpleHtml) {
+            return "<html>" +
+                   simpleHtml
+                       .replace("${width}", String.valueOf(fontSize * 20))
+                       .replace("${submit}", "validate") + 
+                   "</html>";
+        }
+
         JPanel initCardSelectionViewCore(LinkedHashMap<Integer,Account> cards) {
             JPanel cardSelectionViewCore = new JPanel();
             cardSelectionViewCore.setBackground(Color.WHITE);
@@ -730,9 +738,7 @@ public class Wallet {
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
             pane.add(getImageLabel("information.png"), c);
-            JLabel messageText = new JLabel("<html>" + privateMessage.getText()
-                    .replace("${width}", String.valueOf(fontSize * 20))
-                    .replace("${submit}", "validate") + "</html>");
+            JLabel messageText = new JLabel(processExternalHtml(privateMessage.getText()));
             messageText.setFont(standardFont);
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
             c.gridy = 1;
@@ -949,7 +955,7 @@ public class Wallet {
                             logger.info("Decrypted private message:\n" + privateMessage.getRoot());
                             showProviderDialog(privateMessage);
                         } else {
-                            terminatingError(new WalletAlertMessage(optionalMessage).getText());
+                            terminatingError(processExternalHtml(new WalletAlertMessage(optionalMessage).getText()));
                         }
                     } catch (Exception e) {
                         terminatingError(e.getMessage());

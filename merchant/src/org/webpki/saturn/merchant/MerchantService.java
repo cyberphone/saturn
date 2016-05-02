@@ -78,6 +78,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String BANKDIRECT_AUTH_SAMPLE       = "wallet-bankdirect-auth.png";
 
+    static final String BOUNCYCASTLE_FIRST           = "bouncycastle_first";
+    
     static final String LOGGING                      = "logging";
 
     static JSONX509Verifier paymentRoot;
@@ -142,7 +144,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
         try {
-            CustomCryptoProvider.forcedLoad (false);
+            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);

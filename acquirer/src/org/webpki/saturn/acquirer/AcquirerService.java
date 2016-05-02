@@ -69,6 +69,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
 
+    static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
+
     static final String LOGGING               = "logging";
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
@@ -115,7 +117,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
          try {
-            CustomCryptoProvider.forcedLoad (false);
+             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));;
 
             acquirerKey = new ServerX509Signer(new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD)));

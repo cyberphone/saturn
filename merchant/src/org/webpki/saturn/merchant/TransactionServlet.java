@@ -277,8 +277,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
             logger.log(Level.SEVERE, message, e);
-            JSONObjectWriter userError = WalletAlertMessage.encode("<html>A technical error occurred.<br>" +
-                                                                   "Please try again or contact support.</html>");
+            JSONObjectWriter userError = WalletAlertMessage.encode("A technical error occurred.<br>" +
+                                                                   "Please try again or contact support.");
             returnJsonData(response, userError.serializeJSONObject(JSONOutputFormats.NORMALIZED));
         }
     }

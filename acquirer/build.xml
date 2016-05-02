@@ -44,6 +44,7 @@
     <property name="logging" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
+    <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
        tablength="4"
@@ -72,6 +73,7 @@
       <replacefilter token="@acquirer-host@" value="${acquirer.host}"/>
 	  <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
+      <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
       <replacefilter token="@logging@" value="${logging}"/>
 	</replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
@@ -140,6 +142,7 @@
       <condition property="logging" value="true" else="false">
         <isset property="plugin.ejbca.ant.custom.logging"/>
      </condition>
+     <property name="bouncycastle.first" value="false"/>
      <property name="acquirer.host" value="https://mobilepki.org/webpay-acquirer"/>
      <property file="common.properties"/>
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
