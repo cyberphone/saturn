@@ -29,8 +29,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.saturn.common.BaseProperties;
-
 import org.webpki.webutil.ServletUtil;
 
 import net.glxn.qrgen.QRCode;
@@ -38,7 +36,7 @@ import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
 
 
-public class QRDisplayServlet extends HttpServlet implements BaseProperties, MerchantProperties {
+public class QRDisplayServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
     
@@ -77,10 +75,18 @@ public class QRDisplayServlet extends HttpServlet implements BaseProperties, Mer
             ErrorServlet.sessionTimeout(response);
             return;
         }
+        SavedShoppingCart savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+        if (savedShoppingCart == null) {
+            ErrorServlet.systemFail(response, "Missing shopping cart");
+            return;
+        }
+        session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
+
         String id = QRSessions.createSession();
         session.setAttribute(QR_SESSION_ID_ATTR, id);
         response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
         HTML.printQRCode(response,
+                         savedShoppingCart,
                          QRCode.from("webpki.org="
                                 + URLEncoder.encode(
                                         MerchantService.merchantBaseUrl
