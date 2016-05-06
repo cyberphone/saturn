@@ -16,19 +16,24 @@
  */
 package org.webpki.saturn.merchant;
 
-public interface MerchantProperties {
+class Synchronizer {
+    boolean touched;
 
-    public String REQUEST_HASH_SESSION_ATTR     = "REQHASH";
-    public String REQUEST_REFID_SESSION_ATTR    = "REQREFID";
-    public String DEBUG_DATA_SESSION_ATTR       = "DBGDATA";
-    public String SHOPPING_CART_SESSION_ATTR    = "SHOPCART";
-    public String RESULT_DATA_SESSION_ATTR      = "RESDAT";
-    public String QR_SESSION_ID_ATTR            = "QRSESS";
+    synchronized boolean perform(long cometWait) {
+        boolean timeout_flag = false;
+        while (!touched && !timeout_flag) {
+            try {
+                wait(cometWait);
+            } catch (InterruptedException e) {
+                return false;
+            }
+            timeout_flag = true;
+        }
+        return touched;
+    }
 
-    public String RESERVE_MODE_SESSION_ATTR     = "rsrvmd";
-    public String DEBUG_MODE_SESSION_ATTR       = "debug";
-    public String TAP_CONNECT_MODE_SESSION_ATTR = "tapcon";
-    
-    public String SHOPPING_CART_FORM_ATTR       = "shopcart";
-
+    synchronized void haveData4You() {
+        touched = true;
+        notify();
+    }
 }

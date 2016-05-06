@@ -22,6 +22,7 @@ import java.math.BigDecimal;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
@@ -556,7 +557,8 @@ public class HTML implements MerchantProperties {
             .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
                     "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:"
                 + FONT_ARIAL + "\">Select Payment Method</td></tr>" +
-                    "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"document.forms.shoot.submit()\"></td></tr>" +
+                    "<tr><td style=\"padding-bottom:10pt\"><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"document.forms.shoot.submit()\"></td></tr>" +
+                    "<tr><td><img title=\"Saturn QR\" style=\"cursor:pointer\" src=\"images/paywith-saturnqr.png\" onclick=\"document.location.href='qrdisplay'\"></td></tr>" +
                     "<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod()\"></td></tr>" +
                     "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod()\"></td></tr>" +
                     "<tr><td style=\"text-align:center;padding:15pt\"><input class=\"stdbtn\" type=\"button\" value=\"Return to shop..\" title=\"Changed your mind?\" onclick=\"document.forms.restore.submit()\"></td></tr>" +
@@ -579,4 +581,47 @@ public class HTML implements MerchantProperties {
                 FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">This demo only supports Saturn!</div",
                 s.toString()));
     }
-}
+
+    public static void printQRCode(HttpServletResponse response,
+                                   byte[] qrImage,
+                                   String cometRelativeUrl,
+                                   String id) throws IOException, ServletException {
+      HTML.output(response, HTML.getHTML(
+
+              "function startComet() {\n" +
+              "  fetch('" + cometRelativeUrl + "', {\n" +
+              "     headers: {\n" +
+              "       'Content-Type': 'text/plain'\n" +
+              "     },\n" +
+              "     method: 'POST',\n" +
+              "     body: '" + id + "'\n" +
+              "  }).then(function (response) {\n" +
+              "    return response.text();\n" +
+              "  }).then(function (resultData) {\n" +
+              "    console.log('Response', resultData);\n" +
+              "    switch (resultData) {\n" +
+              "      case '" + QRDisplayServlet.QR_CONTINUE + "':\n" +
+              "        startComet();\n" +
+              "        break;\n" +
+              "      case '" + QRDisplayServlet.QR_RETURN_TO_SHOP + "':\n" +
+              "        document.forms.restore.submit();\n" +
+              "        break;\n" +
+              "      default:\n" +
+              "        document.location.href = 'result';\n" +
+              "    }\n" +
+              "  }).catch (function (error) {\n" +
+              "    console.log('Request failed', error);\n" +
+              "  });\n" +                           
+              "}\n",
+
+              "onload=\"startComet()\"",
+
+          "<form name=\"restore\" method=\"POST\" action=\"shop\"></form>" +
+          "<tr><td width=\"100%\" align=\"center\" valign=\"middle\" id=\"progress\"><table cellpadding=\"5\" cellspacing=\"0\">" +
+          "<tr><td align=\"left\">Now use the QR ID&trade; <a href=\"javascript:alert ('You get it automatically when you install the &quot;WebPKI&nbsp;Suite&quot;, just look for the icon!')\"><img border=\"1\" src=\"images/qr_launcher.png\"></a> application to retrieve the Web address<br>" +
+          "that starts the Wallet application in the mobile device</span></td></tr>" +
+          "<tr><td align=\"center\"><img src=\"data:image/png;base64," + new Base64 (false).getBase64StringFromBinary (qrImage) + "\"></td></tr>" +
+          "<tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr>" +
+          "</table></td></tr>"));
+    }
+ }

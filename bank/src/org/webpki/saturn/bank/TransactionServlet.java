@@ -165,20 +165,31 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         String remoteAddress;
         String contextPath;
         String callerAddress;
+        HttpServletRequest request;
         
-        UrlHolder(String remoteAddress, String contextPath) {
-            this.remoteAddress = remoteAddress;
-            this.contextPath = contextPath;
+        UrlHolder(HttpServletRequest request) {
+            this.remoteAddress = request.getRemoteAddr();
+            this.contextPath = request.getContextPath();
             callerAddress = " [Origin=" + remoteAddress + ", Context=" + contextPath + "] ";
+            this.request = request;
         }
 
         private String url;
 
-        public String getUrl() {
+        String getUrl() {
             return url;
         }
 
-        public void setUrl(String url) {
+        void localSystemWalletUrlFix() throws IOException {
+            if (request.getServerName().equals("localhost")) {
+                url = new URL(request.isSecure() ? "https": "http",
+                              "localhost", 
+                              request.getServerPort(),
+                              new URL(url).getFile()).toExternalForm();
+            }
+        }
+
+        void setUrl(String url) {
             this.url = url;
         }
     }
@@ -346,11 +357,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                                               new String[]{"enterprise"})};
      
         urlHolder.setUrl(providerAuthority.getTransactionUrl());
+
+        // Ugly patch allowing the wallet to work with a local system as well
+        urlHolder.localSystemWalletUrlFix();
+
+        // Customer bank: Can we please do a payment now?
         JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
                                                                         accounts,
                                                                         getReferenceId(),
                                                                         BankService.bankKey);
-       
+
         // Decode response
         JSONObjectReader response = postData(urlHolder, transactionRequest);
         if (response.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.PROVIDER_USER_RESPONSE.toString())) {
@@ -418,7 +434,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = null;
         try {
-            urlHolder = new UrlHolder(request.getRemoteAddr(), request.getContextPath());
+            urlHolder = new UrlHolder(request);
             String contentType = request.getContentType();
             if (!contentType.equals(JSON_CONTENT_TYPE)) {
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);

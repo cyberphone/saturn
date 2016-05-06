@@ -125,18 +125,18 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             return inUrl;
         }
         String autoHost = null;
-        Enumeration<NetworkInterface> network_interfaces = NetworkInterface.getNetworkInterfaces();
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
         int foundAddresses = 0;
-        while (network_interfaces.hasMoreElements()) {
-            NetworkInterface network_interface = network_interfaces.nextElement();
-            if (network_interface.isUp() && !network_interface.isVirtual() && !network_interface.isLoopback() &&
-                network_interface.getDisplayName().indexOf("VMware") < 0) {  // Well.... 
-                Enumeration<InetAddress> inet_addresses = network_interface.getInetAddresses();
-                while (inet_addresses.hasMoreElements()) {
-                    InetAddress inet_address = inet_addresses.nextElement();
-                    if (inet_address instanceof Inet4Address) {
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = networkInterfaces.nextElement();
+            if (networkInterface.isUp() && !networkInterface.isVirtual() && !networkInterface.isLoopback() &&
+                networkInterface.getDisplayName().indexOf("VMware") < 0) {  // Well.... 
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    InetAddress inetAddress = inetAddresses.nextElement();
+                    if (inetAddress instanceof Inet4Address) {
                         foundAddresses++;
-                        autoHost = inet_address.getHostAddress();
+                        autoHost = inetAddress.getHostAddress();
                     }
                 }
             }

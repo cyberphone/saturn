@@ -22,9 +22,23 @@
     </module>
 </application>]]></string>
   </resources>
-
   <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
 
+  <resources id="security.constraints.xml">
+  <string><![CDATA[
+   <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>The app</web-resource-name>
+          <url-pattern>/*</url-pattern>
+       </web-resource-collection>
+       <user-data-constraint>
+         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+    </security-constraint>
+    ]]></string>
+  </resources>
+  <property name="security.constraints" refid="security.constraints.xml"/>
+  
   <target name="help">
     <echo message="tomcat [-Derr.payment.ca=0] [-Dunusual.card=0] [-Dcurrency=XYZ] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
@@ -44,6 +58,8 @@
     <property name="logging" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442"/>
     <property name="payee_provider.host" value="https://localhost:8442"/>
+    <property name="merchant.host" value="http://localhost:8080"/>
+    <property name="security.actual" value=""/>
     <property name="server.port.map" value=""/>
     <property name="unusualcard" value="false"/>
     <property name="currency" value="USD"/>
@@ -76,11 +92,13 @@
       <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
       <replacefilter token="@acquirer-authority-url@" value="${acquirer.host}/${acquirerpath}/authority"/>
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payeebankpath}/authority"/>
+      <replacefilter token="@merchant-base-url@" value="${merchant.host}/${appcorename}"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>
       <replacefilter token="@w2nb-wallet@" value="${w2nb.webwallet}"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
       <replacefilter token="@logging@" value="${logging}"/>
+      <replacefilter token="@security-constraints@" value="${security.actual}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
@@ -98,6 +116,7 @@
       <lib dir="${zip.extra.lib.dir}">
          <include name="proxy-support.jar"/>
       </lib>
+      <lib dir="${zip.lib.dir}"/>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
          <include name="${merchantkey}.p12"/>
          <include name="${payment.var.root}.cer"/>
@@ -126,6 +145,9 @@
        <fileset dir="${reference.lib.dir}">
          <include name="*.jar"/>
        </fileset>
+       <fileset dir="lib">
+         <include name="*.jar"/>
+       </fileset>
      </path>
      <antcall target="_build">
        <param name="card.font" value="Arial Unicode MS"/>
@@ -138,6 +160,8 @@
        <param name="zip.extra.lib.dir" value="${common.lib.dir}"/>
        
        <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
+       
+       <param name="zip.lib.dir" value="lib"/>
        
        <param name="zip.key.dir" value="${key.dir}"/>
        
@@ -154,9 +178,16 @@
      <condition property="logging" value="true" else="false">
         <isset property="plugin.ejbca.ant.custom.logging"/>
      </condition>
+     <copy todir="${ejbca.gen.path}/lib" overwrite="true" preservelastmodified="true">
+         <fileset dir="lib">
+             <include name="*.jar"/>
+         </fileset>
+     </copy>
      <property name="bouncycastle.first" value="false"/>
      <property name="acquirer.host" value="https://mobilepki.org"/>
      <property name="payee_provider.host" value="https://mobilepki.org"/>
+     <property name="merchant.host" value="https://mobilepki.org"/>
+     <property name="security.actual" value="security.constraints"/>
      <property name="server.port.map" value="8442"/>
      <property file="common.properties"/>
      <property file="merchants.properties"/>
@@ -183,6 +214,8 @@
        
        <param name="zip.common.lib.dir" value="empty.lib"/>
        
+       <param name="zip.lib.dir" value="empty.lib"/>
+       
        <param name="zip.key.dir" value="keys"/>
 
        <param name="payment.var.root" value="${paymentroot}"/>
@@ -197,6 +230,8 @@
      <echo message="Web2Native Bridge &quot;localhost&quot; Merchant Plugin"/>
      <property name="acquirer.host" value="https://localhost:8442"/>
      <property name="payee_provider.host" value="https://localhost:8442"/>
+     <property name="merchant.host" value="http://localhost:8080"/>
+     <property name="security.actual" value=""/>
      <property name="server.port.map" value=""/>
      <antcall target="mobilepki-ejbca"/>
   </target>

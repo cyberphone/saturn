@@ -267,6 +267,15 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                                 acquirerBased,
                                 debugData);
             }
+            
+            // This may be a QR session
+            String id = (String) session.getAttribute(QR_SESSION_ID_ATTR);
+            if (id != null) {
+                Synchronizer synchronizer = QRSessions.getSynchronizer(id);
+                if (synchronizer != null ) {
+                    synchronizer.haveData4You();
+                }
+            }
  
             logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
             /////////////////////////////////////////////////////////////////////////////////////////

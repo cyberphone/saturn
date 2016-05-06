@@ -8,5 +8,8 @@
 	<classpathentry kind="lib" path="../resources/common.lib/webpki.org-webutil-1.00.jar"/>
 	<classpathentry kind="lib" path="../resources/common.lib/proxy-support.jar"/>
 	<classpathentry kind="lib" path="../resources/ref.lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="lib/qrgen-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/zxing-core-1.7.jar"/>
+	<classpathentry kind="lib" path="lib/zxing-j2se-1.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

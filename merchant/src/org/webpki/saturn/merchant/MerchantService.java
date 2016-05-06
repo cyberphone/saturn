@@ -18,10 +18,19 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.URL;
+
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+
 import java.util.EnumSet;
+import java.util.Enumeration;
 import java.util.Set;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,12 +40,15 @@ import javax.servlet.ServletContextListener;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
+
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
+
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 import org.webpki.util.ISODateTime;
+
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.PayerAccountTypes;
@@ -44,6 +56,7 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.ServerAsymKeySigner;
+
 import org.webpki.webutil.InitPropertyReader;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
@@ -65,6 +78,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String ACQUIRER_AUTHORITY_URL       = "acquirer_authority_url";
 
     static final String SERVER_PORT_MAP              = "server_port_map";
+    
+    static final String MERCHANT_BASE_URL            = "merchant_base_url";
     
     static final String CURRENCY                     = "currency";
 
@@ -93,6 +108,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String payeeProviderAuthorityUrl;
 
     static Integer serverPortMapping;
+    
+    static String merchantBaseUrl;  // For QR and Android only
     
     static Currencies currency;
 
@@ -136,6 +153,36 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
+    String getURL (String inUrl) throws IOException {
+        URL url = new URL(inUrl);
+        if (!url.getHost().equals("localhost")) {
+            return inUrl;
+        }
+        String autoHost = null;
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        int foundAddresses = 0;
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = networkInterfaces.nextElement();
+            if (networkInterface.isUp() && !networkInterface.isVirtual() && !networkInterface.isLoopback() &&
+                networkInterface.getDisplayName().indexOf("VMware") < 0) {  // Well.... 
+                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
+                while (inetAddresses.hasMoreElements()) {
+                    InetAddress inetAddress = inetAddresses.nextElement();
+                    if (inetAddress instanceof Inet4Address) {
+                        foundAddresses++;
+                        autoHost = inetAddress.getHostAddress();
+                    }
+                }
+            }
+        }
+        if (foundAddresses != 1) throw new IOException("Couldn't determine network interface");
+        logger.info("Host automagically set to: " + autoHost);
+        return new URL(url.getProtocol(),
+                       autoHost,
+                       url.getPort(),
+                       url.getFile()).toExternalForm();
+    }
+
     @Override
     public void contextDestroyed(ServletContextEvent event) {
     }
@@ -170,6 +217,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
             acquirerAuthorityUrl = getPropertyString(ACQUIRER_AUTHORITY_URL);
+
+            merchantBaseUrl = getURL(getPropertyString(MERCHANT_BASE_URL));
 
             new AuthorizationData(JSONParser.parse(user_authorization =
                     ArrayUtil.getByteArrayFromInputStream (this.getClass().getResourceAsStream(USER_AUTH_SAMPLE))));

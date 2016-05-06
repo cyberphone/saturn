@@ -47,6 +47,12 @@
     </context-param>
 
     <context-param>
+        <description>Merchant Base URL</description>
+        <param-name>merchant_base_url</param-name>
+        <param-value>@merchant-base-url@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Currency</description>
         <param-name>currency</param-name>
         <param-value>@currency@</param-value>
@@ -125,6 +131,11 @@
         <servlet-class>org.webpki.saturn.merchant.NFCLauncherServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>QRDisplayServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.QRDisplayServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -170,14 +181,9 @@
         <url-pattern>/nfc</url-pattern>
     </servlet-mapping>
 
-    <security-constraint>
-      <web-resource-collection>
-        <web-resource-name>The app</web-resource-name>
-        <url-pattern>/*</url-pattern>
-      </web-resource-collection>
-      <user-data-constraint>
-        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-      </user-data-constraint>
-    </security-constraint>
-
+    <servlet-mapping>
+        <servlet-name>QRDisplayServlet</servlet-name>
+        <url-pattern>/qrdisplay</url-pattern>
+    </servlet-mapping>
+@security-constraints@
 </web-app>
