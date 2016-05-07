@@ -43,6 +43,7 @@ public class QRSessions {
     static final String QR_RETURN_TO_SHOP = "r";
     static final String QR_SUCCESS        = "s";
     static final String QR_CONTINUE       = "c";
+    static final String QR_PROGRESS       = "p";
 
     static final long CYCLE_TIME          = 60000L;
     static final long COMET_WAIT          = 30000L;

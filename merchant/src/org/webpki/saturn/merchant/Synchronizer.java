@@ -17,17 +17,18 @@
 package org.webpki.saturn.merchant;
 
 class Synchronizer {
-    boolean touched;
+    private boolean touched;
+    private boolean inProgress;
 
     synchronized boolean perform(long cometWait) {
-        boolean timeout_flag = false;
-        while (!touched && !timeout_flag) {
+        boolean timeoutFlag = false;
+        while (!touched && !timeoutFlag) {
             try {
                 wait(cometWait);
             } catch (InterruptedException e) {
                 return false;
             }
-            timeout_flag = true;
+            timeoutFlag = true;
         }
         return touched;
     }
@@ -35,5 +36,18 @@ class Synchronizer {
     synchronized void haveData4You() {
         touched = true;
         notify();
+    }
+
+    synchronized void setInProgress() {
+        inProgress = true;
+        notify();
+    }
+
+    synchronized boolean isInProgress() {
+        if (inProgress) {
+            inProgress = false;
+            return true;
+        }
+        return false;
     }
 }

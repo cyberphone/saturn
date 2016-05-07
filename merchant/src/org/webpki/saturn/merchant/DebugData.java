@@ -25,9 +25,7 @@ public class DebugData implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    public byte[] WalletInitialized;
-
-    public byte[] InvokeWallet;
+    public JSONObjectWriter InvokeWallet;
     
     public JSONObjectReader walletResponse;
 

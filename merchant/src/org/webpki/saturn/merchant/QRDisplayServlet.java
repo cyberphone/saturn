@@ -53,7 +53,7 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
             sendResult(response, QRSessions.QR_SUCCESS);
         } else {
             logger.info("QR Continue");
-            sendResult(response, QRSessions.QR_CONTINUE);
+            sendResult(response, synchronizer.isInProgress() ? QRSessions.QR_PROGRESS : QRSessions.QR_CONTINUE);
         }
     }
 

@@ -77,7 +77,11 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             if (httpSessionId == null) {
                 logger.severe("QR session not found");
             } else {
-                doPlugin(httpSessionId, response);
+                Synchronizer synchronizer = QRSessions.getSynchronizer(id);
+                if (synchronizer != null) {
+                    synchronizer.setInProgress();
+                    doPlugin(httpSessionId, response);
+                }
             }
         }
     }

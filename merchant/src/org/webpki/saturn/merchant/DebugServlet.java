@@ -192,9 +192,7 @@ class DebugPrintout implements BaseProperties {
             point +
             "<p>Then the invoking Web-page waits for a ready signal from the <b>Wallet</b>:</p>");
 
-        fancyBox(debugData.WalletInitialized);
-
-        descriptionStdMargin("The " + keyWord(WINDOW_JSON) + " object provides the invoking <b>Merchant</b> Web-page with the size "+
+         descriptionStdMargin("The " + keyWord(WINDOW_JSON) + " object provides the invoking <b>Merchant</b> Web-page with the size "+
             "of the <b>Wallet</b> which is used to adapt the Web-page so that this <i>external</i> " +
             "application does not hide important buyer information.&nbsp;&nbsp;Note: The Web2Native Bridge " +
             "invocation provides additional (here not shown) information to make positioning and alignment feasible.<p>" + 

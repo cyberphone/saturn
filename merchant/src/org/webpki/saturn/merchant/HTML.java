@@ -609,6 +609,9 @@ public class HTML implements MerchantProperties {
               "  }).then(function (resultData) {\n" +
               "    console.log('Response', resultData);\n" +
               "    switch (resultData) {\n" +
+              "      case '" + QRSessions.QR_PROGRESS + "':\n" +
+              "        document.getElementById('qr1').innerHTML = '';\n" +
+              "        document.getElementById('qr2').innerHTML = '';\n" +
               "      case '" + QRSessions.QR_CONTINUE + "':\n" +
               "        startComet();\n" +
               "        break;\n" +
@@ -629,8 +632,8 @@ public class HTML implements MerchantProperties {
               "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div",
 
               currentOrder(savedShoppingCart).toString() +
-          "<tr><td style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\"><img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
-          "<tr><td align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + "\"></td></tr>" +
+          "<tr><td id=\"qr1\" style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\"><img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
+          "<tr><td id=\"qr2\" align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + "\"></td></tr>" +
           "<tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr>" +
           "</table></td></tr>"));
     }
