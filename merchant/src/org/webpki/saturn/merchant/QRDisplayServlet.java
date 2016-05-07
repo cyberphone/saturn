@@ -42,22 +42,18 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
     
     static Logger logger = Logger.getLogger(QRDisplayServlet.class.getCanonicalName());
 
-    static final String QR_RETURN_TO_SHOP = "r";
-    static final String QR_SUCCESS        = "s";
-    static final String QR_CONTINUE       = "c";
-
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String id = new String(ServletUtil.getData(request), "UTF-8");
         logger.info("QR DISP=" + id);
         Synchronizer synchronizer = QRSessions.getSynchronizer(id);
         if (synchronizer == null) {
-            sendResult(response, QR_RETURN_TO_SHOP);
+            sendResult(response, QRSessions.QR_RETURN_TO_SHOP);
         } else if (synchronizer.perform(QRSessions.COMET_WAIT)) {
             QRSessions.removeSession(id);
-            sendResult(response, QR_SUCCESS);
+            sendResult(response, QRSessions.QR_SUCCESS);
         } else {
             logger.info("QR Continue");
-            sendResult(response, QR_CONTINUE);
+            sendResult(response, QRSessions.QR_CONTINUE);
         }
     }
 
@@ -80,19 +76,16 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
             ErrorServlet.systemFail(response, "Missing shopping cart");
             return;
         }
-        session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
-
-        String id = QRSessions.createSession();
+        String id = QRSessions.createSession(session);
         session.setAttribute(QR_SESSION_ID_ATTR, id);
         response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
+        String url = "webpki.org=" + URLEncoder.encode(MerchantService.merchantBaseUrl +
+                                                         "/androidplugin?" + QRSessions.QR_SESSION_ID  + "=" + id,
+                                                       "UTF-8");
+        logger.info("URL=" + url + " SID=" + session.getId());
         HTML.printQRCode(response,
                          savedShoppingCart,
-                         QRCode.from("webpki.org="
-                                + URLEncoder.encode(
-                                        MerchantService.merchantBaseUrl
-                                                + "/plugin?" + "=" + id,
-                                        "UTF-8")).to(ImageType.PNG)
-                               .withSize(200, 200).stream().toByteArray(),
+                         QRCode.from(url).to(ImageType.PNG).withSize(200, 200).stream().toByteArray(),
                          request.getRequestURL().toString(),
                          id);
     }

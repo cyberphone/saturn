@@ -129,6 +129,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static int referenceId = 1000000;
 
+    static String grantedVersions;
+
     static String getReferenceId() {
         return "#" + (referenceId++);
     }

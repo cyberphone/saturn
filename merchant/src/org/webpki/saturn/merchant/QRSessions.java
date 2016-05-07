@@ -17,17 +17,18 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-
 import java.util.logging.Logger;
+
+import javax.servlet.http.HttpSession;
 
 public class QRSessions {
 
     static class SessionInProgress {
         long expiry_time;
         String id;
+        String httpSessionId;
         Synchronizer synchronizer;
     }
 
@@ -39,9 +40,15 @@ public class QRSessions {
 
     private static int sessionId;
 
-    static final long CYCLE_TIME  = 60000L;
-    static final long COMET_WAIT  = 30000L;
-    static final long MAX_SESSION = 300000L;
+    static final String QR_RETURN_TO_SHOP = "r";
+    static final String QR_SUCCESS        = "s";
+    static final String QR_CONTINUE       = "c";
+
+    static final long CYCLE_TIME          = 60000L;
+    static final long COMET_WAIT          = 30000L;
+    static final long MAX_SESSION         = 300000L;
+
+    static final String QR_SESSION_ID     = "qsi";
 
     private static class Looper extends Thread {
         public void run() {
@@ -75,8 +82,9 @@ public class QRSessions {
         }
     }
 
-    static synchronized String createSession() throws IOException {
+    static synchronized String createSession(HttpSession session) throws IOException {
         SessionInProgress sessionInProgress = new SessionInProgress();
+        sessionInProgress.httpSessionId = session.getId();
         sessionInProgress.id = String.valueOf(++sessionId);
         sessionInProgress.expiry_time = System.currentTimeMillis() + MAX_SESSION;
         sessionInProgress.synchronizer = new Synchronizer();
@@ -94,10 +102,18 @@ public class QRSessions {
     }
 
     static Synchronizer getSynchronizer(String id) {
-        SessionInProgress auth = currentSessions.get(id);
-        if (auth == null) {
+        SessionInProgress session = currentSessions.get(id);
+        if (session == null) {
             return null;
         }
-        return auth.synchronizer;
+        return session.synchronizer;
+    }
+
+    static String getHttpSessionId(String id) {
+        SessionInProgress session = currentSessions.get(id);
+        if (session == null) {
+            return null;
+        }
+        return session.httpSessionId;
     }
 }

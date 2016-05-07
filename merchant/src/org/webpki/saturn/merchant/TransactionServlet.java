@@ -148,7 +148,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
     }
 
-    void returnJsonData(HttpServletResponse response, byte[] data) throws IOException {
+    static void returnJsonData(HttpServletResponse response, byte[] data) throws IOException {
         response.setContentType(JSON_CONTENT_TYPE);
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);

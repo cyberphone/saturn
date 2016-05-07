@@ -136,6 +136,11 @@
         <servlet-class>org.webpki.saturn.merchant.QRDisplayServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>AndroidPluginServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.AndroidPluginServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -184,6 +189,11 @@
     <servlet-mapping>
         <servlet-name>QRDisplayServlet</servlet-name>
         <url-pattern>/qrdisplay</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AndroidPluginServlet</servlet-name>
+        <url-pattern>/androidplugin</url-pattern>
     </servlet-mapping>
 @security-constraints@
 </web-app>

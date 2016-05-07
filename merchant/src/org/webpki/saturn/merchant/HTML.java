@@ -564,12 +564,7 @@ public class HTML implements MerchantProperties {
                     "<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod()\"></td></tr>" +
                     "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod()\"></td></tr>" +
                     "<tr><td style=\"text-align:center;padding:15pt\"><input class=\"stdbtn\" type=\"button\" value=\"Return to shop..\" title=\"Changed your mind?\" onclick=\"document.forms.restore.submit()\"></td></tr>" +
-                    "</table></td></tr></table>" +
-                    "<form name=\"shoot\" method=\"POST\" action=\"")
-            .append(android ? "androidpay" : "userpay")
-            .append("\"></form>" +
-             "<form name=\"restore\" method=\"POST\" action=\"shop\">" +
-             "</form></td></tr>");
+                    "</table></td></tr></table></td></tr>");
 
         HTML.output(response, HTML.getHTML(
                 STICK_TO_HOME_URL +
@@ -581,7 +576,10 @@ public class HTML implements MerchantProperties {
                         "        document.getElementById('notimplemented').style.visibility = 'hidden';\n" +
                         "    }, 1000);\n" +
                         "}\n\n",
-                "><div id=\"notimplemented\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
+                "><form name=\"shoot\" method=\"POST\" action=\"" + 
+                (android ? "androidplugin" : "userpay") +
+                "\"></form><form name=\"restore\" method=\"POST\" action=\"shop\">" +
+                "</form><div id=\"notimplemented\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
                 FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">This demo only supports Saturn!</div",
                 s.toString()));
     }
@@ -611,10 +609,10 @@ public class HTML implements MerchantProperties {
               "  }).then(function (resultData) {\n" +
               "    console.log('Response', resultData);\n" +
               "    switch (resultData) {\n" +
-              "      case '" + QRDisplayServlet.QR_CONTINUE + "':\n" +
+              "      case '" + QRSessions.QR_CONTINUE + "':\n" +
               "        startComet();\n" +
               "        break;\n" +
-              "      case '" + QRDisplayServlet.QR_RETURN_TO_SHOP + "':\n" +
+              "      case '" + QRSessions.QR_RETURN_TO_SHOP + "':\n" +
               "        document.forms.restore.submit();\n" +
               "        break;\n" +
               "      default:\n" +
@@ -635,5 +633,16 @@ public class HTML implements MerchantProperties {
           "<tr><td align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + "\"></td></tr>" +
           "<tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr>" +
           "</table></td></tr>"));
+    }
+
+    public static void androidPluginActivate(HttpServletResponse response, String url) throws IOException, ServletException {
+        response.setContentType("text/html; charset=utf-8");
+        response.setHeader("Pragma", "No-Cache");
+        response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
+        response.setDateHeader("EXPIRES", 0);
+        response.getOutputStream().write(
+            HTML.getHTML(null,
+                         "onload=\"document.location.href='" + url + "'\"" ,
+                         "<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><b>Please wait while the Wallet plugin starts...</b></td></tr>").getBytes("UTF-8"));
     }
  }
