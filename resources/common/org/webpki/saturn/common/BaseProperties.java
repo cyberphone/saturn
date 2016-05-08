@@ -20,9 +20,15 @@ public interface BaseProperties {
 
     String EMBEDDED_JSON                     = "@embedded";
 
+    // For the Web2Native Bridge wallet 
     String WINDOW_JSON                       = "window";
     String HEIGHT_JSON                       = "height";
     String WIDTH_JSON                        = "width";
+
+    // For the Android/QR wallet
+    String CANCEL_URL_JSON                   = "cancelUrl";
+    String SUCCESS_URL_JSON                  = "successUrl";
+
     String COMMON_NAME_JSON                  = "commonName";            // Common name of providers to be used in UIs
     String NAME_JSON                         = "name";
 

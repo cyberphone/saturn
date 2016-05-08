@@ -51,11 +51,11 @@ public class ShoppingServlet extends HttpServlet {
             return;
          }
         SavedShoppingCart saved_shopping_cart =
-            (session.getAttribute(UserPaymentServlet.SHOPPING_CART_SESSION_ATTR) != null) ?
-                (SavedShoppingCart)session.getAttribute(UserPaymentServlet.SHOPPING_CART_SESSION_ATTR)
+            (session.getAttribute(W2NBWalletServlet.SHOPPING_CART_SESSION_ATTR) != null) ?
+                (SavedShoppingCart)session.getAttribute(W2NBWalletServlet.SHOPPING_CART_SESSION_ATTR)
                                        :
                 new SavedShoppingCart();
-        session.removeAttribute(UserPaymentServlet.SHOPPING_CART_SESSION_ATTR);
+        session.removeAttribute(W2NBWalletServlet.SHOPPING_CART_SESSION_ATTR);
         HTML.merchantPage(response, saved_shopping_cart);
     }
 

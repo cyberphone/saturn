@@ -117,4 +117,23 @@ public class QRSessions {
         }
         return session.httpSessionId;
     }
+
+    static void optionalSessionSetReady(String id) {
+        if (id != null) {
+            Synchronizer synchronizer = getSynchronizer(id);
+            if (synchronizer != null) {
+                synchronizer.haveData4You();
+            }
+        }
+    }
+
+    static synchronized void cancelSession(String id) {
+        Synchronizer synchronizer = getSynchronizer(id);
+        if (synchronizer != null) {
+            currentSessions.remove(id);
+            synchronized (synchronizer) {
+                synchronizer.notify();
+            }
+        }
+    }
 }

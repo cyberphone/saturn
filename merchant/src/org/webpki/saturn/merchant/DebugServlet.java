@@ -345,7 +345,7 @@ public class DebugServlet extends HttpServlet {
             DebugData debugData = null;
             HttpSession session = request.getSession(false);
             if (session == null ||
-                (debugData = (DebugData)session.getAttribute(UserPaymentServlet.DEBUG_DATA_SESSION_ATTR)) == null) {
+                (debugData = (DebugData)session.getAttribute(W2NBWalletServlet.DEBUG_DATA_SESSION_ATTR)) == null) {
                 ErrorServlet.sessionTimeout(response);
                 return;
             }

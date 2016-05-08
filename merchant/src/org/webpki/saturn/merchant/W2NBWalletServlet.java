@@ -29,11 +29,11 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONOutputFormats;
 
-public class UserPaymentServlet extends HttpServlet implements MerchantProperties {
+public class W2NBWalletServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
    
-    static Logger logger = Logger.getLogger(UserPaymentServlet.class.getName());
+    static Logger logger = Logger.getLogger(W2NBWalletServlet.class.getName());
     
     static boolean getOption(HttpSession session, String name) {
         return session.getAttribute(name) != null && (Boolean)session.getAttribute(name);
@@ -46,11 +46,11 @@ public class UserPaymentServlet extends HttpServlet implements MerchantPropertie
             return;
         }
         WalletRequest walletRequest = new WalletRequest(session);
-        HTML.userPayPage(response,
-                         walletRequest.savedShoppingCart,
-                         getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
-                         walletRequest.debugMode,
-                         new String(walletRequest.requestObject.serializeJSONObject(JSONOutputFormats.PRETTY_JS_NATIVE), "UTF-8"));
+        HTML.w2nbWalletPay(response,
+                           walletRequest.savedShoppingCart,
+                           getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
+                           walletRequest.debugMode,
+                           new String(walletRequest.requestObject.serializeJSONObject(JSONOutputFormats.PRETTY_JS_NATIVE), "UTF-8"));
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

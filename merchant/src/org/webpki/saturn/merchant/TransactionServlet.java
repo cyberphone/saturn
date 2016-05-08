@@ -170,14 +170,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
             }
             JSONObjectReader walletResponse = JSONParser.parse(ServletUtil.getData(request));
-            byte[] requestHash = (byte[]) session.getAttribute(UserPaymentServlet.REQUEST_HASH_SESSION_ATTR);
+            byte[] requestHash = (byte[]) session.getAttribute(W2NBWalletServlet.REQUEST_HASH_SESSION_ATTR);
             if (MerchantService.logging) {
                 logger.info("Received from wallet:\n" + walletResponse);
             }
 
             // Do we have web debug mode?
             DebugData debugData = null;
-            boolean debug = UserPaymentServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
+            boolean debug = W2NBWalletServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             if (debug) {
                 debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
                 debugData.walletResponse = walletResponse;
@@ -194,7 +194,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
            
             // Basic credit is only applicable to account2account operations
             boolean acquirerBased = payerAuthorization.getAccountType().isAcquirerBased();
-            boolean basicCredit = !UserPaymentServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
+            boolean basicCredit = !W2NBWalletServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
                                   !acquirerBased;
 
             // Attest the user's encrypted authorization to show "intent"
@@ -269,13 +269,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             }
             
             // This may be a QR session
-            String id = (String) session.getAttribute(QR_SESSION_ID_ATTR);
-            if (id != null) {
-                Synchronizer synchronizer = QRSessions.getSynchronizer(id);
-                if (synchronizer != null ) {
-                    synchronizer.haveData4You();
-                }
-            }
+            QRSessions.optionalSessionSetReady((String) session.getAttribute(QR_SESSION_ID_ATTR));
  
             logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
             /////////////////////////////////////////////////////////////////////////////////////////

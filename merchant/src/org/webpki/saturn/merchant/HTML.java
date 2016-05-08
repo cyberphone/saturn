@@ -92,9 +92,9 @@ public class HTML implements MerchantProperties {
         response.getOutputStream().write(html.getBytes("UTF-8"));
     }
 
-    public static void homePage(HttpServletResponse response,
-                                boolean debugMode,
-                                boolean reserveMode) throws IOException, ServletException {
+    static void homePage(HttpServletResponse response,
+                         boolean debugMode,
+                         boolean reserveMode) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(null, null,
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
@@ -209,8 +209,8 @@ public class HTML implements MerchantProperties {
         return MerchantService.currency.amountToDisplayString(amount);
     }
     
-    public static void merchantPage(HttpServletResponse response,
-                                    SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
+    static void merchantPage(HttpServletResponse response,
+                             SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
         StringBuffer temp_string = new StringBuffer(
             "\nfunction closeFundFlash() {\n" +
             "    setTimeout(function() {\n" +
@@ -219,7 +219,7 @@ public class HTML implements MerchantProperties {
             "}\n\n" +
             "function userPay() {\n" +
             "    if (getTotal()) {\n" +
-            "        document.getElementById('" + UserPaymentServlet.SHOPPING_CART_FORM_ATTR + "').value = JSON.stringify(shoppingCart);\n" +
+            "        document.getElementById('" + W2NBWalletServlet.SHOPPING_CART_FORM_ATTR + "').value = JSON.stringify(shoppingCart);\n" +
             "        document.forms.shoot.submit();\n" +           
             "    } else {\n" +
             "        document.getElementById('emptybasket').style.top = ((window.innerHeight - document.getElementById('emptybasket').offsetHeight) / 2) + 'px';\n" +
@@ -295,7 +295,7 @@ public class HTML implements MerchantProperties {
             "<tr><td style=\"text-align:center;padding-top:10pt\" id=\"pay\"><input class=\"stdbtn\" type=\"button\" value=\"Checkout..\" title=\"Paying time has come...\" onclick=\"userPay()\"></td></tr>" +
             "</table>" +
             "<form name=\"shoot\" method=\"POST\" action=\"choose\">" +
-            "<input type=\"hidden\" name=\"" + UserPaymentServlet.SHOPPING_CART_FORM_ATTR + "\" id=\"" + UserPaymentServlet.SHOPPING_CART_FORM_ATTR + "\">" +
+            "<input type=\"hidden\" name=\"" + W2NBWalletServlet.SHOPPING_CART_FORM_ATTR + "\" id=\"" + W2NBWalletServlet.SHOPPING_CART_FORM_ATTR + "\">" +
             "</form></td></tr>");
          temp_string.insert(0,
             "\n\n\"use strict\";\n\n" +
@@ -350,11 +350,11 @@ public class HTML implements MerchantProperties {
        return s;
     }
 
-    public static void userPayPage(HttpServletResponse response,
-                                   SavedShoppingCart savedShoppingCart, 
-                                   boolean tapConnectMode,
-                                   boolean debugMode,
-                                   String walletRequest) throws IOException, ServletException {
+    static void w2nbWalletPay(HttpServletResponse response,
+                              SavedShoppingCart savedShoppingCart, 
+                              boolean tapConnectMode,
+                              boolean debugMode,
+                              String walletRequest) throws IOException, ServletException {
         String connectMethod = tapConnectMode ? "tapConnect" : "nativeConnect";
         StringBuffer s = currentOrder(savedShoppingCart);
       
@@ -411,7 +411,7 @@ public class HTML implements MerchantProperties {
                     "    nativePort = port;\n" +
                     "    port.addMessageListener(function(message) {\n" +
                     "      if (message['@context'] != '" + BaseProperties.W2NB_WEB_PAY_CONTEXT_URI + "') {\n" +
-                    "        setFail('Missing or wrong \"@context\"');\n" +
+                    "        setFail('Wrong or missing \"@context\"');\n" +
                     "        return;\n" +
                     "      }\n" +
                     "      var qualifier = message['@qualifier'];\n" +
@@ -478,6 +478,7 @@ public class HTML implements MerchantProperties {
                     "      if (initMode) alert('Wallet application \"" + 
                                      MerchantService.w2nbWalletName + ".jar\" appears to be missing!');\n" +
                     "      nativePort = null;\n" +
+                    "// User cancel\n" +
                     "      document.forms.restore.submit();\n" +
                     "    });\n");
        }
@@ -500,9 +501,9 @@ public class HTML implements MerchantProperties {
                               s.toString()));
     }
 
-    public static void resultPage(HttpServletResponse response,
-                                  boolean debugMode,
-                                  ResultData resultData) throws IOException, ServletException {
+    static void resultPage(HttpServletResponse response,
+                           boolean debugMode,
+                           ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
         s.append("<table>" +
                  "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Order Status<br>&nbsp;</td></tr>" +
@@ -529,7 +530,7 @@ public class HTML implements MerchantProperties {
                     HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
     }
 
-    public static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
+    static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
                   "<table>" +
                   "<tr><td style=\"padding-top:50pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL +
@@ -539,7 +540,7 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(clean ? null : STICK_TO_HOME_URL, null,s.toString()));
     }
 
-    public static void errorPage(HttpServletResponse response, String error, boolean system)
+    static void errorPage(HttpServletResponse response, String error, boolean system)
                                  throws IOException, ServletException {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
                  "<table>" +
@@ -552,9 +553,9 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null,s.toString()));
     }
 
-    public static void userChoosePage(HttpServletResponse response,
-                                      SavedShoppingCart savedShoppingCart,
-                                      boolean android) throws IOException, ServletException {
+    static void userChoosePage(HttpServletResponse response,
+                               SavedShoppingCart savedShoppingCart,
+                               boolean android) throws IOException, ServletException {
         StringBuffer s = currentOrder(savedShoppingCart)
             .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
                     "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:"
@@ -577,17 +578,17 @@ public class HTML implements MerchantProperties {
                         "    }, 1000);\n" +
                         "}\n\n",
                 "><form name=\"shoot\" method=\"POST\" action=\"" + 
-                (android ? "androidplugin" : "userpay") +
+                (android ? "androidplugin" : "w2nbwallet") +
                 "\"></form><form name=\"restore\" method=\"POST\" action=\"shop\">" +
                 "</form><div id=\"notimplemented\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
                 FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">This demo only supports Saturn!</div",
                 s.toString()));
     }
 
-    public static void printQRCode(HttpServletResponse response,
-                                   SavedShoppingCart savedShoppingCart, byte[] qrImage,
-                                   String cometRelativeUrl,
-                                   String id) throws IOException, ServletException {
+    static void printQRCode(HttpServletResponse response,
+                            SavedShoppingCart savedShoppingCart, byte[] qrImage,
+                            String cometRelativeUrl,
+                            String id) throws IOException, ServletException {
       HTML.output(response, HTML.getHTML(
               "function flashQRInfo() {\n" +
               "  document.getElementById('qridflasher').style.top = ((window.innerHeight - document.getElementById('qridflasher').offsetHeight) / 2) + 'px';\n" +
@@ -632,13 +633,13 @@ public class HTML implements MerchantProperties {
               "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div",
 
               currentOrder(savedShoppingCart).toString() +
-          "<tr><td id=\"qr1\" style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\"><img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
-          "<tr><td id=\"qr2\" align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + "\"></td></tr>" +
-          "<tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr>" +
-          "</table></td></tr>"));
+              "<tr><td id=\"qr1\" style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\">" +
+              "<img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
+              "<tr><td id=\"qr2\" align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + 
+              "\"></td></tr><tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr></table></td></tr>"));
     }
 
-    public static void androidPluginActivate(HttpServletResponse response, String url) throws IOException, ServletException {
+    static void androidPluginActivate(HttpServletResponse response, String url) throws IOException, ServletException {
         response.setContentType("text/html; charset=utf-8");
         response.setHeader("Pragma", "No-Cache");
         response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
@@ -648,4 +649,17 @@ public class HTML implements MerchantProperties {
                          "onload=\"document.location.href='" + url + "'\"" ,
                          "<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><b>Please wait while the Wallet plugin starts...</b></td></tr>").getBytes("UTF-8"));
     }
- }
+
+    static void qrClientResult(HttpServletResponse response, boolean success) throws IOException {
+        response.setContentType("text/plain");
+        response.setHeader("Pragma", "No-Cache");
+        response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
+        response.setDateHeader("EXPIRES", 0);
+        response.getOutputStream().write((success ? "SUCCESS :-)" : "Cancelled").getBytes("UTF-8"));
+    }
+
+    static void autoPost(HttpServletResponse response, String url) throws IOException, ServletException {
+        HTML.output(response, "<html><body onload=\"document.forms.posting.submit()\">Redirecting..." +
+                              "<form name=\"posting\" action=\"" + url + "\" method=\"POST\"></form></body></html>");
+    }
+}

@@ -40,9 +40,9 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
     boolean debugMode;
     SavedShoppingCart savedShoppingCart;
     JSONObjectWriter requestObject;
-    
-    WalletRequest(HttpSession session) throws IOException {
-        debugMode = UserPaymentServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
+
+    WalletRequest(HttpSession session, String cancelUrl, String successUrl) throws IOException {
+        debugMode = W2NBWalletServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
         DebugData debugData = null;
         if (debugMode) {
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
@@ -71,9 +71,19 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         requestObject = Messages.createBaseMessage(Messages.WALLET_REQUEST)
             .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, acceptedAccountTypes.toArray(new String[0]))
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
-   
+
+        // Android and QR wallets need special arrangements...
+        if (cancelUrl != null) {
+            requestObject.setString(CANCEL_URL_JSON, cancelUrl)
+                         .setString(SUCCESS_URL_JSON, successUrl);
+        }
+
         if (debugMode) {
             debugData.InvokeWallet = requestObject;
         }
+    }
+
+    WalletRequest(HttpSession session) throws IOException {
+        this(session, null, null);
     }
 }

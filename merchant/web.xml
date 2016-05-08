@@ -97,8 +97,8 @@
     </servlet>
 
     <servlet>
-        <servlet-name>UserPaymentServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.merchant.UserPaymentServlet</servlet-class>
+        <servlet-name>W2NBWalletServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.W2NBWalletServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -152,8 +152,8 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>UserPaymentServlet</servlet-name>
-        <url-pattern>/userpay</url-pattern>
+        <servlet-name>W2NBWalletServlet</servlet-name>
+        <url-pattern>/w2nbwallet</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
