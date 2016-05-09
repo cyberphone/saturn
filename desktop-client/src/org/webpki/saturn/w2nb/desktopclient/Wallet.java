@@ -898,7 +898,7 @@ public class Wallet {
                                     Extension ext = null;
                                     try {
                                         ext = sks.getExtension(ek.getKeyHandle(),
-                                                               BaseProperties.W2NB_WEB_PAY_CONTEXT_URI);
+                                                               BaseProperties.SATURN_WEB_PAY_CONTEXT_URI);
                                     } catch (SKSException e) {
                                         if (e.getError() == SKSException.ERROR_OPTION) {
                                             continue;

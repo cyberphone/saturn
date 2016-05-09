@@ -410,7 +410,7 @@ public class HTML implements MerchantProperties {
         temp_string.append(").then(function(port) {\n" +
                     "    nativePort = port;\n" +
                     "    port.addMessageListener(function(message) {\n" +
-                    "      if (message['@context'] != '" + BaseProperties.W2NB_WEB_PAY_CONTEXT_URI + "') {\n" +
+                    "      if (message['@context'] != '" + BaseProperties.SATURN_WEB_PAY_CONTEXT_URI + "') {\n" +
                     "        setFail('Wrong or missing \"@context\"');\n" +
                     "        return;\n" +
                     "      }\n" +

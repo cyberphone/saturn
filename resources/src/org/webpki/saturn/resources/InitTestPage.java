@@ -188,7 +188,7 @@ public class InitTestPage implements BaseProperties {
         write(").then(function(port) {\n" +
               "    nativePort = port;\n" +
               "    port.addMessageListener(function(message) {\n" +
-              "      if (message[\"@context\"] != \"" + BaseProperties.W2NB_WEB_PAY_CONTEXT_URI + "\") {\n" +
+              "      if (message[\"@context\"] != \"" + BaseProperties.SATURN_WEB_PAY_CONTEXT_URI + "\") {\n" +
               "        setString(\"Missing or wrong \\\"@context\\\"\");\n" +
               "        return;\n" +
               "      }\n" +

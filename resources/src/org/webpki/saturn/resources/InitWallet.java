@@ -169,7 +169,7 @@ public class InitWallet {
                                                            : 
                              Encryption.JOSE_ECDH_ES_ALG_ID)
                   .setPublicKey(publicKey, AlgorithmPreferences.JOSE);
-            surrogateKey.addExtension(BaseProperties.W2NB_WEB_PAY_CONTEXT_URI,
+            surrogateKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                                       SecureKeyStore.SUB_TYPE_EXTENSION,
                                       "",
                                       ow.serializeJSONObject(JSONOutputFormats.NORMALIZED));
@@ -192,7 +192,7 @@ public class InitWallet {
             Extension ext = null;
             try {
                 ext = sks.getExtension(ek.getKeyHandle(),
-                                       BaseProperties.W2NB_WEB_PAY_CONTEXT_URI);
+                                       BaseProperties.SATURN_WEB_PAY_CONTEXT_URI);
             } catch (SKSException e) {
                 if (e.getError() == SKSException.ERROR_OPTION) {
                     continue;

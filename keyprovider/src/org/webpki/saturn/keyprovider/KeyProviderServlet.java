@@ -124,7 +124,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             key.setPrivateKey(paymentCredential.signatureKey.getPrivateKey().getEncoded());
             key.setFriendlyName("Account " + paymentCredential.accountId);
 
-            key.addExtension(BaseProperties.W2NB_WEB_PAY_CONTEXT_URI,
+            key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                              new JSONObjectWriter()
                 .setObject(BaseProperties.ACCOUNT_JSON, 
                            new AccountDescriptor(paymentCredential.accountType,
