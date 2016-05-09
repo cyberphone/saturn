@@ -446,7 +446,7 @@ public class HTML implements MerchantProperties {
                     "          return response.json();\n" +
                     "        }).then(function (resultData) {\n" +
                     "          if (typeof resultData == 'object' && !Array.isArray(resultData)) {\n" +
-                    "            if (Object.keys(resultData).length == 0) {\n" +
+                    "            if (resultData['@qualifier'] == '" + Messages.WALLET_SUCCESS.toString() + "') {\n" +
                     "// \"Normal\" return\n" +
                     "              document.location.href='result';\n" +
                     "            } else {\n" +

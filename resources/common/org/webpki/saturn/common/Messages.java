@@ -27,6 +27,7 @@ public enum Messages {
     WALLET_IS_READY               ("WalletIsReady"),                 // Wallet to payee Web page message
     WALLET_REQUEST                ("WalletRequest"),                 // Payee payment request + other data
     WALLET_ALERT                  ("WalletAlert"),                   // Payee to Wallet message
+    WALLET_SUCCESS                ("WalletSuccess"),                 // Payee to Wallet message
     PAYER_AUTHORIZATION           ("PayerAuthorization"),            // Created by the Wallet
     
     PROVIDER_USER_RESPONSE        ("ProviderUserResponse"),          // May replace any RESPONSE message

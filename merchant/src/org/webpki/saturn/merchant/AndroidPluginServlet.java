@@ -110,15 +110,14 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             }
             logger.info(session.getId());
             String cancelUrl = getPluginUrl() + "?" + ANDROID_CANCEL + "=" + 
-                    (qrMode ? (String) request.getAttribute(QR_SESSION_ID_ATTR) : "");
+                    (qrMode ? (String) session.getAttribute(QR_SESSION_ID_ATTR) : "");
             String successUrl = qrMode ?
                     getPluginUrl() + "?" + QR_ANDROID_SUCCESS + "=true"
                                        :
                     MerchantService.merchantBaseUrl + "/result";
-            TransactionServlet.returnJsonData(response, 
-                new WalletRequest(session, 
-                                  cancelUrl,
-                                  successUrl).requestObject.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+            TransactionServlet.returnJsonData(response, new WalletRequest(session, 
+                                                                          cancelUrl,
+                                                                          successUrl).requestObject);
         } else {
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {

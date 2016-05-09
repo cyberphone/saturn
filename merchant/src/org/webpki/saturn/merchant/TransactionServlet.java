@@ -73,8 +73,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
     
     static final int TIMEOUT_FOR_REQUEST = 5000;
     
-    static final byte[] NORMAL_RETURN = {'{','}'};
-
     static String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
         if (MerchantService.serverPortMapping == null) {
@@ -148,19 +146,20 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
     }
 
-    static void returnJsonData(HttpServletResponse response, byte[] data) throws IOException {
+    static void returnJsonData(HttpServletResponse response, JSONObjectWriter data) throws IOException {
         response.setContentType(JSON_CONTENT_TYPE);
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(data);
+        response.getOutputStream().write(data.serializeJSONObject(JSONOutputFormats.NORMALIZED));
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = new UrlHolder();
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {
-                returnJsonData(response, NORMAL_RETURN);
+                returnJsonData(response, Messages.createBaseMessage(Messages.WALLET_SUCCESS));
                 return;
              }
 
@@ -236,8 +235,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 }
                 // Parse for syntax only
                 new ProviderUserResponse(resultMessage);
-                returnJsonData(response,
-                               resultMessage.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+                returnJsonData(response, new JSONObjectWriter(resultMessage));
                 return;
             }
         
@@ -275,14 +273,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            returnJsonData(response, NORMAL_RETURN);
+            returnJsonData(response, Messages.createBaseMessage(Messages.WALLET_SUCCESS));
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
             logger.log(Level.SEVERE, message, e);
             JSONObjectWriter userError = WalletAlertMessage.encode("An unexpected error occurred.<br>" +
                                                                    "Please try again or contact support.");
-            returnJsonData(response, userError.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+            returnJsonData(response, userError);
         }
     }
 
@@ -323,6 +321,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         }
     }
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect("home");
     }
