@@ -49,7 +49,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     }
 
     void doPlugin (String httpSessionId, boolean qrMode, HttpServletResponse response) throws IOException, ServletException {
-        String url = "webpkiproxy://keygen2?cookie=JSESSIONID%3D" + httpSessionId +
+        String url = "webpkiproxy://saturn?cookie=JSESSIONID%3D" + httpSessionId +
                "&url=" + URLEncoder.encode(getPluginUrl() + (qrMode ? "?" + QR_RETRIEVE + "=true" : "") +
                      (MerchantService.grantedVersions == null ?
                          ""
