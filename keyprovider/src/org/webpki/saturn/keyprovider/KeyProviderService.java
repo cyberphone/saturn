@@ -217,7 +217,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                     }
                     @Override
                     public String getMimeType() throws IOException {
-                        return "image/png";
+                        return "image/svg+xml";
                     }
                 };
                 paymentCredential.encryptionKey =

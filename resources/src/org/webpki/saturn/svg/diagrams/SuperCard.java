@@ -57,8 +57,8 @@ public class SuperCard extends SVGDocument {
         1.2,
         "#A0A0A0",
         "url(#supercardGradient)")
-           .setRadiusX(12)
-           .setRadiusY(12)
+           .setRadiusX(20)
+           .setRadiusY(20)
            .setShader(new SVGShaderTemplate("url(#messageBlur)", "#afafaf", 6, 6)));
         
         add(new SVGText(new SVGDoubleValue(WIDTH/2),

@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<svg viewBox="0 0 316 196" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+ <defs>
+  <linearGradient id="bankdirectGradient" x1="0" y1="0" x2="1" y2="1">
+   <stop stop-color="#c9daa7" offset="0"/>
+   <stop stop-color="#ebf1de" offset="0.5"/>
+   <stop stop-color="#c9daa7" stop-opacity="0.99219" offset="1"/>
+  </linearGradient>
+  <linearGradient id="bankPillar" x1="0" y1="0.6" x2="1" y2="0.6">
+   <stop offset="0" stop-color="#707070" stop-opacity="0.98438"/>
+   <stop stop-color="#e8e8e8" stop-opacity="0.97656" offset="0.37323"/>
+   <stop offset="0.65448" stop-color="#f4f4f2" stop-opacity="0.99219"/>
+   <stop offset="0.99823" stop-opacity="0.98438" stop-color="#969494"/>
+  </linearGradient>
+  <filter width="200%" height="200%" x="-50%" y="-50%" id="messageBlur">
+   <feGaussianBlur stdDeviation="2"/>
+  </filter>
+ </defs>
+ <g>
+   <rect x="10.4" y="10.4" width="301.2" height="181.2" fill="#afafaf" rx="20" ry="20" filter="url(#messageBlur)"/>
+   <rect x="5" y="5" width="300" height="180" stroke="#A0A0A0" stroke-width="1.2" fill="url(#bankdirectGradient)" rx="20" ry="20"/>
+   <text x="154.62069" y="159.66931" font-family="Sans-serif" font-size="30" text-anchor="middle">Luke Skywalker</text>
+   <text x="176.11069" y="82.89931" font-family="Serif" font-size="28" text-anchor="start" font-weight="bold" fill="#558ed5">MyBank</text>
+   <rect stroke="#000000" fill="#ffffff" stroke-width="1.2" x="28.83069" y="27.33862" width="130" height="91"/>
+   <ellipse fill="black" stroke="#f20707" fill-opacity="0" stroke-width="2" cx="93.481" cy="72.1458" rx="55.32679" ry="35.80066"/>
+   <text fill="#000000" x="93.44181" y="68.66931" font-size="18" font-family="Sans-serif" text-anchor="middle" xml:space="preserve">BANK</text>
+   <text fill="#000000" x="93.10848" y="87.66931" font-size="18" font-family="Sans-serif" text-anchor="middle" xml:space="preserve" font-style="normal">DIRECT</text>
+
+   <rect width="4" height="10" x="37.19007" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="44.39007" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="51.59007" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="58.79007" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="28.08333" height="2" x="35.89757" y="50.91667" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="31.43407" height="2" x="34.23" y="52.91758" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="28" height="2.42857" x="36.0615" y="38.28571" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <polygon transform="rotate(-90 50.09128570556641,34.99205780029297) " stroke-width="0.7" points="53.370224457234144,34.9920654296875 46.81234787032008,48.57501983642578 46.81234787032008,21.409095764160156 53.370224457234144,34.9920654296875 " fill="#f2f2f2" stroke="#707070"/>
+
+   <rect width="4" height="10" x="37.19007" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="44.39007" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="51.59007" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="58.79007" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="28.08333" height="2" x="35.89757" y="108.41356" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="31.43407" height="2" x="34.23" y="110.41447" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="28" height="2.42857" x="36.0615" y="95.7826" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <polygon transform="rotate(-90 50.09128189086915,92.48894500732422) " stroke-width="0.7" points="53.3702278137207,92.48895263671875 46.81235122680664,106.07190704345703 46.81235122680664,78.9059829711914 53.3702278137207,92.48895263671875 " fill="#f2f2f2" stroke="#707070"/>
+
+   <rect width="4" height="10" x="125.7" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="132.9" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="140.1" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="147.3" y="40.8" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="28.08333" height="2" x="124.4075" y="50.91667" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="31.43407" height="2" x="122.73993" y="52.91758" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="28" height="2.42857" x="124.57143" y="38.28571" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <polygon transform="rotate(-90 138.6012115478516,34.99205780029296) " stroke-width="0.7" points="141.88015747070312,34.9920654296875 135.32228088378906,48.57501983642578 135.32228088378906,21.409095764160156 141.88015747070312,34.9920654296875 " fill="#f2f2f2" stroke="#707070"/>
+
+   <rect width="4" height="10" x="125.7" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="132.9" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="140.1" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="4" height="10" x="147.3" y="98.29689" stroke-width="0" fill-rule="evenodd" fill="url(#bankPillar)"/>
+   <rect width="28.08333" height="2" x="124.4075" y="108.41356" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="31.43407" height="2" x="122.73993" y="110.41447" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <rect width="28" height="2.42857" x="124.57143" y="95.7826" stroke-width="0.7" fill-rule="evenodd" fill="#f2f2f2" stroke="#707070"/>
+   <polygon transform="rotate(-90 138.6012115478516,92.48894500732423) " stroke-width="0.7" points="141.88015747070312,92.48895355224607 135.32228088378906,106.07190795898435 135.32228088378906,78.90598388671873 141.88015747070312,92.48895355224607 " fill="#f2f2f2" stroke="#707070"/>
+ </g>
+</svg>
