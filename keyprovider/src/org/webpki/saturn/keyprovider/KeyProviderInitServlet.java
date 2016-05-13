@@ -52,7 +52,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final String ERROR_TAG = "err";
 
     static final String HTML_INIT = 
-            "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\">"+
+            "<!DOCTYPE HTML>"+
             "<html><head><meta name=\"viewport\" content=\"initial-scale=1.0\"/>" +
             "<title>Payment Credential Enrollment</title>"+
             "<style type=\"text/css\">html {overflow:auto} html, body {margin:0px;padding:0px;height:100%} "+

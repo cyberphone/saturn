@@ -270,7 +270,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 }.start();
             }
             
-            logger.info("Web2Native Bridge KeyProvider-server initiated");
+            logger.info("Saturn KeyProvider-server initiated");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }
