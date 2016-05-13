@@ -7,7 +7,7 @@
 <g>
 <rect x="10.4" y="10.4" width="301.2" height="181.2" fill="#afafaf" rx="20" ry="20" filter="url(#messageBlur)"/>
 <rect x="5" y="5" width="300" height="180" stroke="#A0A0A0" stroke-width="1.2" fill="#ffffff" rx="20" ry="20"/>
-<text x="155" y="149" font-family="Sans-serif" font-size="30" text-anchor="middle">Luke Skywalker</text>
+<text x="155" y="151" font-family="Sans-serif" font-size="26" text-anchor="middle">Luke Skywalker</text>
 <text x="38.78" y="70.23" font-family="Sans-serif" font-size="34" text-anchor="start" font-weight="bold" fill="#6d8838" letter-spacing="2">UnusualCard</text>
 </g>
 </svg>
