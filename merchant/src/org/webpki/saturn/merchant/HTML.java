@@ -650,12 +650,12 @@ public class HTML implements MerchantProperties {
                          "<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><b>Please wait while the Wallet plugin starts...</b></td></tr>").getBytes("UTF-8"));
     }
 
-    static void qrClientResult(HttpServletResponse response, boolean success) throws IOException {
+    static void qrClientCancel(HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
         response.setHeader("Pragma", "No-Cache");
         response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write((success ? "SUCCESS :-)" : "Cancelled").getBytes("UTF-8"));
+        response.getOutputStream().write("Cancelled".getBytes("UTF-8"));
     }
 
     static void autoPost(HttpServletResponse response, String url) throws IOException, ServletException {

@@ -85,7 +85,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                 // When user clicks "Cancel" in QR mode we must cancel the operation
                 // at the merchant side and return a suitable page to the QR client
                 QRSessions.cancelSession(id);
-                HTML.qrClientResult(response, false);
+                HTML.qrClientCancel(response);
             }
             return;
         }
