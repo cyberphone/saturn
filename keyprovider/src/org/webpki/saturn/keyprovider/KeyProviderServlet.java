@@ -132,7 +132,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON,
                             paymentCredential.cardFormatted)
                 .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON,
-                           KeyProviderService.bankAuthorityUrl)
+                            paymentCredential.authorityUrl)
                 .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
                            signAlg.getAlgorithmId(AlgorithmPreferences.JOSE))
                 .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()

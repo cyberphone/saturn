@@ -85,8 +85,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static String keygen2EnrollmentUrl;
     
-    static String bankAuthorityUrl;
-    
     static String successImageAndMessage;
     
     static Integer serverPortMapping;
@@ -195,10 +193,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials
             ////////////////////////////////////////////////////////////////////////////////////////////
+            String bankHost = getPropertyString(BANK_HOST);
             for (String credentialEntry : CREDENTIALS) {
                 final String[] arguments = getPropertyStringList(credentialEntry);
                 PaymentCredential paymentCredential = new PaymentCredential();
                 paymentCredentials.add(paymentCredential);
+                paymentCredential.authorityUrl = bankHost + "/" + arguments[5] + "/authority";
                 paymentCredential.signatureKey =
                     new KeyStoreEnumerator(getResource(arguments[0]),
                                            getPropertyString(KEYSTORE_PASSWORD));
@@ -225,7 +225,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                         ArrayUtil.getByteArrayFromInputStream(getResource(arguments[4]))).getPublicKey();
             }
 
-            bankAuthorityUrl = getPropertyString(BANK_HOST);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // SKS key management key

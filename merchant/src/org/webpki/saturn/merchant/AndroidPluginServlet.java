@@ -41,7 +41,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     static final String ANDROID_WEBPKI_VERSION_MACRO  = "$VER$";
 
     static final String ANDROID_CANCEL                = "qric";
-    static final String QR_ANDROID_SUCCESS            = "qris";
+    static final String QR_SUCCESS_URL                = "local";
     static final String QR_RETRIEVE                   = "qrir";
     
     String getPluginUrl() {
@@ -75,12 +75,6 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     ///////////////////////////////////////////////////////////////////////////////////
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        if (request.getParameter(QR_ANDROID_SUCCESS) != null) {
-            // If the Wallet in QR mode receives success it should call this URL
-            HTML.qrClientResult(response, true);
-            return;
-        }
-        
         String id = request.getParameter(ANDROID_CANCEL);
         if (id != null) {
             if (id.isEmpty()) {
@@ -111,11 +105,11 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             logger.info(session.getId());
             String cancelUrl = getPluginUrl() + "?" + ANDROID_CANCEL + "=" + 
                     (qrMode ? (String) session.getAttribute(QR_SESSION_ID_ATTR) : "");
-            String successUrl = qrMode ?
-                    getPluginUrl() + "?" + QR_ANDROID_SUCCESS + "=true"
+            String successUrl = qrMode ? QR_SUCCESS_URL
                                        :
                     MerchantService.merchantBaseUrl + "/result";
-            TransactionServlet.returnJsonData(response, new WalletRequest(session, 
+            TransactionServlet.returnJsonData(response, new WalletRequest(session,
+                                                                          MerchantService.merchantBaseUrl + "/transact",
                                                                           cancelUrl,
                                                                           successUrl).requestObject);
         } else {
