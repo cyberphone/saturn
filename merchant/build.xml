@@ -187,7 +187,7 @@
      <property name="acquirer.host" value="https://mobilepki.org"/>
      <property name="payee_provider.host" value="https://mobilepki.org"/>
      <property name="merchant.host" value="https://mobilepki.org"/>
-     <property name="security.actual" value="security.constraints"/>
+     <property name="security.actual" value="${security.constraints}"/>
      <property name="server.port.map" value="8442"/>
      <property file="common.properties"/>
      <property file="merchants.properties"/>
