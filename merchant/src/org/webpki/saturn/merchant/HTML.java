@@ -105,7 +105,7 @@ public class HTML implements MerchantProperties {
                    "<li style=\"padding-top:0pt\">Fully <i>decentralized</i> operation (no dependency on central registries like 3D Secure)</li>" +
                    "<li><i>Digitally signed</i> messages enable a protocol-level security comparable to a PIN-code terminal and chip-card in a physical shop</li>" +
                    "<li>Encryption (like in SET) hides senstive customer data from merchants without needing &quot;tokenization&quot;</li>" +
-                   "<li>Private messaging through the payment system makes it easy applying RBA (Risk Based Authentication) for high-value transactions</li>" +
+                   "<li>Private messaging through the payment system makes it easy applying RBA (Risk Based Authentication) for high-value or &quot;suspicious&quot; transactions</li>" +
                    "<li>Equally applicable for legacy card payment (&quot;pull&quot;) networks as for bank-2-bank (&quot;push&quot;) schemes</li>" +
                    "<li>In addition to supporting Web payments, Saturn is <i>intended to also be usable in traditional payment scenarios " +
                    "including with POS teminals and gas pumps using an NFC/BLE connection to the Wallet</i></li>" +
@@ -113,8 +113,8 @@ public class HTML implements MerchantProperties {
                    "<li>Consumers only deal with payment instruments visualized as cards (like they did <i>before</i> the Web)</li>" +
                    "</ul>" +
                    "Note that the Wallet is <i>pre-configured</i> with payment credentials requiring no signup etc.&nbsp;&nbsp;" +
-                   "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">Install Wallet</a>." +
-                   "</td></tr>" +
+                   "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">Install Wallet</a>.&nbsp; " +
+                   "There is also an <a href=\"android\">Android version</a> of the Wallet.</td></tr>" +
                    "<tr><td align=\"center\"><table cellspacing=\"0\">" +
 //TODO
 //                   "<tr style=\"text-align:left\"><td><a href=\"" + "hh" + "/cards\">Initialize Payment Cards&nbsp;&nbsp;</a></td><td><i>Mandatory</i> First Step</td></tr>" +
@@ -509,9 +509,9 @@ public class HTML implements MerchantProperties {
                  "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Order Status<br>&nbsp;</td></tr>" +
                  "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">Dear customer, your order has been successfully processed!</td></tr>" +
                  "<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
-         .append(resultData.accountType.isAcquirerBased() ? "Card" : "Account")
+         .append(resultData.accountType.isCardPayment() ? "Card" : "Account")
          .append(" Type</th><th>")
-         .append(resultData.accountType.isAcquirerBased() ? "Card Reference" : "Account Number")
+         .append(resultData.accountType.isCardPayment() ? "Card Reference" : "Account Number")
          .append("</th></tr>" +
                  "<tr><td style=\"text-align:center\">")
          .append(resultData.referenceId)
@@ -653,5 +653,21 @@ public class HTML implements MerchantProperties {
     static void autoPost(HttpServletResponse response, String url) throws IOException, ServletException {
         HTML.output(response, "<html><body onload=\"document.forms.posting.submit()\">Redirecting..." +
                               "<form name=\"posting\" action=\"" + url + "\" method=\"POST\"></form></body></html>");
+    }
+
+    static void androidPage(HttpServletResponse response) throws IOException, ServletException {
+        HTML.output(response, HTML.getHTML(null, null,
+                "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+                "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
+                "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
+                 "<tr><td style=\"text-align:left\">Note: The Android Wallet is currently a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
+                "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
+                  "https://play.google.com/store/apps/details?id=org.webpki.mobile.android</a></td></tr>" +
+                "<tr><td>Enroll payment credentials by surfing (with the Android device...) to: <a href=\"https://test.webpki.org/webpay-keyprovider\">" +
+                  "https://test.webpki.org/webpay-keyprovider</td></tr>" +
+                "<tr><td>Unlike the Windows, Linux, and OS/X-based Wallet, the Android version also supports remote operation using QR codes.  This mode is " +
+                  "indicated by the following image in the Merchant Web application:</td></tr>" +
+                "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" +
+                "</table></td></tr>"));       
     }
 }

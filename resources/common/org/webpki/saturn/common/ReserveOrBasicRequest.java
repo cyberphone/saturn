@@ -110,13 +110,13 @@ public class ReserveOrBasicRequest implements BaseProperties {
                                           Date expires,
                                           ServerAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(basicCredit ? Messages.BASIC_CREDIT_REQUEST : 
-            accountType.isAcquirerBased() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
+            accountType.isCardPayment() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
             .setObject(AUTHORIZATION_DATA_JSON, encryptedAuthorizationData)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root);
-        if (accountType.isAcquirerBased()) {
+        if (accountType.isCardPayment()) {
             wr.setString(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
         }
         if (!basicCredit) {

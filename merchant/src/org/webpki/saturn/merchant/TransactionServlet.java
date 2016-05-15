@@ -192,7 +192,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             }
            
             // Basic credit is only applicable to account2account operations
-            boolean acquirerBased = payerAuthorization.getAccountType().isAcquirerBased();
+            boolean acquirerBased = payerAuthorization.getAccountType().isCardPayment();
             boolean basicCredit = !W2NBWalletServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
                                   !acquirerBased;
 

@@ -213,6 +213,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         // Get the embedded by the user and merchant attested payment request
         ReserveOrBasicRequest reserveOrBasicRequest = transactionRequest.getReserveOrBasicRequest();
+        boolean cardPayment = reserveOrBasicRequest.getMessage().isCardPayment();
 
         // Merchant provides the client's IP address which can be used for RBA
         String clientIpAddress = reserveOrBasicRequest.getClientIpAddress();
@@ -279,7 +280,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // Separate credit-card and account2account payments
         AccountDescriptor payeeAccount = null;
         JSONObjectWriter encryptedCardData = null;
-        if (reserveOrBasicRequest.getMessage().isCardPayment()) {
+        if (cardPayment) {
 
             // Lookup of payee's acquirer.  You would typically cache such information
             urlHolder.setUrl(reserveOrBasicRequest.getAcquirerAuthorityUrl());
@@ -342,7 +343,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         Authority providerAuthority = getAuthority(urlHolder);
 
         // We need to separate credit-card and account-2-account payments
-        boolean acquirerBased = attestedPaymentRequest.getPayerAccountType().isAcquirerBased();
+        boolean acquirerBased = attestedPaymentRequest.getPayerAccountType().isCardPayment();
         logger.info("Kind of operation: " + (acquirerBased ? "credit-card" : "account-2-account"));
 
         ////////////////////////////////////////////////////////////////////////////

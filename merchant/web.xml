@@ -141,6 +141,11 @@
         <servlet-class>org.webpki.saturn.merchant.AndroidPluginServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>AndroidServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.AndroidServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -194,6 +199,11 @@
     <servlet-mapping>
         <servlet-name>AndroidPluginServlet</servlet-name>
         <url-pattern>/androidplugin</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AndroidServlet</servlet-name>
+        <url-pattern>/android</url-pattern>
     </servlet-mapping>
 @security-constraints@
 </web-app>

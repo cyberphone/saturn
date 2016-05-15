@@ -194,7 +194,7 @@
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
      <property name="dist.dir" value="${ejbca.gen.path}"/>
      <path id="ejbca.compile.classpath">
-	    <fileset dir="${plugin.ejbca.ant.custom.enrollment_plugin_directory}/lib.common">
+	    <fileset dir="${ejbca.gen.path}/lib">
            <include name="*.jar"/>
         </fileset>
 	    <fileset dir="extra.lib">

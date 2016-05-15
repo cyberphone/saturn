@@ -25,18 +25,18 @@ public enum PayerAccountTypes implements Serializable {
     BANK_DIRECT  (false, "https://bankdirect.net",  "Bank Direct"),
     UNUSUAL_CARD (false, "https://unusualcard.com", "UnusualCard");
 
-    boolean acquirerBased;  // True => card processor model, false = > 3 or 4 corner distributed model
+    boolean cardPayment;  // True => card processor model, false = > 3 or 4 corner distributed model
     String typeUri;            // A brand URI
     String commonName;      // What it is usually called
     
-    PayerAccountTypes (boolean acquirerBased, String typeUri, String commonName) {
-        this.acquirerBased = acquirerBased;
+    PayerAccountTypes (boolean cardPayment, String typeUri, String commonName) {
+        this.cardPayment = cardPayment;
         this.typeUri = typeUri;
         this.commonName = commonName;
     }
 
-    public boolean isAcquirerBased() {
-        return acquirerBased;
+    public boolean isCardPayment() {
+        return cardPayment;
     }
 
     public String getTypeUri() {
