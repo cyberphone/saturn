@@ -340,6 +340,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         // Lookup of payer's bank.  You would typically cache such information
         urlHolder.setUrl(attestedPaymentRequest.getProviderAuthorityUrl());
+
+        // Ugly patch allowing the wallet to work with a local system as well
+        urlHolder.localSystemWalletUrlFix();
+
         Authority providerAuthority = getAuthority(urlHolder);
 
         // We need to separate credit-card and account-2-account payments
@@ -358,9 +362,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                                               new String[]{"enterprise"})};
      
         urlHolder.setUrl(providerAuthority.getTransactionUrl());
-
-        // Ugly patch allowing the wallet to work with a local system as well
-        urlHolder.localSystemWalletUrlFix();
 
         // Customer bank: Can we please do a payment now?
         JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
