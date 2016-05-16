@@ -48,7 +48,11 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute(REQUEST_HASH_SESSION_ATTR) != null) {
+            session.invalidate();
+        }
+        session = request.getSession(true);
         session.setAttribute(TAP_CONNECT_MODE_SESSION_ATTR, isTapConnect());
         HTML.homePage(response,
                       checkBoxGet(session, DEBUG_MODE_SESSION_ATTR),
