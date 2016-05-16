@@ -186,7 +186,7 @@
      <property name="bouncycastle.first" value="false"/>
      <property name="acquirer.host" value="https://mobilepki.org"/>
      <property name="payee_provider.host" value="https://mobilepki.org"/>
-     <property name="merchant.host" value="https://mobilepki.org"/>
+     <property name="merchant.host" value="https://test.webpki.org"/>
      <property name="security.actual" value="${security.constraints}"/>
      <property name="server.port.map" value="8442"/>
      <property file="common.properties"/>
