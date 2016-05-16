@@ -171,13 +171,13 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             }
  
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // A common string for browser enrollments
+            // Show a sign that the user succeeded getting Saturn credentials
             ////////////////////////////////////////////////////////////////////////////////////////////
             successImageAndMessage = new StringBuffer("<img src=\"data:image/png;base64,")
                 .append(new Base64(false).getBase64StringFromBinary(
                     ArrayUtil.getByteArrayFromInputStream(
-                        event.getServletContext().getResourceAsStream("/images/certandkey.png"))))
-                .append("\" title=\"Certificate and Private Key\"><br>&nbsp;" +
+                        event.getServletContext().getResourceAsStream("/images/paywith-saturn.png"))))
+                .append("\" title=\"Payment Credentials\"><br>&nbsp;" +
                         "<br><b>Enrollment Succeeded!</b>").toString();
 
             ////////////////////////////////////////////////////////////////////////////////////////////
