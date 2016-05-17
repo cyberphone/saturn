@@ -102,6 +102,9 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                 return;
             }
             logger.info(session.getId());
+            if (session.getAttribute(RESULT_DATA_SESSION_ATTR) != null) {
+                ErrorServlet.systemFail(response, "Session already used");
+            }
             String cancelUrl = getPluginUrl() + "?" + ANDROID_CANCEL + "=";
             if (qrMode) {
                 cancelUrl = "get:" + cancelUrl + (String) session.getAttribute(QR_SESSION_ID_ATTR);
