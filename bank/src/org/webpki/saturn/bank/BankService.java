@@ -100,6 +100,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static Integer serverPortMapping;
     
+    static String authorityUrl;
+    
     static int referenceId;
     
     static boolean logging;
@@ -172,7 +174,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             String bankHost = getPropertyString(BANK_HOST);
             publishedAuthorityData =
-                Authority.encode(bankHost + "/authority",
+                Authority.encode(authorityUrl = bankHost + "/authority",
                                  bankHost + "/transact",
                                  decryptionKeys.get(0).getPublicKey(),
                                  Expires.inDays(365),

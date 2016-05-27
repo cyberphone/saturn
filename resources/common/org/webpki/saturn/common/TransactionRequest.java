@@ -50,6 +50,8 @@ public class TransactionRequest implements BaseProperties {
             } while (ar.hasMore());
             accountDescriptors = accounts.toArray(new AccountDescriptor[0]);
         }
+        // Strictly not necessary but it could hold "config" data
+        authorityUrl = rd.getString(INITIATOR_AUTHORITY_URL_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
@@ -63,6 +65,11 @@ public class TransactionRequest implements BaseProperties {
     Software software;
     
     GregorianCalendar dateTime;
+
+    String authorityUrl;
+    public String getAuthorityUrl() {
+        return authorityUrl;
+    }
 
     String referenceId;
     public String getReferenceId() {
@@ -85,11 +92,13 @@ public class TransactionRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(ReserveOrBasicRequest reserveOrBasicRequest,
+                                          String authorityUrl,
                                           AccountDescriptor[] accountDescriptors,
                                           String referenceId,
                                           ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
-            .setObject(EMBEDDED_JSON, reserveOrBasicRequest.root);
+            .setObject(EMBEDDED_JSON, reserveOrBasicRequest.root)
+            .setString(INITIATOR_AUTHORITY_URL_JSON, authorityUrl);
         if (reserveOrBasicRequest.message.isCardPayment()) {
         } else {
             JSONArrayWriter aw = wr.setArray(PAYEE_ACCOUNTS_JSON);

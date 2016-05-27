@@ -365,6 +365,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         // Customer bank: Can we please do a payment now?
         JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
+                                                                        BankService.authorityUrl,
                                                                         accounts,
                                                                         getReferenceId(),
                                                                         BankService.bankKey);
