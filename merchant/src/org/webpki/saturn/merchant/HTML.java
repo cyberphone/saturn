@@ -42,7 +42,7 @@ public class HTML implements MerchantProperties {
     static final String HTML_INIT = 
         "<!DOCTYPE html>"+
         "<html><head><meta charset=\"UTF-8\"><link rel=\"shortcut icon\" href=\"favicon.ico\">"+
-//        "<meta name=\"viewport\" content=\"initial-scale=1.0\"/>" +
+        "<meta name=\"viewport\" content=\"initial-scale=1.0\"/>" +
         "<title>Saturn Payment Demo</title>"+
         "<style type=\"text/css\">html {overflow:auto}\n"+
         ".point {text-align:center;font-family:courier;font-weight:bold;font-size:10pt;border-radius:3pt;border-width:1px;border-style:solid;border-color:#B0B0B0;display:inline-block;padding:1.5pt 3pt 1pt 3pt}\n" +
@@ -51,7 +51,7 @@ public class HTML implements MerchantProperties {
           "linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
           "border-width:1px;padding:4pt 10pt 4pt 10pt;border-style:solid;border-color:#a9a9a9;" +
           "text-align:center;font-family:" + FONT_ARIAL + "}\n" +
-        ".tftable td {background-color:#FFFFE0;font-size:11pt;border-width:1px;padding:4pt 8pt 4pt 8pt;border-style:solid;border-color:#a9a9a9;font-family:" + FONT_ARIAL + "}\n" +
+        ".tftable td {background-color:#FFFFE0;font-size:11pt;border-width:1px;padding:4pt 8pt 4pt 8pt;border-style:solid;border-color:#a9a9a9;font-family:" + FONT_ARIAL + ";white-space:nowrap}\n" +
         "body {font-size:10pt;color:#000000;font-family:" + FONT_VERDANA + ";background-color:white}\n" +
         "a {font-weight:bold;font-size:8pt;color:blue;font-family:" + FONT_ARIAL + ";text-decoration:none}\n" +
         "td {font-size:8pt;font-family:" + FONT_VERDANA + "}\n" +
