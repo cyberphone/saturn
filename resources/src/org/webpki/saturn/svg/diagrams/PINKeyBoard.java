@@ -1,0 +1,110 @@
+/*
+ *  Copyright 2006-2016 WebPKI.org (http://webpki.org).
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+package org.webpki.saturn.svg.diagrams;
+
+import org.webpki.tools.svg.SVGAddDouble;
+import org.webpki.tools.svg.SVGAddOffset;
+import org.webpki.tools.svg.SVGDivConstant;
+import org.webpki.tools.svg.SVGDocument;
+import org.webpki.tools.svg.SVGDoubleValue;
+import org.webpki.tools.svg.SVGRect;
+import org.webpki.tools.svg.SVGText;
+
+public class PINKeyBoard extends SVGDocument {
+    public PINKeyBoard() {
+        super(25, 25);
+    }
+
+    final static double BUTTON_WIDTH  = 48;
+    final static double BUTTON_HEIGHT = 44;
+    final static double BUTTON_MARGIN = 2;
+    final static double BUTTON_HSPACE = 20;
+    final static double BUTTON_VSPACE = 16;
+    final static double VALIDATE_WIDTH = 126;
+    final static double VALIDATE_HEIGHT = 80;
+    
+    final static String CORE_COLOR    = "#a5a5a5";
+    final static String S_COLOR       = "#969191";
+    final static String FRONT_COLOR   = "#fcfcfc";
+
+    @Override
+    public String getFilters() {
+        return 
+        "<defs>\n" +
+        "<filter id=\"actorsBlur\" x=\"-25%\" y=\"-25%\" width=\"150%\" height=\"150%\">\n" +
+        "<feGaussianBlur stdDeviation=\"3\"/>\n" +
+        "</filter>\n" +
+        "</defs>\n";
+
+    }
+
+    SVGText basicButton(double x, double y, double buttonWidth, double buttonHeight, 
+                        String fontFamily, int fontSize, String text, int yOffset,
+                        String javascript) {
+        add(new SVGRect(
+                new SVGDoubleValue(x),
+                new SVGDoubleValue(y),
+                new SVGDoubleValue(buttonWidth),
+                new SVGDoubleValue(buttonHeight),
+                1.0,
+                S_COLOR,
+                CORE_COLOR).setRadiusX(10).setRadiusY(10).setLink("javascript:" + javascript, null, null));
+        add(new SVGRect(
+                new SVGDoubleValue(x + BUTTON_MARGIN),
+                new SVGDoubleValue(y + BUTTON_MARGIN),
+                new SVGDoubleValue(buttonWidth - BUTTON_MARGIN - BUTTON_MARGIN),
+                new SVGDoubleValue(buttonHeight - BUTTON_MARGIN - BUTTON_MARGIN),
+                null,
+                null,
+                FRONT_COLOR).setRadiusX(9).setRadiusY(9)
+                          .setFilter("url(#actorsBlur)"));
+        SVGText svgText = new SVGText(
+                new SVGAddDouble(new SVGDoubleValue(x + BUTTON_MARGIN),
+                                 new SVGDivConstant(new SVGDoubleValue(buttonWidth - BUTTON_MARGIN - BUTTON_MARGIN), 2)),
+                new SVGAddOffset(new SVGAddDouble(new SVGDoubleValue(y + BUTTON_MARGIN),
+                                 new SVGDivConstant(new SVGDoubleValue(buttonHeight - BUTTON_MARGIN - BUTTON_MARGIN), 2)), yOffset),
+                fontFamily,
+                fontSize,
+                SVGText.TEXT_ANCHOR.MIDDLE,
+                text);
+        add(svgText.endLink());
+        return svgText;
+    }
+
+    @Override
+    public void generate() {
+        double x = 0;
+        double y = 0;
+        for (int digit = 0; digit < 10; digit++) {
+            String value = String.valueOf(digit);
+            basicButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, "Arial", 35, value, 12, "addDigit('" + value + "')")
+               .setFontWeight(SVGText.FONT_WEIGHTS.BOLD);
+            x += BUTTON_WIDTH + BUTTON_HSPACE;
+            if (digit == 3 || digit == 6) {
+                x = 0;
+                y += BUTTON_HEIGHT + BUTTON_VSPACE;
+            }
+        }
+        double validateX = 3 * BUTTON_WIDTH + 5 * BUTTON_HSPACE;
+        basicButton(validateX + VALIDATE_WIDTH - BUTTON_WIDTH, 0, BUTTON_WIDTH, BUTTON_HEIGHT, "Arial", 55, "&#171;", 14, "deleteDigit()")
+            .setFontColor("#f70707");
+        
+        basicButton(validateX, y - VALIDATE_HEIGHT + BUTTON_HEIGHT, VALIDATE_WIDTH, VALIDATE_HEIGHT, "Arial", 26, "Validate", 7, "validatePin()")
+            .setFontWeight(SVGText.FONT_WEIGHTS.BOLD)
+            .setFontColor("#03af03");
+    }
+}

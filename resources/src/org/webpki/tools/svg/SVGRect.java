@@ -139,8 +139,13 @@ public class SVGRect extends SVGObject {
         return this;
     }
     
-    public SVGRect setLink(String url, String toolTip, boolean replace) {
+    public SVGRect setLink(String url, String toolTip, Boolean replace) {
         _setLink(url, toolTip, replace);
+        return this;
+    }
+
+    public SVGRect endLink() {
+        _endLink();
         return this;
     }
 

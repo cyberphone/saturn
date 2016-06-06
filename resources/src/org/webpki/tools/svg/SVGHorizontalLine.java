@@ -93,7 +93,7 @@ public class SVGHorizontalLine extends SVGLine {
         }
 
         @Override
-        public Text setLink(String url, String toolTip, boolean replace) {
+        public Text setLink(String url, String toolTip, Boolean replace) {
             super.setLink(url, toolTip, replace);
             return this;
         }

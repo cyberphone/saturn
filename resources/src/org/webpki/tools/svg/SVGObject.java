@@ -45,7 +45,9 @@ public abstract class SVGObject {
     
     String linkUrl;
     
-    boolean linkReplace;
+    Boolean linkReplace;
+    
+    boolean endLink;
     
     String linkToolTip;
     
@@ -136,13 +138,17 @@ public abstract class SVGObject {
                                    new SVGStringValue("none") : new SVGStringValue(fillColor));
     }
     
-    void _setLink(String url, String toolTip, boolean replace) {
+    void _setLink(String url, String toolTip, Boolean replace) {
         linkUrl = url;
         linkReplace = replace;
         linkToolTip = toolTip;
         SVGDocument.linksUsed = true;
     }
     
+    void _endLink() {
+        endLink = true;
+    }
+
     void _setRoundLineCap() {
         _attributes.put(SVGAttributes.STROKE_LINECAP, new SVGStringValue("round"));
     }

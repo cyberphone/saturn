@@ -151,8 +151,13 @@ public class SVGText extends SVGObject {
         return updateMargin(SVGDocument.marginY,SVGAttributes.Y);
     }
 
-    public SVGText setLink(String url, String toolTip, boolean replace) {
+    public SVGText setLink(String url, String toolTip, Boolean replace) {
         _setLink(url, toolTip, replace);
+        return this;
+    }
+
+    public SVGText endLink() {
+        _endLink();
         return this;
     }
 }

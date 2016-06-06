@@ -212,7 +212,8 @@ add(someRect = new SVGRect(createDocumentAnchor(370, 150, SVGAnchor.ALIGNMENT.BO
                         new SVGDoubleValue(48),
                         0.5,
                         "#969191",
-                        "#edbca6").setRadiusX(10).setRadiusY(10));
+                        "#edbca6").setRadiusX(10).setRadiusY(10)
+                        .setLink("http://google.com", "Search something", false));
 
 add(new SVGRect(new SVGAnchor(someRect, someRect, SVGAnchor.ALIGNMENT.TOP_LEFT)
 .derive(new SVGDoubleValue(2), new SVGDoubleValue(2), SVGAnchor.ALIGNMENT.TOP_LEFT),
@@ -223,7 +224,8 @@ add(new SVGRect(new SVGAnchor(someRect, someRect, SVGAnchor.ALIGNMENT.TOP_LEFT)
         "#ffffff").setRadiusX(9)
                   .setRadiusY(9)
                   .setFilter("url(#actorsBlur)")
-                  .setLink("http://google.com", "Search something", false));
+                  .endLink()
+                  .addCenterText(0, "Arial", 25, "Search"));
 
 SVGAnchor anchor = new SVGAnchor(someRect, someRect, SVGAnchor.ALIGNMENT.BOTTOM_CENTER);
 add(new SVGRect(anchor.derive(new SVGDoubleValue(20), new SVGDoubleValue(10), SVGAnchor.ALIGNMENT.TOP_LEFT),

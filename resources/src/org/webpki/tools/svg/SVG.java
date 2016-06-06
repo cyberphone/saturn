@@ -24,27 +24,33 @@ public class SVG {
     
     static SVGDocument doc;
     
+    private static void _writeAttribute(String optionalAttribute, String value) {
+        if (value != null) {
+            svgText.append(' ')
+                   .append(optionalAttribute)
+                   .append("=\"")
+                   .append(value)
+                   .append('"');
+        }
+    }
+    
     static void writeSVGObject(SVGObject svgObject) {
         doc.findLargestSize(svgObject);
         for (SVGObject dependencyElement : svgObject.beforeDependencyElements) {
             writeSVGObject(dependencyElement);
         }
         if (svgObject.linkUrl != null) {
-            svgText.append("<a xlink:href=\"")
-                   .append(svgObject.linkUrl)
-                   .append("\" xlink:title=\"")
-                   .append(svgObject.linkToolTip)
-                   .append("\" xlink:show=\"")
-                   .append(svgObject.linkReplace ? "replace" : "new")
-                   .append("\">\n ");
+            svgText.append("<a");
+            _writeAttribute("xlink:href", svgObject.linkUrl);
+            _writeAttribute("xlink:title", svgObject.linkToolTip);
+            if (svgObject.linkReplace != null) {
+                _writeAttribute("xlink:show", svgObject.linkReplace ? "replace" : "new");
+            }
+            svgText.append(">\n");
         }
         svgText.append("<").append(svgObject.getTag());
         for (SVGAttributes svgAttribute : svgObject.getSVGAttributes().keySet()) {
-            svgText.append(" ")
-                   .append(svgAttribute.toString())
-                   .append("=\"")
-                   .append(svgObject.getAttribute(svgAttribute).getStringRepresentation())
-                   .append("\"");
+            _writeAttribute(svgAttribute.toString(), svgObject.getAttribute(svgAttribute).getStringRepresentation());
         }
         if (svgObject.hasBody()) {
             if (svgObject.getBody() != null) {
@@ -65,7 +71,7 @@ public class SVG {
                    .append(svgObject.getTag())
                    .append(">\n");
         }
-        if (svgObject.linkUrl != null) {
+        if (svgObject.endLink) {
             svgText.append("</a>\n");
         }
     }
