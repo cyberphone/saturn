@@ -8,62 +8,62 @@
 <a xlink:href="javascript:addDigit('0')">
 <rect x="25" y="25" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="27" y="27" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="49" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">0</text>
+<text x="49.5" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">0</text>
 </a>
 <a xlink:href="javascript:addDigit('1')">
 <rect x="93" y="25" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="95" y="27" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="117" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">1</text>
+<text x="117.5" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">1</text>
 </a>
 <a xlink:href="javascript:addDigit('2')">
 <rect x="161" y="25" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="163" y="27" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="185" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">2</text>
+<text x="185.5" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">2</text>
 </a>
 <a xlink:href="javascript:addDigit('3')">
 <rect x="229" y="25" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="231" y="27" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="253" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">3</text>
+<text x="253.5" y="59" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">3</text>
 </a>
 <a xlink:href="javascript:addDigit('4')">
 <rect x="25" y="85" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="27" y="87" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="49" y="119" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">4</text>
+<text x="49.5" y="119" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">4</text>
 </a>
 <a xlink:href="javascript:addDigit('5')">
 <rect x="93" y="85" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="95" y="87" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="117" y="119" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">5</text>
+<text x="117.5" y="119" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">5</text>
 </a>
 <a xlink:href="javascript:addDigit('6')">
 <rect x="161" y="85" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="163" y="87" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="185" y="119" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">6</text>
+<text x="185.5" y="119" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">6</text>
 </a>
 <a xlink:href="javascript:addDigit('7')">
 <rect x="25" y="145" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="27" y="147" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="49" y="179" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">7</text>
+<text x="49.5" y="179" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">7</text>
 </a>
 <a xlink:href="javascript:addDigit('8')">
 <rect x="93" y="145" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="95" y="147" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="117" y="179" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">8</text>
+<text x="117.5" y="179" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">8</text>
 </a>
 <a xlink:href="javascript:addDigit('9')">
 <rect x="161" y="145" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="163" y="147" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="185" y="179" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">9</text>
+<text x="185.5" y="179" font-family="Arial" font-size="35" text-anchor="middle" font-weight="bold">9</text>
 </a>
 <a xlink:href="javascript:deleteDigit()">
 <rect x="347" y="25" width="48" height="44" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="349" y="27" width="44" height="40" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="371" y="61" font-family="Arial" font-size="55" text-anchor="middle" fill="#f70707">&#171;</text>
+<text x="371.5" y="61" font-family="Arial" font-size="55" text-anchor="middle" fill="#f70707">&#171;</text>
 </a>
 <a xlink:href="javascript:validatePin()">
 <rect x="269" y="109" width="126" height="80" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
 <rect x="271" y="111" width="122" height="76" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="332" y="156" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold" fill="#03af03">Validate</text>
+<text x="332.5" y="158" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold" fill="#03af03">Validate</text>
 </a>
 </g>
 </svg>

@@ -16,9 +16,6 @@
  */
 package org.webpki.saturn.svg.diagrams;
 
-import org.webpki.tools.svg.SVGAddDouble;
-import org.webpki.tools.svg.SVGAddOffset;
-import org.webpki.tools.svg.SVGDivConstant;
 import org.webpki.tools.svg.SVGDocument;
 import org.webpki.tools.svg.SVGDoubleValue;
 import org.webpki.tools.svg.SVGRect;
@@ -43,13 +40,11 @@ public class PINKeyBoard extends SVGDocument {
 
     @Override
     public String getFilters() {
-        return 
-        "<defs>\n" +
-        "<filter id=\"actorsBlur\" x=\"-25%\" y=\"-25%\" width=\"150%\" height=\"150%\">\n" +
-        "<feGaussianBlur stdDeviation=\"3\"/>\n" +
-        "</filter>\n" +
-        "</defs>\n";
-
+        return "<defs>\n" +
+               "<filter id=\"actorsBlur\" x=\"-25%\" y=\"-25%\" width=\"150%\" height=\"150%\">\n" +
+               "<feGaussianBlur stdDeviation=\"3\"/>\n" +
+               "</filter>\n" +
+               "</defs>\n";
     }
 
     SVGText basicButton(double x, double y, double buttonWidth, double buttonHeight, 
@@ -71,12 +66,10 @@ public class PINKeyBoard extends SVGDocument {
                 null,
                 null,
                 FRONT_COLOR).setRadiusX(9).setRadiusY(9)
-                          .setFilter("url(#actorsBlur)"));
+                            .setFilter("url(#actorsBlur)"));
         SVGText svgText = new SVGText(
-                new SVGAddDouble(new SVGDoubleValue(x + BUTTON_MARGIN),
-                                 new SVGDivConstant(new SVGDoubleValue(buttonWidth - BUTTON_MARGIN - BUTTON_MARGIN), 2)),
-                new SVGAddOffset(new SVGAddDouble(new SVGDoubleValue(y + BUTTON_MARGIN),
-                                 new SVGDivConstant(new SVGDoubleValue(buttonHeight - BUTTON_MARGIN - BUTTON_MARGIN), 2)), yOffset),
+                new SVGDoubleValue(x + (buttonWidth + 1) / 2),
+                new SVGDoubleValue(y + buttonHeight / 2 + yOffset),
                 fontFamily,
                 fontSize,
                 SVGText.TEXT_ANCHOR.MIDDLE,
@@ -91,7 +84,8 @@ public class PINKeyBoard extends SVGDocument {
         double y = 0;
         for (int digit = 0; digit < 10; digit++) {
             String value = String.valueOf(digit);
-            basicButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, "Arial", 35, value, 12, "addDigit('" + value + "')")
+            basicButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
+                        "Arial", 35, value, 12, "addDigit('" + value + "')")
                .setFontWeight(SVGText.FONT_WEIGHTS.BOLD);
             x += BUTTON_WIDTH + BUTTON_HSPACE;
             if (digit == 3 || digit == 6) {
@@ -100,10 +94,12 @@ public class PINKeyBoard extends SVGDocument {
             }
         }
         double validateX = 3 * BUTTON_WIDTH + 5 * BUTTON_HSPACE;
-        basicButton(validateX + VALIDATE_WIDTH - BUTTON_WIDTH, 0, BUTTON_WIDTH, BUTTON_HEIGHT, "Arial", 55, "&#171;", 14, "deleteDigit()")
+        basicButton(validateX + VALIDATE_WIDTH - BUTTON_WIDTH, 0, BUTTON_WIDTH, BUTTON_HEIGHT,
+                    "Arial", 55, "&#171;", 14, "deleteDigit()")
             .setFontColor("#f70707");
         
-        basicButton(validateX, y - VALIDATE_HEIGHT + BUTTON_HEIGHT, VALIDATE_WIDTH, VALIDATE_HEIGHT, "Arial", 26, "Validate", 7, "validatePin()")
+        basicButton(validateX, y - VALIDATE_HEIGHT + BUTTON_HEIGHT, VALIDATE_WIDTH, VALIDATE_HEIGHT,
+                    "Arial", 26, "Validate", 9, "validatePin()")
             .setFontWeight(SVGText.FONT_WEIGHTS.BOLD)
             .setFontColor("#03af03");
     }
