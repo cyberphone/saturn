@@ -20,7 +20,7 @@
    <rect x="10.4" y="10.4" width="301.2" height="181.2" fill="#afafaf" rx="20" ry="20" filter="url(#messageBlur)"/>
    <rect x="5" y="5" width="300" height="180" stroke="#A0A0A0" stroke-width="1.2" fill="url(#bankdirectGradient)" rx="20" ry="20"/>
    <text x="155" y="161" font-family="Sans-serif" font-size="26" text-anchor="middle">Luke Skywalker</text>
-   <text x="176.11069" y="82.89931" font-family="Serif" font-size="28" text-anchor="start" font-weight="bold" fill="#558ed5">MyBank</text>
+   <text x="230" y="82.89931" font-family="Serif" font-size="28" text-anchor="middle" font-weight="bold" fill="#558ed5">MyBank</text>
    <rect stroke="#000000" fill="#ffffff" stroke-width="1.2" x="28.83069" y="27.33862" width="130" height="91"/>
    <ellipse fill="black" stroke="#f20707" fill-opacity="0" stroke-width="2" cx="93.481" cy="72.1458" rx="55.32679" ry="35.80066"/>
    <text fill="#000000" x="93.44181" y="68.66931" font-size="18" font-family="Sans-serif" text-anchor="middle">BANK</text>

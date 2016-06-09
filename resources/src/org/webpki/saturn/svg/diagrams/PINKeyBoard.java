@@ -26,13 +26,13 @@ public class PINKeyBoard extends SVGDocument {
         super(25, 25);
     }
 
-    final static double BUTTON_WIDTH  = 48;
-    final static double BUTTON_HEIGHT = 44;
+    final static double BUTTON_WIDTH  = 44;
+    final static double BUTTON_HEIGHT = 36;
     final static double BUTTON_MARGIN = 2;
-    final static double BUTTON_HSPACE = 20;
-    final static double BUTTON_VSPACE = 16;
+    final static double BUTTON_HSPACE = 36;
+    final static double BUTTON_VSPACE = 20;
     final static double VALIDATE_WIDTH = 126;
-    final static double VALIDATE_HEIGHT = 80;
+    final static double VALIDATE_HEIGHT = 60;
     
     final static String CORE_COLOR    = "#a5a5a5";
     final static String S_COLOR       = "#969191";
@@ -85,7 +85,7 @@ public class PINKeyBoard extends SVGDocument {
         for (int digit = 0; digit < 10; digit++) {
             String value = String.valueOf(digit);
             basicButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        "Arial", 35, value, 12, "addDigit('" + value + "')")
+                        "Arial", 28, value, 10, "addDigit('" + value + "')")
                .setFontWeight(SVGText.FONT_WEIGHTS.BOLD);
             x += BUTTON_WIDTH + BUTTON_HSPACE;
             if (digit == 3 || digit == 6) {
@@ -93,9 +93,9 @@ public class PINKeyBoard extends SVGDocument {
                 y += BUTTON_HEIGHT + BUTTON_VSPACE;
             }
         }
-        double validateX = 3 * BUTTON_WIDTH + 5 * BUTTON_HSPACE;
+        double validateX = 3 * BUTTON_WIDTH + 4 * BUTTON_HSPACE;
         basicButton(validateX + VALIDATE_WIDTH - BUTTON_WIDTH, 0, BUTTON_WIDTH, BUTTON_HEIGHT,
-                    "Arial", 55, "&#171;", 14, "deleteDigit()")
+                    "Arial", 44, "&#171;", 11, "deleteDigit()")
             .setFontColor("#f70707");
         
         basicButton(validateX, y - VALIDATE_HEIGHT + BUTTON_HEIGHT, VALIDATE_WIDTH, VALIDATE_HEIGHT,
