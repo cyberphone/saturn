@@ -31,7 +31,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
-import org.webpki.json.EncryptionCore;
+import org.webpki.json.JSONEncryption;
 
 public class Authority implements BaseProperties {
 
@@ -47,10 +47,10 @@ public class Authority implements BaseProperties {
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(TRANSACTION_URL_JSON, transactionUrl)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, EncryptionCore.JOSE_A128CBC_HS256_ALG_ID)
+                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, JSONEncryption.JOSE_A128CBC_HS256_ALG_ID)
                 .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
                              publicKey instanceof RSAPublicKey ?
-                           EncryptionCore.JOSE_RSA_OAEP_256_ALG_ID : EncryptionCore.JOSE_ECDH_ES_ALG_ID)
+                           JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID : JSONEncryption.JOSE_ECDH_ES_ALG_ID)
                 .setPublicKey(publicKey, AlgorithmPreferences.JOSE))
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)

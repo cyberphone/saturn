@@ -36,13 +36,13 @@ import javax.servlet.ServletContextListener;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
+import org.webpki.crypto.DecryptionKeyHolder;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
-import org.webpki.json.DecryptionKeyHolder;
-import org.webpki.json.EncryptionCore;
+import org.webpki.json.JSONEncryption;
 
 import org.webpki.util.ArrayUtil;
 
@@ -97,7 +97,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         decryptionKeys.add(new DecryptionKeyHolder(keyStoreEnumerator.getPublicKey(),
                                                    keyStoreEnumerator.getPrivateKey(),
                                                    keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey ?
-                EncryptionCore.JOSE_RSA_OAEP_256_ALG_ID : EncryptionCore.JOSE_ECDH_ES_ALG_ID));
+                                                           JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID : JSONEncryption.JOSE_ECDH_ES_ALG_ID));
     }
 
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {

@@ -68,7 +68,7 @@ import org.webpki.json.JSONEncoder;
 import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.EncryptionCore;
+import org.webpki.json.JSONEncryption;
 
 // A KeyGen2 protocol runner that setups pre-configured wallet keys.
 
@@ -137,12 +137,12 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                            signAlg.getAlgorithmId(AlgorithmPreferences.JOSE))
                 .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                     .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON,
-                               EncryptionCore.JOSE_A128CBC_HS256_ALG_ID)
+                               JSONEncryption.JOSE_A128CBC_HS256_ALG_ID)
                     .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
                                paymentCredential.encryptionKey instanceof RSAPublicKey ?
-                                   EncryptionCore.JOSE_RSA_OAEP_256_ALG_ID 
+                                   JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID 
                                                           : 
-                                   EncryptionCore.JOSE_ECDH_ES_ALG_ID)
+                                   JSONEncryption.JOSE_ECDH_ES_ALG_ID)
                     .setPublicKey(paymentCredential.encryptionKey, AlgorithmPreferences.JOSE))
                              .serializeJSONObject(JSONOutputFormats.NORMALIZED));
 

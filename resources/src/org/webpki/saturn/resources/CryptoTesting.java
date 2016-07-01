@@ -18,16 +18,21 @@
 package org.webpki.saturn.resources;
 
 import java.io.IOException;
+
 import java.math.BigInteger;
+
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+
 import java.security.interfaces.ECPublicKey;
+
 import java.security.spec.ECPoint;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
+
 import java.util.Vector;
 
 import javax.crypto.KeyAgreement;
@@ -38,15 +43,18 @@ import org.webpki.asn1.BaseASN1Object;
 import org.webpki.asn1.CompositeContextSpecific;
 import org.webpki.asn1.DerDecoder;
 import org.webpki.asn1.ParseUtil;
+
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyAlgorithms;
+import org.webpki.crypto.DecryptionKeyHolder;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
-import org.webpki.json.DecryptionKeyHolder;
 import org.webpki.json.JSONEncryption;
 import org.webpki.json.EncryptionCore;
+
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 import org.webpki.util.Base64URL;
@@ -153,76 +161,76 @@ public class CryptoTesting {
 
         byte[] t = DebugFormatter.getByteArrayFromHex("652c3fa36b0a7c5b3219fab3a30bc1c4");
 
-        byte[] pout = EncryptionCore.contentDecryption(EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
-                                                   k,
-                                                   e,
-                                                   iv,
-                                                   a,
-                                                   t);
+        byte[] pout = EncryptionCore.contentDecryption(JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                                                       k,
+                                                       e,
+                                                       iv,
+                                                       a,
+                                                       t);
         if (!ArrayUtil.compare(p, pout)) {
             throw new IOException ("pout 1");
         }
-        EncryptionCore.AuthEncResult aer = EncryptionCore.contentEncryption(EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
-                                                                    k,
-                                                                    p,
-                                                                    a);
-        pout = EncryptionCore.contentDecryption(EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
-                                            k,
-                                            aer.getCipherText(),
-                                            aer.getIv(),
-                                            a,
-                                            aer.getTag());
+        EncryptionCore.AuthEncResult aer = EncryptionCore.contentEncryption(JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                                                                            k,
+                                                                            p,
+                                                                            a);
+        pout = EncryptionCore.contentDecryption(JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                                                k,
+                                                aer.getCipherText(),
+                                                aer.getIv(),
+                                                a,
+                                                aer.getTag());
         if (!ArrayUtil.compare(p, pout)) {
             throw new IOException ("pout 2");
         }
-        byte[] dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(EncryptionCore.JOSE_A128CBC_HS256_ALG_ID);
+        byte[] dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(JSONEncryption.JOSE_A128CBC_HS256_ALG_ID);
         JSONObjectReader json = JSONParser.parse(aliceKey);
         String encrec = JSONEncryption.encode(new JSONObjectWriter(json),
-                                             EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
-                                             dataEncryptionKey).toString();
+                                              JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                                              dataEncryptionKey).toString();
         if (!JSONEncryption.parse(JSONParser.parse(encrec), true).getDecryptedData(dataEncryptionKey).toString().equals(json.toString())) {
             throw new IOException("Symmetric");
         }
         System.out.println("ECDH begin");
         KeyPair bob = getKeyPair(bobKey);
         KeyPair alice = getKeyPair(aliceKey);
-        if (!Base64URL.encode(EncryptionCore.receiverKeyAgreement(EncryptionCore.JOSE_ECDH_ES_ALG_ID,
-                EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
-                (ECPublicKey) bob.getPublic(),
-                alice.getPrivate())).equals(ECDH_RESULT_WITH_KDF)) {
+        if (!Base64URL.encode(EncryptionCore.receiverKeyAgreement(JSONEncryption.JOSE_ECDH_ES_ALG_ID,
+                                                                  JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                                                                  (ECPublicKey) bob.getPublic(),
+                                                                  alice.getPrivate())).equals(ECDH_RESULT_WITH_KDF)) {
             throw new IOException("Bad ECDH");
         }
         EncryptionCore.EcdhSenderResult ecdhRes = 
-            EncryptionCore.senderKeyAgreement(EncryptionCore.JOSE_ECDH_ES_ALG_ID,
-                                          EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
-                                          alice.getPublic());
+            EncryptionCore.senderKeyAgreement(JSONEncryption.JOSE_ECDH_ES_ALG_ID,
+                                              JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                                              alice.getPublic());
         if (!ArrayUtil.compare(ecdhRes.getSharedSecret(),
-            EncryptionCore.receiverKeyAgreement(EncryptionCore.JOSE_ECDH_ES_ALG_ID,
-                                            EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
-                                            ecdhRes.getEphemeralKey(),
-                                            alice.getPrivate()))) {
+            EncryptionCore.receiverKeyAgreement(JSONEncryption.JOSE_ECDH_ES_ALG_ID,
+                                                JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                                                ecdhRes.getEphemeralKey(),
+                                                alice.getPrivate()))) {
             throw new IOException("Bad ECDH");
         }
         KeyPairGenerator mallet = KeyPairGenerator.getInstance("RSA", "BC");
         mallet.initialize(2048);
         KeyPair malletKeys = mallet.generateKeyPair();
         Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
-        decryptionKeys.add(new DecryptionKeyHolder(alice.getPublic(), alice.getPrivate(), EncryptionCore.JOSE_ECDH_ES_ALG_ID));
-        decryptionKeys.add(new DecryptionKeyHolder(bob.getPublic(), bob.getPrivate(), EncryptionCore.JOSE_ECDH_ES_ALG_ID));
-        decryptionKeys.add(new DecryptionKeyHolder(malletKeys.getPublic(), malletKeys.getPrivate(), EncryptionCore.JOSE_RSA_OAEP_256_ALG_ID));
+        decryptionKeys.add(new DecryptionKeyHolder(alice.getPublic(), alice.getPrivate(), JSONEncryption.JOSE_ECDH_ES_ALG_ID));
+        decryptionKeys.add(new DecryptionKeyHolder(bob.getPublic(), bob.getPrivate(), JSONEncryption.JOSE_ECDH_ES_ALG_ID));
+        decryptionKeys.add(new DecryptionKeyHolder(malletKeys.getPublic(), malletKeys.getPrivate(), JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID));
 
         JSONObjectReader unEncJson = JSONParser.parse("{\"hi\":\"\\u20ac\\u00e5\\u00f6k\"}");
         String encJson = JSONEncryption.encode(new JSONObjectWriter(unEncJson),
-                                               EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
+                                               JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
                                                bob.getPublic(),
-                                               EncryptionCore.JOSE_ECDH_ES_ALG_ID).toString();
+                                               JSONEncryption.JOSE_ECDH_ES_ALG_ID).toString();
         if (!unEncJson.toString().equals(JSONEncryption.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys).toString())) {
             throw new IOException("Bad JOSE ECDH");
         }
         encJson = JSONEncryption.encode(new JSONObjectWriter(unEncJson),
-                                        EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
+                                        JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
                                         malletKeys.getPublic(),
-                                        EncryptionCore.JOSE_RSA_OAEP_256_ALG_ID).toString();
+                                        JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID).toString();
         if (!unEncJson.toString().equals(JSONEncryption.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys).toString())) {
             throw new IOException("Bad JOSE ECDH");
         }

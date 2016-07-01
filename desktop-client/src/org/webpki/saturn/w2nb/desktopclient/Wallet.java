@@ -78,6 +78,7 @@ import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
+import org.webpki.json.JSONEncryption;
 import org.webpki.json.EncryptionCore;
 
 import org.webpki.keygen2.KeyGen2URIs;
@@ -951,7 +952,7 @@ public class Wallet {
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
                             ProviderUserResponse.PrivateMessage privateMessage = new ProviderUserResponse(optionalMessage)
-                                .getPrivateMessage(dataEncryptionKey, EncryptionCore.JOSE_A128CBC_HS256_ALG_ID);
+                                .getPrivateMessage(dataEncryptionKey, JSONEncryption.JOSE_A128CBC_HS256_ALG_ID);
                             logger.info("Decrypted private message:\n" + privateMessage.getRoot());
                             showProviderDialog(privateMessage);
                         } else {
@@ -1029,7 +1030,7 @@ public class Wallet {
                         domainName,
                         selectedCard.accountDescriptor,
                         dataEncryptionKey,
-                        EncryptionCore.JOSE_A128CBC_HS256_ALG_ID,
+                        JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
                         challengeResults,
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
@@ -1195,7 +1196,7 @@ public class Wallet {
         // it more look like a Web application.  Note that this measurement
         // lacks the 'px' part; you have to add it in the Web application.
         try {
-            dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(EncryptionCore.JOSE_A128CBC_HS256_ALG_ID);
+            dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(JSONEncryption.JOSE_A128CBC_HS256_ALG_ID);
             JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.WALLET_IS_READY);
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)
