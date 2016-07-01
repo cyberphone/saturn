@@ -41,6 +41,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+import org.webpki.json.JSONEncryption;
 
 import org.webpki.net.HTTPSWrapper;
 
@@ -54,7 +55,6 @@ import org.webpki.saturn.common.ChallengeField;
 import org.webpki.saturn.common.MerchantAccountEntry;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.EncryptedData;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.ReserveOrBasicRequest;
@@ -292,10 +292,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                             "Luke Skywalker",
                                             ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
                                             "943");
-            encryptedCardData = EncryptedData.encode(protectedAccountData,
-                                                     acquirerAuthority.getDataEncryptionAlgorithm(),
-                                                     acquirerAuthority.getPublicKey(),
-                                                     acquirerAuthority.getKeyEncryptionAlgorithm());
+            encryptedCardData = JSONEncryption.encode(protectedAccountData,
+                                                      acquirerAuthority.getDataEncryptionAlgorithm(),
+                                                      acquirerAuthority.getPublicKey(),
+                                                      acquirerAuthority.getKeyEncryptionAlgorithm());
         } else {
             // We simply take the first account in the list
             payeeAccount = transactionRequest.getPayeeAccountDescriptors()[0];

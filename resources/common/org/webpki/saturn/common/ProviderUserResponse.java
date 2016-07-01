@@ -28,6 +28,7 @@ import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONEncryption;
 
 public class ProviderUserResponse implements BaseProperties {
 
@@ -63,11 +64,11 @@ public class ProviderUserResponse implements BaseProperties {
 
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, rd);
-        encryptedData = EncryptedData.parse(rd.getObject(PRIVATE_MESSAGE_JSON), true);
+        encryptedData = JSONEncryption.parse(rd.getObject(PRIVATE_MESSAGE_JSON), true);
         rd.checkForUnread();
     }
 
-    EncryptedData encryptedData;
+    JSONEncryption encryptedData;
     
     public PrivateMessage getPrivateMessage(byte[] dataEncryptionKey,
                                             String dataEncryptionAlgorithm)
@@ -108,6 +109,6 @@ public class ProviderUserResponse implements BaseProperties {
         }
         wr.setDateTime(TIME_STAMP_JSON, new Date(), true);
         return Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
-            .setObject(PRIVATE_MESSAGE_JSON, EncryptedData.encode(wr, dataEncryptionAlgorithm, dataEncryptionKey));
+            .setObject(PRIVATE_MESSAGE_JSON, JSONEncryption.encode(wr, dataEncryptionAlgorithm, dataEncryptionKey));
      }
 }

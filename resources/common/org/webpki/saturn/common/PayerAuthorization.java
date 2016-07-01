@@ -23,13 +23,14 @@ import java.security.PublicKey;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONEncryption;
 
 public class PayerAuthorization implements BaseProperties {
     
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.PAYER_AUTHORIZATION, rd);
         // Only syntax checking for intermediaries
-        EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON), false);
+        JSONEncryption.parse(rd.getObject(AUTHORIZATION_DATA_JSON), false);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
@@ -63,9 +64,9 @@ public class PayerAuthorization implements BaseProperties {
             .setString(ACCOUNT_TYPE_JSON, accountType)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(AUTHORIZATION_DATA_JSON,
-                       EncryptedData.encode(unencryptedAuthorizationData,
-                                            dataEncryptionAlgorithm,
-                                            keyEncryptionKey,
-                                            keyEncryptionAlgorithm));
+                       JSONEncryption.encode(unencryptedAuthorizationData,
+                                             dataEncryptionAlgorithm,
+                                             keyEncryptionKey,
+                                             keyEncryptionAlgorithm));
     }
 }

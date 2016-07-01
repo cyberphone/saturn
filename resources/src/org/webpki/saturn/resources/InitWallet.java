@@ -43,12 +43,12 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+import org.webpki.json.EncryptionCore;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.Encryption;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PayerAccountTypes;
 
@@ -162,12 +162,12 @@ public class InitWallet {
                     AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE));
             PublicKey publicKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
             ow.setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
-                  .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Encryption.JOSE_A128CBC_HS256_ALG_ID)
+                  .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, EncryptionCore.JOSE_A128CBC_HS256_ALG_ID)
                   .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
                          publicKey instanceof RSAPublicKey ?
-                             Encryption.JOSE_RSA_OAEP_256_ALG_ID 
+                             EncryptionCore.JOSE_RSA_OAEP_256_ALG_ID 
                                                            : 
-                             Encryption.JOSE_ECDH_ES_ALG_ID)
+                             EncryptionCore.JOSE_ECDH_ES_ALG_ID)
                   .setPublicKey(publicKey, AlgorithmPreferences.JOSE);
             surrogateKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                                       SecureKeyStore.SUB_TYPE_EXTENSION,

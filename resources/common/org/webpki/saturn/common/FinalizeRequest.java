@@ -32,6 +32,8 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONX509Verifier;
+import org.webpki.json.EncryptionCore;
+import org.webpki.json.DecryptionKeyHolder;
 
 public class FinalizeRequest implements BaseProperties {
     

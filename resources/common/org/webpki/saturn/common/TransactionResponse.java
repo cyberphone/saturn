@@ -27,6 +27,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
+import org.webpki.json.JSONEncryption;
 
 public class TransactionResponse implements BaseProperties {
     
@@ -35,7 +36,7 @@ public class TransactionResponse implements BaseProperties {
         transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
-            encryptedCardData = EncryptedData.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON), false);
+            encryptedCardData = JSONEncryption.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON), false);
         } else {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
@@ -53,7 +54,7 @@ public class TransactionResponse implements BaseProperties {
     
     GregorianCalendar dateTime;
 
-    EncryptedData encryptedCardData;
+    JSONEncryption encryptedCardData;
 
     AccountDescriptor accountDescriptor;
     public AccountDescriptor getPayeeAccountDescriptor() {

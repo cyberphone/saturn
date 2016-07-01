@@ -29,6 +29,8 @@ import org.webpki.crypto.AlgorithmPreferences;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONEncryption;
+import org.webpki.json.DecryptionKeyHolder;
 
 import org.webpki.util.ArrayUtil;
 
@@ -42,7 +44,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
         message = Messages.parseBaseMessage(valid, root = rd);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
-        encryptedAuthorizationData = EncryptedData.parse(rd.getObject(AUTHORIZATION_DATA_JSON), false);
+        encryptedAuthorizationData = JSONEncryption.parse(rd.getObject(AUTHORIZATION_DATA_JSON), false);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         if (message.isCardPayment()) {
@@ -61,7 +63,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
 
     PublicKey outerPublicKey;
 
-    EncryptedData encryptedAuthorizationData;
+    JSONEncryption encryptedAuthorizationData;
 
     JSONObjectReader root;
 

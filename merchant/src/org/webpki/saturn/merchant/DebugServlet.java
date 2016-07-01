@@ -39,12 +39,12 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONTypes;
+import org.webpki.json.JSONEncryption;
 
 import org.webpki.util.Base64URL;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.EncryptedData;
 import org.webpki.saturn.common.Version;
 
 class DebugPrintout implements BaseProperties {
@@ -113,10 +113,10 @@ class DebugPrintout implements BaseProperties {
                     rewriter.setupForRewrite(JSONSignatureDecoder.VALUE_JSON);
                     rewriter.setString(JSONSignatureDecoder.VALUE_JSON, getShortenedB64(value, 64));
                 }
-            } else if (property.equals(EncryptedData.CIPHER_TEXT_JSON)) {
-                byte[] cipherText = jsonTree.getBinary(EncryptedData.CIPHER_TEXT_JSON);
-                rewriter.setupForRewrite(EncryptedData.CIPHER_TEXT_JSON);
-                rewriter.setString(EncryptedData.CIPHER_TEXT_JSON, getShortenedB64(cipherText, 64));
+            } else if (property.equals(JSONEncryption.CIPHER_TEXT_JSON)) {
+                byte[] cipherText = jsonTree.getBinary(JSONEncryption.CIPHER_TEXT_JSON);
+                rewriter.setupForRewrite(JSONEncryption.CIPHER_TEXT_JSON);
+                rewriter.setString(JSONEncryption.CIPHER_TEXT_JSON, getShortenedB64(cipherText, 64));
             } else if (property.equals(JSONSignatureDecoder.N_JSON)) {
                 byte[] n = jsonTree.getBinary(JSONSignatureDecoder.N_JSON);
                 rewriter.setupForRewrite(JSONSignatureDecoder.N_JSON);
