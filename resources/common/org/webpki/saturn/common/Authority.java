@@ -33,13 +33,16 @@ import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
 
 public class Authority implements BaseProperties {
-    
+
+    public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
+
     public static JSONObjectWriter encode(String authorityUrl,
                                           String transactionUrl,
                                           PublicKey publicKey,
                                           Date expires,
                                           ServerX509Signer signer) throws IOException {
         return Messages.createBaseMessage(Messages.AUTHORITY)
+            .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(TRANSACTION_URL_JSON, transactionUrl)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
@@ -55,6 +58,10 @@ public class Authority implements BaseProperties {
 
     public Authority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         Messages.parseBaseMessage(Messages.AUTHORITY, root = rd);
+        httpVersion = rd.getString(HTTP_VERSION_JSON);
+        if (!httpVersion.equals(HTTP_VERSION_SUPPORT)) {
+            throw new IOException("\"" + HTTP_VERSION_JSON + "\" is currently limited to " + HTTP_VERSION_SUPPORT);
+        }
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         if (!authorityUrl.equals(expectedAuthorityUrl)) {
             throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
@@ -71,7 +78,12 @@ public class Authority implements BaseProperties {
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
-    
+
+    String httpVersion;
+    public String getHttpVersion() {
+        return httpVersion;
+    }
+
     String authorityUrl;
     public String getAuthorityUrl() {
         return authorityUrl;

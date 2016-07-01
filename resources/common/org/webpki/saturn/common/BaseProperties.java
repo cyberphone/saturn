@@ -42,6 +42,7 @@ public interface BaseProperties {
     String CHALLENGE_RESULTS_JSON            = "challengeResults";      // Result of ProviderUserResponse 
 
     String PAYMENT_REQUEST_JSON              = "paymentRequest";
+    String HTTP_VERSION_JSON                 = "httpVersion";           // For per partner being able to use HTTP/2 and further
     String INITIATOR_AUTHORITY_URL_JSON      = "initiatorAuthorityUrl"; // Payee bank authority URL
     String ACQUIRER_AUTHORITY_URL_JSON       = "acquirerAuthorityUrl";  // For CreditCard payments
     String PAYEE_ACCOUNTS_JSON               = "payeeAccounts";         // For Account2Account payments
