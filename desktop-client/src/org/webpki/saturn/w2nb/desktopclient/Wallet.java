@@ -79,7 +79,8 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONEncryption;
-import org.webpki.json.EncryptionCore;
+
+import org.webpki.json.encryption.EncryptionCore;
 
 import org.webpki.keygen2.KeyGen2URIs;
 

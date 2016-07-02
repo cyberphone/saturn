@@ -24,6 +24,7 @@ import java.security.PublicKey;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONEncryption;
+import org.webpki.json.JSONOutputFormats;
 
 public class PayerAuthorization implements BaseProperties {
     
@@ -64,7 +65,7 @@ public class PayerAuthorization implements BaseProperties {
             .setString(ACCOUNT_TYPE_JSON, accountType)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(AUTHORIZATION_DATA_JSON,
-                       JSONEncryption.encode(unencryptedAuthorizationData,
+                       JSONEncryption.encode(unencryptedAuthorizationData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                              dataEncryptionAlgorithm,
                                              keyEncryptionKey,
                                              keyEncryptionAlgorithm));

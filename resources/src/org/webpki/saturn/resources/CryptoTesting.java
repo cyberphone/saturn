@@ -50,10 +50,11 @@ import org.webpki.crypto.KeyAlgorithms;
 import org.webpki.crypto.DecryptionKeyHolder;
 
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONEncryption;
-import org.webpki.json.EncryptionCore;
+
+import org.webpki.json.encryption.EncryptionCore;
 
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
@@ -185,11 +186,11 @@ public class CryptoTesting {
         }
         byte[] dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(JSONEncryption.JOSE_A128CBC_HS256_ALG_ID);
         JSONObjectReader json = JSONParser.parse(aliceKey);
-        String encrec = JSONEncryption.encode(new JSONObjectWriter(json),
+        String encrec = JSONEncryption.encode(json.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                               JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
                                               dataEncryptionKey).toString();
-        if (!JSONEncryption.parse(JSONParser.parse(encrec), true).getDecryptedData(dataEncryptionKey).toString().equals(json.toString())) {
-            throw new IOException("Symmetric");
+        if (!JSONParser.parse(JSONEncryption.parse(JSONParser.parse(encrec), true).getDecryptedData(dataEncryptionKey)).toString().equals(json.toString())) {
+           throw new IOException("Symmetric");
         }
         System.out.println("ECDH begin");
         KeyPair bob = getKeyPair(bobKey);
@@ -220,18 +221,18 @@ public class CryptoTesting {
         decryptionKeys.add(new DecryptionKeyHolder(malletKeys.getPublic(), malletKeys.getPrivate(), JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID));
 
         JSONObjectReader unEncJson = JSONParser.parse("{\"hi\":\"\\u20ac\\u00e5\\u00f6k\"}");
-        String encJson = JSONEncryption.encode(new JSONObjectWriter(unEncJson),
+        String encJson = JSONEncryption.encode(unEncJson.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                                JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
                                                bob.getPublic(),
                                                JSONEncryption.JOSE_ECDH_ES_ALG_ID).toString();
-        if (!unEncJson.toString().equals(JSONEncryption.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys).toString())) {
+        if (!unEncJson.toString().equals(JSONParser.parse(JSONEncryption.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys)).toString())) {
             throw new IOException("Bad JOSE ECDH");
         }
-        encJson = JSONEncryption.encode(new JSONObjectWriter(unEncJson),
+        encJson = JSONEncryption.encode(unEncJson.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                         JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
                                         malletKeys.getPublic(),
                                         JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID).toString();
-        if (!unEncJson.toString().equals(JSONEncryption.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys).toString())) {
+        if (!unEncJson.toString().equals(JSONParser.parse(JSONEncryption.parse(JSONParser.parse(encJson), false).getDecryptedData(decryptionKeys)).toString())) {
             throw new IOException("Bad JOSE ECDH");
         }
         KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH", "BC");

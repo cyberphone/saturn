@@ -32,8 +32,8 @@ import org.webpki.crypto.DecryptionKeyHolder;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
-import org.webpki.json.EncryptionCore;
 
 public class FinalizeRequest implements BaseProperties {
     
@@ -128,9 +128,9 @@ public class FinalizeRequest implements BaseProperties {
     // Convenience method
     public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
-        return new ProtectedAccountData(reserveOrBasicResponse
-                                            .transactionResponse
-                                                 .encryptedCardData.getDecryptedData(decryptionKeys));
+        return new ProtectedAccountData(JSONParser.parse(reserveOrBasicResponse
+                                                             .transactionResponse
+                                                                 .encryptedCardData.getDecryptedData(decryptionKeys)));
     }
 
     // Convenience method

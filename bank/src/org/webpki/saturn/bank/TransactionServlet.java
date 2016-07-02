@@ -292,7 +292,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                             "Luke Skywalker",
                                             ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
                                             "943");
-            encryptedCardData = JSONEncryption.encode(protectedAccountData,
+            encryptedCardData = JSONEncryption.encode(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                                       acquirerAuthority.getDataEncryptionAlgorithm(),
                                                       acquirerAuthority.getPublicKey(),
                                                       acquirerAuthority.getKeyEncryptionAlgorithm());

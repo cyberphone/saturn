@@ -31,6 +31,7 @@ import org.webpki.crypto.DecryptionKeyHolder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONEncryption;
+import org.webpki.json.JSONParser;
 
 import org.webpki.util.ArrayUtil;
 
@@ -137,7 +138,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
     public AuthorizationData getDecryptedAuthorizationData(Vector<DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
-            new AuthorizationData(encryptedAuthorizationData.getDecryptedData(decryptionKeys));
+            new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));
         comparePublicKeys (outerPublicKey, paymentRequest);
         if (!ArrayUtil.compare(authorizationData.getRequestHash(), paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
