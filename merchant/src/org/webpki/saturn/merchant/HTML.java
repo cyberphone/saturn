@@ -101,11 +101,11 @@ public class HTML implements MerchantProperties {
                    "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Saturn - Web Payment Demo<br>&nbsp;</td></tr>" +
                    "<tr><td style=\"text-align:left\">This application is a demo of the Saturn payment scheme.&nbsp; " +
                    "Using Saturn the client is supposed to have a native &quot;Wallet&quot; based on the Web2Native Bridge" +
-                   ".&nbsp; Primary Saturn features:<ul>" +
-                   "<li style=\"padding-top:0pt\">Fully <i>decentralized</i> operation (no dependency on central registries like 3D Secure)</li>" +
+                   ".&nbsp; Primary Saturn features include:<ul>" +
+                   "<li style=\"padding-top:0pt\">Fully <i>decentralized</i> operation (no dependency on central registries like in 3D Secure)</li>" +
                    "<li><i>Digitally signed</i> messages enable a protocol-level security comparable to a PIN-code terminal and chip-card in a physical shop</li>" +
-                   "<li>Encryption (like in SET) hides sensitive customer data from merchants without needing &quot;tokenization&quot;</li>" +
-                   "<li>Private messaging through the payment system makes it easy applying RBA (Risk Based Authentication) for high-value or &quot;suspicious&quot; transactions</li>" +
+                   "<li>Encryption (like in SET) hides sensitive customer data from merchants, eliminating the need for third-party &quot;tokenization&quot; services</li>" +
+                   "<li>Private messaging through the payment backend makes it easy applying RBA (Risk Based Authentication) for high-value or &quot;suspicious&quot; transactions</li>" +
                    "<li>Equally applicable for legacy card payment (&quot;pull&quot;) networks as for bank-2-bank (&quot;push&quot;) schemes</li>" +
                    "<li>In addition to supporting Web payments, Saturn is <i>also intended to be usable in traditional payment scenarios " +
                    "including with POS terminals and gas pumps using an NFC/BLE connection to the Wallet</i></li>" +
