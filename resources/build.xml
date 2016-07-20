@@ -32,6 +32,15 @@
       <echo message="cryptotest createcerts initwallet [-Dlocalhost=0] inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard -Dplayclass [-Dplayfilter]"/>
   </target>
  
+  <target name="_openkeystoresrc">
+      <!-- The following MUST be set to match your installation/setup -->
+	  <property name="openkeystore.src" location="../../openkeystore/library/src"/>
+	  <condition property="openkeystore.src.found">
+	      <available file="${openkeystore.src}" type="dir"/>
+	  </condition>
+	  <fail message="&quot;openkeystore.src&quot; does not point to a valid installation directory!" unless="openkeystore.src.found"/>
+  </target>
+  
   <target name="inittestpage">
     <delete file="${testpage}"/>
     <delete dir="${temp.dir}"/>

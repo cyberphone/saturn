@@ -42,7 +42,7 @@ import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
-import org.webpki.json.JSONEncryption;
+import org.webpki.json.JSONDecryptionDecoder;
 
 import org.webpki.util.ArrayUtil;
 
@@ -97,7 +97,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         decryptionKeys.add(new DecryptionKeyHolder(keyStoreEnumerator.getPublicKey(),
                                                    keyStoreEnumerator.getPrivateKey(),
                                                    keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey ?
-                                                           JSONEncryption.JOSE_RSA_OAEP_256_ALG_ID : JSONEncryption.JOSE_ECDH_ES_ALG_ID));
+                                                           JSONDecryptionDecoder.JOSE_RSA_OAEP_256_ALG_ID : JSONDecryptionDecoder.JOSE_ECDH_ES_ALG_ID));
     }
 
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {

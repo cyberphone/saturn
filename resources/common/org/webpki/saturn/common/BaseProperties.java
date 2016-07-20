@@ -18,71 +18,71 @@ package org.webpki.saturn.common;
 
 public interface BaseProperties {
 
-    String EMBEDDED_JSON                     = "@embedded";
+    String EMBEDDED_JSON                    = "@embedded";
 
-    // For the Web2Native Bridge wallet 
-    String WINDOW_JSON                       = "window";
-    String HEIGHT_JSON                       = "height";
-    String WIDTH_JSON                        = "width";
+     // For the Web2Native Bridge wallet 
+    String WINDOW_JSON                      = "window";
+    String HEIGHT_JSON                      = "height";
+    String WIDTH_JSON                       = "width";
 
-    // For the Android/QR wallet
-    String ANDROID_CANCEL_URL_JSON           = "androidCancelUrl";
-    String ANDROID_SUCCESS_URL_JSON          = "androidSuccessUrl";
-    String ANDROID_TRANSACTION_URL_JSON      = "androidTransactionUrl";
+     // For the Android/QR wallet
+    String ANDROID_CANCEL_URL_JSON          = "androidCancelUrl";
+    String ANDROID_SUCCESS_URL_JSON         = "androidSuccessUrl";
+    String ANDROID_TRANSACTION_URL_JSON     = "androidTransactionUrl";
 
-    String COMMON_NAME_JSON                  = "commonName";            // Common name of providers to be used in UIs
-    String NAME_JSON                         = "name";
+    String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
+    String NAME_JSON                        = "name";
 
-    String TEXT_JSON                         = "text";                  // ProviderUserResponse
-    String CHALLENGE_FIELDS_JSON             = "challengeFields";       // ProviderUserResponse
-    String LABEL_JSON                        = "label";                 // ProviderUserResponse
-    String LENGTH_JSON                       = "length";                // ProviderUserResponse
-    String PRIVATE_MESSAGE_JSON              = "privateMessage";        // ProviderUserResponse
+    String TEXT_JSON                        = "text";                       // ProviderUserResponse
+    String CHALLENGE_FIELDS_JSON            = "challengeFields";            // ProviderUserResponse
+    String LABEL_JSON                       = "label";                      // ProviderUserResponse
+    String LENGTH_JSON                      = "length";                     // ProviderUserResponse
+    String ENCRYPTED_MESSAGE_JSON           = "encryptedMessage";           // ProviderUserResponse
 
-    String CHALLENGE_RESULTS_JSON            = "challengeResults";      // Result of ProviderUserResponse 
+    String CHALLENGE_RESULTS_JSON           = "challengeResults";           // Result of ProviderUserResponse 
 
-    String PAYMENT_REQUEST_JSON              = "paymentRequest";
-    String HTTP_VERSION_JSON                 = "httpVersion";           // For per partner being able to use HTTP/2 and further
-    String INITIATOR_AUTHORITY_URL_JSON      = "initiatorAuthorityUrl"; // Payee bank authority URL
-    String ACQUIRER_AUTHORITY_URL_JSON       = "acquirerAuthorityUrl";  // For CreditCard payments
-    String PAYEE_ACCOUNTS_JSON               = "payeeAccounts";         // For Account2Account payments
-    String PAYEE_ACCOUNT_JSON                = "payeeAccount";          // Selected payee Account2Account
-    String EXPIRES_JSON                      = "expires";               // Object expiration time
-    String AUTHORITY_URL_JSON                = "authorityUrl";
-    String TRANSACTION_URL_JSON              = "transactionUrl";
-    String AMOUNT_JSON                       = "amount";
-    String CURRENCY_JSON                     = "currency";
-    String TIME_STAMP_JSON                   = "timeStamp";
-    String TRANSACTION_ID_JSON               = "transactionId";
-    String CLIENT_IP_ADDRESS_JSON            = "clientIpAddress";       // Security data for the payment provider
-    String CLIENT_GEO_LOCATION_JSON          = "clientGeoLocation";     // Optional security data that client devices may supply
-    String REFERENCE_ID_JSON                 = "referenceId";
-    String PAYEE_JSON                        = "payee";                 // Payee object
-    String AUTHORIZATION_DATA_JSON           = "authorizationData";     // Payer authorization data
-    String PROVIDER_AUTHORITY_URL_JSON       = "providerAuthorityUrl";  // URL to payment provider
-    String ACCEPTED_ACCOUNT_TYPES_JSON       = "acceptedAccountTypes";  // List of ACCOUNT_TYPE_JSON
-    String ACCOUNT_JSON                      = "account";               // Payer Account2Account or Card
-    String ACCOUNT_REFERENCE_JSON            = "accountReference";      // Account/Card number for payee (like ************5678)
-    String ACCOUNT_TYPE_JSON                 = "accountType";           // Account/Card type in the form of a URI
-    String ACCOUNT_HOLDER_JSON               = "accountHolder";         // Card holder
-    String ACCOUNT_SECURITY_CODE_JSON        = "accountSecurityCode";   // CCV
-    String CARD_FORMAT_ACCOUNT_ID_JSON       = "cardFormatAccountId";   // Display formatting like cards or not
-    String PROTECTED_ACCOUNT_DATA_JSON       = "protectedAccountData";  // Account data that (only) an acquirer needs
-    String REQUEST_HASH_JSON                 = "requestHash";
-    String DOMAIN_NAME_JSON                  = "domainName";
-    String SIGNATURE_ALGORITHM_JSON          = "signatureAlgorithm";
-    String KEY_ENCRYPTION_ALGORITHM_JSON     = "keyEncryptionAlgorithm";     // For "Authority" encryption key
-    String DATA_ENCRYPTION_ALGORITHM_JSON    = "dataEncryptionAlgorithm";    //    -"-
-    String ENCRYPTION_PARAMETERS_JSON        = "encryptionParameters";       //    -"-
-    String SOFTWARE_JSON                     = "software";
-    String ID_JSON                           = "id";
-    String TYPE_JSON                         = "type";
-    String FIELD1_JSON                       = "field1";                // Used for "additional" account data 
-    String FIELD2_JSON                       = "field2";
-    String FIELD3_JSON                       = "field3";
-    String VERSION_JSON                      = "version";
+    String PAYMENT_REQUEST_JSON             = "paymentRequest";
+    String HTTP_VERSION_JSON                = "httpVersion";                // For per partner being able to use HTTP/2 and further
+    String INITIATOR_AUTHORITY_URL_JSON     = "initiatorAuthorityUrl";      // Payee bank authority URL
+    String ACQUIRER_AUTHORITY_URL_JSON      = "acquirerAuthorityUrl";       // For CreditCard payments
+    String PAYEE_ACCOUNTS_JSON              = "payeeAccounts";              // For Account2Account payments
+    String PAYEE_ACCOUNT_JSON               = "payeeAccount";               // Selected payee Account2Account
+    String EXPIRES_JSON                     = "expires";                    // Object expiration time
+    String AUTHORITY_URL_JSON               = "authorityUrl";
+    String TRANSACTION_URL_JSON             = "transactionUrl";
+    String AMOUNT_JSON                      = "amount";
+    String CURRENCY_JSON                    = "currency";
+    String TIME_STAMP_JSON                  = "timeStamp";
+    String TRANSACTION_ID_JSON              = "transactionId";
+    String CLIENT_IP_ADDRESS_JSON           = "clientIpAddress";            // Security data for the payment provider
+    String CLIENT_GEO_LOCATION_JSON         = "clientGeoLocation";          // Optional security data that client devices may supply
+    String REFERENCE_ID_JSON                = "referenceId";
+    String PAYEE_JSON                       = "payee";                      // Payee object
+    String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Payer authorization data
+    String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider
+    String ACCEPTED_ACCOUNT_TYPES_JSON      = "acceptedAccountTypes";       // List of ACCOUNT_TYPE_JSON
+    String ACCOUNT_JSON                     = "account";                    // Payer Account2Account or Card
+    String ACCOUNT_REFERENCE_JSON           = "accountReference";           // Account/Card number for payee (like ************5678)
+    String ACCOUNT_TYPE_JSON                = "accountType";                // Account/Card type in the form of a URI
+    String ACCOUNT_HOLDER_JSON              = "accountHolder";              // Card holder
+    String ACCOUNT_SECURITY_CODE_JSON       = "accountSecurityCode";        // CCV
+    String CARD_FORMAT_ACCOUNT_ID_JSON      = "cardFormatAccountId";        // Display formatting like cards or not
+    String ENCRYPTED_ACCOUNT_DATA_JSON      = "encryptedAccountData";       // Account data that (only) an acquirer needs
+    String REQUEST_HASH_JSON                = "requestHash";
+    String DOMAIN_NAME_JSON                 = "domainName";
+    String SIGNATURE_ALGORITHM_JSON         = "signatureAlgorithm";
+    String KEY_ENCRYPTION_ALGORITHM_JSON    = "keyEncryptionAlgorithm";     // For "Authority" encryption key
+    String DATA_ENCRYPTION_ALGORITHM_JSON   = "dataEncryptionAlgorithm";    //    -"-
+    String ENCRYPTION_PARAMETERS_JSON       = "encryptionParameters";       //    -"-
+    String SOFTWARE_JSON                    = "software";
+    String ID_JSON                          = "id";
+    String TYPE_JSON                        = "type";
+    String FIELD1_JSON                      = "field1";                     // Used for "additional" account data 
+    String FIELD2_JSON                      = "field2";
+    String FIELD3_JSON                      = "field3";
+    String VERSION_JSON                     = "version";
     
-    String SATURN_WEB_PAY_CONTEXT_URI        = "http://xmlns.webpki.org/webpay/v2";
+    String SATURN_WEB_PAY_CONTEXT_URI       = "http://xmlns.webpki.org/webpay/v2";
 
-    String JSON_CONTENT_TYPE                 = "application/json";
+    String JSON_CONTENT_TYPE                = "application/json";
 }

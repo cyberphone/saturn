@@ -201,7 +201,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 ReserveOrBasicRequest.encode(basicCredit,
                                              payerAuthorization.getProviderAuthorityUrl(),
                                              payerAuthorization.getAccountType(),
-                                             walletResponse.getObject(AUTHORIZATION_DATA_JSON),
+                                             walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                              request.getRemoteAddr(),
                                              paymentRequest,
                                              MerchantService.acquirerAuthorityUrl, // Card only

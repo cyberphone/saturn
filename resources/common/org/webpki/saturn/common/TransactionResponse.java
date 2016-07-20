@@ -27,7 +27,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
-import org.webpki.json.JSONEncryption;
+import org.webpki.json.JSONDecryptionDecoder;
 
 public class TransactionResponse implements BaseProperties {
     
@@ -36,7 +36,7 @@ public class TransactionResponse implements BaseProperties {
         transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
-            encryptedCardData = JSONEncryption.parse(rd.getObject(PROTECTED_ACCOUNT_DATA_JSON), false);
+            encryptedCardData = PayerAuthorization.getEncryptionObject(rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON), false);
         } else {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
@@ -54,7 +54,7 @@ public class TransactionResponse implements BaseProperties {
     
     GregorianCalendar dateTime;
 
-    JSONEncryption encryptedCardData;
+    JSONDecryptionDecoder encryptedCardData;
 
     AccountDescriptor accountDescriptor;
     public AccountDescriptor getPayeeAccountDescriptor() {
@@ -91,7 +91,7 @@ public class TransactionResponse implements BaseProperties {
             .setObject(EMBEDDED_JSON, transactionRequest.root)
             .setString(ACCOUNT_REFERENCE_JSON, accountReference);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
-            wr.setObject(PROTECTED_ACCOUNT_DATA_JSON, encryptedCardData);
+            wr.setObject(ENCRYPTED_ACCOUNT_DATA_JSON, encryptedCardData);
         } else {
             wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
         }

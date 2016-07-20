@@ -78,7 +78,7 @@ import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
-import org.webpki.json.JSONEncryption;
+import org.webpki.json.JSONDecryptionDecoder;
 
 import org.webpki.json.encryption.EncryptionCore;
 
@@ -372,7 +372,7 @@ public class Wallet {
         String processExternalHtml(String simpleHtml) {
             return "<html>" +
                    simpleHtml
-                       .replace("${width}", String.valueOf(fontSize * 20))
+                       .replace("${width}", String.valueOf(fontSize * 20) + "px")
                        .replace("${submit}", "validate") + 
                    "</html>";
         }
@@ -953,7 +953,7 @@ public class Wallet {
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
                             ProviderUserResponse.PrivateMessage privateMessage = new ProviderUserResponse(optionalMessage)
-                                .getPrivateMessage(dataEncryptionKey, JSONEncryption.JOSE_A128CBC_HS256_ALG_ID);
+                                .getPrivateMessage(dataEncryptionKey, JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID);
                             logger.info("Decrypted private message:\n" + privateMessage.getRoot());
                             showProviderDialog(privateMessage);
                         } else {
@@ -1031,7 +1031,7 @@ public class Wallet {
                         domainName,
                         selectedCard.accountDescriptor,
                         dataEncryptionKey,
-                        JSONEncryption.JOSE_A128CBC_HS256_ALG_ID,
+                        JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID,
                         challengeResults,
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
@@ -1197,7 +1197,7 @@ public class Wallet {
         // it more look like a Web application.  Note that this measurement
         // lacks the 'px' part; you have to add it in the Web application.
         try {
-            dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(JSONEncryption.JOSE_A128CBC_HS256_ALG_ID);
+            dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID);
             JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.WALLET_IS_READY);
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)

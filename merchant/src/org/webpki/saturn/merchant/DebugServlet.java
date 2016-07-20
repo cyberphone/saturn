@@ -39,7 +39,7 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONTypes;
-import org.webpki.json.JSONEncryption;
+import org.webpki.json.JSONDecryptionDecoder;
 
 import org.webpki.util.Base64URL;
 
@@ -113,10 +113,10 @@ class DebugPrintout implements BaseProperties {
                     rewriter.setupForRewrite(JSONSignatureDecoder.VALUE_JSON);
                     rewriter.setString(JSONSignatureDecoder.VALUE_JSON, getShortenedB64(value, 64));
                 }
-            } else if (property.equals(JSONEncryption.CIPHER_TEXT_JSON)) {
-                byte[] cipherText = jsonTree.getBinary(JSONEncryption.CIPHER_TEXT_JSON);
-                rewriter.setupForRewrite(JSONEncryption.CIPHER_TEXT_JSON);
-                rewriter.setString(JSONEncryption.CIPHER_TEXT_JSON, getShortenedB64(cipherText, 64));
+            } else if (property.equals(JSONDecryptionDecoder.CIPHER_TEXT_JSON)) {
+                byte[] cipherText = jsonTree.getBinary(JSONDecryptionDecoder.CIPHER_TEXT_JSON);
+                rewriter.setupForRewrite(JSONDecryptionDecoder.CIPHER_TEXT_JSON);
+                rewriter.setString(JSONDecryptionDecoder.CIPHER_TEXT_JSON, getShortenedB64(cipherText, 64));
             } else if (property.equals(JSONSignatureDecoder.N_JSON)) {
                 byte[] n = jsonTree.getBinary(JSONSignatureDecoder.N_JSON);
                 rewriter.setupForRewrite(JSONSignatureDecoder.N_JSON);
@@ -261,7 +261,7 @@ class DebugPrintout implements BaseProperties {
             keyWord(PAYMENT_REQUEST_JSON) + " as well as a minimal set of user account data.</p>" +
             (debugData.acquirerMode ?
                  "Also note the inclusion of " +
-                 keyWord(PROTECTED_ACCOUNT_DATA_JSON) + " which only the <b>Acquirer</b> can decrypt"
+                 keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) + " which only the <b>Acquirer</b> can decrypt"
                                     :
                  "Also note the inclusion of the (by the <b>Bank</b>) selected <b>Merchant</b> receiver account (" +
                  keyWord(PAYEE_ACCOUNT_JSON) + ")") +
@@ -286,7 +286,7 @@ class DebugPrintout implements BaseProperties {
                 String finalDescription = null;
                 if (debugData.acquirerMode) {
                     descriptionStdMargin("After receiving the request, the " +
-                         keyWord(PROTECTED_ACCOUNT_DATA_JSON) + " object is <i>decrypted</i>.&nbsp;&nbsp;" +
+                         keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) + " object is <i>decrypted</i>.&nbsp;&nbsp;" +
                         "This mechanism effectively replaces a <b>Merchant</b>-based &quot;tokenization&quot; scheme with the added advantage "+
                         "that the <b>Acquirer</b> also can be included in a protection model by " +
                         "for example randomizing CCVs per request (&quot;upstreams tokenization&quot;).<p>" +

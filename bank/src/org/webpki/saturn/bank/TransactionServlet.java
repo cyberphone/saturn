@@ -41,7 +41,6 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-import org.webpki.json.JSONEncryption;
 
 import org.webpki.net.HTTPSWrapper;
 
@@ -251,7 +250,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // Sorry but you don't appear to have a million bucks :-)
         if (paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "<div style=\"width:${width}px\">Your request for " + 
+                                               "<div style=\"width:${width}\">Your request for " + 
             paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()) +
                                                " appears to be slightly out of your current capabilities...</div>",
                                                null,
@@ -264,7 +263,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "<div style=\"width:${width}px\">This transaction requires additional information to " +
+                                               "<div style=\"width:${width}\">This transaction requires additional information to " +
                                                "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span> " +
                                                "and click the ${submit} button.<br>&nbsp;<br>" +
                                                "Since <i>this is a demo</i>, " +
@@ -292,10 +291,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                             "Luke Skywalker",
                                             ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
                                             "943");
-            encryptedCardData = JSONEncryption.encode(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
-                                                      acquirerAuthority.getDataEncryptionAlgorithm(),
-                                                      acquirerAuthority.getPublicKey(),
-                                                      acquirerAuthority.getKeyEncryptionAlgorithm());
+            encryptedCardData = new JSONObjectWriter()
+                .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
+                                     acquirerAuthority.getDataEncryptionAlgorithm(),
+                                     acquirerAuthority.getPublicKey(),
+                                     acquirerAuthority.getKeyEncryptionAlgorithm());
         } else {
             // We simply take the first account in the list
             payeeAccount = transactionRequest.getPayeeAccountDescriptors()[0];

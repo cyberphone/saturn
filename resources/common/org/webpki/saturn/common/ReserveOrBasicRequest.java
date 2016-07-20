@@ -30,7 +30,7 @@ import org.webpki.crypto.DecryptionKeyHolder;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONEncryption;
+import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
 
 import org.webpki.util.ArrayUtil;
@@ -45,7 +45,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
         message = Messages.parseBaseMessage(valid, root = rd);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
-        encryptedAuthorizationData = JSONEncryption.parse(rd.getObject(AUTHORIZATION_DATA_JSON), false);
+        encryptedAuthorizationData = PayerAuthorization.getEncryptionObject(rd.getObject(ENCRYPTED_AUTHORIZATION_JSON), false);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         if (message.isCardPayment()) {
@@ -64,7 +64,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
 
     PublicKey outerPublicKey;
 
-    JSONEncryption encryptedAuthorizationData;
+    JSONDecryptionDecoder encryptedAuthorizationData;
 
     JSONObjectReader root;
 
@@ -116,7 +116,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
             accountType.isCardPayment() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
-            .setObject(AUTHORIZATION_DATA_JSON, encryptedAuthorizationData)
+            .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root);
         if (accountType.isCardPayment()) {
