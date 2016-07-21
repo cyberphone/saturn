@@ -18,14 +18,11 @@
 package org.webpki.saturn.resources;
 
 import java.io.IOException;
-
 import java.math.BigInteger;
-
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-
 import java.security.spec.ECPoint;
 import java.security.spec.ECPrivateKeySpec;
 import java.security.spec.ECPublicKeySpec;
@@ -36,14 +33,14 @@ import org.webpki.asn1.BaseASN1Object;
 import org.webpki.asn1.CompositeContextSpecific;
 import org.webpki.asn1.DerDecoder;
 import org.webpki.asn1.ParseUtil;
-
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyAlgorithms;
-
+import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 
@@ -55,6 +52,8 @@ public class CryptoTesting {
     
     static final String ECDH_RESULT_WITHOUT_KDF = "SzFxLgluXyC07Pl5D9jMfIt-LIrZC9qByyJPYsDnuaY";
     static final String ECDH_RESULT_WITH_KDF    = "hzHdlfQIAEehb8Hrd_mFRhKsKLEzPfshfXs9l6areCc";
+
+    static final String JEF_ECDH_TEST_STRING = "Hello encrypted world";
 
     static StringBuffer js = new StringBuffer();
 
@@ -125,7 +124,15 @@ public class CryptoTesting {
         KeyPair alice = getKeyPair(aliceKey);
         js.append("// ECDH test data\n\n" +
                   "const ECDH_RESULT_WITH_KDF    = '" + ECDH_RESULT_WITH_KDF + "';\n" +
-                  "const ECDH_RESULT_WITHOUT_KDF = '" + ECDH_RESULT_WITHOUT_KDF + "';\n\n");
+                  "const ECDH_RESULT_WITHOUT_KDF = '" + ECDH_RESULT_WITHOUT_KDF + "';\n\n" +
+                  "const JEF_ECDH_TEST_STRING = '" + JEF_ECDH_TEST_STRING + "';\n" +
+                  "const JEF_OBJECT = ");
+        js.append(new JSONObjectWriter()
+            .setEncryptionObject(JEF_ECDH_TEST_STRING.getBytes("UTF-8"),
+                                 JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID,
+                                 bob.getPublic(),
+                                 JSONDecryptionDecoder.JOSE_ECDH_ES_ALG_ID).serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE));
+        js.append(";\n\n");
         createPEM("PRIVATE", createPKCS8PrivateKey(alice.getPublic().getEncoded(),
                                                    alice.getPrivate().getEncoded()));
         createPEM("PUBLIC", bob.getPublic().getEncoded());

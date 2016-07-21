@@ -122,4 +122,13 @@ public class PaymentRequest implements BaseProperties {
     public byte[] getRequestHash() throws IOException {
         return RequestHash.getRequestHash(new JSONObjectWriter(root));
     }
+
+    public void consistencyCheck(PaymentRequest paymentRequest) throws IOException {
+        if (paymentRequest.currency != currency ||
+            !paymentRequest.amount.equals(amount) ||
+            !paymentRequest.referenceId.equals(referenceId) ||
+            !paymentRequest.payee.commonName.equals(payee.commonName)) {
+            throw new IOException("Inconsistent \"" + PAYMENT_REQUEST_JSON + "\" objects");
+        }
+    }
 }

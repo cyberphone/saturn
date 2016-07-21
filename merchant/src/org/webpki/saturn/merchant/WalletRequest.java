@@ -17,16 +17,14 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
 import java.util.Vector;
 
 import javax.servlet.http.HttpSession;
 
+import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectWriter;
-
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayerAccountTypes;
@@ -72,8 +70,9 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         }
         acceptedAccountTypes.add("https://nosuchcard.com");
         requestObject = Messages.createBaseMessage(Messages.WALLET_REQUEST)
-            .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, acceptedAccountTypes.toArray(new String[0]))
-            .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
+            .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
+                .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, acceptedAccountTypes.toArray(new String[0]))
+                .setObject(PAYMENT_REQUEST_JSON, paymentRequest)));
 
         // Android and QR wallets need special arrangements...
         if (androidCancelUrl != null) {

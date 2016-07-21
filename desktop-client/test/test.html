@@ -24,45 +24,47 @@ var nativePort = null;
 var normalRequest = {
   "@context": "http://xmlns.webpki.org/webpay/v2",
   "@qualifier": "WalletRequest",
-  acceptedAccountTypes: ["https://nosuchcard.com","https://supercard.com","https://bankdirect.net"],
-  paymentRequest: {
-    payee: {
-      commonName: "Demo Merchant",
-      id: "86344"
-    },
-    amount: "306.25",
-    currency: "USD",
-    referenceId: "#6100004",
-    timeStamp: "2016-04-20T06:10:24Z",
-    expires: "2030-09-14T00:00:00Z",
-    software: {
-      name: "WebPKI.org - Merchant",
-      version: "1.00"
-    },
-    signature: {
-      algorithm: "ES256",
-      publicKey: {
-        type: "EC",
-        curve: "P-256",
-        x: "rZ344aiTaOATmLBOdfYThvnQu_zyB1aJZrbbbks2P9I",
-        y: "lKOvfJdgN8WqEbXMDYPRSMsPicm0Tk10pmer9LxvxLg"
+  paymentNetworks: [{
+    acceptedAccountTypes: ["https://nosuchcard.com","https://supercard.com","https://bankdirect.net"],
+    paymentRequest: {
+      payee: {
+        commonName: "Demo Merchant",
+        id: "86344"
       },
-      value: "9T5gb0ywXV_UESjI-2Cf-pfJrsR2EezfAzz6NemBBYbtGuvtxbjlxIx6O2qWKBCUrmCbbPZQGIvfp2gvvLxDGQ"
+      amount: "306.25",
+      currency: "USD",
+      referenceId: "#6100004",
+      timeStamp: "2016-07-21T19:17:48Z",
+      expires: "2030-09-14T00:00:00Z",
+      software: {
+        name: "WebPKI.org - Merchant",
+        version: "1.00"
+      },
+      signature: {
+        algorithm: "ES256",
+        publicKey: {
+          type: "EC",
+          curve: "P-256",
+          x: "rZ344aiTaOATmLBOdfYThvnQu_zyB1aJZrbbbks2P9I",
+          y: "lKOvfJdgN8WqEbXMDYPRSMsPicm0Tk10pmer9LxvxLg"
+        },
+        value: "B3s8X7u4MNs_YW7pIai6LFEDoU3MEZSuzZ9CLETMax8s1g35e9_Ls1Kj9CBthDjkJbSkap0bKhyqMuYiKTOMCQ"
+      }
     }
-  }
+  }]
 };
 
 // All our cards/accounts should match during the discovery phase...
 var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-scrollMatchingRequest.acceptedAccountTypes = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
+scrollMatchingRequest.paymentNetworks[0].acceptedAccountTypes = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
 
 // No card/account should match during the discovery phase...
 var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-nonMatchingRequest.acceptedAccountTypes = ["https://nosuchcard.com"];
+nonMatchingRequest.paymentNetworks[0].acceptedAccountTypes = ["https://nosuchcard.com"];
 
 // Note the modified "payee" property...
 var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-badSignatureRequest.paymentRequest.payee= "DEmo Merchant";
+badSignatureRequest.paymentNetworks[0].paymentRequest.payee.commonName= "DEmo Merchant";
 
 var badMessageRequest = {"hi":"there!"};
 
@@ -92,8 +94,8 @@ function activateExtension() {
   }
   navigator.nativeConnect("org.webpki.webpay.wallet3",
                           document.getElementById("positionWallet").checked ?
-                            setExtensionPosition("Right", "Top", "wallet") :
-                            setExtensionPosition("Center", "Center")).then(function(port) {
+                            setExtensionPosition('Right', 'Top', 'wallet') :
+                            setExtensionPosition('Center', 'Center')).then(function(port) {
     nativePort = port;
     port.addMessageListener(function(message) {
       if (message["@context"] != "http://xmlns.webpki.org/webpay/v2") {

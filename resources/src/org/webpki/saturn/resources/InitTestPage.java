@@ -21,14 +21,12 @@ package org.webpki.saturn.resources;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-
 import java.math.BigDecimal;
 
 import org.webpki.crypto.CustomCryptoProvider;
-
+import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -37,9 +35,7 @@ import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ServerAsymKeySigner;
-
 import org.webpki.util.ISODateTime;
-
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class InitTestPage implements BaseProperties {
@@ -122,17 +118,18 @@ public class InitTestPage implements BaseProperties {
 
         // The payment request is wrapped in an unsigned wallet invocation message
         write(Messages.createBaseMessage(Messages.WALLET_REQUEST)
-            .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON,
-                            new String[]{"https://nosuchcard.com",
-                                          PayerAccountTypes.SUPER_CARD.getTypeUri(),
-                                          PayerAccountTypes.BANK_DIRECT.getTypeUri()})
-            .setObject(PAYMENT_REQUEST_JSON, standardRequest));
+            .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
+                .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON,
+                                new String[]{"https://nosuchcard.com",
+                                              PayerAccountTypes.SUPER_CARD.getTypeUri(),
+                                              PayerAccountTypes.BANK_DIRECT.getTypeUri()})
+                .setObject(PAYMENT_REQUEST_JSON, standardRequest))));
 
         // The normal request is cloned and modified for testing error handling
         write(";\n\n" +
               "// All our cards/accounts should match during the discovery phase...\n" +
               "var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-              "scrollMatchingRequest." + ACCEPTED_ACCOUNT_TYPES_JSON + " = [\"https://nosuchcard.com\"");
+              "scrollMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + ACCEPTED_ACCOUNT_TYPES_JSON + " = [\"https://nosuchcard.com\"");
         for (PayerAccountTypes accountType : PayerAccountTypes.values()) {
             write(", \"");
             write(accountType.getTypeUri());
@@ -142,11 +139,11 @@ public class InitTestPage implements BaseProperties {
         write("];\n\n" +
                 "// No card/account should match during the discovery phase...\n" +
                 "var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-                "nonMatchingRequest." + ACCEPTED_ACCOUNT_TYPES_JSON + " = [\"https://nosuchcard.com\"];\n\n");
+                "nonMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + ACCEPTED_ACCOUNT_TYPES_JSON + " = [\"https://nosuchcard.com\"];\n\n");
 
         write("// Note the modified \"" + PAYEE_JSON + "\" property...\n" +
               "var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-              "badSignatureRequest." + PAYMENT_REQUEST_JSON + "." +  PAYEE_JSON + "= \"DEmo Merchant\";\n\n");
+              "badSignatureRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_REQUEST_JSON + "." +  PAYEE_JSON + "." + COMMON_NAME_JSON + "= \"DEmo Merchant\";\n\n");
 
         write("var badMessageRequest = {\"hi\":\"there!\"};\n\n" +
 

@@ -75,6 +75,7 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.AsymKeySignerInterface;
 
+import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
@@ -89,7 +90,6 @@ import org.webpki.sks.Extension;
 import org.webpki.sks.KeyProtectionInfo;
 import org.webpki.sks.SKSException;
 import org.webpki.sks.SecureKeyStore;
-
 import org.webpki.sks.test.SKSReferenceImplementation;
 
 import org.webpki.util.ArrayUtil;
@@ -172,17 +172,20 @@ public class Wallet {
         String dataEncryptionAlgorithm;
         String keyEncryptionAlgorithm;
         PublicKey keyEncryptionKey;
+        PaymentRequest paymentRequest;
         
         Account(AccountDescriptor accountDescriptor,
                 boolean cardFormatAccountId,
                 ImageIcon cardIcon,
                 AsymSignatureAlgorithms signatureAlgorithm,
-                String authorityUrl) {
+                String authorityUrl,
+                PaymentRequest paymentRequest) {
             this.accountDescriptor = accountDescriptor;
             this.cardFormatAccountId = cardFormatAccountId;
             this.cardIcon = cardIcon;
             this.signatureAlgorithm = signatureAlgorithm;
             this.authorityUrl = authorityUrl;
+            this.paymentRequest = paymentRequest;
         }
     }
 
@@ -300,8 +303,6 @@ public class Wallet {
         SecureKeyStore sks;
         int keyHandle;
         Account selectedCard;
-        
-        PaymentRequest paymentRequest;
         
         JSONObjectWriter resultMessage;
         
@@ -446,7 +447,7 @@ public class Wallet {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<Integer,Account>();
                 for (int i = 0; i < 2; i++) {
                     cards.put(i, new Account(new AccountDescriptor("n/a", DUMMY_ACCOUNT_ID),
-                                             true, dummyCardIcon, null, null));
+                                             true, dummyCardIcon, null, null, null));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
             }
@@ -878,8 +879,7 @@ public class Wallet {
                 JSONObjectReader invokeMessage = stdin.readJSONObject();
                 logger.info("Received from browser:\n" + invokeMessage);
                 Messages.parseBaseMessage(Messages.WALLET_REQUEST, invokeMessage);
-                final String[] accountTypes = invokeMessage.getStringArray(BaseProperties.ACCEPTED_ACCOUNT_TYPES_JSON);
-                paymentRequest = new PaymentRequest(invokeMessage.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
+                final JSONArrayReader paymentNetworks = invokeMessage.getArray(BaseProperties.PAYMENT_NETWORKS_JSON);
                 timer.cancel();
                 if (running) {
                     // Swing is rather poor for multi-threading...
@@ -888,33 +888,45 @@ public class Wallet {
                         public void run() {
                             running = false;
                             try {
-                                // Primary information to the user...
-                                amountString = paymentRequest.getCurrency()
-                                    .amountToDisplayString(paymentRequest.getAmount());
-                                payeeCommonName = paymentRequest.getPayee().getCommonName();
-
-                                // Enumerate keys but only go for those who are intended for
-                                // Web Payments (according to our fictitious payment schemes...)
-                                EnumeratedKey ek = new EnumeratedKey();
-                                while ((ek = sks.enumerateKeys(ek.getKeyHandle())) != null) {
-                                    Extension ext = null;
-                                    try {
-                                        ext = sks.getExtension(ek.getKeyHandle(),
-                                                               BaseProperties.SATURN_WEB_PAY_CONTEXT_URI);
-                                    } catch (SKSException e) {
-                                        if (e.getError() == SKSException.ERROR_OPTION) {
-                                            continue;
-                                        }
-                                        throw new Exception(e);
+                                PaymentRequest comparePaymentRequest = null;
+                                do {
+                                    JSONObjectReader paymentNetwork = paymentNetworks.getObject();
+                                    String[] accountTypes = paymentNetwork.getStringArray(BaseProperties.ACCEPTED_ACCOUNT_TYPES_JSON);
+                                    PaymentRequest paymentRequest = new PaymentRequest(paymentNetwork.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
+                                    if (comparePaymentRequest == null) {
+                                        comparePaymentRequest = paymentRequest;
+                                    } else {
+                                        paymentRequest.consistencyCheck(paymentRequest);
                                     }
-
-                                    // This key had the attribute signifying that it is a payment credential
-                                    // for the fictitious payment schemes this system is supporting but it
-                                    // might still not match the Payee's list of supported account types.
-                                    collectPotentialCard(ek.getKeyHandle(),
-                                                         JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
-                                                         accountTypes);
-                               }
+                                    // Primary information to the user...
+                                    amountString = paymentRequest.getCurrency()
+                                        .amountToDisplayString(paymentRequest.getAmount());
+                                    payeeCommonName = paymentRequest.getPayee().getCommonName();
+    
+                                    // Enumerate keys but only go for those who are intended for
+                                    // Web Payments (according to our fictitious payment schemes...)
+                                    EnumeratedKey ek = new EnumeratedKey();
+                                    while ((ek = sks.enumerateKeys(ek.getKeyHandle())) != null) {
+                                        Extension ext = null;
+                                        try {
+                                            ext = sks.getExtension(ek.getKeyHandle(),
+                                                                   BaseProperties.SATURN_WEB_PAY_CONTEXT_URI);
+                                        } catch (SKSException e) {
+                                            if (e.getError() == SKSException.ERROR_OPTION) {
+                                                continue;
+                                            }
+                                            throw new Exception(e);
+                                        }
+    
+                                        // This key had the attribute signifying that it is a payment credential
+                                        // for the fictitious payment schemes this system is supporting but it
+                                        // might still not match the Payee's list of supported account types.
+                                        collectPotentialCard(ek.getKeyHandle(),
+                                                             JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
+                                                             paymentRequest,
+                                                             accountTypes);
+                                    }
+                                } while (paymentNetworks.hasMore());
                             } catch (Exception e) {
                                 sksProblem(e);
                             }
@@ -970,7 +982,7 @@ public class Wallet {
 
         void collectPotentialCard(int keyHandle,
                                   JSONObjectReader cardProperties,
-                                  String[] accountTypes) throws IOException {
+                                  PaymentRequest paymentRequest, String[] accountTypes) throws IOException {
             AccountDescriptor cardAccount = new AccountDescriptor(cardProperties.getObject(BaseProperties.ACCOUNT_JSON));
             for (String accountType : accountTypes) {
                 if (cardAccount.getAccountType().equals(accountType)) {
@@ -983,7 +995,8 @@ public class Wallet {
                                     AsymSignatureAlgorithms.getAlgorithmFromID(
                                             cardProperties.getString(BaseProperties.SIGNATURE_ALGORITHM_JSON),
                                             AlgorithmPreferences.JOSE),
-                                    cardProperties.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON));
+                                    cardProperties.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON),
+                                    paymentRequest);
                     JSONObjectReader encryptionParameters = cardProperties.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
                     card.keyEncryptionAlgorithm =
                             encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON);
@@ -1027,7 +1040,7 @@ public class Wallet {
                     // User authorizations are always signed by a key that only needs to be
                     // understood by the issuing Payment Provider (bank).
                     JSONObjectWriter authorizationData = AuthorizationData.encode(
-                        paymentRequest,
+                        selectedCard.paymentRequest,
                         domainName,
                         selectedCard.accountDescriptor,
                         dataEncryptionKey,
@@ -1053,7 +1066,7 @@ public class Wallet {
                     // Since user authorizations are pushed through the Payees they must be encrypted in order
                     // to not leak user information to Payees.  Only the proper Payment Provider can decrypt
                     // and process user authorizations.
-                    resultMessage = PayerAuthorization.encode(paymentRequest,
+                    resultMessage = PayerAuthorization.encode(selectedCard.paymentRequest,
                                                               authorizationData,
                                                               selectedCard.authorityUrl,
                                                               selectedCard.accountDescriptor.getAccountType(),
