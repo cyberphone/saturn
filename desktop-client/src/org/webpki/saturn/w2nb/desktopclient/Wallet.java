@@ -79,8 +79,9 @@ import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
-import org.webpki.json.JSONDecryptionDecoder;
 
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 import org.webpki.json.encryption.EncryptionCore;
 
 import org.webpki.keygen2.KeyGen2URIs;
@@ -90,6 +91,7 @@ import org.webpki.sks.Extension;
 import org.webpki.sks.KeyProtectionInfo;
 import org.webpki.sks.SKSException;
 import org.webpki.sks.SecureKeyStore;
+
 import org.webpki.sks.test.SKSReferenceImplementation;
 
 import org.webpki.util.ArrayUtil;
@@ -169,8 +171,8 @@ public class Wallet {
         ImageIcon cardIcon;
         AsymSignatureAlgorithms signatureAlgorithm;
         String authorityUrl;
-        String dataEncryptionAlgorithm;
-        String keyEncryptionAlgorithm;
+        DataEncryptionAlgorithms dataEncryptionAlgorithm;
+        KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey keyEncryptionKey;
         PaymentRequest paymentRequest;
         
@@ -965,7 +967,7 @@ public class Wallet {
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
                             ProviderUserResponse.PrivateMessage privateMessage = new ProviderUserResponse(optionalMessage)
-                                .getPrivateMessage(dataEncryptionKey, JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID);
+                                .getPrivateMessage(dataEncryptionKey, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
                             logger.info("Decrypted private message:\n" + privateMessage.getRoot());
                             showProviderDialog(privateMessage);
                         } else {
@@ -998,16 +1000,16 @@ public class Wallet {
                                     cardProperties.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON),
                                     paymentRequest);
                     JSONObjectReader encryptionParameters = cardProperties.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
-                    card.keyEncryptionAlgorithm =
-                            encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON);
+                    card.keyEncryptionAlgorithm = KeyEncryptionAlgorithms
+                             .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
                     if (!EncryptionCore.permittedKeyEncryptionAlgorithm(card.keyEncryptionAlgorithm)) {
                         logger.warning("Account " + cardAccount.getAccountId() + " contained an unknown \"" +
                                        BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON + "\": " +
                                        card.keyEncryptionAlgorithm);
                         break;
                     }
-                    card.dataEncryptionAlgorithm =
-                            encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON);
+                    card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
+                             .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
                     if (!EncryptionCore.permittedDataEncryptionAlgorithm(card.dataEncryptionAlgorithm)) {
                         logger.warning("Account " + cardAccount.getAccountId() + " contained an unknown \"" +
                                        BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON + "\": " +
@@ -1044,7 +1046,7 @@ public class Wallet {
                         domainName,
                         selectedCard.accountDescriptor,
                         dataEncryptionKey,
-                        JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID,
+                        DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                         challengeResults,
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
@@ -1210,7 +1212,7 @@ public class Wallet {
         // it more look like a Web application.  Note that this measurement
         // lacks the 'px' part; you have to add it in the Web application.
         try {
-            dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID);
+            dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
             JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.WALLET_IS_READY);
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)

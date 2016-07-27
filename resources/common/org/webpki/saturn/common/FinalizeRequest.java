@@ -28,7 +28,8 @@ import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
-import org.webpki.crypto.DecryptionKeyHolder;
+
+import org.webpki.json.encryption.DecryptionKeyHolder;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;

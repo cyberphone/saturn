@@ -32,6 +32,8 @@ import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+
 public class ProviderUserResponse implements BaseProperties {
 
     public class PrivateMessage {
@@ -73,8 +75,11 @@ public class ProviderUserResponse implements BaseProperties {
     JSONDecryptionDecoder encryptedData;
     
     public PrivateMessage getPrivateMessage(byte[] dataEncryptionKey,
-                                            String dataEncryptionAlgorithm)
+                                            DataEncryptionAlgorithms dataEncryptionAlgorithm)
     throws IOException, GeneralSecurityException {
+        if (encryptedData.getDataEncryptionAlgorithm() != dataEncryptionAlgorithm) {
+            throw new IOException("Unexpected data encryption algorithm:" + encryptedData.getDataEncryptionAlgorithm().toString());
+        }
         JSONObjectReader rd = JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey)); 
         PrivateMessage privateMessage = new PrivateMessage(rd);
         privateMessage.commonName = rd.getString(COMMON_NAME_JSON);
@@ -99,7 +104,7 @@ public class ProviderUserResponse implements BaseProperties {
                                           String text,
                                           ChallengeField[] optionalChallengeFields,
                                           byte[] dataEncryptionKey,
-                                          String dataEncryptionAlgorithm) throws IOException, GeneralSecurityException {
+                                          DataEncryptionAlgorithms dataEncryptionAlgorithm) throws IOException, GeneralSecurityException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setString(COMMON_NAME_JSON, commonName)
             .setString(TEXT_JSON, text);

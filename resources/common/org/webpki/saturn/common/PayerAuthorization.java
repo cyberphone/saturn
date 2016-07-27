@@ -26,6 +26,9 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONOutputFormats;
 
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+
 public class PayerAuthorization implements BaseProperties {
     
     static JSONDecryptionDecoder getEncryptionObject(JSONObjectReader rd, boolean sharedSecret) throws IOException {
@@ -65,9 +68,9 @@ public class PayerAuthorization implements BaseProperties {
                                           JSONObjectWriter unencryptedAuthorizationData,
                                           String providerAuthorityUrl,
                                           String accountType,
-                                          String dataEncryptionAlgorithm,
+                                          DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           PublicKey keyEncryptionKey,
-                                          String keyEncryptionAlgorithm) throws IOException, GeneralSecurityException {
+                                          KeyEncryptionAlgorithms keyEncryptionAlgorithm) throws IOException, GeneralSecurityException {
         return Messages.createBaseMessage(Messages.PAYER_AUTHORIZATION)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType)

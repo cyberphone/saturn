@@ -42,7 +42,9 @@ import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
-import org.webpki.json.JSONDecryptionDecoder;
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
@@ -139,15 +141,15 @@ public class CryptoTesting {
                   "const JEF_ECDH_OBJECT = ");
         JSONObjectWriter encryptedData  = new JSONObjectWriter()
             .setEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
-                                 JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID,
+                                 DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                                  alice.getPublic(),
-                                 JSONDecryptionDecoder.JOSE_ECDH_ES_ALG_ID);
+                                 KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
         js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
           .append(";\n\n" +
                   "const JEF_SYM_OBJECT = ");
         encryptedData  = new JSONObjectWriter()
             .setEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
-                                 JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID,
+                                 DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                                  null,
                                  symkey);
     js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))

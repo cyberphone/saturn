@@ -31,7 +31,9 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
-import org.webpki.json.JSONDecryptionDecoder;
+
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 public class Authority implements BaseProperties {
 
@@ -47,10 +49,10 @@ public class Authority implements BaseProperties {
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(TRANSACTION_URL_JSON, transactionUrl)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID)
+                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
                 .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
-                             publicKey instanceof RSAPublicKey ?
-                           JSONDecryptionDecoder.JOSE_RSA_OAEP_256_ALG_ID : JSONDecryptionDecoder.JOSE_ECDH_ES_ALG_ID)
+                             (publicKey instanceof RSAPublicKey ?
+               KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
                 .setPublicKey(publicKey, AlgorithmPreferences.JOSE))
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
@@ -70,8 +72,10 @@ public class Authority implements BaseProperties {
         }
         transactionUrl = rd.getString(TRANSACTION_URL_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        dataEncryptionAlgorithm = encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
-        keyEncryptionAlgorithm = encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
+        dataEncryptionAlgorithm = DataEncryptionAlgorithms
+            .getAlgorithmFromString(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
+        keyEncryptionAlgorithm = KeyEncryptionAlgorithms
+            .getAlgorithmFromString(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
         publicKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
@@ -95,13 +99,13 @@ public class Authority implements BaseProperties {
         return transactionUrl;
     }
 
-    String dataEncryptionAlgorithm;
-    public String getDataEncryptionAlgorithm() {
+    DataEncryptionAlgorithms dataEncryptionAlgorithm;
+    public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
         return dataEncryptionAlgorithm;
     }
 
-    String keyEncryptionAlgorithm;
-    public String getKeyEncryptionAlgorithm() {
+    KeyEncryptionAlgorithms keyEncryptionAlgorithm;
+    public KeyEncryptionAlgorithms getKeyEncryptionAlgorithm() {
         return keyEncryptionAlgorithm;
     }
 

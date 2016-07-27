@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -43,7 +44,9 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-import org.webpki.json.JSONDecryptionDecoder;
+
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
@@ -162,12 +165,12 @@ public class InitWallet {
                     AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE));
             PublicKey publicKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
             ow.setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
-                  .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, JSONDecryptionDecoder.JOSE_A128CBC_HS256_ALG_ID)
+                  .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
                   .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
-                         publicKey instanceof RSAPublicKey ?
-                             JSONDecryptionDecoder.JOSE_RSA_OAEP_256_ALG_ID 
+                        (publicKey instanceof RSAPublicKey ?
+                             KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID 
                                                            : 
-                             JSONDecryptionDecoder.JOSE_ECDH_ES_ALG_ID)
+                             KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
                   .setPublicKey(publicKey, AlgorithmPreferences.JOSE);
             surrogateKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                                       SecureKeyStore.SUB_TYPE_EXTENSION,

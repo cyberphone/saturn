@@ -35,6 +35,8 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONSignatureDecoder;
 
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+
 public class AuthorizationData implements BaseProperties {
 
     public static final String SOFTWARE_ID      = "WebPKI.org - Wallet";
@@ -44,7 +46,7 @@ public class AuthorizationData implements BaseProperties {
                                           String domainName,
                                           AccountDescriptor accountDescriptor,
                                           byte[] dataEncryptionKey,
-                                          String dataEncryptionAlgorithm,
+                                          DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           ChallengeResult[] optionalChallengeResults,
                                           Date timeStamp,
                                           JSONAsymKeySigner signer) throws IOException {
@@ -56,7 +58,7 @@ public class AuthorizationData implements BaseProperties {
             .setObject(ACCOUNT_JSON, accountDescriptor.writeObject())
             .setObject(ENCRYPTION_PARAMETERS_JSON, 
                        new JSONObjectWriter()
-                .setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm)
+                .setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setBinary(JSONSignatureDecoder.VALUE_JSON, dataEncryptionKey));
         if (optionalChallengeResults != null && optionalChallengeResults.length > 0) {
             JSONArrayWriter aw = wr.setArray(CHALLENGE_RESULTS_JSON);
@@ -74,7 +76,7 @@ public class AuthorizationData implements BaseProperties {
                                           String domainName,
                                           AccountDescriptor accountDescriptor,
                                           byte[] dataEncryptionKey,
-                                          String dataEncryptionAlgorithm,
+                                          DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           ChallengeResult[] optionalChallengeResults,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           AsymKeySignerInterface signer) throws IOException {
@@ -108,7 +110,8 @@ public class AuthorizationData implements BaseProperties {
         domainName = rd.getString(DOMAIN_NAME_JSON);
         accountDescriptor = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        dataEncryptionAlgorithm = encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON);
+        dataEncryptionAlgorithm = DataEncryptionAlgorithms
+            .getAlgorithmFromString(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(JSONSignatureDecoder.VALUE_JSON);
         if (rd.hasProperty(CHALLENGE_RESULTS_JSON)) {
             LinkedHashMap<String,ChallengeResult> results = new LinkedHashMap<String,ChallengeResult>();
@@ -128,8 +131,8 @@ public class AuthorizationData implements BaseProperties {
         rd.checkForUnread();
     }
 
-    String dataEncryptionAlgorithm;
-    public String getDataEncryptionAlgorithm() {
+    DataEncryptionAlgorithms dataEncryptionAlgorithm;
+    public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
         return dataEncryptionAlgorithm;
     }
 
