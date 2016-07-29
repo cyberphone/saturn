@@ -38,7 +38,6 @@ public class ProviderUserResponse implements BaseProperties {
 
     public class PrivateMessage {
         
-        
         private PrivateMessage(JSONObjectReader rd) {
             this.root = rd;
         }
@@ -68,7 +67,7 @@ public class ProviderUserResponse implements BaseProperties {
 
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, rd);
-        encryptedData = PayerAuthorization.getEncryptionObject(rd.getObject(ENCRYPTED_MESSAGE_JSON), true);
+        encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON).getEncryptionObject().require(false);
         rd.checkForUnread();
     }
 

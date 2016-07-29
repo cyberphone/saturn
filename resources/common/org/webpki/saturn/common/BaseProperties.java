@@ -39,6 +39,8 @@ public interface BaseProperties {
     String LENGTH_JSON                      = "length";                     // ProviderUserResponse
     String ENCRYPTED_MESSAGE_JSON           = "encryptedMessage";           // ProviderUserResponse
 
+    String KEY_JSON                         = "key";                        // Wallet-originated encryption key
+
     String CHALLENGE_RESULTS_JSON           = "challengeResults";           // Result of ProviderUserResponse 
 
     String PAYMENT_NETWORKS_JSON            = "paymentNetworks";

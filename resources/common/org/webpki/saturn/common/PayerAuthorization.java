@@ -31,18 +31,10 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 public class PayerAuthorization implements BaseProperties {
     
-    static JSONDecryptionDecoder getEncryptionObject(JSONObjectReader rd, boolean sharedSecret) throws IOException {
-        JSONDecryptionDecoder decryptionDecoder = rd.getEncryptionObject();
-        if (sharedSecret != decryptionDecoder.isSharedSecret()) {
-            throw new IOException("Unexpected type of encryption object");
-        }
-        return decryptionDecoder;
-    }
-    
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.PAYER_AUTHORIZATION, rd);
         // Only syntax checking for intermediaries
-        getEncryptionObject(rd.getObject(ENCRYPTED_AUTHORIZATION_JSON), false);
+        rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));

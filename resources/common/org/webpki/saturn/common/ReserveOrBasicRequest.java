@@ -46,7 +46,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
         message = Messages.parseBaseMessage(valid, root = rd);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
-        encryptedAuthorizationData = PayerAuthorization.getEncryptionObject(rd.getObject(ENCRYPTED_AUTHORIZATION_JSON), false);
+        encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         if (message.isCardPayment()) {

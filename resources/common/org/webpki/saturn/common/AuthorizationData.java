@@ -59,7 +59,7 @@ public class AuthorizationData implements BaseProperties {
             .setObject(ENCRYPTION_PARAMETERS_JSON, 
                        new JSONObjectWriter()
                 .setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
-                .setBinary(JSONSignatureDecoder.VALUE_JSON, dataEncryptionKey));
+                .setBinary(KEY_JSON, dataEncryptionKey));
         if (optionalChallengeResults != null && optionalChallengeResults.length > 0) {
             JSONArrayWriter aw = wr.setArray(CHALLENGE_RESULTS_JSON);
             for (ChallengeResult challengeResult : optionalChallengeResults) {
@@ -112,7 +112,7 @@ public class AuthorizationData implements BaseProperties {
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
             .getAlgorithmFromString(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
-        dataEncryptionKey = encryptionParameters.getBinary(JSONSignatureDecoder.VALUE_JSON);
+        dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
         if (rd.hasProperty(CHALLENGE_RESULTS_JSON)) {
             LinkedHashMap<String,ChallengeResult> results = new LinkedHashMap<String,ChallengeResult>();
             JSONArrayReader ar = rd.getArray(CHALLENGE_RESULTS_JSON);
