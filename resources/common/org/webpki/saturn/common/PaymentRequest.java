@@ -40,6 +40,7 @@ public class PaymentRequest implements BaseProperties {
                                           BigDecimal amount,
                                           Currencies currency,
                                           String referenceId,
+                                          Date timeStamp,
                                           Date expires,
                                           JSONAsymKeySigner signer) throws IOException {
         return new JSONObjectWriter()
@@ -47,7 +48,7 @@ public class PaymentRequest implements BaseProperties {
             .setBigDecimal(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, timeStamp, true)
             .setDateTime(EXPIRES_JSON, expires, true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);

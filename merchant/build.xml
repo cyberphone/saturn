@@ -64,6 +64,7 @@
     <property name="unusualcard" value="false"/>
     <property name="currency" value="USD"/>
     <property name="bouncycastle.first" value="true"/>
+    <property name="other.key" value=""/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
        tablength="4"
@@ -88,7 +89,11 @@
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${keypassword}"/>
 	  <replacefilter token="@merchant-key@" value="${merchantkey}.p12"/>
-      <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
+	  <replacefilter token="@merchant-cn@" value="${merchantcn}"/>
+	  <replacefilter token="@merchant-id@" value="${merchantid}"/>
+	  <replacefilter token="@othernetwork-key@" value="${other.key}"/>
+	  <replacefilter token="@othernetwork-id@" value="${othernetworkid}"/>
+	  <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
       <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
       <replacefilter token="@acquirer-authority-url@" value="${acquirer.host}/${acquirerpath}/authority"/>
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payeebankpath}/authority"/>
@@ -119,6 +124,7 @@
       <lib dir="${zip.lib.dir}"/>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
          <include name="${merchantkey}.p12"/>
+         <include name="${othernetworkkey}.p12"/>
          <include name="${payment.var.root}.cer"/>
          <include name="${acquirerroot}.cer"/>
       </zipfileset>
@@ -137,6 +143,9 @@
      </condition>
      <condition property="unusualcard" value="true">
        <isset property="unusual.card"/>
+     </condition>
+     <condition property="other.key" value="${othernetworkkey}.p12">
+       <isset property="other.network"/>
      </condition>
      <path id="tomcat.compile.classpath">
        <fileset dir="${common.lib.dir}">

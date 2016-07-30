@@ -17,18 +17,14 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.net.URL;
-
 import java.security.GeneralSecurityException;
-
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,13 +35,9 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-
 import org.webpki.net.HTTPSWrapper;
-
 import org.webpki.util.ArrayUtil;
-
 import org.webpki.webutil.ServletUtil;
-
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Authority;
@@ -159,7 +151,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {
-                returnJsonData(response, Messages.createBaseMessage(Messages.WALLET_SUCCESS));
+                returnJsonData(response, Messages.createBaseMessage(Messages.PAYMENT_CLIENT_SUCCESS));
                 return;
              }
 
@@ -169,7 +161,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
             }
             JSONObjectReader walletResponse = JSONParser.parse(ServletUtil.getData(request));
-            byte[] requestHash = (byte[]) session.getAttribute(W2NBWalletServlet.REQUEST_HASH_SESSION_ATTR);
             if (MerchantService.logging) {
                 logger.info("Received from wallet:\n" + walletResponse);
             }
@@ -187,8 +178,18 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
 
             // Get the original payment request
             PaymentRequest paymentRequest = payerAuthorization.getPaymentRequest();
-            if (!ArrayUtil.compare(requestHash, paymentRequest.getRequestHash())) {
-                throw new IOException("Incorrect \"" + REQUEST_HASH_JSON + "\"");
+
+            @SuppressWarnings("unchecked")
+            Vector<byte[]> requestHashes = (Vector<byte[]>) session.getAttribute(W2NBWalletServlet.REQUEST_HASH_SESSION_ATTR);
+            boolean notFoundHash = true;
+            for (byte[] hash : requestHashes) {
+                if (ArrayUtil.compare(hash, paymentRequest.getRequestHash())) {
+                    notFoundHash = false;
+                    break;
+                }
+            }
+            if (notFoundHash) {
+                throw new IOException("No hash matches the returned payment request");
             }
            
             // Basic credit is only applicable to account2account operations
@@ -273,7 +274,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            returnJsonData(response, Messages.createBaseMessage(Messages.WALLET_SUCCESS));
+            returnJsonData(response, Messages.createBaseMessage(Messages.PAYMENT_CLIENT_SUCCESS));
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();

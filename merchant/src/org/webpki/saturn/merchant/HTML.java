@@ -415,7 +415,7 @@ public class HTML implements MerchantProperties {
                     "        return;\n" +
                     "      }\n" +
                     "      var qualifier = message['@qualifier'];\n" +
-                    "      if ((initMode && qualifier != '" + Messages.WALLET_IS_READY.toString() + "')  ||\n" +
+                    "      if ((initMode && qualifier != '" + Messages.PAYMENT_CLIENT_IS_READY.toString() + "')  ||\n" +
                     "          (!initMode && qualifier != '" +  Messages.PAYER_AUTHORIZATION.toString() + "')) {\n" +  
                     "        setFail('Wrong or missing \"@qualifier\"');\n" +
                     "        return;\n" +
@@ -446,7 +446,7 @@ public class HTML implements MerchantProperties {
                     "          return response.json();\n" +
                     "        }).then(function (resultData) {\n" +
                     "          if (typeof resultData == 'object' && !Array.isArray(resultData)) {\n" +
-                    "            if (resultData['@qualifier'] == '" + Messages.WALLET_SUCCESS.toString() + "') {\n" +
+                    "            if (resultData['@qualifier'] == '" + Messages.PAYMENT_CLIENT_SUCCESS.toString() + "') {\n" +
                     "// \"Normal\" return\n" +
                     "              document.location.href='result';\n" +
                     "            } else {\n" +

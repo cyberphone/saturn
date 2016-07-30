@@ -880,7 +880,7 @@ public class Wallet {
             try {
                 JSONObjectReader invokeMessage = stdin.readJSONObject();
                 logger.info("Received from browser:\n" + invokeMessage);
-                Messages.parseBaseMessage(Messages.WALLET_REQUEST, invokeMessage);
+                Messages.parseBaseMessage(Messages.PAYMENT_CLIENT_REQUEST, invokeMessage);
                 final JSONArrayReader paymentNetworks = invokeMessage.getArray(BaseProperties.PAYMENT_NETWORKS_JSON);
                 timer.cancel();
                 if (running) {
@@ -962,7 +962,7 @@ public class Wallet {
                     try {
                         logger.info("Received from browser:\n" + optionalMessage);
                         Messages message = Messages.parseBaseMessage(new Messages[]{Messages.PROVIDER_USER_RESPONSE,
-                                                                                    Messages.WALLET_ALERT},
+                                                                                    Messages.PAYMENT_CLIENT_ALERT},
                                                                      optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
@@ -1213,7 +1213,7 @@ public class Wallet {
         // lacks the 'px' part; you have to add it in the Web application.
         try {
             dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
-            JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.WALLET_IS_READY);
+            JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.PAYMENT_CLIENT_IS_READY);
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)
                     .setDouble(BaseProperties.WIDTH_JSON, extWidth)

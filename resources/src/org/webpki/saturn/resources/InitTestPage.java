@@ -21,12 +21,17 @@ package org.webpki.saturn.resources;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+
 import java.math.BigDecimal;
 
+import java.util.Date;
+
 import org.webpki.crypto.CustomCryptoProvider;
+
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -35,7 +40,9 @@ import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ServerAsymKeySigner;
+
 import org.webpki.util.ISODateTime;
+
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class InitTestPage implements BaseProperties {
@@ -89,6 +96,7 @@ public class InitTestPage implements BaseProperties {
                                   new BigDecimal("306.25"),
                                   Currencies.USD,
                                   "#6100004",
+                                  new Date(),
                                   ISODateTime.parseDateTime("2030-09-14T00:00:00Z").getTime(),
                                   signer);
         // Header
@@ -117,7 +125,7 @@ public class InitTestPage implements BaseProperties {
               "var normalRequest = ");
 
         // The payment request is wrapped in an unsigned wallet invocation message
-        write(Messages.createBaseMessage(Messages.WALLET_REQUEST)
+        write(Messages.createBaseMessage(Messages.PAYMENT_CLIENT_REQUEST)
             .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
                 .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON,
                                 new String[]{"https://nosuchcard.com",
@@ -190,7 +198,7 @@ public class InitTestPage implements BaseProperties {
               "        return;\n" +
               "      }\n" +
               "      var qualifier = message[\"@qualifier\"];\n" +
-              "      if ((initMode && qualifier != \"" + Messages.WALLET_IS_READY.toString() + "\" ) ||\n" +
+              "      if ((initMode && qualifier != \"" + Messages.PAYMENT_CLIENT_IS_READY.toString() + "\" ) ||\n" +
               "          (!initMode && qualifier != \"" + Messages.PAYER_AUTHORIZATION.toString() + "\")) {\n" +  
               "        setString(\"Wrong or missing \\\"@qualifier\\\"\");\n" +
               "        closeExtension();\n" +

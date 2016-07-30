@@ -24,11 +24,11 @@ import org.webpki.json.JSONObjectWriter;
 
 public enum Messages {
 
-    WALLET_IS_READY               ("WalletIsReady"),                 // Wallet to payee Web page message
-    WALLET_REQUEST                ("WalletRequest"),                 // Payee payment request + other data
-    WALLET_ALERT                  ("WalletAlert"),                   // Payee to Wallet message
-    WALLET_SUCCESS                ("WalletSuccess"),                 // Payee to Wallet message
-    PAYER_AUTHORIZATION           ("PayerAuthorization"),            // Created by the Wallet
+    PAYMENT_CLIENT_IS_READY       ("PaymentClientIsReady"),          // PaymentClient to payee Web page message
+    PAYMENT_CLIENT_REQUEST        ("PaymentClientRequest"),          // Payee payment request + other data
+    PAYMENT_CLIENT_ALERT          ("PaymentClientAlert"),            // Payee to PaymentClient message
+    PAYMENT_CLIENT_SUCCESS        ("PaymentClientSuccess"),          // Payee to PaymentClient message
+    PAYER_AUTHORIZATION           ("PayerAuthorization"),            // Created by the PaymentClient
     
     PROVIDER_USER_RESPONSE        ("ProviderUserResponse"),          // May replace any RESPONSE message
 

@@ -67,6 +67,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
   
     static final String MERCHANT_KEY                 = "merchant_key";
     
+    static final String MERCHANT_CN                  = "merchant_cn";
+
+    static final String MERCHANT_ID                  = "merchant_id";
+
+    static final String OTHERNETWORK_KEY             = "othernetwork_key";
+
+    static final String OTHERNETWORK_ID              = "othernetwork_id";
+
     static final String KEYSTORE_PASSWORD            = "key_password";
 
     static final String PAYMENT_ROOT                 = "payment_root";
@@ -102,6 +110,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static JSONX509Verifier acquirerRoot;
     
     static ServerAsymKeySigner merchantKey;
+    
+    static String merchantCommonName;
+    
+    static String merchantId;
+    
+    static ServerAsymKeySigner otherNetworkKey;
+    
+    static String otherNetworkId;
     
     static String acquirerAuthorityUrl;
     
@@ -201,6 +217,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             merchantKey = new ServerAsymKeySigner(new KeyStoreEnumerator(getResource(MERCHANT_KEY),
                                                                          getPropertyString(KEYSTORE_PASSWORD)));
+            merchantCommonName = getPropertyString(MERCHANT_CN);
+            merchantId = getPropertyString(MERCHANT_ID);
+
+            if (getPropertyString(OTHERNETWORK_KEY).length () > 0) {
+                otherNetworkKey = new ServerAsymKeySigner(new KeyStoreEnumerator(getResource(OTHERNETWORK_KEY),
+                                                                                 getPropertyString(KEYSTORE_PASSWORD)));
+                otherNetworkId = getPropertyString(OTHERNETWORK_ID);
+            }
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
