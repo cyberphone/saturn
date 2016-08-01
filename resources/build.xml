@@ -289,6 +289,11 @@
            classpathref="compile.classpath"
            includeAntRuntime="false">
     </javac>
+    <copy todir="${temp.dir}">
+       <fileset dir="${src.dir}">
+          <include name="**/*.json"/>
+       </fileset>
+    </copy>
     <java fork="yes"
           classname="org.webpki.saturn.resources.CryptoTesting"
           failonerror="true">

@@ -19,16 +19,7 @@ package org.webpki.saturn.resources;
 
 import java.io.IOException;
 
-import java.math.BigInteger;
-
-import java.security.KeyFactory;
 import java.security.KeyPair;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-
-import java.security.spec.ECPoint;
-import java.security.spec.ECPrivateKeySpec;
-import java.security.spec.ECPublicKeySpec;
 
 import org.webpki.asn1.ASN1OctetString;
 import org.webpki.asn1.ASN1Sequence;
@@ -37,15 +28,12 @@ import org.webpki.asn1.CompositeContextSpecific;
 import org.webpki.asn1.DerDecoder;
 import org.webpki.asn1.ParseUtil;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
-import org.webpki.crypto.KeyAlgorithms;
 
 import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
-import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
@@ -67,44 +55,11 @@ public class CryptoTesting {
 
     static StringBuffer js = new StringBuffer();
 
-    static final String aliceKey = 
-        "{\"kty\":\"EC\"," +
-         "\"crv\":\"P-256\"," +
-           "\"x\":\"Ze2loSV3wrroKUN_4zhwGhCqo3Xhu1td4QjeQ5wIVR0\"," +
-           "\"y\":\"HlLtdXARY_f55A3fnzQbPcm6hgr34Mp8p-nuzQCE0Zw\"," +
-           "\"d\":\"r_kHyZ-a06rmxM3yESK84r1otSg-aQcVStkRhA-iCM8\"" +
-         "}";
+   
+    static KeyPair getKeyPair(String name) throws IOException {
+        return JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(CryptoTesting.class.getResourceAsStream(name))).getKeyPairFromJwk();
+    }
 
-     
-    static final String bobKey = 
-      "{\"kty\":\"EC\"," +
-       "\"crv\":\"P-256\"," +
-         "\"x\":\"mPUKT_bAWGHIhg0TpjjqVsP1rXWQu_vwVOHHtNkdYoA\"," +
-         "\"y\":\"8BQAsImGeAS46fyWw5MhYfGTT0IjBpFw2SS34Dv4Irs\"," +
-         "\"d\":\"AtH35vJsQ9SGjYfOsjUxYXQKrPH3FjZHmEtSKoSN8cM\"" +
-       "}";
-    
-    static BigInteger getCurvePoint (JSONObjectReader rd, String property, KeyAlgorithms ec) throws IOException {
-        byte[] fixed_binary = rd.getBinary (property);
-        if (fixed_binary.length != (ec.getPublicKeySizeInBits () + 7) / 8) {
-            throw new IOException ("Public EC key parameter \"" + property + "\" is not nomalized");
-        }
-        return new BigInteger (1, fixed_binary);
-    }
-    
-    static KeyPair getKeyPair (String jwk) throws Exception {
-        JSONObjectReader rd = JSONParser.parse(jwk);
-        KeyAlgorithms ec = KeyAlgorithms.getKeyAlgorithmFromID (rd.getString ("crv"),
-                                                                AlgorithmPreferences.JOSE);
-        if (!ec.isECKey ()) {
-            throw new IOException ("\"crv\" is not an EC type");
-        }
-        ECPoint w = new ECPoint (getCurvePoint (rd, "x", ec), getCurvePoint (rd, "y", ec));
-        PublicKey publicKey = KeyFactory.getInstance ("EC").generatePublic (new ECPublicKeySpec (w, ec.getECParameterSpec ()));
-        PrivateKey privateKey = KeyFactory.getInstance ("EC").generatePrivate (new ECPrivateKeySpec (getCurvePoint (rd, "d", ec), ec.getECParameterSpec ()));
-        return new KeyPair (publicKey, privateKey);
-    }
-    
     static byte[] createPKCS8PrivateKey(byte[]publicKey, byte[]privateKey) throws IOException {
         ASN1Sequence pkcs8 = ParseUtil.sequence(DerDecoder.decode(privateKey));
         ASN1Sequence inner = ParseUtil.sequence(DerDecoder.decode(ParseUtil.octet(pkcs8.get(2))));
@@ -117,23 +72,24 @@ public class CryptoTesting {
                                              DerDecoder.decode(publicKey).get(1))}).encode())}).encode();
     }
     
-    static void createPEM(String string, byte[] encoded) {
-        js.append("const ECHD_TEST_" + string + "_KEY = \n" +
+    static void createPEM(boolean rsa, String string, byte[] encoded) {
+        js.append("const " + (rsa ? "RSA" : "ECHD") + "_TEST_" + string + "_KEY = \n" +
                   "'-----BEGIN " + string + " KEY-----\\\n")
           .append(new Base64(true).getBase64StringFromBinary(encoded).replace("\r\n", "\\\n"))
           .append("\\\n-----END " + string + " KEY-----';\n\n");
     }
-
+ 
     public static void main(String[] args) throws Exception {
         if (args.length != 1) {
             System.out.println("Missing: outputfile");
             System.exit(3);
         }
         CustomCryptoProvider.forcedLoad(true);
-        KeyPair bob = getKeyPair(bobKey);
-        KeyPair alice = getKeyPair(aliceKey);
+        KeyPair bob = getKeyPair("bobkey.json");
+        KeyPair alice = getKeyPair("alicekey.json");
+        KeyPair rsa = getKeyPair("rsakey.json");
         byte[] symkey = HashAlgorithms.SHA256.digest(Base64URL.decode(ECDH_RESULT_WITH_KDF));
-        js.append("// ECDH test data\n\n" +
+        js.append("// JEF test data\n\n" +
                   "const ECDH_RESULT_WITH_KDF    = '" + ECDH_RESULT_WITH_KDF + "';\n" +
                   "const ECDH_RESULT_WITHOUT_KDF = '" + ECDH_RESULT_WITHOUT_KDF + "';\n\n" +
                   "const JEF_TEST_STRING         = '" + JEF_TEST_STRING + "';\n" +
@@ -146,6 +102,14 @@ public class CryptoTesting {
                                  KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
         js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
           .append(";\n\n" +
+                  "const JEF_RSA_OBJECT = ");
+                  encryptedData  = new JSONObjectWriter()
+          .setEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
+                               DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                               rsa.getPublic(),
+                               KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID);
+      js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
+        .append(";\n\n" +
                   "const JEF_SYM_OBJECT = ");
         encryptedData  = new JSONObjectWriter()
             .setEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
@@ -154,9 +118,10 @@ public class CryptoTesting {
                                  symkey);
     js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
       .append(";\n\n");
-        createPEM("PRIVATE", createPKCS8PrivateKey(alice.getPublic().getEncoded(),
-                                                   alice.getPrivate().getEncoded()));
-        createPEM("PUBLIC", bob.getPublic().getEncoded());
+        createPEM(false, "PRIVATE", createPKCS8PrivateKey(alice.getPublic().getEncoded(),
+                                                          alice.getPrivate().getEncoded()));
+        createPEM(false, "PUBLIC", bob.getPublic().getEncoded());
+        createPEM(true, "PRIVATE", rsa.getPrivate().getEncoded());
         ArrayUtil.writeFile(args[0], js.toString().getBytes("UTF-8"));
         System.out.println(js.toString());
     }
