@@ -26,10 +26,11 @@ import java.net.URL;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.PublicKey;
 
-import java.util.EnumSet;
 import java.util.Enumeration;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Vector;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,8 +64,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static Logger logger = Logger.getLogger(MerchantService.class.getCanonicalName());
     
-    static Set<PayerAccountTypes> acceptedAccountTypes = EnumSet.noneOf(PayerAccountTypes.class);
-  
     static final String MERCHANT_KEY                 = "merchant_key";
     
     static final String MERCHANT_CN                  = "merchant_cn";
@@ -109,15 +108,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static JSONX509Verifier acquirerRoot;
     
-    static ServerAsymKeySigner merchantKey;
+    static LinkedHashMap<PublicKey,PaymentNetwork> paymentNetworks = new LinkedHashMap<PublicKey,PaymentNetwork>();
     
     static String merchantCommonName;
-    
-    static String merchantId;
-    
-    static ServerAsymKeySigner otherNetworkKey;
-    
-    static String otherNetworkId;
     
     static String acquirerAuthorityUrl;
     
@@ -201,6 +194,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                        url.getFile()).toExternalForm();
     }
 
+    void addPaymentNetwork(String keyIdProperty, String merchantIdProperty, String[] acceptedAccountTypes) throws IOException {
+        KeyStoreEnumerator kse = new KeyStoreEnumerator(getResource(keyIdProperty),
+                                                        getPropertyString(KEYSTORE_PASSWORD));
+        paymentNetworks.put(kse.getPublicKey(), new PaymentNetwork(new ServerAsymKeySigner(kse),
+                                                                   getPropertyString(merchantIdProperty),
+                                                                   acceptedAccountTypes));
+    }
+
     @Override
     public void contextDestroyed(ServletContextEvent event) {
     }
@@ -215,27 +216,27 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
             }
 
-            merchantKey = new ServerAsymKeySigner(new KeyStoreEnumerator(getResource(MERCHANT_KEY),
-                                                                         getPropertyString(KEYSTORE_PASSWORD)));
+            // Should be common for all payment networks...
             merchantCommonName = getPropertyString(MERCHANT_CN);
-            merchantId = getPropertyString(MERCHANT_ID);
 
+            // An optional payment network (for client testing purposes)
             if (getPropertyString(OTHERNETWORK_KEY).length () > 0) {
-                otherNetworkKey = new ServerAsymKeySigner(new KeyStoreEnumerator(getResource(OTHERNETWORK_KEY),
-                                                                                 getPropertyString(KEYSTORE_PASSWORD)));
-                otherNetworkId = getPropertyString(OTHERNETWORK_ID);
+                addPaymentNetwork(OTHERNETWORK_KEY, OTHERNETWORK_ID, new String[]{"http://othernetworkpay"});
             }
+
+            // The standard payment network supported by the Saturn demo
+            Vector<String> acceptedAccountTypes = new Vector<String>();
+            for (PayerAccountTypes card : PayerAccountTypes.values()) {
+                if (card != PayerAccountTypes.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
+                    acceptedAccountTypes.add(card.getTypeUri());
+                }
+            }
+            addPaymentNetwork(MERCHANT_KEY, MERCHANT_ID, acceptedAccountTypes.toArray(new String[0]));
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
             acquirerRoot = getRoot(ACQUIRER_ROOT);
-
-            for (PayerAccountTypes card : PayerAccountTypes.values()) {
-                if (card != PayerAccountTypes.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
-                    acceptedAccountTypes.add(card);
-                }
-            }
-         
+        
             currency = Currencies.valueOf(getPropertyString(CURRENCY));
 
             w2nbWalletName = getPropertyString(W2NB_WALLET);

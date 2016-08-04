@@ -31,12 +31,10 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Payee;
-import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.RequestHash;
-import org.webpki.saturn.common.ServerAsymKeySigner;
 
 public class WalletRequest implements BaseProperties, MerchantProperties {
 
@@ -44,27 +42,6 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
     SavedShoppingCart savedShoppingCart;
     JSONObjectWriter requestObject;
     
-    private Date timeStamp;
-    private Date expires;
-    private Vector<byte[]> hashes = new Vector<byte[]>();
-    private JSONArrayWriter paymentNetworks;
-    private String currentReferenceId;
-    
-    void addPaymentNetwork(String merchantId, ServerAsymKeySigner signer, String[] acceptedAccountTypes) throws IOException {
-        JSONObjectWriter paymentRequest =
-                PaymentRequest.encode(Payee.init(MerchantService.merchantCommonName, merchantId),
-                                      new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount), 2),
-                                      MerchantService.currency,
-                                      currentReferenceId,
-                                      timeStamp,
-                                      expires,
-                                      signer);
-        paymentNetworks.setObject()
-            .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, acceptedAccountTypes)
-            .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
-        hashes.add(RequestHash.getRequestHash(paymentRequest));
-    }
-
     WalletRequest(HttpSession session, 
                   String androidTransactionUrl,
                   String androidCancelUrl,
@@ -76,22 +53,27 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         }
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         requestObject = Messages.createBaseMessage(Messages.PAYMENT_CLIENT_REQUEST);
-        paymentNetworks = requestObject.setArray(PAYMENT_NETWORKS_JSON);
-        timeStamp = new Date();
-        expires = Expires.inMinutes(30);
-        currentReferenceId = MerchantService.getReferenceId();
+        JSONArrayWriter paymentNetworksArray = requestObject.setArray(PAYMENT_NETWORKS_JSON);
+        Date timeStamp = new Date();
+        Date expires = Expires.inMinutes(30);
+        String currentReferenceId = MerchantService.getReferenceId();
+        Vector<byte[]> hashes = new Vector<byte[]>();
 
-        // Optional merchant network
-        if (MerchantService.otherNetworkKey != null) {
-            addPaymentNetwork(MerchantService.otherNetworkId, MerchantService.otherNetworkKey, new String[]{"http://othernetworkpay"});
+        // Create a signed payment request for each payment network
+         for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
+            JSONObjectWriter paymentRequest =
+                    PaymentRequest.encode(Payee.init(MerchantService.merchantCommonName, paymentNetwork.merchantId),
+                                          new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount), 2),
+                                          MerchantService.currency,
+                                          currentReferenceId,
+                                          timeStamp,
+                                          expires,
+                                          paymentNetwork.signer);
+            paymentNetworksArray.setObject()
+                .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, paymentNetwork.acceptedAccountTypes)
+                .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
+            hashes.add(RequestHash.getRequestHash(paymentRequest));
         }
-       
-        // The standard payment network supported by the Saturn demo
-        Vector<String> acceptedAccountTypes = new Vector<String>();
-        for (PayerAccountTypes account : MerchantService.acceptedAccountTypes) {
-            acceptedAccountTypes.add(account.getTypeUri());
-        }
-        addPaymentNetwork(MerchantService.merchantId, MerchantService.merchantKey, acceptedAccountTypes.toArray(new String[0]));
         
         // For checking the wallet return
         session.setAttribute(REQUEST_HASH_SESSION_ATTR, hashes);

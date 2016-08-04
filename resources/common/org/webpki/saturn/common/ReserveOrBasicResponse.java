@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.PublicKey;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -80,6 +82,11 @@ public class ReserveOrBasicResponse implements BaseProperties {
     // Convenience methods
     public PayerAccountTypes getPayerAccountType() {
         return transactionResponse.transactionRequest.reserveOrBasicRequest.accountType;
+    }
+
+    // Convenience methods
+    public PublicKey getPublicKey() {
+        return transactionResponse.transactionRequest.reserveOrBasicRequest.outerPublicKey;
     }
 
     public String getAccountReference() {

@@ -17,14 +17,20 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.net.URL;
+
 import java.security.GeneralSecurityException;
+
 import java.util.Vector;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,9 +41,13 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+
 import org.webpki.net.HTTPSWrapper;
+
 import org.webpki.util.ArrayUtil;
+
 import org.webpki.webutil.ServletUtil;
+
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Authority;
@@ -185,6 +195,16 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             for (byte[] hash : requestHashes) {
                 if (ArrayUtil.compare(hash, paymentRequest.getRequestHash())) {
                     notFoundHash = false;
+                    boolean notFoundAccountType = true;
+                    for (String accountType : MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).acceptedAccountTypes) {
+                        if (accountType.equals(payerAuthorization.getAccountType().getTypeUri())) {
+                            notFoundAccountType = false;
+                            break;
+                        }
+                    }
+                    if (notFoundAccountType) {
+                        throw new IOException("Response account doesn't match request");
+                    }
                     break;
                 }
             }
@@ -207,7 +227,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                                              paymentRequest,
                                              MerchantService.acquirerAuthorityUrl, // Card only
                                              Expires.inMinutes(30), // Reserve only
-                                             MerchantService.merchantKey);
+                                             MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
 
             // Now we need to find out where to send the request
             urlHolder.setUrl(MerchantService.payeeProviderAuthorityUrl);
@@ -302,10 +322,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             }
         }
 
-        JSONObjectWriter finalizeRequest = FinalizeRequest.encode(reserveOrBasicResponse,
-                                                                  actualAmount,
-                                                                  MerchantService.getReferenceId(),
-                                                                  MerchantService.merchantKey);
+        JSONObjectWriter finalizeRequest =
+            FinalizeRequest.encode(reserveOrBasicResponse,
+                                   actualAmount,
+                                   MerchantService.getReferenceId(),
+                                   MerchantService.paymentNetworks.get(reserveOrBasicResponse.getPublicKey()).signer);
         // Call the payment provider or acquirer
         JSONObjectReader response = postData(urlHolder, finalizeRequest);
 
