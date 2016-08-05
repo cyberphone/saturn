@@ -96,8 +96,7 @@ public class JCSPaper implements BaseProperties {
             System.exit(-3);
         }
         CustomCryptoProvider.forcedLoad(true);
-        Date date = ISODateTime.parseDateTime("2016-02-02T10:07:00Z").getTime();
-        
+         
         fos = new FileOutputStream(args[0]);
         
         // Read key/certificate to be imported and create signer
@@ -116,7 +115,7 @@ public class JCSPaper implements BaseProperties {
               "table {border-spacing:0;border-collapse: collapse;box-shadow:3pt 3pt 3pt #D0D0D0}\n" +
               "td {border-color:black;border-style:solid;border-width:1px;" +
               "padding:2pt 4pt 2pt 4pt;font-size:8pt;font-family:verdana,arial;text-align:center}\n" +
-              "div.json {margin-top:8pt;margin-bottom:15pt;word-wrap:break-word;width:800pt;background:#F8F8F8;border-width:1px;border-style:solid;border-color:grey;padding:10pt;box-shadow:3pt 3pt 3pt #D0D0D0}\n" +
+              "div.json {margin-top:8pt;margin-bottom:15pt;word-break:break-all;width:800pt;background:#F8F8F8;border-width:1px;border-style:solid;border-color:grey;padding:10pt;box-shadow:3pt 3pt 3pt #D0D0D0}\n" +
               "div.text {width:800pt}\n" +
               "div.header {font-size:12pt;margin-top:15pt;margin-bottom:8pt;font-family:arial,verdana}\n" +
               "code {font-size:9pt;font-family:'Courier New',Courier}\n" +
@@ -139,6 +138,7 @@ public class JCSPaper implements BaseProperties {
            "be respected</i> during parsing and serialization which eliminates canonicalization entirely " +
            "and enables the creation of &quot;Crypto&nbsp;Safe&quot; JSON objects that can travel securely " +
            "through different systems without getting corrupted.</p>" +
+           "<p>There is also a JSON encryption scheme, " + JEF() + " (JSON Encryption Format), using the same syntax as JCS.</p>" +
            "</div><div class=\"header\">Background<br></div>" +
            "<div class=\"text\">" +
            "Although JCS is not tied to any specific application, it grew from the needs of the " +
@@ -163,7 +163,7 @@ public class JCSPaper implements BaseProperties {
         paymentRequest.setString(AMOUNT_JSON, "235.50");
         paymentRequest.setString(CURRENCY_JSON, "USD");
         paymentRequest.setString(REFERENCE_ID_JSON, "05630753");
-        paymentRequest.setString(TIME_STAMP_JSON, "2016-02-02T10:07:41Z");
+        paymentRequest.setString(TIME_STAMP_JSON, "2016-08-05T10:07:00Z");
         JSONObjectWriter josePaymentRequest = new JSONObjectWriter(JSONParser.parse(paymentRequest.toString()));
         paymentRequest.setSignature(paymentRequestSigner);
         JSONObjectReader joseHeader = JSONParser.parse(paymentRequest.toString())
@@ -209,8 +209,9 @@ public class JCSPaper implements BaseProperties {
         write(joseWriter.serializeJSONObject(JSONOutputFormats.PRETTY_HTML));
         System.out.println("JCS=" + writer.serializeJSONObject(JSONOutputFormats.NORMALIZED).length +
                            " JWS=" + joseWriter.serializeJSONObject(JSONOutputFormats.NORMALIZED).length);
-        write("</div><div class=\"text\">"+
-              "Since " + JCS() + " is compatible with " + ECMASCRIPT() + ", you can also use " +
+        write("</div><div class=\"header\" style=\"margin-top:20pt\">JavaScript Usage<br></div>" +
+           "<div class=\"text\">"+
+              "Since " + JCS() + " is compatible with " + ECMASCRIPT() + " (JavaScript), you can also use " +
                " JCS signatures in browsers. The following shows how the <code>" + PAYMENT_REQUEST +
                "</code> message could be featured inside of an HTML5 document:" +
         
@@ -222,7 +223,7 @@ public class JCSPaper implements BaseProperties {
         write("<span style=\"color:orange\">var</span>&nbsp;<span style=\"color:purple\">" +
               PAYMENT_REQUEST_JSON + "</span>&nbsp;=&nbsp;" + jsPaymentRequest.replaceAll("<br>}", "<br>};"));
         write("</div>" +
-              "V0.6, A.Rundgren, 2016-02-22" +
+              "V0.7, A.Rundgren, 2016-08-05" +
               "</body></html>");
         fos.close();
     }
@@ -245,6 +246,10 @@ public class JCSPaper implements BaseProperties {
 
     static String JCS() {
         return link("JCS", "https://cyberphone.github.io/openkeystore/resources/docs/jcs.html");
+    }
+
+    static String JEF() {
+        return link("JEF", "https://cyberphone.github.io/openkeystore/resources/docs/jef.html");
     }
 
     static void checkJws(JSONObjectReader jws) throws Exception {

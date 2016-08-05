@@ -55,7 +55,7 @@ class DebugPrintout implements BaseProperties {
 
     boolean clean;
 
-    static final String STATIC_BOX = "font-size:8pt;word-wrap:break-word;width:800pt;background:#F8F8F8;";
+    static final String STATIC_BOX = "font-size:8pt;word-break:break-all;width:800pt;background:#F8F8F8;";
     static final String COMMON_BOX = "border-width:1px;border-style:solid;border-color:grey;padding:10pt;box-shadow:3pt 3pt 3pt #D0D0D0";
     
     String getShortenedB64(byte[] bin, int maxLength) {
