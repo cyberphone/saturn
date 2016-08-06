@@ -5,7 +5,7 @@
   
   <property name="temp.dir" location=".tmp"/>
   <property name="testpage" location="../desktop-client/test/test.html"/>
-  <property name="jcspaper" location="docs/jsonsignatures.html"/>
+  <property name="jcspaper" location="../../doc/security/jsonsignatures.html"/>
   <property name="nodejscryptotest.dir" location="nodejscryptotest"/>
   
   <property file="../resources/common.properties"/>

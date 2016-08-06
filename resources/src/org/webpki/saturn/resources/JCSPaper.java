@@ -245,11 +245,11 @@ public class JCSPaper implements BaseProperties {
     }
 
     static String JCS() {
-        return link("JCS", "https://cyberphone.github.io/openkeystore/resources/docs/jcs.html");
+        return link("JCS", "https://cyberphone.github.io/doc/security/jcs.html");
     }
 
     static String JEF() {
-        return link("JEF", "https://cyberphone.github.io/openkeystore/resources/docs/jef.html");
+        return link("JEF", "https://cyberphone.github.io/doc/security/jef.html");
     }
 
     static void checkJws(JSONObjectReader jws) throws Exception {
