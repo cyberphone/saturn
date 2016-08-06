@@ -179,15 +179,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             return url;
         }
 
-        void localSystemWalletUrlFix() throws IOException {
-            if (request.getServerName().equals("localhost")) {
-                url = new URL(request.isSecure() ? "https": "http",
-                              "localhost", 
-                              request.getServerPort(),
-                              new URL(url).getFile()).toExternalForm();
-            }
-        }
-
         void setUrl(String url) {
             this.url = url;
         }
@@ -340,10 +331,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         // Lookup of payer's bank.  You would typically cache such information
         urlHolder.setUrl(attestedPaymentRequest.getProviderAuthorityUrl());
-
-        // Ugly patch allowing the wallet to work with a local system as well
-        urlHolder.localSystemWalletUrlFix();
-
         Authority providerAuthority = getAuthority(urlHolder);
 
         // We need to separate credit-card and account-2-account payments

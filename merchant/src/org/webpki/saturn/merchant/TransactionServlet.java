@@ -217,10 +217,19 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             boolean basicCredit = !W2NBWalletServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
                                   !acquirerBased;
 
+            // ugly fix to cope with local installation
+            String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
+            if (request.getServerName().equals("localhost")) {
+                providerAuthorityUrl = new URL(request.isSecure() ? "https": "http",
+                                               "localhost", 
+                                               request.getServerPort(),
+                                               new URL(providerAuthorityUrl).getFile()).toExternalForm();
+            }
+
             // Attest the user's encrypted authorization to show "intent"
             JSONObjectWriter reserveOrBasicRequest =
                 ReserveOrBasicRequest.encode(basicCredit,
-                                             payerAuthorization.getProviderAuthorityUrl(),
+                                             providerAuthorityUrl,
                                              payerAuthorization.getAccountType(),
                                              walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                              request.getRemoteAddr(),
