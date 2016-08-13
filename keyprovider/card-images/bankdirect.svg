@@ -20,34 +20,38 @@
    <ellipse ry="35.80066" rx="55.32679" cy="67.1458" cx="88.481" stroke-width="2" fill-opacity="0" stroke="#f20707" fill="black"/>
    <text text-anchor="middle" font-family="Sans-serif" font-size="18" y="63.66931" x="88.44181" fill="#000000">BANK</text>
    <text text-anchor="middle" font-family="Sans-serif" font-size="18" y="82.66931" x="88.10848" fill="#000000">DIRECT</text>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="32.19007" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="39.39007" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="46.59007" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="53.79007" height="10" width="4"/>
+   <rect fill="#ffffff" y="35.8" x="32.19007" height="10" width="24"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="32.19007" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="39.39007" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="46.59007" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="53.79007" height="10" width="4"/>
    <path stroke="#707070" fill="#f2f2f2" d="m31.0615,33.28571l14,-6.5l14,6.5" stroke-width="0.7"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="45.91667" x="31.0615" height="2" width="28"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="47.91758" x="29.23" height="2" width="31.43407"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="33.28571" x="31.0615" height="2.42857" width="28"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="32.19007" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="39.39007" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="46.59007" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="53.79007" height="10" width="4"/>
+   <rect fill="#ffffff" y="93.29689" x="32.19007" height="10" width="24"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="32.19007" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="39.39007" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="46.59007" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="53.79007" height="10" width="4"/>
    <path stroke="#707070" fill="#f2f2f2" d="m31.0615,90.7826l14,-6.5l14,6.5" stroke-width="0.7"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="103.41356" x="31.0615" height="2" width="28"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="105.41447" x="29.23" height="2" width="31.43407"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="90.7826" x="31.0615" height="2.42857" width="28"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="120.7" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="127.9" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="135.1" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="35.8" x="142.3" height="10" width="4"/>
+   <rect fill="#ffffff" y="35.8" x="120.7" height="10" width="24"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="120.7" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="127.9" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="135.1" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="35.8" x="142.3" height="10" width="4"/>
    <path stroke="#707070" fill="#f2f2f2" d="m119.4075,33.28571l14,-6.5l14,6.5" stroke-width="0.7"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="45.91667" x="119.4075" height="2" width="28"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="47.91758" x="117.73993" height="2" width="31.43407"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="33.28571" x="119.4075" height="2.42857" width="28"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="120.7" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="127.9" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="135.1" height="10" width="4"/>
-   <rect fill="url(#bankPillar)" stroke-width="0" y="93.29689" x="142.3" height="10" width="4"/>
+   <rect fill="#ffffff" y="93.29689" x="120.7" height="10" width="24"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="120.7" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="127.9" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="135.1" height="10" width="4"/>
+   <rect fill="url(#bankPillar)" y="93.29689" x="142.3" height="10" width="4"/>
    <path stroke="#707070" fill="#f2f2f2" d="m119.4075,90.7826l14,-6.5l14,6.5" stroke-width="0.7"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="103.41356" x="119.4075" height="2" width="28"/>
    <rect stroke="#707070" fill="#f2f2f2" stroke-width="0.7" y="105.41447" x="117.73993" height="2" width="31.43407"/>

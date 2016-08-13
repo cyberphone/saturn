@@ -64,7 +64,7 @@ public class SuperCard extends SVGDocument {
         add(new SVGText(new SVGDoubleValue(WIDTH/2),
                         new SVGDoubleValue(HEIGHT * 0.8),
                         "Sans-serif",
-                        HEIGHT / 6,
+                        26,
                         SVGText.TEXT_ANCHOR.MIDDLE,
                         "Luke Skywalker"));
         SVGEmbeddedText et = new SVGEmbeddedText(org.webpki.saturn.svg.diagrams.SupercardGlyphs.class);
