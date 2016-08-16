@@ -241,9 +241,9 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // Sorry but you don't appear to have a million bucks :-)
         if (paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "<div style=\"width:${width}\">Your request for " + 
+                                               "Your request for " + 
             paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()) +
-                                               " appears to be slightly out of your current capabilities...</div>",
+                                               " appears to be slightly out of your current capabilities...",
                                                null,
                                                authorizationData.getDataEncryptionKey(),
                                                authorizationData.getDataEncryptionAlgorithm());
@@ -254,11 +254,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "<div style=\"width:${width}\">This transaction requires additional information to " +
+                                               "This transaction requires additional information to " +
                                                "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span> " +
-                                               "and click the ${submit} button.<br>&nbsp;<br>" +
+                                               "and click the ${submit} button.<p>" +
                                                "Since <i>this is a demo</i>, " +
-                                               "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</div>",
+                                               "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
                                                new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
                                                                         ChallengeField.TYPE.ALPHANUMERIC,
                                                                     20,

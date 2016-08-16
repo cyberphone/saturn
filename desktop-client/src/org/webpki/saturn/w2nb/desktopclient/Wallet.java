@@ -373,11 +373,13 @@ public class Wallet {
         }
 
         String processExternalHtml(String simpleHtml) {
-            return "<html>" +
+            return "<html><div style='width:" +
+                   String.valueOf(fontSize * 20) + "px'>" +
                    simpleHtml
-                       .replace("${width}", String.valueOf(fontSize * 20) + "px")
+                       .replace("<p>", "<br>&nbsp;<br>")
+                       .replace("</p>", "")
                        .replace("${submit}", "validate") + 
-                   "</html>";
+                   "</div></html>";
         }
 
         JPanel initCardSelectionViewCore(LinkedHashMap<Integer,Account> cards) {
