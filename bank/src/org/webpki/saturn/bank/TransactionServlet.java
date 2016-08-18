@@ -255,9 +255,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
                                                "This transaction requires additional information to " +
-                                               "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span> " +
-                                               "and click the ${submit} button.<p>" +
-                                               "Since <i>this is a demo</i>, " +
+                                               "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
+                                               "<p>Since <i>this is a demo</i>, " +
                                                "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
                                                new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
                                                                         ChallengeField.TYPE.ALPHANUMERIC,
