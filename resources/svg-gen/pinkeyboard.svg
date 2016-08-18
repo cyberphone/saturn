@@ -1,4 +1,4 @@
-<svg width="452" height="198" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg width="404" height="150" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
 <filter id="actorsBlur" x="-25%" y="-25%" width="150%" height="150%">
 <feGaussianBlur stdDeviation="3"/>
@@ -6,64 +6,64 @@
 </defs>
 <g>
 <a xlink:href="javascript:addDigit('0')">
-<rect x="25" y="25" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="27" y="27" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="47.5" y="53" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">0</text>
+<rect x="1" y="1" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="3" y="3" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="23.5" y="28" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">0</text>
 </a>
 <a xlink:href="javascript:addDigit('1')">
-<rect x="105" y="25" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="107" y="27" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="127.5" y="53" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">1</text>
+<rect x="81" y="1" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="83" y="3" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="103.5" y="28" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">1</text>
 </a>
 <a xlink:href="javascript:addDigit('2')">
-<rect x="185" y="25" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="187" y="27" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="207.5" y="53" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">2</text>
+<rect x="161" y="1" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="163" y="3" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="183.5" y="28" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">2</text>
 </a>
 <a xlink:href="javascript:addDigit('3')">
-<rect x="265" y="25" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="267" y="27" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="287.5" y="53" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">3</text>
+<rect x="241" y="1" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="243" y="3" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="263.5" y="28" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">3</text>
 </a>
 <a xlink:href="javascript:addDigit('4')">
-<rect x="25" y="81" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="27" y="83" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="47.5" y="109" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">4</text>
+<rect x="1" y="57" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="3" y="59" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="23.5" y="84" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">4</text>
 </a>
 <a xlink:href="javascript:addDigit('5')">
-<rect x="105" y="81" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="107" y="83" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="127.5" y="109" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">5</text>
+<rect x="81" y="57" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="83" y="59" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="103.5" y="84" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">5</text>
 </a>
 <a xlink:href="javascript:addDigit('6')">
-<rect x="185" y="81" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="187" y="83" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="207.5" y="109" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">6</text>
+<rect x="161" y="57" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="163" y="59" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="183.5" y="84" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">6</text>
 </a>
 <a xlink:href="javascript:addDigit('7')">
-<rect x="25" y="137" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="27" y="139" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="47.5" y="165" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">7</text>
+<rect x="1" y="113" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="3" y="115" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="23.5" y="140" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">7</text>
 </a>
 <a xlink:href="javascript:addDigit('8')">
-<rect x="105" y="137" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="107" y="139" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="127.5" y="165" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">8</text>
+<rect x="81" y="113" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="83" y="115" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="103.5" y="140" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">8</text>
 </a>
 <a xlink:href="javascript:addDigit('9')">
-<rect x="185" y="137" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="187" y="139" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="207.5" y="165" font-family="Arial" font-size="28" text-anchor="middle" font-weight="bold">9</text>
+<rect x="161" y="113" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="163" y="115" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="183.5" y="140" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold">9</text>
 </a>
 <a xlink:href="javascript:deleteDigit()">
-<rect x="383" y="25" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="385" y="27" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="405.5" y="54" font-family="Arial" font-size="44" text-anchor="middle" fill="#f70707">&#171;</text>
+<rect x="359" y="1" width="44" height="36" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="361" y="3" width="40" height="32" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="381.5" y="30" font-family="Arial" font-size="44" text-anchor="middle" fill="#be1018">&#171;</text>
 </a>
 <a xlink:href="javascript:validatePin()">
-<rect x="301" y="113" width="126" height="60" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
-<rect x="303" y="115" width="122" height="56" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
-<text x="364.5" y="152" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold" fill="#03af03">Validate</text>
+<rect x="277" y="89" width="126" height="60" stroke="#969191" stroke-width="1" fill="#a5a5a5" rx="10" ry="10"/>
+<rect x="279" y="91" width="122" height="56" fill="#fcfcfc" rx="9" ry="9" filter="url(#actorsBlur)"/>
+<text x="340.5" y="128" font-family="Arial" font-size="26" text-anchor="middle" font-weight="bold" fill="#009900">Validate</text>
 </a>
 </g>
 </svg>

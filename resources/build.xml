@@ -161,8 +161,15 @@
 
   <target name="svg-supercard">
     <antcall target="_svg">
-       <param name="svgfile" value="svg-gen/supercard1.svg"/>
+       <param name="svgfile" value="svg-gen/supercard.svg"/>
        <param name="svgclass" value="org.webpki.saturn.svg.diagrams.SuperCard"/>
+    </antcall>
+  </target>
+  
+  <target name="svg-supercard-square">
+    <antcall target="_svg">
+       <param name="svgfile" value="svg-gen/supercard-square.svg"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.SuperCardSquare"/>
     </antcall>
   </target>
   

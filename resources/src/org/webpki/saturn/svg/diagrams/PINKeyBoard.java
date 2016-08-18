@@ -23,7 +23,7 @@ import org.webpki.tools.svg.SVGText;
 
 public class PINKeyBoard extends SVGDocument {
     public PINKeyBoard() {
-        super(25, 25);
+        super(1, 1);
     }
 
     final static double BUTTON_WIDTH  = 44;
@@ -85,7 +85,7 @@ public class PINKeyBoard extends SVGDocument {
         for (int digit = 0; digit < 10; digit++) {
             String value = String.valueOf(digit);
             basicButton(x, y, BUTTON_WIDTH, BUTTON_HEIGHT,
-                        "Arial", 28, value, 10, "addDigit('" + value + "')")
+                        "Arial", 26, value, 9, "addDigit('" + value + "')")
                .setFontWeight(SVGText.FONT_WEIGHTS.BOLD);
             x += BUTTON_WIDTH + BUTTON_HSPACE;
             if (digit == 3 || digit == 6) {
@@ -96,11 +96,11 @@ public class PINKeyBoard extends SVGDocument {
         double validateX = 3 * BUTTON_WIDTH + 4 * BUTTON_HSPACE;
         basicButton(validateX + VALIDATE_WIDTH - BUTTON_WIDTH, 0, BUTTON_WIDTH, BUTTON_HEIGHT,
                     "Arial", 44, "&#171;", 11, "deleteDigit()")
-            .setFontColor("#f70707");
+            .setFontColor("#be1018");
         
         basicButton(validateX, y - VALIDATE_HEIGHT + BUTTON_HEIGHT, VALIDATE_WIDTH, VALIDATE_HEIGHT,
                     "Arial", 26, "Validate", 9, "validatePin()")
             .setFontWeight(SVGText.FONT_WEIGHTS.BOLD)
-            .setFontColor("#03af03");
+            .setFontColor("#009900");
     }
 }
