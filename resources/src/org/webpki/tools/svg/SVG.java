@@ -41,7 +41,11 @@ public class SVG {
         }
         if (svgObject.linkUrl != null) {
             svgText.append("<a");
-            _writeAttribute("xlink:href", svgObject.linkUrl);
+            if (svgObject.linkUrl.contains("=\"")) {
+                svgText.append(' ').append(svgObject.linkUrl);
+            } else {
+                _writeAttribute("xlink:href", svgObject.linkUrl);
+            }
             _writeAttribute("xlink:title", svgObject.linkToolTip);
             if (svgObject.linkReplace != null) {
                 _writeAttribute("xlink:show", svgObject.linkReplace ? "replace" : "new");
@@ -93,17 +97,25 @@ public class SVG {
                 writeSVGObject(svgObject);
             }
             svgText.append("</g>\n</svg>");
-            svgText = new StringBuffer("<svg width=\"")
-                .append((long)(doc.currentMaxX + SVGDocument.marginX))
-                .append("\" height=\"")
-                .append((long)(doc.currentMaxY +  + SVGDocument.marginY))
-                .append("\" xmlns=\"http://www.w3.org/2000/svg\"")
-                .append(SVGDocument.linksUsed ? " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" : "")
-                .append(">\n")
-                .append(filters)
-                .append("<g>\n")
-                .append(svgText);
-            ArrayUtil.writeFile(args[0], svgText.toString().getBytes("UTF-8"));
+            StringBuffer total = new StringBuffer("<svg ");
+            if (doc.useViewBox()) {
+                total.append("viewBox=\"0 0 ")
+                     .append((long)(doc.currentMaxX + SVGDocument.marginX))
+                     .append(' ')
+                     .append((long)(doc.currentMaxY +  + SVGDocument.marginY));
+            } else {
+                total.append("width=\"")
+                     .append((long)(doc.currentMaxX + SVGDocument.marginX))
+                     .append("\" height=\"")
+                     .append((long)(doc.currentMaxY +  + SVGDocument.marginY));
+            }
+            total.append("\" xmlns=\"http://www.w3.org/2000/svg\"")
+                 .append(SVGDocument.linksUsed ? " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" : "")
+                 .append(">\n")
+                 .append(filters)
+                 .append("<g>\n")
+                 .append(svgText);
+            ArrayUtil.writeFile(args[0], total.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }

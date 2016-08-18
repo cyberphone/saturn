@@ -61,4 +61,8 @@ public abstract class SVGDocument {
     public String getFilters() {
         return "";
     }
+    
+    public boolean useViewBox() {
+        return false;
+    }
 }
