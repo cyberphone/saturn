@@ -40,7 +40,7 @@
   <property name="security.constraints" refid="security.constraints.xml"/>
   
   <target name="help">
-    <echo message="tomcat [-Derr.payment.ca=0] [-Dunusual.card=0] [-Dcurrency=XYZ] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+    <echo message="tomcat [-Dunusual.card=0] [-Dcurrency=XYZ] [-Dslow.operation=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -56,6 +56,7 @@
 
   <target name="_build">
     <property name="logging" value="false"/>
+    <property name="var.slow.operation" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442"/>
     <property name="payee_provider.host" value="https://localhost:8442"/>
     <property name="merchant.host" value="http://localhost:8080"/>
@@ -100,6 +101,7 @@
       <replacefilter token="@merchant-base-url@" value="${merchant.host}/${appcorename}"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>
+      <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
       <replacefilter token="@w2nb-wallet@" value="${w2nb.webwallet}"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
       <replacefilter token="@logging@" value="${logging}"/>
@@ -143,6 +145,9 @@
      </condition>
      <condition property="unusualcard" value="true">
        <isset property="unusual.card"/>
+     </condition>
+     <condition property="var.slow.operation" value="true">
+       <isset property="slow.operation"/>
      </condition>
      <condition property="other.key" value="${othernetworkkey}.p12">
        <isset property="other.network"/>

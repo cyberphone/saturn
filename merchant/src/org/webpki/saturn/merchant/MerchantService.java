@@ -92,6 +92,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String ADD_UNUSUAL_CARD             = "add_unusual_card";
 
+    static final String SLOW_OPERATION               = "slow_operation";
+
     static final String W2NB_WALLET                  = "w2nb_wallet";
     
     static final String USER_AUTH_SAMPLE             = "user-authorization.json";
@@ -126,15 +128,17 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String w2nbWalletName;
     
     // Debug mode samples
-    static byte[] user_authorization;
+    static byte[] userAuthorization;
 
-    static byte[] protected_account_data;
+    static byte[] protectedAccountData;
 
-    static String wallet_supercard_auth;
+    static String walletSupercardAuth;
 
-    static String wallet_bankdirect_auth;
+    static String walletBankdirectAuth;
     
     static boolean logging;
+    
+    static boolean slowOperation;
 
     static int referenceId = 1000000;
 
@@ -247,14 +251,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             merchantBaseUrl = getURL(getPropertyString(MERCHANT_BASE_URL));
 
-            new AuthorizationData(JSONParser.parse(user_authorization =
+            new AuthorizationData(JSONParser.parse(userAuthorization =
                     ArrayUtil.getByteArrayFromInputStream (this.getClass().getResourceAsStream(USER_AUTH_SAMPLE))));
 
-            wallet_supercard_auth = getImageDataURI(SUPERCARD_AUTH_SAMPLE);
+            walletSupercardAuth = getImageDataURI(SUPERCARD_AUTH_SAMPLE);
 
-            wallet_bankdirect_auth = getImageDataURI(BANKDIRECT_AUTH_SAMPLE);
+            walletBankdirectAuth = getImageDataURI(BANKDIRECT_AUTH_SAMPLE);
 
-            protected_account_data = 
+            protectedAccountData = 
                 ProtectedAccountData.encode(new AccountDescriptor(PayerAccountTypes.SUPER_CARD.getTypeUri(),
                                                                   "6875056745552109"),
                                             "Luke Skywalker",
@@ -262,6 +266,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                             "943").serializeJSONObject(JSONOutputFormats.NORMALIZED);
 
             logging = getPropertyBoolean(LOGGING);
+
+            slowOperation = getPropertyBoolean(SLOW_OPERATION);
 
             logger.info("Saturn Merchant-server initiated");
         } catch (Exception e) {

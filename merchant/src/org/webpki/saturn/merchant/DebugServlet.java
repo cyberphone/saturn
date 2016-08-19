@@ -208,7 +208,7 @@ class DebugPrintout implements BaseProperties {
             "<p>After an <i>optional</i> selection of account (card) in the <b>Wallet</b> UI, the user " +
             "authorizes the payment request (typically using a PIN):</p>" +
             "<img style=\"display:block;margin-left:auto;margin-right:auto;height:33%;width:33%\" src=\"" +
-            (debugData.acquirerMode ? MerchantService.wallet_supercard_auth : MerchantService.wallet_bankdirect_auth) + 
+            (debugData.acquirerMode ? MerchantService.walletSupercardAuth : MerchantService.walletBankdirectAuth) + 
             "\"><p>" +
             point +
             "</p><p>The result of this process is not supposed be " +
@@ -294,7 +294,7 @@ class DebugPrintout implements BaseProperties {
                         "</p><p>The following printout " +
                         "shows a <i>sample</i> of protected account data:</p>");
 
-                    fancyBox(MerchantService.protected_account_data);
+                    fancyBox(MerchantService.protectedAccountData);
                 
                     finalDescription = "<p>After this step the card network is invoked <i>which is outside of this specification and implementation</i>.</p>";
                 } else {
@@ -323,7 +323,7 @@ class DebugPrintout implements BaseProperties {
             "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted.&nbsp;&nbsp;As shown it contains " +
             "user account and identity data which <i>usually</i> is of no importance for the <b>Merchant</b>:");
 
-        fancyBox(MerchantService.user_authorization);
+        fancyBox(MerchantService.userAuthorization);
 
         descriptionStdMargin("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }

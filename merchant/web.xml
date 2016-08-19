@@ -101,6 +101,12 @@
     </context-param>
     
     <context-param>
+        <description>Slow operation flag</description>
+        <param-name>slow_operation</param-name>
+        <param-value>@slow-operation@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Logging</description>
         <param-name>logging</param-name>
         <param-value>@logging@</param-value>

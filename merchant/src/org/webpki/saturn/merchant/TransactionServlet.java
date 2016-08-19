@@ -163,7 +163,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             if (session == null) {
                 returnJsonData(response, Messages.createBaseMessage(Messages.PAYMENT_CLIENT_SUCCESS));
                 return;
-             }
+            }
+            
+            if (MerchantService.slowOperation) {
+                Thread.sleep(5000);
+            }
 
             // Reading the Wallet response
             String contentType = request.getContentType();
