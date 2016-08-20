@@ -106,18 +106,31 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
     void requestKeyGen2KeyCreation(HttpServletResponse response, ServerState keygen2State)
             throws IOException {
-        ServerState.PINPolicy pinPolicy = 
+        ServerState.PINPolicy standardPinPolicy = 
             keygen2State.createPINPolicy(PassphraseFormat.NUMERIC,
                                          4,
                                          8,
                                          3,
                                          null);
-        pinPolicy.setGrouping(Grouping.SHARED);
+        standardPinPolicy.setGrouping(Grouping.SHARED);
+        ServerState.PINPolicy serverPinPolicy = 
+                keygen2State.createPINPolicy(PassphraseFormat.STRING,
+                                             4,
+                                             8,
+                                             3,
+                                             null);
     
         for (KeyProviderService.PaymentCredential paymentCredential : KeyProviderService.paymentCredentials) {
-            ServerState.Key key = keygen2State.createKey(AppUsage.SIGNATURE,
-                                                         new KeySpecifier(KeyAlgorithms.NIST_P_256),
-                                                         pinPolicy);
+            ServerState.Key key = paymentCredential.optionalServerPin == null ?
+                    keygen2State.createKey(AppUsage.SIGNATURE,
+                                           new KeySpecifier(KeyAlgorithms.NIST_P_256),
+                                           standardPinPolicy) 
+                                                                              :
+                    keygen2State.createKeyWithPresetPIN(AppUsage.SIGNATURE,
+                                                        new KeySpecifier(KeyAlgorithms.NIST_P_256),
+                                                        serverPinPolicy,
+                                                        paymentCredential.optionalServerPin);                           
+
             AsymSignatureAlgorithms signAlg =
                 paymentCredential.signatureKey.getPublicKey() instanceof RSAPublicKey ?
                     AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256;

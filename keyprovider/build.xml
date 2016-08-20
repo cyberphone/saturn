@@ -86,11 +86,11 @@
       <replacefilter token="@version-check@" value="${plugin.ejbca.ant.custom.logon.version-check}"/>
       <replacefilter token="@security@" value="${security.actual}"/>
       <replacefilter token="@paycred1@"
-        value="${clientkey_super}.p12,SUPER_CARD,${account_id_super},supercard.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath}"/>
+        value="${clientkey_super}.p12,SUPER_CARD,${account_id_super},supercard.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath},@"/>
       <replacefilter token="@paycred2@"
-        value="${clientkey_bankdir}.p12,BANK_DIRECT,!${account_id_bankdir},bankdirect.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath}"/>
+        value="${clientkey_bankdir}.p12,BANK_DIRECT,!${account_id_bankdir},bankdirect.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath},@"/>
       <replacefilter token="@paycred3@"
-        value="${clientkey_unusual}.p12,UNUSUAL_CARD,${account_id_unusual},unusualcard.svg,${payeebankpath}-enc-key-ec.cer,${payeebankpath}"/>
+        value="${clientkey_unusual}.p12,UNUSUAL_CARD,${account_id_unusual},unusualcard.svg,${payeebankpath}-enc-key-ec.cer,${payeebankpath},Money-77"/>
       <replacefilter token="@keyprov-kmk@" value="${kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
     </replace>

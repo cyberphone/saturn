@@ -100,6 +100,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         String accountType;
         String accountId;
         boolean cardFormatted;
+        byte[] optionalServerPin;
         String authorityUrl;
         MIMETypedObject cardImage;
         PublicKey encryptionKey;
@@ -199,6 +200,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 PaymentCredential paymentCredential = new PaymentCredential();
                 paymentCredentials.add(paymentCredential);
                 paymentCredential.authorityUrl = bankHost + "/" + arguments[5] + "/authority";
+                paymentCredential.optionalServerPin = arguments[6].equals("@") ? null : arguments[6].getBytes("utf-8");
                 paymentCredential.signatureKey =
                     new KeyStoreEnumerator(getResource(arguments[0]),
                                            getPropertyString(KEYSTORE_PASSWORD));
