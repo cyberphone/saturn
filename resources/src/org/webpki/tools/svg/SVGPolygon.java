@@ -89,16 +89,6 @@ public class SVGPolygon extends SVGObject {
     }
 
     @Override
-    SVGValue getAnchorX() {
-        return new SVGAddOffset(x, coordinates[0]);
-    }
-    
-    @Override
-    SVGValue getAnchorY() {
-        return new SVGAddOffset(y, coordinates[1]);
-    }
-
-    @Override
     String getTag() {
         return "polygon";
     }

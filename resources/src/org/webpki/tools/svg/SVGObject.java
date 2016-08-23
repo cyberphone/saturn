@@ -57,14 +57,6 @@ public abstract class SVGObject {
 
     abstract double getMaxY();
 
-    SVGValue getAnchorX() {
-        return _attributes.get(SVGAttributes.X);
-    }
-    
-    SVGValue getAnchorY() {
-        return _attributes.get(SVGAttributes.Y);
-    }
-
     abstract boolean hasBody();
     
     String getBody() {

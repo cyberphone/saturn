@@ -44,6 +44,7 @@ public enum SVGAttributes {
     FONT_SIZE      ("font-size"),
     FONT_WEIGHT    ("font-weight"),
     LETTER_SPACING ("letter-spacing"),
+    TRANSFORM      ("transform"),
     TEXT_ANCHOR    ("text-anchor");
 
     String svgNotation;

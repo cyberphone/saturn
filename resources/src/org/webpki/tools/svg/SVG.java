@@ -52,6 +52,10 @@ public class SVG {
             }
             svgText.append(">\n");
         }
+        if (svgObject instanceof SVGEndGlobal) {
+            svgText.append("</g>\n");
+            return;
+        }
         svgText.append("<").append(svgObject.getTag());
         for (SVGAttributes svgAttribute : svgObject.getSVGAttributes().keySet()) {
             _writeAttribute(svgAttribute.toString(), svgObject.getAttribute(svgAttribute).getStringRepresentation());
@@ -70,7 +74,7 @@ public class SVG {
         for (SVGObject dependencyElement : svgObject.afterDependencyElements) {
             writeSVGObject(dependencyElement);
         }
-        if (svgObject.hasBody() && svgObject.getBody() == null) {
+        if (svgObject.hasBody() && svgObject.getBody() == null && !(svgObject instanceof SVGTransform)) {
             svgText.append("</")
                    .append(svgObject.getTag())
                    .append(">\n");

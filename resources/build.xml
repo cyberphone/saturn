@@ -29,7 +29,7 @@
   </path>
   
   <target name="help">
-      <echo message="cryptotest createcerts initwallet [-Dlocalhost=0] inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard -Dplayclass [-Dplayfilter]"/>
+      <echo message="cryptotest createcerts initwallet [-Dlocalhost=0] inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter]"/>
   </target>
  
   <target name="_openkeystoresrc">
@@ -163,6 +163,13 @@
     <antcall target="_svg">
        <param name="svgfile" value="svg-gen/supercard.svg"/>
        <param name="svgclass" value="org.webpki.saturn.svg.diagrams.SuperCard"/>
+    </antcall>
+  </target>
+  
+  <target name="svg-saturnlogo">
+    <antcall target="_svg">
+       <param name="svgfile" value="svg-gen/saturnlogo.svg"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.SaturnLogo"/>
     </antcall>
   </target>
   

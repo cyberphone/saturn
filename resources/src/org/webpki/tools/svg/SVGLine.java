@@ -33,16 +33,6 @@ public class SVGLine extends SVGObject {
     }
 
     @Override
-    SVGValue getAnchorX() {
-        return getAttribute(SVGAttributes.X1);
-    }
-    
-    @Override
-    SVGValue getAnchorY() {
-        return getAttribute(SVGAttributes.Y1);
-    }
-    
-    @Override
     String getTag() {
         return "line";
     }
