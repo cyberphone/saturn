@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.svg.diagrams;
 
-import org.webpki.tools.svg.SVGAnchor;
-import org.webpki.tools.svg.SVGAttributes;
 import org.webpki.tools.svg.SVGCircle;
 import org.webpki.tools.svg.SVGDocument;
 import org.webpki.tools.svg.SVGDoubleValue;
@@ -26,10 +24,9 @@ import org.webpki.tools.svg.SVGEndGlobal;
 import org.webpki.tools.svg.SVGPath;
 import org.webpki.tools.svg.SVGPathValues;
 import org.webpki.tools.svg.SVGRect;
-import org.webpki.tools.svg.SVGShaderTemplate;
 import org.webpki.tools.svg.SVGText;
 import org.webpki.tools.svg.SVGTransform;
-import org.webpki.tools.svg.SVGValue;
+
 import org.webpki.tools.svg.SVGText.TEXT_ANCHOR;
 
 public class SaturnLogo extends SVGDocument {
@@ -42,14 +39,14 @@ public class SaturnLogo extends SVGDocument {
     final static String ATURN_COLOR       = "#808080";
     final static String CIRCLE_COLOR      = "#6e9e3f";
 
-    final static double WIDTH             = 450;
-    final static double HEIGHT            = 200;
+    final static double WIDTH             = 400;
+    final static double HEIGHT            = 150;
     
     final static double MARGIN_X          = 10;
     final static double MARGIN_Y          = 10;
     final static double RING_WIDTH        = 200;
     final static double RING_HEIGHT       = 66;
-    final static double END_RING_SPAN     = 20;
+    final static double END_RING_SPAN     = 22;
     final static double SATURN_WIDTH      = 120;
     final static double FONT_SIZE         = 116;
     final static double INNER_RING_SPAN   = 7;
@@ -58,15 +55,6 @@ public class SaturnLogo extends SVGDocument {
     double x;
     double y;
     
-    @Override
-    public String getFilters() {
-        return "<defs>\n" +
-               "<filter id=\"actorsBlur\" x=\"-25%\" y=\"-25%\" width=\"150%\" height=\"150%\">\n" +
-               "<feGaussianBlur stdDeviation=\"3\"/>\n" +
-               "</filter>\n" +
-               "</defs>\n";
-    }
-
     @Override
     public boolean useViewBox() {
         return true;
@@ -95,16 +83,13 @@ public class SaturnLogo extends SVGDocument {
 
     @Override
     public void generate() {
-        x = 20;
-        y = 50;
-/*
+        x = -25;
+        y = 42;
         add(new SVGRect(new SVGDoubleValue(0), new SVGDoubleValue(0),
                 new SVGDoubleValue(WIDTH), new SVGDoubleValue(HEIGHT),
             1.0,
             "#A0A0A0",
             null));
-*/
-
         add(new SVGTransform("rotate(" + ANGLE + " " + (x + RING_WIDTH / 2 + MARGIN_X) + " " + (y + RING_HEIGHT / 2 + MARGIN_Y) + ")"));
         add(new SVGEllipse(new SVGDoubleValue(x),
                            new SVGDoubleValue(y), 
@@ -130,14 +115,14 @@ public class SaturnLogo extends SVGDocument {
                 null,
                 CIRCLE_COLOR));
         add(new SVGText(new SVGDoubleValue(RING_WIDTH / 2 + x),
-                        new SVGDoubleValue((RING_HEIGHT / 2) + FONT_SIZE / 2.8 + y),
+                        new SVGDoubleValue((RING_HEIGHT / 2) + FONT_SIZE / 2 - 15 + y),
                         "sans-serif",
                         FONT_SIZE,
                         TEXT_ANCHOR.MIDDLE,
                         "S").setFontColor(S_COLOR));
 
-        add(new SVGText(new SVGDoubleValue(RING_WIDTH / 2 + SATURN_WIDTH * 4 / 7 + x),
-                        new SVGDoubleValue((RING_HEIGHT / 2) + FONT_SIZE / 2.8 + y),
+        add(new SVGText(new SVGDoubleValue(RING_WIDTH / 2 + SATURN_WIDTH / 2 + 8 + x),
+                        new SVGDoubleValue((RING_HEIGHT / 2) + FONT_SIZE / 2 - 15 + y),
                         "sans-serif",
                         FONT_SIZE,
                         TEXT_ANCHOR.START,
