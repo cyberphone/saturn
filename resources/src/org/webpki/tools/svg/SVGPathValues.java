@@ -44,29 +44,32 @@ public class SVGPathValues extends SVGValue {
     
     class Coordinate implements Cloneable {
         boolean absolute;
+        boolean actualCoordinate;
         double xValue;
         double yValue;
         
-        Coordinate (boolean absolute, double xValue, double yValue) {
+        Coordinate (boolean absolute, boolean actualCoordinate, double xValue, double yValue) {
             this.absolute = absolute;
             this.xValue = xValue;
             this.yValue = yValue;
-            if (absolute) {
-                currX = xValue;
-                currY = yValue;
-            } else {
-                currX += xValue;
-                currY += yValue;
-            }
-            if (currX > maxX) {
-                maxX = currX;
-            } else if (currX < minX) {
-                minX = currX;
-            }
-            if (currY > maxY) {
-                maxY = currY;
-            } else if (currY < minY) {
-                minY = currY;
+            if (actualCoordinate) {
+                if (absolute) {
+                    currX = xValue;
+                    currY = yValue;
+                } else {
+                    currX += xValue;
+                    currY += yValue;
+                }
+                if (currX > maxX) {
+                    maxX = currX;
+                } else if (currX < minX) {
+                    minX = currX;
+                }
+                if (currY > maxY) {
+                    maxY = currY;
+                } else if (currY < minY) {
+                    minY = currY;
+                }
             }
         }
 
@@ -85,7 +88,12 @@ public class SVGPathValues extends SVGValue {
         }
         
         SubCommand addCoordinate(boolean absolute, double x, double y) {
-            coordinates.add(new Coordinate(absolute, x, y));
+            coordinates.add(new Coordinate(absolute, true, x, y));
+            return this;
+        }
+
+        SubCommand addNonCoordinate(boolean absolute, double x, double y) {
+            coordinates.add(new Coordinate(absolute, false, x, y));
             return this;
         }
 
@@ -152,15 +160,15 @@ public class SVGPathValues extends SVGValue {
     }
 
     public SVGPathValues cubicBezierRelative(double c1x, double c1y, double c2x,double c2y, double x, double y) {
-        addSubCommand(new SubCommand('c').addCoordinate(false, c1x, c1y)
-                                         .addCoordinate(false, c2x, c2y)
+        addSubCommand(new SubCommand('c').addNonCoordinate(false, c1x, c1y)
+                                         .addNonCoordinate(false, c2x, c2y)
                                          .addCoordinate(false, x, y));
         return this;
     }
 
     public SVGPathValues cubicBezierAbsolute(double c1x, double c1y, double c2x,double c2y, double x, double y) {
-        addSubCommand(new SubCommand('C').addCoordinate(true, c1x, c1y)
-                                         .addCoordinate(true, c2x, c2y)
+        addSubCommand(new SubCommand('C').addNonCoordinate(true, c1x, c1y)
+                                         .addNonCoordinate(true, c2x, c2y)
                                          .addCoordinate(true, x, y));
         return this;
     }

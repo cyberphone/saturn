@@ -149,4 +149,8 @@ public abstract class SVGObject {
         afterDependencyElements.add(svgObject);
     }
 
+    public void setFillOpacity(double value) {
+        _attributes.put(SVGAttributes.FILL_OPACITY, new SVGDoubleValue(value));
+    }
+
 }
