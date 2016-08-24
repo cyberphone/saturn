@@ -62,18 +62,18 @@ public class SaturnLogo extends SVGDocument {
 
     void addGuide() {
         add(new SVGTransform("rotate(" + ANGLE + " " + (x + RING_WIDTH / 2 + MARGIN_X) + " " + (y + RING_HEIGHT / 2 + MARGIN_Y) + ")"));
-        add(new SVGEllipse(new SVGDoubleValue(x),
-                           new SVGDoubleValue(y), 
-                           new SVGDoubleValue(RING_WIDTH),
-                           new SVGDoubleValue(RING_HEIGHT),
+        add(new SVGEllipse(new SVGDoubleValue(x - 0.5),
+                           new SVGDoubleValue(y - 0.5), 
+                           new SVGDoubleValue(RING_WIDTH + 1),
+                           new SVGDoubleValue(RING_HEIGHT + 1),
                            1.0,
                            "black",
                            null));
     
-        add(new SVGEllipse(new SVGDoubleValue(END_RING_SPAN + x),
-                           new SVGDoubleValue(INNER_RING_SPAN + y), 
-                           new SVGDoubleValue(RING_WIDTH - END_RING_SPAN - END_RING_SPAN),
-                           new SVGDoubleValue(RING_HEIGHT - INNER_RING_SPAN - INNER_RING_SPAN),
+        add(new SVGEllipse(new SVGDoubleValue(END_RING_SPAN + x + 0.5),
+                           new SVGDoubleValue(INNER_RING_SPAN + y + 0.5), 
+                           new SVGDoubleValue(RING_WIDTH - END_RING_SPAN - END_RING_SPAN - 1),
+                           new SVGDoubleValue(RING_HEIGHT - INNER_RING_SPAN - INNER_RING_SPAN - 1),
                            1.0,
                            "black",
                            null));
@@ -85,11 +85,13 @@ public class SaturnLogo extends SVGDocument {
     public void generate() {
         x = -25;
         y = 42;
+
         add(new SVGRect(new SVGDoubleValue(0), new SVGDoubleValue(0),
                 new SVGDoubleValue(WIDTH), new SVGDoubleValue(HEIGHT),
             1.0,
             "#A0A0A0",
             null));
+
         add(new SVGTransform("rotate(" + ANGLE + " " + (x + RING_WIDTH / 2 + MARGIN_X) + " " + (y + RING_HEIGHT / 2 + MARGIN_Y) + ")"));
         add(new SVGEllipse(new SVGDoubleValue(x),
                            new SVGDoubleValue(y), 
@@ -121,6 +123,7 @@ public class SaturnLogo extends SVGDocument {
                         TEXT_ANCHOR.MIDDLE,
                         "S").setFontColor(S_COLOR));
 
+
         add(new SVGText(new SVGDoubleValue(RING_WIDTH / 2 + SATURN_WIDTH / 2 + 8 + x),
                         new SVGDoubleValue((RING_HEIGHT / 2) + FONT_SIZE / 2 - 15 + y),
                         "sans-serif",
@@ -130,15 +133,16 @@ public class SaturnLogo extends SVGDocument {
 
 
 //        addGuide();
-        SVGPath svgPath = new SVGPath(new SVGDoubleValue(x + 71.7),
-                                      new SVGDoubleValue(y + 86.4),
+        SVGPath svgPath = new SVGPath(new SVGDoubleValue(x + 71.5),
+                                      new SVGDoubleValue(y + 86.2),
                                       new SVGPathValues().moveAbsolute(0, 0)
-                                                         .cubicBezierRelative(0,0,0,0, 10.5, 4.5)
-                                                         .cubicBezierRelative(/*15,-10*/ 0,0,46,-32, 75.4, -75.6)
-                                                         .cubicBezierRelative(0,0,0,0, -4.1, -11)
-                                                         .cubicBezierRelative(0,0,-36,60, -81, 80.5)
+                                                         .cubicBezierRelative(0,0,0,0, 9.2, 5.05)
+                                                         .cubicBezierRelative(/*15,-10*/ 0,0,48,-30.5, 77, -76.65)
+                                                         .cubicBezierRelative(0,0,0,0, -4, -10.95)
+                                                         .cubicBezierRelative(0,0, -22, 50, -82.1, 82.6)
                                                          .endPath(),
 /*
+
                                       0.5,
                                       "#0000FF",
 */
