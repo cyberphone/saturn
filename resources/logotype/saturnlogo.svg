@@ -1,0 +1,12 @@
+<svg viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg">
+<g>
+<g transform="rotate(-45.0 85.0 85.0)">
+<ellipse cx="85" cy="85" rx="100" ry="33" fill="#dd5454"/>
+<ellipse cx="85" cy="85" rx="78" ry="26" fill="#ffffff"/>
+</g>
+<circle cx="85" cy="85" r="60" fill="#6e9e3f"/>
+<text x="85" y="128" font-family="Roboto" font-size="116" text-anchor="middle" fill="#ffffff">S</text>
+<text x="153" y="128" font-family="Roboto" font-size="116" text-anchor="start" fill="#808080">aturn</text>
+<path fill="#dd5454" d="M 56.5,138.19 c 0,0 0,0 9.19,5.05  0,0 48,-30.5 77,-76.65  0,0 0,0 -4,-10.95  0,0 -22,50 -82.1,82.6 z"/>
+</g>
+</svg>
