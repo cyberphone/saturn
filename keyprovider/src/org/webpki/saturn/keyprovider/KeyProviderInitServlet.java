@@ -83,7 +83,7 @@ public class KeyProviderInitServlet extends HttpServlet {
                 "><div style=\"cursor:pointer;padding:2pt 0 0 0;position:absolute;top:15pt;left:15pt;z-index:5;visibility:visible;width:100pt;" +
                 "height:47pt;border-width:1px;border-style:solid;border-color:black;box-shadow:3pt 3pt 3pt #D0D0D0\"" +
                 " onclick=\"document.location.href='http://webpki.org'\" title=\"Home of WebPKI.org\">")
-         .append (KeyProviderService.logotype)
+         .append (KeyProviderService.webpkiLogotype)
          .append ("</div><table cellapdding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
                 .append(box).append("</table></body></html>");
         return s.toString();

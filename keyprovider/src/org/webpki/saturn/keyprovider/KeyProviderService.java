@@ -63,7 +63,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static Logger logger = Logger.getLogger(KeyProviderService.class.getCanonicalName());
     
-    static final String LOGOTYPE              = "logotype";
+    static final String WEBPKI_LOGO           = "webpki_logotype";
+
+    static final String SATURN_LOGO           = "saturn_logotype";
 
     static final String VERSION_CHECK         = "version_check";
 
@@ -108,7 +110,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static Vector<PaymentCredential> paymentCredentials = new Vector<PaymentCredential>();
 
-    public static String logotype;
+    public static String webpkiLogotype;
 
     InputStream getResource(String name) throws IOException {
         InputStream is = this.getClass().getResourceAsStream(name);
@@ -116,6 +118,11 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             throw new IOException("Resource fail for: " + name);
         }
         return is;
+    }
+
+    String getResourceAsString(String propertyName) throws IOException {
+        return new String(ArrayUtil.getByteArrayFromInputStream(getResource(getPropertyString(propertyName))), "UTF-8");
+        
     }
 
     String getURL (String inUrl) throws IOException {
@@ -159,10 +166,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // Logotype
+            // WebPKI.org logotype
             ////////////////////////////////////////////////////////////////////////////////////////////
-            logotype = new String(
-                ArrayUtil.getByteArrayFromInputStream(getResource(getPropertyString(LOGOTYPE))), "UTF-8");
+            webpkiLogotype = getResourceAsString(WEBPKI_LOGO);
 
                 ////////////////////////////////////////////////////////////////////////////////////////////
             // Optional check
@@ -174,12 +180,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Show a sign that the user succeeded getting Saturn credentials
             ////////////////////////////////////////////////////////////////////////////////////////////
-            successImageAndMessage = new StringBuffer("<img src=\"data:image/png;base64,")
-                .append(new Base64(false).getBase64StringFromBinary(
-                    ArrayUtil.getByteArrayFromInputStream(
-                        event.getServletContext().getResourceAsStream("/images/paywith-saturn.png"))))
-                .append("\" title=\"Payment Credentials\"><br>&nbsp;" +
-                        "<br><b>Enrollment Succeeded!</b>").toString();
+            successImageAndMessage = new StringBuffer("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
+                .append(getResourceAsString(SATURN_LOGO))
+                .append("</div><b>Enrollment Succeeded!</b>").toString();
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // KeyGen2

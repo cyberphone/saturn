@@ -78,7 +78,8 @@
            classpath="${compile.classpath}"
            includeAntRuntime="false"/>
     <replace file="${temp.dir}/web.xml">
-      <replacefilter token="@logotype@" value="${logotype.file}"/>
+      <replacefilter token="@webpki-logotype@" value="${webpki-logotype.file}"/>
+      <replacefilter token="@saturn-logotype@" value="${saturn-logotype.file}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
 	  <replacefilter token="@key-password@" value="${keypassword}"/>
       <replacefilter token="@keyprov-host@" value="${keyprov.host}"/>

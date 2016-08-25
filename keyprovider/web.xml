@@ -5,9 +5,15 @@
     version="2.4">
 
     <context-param>
-        <description>Version Check</description>
-        <param-name>logotype</param-name>
-        <param-value>@logotype@</param-value>
+        <description>WebPKI.org Logotype</description>
+        <param-name>webpki_logotype</param-name>
+        <param-value>@webpki-logotype@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Saturn Logotype</description>
+        <param-name>saturn_logotype</param-name>
+        <param-value>@saturn-logotype@</param-value>
     </context-param>
 
     <context-param>

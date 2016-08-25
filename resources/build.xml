@@ -73,7 +73,7 @@
   </target>
 
   <target name="jcspaper">
-    <property name="logotype" location="${logotype.dir}/${logotype.file}"/>
+    <property name="logotype" location="${logotype.dir}/${webpki-logotype.file}"/>
     <delete file="${jcspaper}"/>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
