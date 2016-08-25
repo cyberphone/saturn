@@ -1,4 +1,4 @@
-![Saturn is great](resources/logotype/saturn-small.png)
+![Saturn is great](https://cyberphone.github.io/doc/saturn/github-saturnlogo.svg)
 
 ##A (potentially) Universal Payment System
 
