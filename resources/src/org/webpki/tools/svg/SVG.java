@@ -52,6 +52,9 @@ public class SVG {
             }
             svgText.append(">\n");
         }
+        if (svgObject.invisible) {
+            return;
+        }
         if (svgObject instanceof SVGEndGlobal) {
             svgText.append("</g>\n");
             return;

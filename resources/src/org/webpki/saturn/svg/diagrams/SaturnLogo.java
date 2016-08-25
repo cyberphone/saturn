@@ -86,11 +86,16 @@ public class SaturnLogo extends SVGDocument {
         x = -25;
         y = 42;
 
-        add(new SVGRect(new SVGDoubleValue(0), new SVGDoubleValue(0),
-                new SVGDoubleValue(WIDTH), new SVGDoubleValue(HEIGHT),
-            1.0,
-            "#A0A0A0",
-            null));
+        SVGRect border = new SVGRect(new SVGDoubleValue(0),
+                                     new SVGDoubleValue(0),
+                                     new SVGDoubleValue(WIDTH),
+                                     new SVGDoubleValue(HEIGHT),
+                                     1.0,
+                                     "#A0A0A0",
+                                     null);
+        border.setVisibility(false);
+
+        add(border);
 
         add(new SVGTransform("rotate(" + ANGLE + " " + (x + RING_WIDTH / 2 + MARGIN_X) + " " + (y + RING_HEIGHT / 2 + MARGIN_Y) + ")"));
         add(new SVGEllipse(new SVGDoubleValue(x),

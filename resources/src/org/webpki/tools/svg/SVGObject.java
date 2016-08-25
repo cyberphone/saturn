@@ -43,6 +43,8 @@ public abstract class SVGObject {
 
     Vector<SVGObject> afterDependencyElements = new Vector<SVGObject>();
     
+    boolean invisible;
+    
     String linkUrl;
     
     Boolean linkReplace;
@@ -153,4 +155,7 @@ public abstract class SVGObject {
         _attributes.put(SVGAttributes.FILL_OPACITY, new SVGDoubleValue(value));
     }
 
+    public void setVisibility(boolean visibility) {
+        invisible = !visibility;
+    }
 }

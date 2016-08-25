@@ -1,6 +1,5 @@
 <svg viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg">
 <g>
-<rect x="10" y="10" width="400" height="150" stroke="#A0A0A0" stroke-width="1" fill="none"/>
 <g transform="rotate(-45.0 85.0 85.0)">
 <ellipse cx="85" cy="85" rx="100" ry="33" fill="#dd5454"/>
 <ellipse cx="85" cy="85" rx="78" ry="26" fill="#ffffff"/>
