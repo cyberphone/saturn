@@ -165,9 +165,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 return;
             }
             
-            if (MerchantService.slowOperation) {
-                Thread.sleep(5000);
-            }
+            MerchantService.slowOperationSimulator();
 
             // Reading the Wallet response
             String contentType = request.getContentType();

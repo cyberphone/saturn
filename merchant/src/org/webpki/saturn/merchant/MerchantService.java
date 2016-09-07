@@ -138,14 +138,20 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static boolean logging;
     
-    static boolean slowOperation;
+    private static boolean slowOperation;
 
-    static int referenceId = 1000000;
+    private static int referenceId = 1000000;
 
     static String grantedVersions;
 
     static String getReferenceId() {
         return "#" + (referenceId++);
+    }
+
+    static void slowOperationSimulator() throws InterruptedException {
+        if (slowOperation) {
+            Thread.sleep(5000);
+        }
     }
 
     InputStream getResource(String name) throws IOException {

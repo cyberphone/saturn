@@ -89,6 +89,11 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
 
         id = request.getParameter(QRSessions.QR_SESSION_ID);
         if (id == null) {
+            try {
+                MerchantService.slowOperationSimulator();
+            } catch (InterruptedException e) {
+                throw new IOException(e);
+            }
             // Here we assume that we are being called from the Android client trying
             // to retrieve the payment request
             boolean qrMode = request.getParameter(QR_RETRIEVE) != null;
