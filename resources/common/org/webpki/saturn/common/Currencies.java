@@ -41,9 +41,14 @@ public enum Currencies implements Serializable {
         return decimals;
     }
 
-    static final Pattern ZERO_FRACTION_PATTERN = Pattern.compile("^[0-9]*\\.[0]+$");
+    static final Pattern ZERO_FRACTION_PATTERN = Pattern.compile("[0-9]*\\.[0]+");
 
     public String amountToDisplayString(BigDecimal amount, boolean skipTrailingZeroFraction) throws IOException {
+        String sign = "";
+        if (amount.signum() < 0) {
+            amount = amount.negate();
+            sign = "-";
+        }
         String amountString = amount.setScale(decimals).toPlainString();
         int dp = amountString.indexOf('.');
         StringBuffer amountString2 = new StringBuffer();
@@ -56,6 +61,6 @@ public enum Currencies implements Serializable {
         if (!skipTrailingZeroFraction || !ZERO_FRACTION_PATTERN.matcher(amountString).matches()) {
             amountString2.append(amountString.substring(dp));
         }
-        return symbolFirst ? symbol + amountString2.toString() : amountString2.toString() + symbol;
+        return sign + (symbolFirst ? symbol + amountString2.toString() : amountString2.toString() + symbol);
     }
 }
