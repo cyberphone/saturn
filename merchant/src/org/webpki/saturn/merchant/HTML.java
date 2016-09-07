@@ -207,7 +207,7 @@ public class HTML implements MerchantProperties {
         BigDecimal amount = new BigDecimal(priceX100);
         amount.setScale(MerchantService.currency.getDecimals());
         amount = amount.divide(new BigDecimal(100));
-        return MerchantService.currency.amountToDisplayString(amount);
+        return MerchantService.currency.amountToDisplayString(amount, false);
     }
     
     static void merchantPage(HttpServletResponse response,
@@ -517,7 +517,7 @@ public class HTML implements MerchantProperties {
                  "<tr><td style=\"text-align:center\">")
          .append(resultData.referenceId)
          .append("</td><td style=\"text-align:center\">")
-         .append(resultData.currency.amountToDisplayString(resultData.amount))
+         .append(resultData.currency.amountToDisplayString(resultData.amount, false))
          .append("</td><td style=\"text-align:center\">")
          .append(resultData.accountType.getCommonName())
          .append("</td><td style=\"text-align:center\">")

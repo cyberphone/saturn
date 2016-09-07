@@ -79,8 +79,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     
     static Logger logger = Logger.getLogger(TransactionServlet.class.getCanonicalName());
     
-    static final String RBA_PARM_MOTHER            = "mother";
-    
     static HashMap<String,Integer> requestTypes = new HashMap<String,Integer>();
     
     static final int REQTYPE_PAYEE_INITIAL          = 0;
@@ -104,6 +102,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     }
     
     static final int TIMEOUT_FOR_REQUEST = 5000;
+    
+    // Just a few demo values
+    
+    static final BigDecimal DEMO_ACCOUNT_LIMIT     = new BigDecimal("1000000.00");
+    static final BigDecimal DEMO_RBA_LIMIT         = new BigDecimal("100000.00");
+    static final String RBA_PARM_MOTHER            = "mother";
+    
 
     static String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
@@ -191,6 +196,12 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
     static Authority getAuthority(UrlHolder urlHolder) throws IOException {
         return new Authority(getData(urlHolder), urlHolder.getUrl());
     }
+    
+    String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
+        return "<span style=\"font-weight:bold;white-space:nowrap\">" + 
+               paymentRequest.getCurrency().amountToDisplayString(amount, true) +
+               "</span>";
+    }
 
     JSONObjectWriter processTransactionRequest(JSONObjectReader request, UrlHolder urlHolder)
     throws IOException, GeneralSecurityException {
@@ -239,10 +250,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         ////////////////////////////////////////////////////////////////////////////
 
         // Sorry but you don't appear to have a million bucks :-)
-        if (paymentRequest.getAmount().compareTo(new BigDecimal("1000000.00")) >= 0) {
+        if (paymentRequest.getAmount().compareTo(DEMO_ACCOUNT_LIMIT) >= 0) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
                                                "Your request for " + 
-            paymentRequest.getCurrency().amountToDisplayString(paymentRequest.getAmount()) +
+                                               amountInHtml(paymentRequest, paymentRequest.getAmount()) +
                                                " appears to be slightly out of your current capabilities...",
                                                null,
                                                authorizationData.getDataEncryptionKey(),
@@ -250,11 +261,13 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         }
 
         // RBA v0.001...
-        if (paymentRequest.getAmount().compareTo(new BigDecimal("100000.00")) >= 0 &&
+        if (paymentRequest.getAmount().compareTo(DEMO_RBA_LIMIT) >= 0 &&
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "This transaction requires additional information to " +
+                                               "Transaction requests exceeding " +
+                                               amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
+                                               " requires additional user authentication to " +
                                                "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
                                                "<p>Since <i>this is a demo</i>, " +
                                                "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",

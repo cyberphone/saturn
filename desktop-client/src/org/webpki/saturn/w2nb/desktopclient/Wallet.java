@@ -903,7 +903,7 @@ public class Wallet {
                                     }
                                     // Primary information to the user...
                                     amountString = paymentRequest.getCurrency()
-                                        .amountToDisplayString(paymentRequest.getAmount());
+                                        .amountToDisplayString(paymentRequest.getAmount(), false);
                                     payeeCommonName = paymentRequest.getPayee().getCommonName();
     
                                     // Enumerate keys but only go for those who are intended for
