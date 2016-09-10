@@ -98,6 +98,14 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (!request.getHeader("User-Agent").contains("Android")) {
+            output(response, 
+                    getHTML(null,
+                            null,
+                            "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+                            "This proof-of-concept system only supports Android</td></tr>"));
+            return;
+        }
         HttpSession session = request.getSession(true);
         session.setAttribute(KEYGEN2_SESSION_ATTR,
                              new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagemenentKey)));

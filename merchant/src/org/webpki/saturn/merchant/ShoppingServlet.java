@@ -60,6 +60,11 @@ public class ShoppingServlet extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String userAgent = request.getHeader("User-Agent");
+        if (!userAgent.contains(" Chrome/") || userAgent.contains(" Edge/")) {
+            ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium");
+            return;
+        }
         HttpSession session = request.getSession(false);
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
