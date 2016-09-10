@@ -17,17 +17,16 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.net.URLEncoder;
-
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.webpki.saturn.common.NonDirectPayments;
 
 public class AndroidPluginServlet extends HttpServlet implements MerchantProperties {
 
@@ -115,10 +114,13 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             String successUrl = qrMode ? QR_SUCCESS_URL
                                        :
                     MerchantService.merchantBaseUrl + "/result";
-            TransactionServlet.returnJsonData(response, new WalletRequest(session,
-                                                                          MerchantService.merchantBaseUrl + "/transact",
-                                                                          cancelUrl,
-                                                                          successUrl).requestObject);
+            String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
+            TransactionServlet.returnJsonData(response, 
+                                              new WalletRequest(session,
+                                                                nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
+                                                                MerchantService.merchantBaseUrl + "/transact",
+                                                                cancelUrl,
+                                                                successUrl).requestObject);
         } else {
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {

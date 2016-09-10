@@ -30,6 +30,7 @@ import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.Messages;
@@ -42,7 +43,8 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
     SavedShoppingCart savedShoppingCart;
     JSONObjectWriter requestObject;
     
-    WalletRequest(HttpSession session, 
+    WalletRequest(HttpSession session,
+                  NonDirectPayments optionalNonDirectPayment,
                   String androidTransactionUrl,
                   String androidCancelUrl,
                   String androidSuccessUrl) throws IOException {
@@ -65,6 +67,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                     PaymentRequest.encode(Payee.init(MerchantService.merchantCommonName, paymentNetwork.merchantId),
                                           new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount), 2),
                                           MerchantService.currency,
+                                          optionalNonDirectPayment,
                                           currentReferenceId,
                                           timeStamp,
                                           expires,
@@ -90,7 +93,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         }
     }
 
-    WalletRequest(HttpSession session) throws IOException {
-        this(session, null, null, null);
+    WalletRequest(HttpSession session, NonDirectPayments optionalNonDirectPayment) throws IOException {
+        this(session, optionalNonDirectPayment, null, null, null);
     }
 }

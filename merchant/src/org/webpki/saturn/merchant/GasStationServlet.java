@@ -27,33 +27,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.json.JSONOutputFormats;
+import org.webpki.saturn.common.NonDirectPayments;
 
-public class W2NBWalletServlet extends HttpServlet implements MerchantProperties {
+public class GasStationServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
-   
-    static Logger logger = Logger.getLogger(W2NBWalletServlet.class.getName());
     
-    static boolean getOption(HttpSession session, String name) {
-        return session.getAttribute(name) != null && (Boolean)session.getAttribute(name);
-    }
-
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    static Logger logger = Logger.getLogger(GasStationServlet.class.getName ());
+    
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
             return;
-        }
-        WalletRequest walletRequest = new WalletRequest(session, null);
-        HTML.w2nbWalletPay(response,
-                           walletRequest.savedShoppingCart,
-                           getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
-                           walletRequest.debugMode,
-                           new String(walletRequest.requestObject.serializeJSONObject(JSONOutputFormats.PRETTY_JS_NATIVE), "UTF-8"));
-    }
-
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+         }
+        session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
         response.sendRedirect("home");
     }
 }
