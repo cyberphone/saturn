@@ -126,9 +126,12 @@ public class KeyProviderInitServlet extends HttpServlet {
         output(response, 
                getHTML(null,
                        null,
-                       "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+                       "<tr><td align=\"center\"><table>" +
+                       "<tr><td>This proof-of-concept system provisions secure payment<br>" +
+                       "credentials to be used in the Android version of the \"Wallet\"<br>&nbsp;</td></tr>" +
+                       "<tr><td align=\"center\">" +
                        "<a href=\"intent://keygen2?" + extra +
                        "#Intent;scheme=webpkiproxy;" +
-                       "package=org.webpki.mobile.android;end\">Start KeyGen2</a></td></tr>"));
+                       "package=org.webpki.mobile.android;end\">Start KeyGen2</a></td></tr></table></td></tr>"));
     }
 }

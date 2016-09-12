@@ -166,25 +166,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // WebPKI.org logotype
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            webpkiLogotype = getResourceAsString(WEBPKI_LOGO);
-
-                ////////////////////////////////////////////////////////////////////////////////////////////
-            // Optional check
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            if (getPropertyString(VERSION_CHECK).length() != 0) {
-                grantedVersions = getPropertyStringList(VERSION_CHECK);
-            }
- 
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            // Show a sign that the user succeeded getting Saturn credentials
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            successImageAndMessage = new StringBuffer("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
-                .append(getResourceAsString(SATURN_LOGO))
-                .append("</div><b>Enrollment Succeeded!</b>").toString();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////
             // KeyGen2
             ////////////////////////////////////////////////////////////////////////////////////////////
             keygen2JSONCache = new JSONDecoderCache ();
@@ -245,6 +226,34 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // Get KeyGen2 protocol entry
             ////////////////////////////////////////////////////////////////////////////////////////////
             keygen2EnrollmentUrl = getURL(getPropertyString(KEYPROV_HOST)) + "/getkeys";
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // WebPKI.org logotype
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            webpkiLogotype = getResourceAsString(WEBPKI_LOGO);
+
+                ////////////////////////////////////////////////////////////////////////////////////////////
+            // Optional check
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            if (getPropertyString(VERSION_CHECK).length() != 0) {
+                grantedVersions = getPropertyStringList(VERSION_CHECK);
+            }
+ 
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Show a sign that the user succeeded getting Saturn credentials
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            URL hostUrl = new URL(keygen2EnrollmentUrl);
+            String merchantHost = hostUrl.getHost();
+            if (merchantHost.equals("mobilepki.org")) {
+                merchantHost = "test.webpki.org";
+            }
+            String merchantUrl = new URL(hostUrl.getProtocol(), merchantHost, hostUrl.getPort(), "/webpay-merchant").toExternalForm(); 
+            logger.info(merchantUrl);
+            successImageAndMessage = new StringBuffer("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
+                .append(getResourceAsString(SATURN_LOGO))
+                .append("</div><b>Enrollment Succeeded!</b><p><a href=\"")
+                .append(merchantUrl)
+                .append("\">Continue to merchant site</a></p>").toString();
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Get TLS server certificate (if necessary)
