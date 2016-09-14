@@ -17,8 +17,10 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpSession;
@@ -58,7 +60,9 @@ public class QRSessions {
                     sleep(CYCLE_TIME);
                     synchronized (QRSessions.class) {
                         if (currentSessions.isEmpty()) {
-                            logger.info("Timeout thread died");
+                            if (MerchantService.logging) {
+                                logger.info("Timeout thread died");
+                            }
                             looper = null;
                             break;
                         }
@@ -68,7 +72,9 @@ public class QRSessions {
                         while (list.hasNext()) {
                             SessionInProgress sessionInProgress = list.next();
                             if (current_time > sessionInProgress.expiry_time) {
-                                logger.info("Removed due to timeout, QR Session ID=" + sessionInProgress.id);
+                                if (MerchantService.logging) {
+                                    logger.info("Removed due to timeout, QR Session ID=" + sessionInProgress.id);
+                                }
                                 synchronized (sessionInProgress.synchronizer) {
                                     sessionInProgress.synchronizer.notify();
                                 }
@@ -90,7 +96,9 @@ public class QRSessions {
         sessionInProgress.expiry_time = System.currentTimeMillis() + MAX_SESSION;
         sessionInProgress.synchronizer = new Synchronizer();
         currentSessions.put(sessionInProgress.id, sessionInProgress);
-        logger.info("Created QR Session ID=" + sessionInProgress.id);
+        if (MerchantService.logging) {
+            logger.info("Created QR Session ID=" + sessionInProgress.id);
+        }
         if (looper == null) {
             logger.info("Timeout thread started");
             (looper = new Looper()).start();

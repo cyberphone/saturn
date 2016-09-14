@@ -44,7 +44,9 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
 
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String id = new String(ServletUtil.getData(request), "UTF-8");
-        logger.info("QR DISP=" + id);
+        if (MerchantService.logging) {
+            logger.info("QR DISP=" + id);
+        }
         Synchronizer synchronizer = QRSessions.getSynchronizer(id);
         if (synchronizer == null) {
             sendResult(response, QRSessions.QR_RETURN_TO_SHOP);
@@ -52,7 +54,9 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
             QRSessions.removeSession(id);
             sendResult(response, QRSessions.QR_SUCCESS);
         } else {
-            logger.info("QR Continue");
+            if (MerchantService.logging) {
+                logger.info("QR Continue");
+            }
             sendResult(response, synchronizer.isInProgress() ? QRSessions.QR_PROGRESS : QRSessions.QR_CONTINUE);
         }
     }
