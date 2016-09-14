@@ -161,7 +161,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {
-                returnJsonData(response, Messages.createBaseMessage(Messages.PAYMENT_CLIENT_SUCCESS));
+                returnJsonData(response, WalletAlertMessage.encode("The session appears to have timed out."));
                 return;
             }
             
