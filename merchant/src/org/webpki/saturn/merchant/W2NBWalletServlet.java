@@ -17,17 +17,16 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONOutputFormats;
+import org.webpki.saturn.common.NonDirectPayments;
 
 public class W2NBWalletServlet extends HttpServlet implements MerchantProperties {
 
@@ -45,7 +44,9 @@ public class W2NBWalletServlet extends HttpServlet implements MerchantProperties
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        WalletRequest walletRequest = new WalletRequest(session, null);
+        String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
+        WalletRequest walletRequest = new WalletRequest(session,
+                                                        nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment));
         HTML.w2nbWalletPay(response,
                            walletRequest.savedShoppingCart,
                            getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
