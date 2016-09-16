@@ -221,10 +221,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
 
             // ugly fix to cope with local installation
             String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
-            if (request.getServerName().equals("localhost")) {
-                providerAuthorityUrl = new URL(request.isSecure() ? "https": "http",
-                                               "localhost", 
-                                               request.getServerPort(),
+            if (MerchantService.payeeProviderAuthorityUrl.contains("localhost")) {
+                URL url = new URL(MerchantService.payeeProviderAuthorityUrl);
+                providerAuthorityUrl = new URL(url.getProtocol(),
+                                               url.getHost(), 
+                                               url.getPort(),
                                                new URL(providerAuthorityUrl).getFile()).toExternalForm();
             }
 
