@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.util.Base64;
@@ -129,7 +130,9 @@ public class HTML implements MerchantProperties {
                    DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (debugMode ? " checked" : "") +
                    "></td><td>Debug (JSON Message Dump) Option</td></form></tr>" +
-                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
+                   "<tr><td style=\"text-align:left;padding-top:10pt\"><a href=\"" + "gasstation" + 
+                   "\">Gas Station</a></td><td style=\"text-align:left;padding-top:10pt\">A <i>Different</i> Payment Scenario</td></tr>" +
+                   "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"http://xmlns.webpki.org/webpay/v2\">Payment System</a>&nbsp;&nbsp;</td><td>State Diagram Etc.</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Demo Source Code</a></td><td>For Nerds...</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge\">Web2Native Bridge</a>&nbsp;&nbsp;&nbsp;</td><td>API and &quot;Executive Level&quot; Description</td></tr>" +
@@ -585,59 +588,103 @@ public class HTML implements MerchantProperties {
                 FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">This demo only supports Saturn!</div",
                 s.toString()));
     }
+    
+    static String gasStation() {
+        return
+        "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+        "<table>" +
+        "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
+        + FONT_ARIAL + "\">Gas Station<br>&nbsp;</td></tr>";
 
-    static void printQRCode(HttpServletResponse response,
-                            SavedShoppingCart savedShoppingCart, byte[] qrImage,
-                            String cometRelativeUrl,
-                            String id) throws IOException, ServletException {
-      HTML.output(response, HTML.getHTML(
-              "function flashQRInfo() {\n" +
-              "  document.getElementById('qridflasher').style.top = ((window.innerHeight - document.getElementById('qridflasher').offsetHeight) / 2) + 'px';\n" +
-              "  document.getElementById('qridflasher').style.left = ((window.innerWidth - document.getElementById('qridflasher').offsetWidth) / 2) + 'px';\n" +
-              "  document.getElementById('qridflasher').style.visibility = 'visible';\n" +
-              "  setTimeout(function() {\n" +
-              "    document.getElementById('qridflasher').style.visibility = 'hidden';\n" +
-              "  }, 5000);\n" +
-              "}\n\n" +
-              "function startComet() {\n" +
-              "  fetch('" + cometRelativeUrl + "', {\n" +
-              "     headers: {\n" +
-              "       'Content-Type': 'text/plain'\n" +
-              "     },\n" +
-              "     method: 'POST',\n" +
-              "     body: '" + id + "'\n" +
-              "  }).then(function (response) {\n" +
-              "    return response.text();\n" +
-              "  }).then(function (resultData) {\n" +
-              "    console.log('Response', resultData);\n" +
-              "    switch (resultData) {\n" +
-              "      case '" + QRSessions.QR_PROGRESS + "':\n" +
-              "        document.getElementById('qr1').innerHTML = '';\n" +
-              "        document.getElementById('qr2').innerHTML = '';\n" +
-              "      case '" + QRSessions.QR_CONTINUE + "':\n" +
-              "        startComet();\n" +
-              "        break;\n" +
-              "      case '" + QRSessions.QR_RETURN_TO_SHOP + "':\n" +
-              "        document.forms.restore.submit();\n" +
-              "        break;\n" +
-              "      default:\n" +
-              "        document.location.href = 'result';\n" +
-              "    }\n" +
-              "  }).catch (function(error) {\n" +
-              "    console.log('Request failed', error);\n" +
-              "  });\n" +                           
-              "}\n",
+    }
+    static String cometJavaScriptSupport(String id, HttpServletRequest request, String returnAction, String successAction) {
+        return new StringBuffer(
+            "function flashQRInfo() {\n" +
+            "  document.getElementById('qridflasher').style.top = ((window.innerHeight - document.getElementById('qridflasher').offsetHeight) / 2) + 'px';\n" +
+            "  document.getElementById('qridflasher').style.left = ((window.innerWidth - document.getElementById('qridflasher').offsetWidth) / 2) + 'px';\n" +
+            "  document.getElementById('qridflasher').style.visibility = 'visible';\n" +
+            "  setTimeout(function() {\n" +
+            "    document.getElementById('qridflasher').style.visibility = 'hidden';\n" +
+            "  }, 5000);\n" +
+            "}\n\n" +
+            "function startComet() {\n" +
+            "  fetch('")
+        .append(request.getRequestURL().toString())
+        .append(
+            "', {\n" +
+            "     headers: {\n" +
+            "       'Content-Type': 'text/plain'\n" +
+            "     },\n" +
+            "     method: 'POST',\n" +
+            "     body: '" + id + "'\n" +
+            "  }).then(function (response) {\n" +
+            "    return response.text();\n" +
+            "  }).then(function (resultData) {\n" +
+            "    console.log('Response', resultData);\n" +
+            "    switch (resultData) {\n" +
+            "      case '" + QRSessions.QR_PROGRESS + "':\n" +
+            "        document.getElementById('qr1').innerHTML = '';\n" +
+            "        document.getElementById('qr2').innerHTML = '';\n" +
+            "      case '" + QRSessions.QR_CONTINUE + "':\n" +
+            "        startComet();\n" +
+            "        break;\n" +
+            "      case '" + QRSessions.QR_RETURN + "':\n" +
+            "        ")
+        .append(returnAction)
+        .append(";\n" +
+            "        break;\n" +
+            "      default:\n" +
+            "        ")
+        .append(successAction)
+        .append(";\n" +
+            "    }\n" +
+            "  }).catch (function(error) {\n" +
+            "    console.log('Request failed', error);\n" +
+            "  });\n" +                           
+            "}\n").toString();
+    }
+    
+    static String bodyStartQR(String optional) {
+        return "onload=\"startComet()\">" + optional + 
+               "<div id=\"qridflasher\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
+               FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">" +
+               "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div";       
+    }
+    
+    static String bodyEndQR(byte[] qrImage) {
+        return "<tr><td id=\"qr1\" style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\">" +
+               "<img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
+               "<tr><td id=\"qr2\" align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + 
+               "\"></td></tr><tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr></table></td></tr>";     
+    }
 
-              "onload=\"startComet()\"><form name=\"restore\" method=\"POST\" action=\"shop\"></form>" + 
-              "<div id=\"qridflasher\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
-              FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">" +
-              "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div",
+    static void printQRCode4Shop(HttpServletResponse response,
+                                 SavedShoppingCart savedShoppingCart,
+                                 byte[] qrImage,
+                                 HttpServletRequest request,
+                                 String id) throws IOException, ServletException {
+        HTML.output(response, HTML.getHTML(
+            cometJavaScriptSupport(id, request, "document.forms.restore.submit()", "document.location.href = 'result'"),
+            
+            bodyStartQR("<form name=\"restore\" method=\"POST\" action=\"shop\"></form>"),
+            
+            currentOrder(savedShoppingCart).toString() +
+            
+            bodyEndQR(qrImage)));
+    }
 
-              currentOrder(savedShoppingCart).toString() +
-              "<tr><td id=\"qr1\" style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\">" +
-              "<img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
-              "<tr><td id=\"qr2\" align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + 
-              "\"></td></tr><tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr></table></td></tr>"));
+    static void printQRCode4GasStation(HttpServletResponse response,
+                                       byte[] qrImage,
+                                       HttpServletRequest request,
+                                       String id) throws IOException, ServletException {
+        HTML.output(response, HTML.getHTML(
+            cometJavaScriptSupport(id, request, "document.location.href='home'", "document.forms.fillgas.submit()"),
+            
+            bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\"></form>"),
+            
+            gasStation() +
+            
+            bodyEndQR(qrImage)));
     }
 
     static void androidPluginActivate(HttpServletResponse response, String url) throws IOException, ServletException {

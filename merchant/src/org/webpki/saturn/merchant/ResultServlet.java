@@ -49,7 +49,7 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
             return;
         }
         HTML.resultPage(response,
-                        W2NBWalletServlet.getOption(session, DEBUG_MODE_SESSION_ATTR),
+                        HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR),
                         resultData);
     }
 }

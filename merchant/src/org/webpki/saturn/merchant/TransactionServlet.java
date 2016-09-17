@@ -87,7 +87,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                        url2.getFile()).toExternalForm(); 
     }
     
-    JSONObjectReader fetchJSONData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
+    static JSONObjectReader fetchJSONData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
         if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
             throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
                                   (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
@@ -103,7 +103,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         return result;
     }
 
-    JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
+    static JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
         if (MerchantService.logging) {
             logger.info("About to call " + urlHolder.getUrl() + " with data:\n" + request);
         }
@@ -115,7 +115,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         return fetchJSONData(wrap, urlHolder);
     }
 
-    JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
+    static JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
         if (MerchantService.logging) {
             logger.info("About to call " + urlHolder.getUrl());
         }
@@ -179,7 +179,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
 
             // Do we have web debug mode?
             DebugData debugData = null;
-            boolean debug = W2NBWalletServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
+            boolean debug = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             if (debug) {
                 debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
                 debugData.walletResponse = walletResponse;
@@ -216,7 +216,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
            
             // Basic credit is only applicable to account2account operations
             boolean acquirerBased = payerAuthorization.getAccountType().isCardPayment();
-            boolean basicCredit = !W2NBWalletServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
+            boolean basicCredit = !HomeServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
                                   !acquirerBased;
 
             // ugly fix to cope with local installation
@@ -291,7 +291,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
 
             // Two-phase operation: perform the final step
-            if (!basicCredit) {
+            if (!basicCredit && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
                 processFinalize(reserveOrBasicResponse,
                                 paymentRequest.getAmount(),
                                 urlHolder,
@@ -301,6 +301,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             
             // This may be a QR session
             QRSessions.optionalSessionSetReady((String) session.getAttribute(QR_SESSION_ID_ATTR));
+
+            // This may be a Gas Station session
+            if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
+                session.setAttribute(GAS_RESERVATION_SESSION_ATTR, reserveOrBasicResponse);
+            }
  
             logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
             /////////////////////////////////////////////////////////////////////////////////////////
@@ -317,11 +322,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         }
     }
 
-    void processFinalize(ReserveOrBasicResponse reserveOrBasicResponse,
-                         BigDecimal actualAmount,
-                         UrlHolder urlHolder,
-                         boolean acquirerBased,
-                         DebugData debugData)
+    static void processFinalize(ReserveOrBasicResponse reserveOrBasicResponse,
+                                BigDecimal actualAmount,
+                                UrlHolder urlHolder,
+                                boolean acquirerBased,
+                                DebugData debugData)
     throws IOException, GeneralSecurityException {
         if (acquirerBased) {
             // Lookup of configured acquirer authority.  This information is preferably cached

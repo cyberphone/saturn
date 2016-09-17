@@ -42,7 +42,7 @@ public class QRSessions {
 
     private static int sessionId;
 
-    static final String QR_RETURN_TO_SHOP = "r";
+    static final String QR_RETURN         = "r";
     static final String QR_SUCCESS        = "s";
     static final String QR_CONTINUE       = "c";
     static final String QR_PROGRESS       = "p";

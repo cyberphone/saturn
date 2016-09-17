@@ -19,7 +19,6 @@ package org.webpki.saturn.merchant;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +32,10 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
         return false;
     }
     
+    static boolean getOption(HttpSession session, String name) {
+        return session.getAttribute(name) != null && (Boolean)session.getAttribute(name);
+    }
+
     boolean checkBoxGet(HttpSession session, String name) {
         boolean argument = false;
         if (session.getAttribute(name) == null) {
@@ -53,6 +56,10 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
             session.invalidate();
         }
         session = request.getSession(true);
+        if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
+            session.removeAttribute(GAS_STATION_SESSION_ATTR);
+            session.removeAttribute(RESERVE_MODE_SESSION_ATTR);
+        }
         session.setAttribute(TAP_CONNECT_MODE_SESSION_ATTR, isTapConnect());
         HTML.homePage(response,
                       checkBoxGet(session, DEBUG_MODE_SESSION_ATTR),

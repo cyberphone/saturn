@@ -17,16 +17,17 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.saturn.common.NonDirectPayments;
 
 public class W2NBWalletServlet extends HttpServlet implements MerchantProperties {
 
@@ -34,22 +35,16 @@ public class W2NBWalletServlet extends HttpServlet implements MerchantProperties
    
     static Logger logger = Logger.getLogger(W2NBWalletServlet.class.getName());
     
-    static boolean getOption(HttpSession session, String name) {
-        return session.getAttribute(name) != null && (Boolean)session.getAttribute(name);
-    }
-
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
-        WalletRequest walletRequest = new WalletRequest(session,
-                                                        nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment));
+        WalletRequest walletRequest = new WalletRequest(session, null);
         HTML.w2nbWalletPay(response,
                            walletRequest.savedShoppingCart,
-                           getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
+                           HomeServlet.getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
                            walletRequest.debugMode,
                            new String(walletRequest.requestObject.serializeJSONObject(JSONOutputFormats.PRETTY_JS_NATIVE), "UTF-8"));
     }

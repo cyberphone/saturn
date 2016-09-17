@@ -35,6 +35,8 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
     
     static Logger logger = Logger.getLogger(GasStationServlet.class.getName ());
     
+    static final long STANDARD_RESERVATION_AMOUNT_X_100 = 20000;
+    
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -42,6 +44,10 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
             return;
          }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
-        response.sendRedirect("home");
+        session.setAttribute(RESERVE_MODE_SESSION_ATTR, true);
+        SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
+        savedShoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;
+        session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
+        response.sendRedirect("qrdisplay");
     }
 }

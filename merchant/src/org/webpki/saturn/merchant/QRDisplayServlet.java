@@ -49,7 +49,7 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
         }
         Synchronizer synchronizer = QRSessions.getSynchronizer(id);
         if (synchronizer == null) {
-            sendResult(response, QRSessions.QR_RETURN_TO_SHOP);
+            sendResult(response, QRSessions.QR_RETURN);
         } else if (synchronizer.perform(QRSessions.COMET_WAIT)) {
             QRSessions.removeSession(id);
             sendResult(response, QRSessions.QR_SUCCESS);
@@ -75,11 +75,6 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        SavedShoppingCart savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
-        if (savedShoppingCart == null) {
-            ErrorServlet.systemFail(response, "Missing shopping cart");
-            return;
-        }
         String id = QRSessions.createSession(session);
         session.setAttribute(QR_SESSION_ID_ATTR, id);
         response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
@@ -87,10 +82,17 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
                                                          "/androidplugin?" + QRSessions.QR_SESSION_ID  + "=" + id,
                                                        "UTF-8");
         logger.info("URL=" + url + " SID=" + session.getId());
-        HTML.printQRCode(response,
-                         savedShoppingCart,
-                         QRCode.from(url).to(ImageType.PNG).withSize(200, 200).stream().toByteArray(),
-                         request.getRequestURL().toString(),
-                         id);
+        byte[] qrImage = QRCode.from(url).to(ImageType.PNG).withSize(200, 200).stream().toByteArray();
+
+        if (session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
+            SavedShoppingCart savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+            if (savedShoppingCart == null) {
+                ErrorServlet.systemFail(response, "Missing shopping cart");
+                return;
+            }
+            HTML.printQRCode4Shop(response, savedShoppingCart, qrImage, request, id);
+        } else {
+            HTML.printQRCode4GasStation(response, qrImage, request, id);
+        }
     }
 }

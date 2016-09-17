@@ -48,7 +48,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                   String androidTransactionUrl,
                   String androidCancelUrl,
                   String androidSuccessUrl) throws IOException {
-        debugMode = W2NBWalletServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
+        debugMode = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
         DebugData debugData = null;
         if (debugMode) {
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
