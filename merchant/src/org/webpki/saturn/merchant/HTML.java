@@ -27,6 +27,7 @@ import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
+import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -505,7 +506,7 @@ public class HTML implements MerchantProperties {
                               s.toString()));
     }
 
-    static void resultPage(HttpServletResponse response,
+    static void shopResultPage(HttpServletResponse response,
                            boolean debugMode,
                            ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
@@ -705,17 +706,50 @@ public class HTML implements MerchantProperties {
 
     static void androidPage(HttpServletResponse response) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(null, null,
-                "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-                "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
-                "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
-                 "<tr><td style=\"text-align:left\">Note: The Android Wallet is currently a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
-                "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
-                  "https://play.google.com/store/apps/details?id=org.webpki.mobile.android</a></td></tr>" +
-                "<tr><td>Enroll payment <i>test credentials</i> by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +
-                  "https://mobilepki.org/webpay-keyprovider</td></tr>" +
-                "<tr><td>Unlike the Windows, Linux, and OS/X-based Wallet, the Android version also supports remote operation using QR codes.  This mode is " +
-                  "indicated by the following image in the Merchant Web application:</td></tr>" +
-                "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" +
-                "</table></td></tr>"));       
+            "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+            "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
+            "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
+             "<tr><td style=\"text-align:left\">Note: The Android Wallet is currently a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
+            "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
+              "https://play.google.com/store/apps/details?id=org.webpki.mobile.android</a></td></tr>" +
+            "<tr><td>Enroll payment <i>test credentials</i> by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +
+              "https://mobilepki.org/webpay-keyprovider</td></tr>" +
+            "<tr><td>Unlike the Windows, Linux, and OS/X-based Wallet, the Android version also supports remote operation using QR codes.  This mode is " +
+              "indicated by the following image in the Merchant Web application:</td></tr>" +
+            "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" +
+            "</table></td></tr>"));       
     }
+
+    static void gasFillingPage(HttpServletResponse response) throws IOException, ServletException {
+        HTML.output(response, HTML.getHTML(null, "><form name=\"finish\" action=\"result\" method=\"POST\"></form",
+            gasStation() +
+            "<tr><td><input type=\"button\" value=\"Finish\" onclick=\"document.forms.finish.submit()\"></td></tr>" +
+            "</table></td></tr>"));
+    }
+
+    static void gasStationResultPage(HttpServletResponse response,
+                                     DebugData debugData,
+                                     BigDecimal actualAmount,
+                                     ReserveOrBasicResponse reserveOrBasicResponse) {
+        HTML.output(response, HTML.getHTML(null, null, new StringBuffer()
+            .append(gasStation())
+            .append("<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
+.append(resultData.accountType.isCardPayment() ? "Card" : "Account")
+.append(" Type</th><th>")
+.append(resultData.accountType.isCardPayment() ? "Card Reference" : "Account Number")
+.append("</th></tr>" +
+    "<tr><td style=\"text-align:center\">")
+.append(resultData.referenceId)
+.append("</td><td style=\"text-align:center\">")
+.append(resultData.currency.amountToDisplayString(resultData.amount, false))
+.append("</td><td style=\"text-align:center\">")
+.append(resultData.accountType.getCommonName())
+.append("</td><td style=\"text-align:center\">")
+.append(resultData.accountReference)
+.append("</td></tr></table></td></tr>");
+if (debugMode) {
+s.append("<tr><td style=\"text-align:center;padding-top:20pt\"><a href=\"debug\">Show Debug Info</a></td></tr>");
+}
+s.append("</table></td></tr></table></td></tr>");
+}
 }

@@ -25,7 +25,7 @@ public interface MerchantProperties {
     public String RESULT_DATA_SESSION_ATTR      = "RESDAT";
     public String QR_SESSION_ID_ATTR            = "QRSESS";
     public String GAS_STATION_SESSION_ATTR      = "GASSTAT";
-    public String GAS_RESERVATION_SESSION_ATTR  = "GASRESV";
+    public String GAS_STATION_RES_SESSION_ATTR  = "GASRESV";
 
     public String RESERVE_MODE_SESSION_ATTR     = "rsrvmd";
     public String DEBUG_MODE_SESSION_ATTR       = "debug";

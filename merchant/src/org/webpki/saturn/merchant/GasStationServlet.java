@@ -50,4 +50,13 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
         session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
         response.sendRedirect("qrdisplay");
     }
+
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            ErrorServlet.sessionTimeout(response);
+            return;
+         }
+        HTML.gasFillingPage(response);
+    }
 }

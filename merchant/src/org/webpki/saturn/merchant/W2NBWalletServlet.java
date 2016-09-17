@@ -17,11 +17,9 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +33,7 @@ public class W2NBWalletServlet extends HttpServlet implements MerchantProperties
    
     static Logger logger = Logger.getLogger(W2NBWalletServlet.class.getName());
     
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -49,6 +48,7 @@ public class W2NBWalletServlet extends HttpServlet implements MerchantProperties
                            new String(walletRequest.requestObject.serializeJSONObject(JSONOutputFormats.PRETTY_JS_NATIVE), "UTF-8"));
     }
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect("home");
     }

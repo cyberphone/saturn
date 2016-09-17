@@ -52,7 +52,6 @@ import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Authority;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.PaymentRequest;
@@ -126,20 +125,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         return fetchJSONData(wrap, urlHolder);
     }
 
-    // The purpose of this class is to enable URL information in exceptions
-
-    class UrlHolder {
-        private String url;
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-    }
-    
     Authority payeeProviderAuthority;
     
     synchronized void updatePayeeProviderAuthority(UrlHolder urlHolder) throws IOException {
@@ -216,8 +201,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
            
             // Basic credit is only applicable to account2account operations
             boolean acquirerBased = payerAuthorization.getAccountType().isCardPayment();
-            boolean basicCredit = !HomeServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) &&
-                                  !acquirerBased;
+            boolean basicCredit = !HomeServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) && !acquirerBased;
 
             // ugly fix to cope with local installation
             String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
@@ -278,18 +262,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             // No error return, then we can verify the response fully
             reserveOrBasicResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
        
-            // Create a viewable response
-            ResultData resultData = new ResultData();
-            resultData.amount = paymentRequest.getAmount();
-            resultData.referenceId = paymentRequest.getReferenceId();
-            resultData.currency = paymentRequest.getCurrency();
-            resultData.accountType = reserveOrBasicResponse.getPayerAccountType();
-            resultData.accountReference =  acquirerBased ? // = Card
-                    AuthorizationData.formatCardNumber(reserveOrBasicResponse.getAccountReference())
-                                                 :
-                        reserveOrBasicResponse.getAccountReference();  // Currently "unmoderated" account
-            session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
-
             // Two-phase operation: perform the final step
             if (!basicCredit && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
                 processFinalize(reserveOrBasicResponse,
@@ -302,9 +274,19 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             // This may be a QR session
             QRSessions.optionalSessionSetReady((String) session.getAttribute(QR_SESSION_ID_ATTR));
 
-            // This may be a Gas Station session
-            if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
-                session.setAttribute(GAS_RESERVATION_SESSION_ATTR, reserveOrBasicResponse);
+            // This may be a Shop or Gas Station session
+            if (session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
+                // Shop: Create a viewable response
+                ResultData resultData = new ResultData();
+                resultData.amount = paymentRequest.getAmount();
+                resultData.referenceId = paymentRequest.getReferenceId();
+                resultData.currency = paymentRequest.getCurrency();
+                resultData.accountType = reserveOrBasicResponse.getPayerAccountType();
+                resultData.accountReference = reserveOrBasicResponse.getFormattedAccountReference();
+                session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
+            } else {
+                // Gas Station: Save reservation part for future fulfillment
+                session.setAttribute(GAS_STATION_RES_SESSION_ATTR, reserveOrBasicResponse);
             }
  
             logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());

@@ -92,4 +92,9 @@ public class ReserveOrBasicResponse implements BaseProperties {
     public String getAccountReference() {
         return transactionResponse.accountReference;
     }
+
+    public String getFormattedAccountReference() {
+        return transactionResponse.transactionRequest.reserveOrBasicRequest.accountType.cardPayment ?
+            AuthorizationData.formatCardNumber(transactionResponse.accountReference) : transactionResponse.accountReference;
+    }
 }

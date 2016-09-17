@@ -17,13 +17,10 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.net.URLEncoder;
-
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,6 +58,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     ///////////////////////////////////////////////////////////////////////////////////
     // The POST method is only called by Saturn Web pay for Android                  //
     ///////////////////////////////////////////////////////////////////////////////////
+    @Override
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         if (session == null) {
@@ -76,6 +74,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     // Note: Most of this slimy and error-prone code would be redundant if Android   //
     // had a useful Web2App concept.                                                 //
     ///////////////////////////////////////////////////////////////////////////////////
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String id = request.getParameter(ANDROID_CANCEL);
         if (id != null) {
