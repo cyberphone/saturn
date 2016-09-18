@@ -17,17 +17,20 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.ReserveOrBasicResponse;
+
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -324,7 +327,7 @@ public class HTML implements MerchantProperties {
     static StringBuffer currentOrder(SavedShoppingCart savedShoppingCart) throws IOException {
         StringBuffer s = new StringBuffer(
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-                "<table>" +
+                "<table border='1'>" +
                 "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
                 + FONT_ARIAL + "\">Current Order<br>&nbsp;</td></tr>" +
                 "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
@@ -506,31 +509,46 @@ public class HTML implements MerchantProperties {
                               s.toString()));
     }
 
-    static void shopResultPage(HttpServletResponse response,
-                           boolean debugMode,
-                           ResultData resultData) throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
-        s.append("<table>" +
-                 "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Order Status<br>&nbsp;</td></tr>" +
-                 "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">Dear customer, your order has been successfully processed!</td></tr>" +
-                 "<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
-         .append(resultData.accountType.isCardPayment() ? "Card" : "Account")
-         .append(" Type</th><th>")
-         .append(resultData.accountType.isCardPayment() ? "Card Reference" : "Account Number")
-         .append("</th></tr>" +
-                 "<tr><td style=\"text-align:center\">")
-         .append(resultData.referenceId)
-         .append("</td><td style=\"text-align:center\">")
-         .append(resultData.currency.amountToDisplayString(resultData.amount, false))
-         .append("</td><td style=\"text-align:center\">")
-         .append(resultData.accountType.getCommonName())
-         .append("</td><td style=\"text-align:center\">")
-         .append(resultData.accountReference)
-         .append("</td></tr></table></td></tr>");
+    static StringBuffer receiptCore(ResultData resultData, boolean debugMode) throws IOException {
+        StringBuffer s = new StringBuffer("<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
+            .append(resultData.accountType.isCardPayment() ? "Card" : "Account")
+            .append(" Type</th><th>")
+            .append(resultData.accountType.isCardPayment() ? "Card Reference" : "Account Number")   
+            .append("</th></tr><tr><td style=\"text-align:center\">")  
+            .append(resultData.referenceId)
+            .append("</td><td style=\"text-align:center\">")
+            .append(resultData.currency.amountToDisplayString(resultData.amount, false))
+            .append("</td><td style=\"text-align:center\">")
+            .append(resultData.accountType.getCommonName())
+            .append("</td><td style=\"text-align:center\">")
+            .append(resultData.accountReference)
+            .append("</td></tr></table></td></tr>");
         if (debugMode) {
             s.append("<tr><td style=\"text-align:center;padding-top:20pt\"><a href=\"debug\">Show Debug Info</a></td></tr>");
         }
-        s.append("</table></td></tr></table></td></tr>");
+        return s;
+    }
+
+    static void shopResultPage(HttpServletResponse response,
+                               boolean debugMode,
+                               ResultData resultData) throws IOException, ServletException {
+        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
+            .append("<table>" +
+                    "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Order Status<br>&nbsp;</td></tr>" +
+                    "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">Dear customer, your order has been successfully processed!</td></tr>")
+            .append(receiptCore(resultData, debugMode))
+            .append("</table></td></tr></table></td></tr>");
+        HTML.output(response, 
+                    HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
+    }
+
+    static void gasStationResultPage(HttpServletResponse response,
+                                     boolean debugMode,
+                                     ResultData resultData) throws IOException, ServletException {
+        StringBuffer s = new StringBuffer()
+            .append(gasStation())
+            .append(receiptCore(resultData, debugMode))
+            .append("</table></td></tr></table></td></tr>");
         HTML.output(response, 
                     HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
     }
@@ -593,13 +611,21 @@ public class HTML implements MerchantProperties {
     static String gasStation() {
         return
         "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-        "<table>" +
+        "<table border='1'>" +
         "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
         + FONT_ARIAL + "\">Gas Station<br>&nbsp;</td></tr>";
 
     }
     static String cometJavaScriptSupport(String id, HttpServletRequest request, String returnAction, String successAction) {
         return new StringBuffer(
+            "\"use strict\";\n" +
+            STICK_TO_HOME_URL +
+            "function setQRDisplay(turnOn) {" +
+            "  var displayArg = turnOn ? 'table-row' : 'none';\n" +
+            "  document.getElementById('qr1').style.display = displayArg;\n" +
+            "  document.getElementById('qr2').style.display = displayArg;\n" +
+            "  document.getElementById('waiting').style.paddingTop = turnOn ? '0pt' : '15pt';\n" +
+            "}\n" +
             "function flashQRInfo() {\n" +
             "  document.getElementById('qridflasher').style.top = ((window.innerHeight - document.getElementById('qridflasher').offsetHeight) / 2) + 'px';\n" +
             "  document.getElementById('qridflasher').style.left = ((window.innerWidth - document.getElementById('qridflasher').offsetWidth) / 2) + 'px';\n" +
@@ -624,8 +650,7 @@ public class HTML implements MerchantProperties {
             "    console.log('Response', resultData);\n" +
             "    switch (resultData) {\n" +
             "      case '" + QRSessions.QR_PROGRESS + "':\n" +
-            "        document.getElementById('qr1').innerHTML = '';\n" +
-            "        document.getElementById('qr2').innerHTML = '';\n" +
+            "        setQRDisplay(false);\n" +
             "      case '" + QRSessions.QR_CONTINUE + "':\n" +
             "        startComet();\n" +
             "        break;\n" +
@@ -652,11 +677,22 @@ public class HTML implements MerchantProperties {
                "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div";       
     }
     
-    static String bodyEndQR(byte[] qrImage) {
-        return "<tr><td id=\"qr1\" style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\">" +
-               "<img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
-               "<tr><td id=\"qr2\" align=\"center\"><img src=\"data:image/png;base64," + new Base64(false).getBase64StringFromBinary(qrImage) + 
-               "\"></td></tr><tr><td align=\"center\"><img src=\"images/waiting.gif\"></td></tr></table></td></tr>";     
+    static StringBuffer bodyEndQR(byte[] qrImage, boolean qrInitOn) {
+        String display = qrInitOn ? "" : " style=\"display:none\"";
+        return new StringBuffer()
+            .append(
+                "<tr")
+            .append(display)
+            .append(
+                " id=\"qr1\"><td style=\"padding-top:10pt\" align=\"left\">Now use the QR ID&trade; <a href=\"javascript:flashQRInfo()\">" +
+                "<img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
+                "<tr")
+             .append(display)
+             .append(" id=\"qr2\"><td align=\"center\"><img src=\"data:image/png;base64,")
+             .append(new Base64(false).getBase64StringFromBinary(qrImage))
+             .append("\"></td></tr><tr><td id=\"waiting\" style=\"padding-top:")
+             .append(qrInitOn ? 0 : 15)
+             .append("pt\" align=\"center\"><img src=\"images/waiting.gif\"></td></tr></table></td></tr>");     
     }
 
     static void printQRCode4Shop(HttpServletResponse response,
@@ -666,12 +702,9 @@ public class HTML implements MerchantProperties {
                                  String id) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
             cometJavaScriptSupport(id, request, "document.forms.restore.submit()", "document.location.href = 'result'"),
-            
             bodyStartQR("<form name=\"restore\" method=\"POST\" action=\"shop\"></form>"),
-            
             currentOrder(savedShoppingCart).toString() +
-            
-            bodyEndQR(qrImage)));
+            bodyEndQR(qrImage, true)));
     }
 
     static void printQRCode4GasStation(HttpServletResponse response,
@@ -680,12 +713,10 @@ public class HTML implements MerchantProperties {
                                        String id) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
             cometJavaScriptSupport(id, request, "document.location.href='home'", "document.forms.fillgas.submit()"),
-            
             bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\"></form>"),
-            
             gasStation() +
-            
-            bodyEndQR(qrImage)));
+            "<tr><td><input type=\"button\" value=\"Select\" onclick=\"setQRDisplay(true)\"></td></tr>" +
+            bodyEndQR(qrImage, false)));
     }
 
     static void androidPluginActivate(HttpServletResponse response, String url) throws IOException, ServletException {
@@ -721,35 +752,12 @@ public class HTML implements MerchantProperties {
     }
 
     static void gasFillingPage(HttpServletResponse response) throws IOException, ServletException {
-        HTML.output(response, HTML.getHTML(null, "><form name=\"finish\" action=\"result\" method=\"POST\"></form",
+        HTML.output(response, HTML.getHTML(
+            STICK_TO_HOME_URL, 
+            "><form name=\"finish\" action=\"result\" method=\"POST\"></form",
             gasStation() +
             "<tr><td><input type=\"button\" value=\"Finish\" onclick=\"document.forms.finish.submit()\"></td></tr>" +
             "</table></td></tr>"));
     }
 
-    static void gasStationResultPage(HttpServletResponse response,
-                                     DebugData debugData,
-                                     BigDecimal actualAmount,
-                                     ReserveOrBasicResponse reserveOrBasicResponse) {
-        HTML.output(response, HTML.getHTML(null, null, new StringBuffer()
-            .append(gasStation())
-            .append("<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
-.append(resultData.accountType.isCardPayment() ? "Card" : "Account")
-.append(" Type</th><th>")
-.append(resultData.accountType.isCardPayment() ? "Card Reference" : "Account Number")
-.append("</th></tr>" +
-    "<tr><td style=\"text-align:center\">")
-.append(resultData.referenceId)
-.append("</td><td style=\"text-align:center\">")
-.append(resultData.currency.amountToDisplayString(resultData.amount, false))
-.append("</td><td style=\"text-align:center\">")
-.append(resultData.accountType.getCommonName())
-.append("</td><td style=\"text-align:center\">")
-.append(resultData.accountReference)
-.append("</td></tr></table></td></tr>");
-if (debugMode) {
-s.append("<tr><td style=\"text-align:center;padding-top:20pt\"><a href=\"debug\">Show Debug Info</a></td></tr>");
-}
-s.append("</table></td></tr></table></td></tr>");
-}
 }

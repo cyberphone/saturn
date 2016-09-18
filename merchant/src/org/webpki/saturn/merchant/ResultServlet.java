@@ -67,6 +67,11 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
             ErrorServlet.sessionTimeout(response);
             return;
         }
+        ResultData resultData = (ResultData) session.getAttribute(RESULT_DATA_SESSION_ATTR);
+        if (resultData == null) {
+            ErrorServlet.systemFail(response, "Missing result data");
+            return;
+        }
         ReserveOrBasicResponse reserveOrBasicResponse = (ReserveOrBasicResponse) session.getAttribute(GAS_STATION_RES_SESSION_ATTR);
         if (reserveOrBasicResponse == null) {
             ErrorServlet.systemFail(response, "Missing reservation object");
@@ -74,6 +79,7 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
         }
         try {
             BigDecimal actualAmount = new BigDecimal("150.25");
+            resultData.amount = actualAmount;
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
             TransactionServlet.processFinalize(reserveOrBasicResponse,
                                                actualAmount,
@@ -81,9 +87,8 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
                                                reserveOrBasicResponse.getPayerAccountType().isCardPayment(),
                                                debugData);
             HTML.gasStationResultPage(response,
-                                      debugData,
-                                      actualAmount,
-                                      reserveOrBasicResponse);
+                                      debugData != null,
+                                      resultData);
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
             logger.log(Level.SEVERE, message, e);

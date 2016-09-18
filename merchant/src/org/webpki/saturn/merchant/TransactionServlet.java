@@ -265,27 +265,26 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
             // Two-phase operation: perform the final step
             if (!basicCredit && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
                 processFinalize(reserveOrBasicResponse,
-                                paymentRequest.getAmount(),
+                                paymentRequest.getAmount(),  // Just a copy since we don't have a complete scenario                                
                                 urlHolder,
                                 acquirerBased,
                                 debugData);
             }
             
+            // Create a viewable response
+            ResultData resultData = new ResultData();
+            resultData.amount = paymentRequest.getAmount();  // Gas Station will upgrade amount
+            resultData.referenceId = paymentRequest.getReferenceId();
+            resultData.currency = paymentRequest.getCurrency();
+            resultData.accountType = reserveOrBasicResponse.getPayerAccountType();
+            resultData.accountReference = reserveOrBasicResponse.getFormattedAccountReference();
+            session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
+
             // This may be a QR session
             QRSessions.optionalSessionSetReady((String) session.getAttribute(QR_SESSION_ID_ATTR));
 
-            // This may be a Shop or Gas Station session
-            if (session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
-                // Shop: Create a viewable response
-                ResultData resultData = new ResultData();
-                resultData.amount = paymentRequest.getAmount();
-                resultData.referenceId = paymentRequest.getReferenceId();
-                resultData.currency = paymentRequest.getCurrency();
-                resultData.accountType = reserveOrBasicResponse.getPayerAccountType();
-                resultData.accountReference = reserveOrBasicResponse.getFormattedAccountReference();
-                session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
-            } else {
-                // Gas Station: Save reservation part for future fulfillment
+            // Gas Station: Save reservation part for future fulfillment
+            if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
                 session.setAttribute(GAS_STATION_RES_SESSION_ATTR, reserveOrBasicResponse);
             }
  
