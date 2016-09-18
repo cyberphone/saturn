@@ -17,20 +17,16 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
-
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
-
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -43,6 +39,8 @@ public class HTML implements MerchantProperties {
     
     static final String FONT_VERDANA = "Verdana,'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans'";
     static final String FONT_ARIAL = "Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans'";
+    
+    static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" style=\"width:60pt;position:absolute;right:10pt;top:10pt\"";
     
     static final String HTML_INIT = 
         "<!DOCTYPE html>"+
@@ -327,7 +325,7 @@ public class HTML implements MerchantProperties {
     static StringBuffer currentOrder(SavedShoppingCart savedShoppingCart) throws IOException {
         StringBuffer s = new StringBuffer(
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-                "<table border='1'>" +
+                "<table>" +
                 "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
                 + FONT_ARIAL + "\">Current Order<br>&nbsp;</td></tr>" +
                 "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
@@ -546,11 +544,11 @@ public class HTML implements MerchantProperties {
                                      boolean debugMode,
                                      ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer()
-            .append(gasStation())
+            .append(gasStation("Receipt"))
             .append(receiptCore(resultData, debugMode))
             .append("</table></td></tr></table></td></tr>");
         HTML.output(response, 
-                    HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
+                    HTML.getHTML(STICK_TO_HOME_URL, ">" + GAS_PUMP_LOGO, s.toString()));
     }
 
     static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
@@ -608,12 +606,12 @@ public class HTML implements MerchantProperties {
                 s.toString()));
     }
     
-    static String gasStation() {
-        return
-        "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-        "<table border='1'>" +
-        "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
-        + FONT_ARIAL + "\">Gas Station<br>&nbsp;</td></tr>";
+    static String gasStation(String header) {
+        return new StringBuffer(
+              "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+              "<table border='1'>" +
+              "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
+              + FONT_ARIAL + "\">" + header + "<br>&nbsp;</td></tr>").toString();
 
     }
     static String cometJavaScriptSupport(String id, HttpServletRequest request, String returnAction, String successAction) {
@@ -672,7 +670,8 @@ public class HTML implements MerchantProperties {
     
     static String bodyStartQR(String optional) {
         return "onload=\"startComet()\">" + optional + 
-               "<div id=\"qridflasher\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
+               GAS_PUMP_LOGO +
+               "><div id=\"qridflasher\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
                FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">" +
                "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div";       
     }
@@ -714,7 +713,7 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(
             cometJavaScriptSupport(id, request, "document.location.href='home'", "document.forms.fillgas.submit()"),
             bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\"></form>"),
-            gasStation() +
+            gasStation("Select Fuel + Authorize Payment") +
             "<tr><td><input type=\"button\" value=\"Select\" onclick=\"setQRDisplay(true)\"></td></tr>" +
             bodyEndQR(qrImage, false)));
     }
@@ -754,8 +753,8 @@ public class HTML implements MerchantProperties {
     static void gasFillingPage(HttpServletResponse response) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
             STICK_TO_HOME_URL, 
-            "><form name=\"finish\" action=\"result\" method=\"POST\"></form",
-            gasStation() +
+            ">" + GAS_PUMP_LOGO + "><form name=\"finish\" action=\"result\" method=\"POST\"></form",
+            gasStation("Fill Tank") +
             "<tr><td><input type=\"button\" value=\"Finish\" onclick=\"document.forms.finish.submit()\"></td></tr>" +
             "</table></td></tr>"));
     }
