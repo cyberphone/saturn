@@ -78,7 +78,14 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
             return;
         }
         try {
-            BigDecimal actualAmount = new BigDecimal("150.25");
+            int decilitres = Integer.parseInt(request.getParameter(GasStationServlet.FUEL_DECILITRE_FIELD));
+            FuelTypes fuelType = FuelTypes.valueOf(FuelTypes.class, request.getParameter(GasStationServlet.FUEL_TYPE_FIELD));
+            int priceX1000 = fuelType.pricePerLitreX100 * decilitres;
+            int upround = priceX1000 % GasStationServlet.ROUND_UP_FACTOR_X_10;
+            if (upround != 0) {
+                priceX1000 += GasStationServlet.ROUND_UP_FACTOR_X_10 - upround;
+            }
+            BigDecimal actualAmount = new BigDecimal(priceX1000).divide(new BigDecimal(1000));
             resultData.amount = actualAmount;
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
             TransactionServlet.processFinalize(reserveOrBasicResponse,
@@ -87,7 +94,8 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
                                                reserveOrBasicResponse.getPayerAccountType().isCardPayment(),
                                                debugData);
             HTML.gasStationResultPage(response,
-                                      FuelTypes.valueOf(FuelTypes.class, request.getParameter(GasStationServlet.FUEL_TYPE_FIELD)),
+                                      fuelType,
+                                      decilitres,
                                       debugData != null,
                                       resultData);
         } catch (Exception e) {

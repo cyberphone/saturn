@@ -36,8 +36,11 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
     static Logger logger = Logger.getLogger(GasStationServlet.class.getName ());
     
     static final long STANDARD_RESERVATION_AMOUNT_X_100 = 20000;
+    
+    static final int ROUND_UP_FACTOR_X_10               = 50;  // 5 cents
 
     static final String FUEL_TYPE_FIELD                 = "fueltype";
+    static final String FUEL_DECILITRE_FIELD            = "fueldeci";
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);

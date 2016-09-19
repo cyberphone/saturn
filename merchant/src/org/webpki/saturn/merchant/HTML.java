@@ -35,7 +35,7 @@ public class HTML implements MerchantProperties {
                     "history.pushState(null, null, 'home');\n" +
                     "window.addEventListener('popstate', function(event) {\n" +
                     "    history.pushState(null, null, 'home');\n" +
-                    "});";
+                    "});\n";
     
     static final String FONT_VERDANA = "Verdana,'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans'";
     static final String FONT_ARIAL = "Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans'";
@@ -540,8 +540,26 @@ public class HTML implements MerchantProperties {
                     HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
     }
 
+    static String updatePumpDisplay(FuelTypes fuelType) {
+        return "function setDigits(prefix, value) {\n" +
+               "  var q = 0;\n" +
+               "  while(value) {\n" +
+               "    var digit = value % 10;\n" +
+               "    document.getElementById(prefix + (q++)).innerHTML = digit;\n" +
+               "    value = (value - digit) / 10;\n" +
+               "  }\n" +
+               "}\n" +
+               "function updatePumpDisplay(decilitres) {\n" +
+               "  var priceX1000 = " + fuelType.pricePerLitreX100 + " * decilitres;\n" +
+               "  var roundup = priceX1000 % " + GasStationServlet.ROUND_UP_FACTOR_X_10 + ";\n" +
+               "  if (roundup) priceX1000 += " + GasStationServlet.ROUND_UP_FACTOR_X_10 + " - roundup;\n" +
+               "  setDigits('pvol', decilitres);\n" +
+               "  setDigits('ppri', priceX1000 / 10);\n" +
+               "}\n";
+    }
     static void gasStationResultPage(HttpServletResponse response,
                                      FuelTypes fuelType,
+                                     int decilitres,
                                      boolean debugMode,
                                      ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer()
@@ -551,7 +569,10 @@ public class HTML implements MerchantProperties {
             .append(receiptCore(resultData, debugMode))
             .append("</table></td></tr></table></td></tr>");
         HTML.output(response, 
-                    HTML.getHTML(STICK_TO_HOME_URL, ">" + GAS_PUMP_LOGO, s.toString()));
+                    HTML.getHTML(STICK_TO_HOME_URL + updatePumpDisplay(fuelType),
+                                 "onload=\"updatePumpDisplay(" + decilitres + ")\">" +
+                                 GAS_PUMP_LOGO,
+                                 s.toString()));
     }
 
     static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
@@ -609,21 +630,23 @@ public class HTML implements MerchantProperties {
                 s.toString()));
     }
     
-    static StringBuffer pumpDigit(int digit) {
-        return new StringBuffer("<td><div style=\"background-color:white;padding:5pt\">")
+    static StringBuffer pumpDigit(int digit, String prefix) {
+        return new StringBuffer("<td><div style=\"background-color:white;padding:0pt 3pt 1pt 3pt;font-size:14pt\" id=\"")
+            .append(prefix)
             .append(digit)
-            .append("</div></td>");
+            .append("\">0</div></td>");
     }
     
-    static StringBuffer pumpDisplay(int digits, int decimals, String leader, String trailer) {
+    static StringBuffer pumpDisplay(int digits, int decimals, String leader, String trailer, String prefix) {
         StringBuffer s = new StringBuffer("<table cellspacing=\"5\"><tr><td style=\"color:white\">")
             .append(leader)
             .append("</td>");
         while (digits-- > 0) {
-            s.append(pumpDigit(digits));
+            s.append(pumpDigit(digits + decimals, prefix));
         }
+        s.append("<td style=\"color:white\">&#x2022;</td>");
         while (decimals-- > 0) {
-            s.append(pumpDigit(decimals));
+            s.append(pumpDigit(decimals, prefix));
         }
         return s.append("<td style=\"color:white\">")
                 .append(trailer)
@@ -634,8 +657,8 @@ public class HTML implements MerchantProperties {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>");
         if (visiblePumpDisplay) {
             s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table><tr><td align=\"center\" style=\"background-color:grey\">")
-             .append(pumpDisplay(3, 1, "Volume", "Litres"))
-             .append(pumpDisplay(3, 2, "To Pay", "$"))
+             .append(pumpDisplay(3, 1, "Volume", "Litres", "pvol"))
+             .append(pumpDisplay(3, 2, "To Pay", "$", "ppri"))
              .append("</td></tr></table></td></tr>");
         }
         return s.append("<tr><td id=\"phase\" style=\"padding-bottom:10pt;text-align:center;" +
@@ -800,7 +823,7 @@ public class HTML implements MerchantProperties {
             bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\">" +
                         "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
                         "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\"></form>"),
-            gasStation("1. Select Fuel Type", true) +
+            gasStation("1. Select Fuel Type", false) +
             selectionButtons(FuelTypes.values()) +
             bodyEndQR(qrImage, false)));
     }
@@ -840,13 +863,17 @@ public class HTML implements MerchantProperties {
     static void gasFillingPage(HttpServletResponse response, FuelTypes fuelType) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
             STICK_TO_HOME_URL +
+            "var decilitres = 35;\n" +
             "function doneFilling() {\n" +
             "  document.getElementById('" + GasStationServlet.FUEL_TYPE_FIELD + "').value = '" + fuelType.toString() + "';\n" +
+            "  document.getElementById('" + GasStationServlet.FUEL_DECILITRE_FIELD + "').value = decilitres;\n" +
             "  document.forms.finish.submit();\n" +
             "}\n", 
             ">" + GAS_PUMP_LOGO + "><form name=\"finish\" action=\"result\" method=\"POST\">" +
             "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
             "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\">" +
+            "<input name=\"" + GasStationServlet.FUEL_DECILITRE_FIELD + "\" " +
+            "id=\"" + GasStationServlet.FUEL_DECILITRE_FIELD + "\" type=\"hidden\">" +
             "</form",
             gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
