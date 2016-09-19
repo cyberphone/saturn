@@ -17,16 +17,20 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
+
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -40,7 +44,7 @@ public class HTML implements MerchantProperties {
     static final String FONT_VERDANA = "Verdana,'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans'";
     static final String FONT_ARIAL = "Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans'";
     
-    static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" style=\"width:60pt;position:absolute;right:10pt;top:10pt\"";
+    static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" title=\"For showing context\" style=\"width:50pt;position:absolute;right:10pt;top:10pt\"";
     
     static final String HTML_INIT = 
         "<!DOCTYPE html>"+
@@ -631,7 +635,7 @@ public class HTML implements MerchantProperties {
     }
     
     static StringBuffer pumpDigit(int digit, String prefix) {
-        return new StringBuffer("<td><div style=\"background-color:white;padding:0pt 3pt 1pt 3pt;font-size:14pt\" id=\"")
+        return new StringBuffer("<td><div style=\"background-color:white;padding:0pt 3pt 1pt 3pt;font-size:14pt;border-radius:2pt\" id=\"")
             .append(prefix)
             .append(digit)
             .append("\">0</div></td>");
@@ -656,7 +660,9 @@ public class HTML implements MerchantProperties {
     static String gasStation(String header, boolean visiblePumpDisplay) {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>");
         if (visiblePumpDisplay) {
-            s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table><tr><td align=\"center\" style=\"background-color:grey\">")
+            s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table title=\"This is [sort of] a pump display\"><tr>"+
+                     "<td align=\"center\" style=\"background-color:grey;border-radius:4pt\">" +
+                     "<div style=\"padding:3pt;font-size:12pt;color:white\">Pump O'Matic</div>")
              .append(pumpDisplay(3, 1, "Volume", "Litres", "pvol"))
              .append(pumpDisplay(3, 2, "To Pay", "$", "ppri"))
              .append("</td></tr></table></td></tr>");
@@ -748,11 +754,11 @@ public class HTML implements MerchantProperties {
                 "<img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
                 "<tr")
              .append(display)
-             .append(" id=\"qr2\"><td align=\"center\"><img src=\"data:image/png;base64,")
+             .append(" id=\"qr2\"><td align=\"center\"><img title=\"Do NOT put the cursor here because then the QR reader won't work\" src=\"data:image/png;base64,")
              .append(new Base64(false).getBase64StringFromBinary(qrImage))
              .append("\"></td></tr><tr><td id=\"waiting\" style=\"padding-top:")
              .append(qrInitOn ? 0 : 15)
-             .append("pt\" align=\"center\"><img src=\"images/waiting.gif\"></td></tr></table></td></tr>");     
+             .append("pt\" align=\"center\"><img title=\"Something is running...\" src=\"images/waiting.gif\"></td></tr></table></td></tr>");     
     }
 
     static void printQRCode4Shop(HttpServletResponse response,
@@ -769,11 +775,11 @@ public class HTML implements MerchantProperties {
     
     static String selectionButtons(FuelTypes[] fuelTypes) throws IOException {
         StringBuffer s = new StringBuffer("<tr><td><table cellpadding=\"0\" cellspacing=\"0\" align=\"center\">" +
-                                          "<tr style=\"text-align:center;font-size:11pt\"><td>Fuel Type</td><td>Price/Litre</td></tr>");
+                                          "<tr style=\"text-align:center\"><td>Fuel Type</td><td>Price/Litre</td></tr>");
         for (FuelTypes fuelType : fuelTypes) {
             s.append("<tr id=\"")
              .append(fuelType.toString())
-             .append(".\"><td style=\"height:6pt\"></td></tr><tr id=\"")
+             .append(".\"><td style=\"height:6pt\"></td></tr><tr title=\"Selected fuel type\" id=\"")
              .append(fuelType.toString())
              .append("\" style=\"box-shadow:3pt 3pt 3pt #D0D0D0;text-align:center;background-color:")
              .append(fuelType.color);
@@ -814,7 +820,8 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(
             cometJavaScriptSupport(id, request, 
                                   "document.location.href='home'",
-                                  "      document.getElementById('phase').innerHTML = '3. Waiting For User Autorization...';\n",
+                                  "      document.getElementById('phase').innerHTML = '3. Waiting For User Authorization...<br>" +
+                                  "<span style=\"font-size:8pt;font-weight:normal;font-family:verdana;position:relative;top:2pt\">(using the mobile device)</span>';\n",
                                   "document.forms.fillgas.submit()") +
             s.append(
             "  setQRDisplay(true);\n" +
@@ -860,10 +867,27 @@ public class HTML implements MerchantProperties {
             "</table></td></tr>"));       
     }
 
-    static void gasFillingPage(HttpServletResponse response, FuelTypes fuelType) throws IOException, ServletException {
+    static void gasFillingPage(HttpServletResponse response, FuelTypes fuelType, int maxVolume) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
             STICK_TO_HOME_URL +
-            "var decilitres = 35;\n" +
+            updatePumpDisplay(fuelType) +
+            "var decilitres = 0;\n" +
+            "var timer = null;\n" +
+            "function execute() {\n" +
+            "  if (timer) {\n"+
+            "    clearInterval(timer);\n" +
+            "    doneFilling();\n" +
+            "  } else {\n" +
+            "    document.getElementById('cmd').value = '\u00a0\u00a0\u00a0Click when you have finished pumping...\u00a0\u00a0\u00a0';\n" +
+            "    timer = setInterval(function () {\n" +
+            "      updatePumpDisplay(++decilitres);\n" +
+            "      if (decilitres == " + maxVolume + ") {\n" +
+            "        clearInterval(timer);\n" +
+            "        doneFilling();\n" +
+            "      }\n" +
+            "    }, 100);\n" +
+            "  }\n" +
+            "}\n" +
             "function doneFilling() {\n" +
             "  document.getElementById('" + GasStationServlet.FUEL_TYPE_FIELD + "').value = '" + fuelType.toString() + "';\n" +
             "  document.getElementById('" + GasStationServlet.FUEL_DECILITRE_FIELD + "').value = decilitres;\n" +
@@ -877,7 +901,7 @@ public class HTML implements MerchantProperties {
             "</form",
             gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
-            "<tr><td><input type=\"button\" value=\"Finish\" onclick=\"doneFilling()\"></td></tr>" +
+            "<tr><td style=\"padding-top:20pt\" align=\"center\"><input id=\"cmd\" type=\"button\" style=\"min-width:12em;font-size:11pt\" value=\"Start pumping!\" onclick=\"execute()\"></td></tr>" +
             "</table></td></tr>"));
     }
 

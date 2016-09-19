@@ -17,11 +17,9 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,7 +33,7 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
     
     static Logger logger = Logger.getLogger(GasStationServlet.class.getName ());
     
-    static final long STANDARD_RESERVATION_AMOUNT_X_100 = 20000;
+    static final int STANDARD_RESERVATION_AMOUNT_X_100 = 20000;
     
     static final int ROUND_UP_FACTOR_X_10               = 50;  // 5 cents
 
@@ -46,6 +44,11 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
         HttpSession session = request.getSession(false);
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
+            return;
+        }
+        String userAgent = request.getHeader("User-Agent");
+        if (!userAgent.contains(" Chrome/") || userAgent.contains(" Edge/")) {
+            ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium");
             return;
         }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
@@ -62,6 +65,12 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        HTML.gasFillingPage(response, FuelTypes.valueOf(FuelTypes.class, request.getParameter(FUEL_TYPE_FIELD)));
+        FuelTypes fuelType = FuelTypes.valueOf(FuelTypes.class, request.getParameter(FUEL_TYPE_FIELD));
+        int maxVolumeInDecilitres = (STANDARD_RESERVATION_AMOUNT_X_100 * 10) / fuelType.pricePerLitreX100;
+        int priceX1000 = fuelType.pricePerLitreX100 * maxVolumeInDecilitres;
+        if (priceX1000 % GasStationServlet.ROUND_UP_FACTOR_X_10 != 0) {
+            maxVolumeInDecilitres--;
+        }
+        HTML.gasFillingPage(response, fuelType, maxVolumeInDecilitres);
     }
 }
