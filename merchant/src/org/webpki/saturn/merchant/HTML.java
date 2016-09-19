@@ -17,20 +17,16 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
-
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
-
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -549,7 +545,7 @@ public class HTML implements MerchantProperties {
                                      boolean debugMode,
                                      ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer()
-            .append(gasStation("Thank You - Welcome Back!"))
+            .append(gasStation("Thank You - Welcome Back!", true))
             .append(selectionButtons(new FuelTypes[]{fuelType}))
             .append("<tr><td style=\"height:15pt\"></td></tr>")
             .append(receiptCore(resultData, debugMode))
@@ -613,14 +609,43 @@ public class HTML implements MerchantProperties {
                 s.toString()));
     }
     
-    static String gasStation(String header) {
-        return new StringBuffer(
-              "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-              "<table>" +
-              "<tr><td id=\"phase\" style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:11pt;font-family:"
-              + FONT_ARIAL + "\">" + header + "</td></tr>").toString();
+    static StringBuffer pumpDigit(int digit) {
+        return new StringBuffer("<td><div style=\"background-color:white;padding:5pt\">")
+            .append(digit)
+            .append("</div></td>");
+    }
+    
+    static StringBuffer pumpDisplay(int digits, int decimals, String leader, String trailer) {
+        StringBuffer s = new StringBuffer("<table cellspacing=\"5\"><tr><td style=\"color:white\">")
+            .append(leader)
+            .append("</td>");
+        while (digits-- > 0) {
+            s.append(pumpDigit(digits));
+        }
+        while (decimals-- > 0) {
+            s.append(pumpDigit(decimals));
+        }
+        return s.append("<td style=\"color:white\">")
+                .append(trailer)
+                .append("</td></tr></table>");
+    }
+    
+    static String gasStation(String header, boolean visiblePumpDisplay) {
+        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>");
+        if (visiblePumpDisplay) {
+            s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table><tr><td align=\"center\" style=\"background-color:grey\">")
+             .append(pumpDisplay(3, 1, "Volume", "Litres"))
+             .append(pumpDisplay(3, 2, "To Pay", "$"))
+             .append("</td></tr></table></td></tr>");
+        }
+        return s.append("<tr><td id=\"phase\" style=\"padding-bottom:10pt;text-align:center;" +
+                        "font-weight:bolder;font-size:11pt;font-family:" +
+                        FONT_ARIAL + "\">")
+                .append(header)
+                .append("</td></tr>").toString();
 
     }
+
     static String cometJavaScriptSupport(String id, 
                                          HttpServletRequest request,
                                          String returnAction,
@@ -775,7 +800,7 @@ public class HTML implements MerchantProperties {
             bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\">" +
                         "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
                         "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\"></form>"),
-            gasStation("1. Select Fuel Type") +
+            gasStation("1. Select Fuel Type", true) +
             selectionButtons(FuelTypes.values()) +
             bodyEndQR(qrImage, false)));
     }
@@ -823,7 +848,7 @@ public class HTML implements MerchantProperties {
             "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
             "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\">" +
             "</form",
-            gasStation("4. Fill Tank") +
+            gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
             "<tr><td><input type=\"button\" value=\"Finish\" onclick=\"doneFilling()\"></td></tr>" +
             "</table></td></tr>"));
