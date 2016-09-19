@@ -125,7 +125,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         return fetchJSONData(wrap, urlHolder);
     }
 
-    Authority payeeProviderAuthority;
+    static Authority payeeProviderAuthority;
     
     synchronized void updatePayeeProviderAuthority(UrlHolder urlHolder) throws IOException {
         payeeProviderAuthority = new Authority(getData(urlHolder), urlHolder.getUrl());
@@ -318,6 +318,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                 debugData.acquirerMode = true;
                 debugData.acquirerAuthority = acquirerAuthority.getRoot();
             }
+        } else if (urlHolder.getUrl() == null) {
+            urlHolder.setUrl(payeeProviderAuthority.getTransactionUrl());
         }
 
         JSONObjectWriter finalizeRequest =

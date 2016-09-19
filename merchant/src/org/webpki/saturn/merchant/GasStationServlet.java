@@ -36,13 +36,15 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
     static Logger logger = Logger.getLogger(GasStationServlet.class.getName ());
     
     static final long STANDARD_RESERVATION_AMOUNT_X_100 = 20000;
+
+    static final String FUEL_TYPE_FIELD                 = "fueltype";
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
             return;
-         }
+        }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
         session.setAttribute(RESERVE_MODE_SESSION_ATTR, true);
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
@@ -56,7 +58,7 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
             return;
-         }
-        HTML.gasFillingPage(response);
+        }
+        HTML.gasFillingPage(response, FuelTypes.valueOf(FuelTypes.class, request.getParameter(FUEL_TYPE_FIELD)));
     }
 }

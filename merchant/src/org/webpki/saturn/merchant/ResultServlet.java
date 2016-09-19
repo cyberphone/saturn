@@ -87,6 +87,7 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
                                                reserveOrBasicResponse.getPayerAccountType().isCardPayment(),
                                                debugData);
             HTML.gasStationResultPage(response,
+                                      FuelTypes.valueOf(FuelTypes.class, request.getParameter(GasStationServlet.FUEL_TYPE_FIELD)),
                                       debugData != null,
                                       resultData);
         } catch (Exception e) {

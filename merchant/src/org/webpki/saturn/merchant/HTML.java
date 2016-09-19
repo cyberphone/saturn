@@ -17,16 +17,20 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
+
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -80,7 +84,7 @@ public class HTML implements MerchantProperties {
             + "left:15px;z-index:5;visibility:visible;padding:5pt 8pt 5pt 8pt;font-size:10pt;"
             + "text-align:center;background: radial-gradient(ellipse at center, rgba(255,255,255,1) "
             + "0%,rgba(242,243,252,1) 38%,rgba(196,210,242,1) 100%);border-radius:8pt;border-width:1px;"
-            + "border-style:solid;border-color:#B0B0B0;box-shadow:3pt 3pt 3pt #D0D0D0;}\">"
+            + "border-style:solid;border-color:#B0B0B0;box-shadow:3pt 3pt 3pt #D0D0D0}\">"
             + "Saturn<br><span style=\"font-size:8pt\">Payment Demo</span></div>"
             + "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
          .append(box)
@@ -541,10 +545,13 @@ public class HTML implements MerchantProperties {
     }
 
     static void gasStationResultPage(HttpServletResponse response,
+                                     FuelTypes fuelType,
                                      boolean debugMode,
                                      ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer()
-            .append(gasStation("Receipt"))
+            .append(gasStation("Thank You - Welcome Back!"))
+            .append(selectionButtons(new FuelTypes[]{fuelType}))
+            .append("<tr><td style=\"height:15pt\"></td></tr>")
             .append(receiptCore(resultData, debugMode))
             .append("</table></td></tr></table></td></tr>");
         HTML.output(response, 
@@ -609,12 +616,16 @@ public class HTML implements MerchantProperties {
     static String gasStation(String header) {
         return new StringBuffer(
               "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-              "<table border='1'>" +
-              "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
-              + FONT_ARIAL + "\">" + header + "<br>&nbsp;</td></tr>").toString();
+              "<table>" +
+              "<tr><td id=\"phase\" style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:11pt;font-family:"
+              + FONT_ARIAL + "\">" + header + "</td></tr>").toString();
 
     }
-    static String cometJavaScriptSupport(String id, HttpServletRequest request, String returnAction, String successAction) {
+    static String cometJavaScriptSupport(String id, 
+                                         HttpServletRequest request,
+                                         String returnAction,
+                                         String progressAction,
+                                         String successAction) {
         return new StringBuffer(
             "\"use strict\";\n" +
             STICK_TO_HOME_URL +
@@ -647,7 +658,9 @@ public class HTML implements MerchantProperties {
             "  }).then(function (resultData) {\n" +
             "    console.log('Response', resultData);\n" +
             "    switch (resultData) {\n" +
-            "      case '" + QRSessions.QR_PROGRESS + "':\n" +
+            "      case '" + QRSessions.QR_PROGRESS + "':\n")
+        .append(progressAction)
+        .append(
             "        setQRDisplay(false);\n" +
             "      case '" + QRSessions.QR_CONTINUE + "':\n" +
             "        startComet();\n" +
@@ -700,21 +713,70 @@ public class HTML implements MerchantProperties {
                                  HttpServletRequest request,
                                  String id) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
-            cometJavaScriptSupport(id, request, "document.forms.restore.submit()", "document.location.href = 'result'"),
+            cometJavaScriptSupport(id, request, "document.forms.restore.submit()", "", "document.location.href = 'result'"),
             bodyStartQR("<form name=\"restore\" method=\"POST\" action=\"shop\"></form>"),
             currentOrder(savedShoppingCart).toString() +
             bodyEndQR(qrImage, true)));
+    }
+    
+    static String selectionButtons(FuelTypes[] fuelTypes) throws IOException {
+        StringBuffer s = new StringBuffer("<tr><td><table cellpadding=\"0\" cellspacing=\"0\" align=\"center\">" +
+                                          "<tr style=\"text-align:center;font-size:11pt\"><td>Fuel Type</td><td>Price/Litre</td></tr>");
+        for (FuelTypes fuelType : fuelTypes) {
+            s.append("<tr id=\"")
+             .append(fuelType.toString())
+             .append(".\"><td style=\"height:6pt\"></td></tr><tr id=\"")
+             .append(fuelType.toString())
+             .append("\" style=\"box-shadow:3pt 3pt 3pt #D0D0D0;text-align:center;background-color:")
+             .append(fuelType.color);
+            if (fuelTypes.length > 1) {
+                s.append(";cursor:pointer\" onclick=\"selectFuel('")
+                 .append(fuelType.toString())
+                 .append("', this)");
+            }
+            s.append("\"><td style=\"font-size:11pt;font-family:" + FONT_ARIAL + ";padding:6pt;min-width:10em\">")
+             .append(fuelType.commonName)
+             .append("</td><td style=\"font-size:11pt;font-family:" + FONT_ARIAL + ";padding:6pt 12pt 6pt 12pt\">")
+             .append(fuelType.displayPrice())
+             .append("</td></tr>");
+        }
+        return s.append("</table></td></tr>").toString();
     }
 
     static void printQRCode4GasStation(HttpServletResponse response,
                                        byte[] qrImage,
                                        HttpServletRequest request,
                                        String id) throws IOException, ServletException {
+        StringBuffer s = new StringBuffer("function selectFuel(fuelType, element) {\n");
+        for (FuelTypes fuelType : FuelTypes.values()) {
+            s.append("  if (fuelType == '")
+             .append(fuelType.toString())
+             .append("') {\n" +
+             "    document.getElementById('" + GasStationServlet.FUEL_TYPE_FIELD + "').value = fuelType;\n" +
+             "    element.style.cursor = 'default';\n" +
+             "   } else {\n" +
+             "    document.getElementById('")
+             .append(fuelType.toString())
+             .append("').style.display = 'none';\n" +
+             "    document.getElementById('")
+            .append(fuelType.toString())
+            .append(".').style.display = 'none';\n" +
+            "}\n");
+        }
         HTML.output(response, HTML.getHTML(
-            cometJavaScriptSupport(id, request, "document.location.href='home'", "document.forms.fillgas.submit()"),
-            bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\"></form>"),
-            gasStation("Select Fuel + Authorize Payment") +
-            "<tr><td><input type=\"button\" value=\"Select\" onclick=\"setQRDisplay(true)\"></td></tr>" +
+            cometJavaScriptSupport(id, request, 
+                                  "document.location.href='home'",
+                                  "      document.getElementById('phase').innerHTML = '3. Waiting For User Autorization...';\n",
+                                  "document.forms.fillgas.submit()") +
+            s.append(
+            "  setQRDisplay(true);\n" +
+            "  document.getElementById('phase').innerHTML = '2. Initiate Payment';\n" +
+            "}\n").toString(),
+            bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\">" +
+                        "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
+                        "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\"></form>"),
+            gasStation("1. Select Fuel Type") +
+            selectionButtons(FuelTypes.values()) +
             bodyEndQR(qrImage, false)));
     }
 
@@ -750,12 +812,20 @@ public class HTML implements MerchantProperties {
             "</table></td></tr>"));       
     }
 
-    static void gasFillingPage(HttpServletResponse response) throws IOException, ServletException {
+    static void gasFillingPage(HttpServletResponse response, FuelTypes fuelType) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
-            STICK_TO_HOME_URL, 
-            ">" + GAS_PUMP_LOGO + "><form name=\"finish\" action=\"result\" method=\"POST\"></form",
-            gasStation("Fill Tank") +
-            "<tr><td><input type=\"button\" value=\"Finish\" onclick=\"document.forms.finish.submit()\"></td></tr>" +
+            STICK_TO_HOME_URL +
+            "function doneFilling() {\n" +
+            "  document.getElementById('" + GasStationServlet.FUEL_TYPE_FIELD + "').value = '" + fuelType.toString() + "';\n" +
+            "  document.forms.finish.submit();\n" +
+            "}\n", 
+            ">" + GAS_PUMP_LOGO + "><form name=\"finish\" action=\"result\" method=\"POST\">" +
+            "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
+            "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\">" +
+            "</form",
+            gasStation("4. Fill Tank") +
+            selectionButtons(new FuelTypes[]{fuelType}) +
+            "<tr><td><input type=\"button\" value=\"Finish\" onclick=\"doneFilling()\"></td></tr>" +
             "</table></td></tr>"));
     }
 
