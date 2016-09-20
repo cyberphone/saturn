@@ -24,18 +24,18 @@ import org.webpki.saturn.common.Currencies;
 
 public enum FuelTypes implements Serializable {
 
-    STD_95E    ("Standard 95E",      135, "#c8e3ff"), 
-    BIO_DIESEL ("Bio Diesel",        104, "#ddfca9"),
-    NITRO      ("Nitro Racing Fuel", 628, "#f2ddbf");
+    STD_95E    ("Standard 95E",      135, "linear-gradient(to bottom, #3ab6e8 0%,#8fd6e8 35%,#a7dfed 65%,#3ab6e8 100%)"), 
+    BIO_DIESEL ("Bio Diesel",        104, "linear-gradient(to bottom, #98e524 0%,#d2ff52 40%,#d2ff52 60%,#98e524 100%)"),
+    NITRO      ("Nitro Racing Fuel", 628, "linear-gradient(to bottom, #fb9d23 0%,#ffc578 35%,#ffc578 65%,#fb9d23 100%)");
 
     String commonName;
     int pricePerLitreX100;
-    String color;
+    String background;
 
-    FuelTypes (String commonName, int pricePerLitreX100, String color) {
+    FuelTypes (String commonName, int pricePerLitreX100, String background) {
         this.commonName = commonName;
         this.pricePerLitreX100 = pricePerLitreX100;
-        this.color = color;
+        this.background = background;
     }
     
     String displayPrice() throws IOException {

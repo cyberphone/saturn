@@ -29,6 +29,7 @@ import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
 
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.Messages;
 
 import org.webpki.w2nbproxy.ExtensionPositioning;
@@ -44,7 +45,7 @@ public class HTML implements MerchantProperties {
     static final String FONT_VERDANA = "Verdana,'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans'";
     static final String FONT_ARIAL = "Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans'";
     
-    static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" title=\"For showing context\" style=\"width:50pt;position:absolute;right:10pt;top:10pt\"";
+    static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" title=\"For showing context\" style=\"width:30pt;position:absolute;right:10pt;top:10pt\"";
     
     static final String HTML_INIT = 
         "<!DOCTYPE html>"+
@@ -84,7 +85,7 @@ public class HTML implements MerchantProperties {
             + "left:15px;z-index:5;visibility:visible;padding:5pt 8pt 5pt 8pt;font-size:10pt;"
             + "text-align:center;background: radial-gradient(ellipse at center, rgba(255,255,255,1) "
             + "0%,rgba(242,243,252,1) 38%,rgba(196,210,242,1) 100%);border-radius:8pt;border-width:1px;"
-            + "border-style:solid;border-color:#B0B0B0;box-shadow:3pt 3pt 3pt #D0D0D0}\">"
+            + "border-style:solid;border-color:#B0B0B0;box-shadow:3pt 3pt 3pt #D0D0D0;}\">"
             + "Saturn<br><span style=\"font-size:8pt\">Payment Demo</span></div>"
             + "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
          .append(box)
@@ -661,7 +662,7 @@ public class HTML implements MerchantProperties {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>");
         if (visiblePumpDisplay) {
             s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table title=\"This is [sort of] a pump display\"><tr>"+
-                     "<td align=\"center\" style=\"background-color:grey;border-radius:4pt\">" +
+                     "<td align=\"center\" style=\"box-shadow:5pt 5pt 5pt #c0c0c0;background:linear-gradient(135deg, #516287 0%,#5697e2 71%,#5697e2 71%,#516287 100%);border-radius:4pt\">" +
                      "<div style=\"padding:3pt;font-size:12pt;color:white\">Pump O'Matic</div>")
              .append(pumpDisplay(3, 1, "Volume", "Litres", "pvol"))
              .append(pumpDisplay(3, 2, "To Pay", "$", "ppri"))
@@ -781,8 +782,8 @@ public class HTML implements MerchantProperties {
              .append(fuelType.toString())
              .append(".\"><td style=\"height:6pt\"></td></tr><tr title=\"Selected fuel type\" id=\"")
              .append(fuelType.toString())
-             .append("\" style=\"box-shadow:3pt 3pt 3pt #D0D0D0;text-align:center;background-color:")
-             .append(fuelType.color);
+             .append("\" style=\"box-shadow:3pt 3pt 3pt #D0D0D0;text-align:center;background:")
+             .append(fuelType.background);
             if (fuelTypes.length > 1) {
                 s.append(";cursor:pointer\" onclick=\"selectFuel('")
                  .append(fuelType.toString())
@@ -820,8 +821,8 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(
             cometJavaScriptSupport(id, request, 
                                   "document.location.href='home'",
-                                  "      document.getElementById('phase').innerHTML = '3. Waiting For User Authorization...<br>" +
-                                  "<span style=\"font-size:8pt;font-weight:normal;font-family:verdana;position:relative;top:2pt\">(using the mobile device)</span>';\n",
+                                  "      document.getElementById('phase').innerHTML = '3. Waiting For User Authorization...';\n" +
+                                  "      document.getElementById('authtext').style.display = 'table-row';\n",
                                   "document.forms.fillgas.submit()") +
             s.append(
             "  setQRDisplay(true);\n" +
@@ -831,6 +832,12 @@ public class HTML implements MerchantProperties {
                         "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
                         "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\"></form>"),
             gasStation("1. Select Fuel Type", false) +
+            "<tr id=\"authtext\" style=\"display:none\"><td style=\"width:40em;padding-bottom:15pt\">Since the quantity of fuel is usually not known in an advance, " +
+            "automated fueling stations require <i>pre-authorization</i> of a fixed maximum amount of money (" +
+            Currencies.USD.amountToDisplayString(new BigDecimal(GasStationServlet.STANDARD_RESERVATION_AMOUNT_X_100 / 100), true) +
+            " in the demo), while only the actual amount " +
+            "needed is eventually withdrawn from the client's account. This should be reflected in the Wallet's " +
+            "authorization display as well.</td></tr>" +
             selectionButtons(FuelTypes.values()) +
             bodyEndQR(qrImage, false)));
     }
@@ -878,7 +885,7 @@ public class HTML implements MerchantProperties {
             "    clearInterval(timer);\n" +
             "    doneFilling();\n" +
             "  } else {\n" +
-            "    document.getElementById('cmd').value = '\u00a0\u00a0\u00a0Click when you have finished pumping...\u00a0\u00a0\u00a0';\n" +
+            "    document.getElementById('cmd').value = '\u00a0\u00a0\u00a0Click here to \"simulate\" that you have finished pumping...\u00a0\u00a0\u00a0';\n" +
             "    timer = setInterval(function () {\n" +
             "      updatePumpDisplay(++decilitres);\n" +
             "      if (decilitres == " + maxVolume + ") {\n" +
@@ -901,7 +908,7 @@ public class HTML implements MerchantProperties {
             "</form",
             gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
-            "<tr><td style=\"padding-top:20pt\" align=\"center\"><input id=\"cmd\" type=\"button\" style=\"min-width:12em;font-size:11pt\" value=\"Start pumping!\" onclick=\"execute()\"></td></tr>" +
+            "<tr><td style=\"padding-top:20pt\" align=\"center\"><input id=\"cmd\" type=\"button\" style=\"min-width:12em;font-size:11pt;padding:4pt\" value=\"Start pumping!\" onclick=\"execute()\"></td></tr>" +
             "</table></td></tr>"));
     }
 
