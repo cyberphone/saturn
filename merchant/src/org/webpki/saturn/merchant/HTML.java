@@ -880,17 +880,23 @@ public class HTML implements MerchantProperties {
             updatePumpDisplay(fuelType) +
             "var decilitres = 0;\n" +
             "var timer = null;\n" +
+            "function finishPumping() {\n" +
+            "  clearInterval(timer);\n" +
+            "  document.getElementById('pumpbtn').innerHTML = 'Please wait while we are finalizing the payment...';\n" +
+            "  setTimeout(function() {\n" +
+            "    doneFilling();\n" +
+            "  }, 5000);\n" +
+            "}\n" +
             "function execute() {\n" +
             "  if (timer) {\n"+
-            "    clearInterval(timer);\n" +
-            "    doneFilling();\n" +
+            "    finishPumping();\n" +
             "  } else {\n" +
+            "    document.getElementById('waiting').style.display = 'table-row';\n" +
             "    document.getElementById('cmd').value = '\u00a0\u00a0\u00a0Click here to \"simulate\" that you have finished pumping...\u00a0\u00a0\u00a0';\n" +
             "    timer = setInterval(function () {\n" +
             "      updatePumpDisplay(++decilitres);\n" +
             "      if (decilitres == " + maxVolume + ") {\n" +
-            "        clearInterval(timer);\n" +
-            "        doneFilling();\n" +
+            "        finishPumping();\n" +
             "      }\n" +
             "    }, 100);\n" +
             "  }\n" +
@@ -908,7 +914,8 @@ public class HTML implements MerchantProperties {
             "</form",
             gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
-            "<tr><td style=\"padding-top:20pt\" align=\"center\"><input id=\"cmd\" type=\"button\" style=\"min-width:12em;font-size:11pt;padding:4pt\" value=\"Start pumping!\" onclick=\"execute()\"></td></tr>" +
+            "<tr><td style=\"padding-top:20pt;font-size:11pt;font-family:" + FONT_ARIAL + "\" align=\"center\" id=\"pumpbtn\"><input id=\"cmd\" type=\"button\" style=\"min-width:12em;font-size:11pt;padding:4pt\" value=\"Start pumping!\" onclick=\"execute()\"></td></tr>" +
+            "<tr id=\"waiting\" style=\"display:none\"><td style=\"padding-top:20pt\" align=\"center\"><img title=\"Something is running...\" src=\"images/waiting.gif\"></td></tr>" +
             "</table></td></tr>"));
     }
 
