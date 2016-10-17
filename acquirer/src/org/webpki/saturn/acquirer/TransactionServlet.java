@@ -35,7 +35,7 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.FinalizeCardpayResponse;
-import org.webpki.saturn.common.MerchantAccountEntry;
+import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.FinalizeRequest;
 
@@ -101,14 +101,14 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
             // Verify that the merchant is one of our customers
             Payee payee = finalizeRequest.getPayee();
-            MerchantAccountEntry merchantAccountEntry = AcquirerService.merchantAccountDb.get(payee.getId());
-            if (merchantAccountEntry == null) {
+            PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
+            if (merchantProperties == null) {
                 throw new IOException("Unknown merchant Id: " + payee.getId());
             }
-            if (!merchantAccountEntry.getPublicKey().equals(finalizeRequest.getPublicKey())) {
+            if (!merchantProperties.getPublicKey().equals(finalizeRequest.getPublicKey())) {
                 throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
             }
-            if (!finalizeRequest.getMerchantKeyIssuer().equals(merchantAccountEntry.getIssuer())) {
+            if (!finalizeRequest.getMerchantKeyIssuer().equals(merchantProperties.getIssuer())) {
                 throw new IOException("Non-matching issuer for merchant Id: " + payee.getId());
             }
 

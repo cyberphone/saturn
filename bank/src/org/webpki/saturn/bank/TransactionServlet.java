@@ -51,7 +51,7 @@ import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.FinalizeTransactionRequest;
 import org.webpki.saturn.common.FinalizeTransactionResponse;
 import org.webpki.saturn.common.ChallengeField;
-import org.webpki.saturn.common.MerchantAccountEntry;
+import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.FinalizeRequest;
@@ -333,11 +333,11 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         PaymentRequest paymentRequest = attestedPaymentRequest.getPaymentRequest();
 
         // Verify that the merchant's signature belongs to a for us known merchant
-        MerchantAccountEntry merchantAccountEntry = BankService.merchantAccountDb.get(paymentRequest.getPayee().getId());
-        if (merchantAccountEntry == null) {
+        PayeeCoreProperties merchantProperties = BankService.merchantAccountDb.get(paymentRequest.getPayee().getId());
+        if (merchantProperties == null) {
             throw new IOException("Unknown merchant: " + paymentRequest.getPayee().writeObject().toString());
         }
-        if (!merchantAccountEntry.getPublicKey().equals(paymentRequest.getPublicKey())) {
+        if (!merchantProperties.getPublicKey().equals(paymentRequest.getPublicKey())) {
             throw new IOException("Public key doesn't match merchant: " + paymentRequest.getPayee().writeObject().toString());
         }
 

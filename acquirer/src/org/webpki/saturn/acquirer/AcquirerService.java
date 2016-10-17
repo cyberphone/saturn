@@ -49,7 +49,7 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.Expires;
-import org.webpki.saturn.common.MerchantAccountEntry;
+import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerX509Signer;
 
@@ -76,7 +76,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
 
-    static LinkedHashMap<String,MerchantAccountEntry> merchantAccountDb = new LinkedHashMap<String,MerchantAccountEntry>();
+    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb = new LinkedHashMap<String,PayeeCoreProperties>();
 
     static JSONX509Verifier paymentRoot;
 
@@ -129,7 +129,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                     ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
-                MerchantAccountEntry account = new MerchantAccountEntry(accounts.getObject());
+                PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
                 merchantAccountDb.put(account.getId(), account);
             }
 

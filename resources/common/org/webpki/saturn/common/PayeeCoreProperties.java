@@ -22,13 +22,13 @@ import java.security.PublicKey;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONSignatureDecoder;
 
-public class MerchantAccountEntry implements BaseProperties {
+public class PayeeCoreProperties implements BaseProperties {
     PublicKey publicKey;
     String commonName;
     String id;
     String issuer;
 
-    public MerchantAccountEntry(JSONObjectReader rd) throws IOException {
+    public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
         commonName = rd.getObject(PAYEE_JSON).getString(COMMON_NAME_JSON);
         id = rd.getObject(PAYEE_JSON).getString(ID_JSON);
         publicKey = rd.getPublicKey();

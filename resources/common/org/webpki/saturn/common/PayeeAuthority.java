@@ -33,11 +33,12 @@ import org.webpki.json.JSONSignatureTypes;
 public class PayeeAuthority implements BaseProperties {
 
     public static JSONObjectWriter encode(String providerAuthorityUrl,
+                                          Payee payee,
                                           PublicKey payeePublicKey,
                                           Date expires,
                                           ServerX509Signer attestSigner) throws IOException {
-        return Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
-            .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
+        return payee.writeObject(Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
+                                     .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
             .setPublicKey(payeePublicKey, AlgorithmPreferences.JOSE)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
@@ -47,6 +48,7 @@ public class PayeeAuthority implements BaseProperties {
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         Messages.parseBaseMessage(Messages.PAYEE_AUTHORITY, root = rd);
         providerAuthorityUrl = rd.getString(TRANSACTION_URL_JSON);
+        payee = new Payee(rd);
         payeePublicKey = rd.getPublicKey(AlgorithmPreferences.JOSE);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
@@ -58,6 +60,11 @@ public class PayeeAuthority implements BaseProperties {
     String providerAuthorityUrl;
     public String getProviderAuthorityUrl() {
         return providerAuthorityUrl;
+    }
+
+    Payee payee;
+    public Payee getPayee() {
+        return payee;
     }
 
     PublicKey payeePublicKey;

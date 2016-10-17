@@ -64,14 +64,14 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         // Create a signed payment request for each payment network
          for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
             JSONObjectWriter paymentRequest =
-                    PaymentRequest.encode(Payee.init(MerchantService.merchantCommonName, paymentNetwork.merchantId),
-                                          new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount), 2),
-                                          MerchantService.currency,
-                                          optionalNonDirectPayment,
-                                          currentReferenceId,
-                                          timeStamp,
-                                          expires,
-                                          paymentNetwork.signer);
+                PaymentRequest.encode(new Payee(MerchantService.merchantCommonName, paymentNetwork.merchantId),
+                                      new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount), 2),
+                                      MerchantService.currency,
+                                      optionalNonDirectPayment,
+                                      currentReferenceId,
+                                      timeStamp,
+                                      expires,
+                                      paymentNetwork.signer);
             paymentNetworksArray.setObject()
                 .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, paymentNetwork.acceptedAccountTypes)
                 .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
