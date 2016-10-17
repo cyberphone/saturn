@@ -47,7 +47,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.Authority;
+import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.MerchantAccountEntry;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -138,7 +138,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             
             String aquirerHost = getPropertyString(ACQUIRER_HOST);
             publishedAuthorityData =
-                Authority.encode(aquirerHost + "/authority",
+                ProviderAuthority.encode(aquirerHost + "/authority",
                                  aquirerHost + "/transact",
                                  decryptionKeys.get(0).getPublicKey(),
                                  Expires.inDays(365),

@@ -50,7 +50,7 @@ import org.webpki.webutil.ServletUtil;
 
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.Authority;
+import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.FinalizeCreditResponse;
@@ -125,10 +125,10 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         return fetchJSONData(wrap, urlHolder);
     }
 
-    static Authority payeeProviderAuthority;
+    static ProviderAuthority payeeProviderAuthority;
     
     synchronized void updatePayeeProviderAuthority(UrlHolder urlHolder) throws IOException {
-        payeeProviderAuthority = new Authority(getData(urlHolder), urlHolder.getUrl());
+        payeeProviderAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
         // Verify that the claimed authority belongs to a known payment provider network
         payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
     }
@@ -312,7 +312,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
         if (acquirerBased) {
             // Lookup of configured acquirer authority.  This information is preferably cached
             urlHolder.setUrl(MerchantService.acquirerAuthorityUrl);
-            Authority acquirerAuthority = new Authority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
+            ProviderAuthority acquirerAuthority = new ProviderAuthority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
             urlHolder.setUrl(acquirerAuthority.getTransactionUrl());
             if (debugData != null) {
                 debugData.acquirerMode = true;

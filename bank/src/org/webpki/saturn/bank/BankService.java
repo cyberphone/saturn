@@ -49,7 +49,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.Authority;
+import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.MerchantAccountEntry;
@@ -175,7 +175,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             String bankHost = getPropertyString(BANK_HOST);
             publishedAuthorityData =
-                Authority.encode(authorityUrl = bankHost + "/authority",
+                ProviderAuthority.encode(authorityUrl = bankHost + "/authority",
                                  bankHost + "/transact",
                                  decryptionKeys.get(0).getPublicKey(),
                                  Expires.inDays(365),

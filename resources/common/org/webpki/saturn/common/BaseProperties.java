@@ -75,7 +75,7 @@ public interface BaseProperties {
     String REQUEST_HASH_JSON                = "requestHash";
     String DOMAIN_NAME_JSON                 = "domainName";
     String SIGNATURE_ALGORITHM_JSON         = "signatureAlgorithm";
-    String KEY_ENCRYPTION_ALGORITHM_JSON    = "keyEncryptionAlgorithm";     // For "Authority" encryption key
+    String KEY_ENCRYPTION_ALGORITHM_JSON    = "keyEncryptionAlgorithm";     // For "ProviderAuthority" encryption key
     String DATA_ENCRYPTION_ALGORITHM_JSON   = "dataEncryptionAlgorithm";    //    -"-
     String ENCRYPTION_PARAMETERS_JSON       = "encryptionParameters";       //    -"-
     String SOFTWARE_JSON                    = "software";

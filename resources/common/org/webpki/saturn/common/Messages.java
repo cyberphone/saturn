@@ -81,8 +81,10 @@ public enum Messages {
                                    true, false),
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    AUTHORITY                     ("Authority");                     // Published entity data
+    PROVIDER_AUTHORITY            ("ProviderAuthority"),             // Published provider entity data
     
+    PAYEE_AUTHORITY               ("PayeeAuthority");                // Published Payee entity data
+
     String qualifier;
     
     Boolean cardPayment;

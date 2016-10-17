@@ -92,8 +92,8 @@
     </servlet>
 
     <servlet>
-        <servlet-name>AuthorityPublisherServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.bank.AuthorityPublisherServlet</servlet-class>
+        <servlet-name>ProviderAuthorityServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.ProviderAuthorityServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -102,7 +102,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>AuthorityPublisherServlet</servlet-name>
+        <servlet-name>ProviderAuthorityServlet</servlet-name>
         <url-pattern>/authority</url-pattern>
     </servlet-mapping>
 

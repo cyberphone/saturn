@@ -222,12 +222,12 @@ class DebugPrintout implements BaseProperties {
 
         description(point +
             "<p>After receiving the <b>Wallet</b> response, the <b>Merchant</b> uses the supplied " +
-             keyWord(PROVIDER_AUTHORITY_URL_JSON) + " to retrieve the associated " + keyWord(Messages.AUTHORITY.toString()) +
+             keyWord(PROVIDER_AUTHORITY_URL_JSON) + " to retrieve the associated " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
              " object of the <b>Bank</b> claimed to be the user's account holder for the selected card:</p>");
 
         fancyBox(debugData.providerAuthority);
 
-        descriptionStdMargin("An " + keyWord(Messages.AUTHORITY.toString()) + 
+        descriptionStdMargin("An " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + 
             " is a long-lived object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
             "has the following tasks:<ul>" +
             "<li>Provide credentials of an entity allowing relying parties verifying such before interacting with the entity</li>" +
@@ -236,7 +236,7 @@ class DebugPrintout implements BaseProperties {
             "<li>Publish and attest the entity's current encryption key and parameters</li></ul>" +
             point +
             "<p>Now the <b>Merchant</b> creates a <i>signed</i> request and sends it to the " + keyWord(TRANSACTION_URL_JSON) +
-            " extracted from the " + keyWord(Messages.AUTHORITY.toString()) + " object.&nbsp;&nbsp;" +
+            " extracted from the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.&nbsp;&nbsp;" +
             "Since the <b>Wallet</b> response is encrypted, the <b>Merchant</b> needs to prove to the <b>Bank</b> " +
             "that it knows the embedded " + keyWord(PAYMENT_REQUEST_JSON) + " which it does through the " + keyWord(REQUEST_HASH_JSON) +
             " construct and " + keyWord(REFERENCE_ID_JSON) + " which must match the hash of the request and property respectively" +
@@ -278,7 +278,7 @@ class DebugPrintout implements BaseProperties {
                      "<p>For finalization of the payment, the <b>Merchant</b> sets an " + keyWord(AMOUNT_JSON) + 
                      " which must be <i>equal or lower</i> than in the original request, <i>counter-signs</i> the request, " +
                      "and sends it to the " + (debugData.acquirerMode ? keyWord(TRANSACTION_URL_JSON) +
-                     " retrievable from the <b>Acquirer</b> " + keyWord(Messages.AUTHORITY.toString()) + " object:" :
+                     " retrievable from the <b>Acquirer</b> " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object:" :
                      "<b>Bank</b> again:</p>"));
 
                 fancyBox(debugData.finalizeRequest);

@@ -35,32 +35,32 @@ import org.webpki.json.JSONSignatureTypes;
 import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
-public class Authority implements BaseProperties {
+public class ProviderAuthority implements BaseProperties {
 
     public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
 
     public static JSONObjectWriter encode(String authorityUrl,
                                           String transactionUrl,
-                                          PublicKey publicKey,
+                                          PublicKey encryptionPublicKey,
                                           Date expires,
                                           ServerX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(Messages.AUTHORITY)
+        return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
             .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(TRANSACTION_URL_JSON, transactionUrl)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                 .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
                 .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
-                             (publicKey instanceof RSAPublicKey ?
+                             (encryptionPublicKey instanceof RSAPublicKey ?
                KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
-                .setPublicKey(publicKey, AlgorithmPreferences.JOSE))
+                .setPublicKey(encryptionPublicKey, AlgorithmPreferences.JOSE))
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
             .setSignature(signer);
     }
 
-    public Authority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
-        Messages.parseBaseMessage(Messages.AUTHORITY, root = rd);
+    public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
+        Messages.parseBaseMessage(Messages.PROVIDER_AUTHORITY, root = rd);
         httpVersion = rd.getString(HTTP_VERSION_JSON);
         if (!httpVersion.equals(HTTP_VERSION_SUPPORT)) {
             throw new IOException("\"" + HTTP_VERSION_JSON + "\" is currently limited to " + HTTP_VERSION_SUPPORT);
@@ -76,7 +76,7 @@ public class Authority implements BaseProperties {
             .getAlgorithmFromString(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
         keyEncryptionAlgorithm = KeyEncryptionAlgorithms
             .getAlgorithmFromString(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
-        publicKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
+        encryptionPublicKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -109,9 +109,9 @@ public class Authority implements BaseProperties {
         return keyEncryptionAlgorithm;
     }
 
-    PublicKey publicKey;
-    public PublicKey getPublicKey() {
-        return publicKey;
+    PublicKey encryptionPublicKey;
+    public PublicKey getEncryptionPublicKey() {
+        return encryptionPublicKey;
     }
 
     GregorianCalendar expires;

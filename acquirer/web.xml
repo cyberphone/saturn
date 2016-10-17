@@ -63,8 +63,8 @@
     </listener>
 
     <servlet>
-        <servlet-name>AuthorityPublisherServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.acquirer.AuthorityPublisherServlet</servlet-class>
+        <servlet-name>ProviderAuthorityServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.acquirer.ProviderAuthorityServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -73,7 +73,7 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>AuthorityPublisherServlet</servlet-name>
+        <servlet-name>ProviderAuthorityServlet</servlet-name>
         <url-pattern>/authority</url-pattern>
     </servlet-mapping>
 

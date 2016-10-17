@@ -14,11 +14,9 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.acquirer;
+package org.webpki.saturn.bank;
 
 import java.io.IOException;
-
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 
@@ -28,18 +26,16 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.saturn.common.BaseProperties;
 
-//This servlet publishes the Acquirer (Card-Processor) "Authority" object.
+//This servlet publishes the Payment Provider (Bank) "ProviderAuthority" object.
 
-public class AuthorityPublisherServlet extends HttpServlet {
+public class ProviderAuthorityServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
-    
-    static Logger logger = Logger.getLogger(AuthorityPublisherServlet.class.getCanonicalName());
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(AcquirerService.publishedAuthorityData);
+        response.getOutputStream().write(BankService.publishedAuthorityData);
     }
 }

@@ -46,15 +46,15 @@ public class ReserveOrBasicRequest implements BaseProperties {
         message = Messages.parseBaseMessage(valid, root = rd);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
-        encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
-        clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
+        encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         if (message.isCardPayment()) {
             acquirerAuthorityUrl = rd.getString(ACQUIRER_AUTHORITY_URL_JSON);
         }
         if (!message.isBasicCredit()) {
             expires = rd.getDateTime(EXPIRES_JSON);
         }
+        clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         rd.checkForUnread();
@@ -117,16 +117,16 @@ public class ReserveOrBasicRequest implements BaseProperties {
             accountType.isCardPayment() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
-            .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
-            .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root);
+            .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
+            .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);
         if (accountType.isCardPayment()) {
             wr.setString(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
         }
         if (!basicCredit) {
             wr.setDateTime(EXPIRES_JSON, expires, true);
         }
-        return wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
+        return wr.setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
+                 .setDateTime(TIME_STAMP_JSON, new Date(), true)
                  .setSignature(signer);
     }
 

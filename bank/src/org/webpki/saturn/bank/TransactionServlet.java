@@ -52,7 +52,7 @@ import org.webpki.saturn.common.FinalizeTransactionRequest;
 import org.webpki.saturn.common.FinalizeTransactionResponse;
 import org.webpki.saturn.common.ChallengeField;
 import org.webpki.saturn.common.MerchantAccountEntry;
-import org.webpki.saturn.common.Authority;
+import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.AccountDescriptor;
@@ -193,8 +193,8 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         return "#" + (BankService.referenceId++);
     }
     
-    static Authority getAuthority(UrlHolder urlHolder) throws IOException {
-        return new Authority(getData(urlHolder), urlHolder.getUrl());
+    static ProviderAuthority getAuthority(UrlHolder urlHolder) throws IOException {
+        return new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
     }
     
     String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
@@ -286,7 +286,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
             // Lookup of payee's acquirer.  You would typically cache such information
             urlHolder.setUrl(reserveOrBasicRequest.getAcquirerAuthorityUrl());
-            Authority acquirerAuthority = getAuthority(urlHolder);
+            ProviderAuthority acquirerAuthority = getAuthority(urlHolder);
 
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
@@ -297,7 +297,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
             encryptedCardData = new JSONObjectWriter()
                 .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                      acquirerAuthority.getDataEncryptionAlgorithm(),
-                                     acquirerAuthority.getPublicKey(),
+                                     acquirerAuthority.getEncryptionPublicKey(),
                                      acquirerAuthority.getKeyEncryptionAlgorithm());
         } else {
             // We simply take the first account in the list
@@ -343,7 +343,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         // Lookup of payer's bank.  You would typically cache such information
         urlHolder.setUrl(attestedPaymentRequest.getProviderAuthorityUrl());
-        Authority providerAuthority = getAuthority(urlHolder);
+        ProviderAuthority providerAuthority = getAuthority(urlHolder);
 
         // We need to separate credit-card and account-2-account payments
         boolean acquirerBased = attestedPaymentRequest.getPayerAccountType().isCardPayment();
@@ -389,7 +389,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
 
         // Lookup of payer's bank.  You would typically cache such information
         urlHolder.setUrl(finalizeRequest.getProviderAuthorityUrl());
-        Authority providerAuthority = getAuthority(urlHolder);
+        ProviderAuthority providerAuthority = getAuthority(urlHolder);
 
         // This message is the one which finally actually lifts money
         urlHolder.setUrl(providerAuthority.getTransactionUrl());
