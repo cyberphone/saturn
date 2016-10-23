@@ -39,7 +39,7 @@ public class KeyProviderInitServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    static Logger log = Logger.getLogger (KeyProviderInitServlet.class.getCanonicalName());
+    static Logger log = Logger.getLogger(KeyProviderInitServlet.class.getCanonicalName());
 
     static final String ANDROID_WEBPKI_VERSION_TAG     = "VER";
     static final String ANDROID_WEBPKI_VERSION_MACRO   = "$VER$";  // KeyGen2 Android PoC

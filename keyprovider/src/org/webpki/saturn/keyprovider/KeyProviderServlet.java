@@ -78,7 +78,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
     private static final long serialVersionUID = 1L;
 
-    static Logger log = Logger.getLogger (KeyProviderServlet.class.getCanonicalName());
+    static Logger log = Logger.getLogger(KeyProviderServlet.class.getCanonicalName());
     
     static String success_image_and_message;
     

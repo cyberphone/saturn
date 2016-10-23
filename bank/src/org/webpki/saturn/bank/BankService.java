@@ -49,6 +49,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
+import org.webpki.saturn.common.PayeeAuthorityList;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -104,6 +105,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static String authorityUrl;
     
     static int referenceId;
+    
+    static PayeeAuthorityList payeeAuthorityList;
     
     static boolean logging;
 
@@ -180,6 +183,12 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                  decryptionKeys.get(0).getPublicKey(),
                                  Expires.inDays(365),
                                  bankKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
+
+            payeeAuthorityList = new PayeeAuthorityList(merchantAccountDb, 
+                                                        bankKey,
+                                                        bankHost + "/payees/",
+                                                        authorityUrl,
+                                                        3600);
 
             logging = getPropertyBoolean(LOGGING);
 

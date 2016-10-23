@@ -34,7 +34,7 @@ public class QRSessions {
         Synchronizer synchronizer;
     }
 
-    private static final Logger logger = Logger.getLogger (QRSessions.class.getCanonicalName());
+    private static final Logger logger = Logger.getLogger(QRSessions.class.getCanonicalName());
 
     private static LinkedHashMap<String,SessionInProgress> currentSessions = new LinkedHashMap<String,SessionInProgress> ();
 

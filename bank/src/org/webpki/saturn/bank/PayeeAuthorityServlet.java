@@ -33,9 +33,17 @@ public class PayeeAuthorityServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
-        response.setHeader("Pragma", "No-Cache");
-        response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(BankService.publishedAuthorityData);
+        String id = request.getPathInfo();
+        if (id != null) {
+            byte[] authorityBlob = BankService.payeeAuthorityList.getAuthorityBlob(id.substring(1));
+            if (authorityBlob != null) {
+                response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
+                response.setHeader("Pragma", "No-Cache");
+                response.setDateHeader("EXPIRES", 0);
+                response.getOutputStream().write(authorityBlob);
+                return;
+            }
+        }
+        response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
 }

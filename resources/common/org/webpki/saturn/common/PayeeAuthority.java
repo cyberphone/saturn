@@ -32,12 +32,14 @@ import org.webpki.json.JSONSignatureTypes;
 
 public class PayeeAuthority implements BaseProperties {
 
-    public static JSONObjectWriter encode(String providerAuthorityUrl,
+    public static JSONObjectWriter encode(String authorityUrl,
+                                          String providerAuthorityUrl,
                                           Payee payee,
                                           PublicKey payeePublicKey,
                                           Date expires,
                                           ServerX509Signer attestSigner) throws IOException {
         return payee.writeObject(Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
+                                     .setString(AUTHORITY_URL_JSON, authorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
             .setPublicKey(payeePublicKey, AlgorithmPreferences.JOSE)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
@@ -47,7 +49,8 @@ public class PayeeAuthority implements BaseProperties {
 
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         Messages.parseBaseMessage(Messages.PAYEE_AUTHORITY, root = rd);
-        providerAuthorityUrl = rd.getString(TRANSACTION_URL_JSON);
+        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
+        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         payee = new Payee(rd);
         payeePublicKey = rd.getPublicKey(AlgorithmPreferences.JOSE);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
@@ -55,6 +58,11 @@ public class PayeeAuthority implements BaseProperties {
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
+    }
+
+    String authorityUrl;
+    public String getAuthorityUrl() {
+        return authorityUrl;
     }
 
     String providerAuthorityUrl;
