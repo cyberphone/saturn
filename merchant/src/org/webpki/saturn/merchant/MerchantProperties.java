@@ -27,6 +27,7 @@ public interface MerchantProperties {
     public String GAS_STATION_SESSION_ATTR      = "GASSTAT";
     public String GAS_STATION_RES_SESSION_ATTR  = "GASRESV";
 
+    public String NATIVE_MODE_SESSION_ATTR      = "nmode";
     public String RESERVE_MODE_SESSION_ATTR     = "rsrvmd";
     public String DEBUG_MODE_SESSION_ATTR       = "debug";
     public String TAP_CONNECT_MODE_SESSION_ATTR = "tapcon";

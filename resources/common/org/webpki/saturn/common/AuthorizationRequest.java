@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
@@ -36,26 +38,21 @@ import org.webpki.json.encryption.DecryptionKeyHolder;
 
 import org.webpki.util.ArrayUtil;
 
-public class ReserveOrBasicRequest implements BaseProperties {
+public class AuthorizationRequest implements BaseProperties {
     
-    static final Messages[] valid = {Messages.BASIC_CREDIT_REQUEST,
-                                     Messages.RESERVE_CREDIT_REQUEST,
-                                     Messages.RESERVE_CARDPAY_REQUEST};
-    
-    public ReserveOrBasicRequest(JSONObjectReader rd) throws IOException {
-        message = Messages.parseBaseMessage(valid, root = rd);
-        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
+    public AuthorizationRequest(JSONObjectReader rd) throws IOException {
+        Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, root = rd);
+        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
-        if (message.isCardPayment()) {
-            acquirerAuthorityUrl = rd.getString(ACQUIRER_AUTHORITY_URL_JSON);
-        } else {
+        if (rd.hasProperty(PAYEE_ACCOUNT_JSON)) {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
-        if (!message.isBasicCredit()) {
-            expires = rd.getDateTime(EXPIRES_JSON);
+        if (rd.hasProperty(AMOUNT_JSON)) {
+            amount = rd.getBigDecimal(AMOUNT_JSON, paymentRequest.currency.getDecimals());
         }
+        referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
@@ -81,26 +78,21 @@ public class ReserveOrBasicRequest implements BaseProperties {
         return accountDescriptor;
     }
 
-    GregorianCalendar expires;
-    public GregorianCalendar getExpires() {
-        return expires;
+    String authorityUrl;
+    public String getAuthorityUrl() {
+        return authorityUrl;
     }
 
-    Messages message;
-    public Messages getMessage() {
-        return message;
+    BigDecimal amount;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
-    String acquirerAuthorityUrl;
-    public String getAcquirerAuthorityUrl() {
-        return acquirerAuthorityUrl;
+    String referenceId;
+    public String getReferenceId() {
+        return referenceId;
     }
 
-    String providerAuthorityUrl;
-    public String getProviderAuthorityUrl() {
-        return providerAuthorityUrl;
-    }
- 
     String clientIpAddress;
     public String getClientIpAddress() {
         return clientIpAddress;
@@ -111,31 +103,28 @@ public class ReserveOrBasicRequest implements BaseProperties {
         return paymentRequest;
     }
 
-    public static JSONObjectWriter encode(boolean basicCredit,
-                                          String providerAuthorityUrl,
+    public static JSONObjectWriter encode(String authorityUrl,
                                           PayerAccountTypes accountType,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          String acquirerAuthorityUrl,
+                                          BigDecimal amount,
                                           AccountDescriptor accountDescriptor,
-                                          Date expires,
+                                          String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
-        JSONObjectWriter wr = Messages.createBaseMessage(basicCredit ? Messages.BASIC_CREDIT_REQUEST : 
-            accountType.isCardPayment() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
-            .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
+        JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST)
+            .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);
-        if (accountType.isCardPayment()) {
-            wr.setString(ACQUIRER_AUTHORITY_URL_JSON, acquirerAuthorityUrl);
-        } else {
+        if (accountDescriptor != null) {
             wr.setObject(PAYEE_ACCOUNT_JSON, accountDescriptor.writeObject());
         }
-        if (!basicCredit) {
-            wr.setDateTime(EXPIRES_JSON, expires, true);
+        if (amount != null) {
+            wr.setBigDecimal(AMOUNT_JSON, amount, paymentRequest.currency.getDecimals());
         }
-        return wr.setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
+        return wr.setString(REFERENCE_ID_JSON, referenceId)
+                 .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
                  .setDateTime(TIME_STAMP_JSON, new Date(), true)
                  .setSignature(signer);
     }

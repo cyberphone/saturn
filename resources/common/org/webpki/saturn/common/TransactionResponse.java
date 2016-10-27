@@ -37,8 +37,6 @@ public class TransactionResponse implements BaseProperties {
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
             encryptedCardData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
-        } else {
-            accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
@@ -55,11 +53,6 @@ public class TransactionResponse implements BaseProperties {
     GregorianCalendar dateTime;
 
     JSONDecryptionDecoder encryptedCardData;
-
-    AccountDescriptor accountDescriptor;
-    public AccountDescriptor getPayeeAccountDescriptor() {
-        return accountDescriptor;
-    }
 
     String referenceId;
     public String getReferenceId() {
@@ -83,7 +76,6 @@ public class TransactionResponse implements BaseProperties {
 
     public static JSONObjectWriter encode(TransactionRequest transactionRequest,
                                           String accountReference,
-                                          AccountDescriptor payeeAccount,
                                           JSONObjectWriter encryptedCardData,
                                           String referenceId,
                                           ServerX509Signer signer) throws IOException {
@@ -92,8 +84,6 @@ public class TransactionResponse implements BaseProperties {
             .setString(ACCOUNT_REFERENCE_JSON, accountReference);
         if (transactionRequest.reserveOrBasicRequest.message.isCardPayment()) {
             wr.setObject(ENCRYPTED_ACCOUNT_DATA_JSON, encryptedCardData);
-        } else {
-            wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
         }
         wr.setString(REFERENCE_ID_JSON, referenceId)
           .setDateTime(TIME_STAMP_JSON, new Date(), true)

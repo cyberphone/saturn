@@ -179,10 +179,12 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             String bankHost = getPropertyString(BANK_HOST);
             publishedAuthorityData =
                 ProviderAuthority.encode(authorityUrl = bankHost + "/authority",
-                                 bankHost + "/transact",
-                                 decryptionKeys.get(0).getPublicKey(),
-                                 Expires.inDays(365),
-                                 bankKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
+                                         bankHost + "/authorize",
+                                         bankHost + "/transact",
+                                         new String[]{"https://swift.com", "https://ultragiro.se"},
+                                         decryptionKeys.get(0).getPublicKey(),
+                                         Expires.inDays(365),
+                                         bankKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
 
             payeeAuthorityList = new PayeeAuthorityList(merchantAccountDb, 
                                                         bankKey,

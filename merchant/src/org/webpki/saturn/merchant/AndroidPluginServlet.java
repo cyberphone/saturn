@@ -127,7 +127,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             TransactionServlet.returnJsonData(response, 
                                               new WalletRequest(session,
                                                                 nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
-                                                                MerchantService.merchantBaseUrl + "/transact",
+                                                                MerchantService.merchantBaseUrl,
                                                                 cancelUrl,
                                                                 successUrl).requestObject);
         } else {

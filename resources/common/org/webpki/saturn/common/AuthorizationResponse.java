@@ -18,29 +18,34 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.Arrays;
+import java.security.GeneralSecurityException;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
 
+import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
 
-public class TransactionRequest implements BaseProperties {
+import org.webpki.json.encryption.DecryptionKeyHolder;
+
+public class AuthorizationResponse implements BaseProperties {
     
     public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
     public static final String SOFTWARE_VERSION = "1.00";
 
-    public TransactionRequest(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, root = rd);
-        reserveOrBasicRequest = new ReserveOrBasicRequest(rd.getObject(EMBEDDED_JSON));
-
-        // Strictly not necessary but it could hold "config" data
-        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-
+    public AuthorizationResponse(JSONObjectReader rd) throws IOException {
+        Messages.parseBaseMessage(Messages.AUTHORIZATION_RESPONSE, root = rd);
+        authorizationRequest = new AuthorizationRequest(rd.getObject(EMBEDDED_JSON));
+        if (authorizationRequest.accountType.cardPayment) {
+            encryptedCardData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
+        }
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
@@ -50,15 +55,10 @@ public class TransactionRequest implements BaseProperties {
     }
 
     JSONObjectReader root;
-    
-    Software software;
-    
-    GregorianCalendar dateTime;
 
-    String authorityUrl;
-    public String getAuthorityUrl() {
-        return authorityUrl;
-    }
+    Software software;
+
+    GregorianCalendar dateTime;
 
     String referenceId;
     public String getReferenceId() {
@@ -70,27 +70,29 @@ public class TransactionRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    ReserveOrBasicRequest reserveOrBasicRequest;
-    public ReserveOrBasicRequest getReserveOrBasicRequest() {
-        return reserveOrBasicRequest;
+    JSONDecryptionDecoder encryptedCardData;
+    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
+    throws IOException, GeneralSecurityException {
+        return new ProtectedAccountData(JSONParser.parse(encryptedCardData.getDecryptedData(decryptionKeys)));
     }
 
-    public static JSONObjectWriter encode(ReserveOrBasicRequest reserveOrBasicRequest,
-                                          String authorityUrl,
+    AuthorizationRequest authorizationRequest;
+    public AuthorizationRequest getAuthorizationRequest() {
+        return authorizationRequest;
+    }
+
+    public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
+                                          JSONObjectWriter encryptedCardData,
                                           String referenceId,
                                           ServerX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
-            .setObject(EMBEDDED_JSON, reserveOrBasicRequest.root)
-            .setString(AUTHORITY_URL_JSON, authorityUrl)
-            .setString(REFERENCE_ID_JSON, referenceId)
+        JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_RESPONSE)
+            .setObject(EMBEDDED_JSON, authorizationRequest.root);
+        if (encryptedCardData != null) {
+            wr.setObject(ENCRYPTED_ACCOUNT_DATA_JSON, encryptedCardData);
+        }
+        return wr.setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
-    }
-
-    void compareCertificates(JSONSignatureDecoder signatureDecoder) throws IOException {
-        if (!Arrays.equals(this.signatureDecoder.getCertificatePath(), signatureDecoder.getCertificatePath())) {
-            throw new IOException("Outer and inner certificates differ");
-        }
     }
 }

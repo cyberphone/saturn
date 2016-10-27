@@ -48,6 +48,7 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.webutil.ServletUtil;
 
+import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.ProviderAuthority;
@@ -222,6 +223,7 @@ public class TransactionServlet extends HttpServlet implements BaseProperties, M
                                              request.getRemoteAddr(),
                                              paymentRequest,
                                              MerchantService.acquirerAuthorityUrl, // Card only
+                                             acquirerBased ? null : new AccountDescriptor(SATURN_WEB_PAY_CONTEXT_URI, "3407766"),
                                              Expires.inMinutes(30), // Reserve only
                                              MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
 

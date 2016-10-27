@@ -17,32 +17,15 @@
 package org.webpki.saturn.bank;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-
-import java.math.BigDecimal;
-
-import java.net.URL;
 
 import java.security.GeneralSecurityException;
 
 import java.util.HashMap;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import javax.servlet.ServletException;
-
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
-
-import org.webpki.net.HTTPSWrapper;
 
 import org.webpki.util.ISODateTime;
 
@@ -53,9 +36,7 @@ import org.webpki.saturn.common.FinalizeTransactionResponse;
 import org.webpki.saturn.common.ChallengeField;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.FinalizeRequest;
-import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.ReserveOrBasicResponse;
@@ -67,18 +48,14 @@ import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.ProviderUserResponse;
 
-import org.webpki.webutil.ServletUtil;
+//////////////////////////////////////////////////////////////////////////////////
+// This is the Saturn "Native" mode Payment Provider (Bank) transaction servlet //
+//////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////
-// This is the core Payment Provider (Bank) payment transaction servlet //
-//////////////////////////////////////////////////////////////////////////
-
-public class TransactionServlet extends HttpServlet implements BaseProperties {
-
+public class TransactionServlet extends ProcessingBaseServlet {
+  
     private static final long serialVersionUID = 1L;
-    
-    static Logger logger = Logger.getLogger(TransactionServlet.class.getCanonicalName());
-    
+
     static HashMap<String,Integer> requestTypes = new HashMap<String,Integer>();
     
     static final int REQTYPE_PAYEE_INITIAL          = 0;
@@ -101,108 +78,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         requestTypes.put(Messages.FINALIZE_TRANSACTION_REQUEST.toString(), REQTYPE_FINALIZE_TRANSACTION);
     }
     
-    static final int TIMEOUT_FOR_REQUEST = 5000;
-    
-    // Just a few demo values
-    
-    static final BigDecimal DEMO_ACCOUNT_LIMIT     = new BigDecimal("1000000.00");
-    static final BigDecimal DEMO_RBA_LIMIT         = new BigDecimal("100000.00");
-    static final String RBA_PARM_MOTHER            = "mother";
-    
-
-    static String portFilter(String url) throws IOException {
-        // Our JBoss installation has some port mapping issues...
-        if (BankService.serverPortMapping == null) {
-            return url;
-        }
-        URL url2 = new URL(url);
-        return new URL(url2.getProtocol(),
-                       url2.getHost(),
-                       BankService.serverPortMapping,
-                       url2.getFile()).toExternalForm(); 
-    }
-
-    static JSONObjectReader fetchJSONData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
-        if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
-            throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
-                                  (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
-        }
-        // We expect JSON, yes
-        if (!wrap.getRawContentType().equals(JSON_CONTENT_TYPE)) {
-            throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + wrap.getRawContentType());
-        }
-        JSONObjectReader result = JSONParser.parse(wrap.getData());
-        if (BankService.logging) {
-            logger.info("Call to " + urlHolder.getUrl() + urlHolder.callerAddress +
-                        "returned:\n" + result);
-        }
-        return result;
-    }
-
-    static JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
-        if (BankService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress +
-                        "with data:\n" + request);
-        }
-        HTTPSWrapper wrap = new HTTPSWrapper();
-        wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader("Content-Type", JSON_CONTENT_TYPE);
-        wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeJSONObject(JSONOutputFormats.NORMALIZED));
-        return fetchJSONData(wrap, urlHolder);
-    }
-
-    static JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
-        if (BankService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress);
-        }
-        HTTPSWrapper wrap = new HTTPSWrapper();
-        wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setRequireSuccess(false);
-        wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
-        return fetchJSONData(wrap, urlHolder);
-    }
-
-    // The purpose of this class is to enable URL information in exceptions
-
-    class UrlHolder {
-        String remoteAddress;
-        String contextPath;
-        String callerAddress;
-        HttpServletRequest request;
-        
-        UrlHolder(HttpServletRequest request) {
-            this.remoteAddress = request.getRemoteAddr();
-            this.contextPath = request.getContextPath();
-            callerAddress = " [Origin=" + remoteAddress + ", Context=" + contextPath + "] ";
-            this.request = request;
-        }
-
-        private String url;
-
-        String getUrl() {
-            return url;
-        }
-
-        void setUrl(String url) {
-            this.url = url;
-        }
-    }
-    
-    static String getReferenceId() {
-        return "#" + (BankService.referenceId++);
-    }
-    
-    static ProviderAuthority getAuthority(UrlHolder urlHolder) throws IOException {
-        return new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
-    }
-    
-    String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
-        return "<span style=\"font-weight:bold;white-space:nowrap\">" + 
-               paymentRequest.getCurrency().amountToDisplayString(amount, true) +
-               "</span>";
-    }
-
     JSONObjectWriter processTransactionRequest(JSONObjectReader request, UrlHolder urlHolder)
     throws IOException, GeneralSecurityException {
 
@@ -280,7 +155,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         }
 
         // Separate credit-card and account2account payments
-        AccountDescriptor payeeAccount = null;
         JSONObjectWriter encryptedCardData = null;
         if (cardPayment) {
 
@@ -299,9 +173,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                      acquirerAuthority.getDataEncryptionAlgorithm(),
                                      acquirerAuthority.getEncryptionPublicKey(),
                                      acquirerAuthority.getKeyEncryptionAlgorithm());
-        } else {
-            // We simply take the first account in the list
-            payeeAccount = transactionRequest.getPayeeAccountDescriptors()[0];
         }
 
         StringBuffer accountReference = new StringBuffer();
@@ -312,7 +183,6 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         
         return TransactionResponse.encode(transactionRequest,
                                           accountReference.toString(),
-                                          payeeAccount,
                                           encryptedCardData,
                                           getReferenceId(),
                                           BankService.bankKey);
@@ -353,19 +223,12 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
         // We got an authentic request.  Now we need to get an attestation by     //
         // the payer's bank that user is authentic and have the required funds... //
         ////////////////////////////////////////////////////////////////////////////
-
-        // Should be external data but this is a demo you know...
-        AccountDescriptor[] accounts = {new AccountDescriptor("http://ultragiro.fr", "35964640"),
-                                        new AccountDescriptor("http://mybank.com", 
-                                                              "J-399.962",
-                                                              new String[]{"enterprise"})};
-     
+    
         urlHolder.setUrl(providerAuthority.getTransactionUrl());
 
         // Customer bank: Can we please do a payment now?
         JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
                                                                         BankService.authorityUrl,
-                                                                        accounts,
                                                                         getReferenceId(),
                                                                         BankService.bankKey);
 
@@ -433,76 +296,28 @@ public class TransactionServlet extends HttpServlet implements BaseProperties {
                                                   BankService.bankKey);
     }
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        UrlHolder urlHolder = null;
-        try {
-            urlHolder = new UrlHolder(request);
-            String contentType = request.getContentType();
-            if (!contentType.equals(JSON_CONTENT_TYPE)) {
-                throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
-            }
-            JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
-            if (BankService.logging) {
-                logger.info("Call from" + urlHolder.callerAddress + "with data:\n" + providerRequest);
-            }
-
-            /////////////////////////////////////////////////////////////////////////////////////////
-            // We rationalize here by using a single end-point for all requests                    //
-            /////////////////////////////////////////////////////////////////////////////////////////
-            Integer requestType = requestTypes.get(providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
-            if (requestType == null) {
-                throw new IOException("Unexpected \"" + JSONDecoderCache.QUALIFIER_JSON + "\" :" + 
+    JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+        Integer requestType = requestTypes.get(providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
+        if (requestType == null) {
+            throw new IOException("Unexpected \"" + JSONDecoderCache.QUALIFIER_JSON + "\" :" + 
                                       providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
-            }
-
-            JSONObjectWriter providerResponse = null; 
-            switch (requestType) {
-                case REQTYPE_PAYEE_INITIAL:
-                    providerResponse = processReserveOrBasicRequest(providerRequest, urlHolder);
-                    break;
-
-                case REQTYPE_TRANSACTION:
-                    providerResponse = processTransactionRequest(providerRequest, urlHolder);
-                    break;
-
-                case REQTYPE_PAYEE_FINALIZE_CREDIT:
-                    providerResponse = processFinalizeCreditRequest(providerRequest, urlHolder);
-                    break;
-                    
-                case REQTYPE_PAYEE_FINALIZE_CARDPAY:
-                    providerResponse = processFinalizeCardpayRequest(providerRequest, urlHolder);
-                    break;
- 
-                case REQTYPE_FINALIZE_TRANSACTION:
-                    providerResponse = processFinalizeTransactionRequest(providerRequest, urlHolder);
-                    break;
-            }
-            if (BankService.logging) {
-                logger.info("Responded to caller"  + urlHolder.callerAddress + "with data:\n" + providerResponse);
-            }
-
-            /////////////////////////////////////////////////////////////////////////////////////////
-            // Normal return                                                                       //
-            /////////////////////////////////////////////////////////////////////////////////////////
-            response.setContentType(JSON_CONTENT_TYPE);
-            response.setHeader("Pragma", "No-Cache");
-            response.setDateHeader("EXPIRES", 0);
-            response.getOutputStream().write(providerResponse.serializeJSONObject(JSONOutputFormats.NORMALIZED));
-            
-        } catch (Exception e) {
-            /////////////////////////////////////////////////////////////////////////////////////////
-            // Hard error return. Note that we return a clear-text message in the response body.   //
-            // Having specific error message syntax for hard errors only complicates things since  //
-            // there will always be the dreadful "internal server error" to deal with as well as   //
-            // general connectivity problems.                                                      //
-            /////////////////////////////////////////////////////////////////////////////////////////
-            String message = (urlHolder == null ? "" : "From" + urlHolder.callerAddress +
-                              (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl()) + "\n") + e.getMessage();
-            logger.log(Level.SEVERE, message, e);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            PrintWriter writer = response.getWriter();
-            writer.print(message);
-            writer.flush();
         }
+        switch (requestType) {
+            case REQTYPE_PAYEE_INITIAL:
+                return processReserveOrBasicRequest(providerRequest, urlHolder);
+
+            case REQTYPE_TRANSACTION:
+                return processTransactionRequest(providerRequest, urlHolder);
+
+            case REQTYPE_PAYEE_FINALIZE_CREDIT:
+                return processFinalizeCreditRequest(providerRequest, urlHolder);
+                
+            case REQTYPE_PAYEE_FINALIZE_CARDPAY:
+                return processFinalizeCardpayRequest(providerRequest, urlHolder);
+ 
+            case REQTYPE_FINALIZE_TRANSACTION:
+                return processFinalizeTransactionRequest(providerRequest, urlHolder);
+        }
+        return null;
     }
 }

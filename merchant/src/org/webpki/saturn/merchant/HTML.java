@@ -102,7 +102,8 @@ public class HTML implements MerchantProperties {
 
     static void homePage(HttpServletResponse response,
                          boolean debugMode,
-                         boolean reserveMode) throws IOException, ServletException {
+                         boolean reserveMode,
+                         boolean nativeMode) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(null, null,
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
@@ -136,7 +137,11 @@ public class HTML implements MerchantProperties {
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
                    DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (debugMode ? " checked" : "") +
-                   "></td><td>Debug (JSON Message Dump) Option</td></form></tr>" +
+                   "></td><td>Debug (JSON Message Dump) Option</td></tr>" +
+                   "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
+                   NATIVE_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
+                   (nativeMode ? " checked" : "") +
+                   "></td><td>Saturn &quot;Native&quot; Mode</td></form></tr>" +
                    "<tr><td style=\"text-align:left;padding-top:10pt\"><a href=\"" + "gasstation" + 
                    "\">Gas Station</a></td><td style=\"text-align:left;padding-top:10pt\">A <i>Different</i> Payment Scenario</td></tr>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
@@ -365,6 +370,7 @@ public class HTML implements MerchantProperties {
                               SavedShoppingCart savedShoppingCart, 
                               boolean tapConnectMode,
                               boolean debugMode,
+                              boolean nativeMode,
                               String walletRequest) throws IOException, ServletException {
         String connectMethod = tapConnectMode ? "tapConnect" : "nativeConnect";
         StringBuffer s = currentOrder(savedShoppingCart);
@@ -446,7 +452,9 @@ public class HTML implements MerchantProperties {
                     "        nativePort.postMessage(invocationData);\n" +
                     "      } else {\n" +
                     "// This is it...transfer the Wallet authorization data back to the Merchant server\n" +
-                    "        fetch('transact', {\n" +
+                    "        fetch('")
+                  .append(nativeMode ? "transact" : "authorize")
+                  .append("', {\n" +
                     "           headers: {\n" +
                     "             'Content-Type': 'application/json'\n" +
                     "           },\n" +
