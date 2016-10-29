@@ -90,7 +90,8 @@ public class AuthorizationResponse implements BaseProperties {
         if (encryptedCardData != null) {
             wr.setObject(ENCRYPTED_ACCOUNT_DATA_JSON, encryptedCardData);
         }
-        return wr.setString(REFERENCE_ID_JSON, referenceId)
+        return wr
+            .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);

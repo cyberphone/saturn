@@ -136,6 +136,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static String walletBankdirectAuth;
     
+    static PaymentNetwork primaryMerchant;
+
     static boolean logging;
     
     private static boolean slowOperation;
@@ -204,12 +206,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                        url.getFile()).toExternalForm();
     }
 
-    void addPaymentNetwork(String keyIdProperty, String merchantIdProperty, String[] acceptedAccountTypes) throws IOException {
+    PaymentNetwork addPaymentNetwork(String keyIdProperty, String merchantIdProperty, String[] acceptedAccountTypes) throws IOException {
         KeyStoreEnumerator kse = new KeyStoreEnumerator(getResource(keyIdProperty),
                                                         getPropertyString(KEYSTORE_PASSWORD));
-        paymentNetworks.put(kse.getPublicKey(), new PaymentNetwork(new ServerAsymKeySigner(kse),
-                                                                   getPropertyString(merchantIdProperty),
-                                                                   acceptedAccountTypes));
+        PaymentNetwork paymentNetwork = new PaymentNetwork(new ServerAsymKeySigner(kse),
+                                                           getPropertyString(merchantIdProperty),
+                                                           acceptedAccountTypes);
+        paymentNetworks.put(kse.getPublicKey(), paymentNetwork);
+        return paymentNetwork;
     }
 
     @Override
@@ -241,7 +245,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                     acceptedAccountTypes.add(card.getTypeUri());
                 }
             }
-            addPaymentNetwork(MERCHANT_KEY, MERCHANT_ID, acceptedAccountTypes.toArray(new String[0]));
+            primaryMerchant = addPaymentNetwork(MERCHANT_KEY, MERCHANT_ID, acceptedAccountTypes.toArray(new String[0]));
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 

@@ -17,20 +17,15 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
-
 import org.webpki.json.encryption.DecryptionKeyHolder;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
@@ -81,11 +76,11 @@ public class FinalizeRequest implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
-        ReserveOrBasicRequest.comparePublicKeys(publicKey,
-                                                reserveOrBasicResponse
-                                                    .transactionResponse
-                                                        .transactionRequest
-                                                            .reserveOrBasicRequest.getPaymentRequest());
+        AuthorizationRequest.comparePublicKeys(publicKey,
+                                               reserveOrBasicResponse
+                                                   .transactionResponse
+                                                       .transactionRequest
+                                                           .reserveOrBasicRequest.getPaymentRequest());
         rd.checkForUnread();
     }
 

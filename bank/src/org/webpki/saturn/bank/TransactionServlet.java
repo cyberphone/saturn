@@ -17,18 +17,14 @@
 package org.webpki.saturn.bank;
 
 import java.io.IOException;
-
 import java.security.GeneralSecurityException;
-
 import java.util.HashMap;
 
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-
 import org.webpki.util.ISODateTime;
-
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.FinalizeTransactionRequest;
@@ -296,7 +292,9 @@ public class TransactionServlet extends ProcessingBaseServlet {
                                                   BankService.bankKey);
     }
 
-    JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+    @Override
+    JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder)
+    throws IOException, GeneralSecurityException {
         Integer requestType = requestTypes.get(providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
         if (requestType == null) {
             throw new IOException("Unexpected \"" + JSONDecoderCache.QUALIFIER_JSON + "\" :" + 

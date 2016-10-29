@@ -18,8 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.math.BigDecimal;
-
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
@@ -48,9 +46,6 @@ public class AuthorizationRequest implements BaseProperties {
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         if (rd.hasProperty(PAYEE_ACCOUNT_JSON)) {
             accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
-        }
-        if (rd.hasProperty(AMOUNT_JSON)) {
-            amount = rd.getBigDecimal(AMOUNT_JSON, paymentRequest.currency.getDecimals());
         }
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
@@ -83,11 +78,6 @@ public class AuthorizationRequest implements BaseProperties {
         return authorityUrl;
     }
 
-    BigDecimal amount;
-    public BigDecimal getAmount() {
-        return amount;
-    }
-
     String referenceId;
     public String getReferenceId() {
         return referenceId;
@@ -108,7 +98,6 @@ public class AuthorizationRequest implements BaseProperties {
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          BigDecimal amount,
                                           AccountDescriptor accountDescriptor,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
@@ -120,13 +109,11 @@ public class AuthorizationRequest implements BaseProperties {
         if (accountDescriptor != null) {
             wr.setObject(PAYEE_ACCOUNT_JSON, accountDescriptor.writeObject());
         }
-        if (amount != null) {
-            wr.setBigDecimal(AMOUNT_JSON, amount, paymentRequest.currency.getDecimals());
-        }
-        return wr.setString(REFERENCE_ID_JSON, referenceId)
-                 .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
-                 .setDateTime(TIME_STAMP_JSON, new Date(), true)
-                 .setSignature(signer);
+        return wr
+            .setString(REFERENCE_ID_JSON, referenceId)
+            .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
+            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setSignature(signer);
     }
 
     public static void comparePublicKeys(PublicKey publicKey, PaymentRequest paymentRequest) throws IOException {

@@ -140,17 +140,11 @@ public class ReserveOrBasicRequest implements BaseProperties {
                  .setSignature(signer);
     }
 
-    public static void comparePublicKeys(PublicKey publicKey, PaymentRequest paymentRequest) throws IOException {
-        if (!publicKey.equals(paymentRequest.getPublicKey())) {
-            throw new IOException("Outer and inner public keys differ");
-        }
-    }
-
     public AuthorizationData getDecryptedAuthorizationData(Vector<DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
             new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));
-        comparePublicKeys (outerPublicKey, paymentRequest);
+        AuthorizationRequest.comparePublicKeys (outerPublicKey, paymentRequest);
         if (!ArrayUtil.compare(authorizationData.getRequestHash(), paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }
