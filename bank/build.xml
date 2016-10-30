@@ -63,6 +63,7 @@
 	  <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
 	  <replacefilter token="@bank-reference-id-start@" value="${reference.id.start}"/>
 	  <replacefilter token="@payment-root@" value="${paymentroot}.cer"/>
+  	  <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
 	  <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
@@ -87,6 +88,7 @@
          <include name="${enc.key.ec}"/>
          <include name="${cert.key}"/>
          <include name="${paymentroot}.cer"/>
+         <include name="${acquirerroot}.cer"/>
       </zipfileset>
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
          <include name="${users.db}"/>

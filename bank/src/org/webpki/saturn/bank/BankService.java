@@ -74,6 +74,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final String PAYMENT_ROOT          = "payment_root";
 
+    static final String ACQUIRER_ROOT         = "acquirer_root";
+
     static final String USER_ACCOUNT_DB       = "user_account_db";
     
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
@@ -95,6 +97,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static ServerX509Signer bankKey;
     
     static JSONX509Verifier paymentRoot;
+    
+    static JSONX509Verifier acquirerRoot;
     
     static X509Certificate[] bankCertificatePath;
     
@@ -155,6 +159,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
+            acquirerRoot = getRoot(ACQUIRER_ROOT);
+            
             JSONArrayReader accounts = JSONParser.parse(
                                           ArrayUtil.getByteArrayFromInputStream (getResource(USER_ACCOUNT_DB))
                                                        ).getJSONArrayReader();

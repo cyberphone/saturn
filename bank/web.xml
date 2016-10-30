@@ -51,7 +51,13 @@
         <param-name>payment_root</param-name>
         <param-value>@payment-root@</param-value>
     </context-param>
-    
+
+    <context-param>
+        <description>Acquirer Network Root Certificate</description>
+        <param-name>acquirer_root</param-name>
+        <param-value>@acquirer-root@</param-value>
+    </context-param>
+
     <context-param>
         <description>Merchant Accounts</description>
         <param-name>merchant_account_db</param-name>

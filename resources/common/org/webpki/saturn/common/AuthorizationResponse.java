@@ -18,18 +18,14 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.security.GeneralSecurityException;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
 
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
 

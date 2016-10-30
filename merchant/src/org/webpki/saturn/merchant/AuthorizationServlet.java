@@ -57,14 +57,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
     private static final String MERCHANT_ACCOUNT_ID = "IBAN:FR7630004003200001019471656";
     
-    static ProviderAuthority payeeProviderAuthority;
-    
-    synchronized void updatePayeeProviderAuthority(UrlHolder urlHolder) throws IOException {
-        payeeProviderAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
-        // Verify that the claimed authority belongs to a known payment provider network
-        payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
-    }
-
     @Override
     void processCall(JSONObjectReader walletResponse,
                      PaymentRequest paymentRequest, 
@@ -108,19 +100,19 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Card payments are actually reservations and they are not indefinite
         Date expires = cardPayment ? Expires.inMinutes(10) : null;
 
+        String payeeAuthorityUrl = cardPayment ? MerchantService.acquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
-            AuthorizationRequest.encode(MerchantService.payeeProviderAuthorityUrl
-                                            .substring(0, MerchantService.payeeProviderAuthorityUrl.lastIndexOf('/')) +
+            AuthorizationRequest.encode(payeeAuthorityUrl.substring(0, payeeAuthorityUrl.lastIndexOf('/')) +
                                             "/payees/" + MerchantService.primaryMerchant.merchantId,
-                                         payerAuthorization.getAccountType(),
-                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
-                                         request.getRemoteAddr(),
-                                         paymentRequest,
-                                         accountDescriptor,
-                                         MerchantService.getReferenceId(),
-                                         expires,
-                                         MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
+                                        payerAuthorization.getAccountType(),
+                                        walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
+                                        request.getRemoteAddr(),
+                                        paymentRequest,
+                                        accountDescriptor,
+                                        MerchantService.getReferenceId(),
+                                        expires,
+                                        MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
 
         if (debug) {
   //          debugData.providerAuthority = payeeProviderAuthority.getRoot();

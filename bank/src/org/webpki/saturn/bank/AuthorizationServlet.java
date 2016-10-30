@@ -59,8 +59,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         PayeeAuthority PayeeAuthority = getPayeeAuthority(urlHolder);
         urlHolder.setUrl(null);
         AuthorizationRequest.comparePublicKeys(PayeeAuthority.getPayeePublicKey(), paymentRequest);
-//TODO acquirerRoot
-        PayeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.paymentRoot : BankService.paymentRoot);
+        PayeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
 
         // Decrypt the encrypted user authorization
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);

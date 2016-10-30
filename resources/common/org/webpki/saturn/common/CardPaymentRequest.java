@@ -49,8 +49,6 @@ public class CardPaymentRequest implements BaseProperties {
         rd.checkForUnread();
     }
 
-    PublicKey publicKey;
-
     Software software;
 
     JSONObjectReader root;
@@ -63,6 +61,15 @@ public class CardPaymentRequest implements BaseProperties {
     String referenceId;
     public String getReferenceId() {
         return referenceId;
+    }
+
+    public Payee getPayee() {
+        return authorizationResponse.authorizationRequest.paymentRequest.payee;
+    }
+
+    PublicKey publicKey;
+    public PublicKey getPublicKey() {
+        return publicKey;
     }
 
     AuthorizationResponse authorizationResponse;
