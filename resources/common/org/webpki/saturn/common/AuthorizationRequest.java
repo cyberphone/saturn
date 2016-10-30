@@ -57,12 +57,10 @@ public class AuthorizationRequest implements BaseProperties {
         }
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
-        outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
+        publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         rd.checkForUnread();
     }
 
-
-    PublicKey outerPublicKey;
 
     Software software;
 
@@ -73,6 +71,11 @@ public class AuthorizationRequest implements BaseProperties {
     PayerAccountTypes accountType;
     public PayerAccountTypes getPayerAccountType() {
         return accountType;
+    }
+
+    PublicKey publicKey;
+    public PublicKey getPublicKey() {
+        return publicKey;
     }
 
     AccountDescriptor accountDescriptor;
@@ -148,7 +151,7 @@ public class AuthorizationRequest implements BaseProperties {
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
             new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));
-        comparePublicKeys (outerPublicKey, paymentRequest);
+        comparePublicKeys (publicKey, paymentRequest);
         if (!ArrayUtil.compare(authorizationData.getRequestHash(), paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }

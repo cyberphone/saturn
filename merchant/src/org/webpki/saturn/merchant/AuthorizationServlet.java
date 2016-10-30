@@ -17,15 +17,12 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
+import java.math.BigDecimal;
 import java.net.URL;
-
 import java.security.GeneralSecurityException;
-
 import java.util.Date;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,12 +30,16 @@ import javax.servlet.http.HttpSession;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.CardPaymentRequest;
+import org.webpki.saturn.common.CardPaymentResponse;
 import org.webpki.saturn.common.Expires;
+import org.webpki.saturn.common.FinalizeCardpayResponse;
+import org.webpki.saturn.common.FinalizeCreditResponse;
+import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.PaymentRequest;
@@ -145,6 +146,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // No error return, then we can verify the response fully
         authorizationResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
    
+        // Two-phase operation: perform the final step
+        if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
+            processCardPayment(authorizationResponse,
+                               paymentRequest.getAmount(),  // Just a copy since we don't have a complete scenario                                
+                               urlHolder,
+                               debugData);
+        }
+
         // Create a viewable response
         ResultData resultData = new ResultData();
         resultData.amount = paymentRequest.getAmount();  // Gas Station will upgrade amount
@@ -157,6 +166,37 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         resultData.accountReference = accountReference;
         session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
+    }
+
+    static void processCardPayment(AuthorizationResponse authorizationResponse,
+                                   BigDecimal amount,
+                                   UrlHolder urlHolder,
+                                   DebugData debugData) throws IOException {
+        // Lookup of configured acquirer authority.  This information is preferably cached
+        urlHolder.setUrl(MerchantService.acquirerAuthorityUrl);
+        ProviderAuthority acquirerAuthority = new ProviderAuthority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
+        urlHolder.setUrl(acquirerAuthority.getAuthorizationUrl());
+        if (debugData != null) {
+            debugData.acquirerMode = true;
+            debugData.acquirerAuthority = acquirerAuthority.getRoot();
+        }
+
+        JSONObjectWriter cardPaymentRequest =
+            CardPaymentRequest.encode(authorizationResponse,
+                                      MerchantService.getReferenceId(),
+                                      MerchantService.paymentNetworks.get(authorizationResponse
+                                                                              .getAuthorizationRequest()
+                                                                                  .getPublicKey()).signer);
+        // Call the payment provider or acquirer
+        JSONObjectReader response = postData(urlHolder, cardPaymentRequest);
+
+        if (debugData != null) {
+//            debugData.finalizeRequest = finalizeRequest;
+//            debugData.finalizeResponse = response;
+        }
+        
+        CardPaymentResponse cardPaymentResponse = new CardPaymentResponse(response);
+        cardPaymentResponse.getSignatureDecoder().verify(MerchantService.acquirerRoot);
     }
 
     @Override

@@ -17,20 +17,19 @@
 package org.webpki.saturn.acquirer;
 
 import java.io.IOException;
-
 import java.security.GeneralSecurityException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.FinalizeCardpayResponse;
+import org.webpki.saturn.common.CardPaymentRequest;
+import org.webpki.saturn.common.CardPaymentResponse;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.Payee;
-import org.webpki.saturn.common.FinalizeRequest;
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-// This is the core Acquirer (Card-Processor) Saturn "native" mode payment transaction servlet //
-/////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+// This is the core Acquirer (Card-Processor) Saturn basic mode payment authorization servlet //
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 public class AuthorizationServlet extends ProcessingBaseServlet {
 
@@ -39,31 +38,27 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
         // Decode the finalize cardpay request
-        FinalizeRequest finalizeRequest = new FinalizeRequest(providerRequest);
+        CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest);
 
         // Verify that the merchant's bank is known
-        finalizeRequest.verifyMerchantBank(AcquirerService.paymentRoot);
+//        cardPaymentRequest.verifyMerchantBank(AcquirerService.paymentRoot);
 
         // Verify that the merchant is one of our customers
-        Payee payee = finalizeRequest.getPayee();
+        Payee payee = cardPaymentRequest.getPayee();
         PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
         if (merchantProperties == null) {
             throw new IOException("Unknown merchant Id: " + payee.getId());
         }
-        if (!merchantProperties.getPublicKey().equals(finalizeRequest.getPublicKey())) {
+        if (!merchantProperties.getPublicKey().equals(cardPaymentRequest.getPublicKey())) {
             throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
         }
-        if (!finalizeRequest.getMerchantKeyIssuer().equals(merchantProperties.getIssuer())) {
-            throw new IOException("Non-matching issuer for merchant Id: " + payee.getId());
-        }
-
-        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(AcquirerService.decryptionKeys));
+        logger.info("Card data: " + cardPaymentRequest.getProtectedAccountData(AcquirerService.decryptionKeys));
 
         // Here we are supposed to talk to the card payment network....
 
         // It appears that we succeeded
-        return FinalizeCardpayResponse.encode(finalizeRequest,
-                                              getReferenceId(),
-                                              AcquirerService.acquirerKey);
+        return CardPaymentResponse.encode(cardPaymentRequest,
+                                          getReferenceId(),
+                                          AcquirerService.acquirerKey);
     }
 }
