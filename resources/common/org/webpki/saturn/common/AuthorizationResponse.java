@@ -43,6 +43,7 @@ public class AuthorizationResponse implements BaseProperties {
     public AuthorizationResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.AUTHORIZATION_RESPONSE, root = rd);
         authorizationRequest = new AuthorizationRequest(rd.getObject(EMBEDDED_JSON));
+        accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         if (authorizationRequest.accountType.cardPayment) {
             encryptedCardData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
         }
@@ -65,16 +66,17 @@ public class AuthorizationResponse implements BaseProperties {
         return referenceId;
     }
 
+    String accountReference;
+    public String getAccountReference() {
+        return accountReference;
+    }
+
     JSONSignatureDecoder signatureDecoder;
     public JSONSignatureDecoder getSignatureDecoder() {
         return signatureDecoder;
     }
 
     JSONDecryptionDecoder encryptedCardData;
-    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
-    throws IOException, GeneralSecurityException {
-        return new ProtectedAccountData(JSONParser.parse(encryptedCardData.getDecryptedData(decryptionKeys)));
-    }
 
     AuthorizationRequest authorizationRequest;
     public AuthorizationRequest getAuthorizationRequest() {
@@ -82,11 +84,13 @@ public class AuthorizationResponse implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
+                                          String accountReference,
                                           JSONObjectWriter encryptedCardData,
                                           String referenceId,
                                           ServerX509Signer signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_RESPONSE)
-            .setObject(EMBEDDED_JSON, authorizationRequest.root);
+            .setObject(EMBEDDED_JSON, authorizationRequest.root)
+            .setString(ACCOUNT_REFERENCE_JSON, accountReference);
         if (encryptedCardData != null) {
             wr.setObject(ENCRYPTED_ACCOUNT_DATA_JSON, encryptedCardData);
         }

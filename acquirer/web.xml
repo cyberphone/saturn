@@ -68,8 +68,18 @@
     </servlet>
 
     <servlet>
+        <servlet-name>PayeeAuthorityServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.acquirer.PayeeAuthorityServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>TransactionServlet</servlet-name>
         <servlet-class>org.webpki.saturn.acquirer.TransactionServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>AuthorizationServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.acquirer.AuthorizationServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -78,8 +88,18 @@
     </servlet-mapping>
 
     <servlet-mapping>
+        <servlet-name>PayeeAuthorityServlet</servlet-name>
+        <url-pattern>/payees/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
         <servlet-name>TransactionServlet</servlet-name>
         <url-pattern>/transact</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AuthorizationServlet</servlet-name>
+        <url-pattern>/authorize</url-pattern>
     </servlet-mapping>
 
     <security-constraint>

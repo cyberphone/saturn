@@ -38,6 +38,8 @@ public enum Messages {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     AUTHORIZATION_REQUEST         ("AuthorizationRequest"),            // Payee provider to Payer provider
     AUTHORIZATION_RESPONSE        ("AuthorizationResponse"),           // Response to the former
+    CARD_PAYMENT_REQUEST          ("CardPaymentRequest"),              // Payee provider to Acquirer
+    CARD_PAYMENT_RESPONSE         ("CardPaymentResponse"),             // Response to the former
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // One-step payment operation in "Native" Account2Account mode

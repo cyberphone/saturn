@@ -41,6 +41,7 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.net.HTTPSWrapper;
 
+import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
@@ -149,10 +150,14 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return "#" + (BankService.referenceId++);
     }
     
-    static ProviderAuthority getAuthority(UrlHolder urlHolder) throws IOException {
+    static ProviderAuthority getProviderAuthority(UrlHolder urlHolder) throws IOException {
         return new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
     }
-    
+
+    static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder) throws IOException {
+        return new PayeeAuthority(getData(urlHolder), urlHolder.getUrl());
+    }
+ 
     static String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
         return "<span style=\"font-weight:bold;white-space:nowrap\">" + 
                paymentRequest.getCurrency().amountToDisplayString(amount, true) +

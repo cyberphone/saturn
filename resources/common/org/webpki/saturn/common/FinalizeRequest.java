@@ -161,8 +161,8 @@ public class FinalizeRequest implements BaseProperties {
                            getDecimals(reserveOrBasicResponse))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(TransactionRequest.SOFTWARE_NAME,
-                                                      TransactionRequest.SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(AuthorizationResponse.SOFTWARE_NAME,
+                                                      AuthorizationResponse.SOFTWARE_VERSION))
             .setSignature(signer);
     }
 }

@@ -32,7 +32,7 @@ import org.webpki.saturn.common.FinalizeRequest;
 // This is the core Acquirer (Card-Processor) Saturn "native" mode payment transaction servlet //
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-public class TransactionServlet extends ProcessingBaseServlet {
+public class AuthorizationServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     

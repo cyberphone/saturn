@@ -47,6 +47,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
+import org.webpki.saturn.common.PayeeAuthorityList;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.PayeeCoreProperties;
@@ -82,9 +83,13 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static ServerX509Signer acquirerKey;
     
+    static String authorityUrl;
+    
     static String payeeId;
     
     static byte[] publishedAuthorityData;
+
+    static PayeeAuthorityList payeeAuthorityList;
     
     static boolean logging;
     
@@ -138,13 +143,19 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             
             String aquirerHost = getPropertyString(ACQUIRER_HOST);
             publishedAuthorityData =
-                ProviderAuthority.encode(aquirerHost + "/authority",
-                                         aquirerHost + "/transact",
+                ProviderAuthority.encode(authorityUrl = aquirerHost + "/authority",
+                                         aquirerHost + "/authorize",
                                          aquirerHost + "/transact",
                                          null,
                                          decryptionKeys.get(0).getPublicKey(),
                                          Expires.inDays(365),
                                          acquirerKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
+
+            payeeAuthorityList = new PayeeAuthorityList(merchantAccountDb, 
+                                                        acquirerKey,
+                                                        aquirerHost + "/payees/",
+                                                        authorityUrl,
+                                                        3600);
 
             logging = getPropertyBoolean(LOGGING);
 

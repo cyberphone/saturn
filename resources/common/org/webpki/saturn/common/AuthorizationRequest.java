@@ -17,27 +17,25 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
-
 import org.webpki.json.encryption.DecryptionKeyHolder;
-
 import org.webpki.util.ArrayUtil;
 
 public class AuthorizationRequest implements BaseProperties {
     
+    public static final String SOFTWARE_NAME    = "WebPKI.org - Payee";
+    public static final String SOFTWARE_VERSION = "1.00";
+
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, root = rd);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
@@ -49,15 +47,19 @@ public class AuthorizationRequest implements BaseProperties {
         }
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON);
+        if (rd.hasProperty(EXPIRES_JSON)) {
+            expires = rd.getDateTime(EXPIRES_JSON);
+        }
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON);
+        software = new Software(rd);
         outerPublicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         rd.checkForUnread();
     }
 
 
-    GregorianCalendar dateTime;
-
     PublicKey outerPublicKey;
+
+    Software software;
 
     JSONDecryptionDecoder encryptedAuthorizationData;
 
@@ -71,6 +73,16 @@ public class AuthorizationRequest implements BaseProperties {
     AccountDescriptor accountDescriptor;
     public AccountDescriptor getAccountDescriptor() {
         return accountDescriptor;
+    }
+
+    GregorianCalendar expires;
+    public GregorianCalendar getExpires() {
+        return expires;
+    }
+
+    GregorianCalendar timeStamp;
+    public GregorianCalendar getTimeStamp() {
+        return timeStamp;
     }
 
     String authorityUrl;
@@ -100,6 +112,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           PaymentRequest paymentRequest,
                                           AccountDescriptor accountDescriptor,
                                           String referenceId,
+                                          Date expires,
                                           ServerAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
@@ -109,10 +122,14 @@ public class AuthorizationRequest implements BaseProperties {
         if (accountDescriptor != null) {
             wr.setObject(PAYEE_ACCOUNT_JSON, accountDescriptor.writeObject());
         }
+        wr.setString(REFERENCE_ID_JSON, referenceId)
+          .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress);
+        if (expires != null) {
+            wr.setDateTime(EXPIRES_JSON, expires, true);
+        }
         return wr
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
     }
 

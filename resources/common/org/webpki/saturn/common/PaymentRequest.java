@@ -33,9 +33,6 @@ import org.webpki.json.JSONAsymKeySigner;
 
 public class PaymentRequest implements BaseProperties {
     
-    public static final String SOFTWARE_NAME    = "WebPKI.org - Merchant";
-    public static final String SOFTWARE_VERSION = "1.00";
-
     public static JSONObjectWriter encode(Payee payee,
                                           BigDecimal amount,
                                           Currencies currency,
@@ -55,7 +52,7 @@ public class PaymentRequest implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, timeStamp, true)
             .setDateTime(EXPIRES_JSON, expires, true)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(AuthorizationRequest.SOFTWARE_NAME, AuthorizationRequest.SOFTWARE_VERSION))
             .setSignature(signer);
     }
 

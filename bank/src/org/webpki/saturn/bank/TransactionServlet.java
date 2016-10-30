@@ -156,7 +156,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
             // Lookup of payee's acquirer.  You would typically cache such information
             urlHolder.setUrl(reserveOrBasicRequest.getAcquirerAuthorityUrl());
-            ProviderAuthority acquirerAuthority = getAuthority(urlHolder);
+            ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
 
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
@@ -209,7 +209,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
         // Lookup of payer's bank.  You would typically cache such information
         urlHolder.setUrl(attestedPaymentRequest.getProviderAuthorityUrl());
-        ProviderAuthority providerAuthority = getAuthority(urlHolder);
+        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
 
         // We need to separate credit-card and account-2-account payments
         boolean acquirerBased = attestedPaymentRequest.getPayerAccountType().isCardPayment();
@@ -248,7 +248,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
         // Lookup of payer's bank.  You would typically cache such information
         urlHolder.setUrl(finalizeRequest.getProviderAuthorityUrl());
-        ProviderAuthority providerAuthority = getAuthority(urlHolder);
+        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
 
         // This message is the one which finally actually lifts money
         urlHolder.setUrl(providerAuthority.getTransactionUrl());

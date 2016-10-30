@@ -17,25 +17,25 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-import java.util.Arrays;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
 
-public class TransactionRequest implements BaseProperties {
+public class CardPaymentResponse implements BaseProperties {
     
-    public TransactionRequest(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, root = rd);
-        reserveOrBasicRequest = new ReserveOrBasicRequest(rd.getObject(EMBEDDED_JSON));
+    public static final String SOFTWARE_NAME    = "WebPKI.org - Acquirer";
+    public static final String SOFTWARE_VERSION = "1.00";
 
-        // Strictly not necessary but it could hold "config" data
-        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-
+    public CardPaymentResponse(JSONObjectReader rd) throws IOException {
+        Messages.parseBaseMessage(Messages.CARD_PAYMENT_RESPONSE, root = rd);
+        cardPaymentRequest = new CardPaymentRequest(rd.getObject(EMBEDDED_JSON));
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
@@ -45,19 +45,19 @@ public class TransactionRequest implements BaseProperties {
     }
 
     JSONObjectReader root;
-    
-    Software software;
-    
-    GregorianCalendar dateTime;
 
-    String authorityUrl;
-    public String getAuthorityUrl() {
-        return authorityUrl;
-    }
+    Software software;
+
+    GregorianCalendar dateTime;
 
     String referenceId;
     public String getReferenceId() {
         return referenceId;
+    }
+
+    String accountReference;
+    public String getAccountReference() {
+        return accountReference;
     }
 
     JSONSignatureDecoder signatureDecoder;
@@ -65,27 +65,20 @@ public class TransactionRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    ReserveOrBasicRequest reserveOrBasicRequest;
-    public ReserveOrBasicRequest getReserveOrBasicRequest() {
-        return reserveOrBasicRequest;
+
+    CardPaymentRequest cardPaymentRequest;
+    public CardPaymentRequest getCardPaymentRequest() {
+        return cardPaymentRequest;
     }
 
-    public static JSONObjectWriter encode(ReserveOrBasicRequest reserveOrBasicRequest,
-                                          String authorityUrl,
+    public static JSONObjectWriter encode(CardPaymentRequest cardPaymentRequest,
                                           String referenceId,
                                           ServerX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
-            .setObject(EMBEDDED_JSON, reserveOrBasicRequest.root)
-            .setString(AUTHORITY_URL_JSON, authorityUrl)
+        return Messages.createBaseMessage(Messages.CARD_PAYMENT_RESPONSE)
+            .setObject(EMBEDDED_JSON, cardPaymentRequest.root)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(AuthorizationResponse.SOFTWARE_NAME, AuthorizationResponse.SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
-    }
-
-    void compareCertificates(JSONSignatureDecoder signatureDecoder) throws IOException {
-        if (!Arrays.equals(this.signatureDecoder.getCertificatePath(), signatureDecoder.getCertificatePath())) {
-            throw new IOException("Outer and inner certificates differ");
-        }
     }
 }

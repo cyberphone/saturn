@@ -92,6 +92,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>AuthorizationServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.AuthorizationServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>ProviderAuthorityServlet</servlet-name>
         <servlet-class>org.webpki.saturn.bank.ProviderAuthorityServlet</servlet-class>
     </servlet>
@@ -104,6 +109,11 @@
     <servlet-mapping>
         <servlet-name>TransactionServlet</servlet-name>
         <url-pattern>/transact</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>AuthorizationServlet</servlet-name>
+        <url-pattern>/authorize</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
