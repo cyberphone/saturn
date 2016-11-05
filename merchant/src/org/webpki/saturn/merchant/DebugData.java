@@ -25,6 +25,8 @@ public class DebugData implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
+    public boolean nativeMode;
+    
     public JSONObjectWriter InvokeWallet;
     
     public JSONObjectReader walletResponse;
@@ -35,6 +37,19 @@ public class DebugData implements Serializable {
     
     public boolean softReserveOrBasicError;
     
+    public JSONObjectReader payeeAuthority;
+    
+    public JSONObjectReader payeeProviderAuthority;
+
+    public JSONObjectWriter authorizationRequest;
+    
+    public JSONObjectReader authorizationResponse;
+
+    public JSONObjectWriter cardPaymentRequest;
+    
+    public JSONObjectReader cardPaymentResponse;
+
+    // Native mode
     public JSONObjectWriter reserveOrBasicRequest;
     
     public JSONObjectReader reserveOrBasicResponse;

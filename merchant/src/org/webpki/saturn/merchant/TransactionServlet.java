@@ -109,6 +109,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         if (debug) {
             debugData.providerAuthority = payeeProviderAuthority.getRoot();
             debugData.basicCredit = basicCredit;
+            debugData.nativeMode = true;
         }
 
         // Call the payee bank

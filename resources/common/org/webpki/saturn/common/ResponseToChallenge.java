@@ -21,9 +21,9 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-public class ChallengeResult implements BaseProperties {
+public class ResponseToChallenge implements BaseProperties {
 
-    public ChallengeResult(String id, String text) {
+    public ResponseToChallenge(String id, String text) {
         this.id = id;
         this.text = text;
     }
@@ -44,7 +44,7 @@ public class ChallengeResult implements BaseProperties {
         return text;
     }
 
-    public ChallengeResult(JSONObjectReader rd) throws IOException {
+    public ResponseToChallenge(JSONObjectReader rd) throws IOException {
         id = rd.getString(ID_JSON);
         text = rd.getStringConditional(TEXT_JSON);
     }

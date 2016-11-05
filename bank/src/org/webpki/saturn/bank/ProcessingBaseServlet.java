@@ -126,13 +126,11 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         String remoteAddress;
         String contextPath;
         String callerAddress;
-        HttpServletRequest request;
         
         UrlHolder(HttpServletRequest request) {
             this.remoteAddress = request.getRemoteAddr();
             this.contextPath = request.getContextPath();
             callerAddress = " [Origin=" + remoteAddress + ", Context=" + contextPath + "] ";
-            this.request = request;
         }
 
         private String url;

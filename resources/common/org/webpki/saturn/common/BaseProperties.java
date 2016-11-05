@@ -41,7 +41,7 @@ public interface BaseProperties {
 
     String KEY_JSON                         = "key";                        // Wallet-originated encryption key
 
-    String CHALLENGE_RESULTS_JSON           = "challengeResults";           // Result of ProviderUserResponse 
+    String RESPONSE_TO_CHALLENGE_JSON       = "responseToChallenge";        // Result of ProviderUserResponse 
 
     String PAYMENT_NETWORKS_JSON            = "paymentNetworks";
     String PAYMENT_REQUEST_JSON             = "paymentRequest";

@@ -17,12 +17,16 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.net.URL;
+
 import java.security.GeneralSecurityException;
 import java.util.Date;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -30,6 +34,7 @@ import javax.servlet.http.HttpSession;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -37,10 +42,8 @@ import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.CardPaymentRequest;
 import org.webpki.saturn.common.CardPaymentResponse;
 import org.webpki.saturn.common.Expires;
-import org.webpki.saturn.common.FinalizeCardpayResponse;
-import org.webpki.saturn.common.FinalizeCreditResponse;
-import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.Messages;
+import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.PayerAuthorization;
@@ -68,7 +71,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                      boolean debug, 
                      DebugData debugData, 
                      UrlHolder urlHolder) throws IOException, GeneralSecurityException {
-        // Basic credit is only applicable to account2account operations
+        // Slightly different flows for card- and bank-to-bank authorizations
         boolean cardPayment = payerAuthorization.getAccountType().isCardPayment();
  
         // ugly fix to cope with local installation
@@ -85,6 +88,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         urlHolder.setUrl(providerAuthorityUrl);
         ProviderAuthority providerAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
         urlHolder.setUrl(null);
+
+        if (debug) {
+            debugData.providerAuthority = providerAuthority.getRoot();
+            debugData.basicCredit = !cardPayment;
+            debugData.acquirerMode = cardPayment;
+        }
+
         AccountDescriptor accountDescriptor = null;
         if (!cardPayment) {
             for (String accountType : providerAuthority.getProviderAccountTypes()) {
@@ -102,10 +112,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         Date expires = cardPayment ? Expires.inMinutes(10) : null;
 
         String payeeAuthorityUrl = cardPayment ? MerchantService.acquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
+        payeeAuthorityUrl = payeeAuthorityUrl.substring(0, payeeAuthorityUrl.lastIndexOf('/')) +
+                            "/payees/" + MerchantService.primaryMerchant.merchantId;
+
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
-            AuthorizationRequest.encode(payeeAuthorityUrl.substring(0, payeeAuthorityUrl.lastIndexOf('/')) +
-                                            "/payees/" + MerchantService.primaryMerchant.merchantId,
+            AuthorizationRequest.encode(payeeAuthorityUrl,
                                         payerAuthorization.getAccountType(),
                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                         request.getRemoteAddr(),
@@ -115,19 +127,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         expires,
                                         MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
 
-        if (debug) {
-  //          debugData.providerAuthority = payeeProviderAuthority.getRoot();
-  //          debugData.basicCredit = basicCredit;
-        }
-
         // Call Payer bank
         urlHolder.setUrl(providerAuthority.getAuthorizationUrl());
         JSONObjectReader resultMessage = postData(urlHolder, authorizationRequest);
         urlHolder.setUrl(null);
 
         if (debug) {
- //           debugData.reserveOrBasicRequest = reserveOrBasicRequest;
- //           debugData.reserveOrBasicResponse = resultMessage;
+            debugData.authorizationRequest = authorizationRequest;
+            urlHolder.setUrl(payeeAuthorityUrl);
+            debugData.payeeAuthority = new PayeeAuthority(getData(urlHolder), urlHolder.getUrl()).getRoot();
+            urlHolder.setUrl(null);
+            debugData.authorizationResponse = resultMessage;
         }
 
         if (resultMessage.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.PROVIDER_USER_RESPONSE.toString())) {
@@ -177,7 +187,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         ProviderAuthority acquirerAuthority = new ProviderAuthority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
         urlHolder.setUrl(acquirerAuthority.getAuthorizationUrl());
         if (debugData != null) {
-            debugData.acquirerMode = true;
             debugData.acquirerAuthority = acquirerAuthority.getRoot();
         }
 
@@ -187,12 +196,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                       MerchantService.paymentNetworks.get(authorizationResponse
                                                                               .getAuthorizationRequest()
                                                                                   .getPublicKey()).signer);
-        // Call the payment provider or acquirer
+        // Call the Acquirer
         JSONObjectReader response = postData(urlHolder, cardPaymentRequest);
 
         if (debugData != null) {
-//            debugData.finalizeRequest = finalizeRequest;
-//            debugData.finalizeResponse = response;
+            debugData.cardPaymentRequest = cardPaymentRequest;
+            debugData.cardPaymentResponse = response;
         }
         
         CardPaymentResponse cardPaymentResponse = new CardPaymentResponse(response);

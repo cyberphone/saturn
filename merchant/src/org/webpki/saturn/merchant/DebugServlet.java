@@ -17,16 +17,12 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.security.GeneralSecurityException;
-
 import java.security.cert.X509Certificate;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,9 +36,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONTypes;
 import org.webpki.json.JSONDecryptionDecoder;
-
 import org.webpki.util.Base64URL;
-
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Version;
@@ -54,6 +48,7 @@ class DebugPrintout implements BaseProperties {
     Point point = new Point();
 
     boolean clean;
+    DebugData debugData;
 
     static final String STATIC_BOX = "font-size:8pt;word-break:break-all;width:800pt;background:#F8F8F8;";
     static final String COMMON_BOX = "border-width:1px;border-style:solid;border-color:grey;padding:10pt;box-shadow:3pt 3pt 3pt #D0D0D0";
@@ -175,13 +170,16 @@ class DebugPrintout implements BaseProperties {
                 "response is <i>unsigned</i> since the associated request is assumed to be <i>rolled-back</i>:";
     }
 
-    DebugPrintout(DebugData debugData, boolean clean) throws IOException, GeneralSecurityException {
+    DebugPrintout(DebugData debugData, boolean clean) throws Exception {
         this.clean = clean;
+        this.debugData = debugData;
         description("<p>The following page shows the messages " + (clean? "(<i>here slightly edited for brevity</i>) " : "") +
-            "exchanged between the " +
-            "<b>Merchant</b> (Payee), the <b>Wallet</b> (Payer), and the user's <b>Bank</b> (Payment provider).&nbsp;&nbsp;" +
+            "exchanged between a " +
+            "<b>Merchant</b> (Payee), <b>Merchant&nbsp;Bank</b>, <b>Wallet</b> (Payer), and <b>User&nbsp;Bank</b> (Payment provider).&nbsp;&nbsp;" +
             "For traditional card payments there is also an <b>Acquirer</b> (aka &quot;card processor&quot;) involved.</p><p>Current mode: <i>" +
-            (debugData.acquirerMode ? "Card payment" : "Account-2-Account payment using " + (debugData.basicCredit ? "direct debit" : "reserve+finalize")) +
+            (debugData.nativeMode ? "Saturn &quot;Native&quot; " +
+            (debugData.acquirerMode ? "Card payment" : "Account-2-Account payment using " + (debugData.basicCredit ? "direct debit" : "reserve+finalize")) :
+            (debugData.basicCredit ? "Bank-to-Bank payment" : "Card payment")) +
             "</i></p>" +
             point+
             "<p>The user performs &quot;Checkout&quot; (after <i>optionally</i> selecting payment method), " +
@@ -190,17 +188,14 @@ class DebugPrintout implements BaseProperties {
             keyWord("navigator.nativeConnect()") + 
             " <a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge#api\">[CONNECT]</a> browser API.</p>" +
             point +
-            "<p>Then the invoking Web-page waits for a ready signal from the <b>Wallet</b>:</p>");
+            "<p>Then the invoking Web-page waits for a ready signal from the <b>Wallet</b>.</p>");
 
-         descriptionStdMargin("The " + keyWord(WINDOW_JSON) + " object provides the invoking <b>Merchant</b> Web-page with the size "+
-            "of the <b>Wallet</b> which is used to adapt the Web-page so that this <i>external</i> " +
-            "application does not hide important buyer information.&nbsp;&nbsp;Note: The Web2Native Bridge " +
-            "invocation provides additional (here not shown) information to make positioning and alignment feasible.<p>" + 
+         descriptionStdMargin(
             point +
-            "</p><p>When the message above has been received the <b>Merchant</b> Web-page sends a " +
-            "list of accepted account types (aka payment instruments) and a <i>signed</i> " + 
+            "<p>When the ready signal has been received the <b>Merchant</b> Web-page sends a " +
+            "list of accepted account types (aka payment instruments) and associated <i>signed</i> " + 
             "<a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/jcs.html\">[SIGNATURE]</a> " +
-            keyWord(PAYMENT_REQUEST_JSON) + " to the <b>Wallet</b>:</p>");
+            keyWord(PAYMENT_REQUEST_JSON) + " objects to the <b>Wallet</b>:</p>");
 
         fancyBox(debugData.InvokeWallet);
 
@@ -226,15 +221,34 @@ class DebugPrintout implements BaseProperties {
              " object of the <b>Bank</b> claimed to be the user's account holder for the selected card:</p>");
 
         fancyBox(debugData.providerAuthority);
-
         descriptionStdMargin("An " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + 
             " is a long-lived object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
             "has the following tasks:<ul>" +
             "<li>Provide credentials of an entity allowing relying parties verifying such before interacting with the entity</li>" +
             "<li>Through a signature attest the authenticy of " +
             keyWord(AUTHORITY_URL_JSON) + " and " + keyWord(TRANSACTION_URL_JSON) + "</li>" +
-            "<li>Publish and attest the entity's current encryption key and parameters</li></ul>" +
-            point +
+            "<li>Publish and attest the entity's current encryption key and parameters</li></ul>");
+        if (debugData.nativeMode) {
+            nativeMode();
+        } else {
+            standardMode();
+        }
+        description("<p id=\"secretdata\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">Unencrypted User Authorization</p>" +
+            "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted.&nbsp;&nbsp;As shown it contains " +
+            "user account and identity data which <i>usually</i> is of no importance for the <b>Merchant</b>:");
+
+        fancyBox(MerchantService.userAuthorization);
+
+        descriptionStdMargin("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
+    }
+    
+    void standardMode() throws Exception {
+        // TODO Auto-generated method stub
+        
+    }
+
+    void nativeMode() throws Exception {
+        description(point +
             "<p>Now the <b>Merchant</b> creates a <i>signed</i> request and sends it to the " + keyWord(TRANSACTION_URL_JSON) +
             " extracted from the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.&nbsp;&nbsp;" +
             "Since the <b>Wallet</b> response is encrypted, the <b>Merchant</b> needs to prove to the <b>Bank</b> " +
@@ -318,15 +332,8 @@ class DebugPrintout implements BaseProperties {
                 }
             }
         }
-        description("<p id=\"secretdata\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">Unencrypted User Authorization</p>" +
-            "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted.&nbsp;&nbsp;As shown it contains " +
-            "user account and identity data which <i>usually</i> is of no importance for the <b>Merchant</b>:");
-
-        fancyBox(MerchantService.userAuthorization);
-
-        descriptionStdMargin("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }
-    
+
     public String toString() {
         return s.toString();
     }

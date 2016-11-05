@@ -98,7 +98,7 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.ChallengeResult;
+import org.webpki.saturn.common.ResponseToChallenge;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.Messages;
@@ -482,7 +482,7 @@ public class Wallet {
             ((CardLayout)views.getLayout()).show(views, VIEW_SELECTION);
         }
 
-        void userPayEvent(ChallengeResult[] challengeResults) {
+        void userPayEvent(ResponseToChallenge[] challengeResults) {
             if (userAuthorizationSucceeded(challengeResults)) {
 
                 // The user have done his/her part, now it is up to the rest of
@@ -779,11 +779,11 @@ public class Wallet {
                     dialog.setVisible(false);
                     windowAdapter.windowClosing(null);
                     if (hasSubmit) {
-                        Vector<ChallengeResult> results = new Vector<ChallengeResult>();
+                        Vector<ResponseToChallenge> results = new Vector<ResponseToChallenge>();
                         for (String id : challengeTextFields.keySet()) {
-                            results.add(new ChallengeResult(id, challengeTextFields.get(id).getText()));
+                            results.add(new ResponseToChallenge(id, challengeTextFields.get(id).getText()));
                         }
-                        userPayEvent(results.toArray(new ChallengeResult[0]));
+                        userPayEvent(results.toArray(new ResponseToChallenge[0]));
                     }
                 }
             });
@@ -1034,7 +1034,7 @@ public class Wallet {
             return false;
         }
 
-        boolean userAuthorizationSucceeded(ChallengeResult[] challengeResults) {
+        boolean userAuthorizationSucceeded(ResponseToChallenge[] challengeResults) {
             try {
                 if (pinBlockCheck()) {
                     return false;

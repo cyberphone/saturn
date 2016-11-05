@@ -47,7 +47,7 @@ public class AuthorizationData implements BaseProperties {
                                           AccountDescriptor accountDescriptor,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
-                                          ChallengeResult[] optionalChallengeResults,
+                                          ResponseToChallenge[] optionalChallengeResults,
                                           Date timeStamp,
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
@@ -61,8 +61,8 @@ public class AuthorizationData implements BaseProperties {
                 .setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setBinary(KEY_JSON, dataEncryptionKey));
         if (optionalChallengeResults != null && optionalChallengeResults.length > 0) {
-            JSONArrayWriter aw = wr.setArray(CHALLENGE_RESULTS_JSON);
-            for (ChallengeResult challengeResult : optionalChallengeResults) {
+            JSONArrayWriter aw = wr.setArray(RESPONSE_TO_CHALLENGE_JSON);
+            for (ResponseToChallenge challengeResult : optionalChallengeResults) {
                 aw.setObject(challengeResult.writeObject());
             }
             
@@ -77,7 +77,7 @@ public class AuthorizationData implements BaseProperties {
                                           AccountDescriptor accountDescriptor,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
-                                          ChallengeResult[] optionalChallengeResults,
+                                          ResponseToChallenge[] optionalChallengeResults,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
@@ -113,16 +113,16 @@ public class AuthorizationData implements BaseProperties {
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
             .getAlgorithmFromString(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
-        if (rd.hasProperty(CHALLENGE_RESULTS_JSON)) {
-            LinkedHashMap<String,ChallengeResult> results = new LinkedHashMap<String,ChallengeResult>();
-            JSONArrayReader ar = rd.getArray(CHALLENGE_RESULTS_JSON);
+        if (rd.hasProperty(RESPONSE_TO_CHALLENGE_JSON)) {
+            LinkedHashMap<String,ResponseToChallenge> results = new LinkedHashMap<String,ResponseToChallenge>();
+            JSONArrayReader ar = rd.getArray(RESPONSE_TO_CHALLENGE_JSON);
              do {
-                 ChallengeResult challengeResult = new ChallengeResult(ar.getObject());
+                 ResponseToChallenge challengeResult = new ResponseToChallenge(ar.getObject());
                 if (results.put(challengeResult.getId(), challengeResult) != null) {
                     throw new IOException("Duplicate: " + challengeResult.getId());
                 }
             } while (ar.hasMore());
-            optionalChallengeResults = results.values().toArray(new ChallengeResult[0]);
+            optionalChallengeResults = results.values().toArray(new ResponseToChallenge[0]);
         }
         
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
@@ -141,8 +141,8 @@ public class AuthorizationData implements BaseProperties {
         return dataEncryptionKey;
     }
 
-    ChallengeResult[] optionalChallengeResults;
-    public ChallengeResult[] getOptionalChallengeResults() {
+    ResponseToChallenge[] optionalChallengeResults;
+    public ResponseToChallenge[] getOptionalChallengeResults() {
         return optionalChallengeResults;
     }
 
