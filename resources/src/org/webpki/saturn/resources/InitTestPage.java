@@ -92,9 +92,10 @@ public class InitTestPage implements BaseProperties {
 
         // Create signed payment request
         JSONObjectWriter standardRequest = 
-            PaymentRequest.encode(Payee.init(args[3], args[4]),
+            PaymentRequest.encode(new Payee(args[3], args[4]),
                                   new BigDecimal("306.25"),
                                   Currencies.USD,
+                                  null,
                                   "#6100004",
                                   new Date(),
                                   ISODateTime.parseDateTime("2030-09-14T00:00:00Z").getTime(),

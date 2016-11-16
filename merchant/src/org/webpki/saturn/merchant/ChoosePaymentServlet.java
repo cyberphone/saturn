@@ -59,7 +59,7 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
             if (quantity != 0) {
                 String sku = or.getString("sku");
                 savedShoppingCart.items.put(sku, quantity);
-                total += quantity * or.getLong("priceX100");
+                total += quantity * or.getInt53("priceX100");
             }
         }
         savedShoppingCart.total = total;
