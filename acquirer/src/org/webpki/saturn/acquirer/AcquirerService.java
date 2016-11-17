@@ -38,7 +38,6 @@ import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 
@@ -47,9 +46,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.PayeeAuthorityList;
-import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.Expires;
+import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerX509Signer;
@@ -75,6 +72,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static final String LOGGING               = "logging";
 
+    static final int PROVIDER_EXPIRATION_TIME = 3600;
+
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
 
     static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb = new LinkedHashMap<String,PayeeCoreProperties>();
@@ -87,9 +86,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     
     static String payeeId;
     
-    static byte[] publishedAuthorityData;
-
-    static PayeeAuthorityList payeeAuthorityList;
+    static AuthorityObjectManager authorityObjectManager;
     
     static boolean logging;
     
@@ -142,20 +139,18 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             addDecryptionKey(DECRYPTION_KEY2);
             
             String aquirerHost = getPropertyString(ACQUIRER_HOST);
-            publishedAuthorityData =
-                ProviderAuthority.encode(authorityUrl = aquirerHost + "/authority",
-                                         aquirerHost + "/authorize",
-                                         aquirerHost + "/transact",
-                                         null,
-                                         decryptionKeys.get(0).getPublicKey(),
-                                         Expires.inDays(365),
-                                         acquirerKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
-
-            payeeAuthorityList = new PayeeAuthorityList(merchantAccountDb, 
-                                                        acquirerKey,
-                                                        aquirerHost + "/payees/",
-                                                        authorityUrl,
-                                                        3600);
+            authorityObjectManager =
+                new AuthorityObjectManager(authorityUrl = aquirerHost + "/authority",
+                                           aquirerHost + "/authorize",
+                                           aquirerHost + "/transact",
+                                           null,
+                                           decryptionKeys.get(0).getPublicKey(),
+                                           
+                                           merchantAccountDb, 
+                                           aquirerHost + "/payees/",
+                                           
+                                           PROVIDER_EXPIRATION_TIME,
+                                           acquirerKey);
 
             logging = getPropertyBoolean(LOGGING);
 

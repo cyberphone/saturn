@@ -40,7 +40,6 @@ import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 
@@ -49,9 +48,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.PayeeAuthorityList;
-import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.Expires;
+import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ServerX509Signer;
@@ -85,6 +82,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
     static final String LOGGING               = "logging";
+    
+    static final int PROVIDER_EXPIRATION_TIME = 3600;
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
     
@@ -102,15 +101,13 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static X509Certificate[] bankCertificatePath;
     
-    static byte[] publishedAuthorityData;
-
     static Integer serverPortMapping;
     
     static String authorityUrl;
     
     static int referenceId;
     
-    static PayeeAuthorityList payeeAuthorityList;
+    static AuthorityObjectManager authorityObjectManager;
     
     static boolean logging;
 
@@ -183,20 +180,18 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             referenceId = getPropertyInt(REFERENCE_ID_START);
 
             String bankHost = getPropertyString(BANK_HOST);
-            publishedAuthorityData =
-                ProviderAuthority.encode(authorityUrl = bankHost + "/authority",
-                                         bankHost + "/authorize",
-                                         bankHost + "/transact",
-                                         new String[]{"https://swift.com", "https://ultragiro.se"},
-                                         decryptionKeys.get(0).getPublicKey(),
-                                         Expires.inDays(365),
-                                         bankKey).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
+            authorityObjectManager = 
+                new AuthorityObjectManager(authorityUrl = bankHost + "/authority",
+                                           bankHost + "/authorize",
+                                           bankHost + "/transact",
+                                           new String[]{"https://swift.com", "https://ultragiro.se"},
+                                           decryptionKeys.get(0).getPublicKey(),
 
-            payeeAuthorityList = new PayeeAuthorityList(merchantAccountDb, 
-                                                        bankKey,
-                                                        bankHost + "/payees/",
-                                                        authorityUrl,
-                                                        3600);
+                                           merchantAccountDb,
+                                           bankHost + "/payees/",
+
+                                           PROVIDER_EXPIRATION_TIME,
+                                           bankKey);
 
             logging = getPropertyBoolean(LOGGING);
 

@@ -40,6 +40,6 @@ public class ProviderAuthorityServlet extends HttpServlet {
         response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(AcquirerService.publishedAuthorityData);
+        response.getOutputStream().write(AcquirerService.authorityObjectManager.getProviderAuthorityBlob());
     }
 }

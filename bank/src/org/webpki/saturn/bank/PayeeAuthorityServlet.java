@@ -35,7 +35,7 @@ public class PayeeAuthorityServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String id = request.getPathInfo();
         if (id != null) {
-            byte[] authorityBlob = BankService.payeeAuthorityList.getAuthorityBlob(id.substring(1));
+            byte[] authorityBlob = BankService.authorityObjectManager.getPayeeAuthorityBlob(id.substring(1));
             if (authorityBlob != null) {
                 response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
                 response.setHeader("Pragma", "No-Cache");
