@@ -14,12 +14,20 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.merchant;
+package org.webpki.saturn.common;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 // The purpose of this class is to enable URL information in exceptions
 
 public class UrlHolder {
+    String callerAddress;
+    
+    public UrlHolder(HttpServletRequest request) {
+        callerAddress = " [Origin=" + request.getRemoteAddr() + ", Context=" + request.getContextPath() + "] ";
+    }
+
     private String url;
 
     public String getUrl() {
@@ -28,6 +36,10 @@ public class UrlHolder {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+    
+    public String getCallerAddress() {
+        return callerAddress;
     }
 }
     

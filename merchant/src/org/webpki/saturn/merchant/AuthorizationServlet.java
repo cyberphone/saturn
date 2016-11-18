@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.net.URL;
 
 import java.security.GeneralSecurityException;
+
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -48,6 +49,7 @@ import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -84,9 +86,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                            new URL(providerAuthorityUrl).getFile()).toExternalForm();
         }
 
-        // Lookup of Payer's bank.  You would typically cache such information
+        // Lookup of Payer's bank
         urlHolder.setUrl(providerAuthorityUrl);
-        ProviderAuthority providerAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
+        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
         urlHolder.setUrl(null);
 
         if (debug) {
@@ -97,14 +99,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         AccountDescriptor accountDescriptor = null;
         if (!cardPayment) {
-            for (String accountType : providerAuthority.getProviderAccountTypes()) {
+            for (String accountType : providerAuthority.getProviderAccountTypes(true)) {
                 if (accountType.equals(MERCHANT_ACCOUNT_TYPE)) {
                     accountDescriptor = new AccountDescriptor(accountType, MERCHANT_ACCOUNT_ID);
                     break;
                 }
             }
             if (accountDescriptor == null) {
-                throw new IOException("No matching account type: " + providerAuthority.getProviderAccountTypes());
+                throw new IOException("No matching account type: " + providerAuthority.getProviderAccountTypes(true));
             }
         }
 
@@ -182,9 +184,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                    BigDecimal amount,
                                    UrlHolder urlHolder,
                                    DebugData debugData) throws IOException {
-        // Lookup of configured acquirer authority.  This information is preferably cached
+        // Lookup of configured acquirer authority
         urlHolder.setUrl(MerchantService.acquirerAuthorityUrl);
-        ProviderAuthority acquirerAuthority = new ProviderAuthority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
+        ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
         urlHolder.setUrl(acquirerAuthority.getAuthorizationUrl());
         if (debugData != null) {
             debugData.acquirerAuthority = acquirerAuthority.getRoot();

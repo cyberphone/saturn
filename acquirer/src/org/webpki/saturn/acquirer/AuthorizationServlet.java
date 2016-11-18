@@ -22,6 +22,7 @@ import java.security.GeneralSecurityException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.CardPaymentRequest;
 import org.webpki.saturn.common.CardPaymentResponse;
 import org.webpki.saturn.common.PayeeCoreProperties;

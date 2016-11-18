@@ -83,7 +83,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static final String LOGGING               = "logging";
     
-    static final int PROVIDER_EXPIRATION_TIME = 3600;
+    static final int PROVIDER_EXPIRATION_TIME = 360;
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
     
@@ -135,6 +135,13 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     @Override
     public void contextDestroyed(ServletContextEvent event) {
+        if (authorityObjectManager != null) {
+            try {
+                authorityObjectManager.interrupt();
+                authorityObjectManager.join();
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
     @Override

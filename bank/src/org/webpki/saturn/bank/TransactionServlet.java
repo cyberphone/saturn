@@ -17,14 +17,19 @@
 package org.webpki.saturn.bank;
 
 import java.io.IOException;
+
 import java.security.GeneralSecurityException;
+
 import java.util.HashMap;
 
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
+
 import org.webpki.util.ISODateTime;
+
+import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.FinalizeTransactionRequest;
@@ -154,7 +159,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         JSONObjectWriter encryptedCardData = null;
         if (cardPayment) {
 
-            // Lookup of payee's acquirer.  You would typically cache such information
+            // Lookup of payee's acquirer
             urlHolder.setUrl(reserveOrBasicRequest.getAcquirerAuthorityUrl());
             ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
 
@@ -167,7 +172,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
             encryptedCardData = new JSONObjectWriter()
                 .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                      acquirerAuthority.getDataEncryptionAlgorithm(),
-                                     acquirerAuthority.getEncryptionPublicKey(),
+                                     acquirerAuthority.getEncryptionKey(true),
                                      acquirerAuthority.getKeyEncryptionAlgorithm());
         }
 

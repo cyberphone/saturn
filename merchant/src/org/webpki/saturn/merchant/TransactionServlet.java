@@ -17,15 +17,11 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.net.URL;
-
 import java.security.GeneralSecurityException;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.Messages;
@@ -46,6 +41,7 @@ import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.FinalizeRequest;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //

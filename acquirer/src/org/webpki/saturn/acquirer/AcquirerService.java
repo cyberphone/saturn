@@ -114,6 +114,13 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     
     @Override
     public void contextDestroyed(ServletContextEvent event) {
+        if (authorityObjectManager != null) {
+            try {
+                authorityObjectManager.interrupt();
+                authorityObjectManager.join();
+            } catch (InterruptedException e) {
+            }
+        }
     }
 
     @Override

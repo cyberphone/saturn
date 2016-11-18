@@ -45,8 +45,7 @@ public class AuthorityObjectManager extends Thread {
     long renewCycle;
     byte[] providerAuthorityBlob;
     ServerX509Signer providerSigner;
-
-
+    
     void update() throws IOException {
         synchronized(this) {
             providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,

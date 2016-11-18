@@ -17,12 +17,16 @@
 package org.webpki.saturn.acquirer;
 
 import java.io.IOException;
+
 import java.io.PrintWriter;
+
 import java.security.GeneralSecurityException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,11 +35,10 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+
+import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.FinalizeCardpayResponse;
-import org.webpki.saturn.common.PayeeCoreProperties;
-import org.webpki.saturn.common.Payee;
-import org.webpki.saturn.common.FinalizeRequest;
+
 import org.webpki.webutil.ServletUtil;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -54,35 +57,13 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return "#" + (referenceId++);
     }
 
-    class UrlHolder {
-        String remoteAddress;
-        String contextPath;
-        String callerAddress;
-        
-        UrlHolder(String remoteAddress, String contextPath) {
-            this.remoteAddress = remoteAddress;
-            this.contextPath = contextPath;
-            callerAddress = " [Origin=" + remoteAddress + ", Context=" + contextPath + "] ";
-        }
-
-        private String url;
-
-        public String getUrl() {
-            return url;
-        }
-
-        public void setUrl(String url) {
-            this.url = url;
-        }
-    }
-    
     abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest)
     throws IOException, GeneralSecurityException;
     
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = null;
         try {
-            urlHolder = new UrlHolder(request.getRemoteAddr(), request.getContextPath());
+            urlHolder = new UrlHolder(request);
 
             String contentType = request.getContentType();
             if (!contentType.equals(JSON_CONTENT_TYPE)) {
@@ -90,13 +71,13 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
             JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
             if (AcquirerService.logging) {
-                logger.info("Call from" + urlHolder.callerAddress + "with data:\n" + providerRequest);
+                logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
             }
             
             JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest);
 
             if (AcquirerService.logging) {
-                logger.info("Responded to caller"  + urlHolder.callerAddress + "with data:\n" + providerResponse);
+                logger.info("Responded to caller"  + urlHolder.getCallerAddress() + "with data:\n" + providerResponse);
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +95,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
             /////////////////////////////////////////////////////////////////////////////////////////
-            String message = (urlHolder == null ? "" : "Source" + urlHolder.callerAddress) + e.getMessage();
+            String message = (urlHolder == null ? "" : "Source" + urlHolder.getCallerAddress()) + e.getMessage();
             logger.log(Level.SEVERE, message, e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = response.getWriter();

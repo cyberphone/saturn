@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
@@ -48,8 +49,8 @@ public class ProviderAuthority implements BaseProperties {
     public static JSONObjectWriter encode(String authorityUrl,
                                           String authorizationUrl,
                                           String transactionUrl,
-                                          String[] providerAccountTypes,
-                                          PublicKey encryptionPublicKey,
+                                          String[] optionalProviderAccountTypes,
+                                          PublicKey optionalEncryptionKey,
                                           Date expires,
                                           ServerX509Signer signer) throws IOException {
         test(authorizationUrl, transactionUrl);
@@ -64,18 +65,20 @@ public class ProviderAuthority implements BaseProperties {
         if (transactionUrl != null) {
             wr.setString(TRANSACTION_URL_JSON, transactionUrl);
         }
-        if (providerAccountTypes != null) {
-            wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, providerAccountTypes);
+        if (optionalProviderAccountTypes != null) {
+            wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes);
         }
-        wr.setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-            .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
-            .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
-                         (encryptionPublicKey instanceof RSAPublicKey ?
-           KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
-            .setPublicKey(encryptionPublicKey, AlgorithmPreferences.JOSE))
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
-            .setSignature(signer);
+        if (optionalEncryptionKey != null) {
+            wr.setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
+                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
+                .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
+                             (optionalEncryptionKey instanceof RSAPublicKey ?
+               KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
+                .setPublicKey(optionalEncryptionKey, AlgorithmPreferences.JOSE));
+        }
+        wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
+          .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
+          .setSignature(signer);
         return wr;
     }
 
@@ -93,13 +96,15 @@ public class ProviderAuthority implements BaseProperties {
         authorizationUrl = rd.getStringConditional(AUTHORIZATION_URL_JSON);
         transactionUrl = rd.getStringConditional(TRANSACTION_URL_JSON);
         test(authorizationUrl, transactionUrl);
-        providerAccountTypes = rd.getStringArrayConditional(PROVIDER_ACCOUNT_TYPES_JSON);
-        JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        dataEncryptionAlgorithm = DataEncryptionAlgorithms
-            .getAlgorithmFromString(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
-        keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-            .getAlgorithmFromString(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
-        encryptionPublicKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
+        optionalProviderAccountTypes = rd.getStringArrayConditional(PROVIDER_ACCOUNT_TYPES_JSON);
+        if (rd.hasProperty(ENCRYPTION_PARAMETERS_JSON)) {
+            JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
+            dataEncryptionAlgorithm = DataEncryptionAlgorithms
+                .getAlgorithmFromString(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
+            keyEncryptionAlgorithm = KeyEncryptionAlgorithms
+                .getAlgorithmFromString(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
+            optionalEncryptionKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
+        }
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -127,9 +132,12 @@ public class ProviderAuthority implements BaseProperties {
         return transactionUrl;
     }
 
-    String[] providerAccountTypes;
-    public String[] getProviderAccountTypes() {
-        return providerAccountTypes;
+    String[] optionalProviderAccountTypes;
+    public String[] getProviderAccountTypes(boolean required) throws IOException {
+        if (required && optionalProviderAccountTypes == null) {
+            throw new IOException("Expected \"" + PROVIDER_ACCOUNT_TYPES_JSON + "\" missing in: " + authorityUrl);
+        }
+        return optionalProviderAccountTypes;
     }
 
     DataEncryptionAlgorithms dataEncryptionAlgorithm;
@@ -142,9 +150,12 @@ public class ProviderAuthority implements BaseProperties {
         return keyEncryptionAlgorithm;
     }
 
-    PublicKey encryptionPublicKey;
-    public PublicKey getEncryptionPublicKey() {
-        return encryptionPublicKey;
+    PublicKey optionalEncryptionKey;
+    public PublicKey getEncryptionKey(boolean required) throws IOException {
+        if (required && optionalEncryptionKey == null) {
+            throw new IOException("Expected \"" + ENCRYPTION_PARAMETERS_JSON + "\" missing in: " + authorityUrl);
+        }
+        return optionalEncryptionKey;
     }
 
     GregorianCalendar expires;

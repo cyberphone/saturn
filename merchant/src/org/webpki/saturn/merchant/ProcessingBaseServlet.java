@@ -22,6 +22,10 @@ import java.net.URL;
 
 import java.security.GeneralSecurityException;
 
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -45,6 +49,8 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.webutil.ServletUtil;
 
+import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
@@ -61,6 +67,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
+    static Map<String,ProviderAuthority> providerAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
+
     static final int TIMEOUT_FOR_REQUEST = 5000;
     
     static String portFilter(String url) throws IOException {
@@ -86,14 +94,16 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         JSONObjectReader result = JSONParser.parse(wrap.getData());
         if (MerchantService.logging) {
-            logger.info("Call to " + urlHolder.getUrl() + " returned:\n" + result);
+            logger.info("Call to " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
+                        "returned:\n" + result);
         }
         return result;
     }
 
     static JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
         if (MerchantService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + " with data:\n" + request);
+            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
+                        "with data:\n" + request);
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
@@ -105,7 +115,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     static JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
         if (MerchantService.logging) {
-            logger.info("About to call " + urlHolder.getUrl());
+            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress());
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
@@ -121,6 +131,22 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         response.getOutputStream().write(data.serializeJSONObject(JSONOutputFormats.NORMALIZED));
     }
 
+    static ProviderAuthority getProviderAuthority(UrlHolder urlHolder) throws IOException {
+        ProviderAuthority providerAuthority = providerAuthorityObjects.get(urlHolder.getUrl());
+        if (providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
+            providerAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
+            providerAuthorityObjects.put(urlHolder.getUrl(), providerAuthority);
+            if (MerchantService.logging) {
+                logger.info("Updated cache " + urlHolder.getUrl());
+            }
+        } else {
+            if (MerchantService.logging) {
+                logger.info("Fetched from cache " + urlHolder.getUrl());
+            }
+        }
+        return providerAuthority;
+    }
+
     abstract void processCall(JSONObjectReader walletResponse,
                               PaymentRequest paymentRequest, 
                               PayerAuthorization payerAuthorization,
@@ -133,7 +159,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        UrlHolder urlHolder = new UrlHolder();
+        UrlHolder urlHolder = new UrlHolder(request);
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {

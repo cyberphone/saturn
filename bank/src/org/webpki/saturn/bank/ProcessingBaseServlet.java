@@ -25,6 +25,11 @@ import java.net.URL;
 
 import java.security.GeneralSecurityException;
 
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,6 +50,7 @@ import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.UrlHolder;
 
 import org.webpki.webutil.ServletUtil;
 
@@ -66,6 +72,10 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static final BigDecimal DEMO_RBA_LIMIT         = new BigDecimal("100000.00");
     static final String RBA_PARM_MOTHER            = "mother";
     
+    static Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
+
+    static Map<String,ProviderAuthority> providerAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
+
 
     static String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
@@ -90,7 +100,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         JSONObjectReader result = JSONParser.parse(wrap.getData());
         if (BankService.logging) {
-            logger.info("Call to " + urlHolder.getUrl() + urlHolder.callerAddress +
+            logger.info("Call to " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
                         "returned:\n" + result);
         }
         return result;
@@ -98,7 +108,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     static JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
         if (BankService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress +
+            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
                         "with data:\n" + request);
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
@@ -111,7 +121,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     static JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
         if (BankService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.callerAddress);
+            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress());
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
@@ -120,40 +130,41 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return fetchJSONData(wrap, urlHolder);
     }
 
-    // The purpose of this class is to enable URL information in exceptions
-
-    class UrlHolder {
-        String remoteAddress;
-        String contextPath;
-        String callerAddress;
-        
-        UrlHolder(HttpServletRequest request) {
-            this.remoteAddress = request.getRemoteAddr();
-            this.contextPath = request.getContextPath();
-            callerAddress = " [Origin=" + remoteAddress + ", Context=" + contextPath + "] ";
-        }
-
-        private String url;
-
-        String getUrl() {
-            return url;
-        }
-
-        void setUrl(String url) {
-            this.url = url;
-        }
-    }
     
     static String getReferenceId() {
         return "#" + (BankService.referenceId++);
     }
     
     static ProviderAuthority getProviderAuthority(UrlHolder urlHolder) throws IOException {
-        return new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
+        ProviderAuthority providerAuthority = providerAuthorityObjects.get(urlHolder.getUrl());
+        if (providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
+            providerAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
+            providerAuthorityObjects.put(urlHolder.getUrl(), providerAuthority);
+            if (BankService.logging) {
+                logger.info("Updated cache " + urlHolder.getUrl());
+            }
+        } else {
+            if (BankService.logging) {
+                logger.info("Fetched from cache " + urlHolder.getUrl());
+            }
+        }
+        return providerAuthority;
     }
 
     static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder) throws IOException {
-        return new PayeeAuthority(getData(urlHolder), urlHolder.getUrl());
+        PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(urlHolder.getUrl());
+        if (payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
+            payeeAuthority = new PayeeAuthority(getData(urlHolder), urlHolder.getUrl());
+            payeeAuthorityObjects.put(urlHolder.getUrl(), payeeAuthority);
+            if (BankService.logging) {
+                logger.info("Updated cache " + urlHolder.getUrl());
+            }
+        } else {
+            if (BankService.logging) {
+                logger.info("Fetched from cache " + urlHolder.getUrl());
+            }
+        }
+        return payeeAuthority;
     }
  
     static String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
@@ -175,7 +186,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
             JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
             if (BankService.logging) {
-                logger.info("Call from" + urlHolder.callerAddress + "with data:\n" + providerRequest);
+                logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +194,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             JSONObjectWriter providerResponse = processCall(providerRequest, urlHolder); 
             if (BankService.logging) {
-                logger.info("Responded to caller"  + urlHolder.callerAddress + "with data:\n" + providerResponse);
+                logger.info("Responded to caller"  + urlHolder.getCallerAddress() + "with data:\n" + providerResponse);
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +212,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
             /////////////////////////////////////////////////////////////////////////////////////////
-            String message = (urlHolder == null ? "" : "From" + urlHolder.callerAddress +
+            String message = (urlHolder == null ? "" : "From" + urlHolder.getCallerAddress() +
                               (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl()) + "\n") + e.getMessage();
             logger.log(Level.SEVERE, message, e);
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

@@ -50,6 +50,10 @@ public class PayeeAuthority implements BaseProperties {
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         Messages.parseBaseMessage(Messages.PAYEE_AUTHORITY, root = rd);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
+        if (!authorityUrl.equals(expectedAuthorityUrl)) {
+            throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
+                                  " expected=" + expectedAuthorityUrl);
+        }
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         payee = new Payee(rd);
         payeePublicKey = rd.getPublicKey(AlgorithmPreferences.JOSE);

@@ -17,20 +17,18 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.saturn.common.ReserveOrBasicResponse;
+import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet shows the result of a transaction to the user           //
@@ -61,7 +59,7 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        UrlHolder urlHolder = new UrlHolder();
+        UrlHolder urlHolder = new UrlHolder(request);
         HttpSession session = request.getSession(false);
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
