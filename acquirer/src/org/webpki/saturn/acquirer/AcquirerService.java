@@ -126,7 +126,10 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     @Override
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
-         try {
+        try {
+            logging = getPropertyBoolean(LOGGING);
+
+             
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));;
 
             acquirerKey = new ServerX509Signer(new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
@@ -152,14 +155,15 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                            aquirerHost + "/transact",
                                            null,
                                            decryptionKeys.get(0).getPublicKey(),
-                                           
+
                                            merchantAccountDb, 
                                            aquirerHost + "/payees/",
-                                           
-                                           PROVIDER_EXPIRATION_TIME,
-                                           acquirerKey);
 
-            logging = getPropertyBoolean(LOGGING);
+                                           PROVIDER_EXPIRATION_TIME,
+                                           acquirerKey,
+
+                                           logging);
+
 
             logger.info("Saturn Acquirer-server initiated");
         } catch (Exception e) {

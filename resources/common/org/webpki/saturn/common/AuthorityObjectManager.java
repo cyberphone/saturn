@@ -45,6 +45,8 @@ public class AuthorityObjectManager extends Thread {
     long renewCycle;
     byte[] providerAuthorityBlob;
     ServerX509Signer providerSigner;
+
+    boolean logging;
     
     void update() throws IOException {
         synchronized(this) {
@@ -56,7 +58,9 @@ public class AuthorityObjectManager extends Thread {
                                                              Expires.inSeconds(expiryTimeInSeconds),
                                                              providerSigner).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
         }
-        logger.info("Updated \"" + Messages.PROVIDER_AUTHORITY.toString() + "\"");
+        if (logging) {
+            logger.info("Updated \"" + Messages.PROVIDER_AUTHORITY.toString() + "\"");
+        }
 
         for (String id : payees.keySet()) {
             PayeeCoreProperties payeeCoreProperties = payees.get(id);
@@ -69,22 +73,26 @@ public class AuthorityObjectManager extends Thread {
                                                               Expires.inSeconds(expiryTimeInSeconds),
                                                               providerSigner).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT));
             }
-            logger.info("Updated \"" + Messages.PAYEE_AUTHORITY.toString() + "\" with id:" + id);
+            if (logging) {
+                logger.info("Updated \"" + Messages.PAYEE_AUTHORITY.toString() + "\" with id:" + id);
+            }
         }
 
     }
 
     public AuthorityObjectManager(String providerAuthorityUrl,
-                                    String authorizeUrl,
-                                    String transactionUrl,
-                                    String[] optionalProviderAccountTypes,
-                                    PublicKey optionalEncryptionKey,
+                                  String authorizeUrl,
+                                  String transactionUrl,
+                                  String[] optionalProviderAccountTypes,
+                                  PublicKey optionalEncryptionKey,
                                     
-                                    LinkedHashMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
-                                    String payeeBaseAuthorityUrl,
+                                  LinkedHashMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
+                                  String payeeBaseAuthorityUrl,
 
-                                    int expiryTimeInSeconds,
-                                    ServerX509Signer providerSigner) throws IOException {
+                                  int expiryTimeInSeconds,
+                                  ServerX509Signer providerSigner,
+                                  
+                                  boolean logging) throws IOException {
         this.providerAuthorityUrl = providerAuthorityUrl;
         this.authorizeUrl = authorizeUrl;
         this.transactionUrl = transactionUrl;
@@ -97,6 +105,7 @@ public class AuthorityObjectManager extends Thread {
         this.expiryTimeInSeconds = expiryTimeInSeconds;
         this.renewCycle = expiryTimeInSeconds * 500;
         this.providerSigner = providerSigner;
+        this.logging = logging;
         update();
         start();
     }

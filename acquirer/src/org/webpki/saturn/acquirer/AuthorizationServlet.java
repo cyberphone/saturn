@@ -17,11 +17,13 @@
 package org.webpki.saturn.acquirer;
 
 import java.io.IOException;
+
 import java.security.GeneralSecurityException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.CardPaymentRequest;
 import org.webpki.saturn.common.CardPaymentResponse;
@@ -53,7 +55,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         if (!merchantProperties.getPublicKey().equals(cardPaymentRequest.getPublicKey())) {
             throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
         }
-        logger.info("Card data: " + cardPaymentRequest.getProtectedAccountData(AcquirerService.decryptionKeys));
+
+        // Get card data
+        ProtectedAccountData protectedAccountData = cardPaymentRequest.getProtectedAccountData(AcquirerService.decryptionKeys);
+        if (AcquirerService.logging) {
+            logger.info("Card data: " + protectedAccountData);
+        }
 
         // Here we are supposed to talk to the card payment network....
 

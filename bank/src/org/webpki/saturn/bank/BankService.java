@@ -83,7 +83,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static final String LOGGING               = "logging";
     
-    static final int PROVIDER_EXPIRATION_TIME = 360;
+    static final int PROVIDER_EXPIRATION_TIME = 3600;
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
     
@@ -147,7 +147,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     @Override
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
-         try {
+        try {
+            logging = getPropertyBoolean(LOGGING);
+
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
@@ -198,9 +200,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            bankHost + "/payees/",
 
                                            PROVIDER_EXPIRATION_TIME,
-                                           bankKey);
+                                           bankKey,
 
-            logging = getPropertyBoolean(LOGGING);
+                                           logging);
 
             logger.info("Saturn \"" + bankCommonName + "\" server initiated");
         } catch (Exception e) {
