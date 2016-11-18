@@ -148,7 +148,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
          try {
-             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
+            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);

@@ -30,6 +30,7 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
+import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.json.encryption.DecryptionKeyHolder;
 
@@ -94,5 +95,9 @@ public class CardPaymentRequest implements BaseProperties {
         return new ProtectedAccountData(JSONParser.parse(authorizationResponse
                                                              .encryptedCardData
                                                                  .getDecryptedData(decryptionKeys)));
+    }
+
+    public void verifyUserBank(JSONX509Verifier paymentRoot) throws IOException {
+        authorizationResponse.signatureDecoder.verify(paymentRoot);
     }
 }

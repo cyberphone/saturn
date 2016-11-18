@@ -41,8 +41,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Decode the finalize cardpay request
         CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest);
 
-        // Verify that the merchant's bank is known
-//        cardPaymentRequest.verifyMerchantBank(AcquirerService.paymentRoot);
+        // Verify that the user's bank is known
+        cardPaymentRequest.verifyUserBank(AcquirerService.paymentRoot);
 
         // Verify that the merchant is one of our customers
         Payee payee = cardPaymentRequest.getPayee();

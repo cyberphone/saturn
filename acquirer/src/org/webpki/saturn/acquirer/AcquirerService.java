@@ -127,7 +127,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     public void contextInitialized(ServletContextEvent event) {
         initProperties (event);
          try {
-             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));;
+            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));;
 
             acquirerKey = new ServerX509Signer(new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD)));
