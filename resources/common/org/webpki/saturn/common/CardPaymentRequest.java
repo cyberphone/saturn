@@ -90,11 +90,11 @@ public class CardPaymentRequest implements BaseProperties {
             .setSignature(signer);
     }
 
-    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
+    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys, boolean cardAccount)
     throws IOException, GeneralSecurityException {
         return new ProtectedAccountData(JSONParser.parse(authorizationResponse
                                                              .encryptedCardData
-                                                                 .getDecryptedData(decryptionKeys)));
+                                                                 .getDecryptedData(decryptionKeys)), cardAccount);
     }
 
     public void verifyUserBank(JSONX509Verifier paymentRoot) throws IOException {

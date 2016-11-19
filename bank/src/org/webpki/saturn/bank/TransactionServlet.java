@@ -42,6 +42,7 @@ import org.webpki.saturn.common.ReserveOrBasicRequest;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.Messages;
+import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.TransactionRequest;
@@ -166,9 +167,9 @@ public class TransactionServlet extends ProcessingBaseServlet {
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
                 ProtectedAccountData.encode(authorizationData.getAccountDescriptor(),
-                                            "Luke Skywalker",
-                                            ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
-                                            "943");
+                                            new CardSpecificData("Luke Skywalker",
+                                                                 ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
+                                                                 "943"));
             encryptedCardData = new JSONObjectWriter()
                 .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                      acquirerAuthority.getDataEncryptionAlgorithm(),
@@ -274,7 +275,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         // Decode the finalize cardpay request
         FinalizeRequest finalizeRequest = new FinalizeRequest(payeeRequest);
         
-        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(BankService.decryptionKeys));
+        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(BankService.decryptionKeys, true));
 
         // Here we are supposed to talk to the card payment network....
 

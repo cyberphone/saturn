@@ -18,33 +18,29 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.Date;
-import java.util.GregorianCalendar;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 public class ProtectedAccountData implements BaseProperties {
     
     public static JSONObjectWriter encode(AccountDescriptor accountDescriptor,
-                                          String accountHolder,
-                                          Date expires,
-                                          String accountSecurityCode) throws IOException {
-        return new JSONObjectWriter()
-            .setObject(ACCOUNT_JSON, accountDescriptor.writeObject())
-            .setString(ACCOUNT_HOLDER_JSON, accountHolder)
-            .setDateTime(EXPIRES_JSON, expires, true)
-            .setString(ACCOUNT_SECURITY_CODE_JSON, accountSecurityCode);
+                                          CardSpecificData cardSpecificData) throws IOException {
+        JSONObjectWriter wr = new JSONObjectWriter()
+            .setObject(ACCOUNT_JSON, accountDescriptor.writeObject());
+        if (cardSpecificData != null) {
+            cardSpecificData.writeData(wr);
+        }
+        return wr;
     }
     
     JSONObjectReader root;
 
-    public ProtectedAccountData(JSONObjectReader rd) throws IOException {
+    public ProtectedAccountData(JSONObjectReader rd, boolean cardAccount) throws IOException {
         root = rd;
         accountDescriptor = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
-        accountHolder = rd.getString(ACCOUNT_HOLDER_JSON);
-        expires = rd.getDateTime(EXPIRES_JSON);
-        accountSecurityCode = rd.getString(ACCOUNT_SECURITY_CODE_JSON);
+        if (cardAccount) {
+            cardSpecificData = new CardSpecificData(rd);
+        }
         rd.checkForUnread();
     }
 
@@ -53,19 +49,9 @@ public class ProtectedAccountData implements BaseProperties {
         return accountDescriptor;
     }
 
-    String accountHolder;
-    public String getAccountHolder() {
-        return accountHolder;
-    }
-
-    GregorianCalendar expires;
-    public GregorianCalendar getExpires() {
-        return expires;
-    }
-
-    String accountSecurityCode;
-    public String getAccountSecurityCode() {
-        return accountSecurityCode;
+    CardSpecificData cardSpecificData;
+    public CardSpecificData getCardSpecificData() {
+        return cardSpecificData;
     }
 
     @Override

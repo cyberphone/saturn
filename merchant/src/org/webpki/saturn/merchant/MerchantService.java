@@ -53,6 +53,7 @@ import org.webpki.util.ISODateTime;
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ProtectedAccountData;
@@ -271,9 +272,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             protectedAccountData = 
                 ProtectedAccountData.encode(new AccountDescriptor(PayerAccountTypes.SUPER_CARD.getTypeUri(),
                                                                   "6875056745552109"),
-                                            "Luke Skywalker",
-                                            ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
-                                            "943").serializeJSONObject(JSONOutputFormats.NORMALIZED);
+                                            new CardSpecificData("Luke Skywalker",
+                                                                 ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
+                                                                 "943")).serializeJSONObject(JSONOutputFormats.NORMALIZED);
 
             logging = getPropertyBoolean(LOGGING);
 

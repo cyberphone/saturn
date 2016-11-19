@@ -58,7 +58,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
             throw new IOException("Non-matching issuer for merchant Id: " + payee.getId());
         }
 
-        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(AcquirerService.decryptionKeys));
+        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(AcquirerService.decryptionKeys, true));
 
         // Here we are supposed to talk to the card payment network....
 

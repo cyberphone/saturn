@@ -32,6 +32,7 @@ import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
+import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.ProviderUserResponse;
@@ -133,9 +134,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
                 ProtectedAccountData.encode(authorizationData.getAccountDescriptor(),
-                                            "Luke Skywalker",
-                                            ISODateTime.parseDateTime("2019-12-31T00:00:00Z").getTime(),
-                                            "943");
+                                            new CardSpecificData("Luke Skywalker",
+                                                                 ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
+                                                                 "943"));
             encryptedCardData = new JSONObjectWriter()
                 .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                      acquirerAuthority.getDataEncryptionAlgorithm(),

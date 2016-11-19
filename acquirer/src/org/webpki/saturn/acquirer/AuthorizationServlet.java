@@ -57,7 +57,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Get card data
-        ProtectedAccountData protectedAccountData = cardPaymentRequest.getProtectedAccountData(AcquirerService.decryptionKeys);
+        ProtectedAccountData protectedAccountData = cardPaymentRequest.getProtectedAccountData(AcquirerService.decryptionKeys, true);
         if (AcquirerService.logging) {
             logger.info("Card data: " + protectedAccountData);
         }
