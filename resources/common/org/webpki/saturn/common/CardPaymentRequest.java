@@ -93,7 +93,7 @@ public class CardPaymentRequest implements BaseProperties {
     public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys, boolean cardAccount)
     throws IOException, GeneralSecurityException {
         return new ProtectedAccountData(JSONParser.parse(authorizationResponse
-                                                             .encryptedCardData
+                                                             .encryptedAccountData
                                                                  .getDecryptedData(decryptionKeys)), cardAccount);
     }
 

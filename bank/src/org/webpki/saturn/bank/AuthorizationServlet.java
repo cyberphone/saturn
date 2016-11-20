@@ -22,7 +22,6 @@ import java.security.GeneralSecurityException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -30,8 +29,8 @@ import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.ChallengeField;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UserAccountEntry;
@@ -122,28 +121,21 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                authorizationData.getDataEncryptionAlgorithm());
         }
 
+        // Lookup of payee's provider
+        urlHolder.setUrl(payeeAuthority.getProviderAuthorityUrl());
+        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
+        urlHolder.setUrl(null);
+
+        // Pure sample data...
         // Separate credit-card and account2account payments
-        JSONObjectWriter encryptedCardData = null;
-        if (cardPayment) {
+        AccountDescriptor accountDescriptor = cardPayment ?
+            authorizationData.getAccountDescriptor() : new AccountDescriptor("https://swift.com", "IBAN:FGFGFGFFGFGFGFGF");
+        CardSpecificData cardSpecificData = cardPayment ? 
+            new CardSpecificData("Luke Skywalker",
+                                 ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),
+                                 "943") : null;
 
-            // Lookup of payee's acquirer
-            urlHolder.setUrl(payeeAuthority.getProviderAuthorityUrl());
-            ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
-            urlHolder.setUrl(null);
-
-            // Pure sample data...
-            JSONObjectWriter protectedAccountData =
-                ProtectedAccountData.encode(authorizationData.getAccountDescriptor(),
-                                            new CardSpecificData("Luke Skywalker",
-                                                                 ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
-                                                                 "943"));
-            encryptedCardData = new JSONObjectWriter()
-                .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
-                                     acquirerAuthority.getDataEncryptionAlgorithm(),
-                                     acquirerAuthority.getEncryptionKey(),
-                                     acquirerAuthority.getKeyEncryptionAlgorithm());
-        }
-
+        // Reference to Merchant
         StringBuffer accountReference = new StringBuffer();
         int q = accountId.length() - 4;
         for (char c : accountId.toCharArray()) {
@@ -153,7 +145,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // We did it!
         return AuthorizationResponse.encode(authorizationRequest,
                                             accountReference.toString(),
-                                            encryptedCardData,
+                                            providerAuthority,
+                                            accountDescriptor,
+                                            cardSpecificData,
                                             getReferenceId(),
                                             BankService.bankKey);
     }

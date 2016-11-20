@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -26,10 +28,9 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
-
-import org.webpki.json.encryption.DecryptionKeyHolder;
 
 public class AuthorizationResponse implements BaseProperties {
     
@@ -40,9 +41,7 @@ public class AuthorizationResponse implements BaseProperties {
         Messages.parseBaseMessage(Messages.AUTHORIZATION_RESPONSE, root = rd);
         authorizationRequest = new AuthorizationRequest(rd.getObject(EMBEDDED_JSON));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
-        if (authorizationRequest.accountType.cardPayment) {
-            encryptedCardData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
-        }
+        encryptedAccountData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
@@ -72,7 +71,7 @@ public class AuthorizationResponse implements BaseProperties {
         return signatureDecoder;
     }
 
-    JSONDecryptionDecoder encryptedCardData;
+    JSONDecryptionDecoder encryptedAccountData;
 
     AuthorizationRequest authorizationRequest;
     public AuthorizationRequest getAuthorizationRequest() {
@@ -81,16 +80,21 @@ public class AuthorizationResponse implements BaseProperties {
 
     public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
                                           String accountReference,
-                                          JSONObjectWriter encryptedCardData,
+                                          ProviderAuthority providerAuthority,
+                                          AccountDescriptor accountDescriptor,
+                                          CardSpecificData cardSpecificData,
                                           String referenceId,
-                                          ServerX509Signer signer) throws IOException {
-        JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_RESPONSE)
+                                          ServerX509Signer signer) throws IOException, GeneralSecurityException {
+        return Messages.createBaseMessage(Messages.AUTHORIZATION_RESPONSE)
             .setObject(EMBEDDED_JSON, authorizationRequest.root)
-            .setString(ACCOUNT_REFERENCE_JSON, accountReference);
-        if (encryptedCardData != null) {
-            wr.setObject(ENCRYPTED_ACCOUNT_DATA_JSON, encryptedCardData);
-        }
-        return wr
+            .setString(ACCOUNT_REFERENCE_JSON, accountReference)
+            .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
+                       new JSONObjectWriter()
+                           .setEncryptionObject(ProtectedAccountData.encode(accountDescriptor, cardSpecificData)
+                                                    .serializeJSONObject(JSONOutputFormats.NORMALIZED),
+                                                providerAuthority.getDataEncryptionAlgorithm(),
+                                                providerAuthority.getEncryptionKey(),
+                                                providerAuthority.getKeyEncryptionAlgorithm()))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
