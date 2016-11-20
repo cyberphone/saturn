@@ -50,6 +50,7 @@ import org.webpki.util.ArrayUtil;
 import org.webpki.webutil.ServletUtil;
 
 import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.BaseProperties;
@@ -68,6 +69,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
     static Map<String,ProviderAuthority> providerAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
+
+    static Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
 
     static final int TIMEOUT_FOR_REQUEST = 5000;
     
@@ -145,6 +148,22 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
         }
         return providerAuthority;
+    }
+
+    static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder) throws IOException {
+        PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(urlHolder.getUrl());
+        if (payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
+            payeeAuthority = new PayeeAuthority(getData(urlHolder), urlHolder.getUrl());
+            payeeAuthorityObjects.put(urlHolder.getUrl(), payeeAuthority);
+            if (MerchantService.logging) {
+                logger.info("Updated cache " + urlHolder.getUrl());
+            }
+        } else {
+            if (MerchantService.logging) {
+                logger.info("Fetched from cache " + urlHolder.getUrl());
+            }
+        }
+        return payeeAuthority;
     }
 
     abstract void processCall(JSONObjectReader walletResponse,

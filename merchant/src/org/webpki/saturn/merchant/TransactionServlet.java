@@ -51,14 +51,6 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
-    static ProviderAuthority payeeProviderAuthority;
-    
-    synchronized void updatePayeeProviderAuthority(UrlHolder urlHolder) throws IOException {
-        payeeProviderAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
-        // Verify that the claimed authority belongs to a known payment provider network
-        payeeProviderAuthority.getSignatureDecoder().verify(MerchantService.paymentRoot);
-    }
-
     @Override
     void processCall(JSONObjectReader walletResponse,
                      PaymentRequest paymentRequest, 
@@ -71,36 +63,36 @@ public class TransactionServlet extends ProcessingBaseServlet {
                      UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Basic credit is only applicable to account2account operations
         boolean acquirerBased = payerAuthorization.getAccountType().isCardPayment();
+        urlHolder.setUrl(acquirerBased ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl);
+        urlHolder.setUrl(getPayeeAuthority(urlHolder).getProviderAuthorityUrl());
+        ProviderAuthority payeeProviderAuthority = getProviderAuthority(urlHolder);
+        urlHolder.setUrl(null);
+
         boolean basicCredit = !HomeServlet.getOption(session, RESERVE_MODE_SESSION_ATTR) && !acquirerBased;
 
         // ugly fix to cope with local installation
-        String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
+        String payerProviderAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
         if (MerchantService.payeeProviderAuthorityUrl.contains("localhost")) {
             URL url = new URL(MerchantService.payeeProviderAuthorityUrl);
-            providerAuthorityUrl = new URL(url.getProtocol(),
-                                           url.getHost(), 
-                                           url.getPort(),
-                                           new URL(providerAuthorityUrl).getFile()).toExternalForm();
+            payerProviderAuthorityUrl = new URL(url.getProtocol(),
+                                                url.getHost(), 
+                                                url.getPort(),
+                                                new URL(payerProviderAuthorityUrl).getFile()).toExternalForm();
         }
 
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter reserveOrBasicRequest =
             ReserveOrBasicRequest.encode(basicCredit,
-                                         providerAuthorityUrl,
+                                         payerProviderAuthorityUrl,
                                          payerAuthorization.getAccountType(),
                                          walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                          request.getRemoteAddr(),
                                          paymentRequest,
-                                         MerchantService.acquirerAuthorityUrl, // Card only
+// TODO
+                                         null, // Card only
                                          acquirerBased ? null : new AccountDescriptor(SATURN_WEB_PAY_CONTEXT_URI, "3407766"),
                                          Expires.inMinutes(30), // Reserve only
                                          MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
-
-        // Now we need to find out where to send the request
-        urlHolder.setUrl(MerchantService.payeeProviderAuthorityUrl);
-        if (payeeProviderAuthority == null) {
-           updatePayeeProviderAuthority(urlHolder);
-        }
 
         if (debug) {
             debugData.providerAuthority = payeeProviderAuthority.getRoot();
@@ -160,15 +152,17 @@ public class TransactionServlet extends ProcessingBaseServlet {
     throws IOException, GeneralSecurityException {
         if (acquirerBased) {
             // Lookup of configured acquirer authority.  This information is preferably cached
-            urlHolder.setUrl(MerchantService.acquirerAuthorityUrl);
-            ProviderAuthority acquirerAuthority = new ProviderAuthority(getData(urlHolder), MerchantService.acquirerAuthorityUrl);
+// TODO
+            urlHolder.setUrl(null);
+            ProviderAuthority acquirerAuthority = new ProviderAuthority(getData(urlHolder), null);
             urlHolder.setUrl(acquirerAuthority.getTransactionUrl());
             if (debugData != null) {
                 debugData.acquirerMode = true;
                 debugData.acquirerAuthority = acquirerAuthority.getRoot();
             }
         } else if (urlHolder.getUrl() == null) {
-            urlHolder.setUrl(payeeProviderAuthority.getTransactionUrl());
+// TODO
+            urlHolder.setUrl(null/* payeeProviderAuthority.getTransactionUrl() */);
         }
 
         JSONObjectWriter finalizeRequest =

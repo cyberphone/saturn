@@ -58,10 +58,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         // Verify that the authorization request is signed by a payment partner
         urlHolder.setUrl(authorizationRequest.getAuthorityUrl());
-        PayeeAuthority PayeeAuthority = getPayeeAuthority(urlHolder);
+        PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder);
         urlHolder.setUrl(null);
-        AuthorizationRequest.comparePublicKeys(PayeeAuthority.getPayeePublicKey(), paymentRequest);
-        PayeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
+        AuthorizationRequest.comparePublicKeys(payeeAuthority.getPayeePublicKey(), paymentRequest);
+        payeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
 
         // Decrypt the encrypted user authorization
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
@@ -127,7 +127,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         if (cardPayment) {
 
             // Lookup of payee's acquirer
-            urlHolder.setUrl(PayeeAuthority.getProviderAuthorityUrl());
+            urlHolder.setUrl(payeeAuthority.getProviderAuthorityUrl());
             ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
             urlHolder.setUrl(null);
 
@@ -140,7 +140,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             encryptedCardData = new JSONObjectWriter()
                 .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                      acquirerAuthority.getDataEncryptionAlgorithm(),
-                                     acquirerAuthority.getEncryptionKey(true),
+                                     acquirerAuthority.getEncryptionKey(),
                                      acquirerAuthority.getKeyEncryptionAlgorithm());
         }
 

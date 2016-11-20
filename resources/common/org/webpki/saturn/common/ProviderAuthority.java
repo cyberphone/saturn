@@ -50,7 +50,7 @@ public class ProviderAuthority implements BaseProperties {
                                           String authorizationUrl,
                                           String transactionUrl,
                                           String[] optionalProviderAccountTypes,
-                                          PublicKey optionalEncryptionKey,
+                                          PublicKey encryptionKey,
                                           Date expires,
                                           ServerX509Signer signer) throws IOException {
         test(authorizationUrl, transactionUrl);
@@ -68,15 +68,13 @@ public class ProviderAuthority implements BaseProperties {
         if (optionalProviderAccountTypes != null) {
             wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes);
         }
-        if (optionalEncryptionKey != null) {
-            wr.setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
-                .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
-                             (optionalEncryptionKey instanceof RSAPublicKey ?
-               KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
-                .setPublicKey(optionalEncryptionKey, AlgorithmPreferences.JOSE));
-        }
-        wr.setDateTime(TIME_STAMP_JSON, new Date(), true)
+        wr.setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
+            .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
+            .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
+                         (encryptionKey instanceof RSAPublicKey ?
+           KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
+            .setPublicKey(encryptionKey, AlgorithmPreferences.JOSE))
+          .setDateTime(TIME_STAMP_JSON, new Date(), true)
           .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
           .setSignature(signer);
         return wr;
@@ -97,14 +95,12 @@ public class ProviderAuthority implements BaseProperties {
         transactionUrl = rd.getStringConditional(TRANSACTION_URL_JSON);
         test(authorizationUrl, transactionUrl);
         optionalProviderAccountTypes = rd.getStringArrayConditional(PROVIDER_ACCOUNT_TYPES_JSON);
-        if (rd.hasProperty(ENCRYPTION_PARAMETERS_JSON)) {
-            JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-            dataEncryptionAlgorithm = DataEncryptionAlgorithms
-                .getAlgorithmFromString(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
-            keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-                .getAlgorithmFromString(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
-            optionalEncryptionKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
-        }
+        JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
+        dataEncryptionAlgorithm = DataEncryptionAlgorithms
+            .getAlgorithmFromString(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
+        keyEncryptionAlgorithm = KeyEncryptionAlgorithms
+            .getAlgorithmFromString(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
+        encryptionKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -150,12 +146,9 @@ public class ProviderAuthority implements BaseProperties {
         return keyEncryptionAlgorithm;
     }
 
-    PublicKey optionalEncryptionKey;
-    public PublicKey getEncryptionKey(boolean required) throws IOException {
-        if (required && optionalEncryptionKey == null) {
-            throw new IOException("Expected \"" + ENCRYPTION_PARAMETERS_JSON + "\" missing in: " + authorityUrl);
-        }
-        return optionalEncryptionKey;
+    PublicKey encryptionKey;
+    public PublicKey getEncryptionKey() throws IOException {
+        return encryptionKey;
     }
 
     GregorianCalendar expires;

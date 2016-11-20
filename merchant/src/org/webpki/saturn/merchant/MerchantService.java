@@ -83,7 +83,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static final String PAYEE_PROVIDER_AUTHORITY_URL = "payee_provider_authority_url";
 
-    static final String ACQUIRER_AUTHORITY_URL       = "acquirer_authority_url";
+    static final String PAYEE_ACQUIRER_AUTHORITY_URL = "payee_acquirer_authority_url";
 
     static final String SERVER_PORT_MAP              = "server_port_map";
     
@@ -115,7 +115,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static String merchantCommonName;
     
-    static String acquirerAuthorityUrl;
+    static String payeeAcquirerAuthorityUrl;
     
     static String payeeProviderAuthorityUrl;
 
@@ -258,7 +258,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
-            acquirerAuthorityUrl = getPropertyString(ACQUIRER_AUTHORITY_URL);
+            payeeAcquirerAuthorityUrl = getPropertyString(PAYEE_ACQUIRER_AUTHORITY_URL);
 
             merchantBaseUrl = getURL(getPropertyString(MERCHANT_BASE_URL));
 

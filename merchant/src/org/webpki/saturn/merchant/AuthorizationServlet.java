@@ -113,9 +113,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Card payments are actually reservations and they are not indefinite
         Date expires = cardPayment ? Expires.inMinutes(10) : null;
 
-        String payeeAuthorityUrl = cardPayment ? MerchantService.acquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
-        payeeAuthorityUrl = payeeAuthorityUrl.substring(0, payeeAuthorityUrl.lastIndexOf('/')) +
-                            "/payees/" + MerchantService.primaryMerchant.merchantId;
+        String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
 
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
@@ -184,8 +182,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                    BigDecimal amount,
                                    UrlHolder urlHolder,
                                    DebugData debugData) throws IOException {
-        // Lookup of configured acquirer authority
-        urlHolder.setUrl(MerchantService.acquirerAuthorityUrl);
+        // Lookup of acquirer authority
+        urlHolder.setUrl(MerchantService.payeeAcquirerAuthorityUrl);
+        urlHolder.setUrl(getPayeeAuthority(urlHolder).getProviderAuthorityUrl());
         ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
         urlHolder.setUrl(acquirerAuthority.getAuthorizationUrl());
         if (debugData != null) {

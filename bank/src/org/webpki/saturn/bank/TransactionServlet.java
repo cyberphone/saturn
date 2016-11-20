@@ -173,7 +173,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
             encryptedCardData = new JSONObjectWriter()
                 .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
                                      acquirerAuthority.getDataEncryptionAlgorithm(),
-                                     acquirerAuthority.getEncryptionKey(true),
+                                     acquirerAuthority.getEncryptionKey(),
                                      acquirerAuthority.getKeyEncryptionAlgorithm());
         }
 

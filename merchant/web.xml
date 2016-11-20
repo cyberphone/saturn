@@ -59,9 +59,9 @@
     </context-param>
 
     <context-param>
-        <description>Acquirer Authority URL</description>
-        <param-name>acquirer_authority_url</param-name>
-        <param-value>@acquirer-authority-url@</param-value>
+        <description>Payee Acquirer Authority URL</description>
+        <param-name>payee_acquirer_authority_url</param-name>
+        <param-value>@payee-acquirer-authority-url@</param-value>
     </context-param>
 
     <context-param>
