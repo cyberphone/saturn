@@ -58,6 +58,7 @@ public class AuthorizationRequest implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
+        comparePublicKeys (publicKey, paymentRequest);
         rd.checkForUnread();
     }
 
@@ -151,7 +152,6 @@ public class AuthorizationRequest implements BaseProperties {
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
             new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));
-        comparePublicKeys (publicKey, paymentRequest);
         if (!ArrayUtil.compare(authorizationData.getRequestHash(), paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }

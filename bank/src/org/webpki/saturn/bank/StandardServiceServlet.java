@@ -67,7 +67,7 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         ProviderAuthority providerAuthority = getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
         providerAuthority.compareIssuers(payeeAuthority);  // Sanity check
 
-        // Decrypt the encrypted user authorization
+        // Decrypt and validate the encrypted user authorization
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         // Verify that the there is a matching user account
