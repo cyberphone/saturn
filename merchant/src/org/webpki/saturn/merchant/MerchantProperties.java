@@ -18,8 +18,7 @@ package org.webpki.saturn.merchant;
 
 public interface MerchantProperties {
 
-    public String REQUEST_HASH_SESSION_ATTR     = "REQHASH";
-    public String REQUEST_REFID_SESSION_ATTR    = "REQREFID";
+    public String WALLET_REQUEST_SESSION_ATTR   = "WALLREQ";
     public String DEBUG_DATA_SESSION_ATTR       = "DBGDATA";
     public String SHOPPING_CART_SESSION_ATTR    = "SHOPCART";
     public String RESULT_DATA_SESSION_ATTR      = "RESDAT";

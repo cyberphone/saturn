@@ -22,7 +22,7 @@ function setString(rawString) {
 var nativePort = null;
 
 var normalRequest = {
-  "@context": "http://xmlns.webpki.org/webpay/v2",
+  "@context": "http://webpki.org/saturn/v3",
   "@qualifier": "PaymentClientRequest",
   paymentNetworks: [{
     acceptedAccountTypes: ["https://nosuchcard.com","https://supercard.com","https://bankdirect.net"],
@@ -34,10 +34,10 @@ var normalRequest = {
       amount: "306.25",
       currency: "USD",
       referenceId: "#6100004",
-      timeStamp: "2016-07-30T01:24:25Z",
+      timeStamp: "2016-11-21T17:11:03Z",
       expires: "2030-09-14T00:00:00Z",
       software: {
-        name: "WebPKI.org - Merchant",
+        name: "WebPKI.org - Payee",
         version: "1.00"
       },
       signature: {
@@ -48,7 +48,7 @@ var normalRequest = {
           x: "rZ344aiTaOATmLBOdfYThvnQu_zyB1aJZrbbbks2P9I",
           y: "lKOvfJdgN8WqEbXMDYPRSMsPicm0Tk10pmer9LxvxLg"
         },
-        value: "UCk3D2EuwOL7Az8tEXZEnd8vWZtfEPb9IWnaLSiNPW-t3YWotWHR2bEOAgzDjntZhmgk8juR3VDxxzfJLQ1Y6Q"
+        value: "twMzz8fGdWVwvLMjpsPTEUVNjSL_J_5lYCJGw_0FMIfqFFQpq_1rN_Bm1zC6X_2jE7k_BGvfGlKgDBj4N33o8A"
       }
     }
   }]
@@ -98,7 +98,7 @@ function activateExtension() {
                             setExtensionPosition('Center', 'Center')).then(function(port) {
     nativePort = port;
     port.addMessageListener(function(message) {
-      if (message["@context"] != "http://xmlns.webpki.org/webpay/v2") {
+      if (message["@context"] != "http://webpki.org/saturn/v3") {
         setString("Missing or wrong \"@context\"");
         return;
       }

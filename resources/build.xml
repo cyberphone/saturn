@@ -21,10 +21,13 @@
   
   <property environment="env"/>
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
-
+	
   <path id="compile.classpath">
      <fileset dir="${common.lib.dir}">
        <include name="*.jar"/>
+    </fileset>
+    <fileset dir="${reference.lib.dir}">
+      <include name="*.jar"/>
     </fileset>
   </path>
   

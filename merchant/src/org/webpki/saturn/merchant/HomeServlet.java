@@ -53,7 +53,7 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute(REQUEST_HASH_SESSION_ATTR) != null) {
+        if (session != null && session.getAttribute(WALLET_REQUEST_SESSION_ATTR) != null) {
             session.invalidate();
         }
         session = request.getSession(true);

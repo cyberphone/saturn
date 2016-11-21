@@ -1069,8 +1069,7 @@ public class Wallet {
                     // Since user authorizations are pushed through the Payees they must be encrypted in order
                     // to not leak user information to Payees.  Only the proper Payment Provider can decrypt
                     // and process user authorizations.
-                    resultMessage = PayerAuthorization.encode(selectedCard.paymentRequest,
-                                                              authorizationData,
+                    resultMessage = PayerAuthorization.encode(authorizationData,
                                                               selectedCard.authorityUrl,
                                                               selectedCard.accountDescriptor.getAccountType(),
                                                               selectedCard.dataEncryptionAlgorithm,

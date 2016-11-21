@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Vector;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -209,32 +208,15 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // Decode the user's authorization.  The encrypted data is only parsed for correctness
             PayerAuthorization payerAuthorization = new PayerAuthorization(walletResponse);
 
-            // Get the original payment request
-            PaymentRequest paymentRequest = payerAuthorization.getPaymentRequest();
-
             @SuppressWarnings("unchecked")
-            Vector<byte[]> requestHashes = (Vector<byte[]>) session.getAttribute(W2NBWalletServlet.REQUEST_HASH_SESSION_ATTR);
-            boolean notFoundHash = true;
-            for (byte[] hash : requestHashes) {
-                if (ArrayUtil.compare(hash, paymentRequest.getRequestHash())) {
-                    notFoundHash = false;
-                    boolean notFoundAccountType = true;
-                    for (String accountType : MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).acceptedAccountTypes) {
-                        if (accountType.equals(payerAuthorization.getAccountType().getTypeUri())) {
-                            notFoundAccountType = false;
-                            break;
-                        }
-                    }
-                    if (notFoundAccountType) {
-                        throw new IOException("Response account doesn't match request");
-                    }
-                    break;
-                }
+            JSONObjectWriter rawPaymentRequest = ((LinkedHashMap<String,JSONObjectWriter>) session.getAttribute(WALLET_REQUEST_SESSION_ATTR))
+                .get(payerAuthorization.getAccountType().getTypeUri());
+            if (rawPaymentRequest == null) {
+                throw new IOException("Missing: " + payerAuthorization.getAccountType().getTypeUri());
             }
-            if (notFoundHash) {
-                throw new IOException("No hash matches the returned payment request");
-            }
-
+            PaymentRequest paymentRequest =
+                new PaymentRequest(JSONParser.parse(rawPaymentRequest.serializeToString(JSONOutputFormats.NORMALIZED)));
+            
             // The actual processing is here
             if (processCall(walletResponse,
                             paymentRequest, 

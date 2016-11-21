@@ -23,7 +23,6 @@ import java.security.PublicKey;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONOutputFormats;
 
 import org.webpki.json.encryption.DataEncryptionAlgorithms;
@@ -35,7 +34,6 @@ public class PayerAuthorization implements BaseProperties {
         Messages.parseBaseMessage(Messages.PAYER_AUTHORIZATION, rd);
         // Only syntax checking for intermediaries
         rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
-        paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         rd.checkForUnread();
@@ -51,13 +49,7 @@ public class PayerAuthorization implements BaseProperties {
         return accountType;
     }
 
-    PaymentRequest paymentRequest;
-    public PaymentRequest getPaymentRequest() {
-        return paymentRequest;
-    }
-
-    public static JSONObjectWriter encode(PaymentRequest paymentRequest,
-                                          JSONObjectWriter unencryptedAuthorizationData,
+    public static JSONObjectWriter encode(JSONObjectWriter unencryptedAuthorizationData,
                                           String providerAuthorityUrl,
                                           String accountType,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
@@ -66,7 +58,6 @@ public class PayerAuthorization implements BaseProperties {
         return Messages.createBaseMessage(Messages.PAYER_AUTHORIZATION)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType)
-            .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, 
                        new JSONObjectWriter()
                           .setEncryptionObject(unencryptedAuthorizationData.serializeJSONObject(JSONOutputFormats.NORMALIZED),

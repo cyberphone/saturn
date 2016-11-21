@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import java.util.Date;
-import java.util.Vector;
+import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpSession;
 
@@ -35,7 +35,6 @@ import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.RequestHash;
 
 public class WalletRequest implements BaseProperties, MerchantProperties {
 
@@ -61,7 +60,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         Date timeStamp = new Date();
         Date expires = Expires.inMinutes(30);
         String currentReferenceId = MerchantService.getReferenceId();
-        Vector<byte[]> hashes = new Vector<byte[]>();
+        LinkedHashMap<String,JSONObjectWriter> requests = new LinkedHashMap<String,JSONObjectWriter>();
 
         // Create a signed payment request for each payment network
          for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
@@ -75,15 +74,16 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                                       timeStamp,
                                       expires,
                                       paymentNetwork.signer);
+            for (String accountType : paymentNetwork.acceptedAccountTypes) {
+                if (requests.put(accountType, paymentRequest) != null) {
+                    throw new IOException("Duplicate: " + accountType);
+                }
+            }
             paymentNetworksArray.setObject()
                 .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, paymentNetwork.acceptedAccountTypes)
                 .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
-            hashes.add(RequestHash.getRequestHash(paymentRequest));
         }
         
-        // For checking the wallet return
-        session.setAttribute(REQUEST_HASH_SESSION_ATTR, hashes);
-
         // Android and QR wallets need special arrangements...
         if (androidCancelUrl != null) {
             requestObject.setString(ANDROID_CANCEL_URL_JSON, androidCancelUrl)
@@ -94,6 +94,9 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         if (debugMode) {
             debugData.InvokeWallet = requestObject;
         }
+
+        // Must keep
+        session.setAttribute(WALLET_REQUEST_SESSION_ATTR, requests);
     }
 
     WalletRequest(HttpSession session, NonDirectPayments optionalNonDirectPayment) throws IOException {

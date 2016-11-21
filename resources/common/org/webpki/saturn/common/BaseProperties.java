@@ -86,7 +86,7 @@ public interface BaseProperties {
     String FIELD3_JSON                      = "field3";
     String VERSION_JSON                     = "version";
     
-    String SATURN_WEB_PAY_CONTEXT_URI       = "http://xmlns.webpki.org/webpay/v2";
+    String SATURN_WEB_PAY_CONTEXT_URI       = "http://webpki.org/saturn/v3";
 
     String JSON_CONTENT_TYPE                = "application/json";
 }
