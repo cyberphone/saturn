@@ -128,7 +128,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
 
         // Call Payer bank
-        urlHolder.setUrl(providerAuthority.getAuthorizationUrl());
+        urlHolder.setUrl(providerAuthority.getServiceUrl());
         JSONObjectReader resultMessage = postData(urlHolder, authorizationRequest);
         urlHolder.setUrl(null);
 
@@ -186,7 +186,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         urlHolder.setUrl(MerchantService.payeeAcquirerAuthorityUrl);
         urlHolder.setUrl(getPayeeAuthority(urlHolder).getProviderAuthorityUrl());
         ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
-        urlHolder.setUrl(acquirerAuthority.getAuthorizationUrl());
+        urlHolder.setUrl(acquirerAuthority.getServiceUrl());
         if (debugData != null) {
             debugData.acquirerAuthority = acquirerAuthority.getRoot();
         }

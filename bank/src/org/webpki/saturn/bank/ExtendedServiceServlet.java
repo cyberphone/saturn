@@ -54,7 +54,7 @@ import org.webpki.saturn.common.ProviderUserResponse;
 // This is the Saturn "Native" mode Payment Provider (Bank) transaction servlet //
 //////////////////////////////////////////////////////////////////////////////////
 
-public class TransactionServlet extends ProcessingBaseServlet {
+public class ExtendedServiceServlet extends ProcessingBaseServlet {
   
     private static final long serialVersionUID = 1L;
 
@@ -226,7 +226,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         // the payer's bank that user is authentic and have the required funds... //
         ////////////////////////////////////////////////////////////////////////////
     
-        urlHolder.setUrl(providerAuthority.getTransactionUrl());
+        urlHolder.setUrl(providerAuthority.getExtendedServiceUrl());
 
         // Customer bank: Can we please do a payment now?
         JSONObjectWriter transactionRequest = TransactionRequest.encode(attestedPaymentRequest,
@@ -257,7 +257,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
 
         // This message is the one which finally actually lifts money
-        urlHolder.setUrl(providerAuthority.getTransactionUrl());
+        urlHolder.setUrl(providerAuthority.getExtendedServiceUrl());
         FinalizeTransactionResponse finalizeTransactionResponse = 
             new FinalizeTransactionResponse(postData(urlHolder,
                                                      FinalizeTransactionRequest.encode(finalizeRequest,

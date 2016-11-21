@@ -119,7 +119,7 @@ class DebugPrintout implements BaseProperties {
             }
         }
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
-        updateUrls(jsonTree, rewriter, TRANSACTION_URL_JSON);
+        updateUrls(jsonTree, rewriter, EXTENDED_SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, ACQUIRER_AUTHORITY_URL_JSON);
         updateSpecific(jsonTree, rewriter, DOMAIN_NAME_JSON, "demomerchant.com");
@@ -226,7 +226,7 @@ class DebugPrintout implements BaseProperties {
             "has the following tasks:<ul>" +
             "<li>Provide credentials of an entity allowing relying parties verifying such before interacting with the entity</li>" +
             "<li>Through a signature attest the authenticy of " +
-            keyWord(AUTHORITY_URL_JSON) + " and " + keyWord(TRANSACTION_URL_JSON) + "</li>" +
+            keyWord(AUTHORITY_URL_JSON) + " and " + keyWord(EXTENDED_SERVICE_URL_JSON) + "</li>" +
             "<li>Publish and attest the entity's current encryption key and parameters</li></ul>");
         if (debugData.nativeMode) {
             nativeMode();
@@ -249,7 +249,7 @@ class DebugPrintout implements BaseProperties {
 
     void nativeMode() throws Exception {
         description(point +
-            "<p>Now the <b>Merchant</b> creates a <i>signed</i> request and sends it to the " + keyWord(TRANSACTION_URL_JSON) +
+            "<p>Now the <b>Merchant</b> creates a <i>signed</i> request and sends it to the " + keyWord(EXTENDED_SERVICE_URL_JSON) +
             " extracted from the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.&nbsp;&nbsp;" +
             "Since the <b>Wallet</b> response is encrypted, the <b>Merchant</b> needs to prove to the <b>Bank</b> " +
             "that it knows the embedded " + keyWord(PAYMENT_REQUEST_JSON) + " which it does through the " + keyWord(REQUEST_HASH_JSON) +
@@ -290,7 +290,7 @@ class DebugPrintout implements BaseProperties {
                 description(point +
                      "<p>For finalization of the payment, the <b>Merchant</b> sets an " + keyWord(AMOUNT_JSON) + 
                      " which must be <i>equal or lower</i> than in the original request, <i>counter-signs</i> the request, " +
-                     "and sends it to the " + (debugData.acquirerMode ? keyWord(TRANSACTION_URL_JSON) +
+                     "and sends it to the " + (debugData.acquirerMode ? keyWord(EXTENDED_SERVICE_URL_JSON) +
                      " retrievable from the <b>Acquirer</b> " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object:" :
                      "<b>Bank</b> again:</p>"));
 

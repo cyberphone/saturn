@@ -28,7 +28,7 @@ public interface BaseProperties {
      // For the Android/QR wallet
     String ANDROID_CANCEL_URL_JSON          = "androidCancelUrl";
     String ANDROID_SUCCESS_URL_JSON         = "androidSuccessUrl";
-    String ANDROID_TRANSACTION_URL_JSON     = "androidTransactionUrl";
+    String ANDROID_TRANSACTION_URL_JSON     = "androidExtendedServiceUrl";
 
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
     String NAME_JSON                        = "name";
@@ -50,8 +50,8 @@ public interface BaseProperties {
     String PAYEE_ACCOUNT_JSON               = "payeeAccount";               // Selected payee Account2Account
     String EXPIRES_JSON                     = "expires";                    // Object expiration time
     String AUTHORITY_URL_JSON               = "authorityUrl";               // Double use self in *Authority objects and initiator
-    String AUTHORIZATION_URL_JSON           = "authorizationUrl";           // Saturn authorization system (Saturn "lite")
-    String TRANSACTION_URL_JSON             = "transactionUrl";             // Native Saturn payment system
+    String SERVICE_URL_JSON                 = "serviceUrl";                 // Saturn "lite" (standard)
+    String EXTENDED_SERVICE_URL_JSON        = "extendedServiceUrl";         // Native Saturn payment system
     String AMOUNT_JSON                      = "amount";
     String CURRENCY_JSON                    = "currency";
     String NON_DIRECT_PAYMENT_JSON          = "nonDirectPayment";           // Deposit, automated gas station, booking

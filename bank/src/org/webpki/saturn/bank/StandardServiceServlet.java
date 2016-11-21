@@ -42,7 +42,7 @@ import org.webpki.util.ISODateTime;
 // This is the Saturn basic mode Payment Provider (Bank) authorization servlet //
 /////////////////////////////////////////////////////////////////////////////////
 
-public class AuthorizationServlet extends ProcessingBaseServlet {
+public class StandardServiceServlet extends ProcessingBaseServlet {
   
     private static final long serialVersionUID = 1L;
 

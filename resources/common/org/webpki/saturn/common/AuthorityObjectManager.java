@@ -33,8 +33,8 @@ public class AuthorityObjectManager extends Thread {
     LinkedHashMap<String,byte[]> payeeAuthorityBlobs = new LinkedHashMap<String,byte[]>();
 
     String providerAuthorityUrl;
-    String authorizeUrl;
-    String transactionUrl;
+    String serviceUrl;
+    String extendedServiceUrl;
     String[] optionalProviderAccountTypes;
     PublicKey optionalEncryptionKey;
     
@@ -51,8 +51,8 @@ public class AuthorityObjectManager extends Thread {
     void update() throws IOException {
         synchronized(this) {
             providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,
-                                                             authorizeUrl,
-                                                             transactionUrl,
+                                                             serviceUrl,
+                                                             extendedServiceUrl,
                                                              optionalProviderAccountTypes,
                                                              optionalEncryptionKey,
                                                              Expires.inSeconds(expiryTimeInSeconds),
@@ -81,8 +81,8 @@ public class AuthorityObjectManager extends Thread {
     }
 
     public AuthorityObjectManager(String providerAuthorityUrl,
-                                  String authorizeUrl,
-                                  String transactionUrl,
+                                  String serviceUrl,
+                                  String extendedServiceUrl,
                                   String[] optionalProviderAccountTypes,
                                   PublicKey optionalEncryptionKey,
                                     
@@ -94,8 +94,8 @@ public class AuthorityObjectManager extends Thread {
                                   
                                   boolean logging) throws IOException {
         this.providerAuthorityUrl = providerAuthorityUrl;
-        this.authorizeUrl = authorizeUrl;
-        this.transactionUrl = transactionUrl;
+        this.serviceUrl = serviceUrl;
+        this.extendedServiceUrl = extendedServiceUrl;
         this.optionalProviderAccountTypes = optionalProviderAccountTypes;
         this.optionalEncryptionKey = optionalEncryptionKey;
 

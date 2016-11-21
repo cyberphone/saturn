@@ -93,13 +93,13 @@
     </listener>
 
     <servlet>
-        <servlet-name>TransactionServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.bank.TransactionServlet</servlet-class>
+        <servlet-name>ExtendedServiceServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.ExtendedServiceServlet</servlet-class>
     </servlet>
 
     <servlet>
-        <servlet-name>AuthorizationServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.bank.AuthorizationServlet</servlet-class>
+        <servlet-name>StandardServiceServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.StandardServiceServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -113,13 +113,13 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>TransactionServlet</servlet-name>
-        <url-pattern>/transact</url-pattern>
+        <servlet-name>ExtendedServiceServlet</servlet-name>
+        <url-pattern>/extended</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>AuthorizationServlet</servlet-name>
-        <url-pattern>/authorize</url-pattern>
+        <servlet-name>StandardServiceServlet</servlet-name>
+        <url-pattern>/service</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

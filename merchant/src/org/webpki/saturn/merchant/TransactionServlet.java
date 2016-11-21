@@ -101,7 +101,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         }
 
         // Call the payee bank
-        urlHolder.setUrl(payeeProviderAuthority.getTransactionUrl());
+        urlHolder.setUrl(payeeProviderAuthority.getExtendedServiceUrl());
         JSONObjectReader resultMessage = postData(urlHolder, reserveOrBasicRequest);
 
         if (debug) {
@@ -155,14 +155,14 @@ public class TransactionServlet extends ProcessingBaseServlet {
 // TODO
             urlHolder.setUrl(null);
             ProviderAuthority acquirerAuthority = new ProviderAuthority(getData(urlHolder), null);
-            urlHolder.setUrl(acquirerAuthority.getTransactionUrl());
+            urlHolder.setUrl(acquirerAuthority.getExtendedServiceUrl());
             if (debugData != null) {
                 debugData.acquirerMode = true;
                 debugData.acquirerAuthority = acquirerAuthority.getRoot();
             }
         } else if (urlHolder.getUrl() == null) {
 // TODO
-            urlHolder.setUrl(null/* payeeProviderAuthority.getTransactionUrl() */);
+            urlHolder.setUrl(null/* payeeProviderAuthority.getExtendedServiceUrl() */);
         }
 
         JSONObjectWriter finalizeRequest =
