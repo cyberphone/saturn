@@ -64,15 +64,15 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     private static final String MERCHANT_ACCOUNT_ID = "IBAN:FR7630004003200001019471656";
     
     @Override
-    void processCall(JSONObjectReader walletResponse,
-                     PaymentRequest paymentRequest, 
-                     PayerAuthorization payerAuthorization,
-                     HttpSession session,
-                     HttpServletRequest request,
-                     HttpServletResponse response,
-                     boolean debug, 
-                     DebugData debugData, 
-                     UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+    boolean processCall(JSONObjectReader walletResponse,
+                        PaymentRequest paymentRequest, 
+                        PayerAuthorization payerAuthorization,
+                        HttpSession session,
+                        HttpServletRequest request,
+                        HttpServletResponse response,
+                        boolean debug, 
+                        DebugData debugData, 
+                       UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Slightly different flows for card- and bank-to-bank authorizations
         boolean cardPayment = payerAuthorization.getAccountType().isCardPayment();
  
@@ -147,7 +147,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             // Parse for syntax only
             new ProviderUserResponse(resultMessage);
             returnJsonData(response, new JSONObjectWriter(resultMessage));
-            return;
+            return false;
         }
     
         // Additional consistency checking
@@ -176,6 +176,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         resultData.accountReference = accountReference;
         session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
+        return true;
     }
 
     static void processCardPayment(AuthorizationResponse authorizationResponse,

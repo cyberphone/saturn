@@ -161,8 +161,7 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
         if (cardPayment) {
 
             // Lookup of payee's acquirer
-            urlHolder.setUrl(reserveOrBasicRequest.getAcquirerAuthorityUrl());
-            ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
+            ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder, reserveOrBasicRequest.getAcquirerAuthorityUrl());
 
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
@@ -214,8 +213,7 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
         }
 
         // Lookup of payer's bank.  You would typically cache such information
-        urlHolder.setUrl(attestedPaymentRequest.getProviderAuthorityUrl());
-        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
+        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder, attestedPaymentRequest.getProviderAuthorityUrl());
 
         // We need to separate credit-card and account-2-account payments
         boolean acquirerBased = attestedPaymentRequest.getPayerAccountType().isCardPayment();
@@ -253,8 +251,7 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
         FinalizeRequest finalizeRequest = new FinalizeRequest(payeeRequest);
 
         // Lookup of payer's bank.  You would typically cache such information
-        urlHolder.setUrl(finalizeRequest.getProviderAuthorityUrl());
-        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
+        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder, finalizeRequest.getProviderAuthorityUrl());
 
         // This message is the one which finally actually lifts money
         urlHolder.setUrl(providerAuthority.getExtendedServiceUrl());

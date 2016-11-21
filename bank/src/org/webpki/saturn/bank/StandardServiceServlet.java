@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
+import java.util.Date;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
@@ -34,7 +36,6 @@ import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UserAccountEntry;
-import org.webpki.saturn.common.ProviderUserResponse;
 
 import org.webpki.util.ISODateTime;
 
@@ -45,28 +46,29 @@ import org.webpki.util.ISODateTime;
 public class StandardServiceServlet extends ProcessingBaseServlet {
   
     private static final long serialVersionUID = 1L;
-
+    
     @Override
     JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder)
     throws IOException, GeneralSecurityException {
 
         // Decode authorization request message
         AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);
+
+        // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
         boolean cardPayment = authorizationRequest.getPayerAccountType().isCardPayment();
         
         // Verify that the authorization request is signed by a payment partner
-        urlHolder.setUrl(authorizationRequest.getAuthorityUrl());
-        PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder);
-        urlHolder.setUrl(null);
+        PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
         AuthorizationRequest.comparePublicKeys(payeeAuthority.getPayeePublicKey(), paymentRequest);
         payeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
 
+        // Lookup of payee's provider
+        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
+        providerAuthority.compareIssuers(payeeAuthority);  // Sanity check
+
         // Decrypt the encrypted user authorization
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
-
-        // Merchant provides the client's IP address which can be used for RBA
-        String clientIpAddress = authorizationRequest.getClientIpAddress();
 
         // Verify that the there is a matching user account
         String accountId = authorizationData.getAccountDescriptor().getAccountId();
@@ -84,7 +86,26 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
             logger.severe("Wrong public key for account ID: " + accountId);
             throw new IOException("Wrong user public key");
         }
-        logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType);
+
+        // We don't accept requests that are old or ahead of time
+        long diff = new Date().getTime() - authorizationData.getTimeStamp().getTimeInMillis();
+        if (diff > (MAX_CLIENT_CLOCK_SKEW + MAX_CLIENT_AUTH_AGE) || diff < -MAX_CLIENT_CLOCK_SKEW) {
+            return createPrivateMessage("Either your request is older than " + 
+                                            (MAX_CLIENT_AUTH_AGE / 60000) +
+                                            " minutes, or your device clock is incorrect.<p>Timestamp=" +
+                                            "<span style=\"white-space:nowrap\">" + 
+                                            ISODateTime.formatDateTime(authorizationData.getTimeStamp().getTime(), false) +
+                                            "</span>.</p>",
+                                        null,
+                                        authorizationData);
+        }
+            
+
+        // Merchant provides the client's IP address which can be used for RBA
+        String clientIpAddress = authorizationRequest.getClientIpAddress();
+        
+        logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
+
 
         ////////////////////////////////////////////////////////////////////////////
         // We got an authentic request.  Now we need to check available funds etc.//
@@ -93,38 +114,29 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
 
         // Sorry but you don't appear to have a million bucks :-)
         if (paymentRequest.getAmount().compareTo(DEMO_ACCOUNT_LIMIT) >= 0) {
-            return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "Your request for " + 
-                                               amountInHtml(paymentRequest, paymentRequest.getAmount()) +
-                                               " appears to be slightly out of your current capabilities...",
-                                               null,
-                                               authorizationData.getDataEncryptionKey(),
-                                               authorizationData.getDataEncryptionAlgorithm());
+            return createPrivateMessage("Your request for " + 
+                                            amountInHtml(paymentRequest, paymentRequest.getAmount()) +
+                                            " appears to be slightly out of your current capabilities...",
+                                        null,
+                                        authorizationData);
         }
 
         // RBA v0.001...
         if (paymentRequest.getAmount().compareTo(DEMO_RBA_LIMIT) >= 0 &&
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
-            return ProviderUserResponse.encode(BankService.bankCommonName,
-                                               "Transaction requests exceeding " +
-                                               amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
-                                               " requires additional user authentication to " +
-                                               "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
-                                               "<p>Since <i>this is a demo</i>, " +
-                                               "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
-                                               new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
-                                                                        ChallengeField.TYPE.ALPHANUMERIC,
-                                                                    20,
-                                                                    null)},
-                                               authorizationData.getDataEncryptionKey(),
-                                               authorizationData.getDataEncryptionAlgorithm());
+            return createPrivateMessage("Transaction requests exceeding " +
+                                            amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
+                                            " requires additional user authentication to " +
+                                            "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
+                                            "<p>Since <i>this is a demo</i>, " +
+                                            "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
+                                        new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
+                                                                                ChallengeField.TYPE.ALPHANUMERIC,
+                                                                                20,
+                                                                                null)},
+                                        authorizationData);
         }
-
-        // Lookup of payee's provider
-        urlHolder.setUrl(payeeAuthority.getProviderAuthorityUrl());
-        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
-        urlHolder.setUrl(null);
 
         // Pure sample data...
         // Separate credit-card and account2account payments

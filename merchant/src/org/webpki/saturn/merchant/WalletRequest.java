@@ -46,7 +46,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
     
     WalletRequest(HttpSession session,
                   NonDirectPayments optionalNonDirectPayment,
-                  String androidProcessUrl,
+                  String androidTransactionUrl,
                   String androidCancelUrl,
                   String androidSuccessUrl) throws IOException {
         debugMode = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
@@ -88,7 +88,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         if (androidCancelUrl != null) {
             requestObject.setString(ANDROID_CANCEL_URL_JSON, androidCancelUrl)
                          .setString(ANDROID_SUCCESS_URL_JSON, androidSuccessUrl)
-                         .setString(ANDROID_TRANSACTION_URL_JSON, androidProcessUrl + (nativeMode ? "/transact" : "/authorize"));
+                         .setString(ANDROID_TRANSACTION_URL_JSON, androidTransactionUrl + (nativeMode ? "/transact" : "/authorize"));
         }
 
         if (debugMode) {

@@ -28,7 +28,7 @@ public interface BaseProperties {
      // For the Android/QR wallet
     String ANDROID_CANCEL_URL_JSON          = "androidCancelUrl";
     String ANDROID_SUCCESS_URL_JSON         = "androidSuccessUrl";
-    String ANDROID_TRANSACTION_URL_JSON     = "androidExtendedServiceUrl";
+    String ANDROID_TRANSACTION_URL_JSON     = "androidTransactionUrl";
 
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
     String NAME_JSON                        = "name";

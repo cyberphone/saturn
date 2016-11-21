@@ -22,6 +22,7 @@ import java.security.PublicKey;
 
 import java.security.interfaces.RSAPublicKey;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
@@ -169,5 +170,15 @@ public class ProviderAuthority implements BaseProperties {
     JSONObjectReader root;
     public JSONObjectReader getRoot() {
         return root;
+    }
+
+    public static void compareCertificates(JSONSignatureDecoder arg1, JSONSignatureDecoder arg2) throws IOException {
+        if (!Arrays.equals(arg1.getCertificatePath(), arg2.getCertificatePath())) {
+            throw new IOException("\"" + JSONSignatureDecoder.CERTIFICATE_PATH_JSON + "\" mismatch");
+        }
+    }
+
+    public void compareIssuers(PayeeAuthority payeeAuthority) throws IOException {
+        compareCertificates(signatureDecoder, payeeAuthority.getSignatureDecoder());
     }
 }

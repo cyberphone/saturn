@@ -46,10 +46,13 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.net.HTTPSWrapper;
 
+import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.ChallengeField;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 
 import org.webpki.webutil.ServletUtil;
@@ -64,13 +67,17 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
-    static final int TIMEOUT_FOR_REQUEST = 5000;
+    static final int TIMEOUT_FOR_REQUEST           = 5000;
+    static final long MAX_CLIENT_CLOCK_SKEW        = 5 * 60 * 1000;
+    static final long MAX_CLIENT_AUTH_AGE          = 20 * 60 * 1000;
     
     // Just a few demo values
     
     static final BigDecimal DEMO_ACCOUNT_LIMIT     = new BigDecimal("1000000.00");
     static final BigDecimal DEMO_RBA_LIMIT         = new BigDecimal("100000.00");
     static final String RBA_PARM_MOTHER            = "mother";
+    
+     // Authority object caches
     
     static Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
 
@@ -135,35 +142,39 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return "#" + (BankService.referenceId++);
     }
     
-    static ProviderAuthority getProviderAuthority(UrlHolder urlHolder) throws IOException {
-        ProviderAuthority providerAuthority = providerAuthorityObjects.get(urlHolder.getUrl());
+    static ProviderAuthority getProviderAuthority(UrlHolder urlHolder, String url) throws IOException {
+        urlHolder.setUrl(url);
+        ProviderAuthority providerAuthority = providerAuthorityObjects.get(url);
         if (providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
-            providerAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
-            providerAuthorityObjects.put(urlHolder.getUrl(), providerAuthority);
+            providerAuthority = new ProviderAuthority(getData(urlHolder), url);
+            providerAuthorityObjects.put(url, providerAuthority);
             if (BankService.logging) {
-                logger.info("Updated cache " + urlHolder.getUrl());
+                logger.info("Updated cache " + url);
             }
         } else {
             if (BankService.logging) {
-                logger.info("Fetched from cache " + urlHolder.getUrl());
+                logger.info("Fetched from cache " + url);
             }
         }
+        urlHolder.setUrl(null);
         return providerAuthority;
     }
 
-    static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder) throws IOException {
-        PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(urlHolder.getUrl());
+    static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder, String url) throws IOException {
+        urlHolder.setUrl(url);
+        PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(url);
         if (payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
-            payeeAuthority = new PayeeAuthority(getData(urlHolder), urlHolder.getUrl());
-            payeeAuthorityObjects.put(urlHolder.getUrl(), payeeAuthority);
+            payeeAuthority = new PayeeAuthority(getData(urlHolder), url);
+            payeeAuthorityObjects.put(url, payeeAuthority);
             if (BankService.logging) {
-                logger.info("Updated cache " + urlHolder.getUrl());
+                logger.info("Updated cache " + url);
             }
         } else {
             if (BankService.logging) {
-                logger.info("Fetched from cache " + urlHolder.getUrl());
+                logger.info("Fetched from cache " + url);
             }
         }
+        urlHolder.setUrl(null);
         return payeeAuthority;
     }
  
@@ -172,6 +183,17 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                paymentRequest.getCurrency().amountToDisplayString(amount, true) +
                "</span>";
     }
+
+    static JSONObjectWriter createPrivateMessage(String text,
+                                                 ChallengeField[] optionalChallengeFields,
+                                                 AuthorizationData authorizationData) throws IOException, GeneralSecurityException {
+        return ProviderUserResponse.encode(BankService.bankCommonName,
+                                           text,
+                                           optionalChallengeFields,
+                                           authorizationData.getDataEncryptionKey(),
+                                           authorizationData.getDataEncryptionAlgorithm());
+    }
+
 
     abstract JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder) 
     throws IOException, GeneralSecurityException;

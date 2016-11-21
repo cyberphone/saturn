@@ -166,15 +166,15 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return payeeAuthority;
     }
 
-    abstract void processCall(JSONObjectReader walletResponse,
-                              PaymentRequest paymentRequest, 
-                              PayerAuthorization payerAuthorization,
-                              HttpSession session,
-                              HttpServletRequest request,
-                              HttpServletResponse response,
-                              boolean debug, 
-                              DebugData debugData, 
-                              UrlHolder urlHolder) throws IOException, GeneralSecurityException;
+    abstract boolean processCall(JSONObjectReader walletResponse,
+                                 PaymentRequest paymentRequest, 
+                                 PayerAuthorization payerAuthorization,
+                                 HttpSession session,
+                                 HttpServletRequest request,
+                                 HttpServletResponse response,
+                                 boolean debug, 
+                                 DebugData debugData, 
+                                 UrlHolder urlHolder) throws IOException, GeneralSecurityException;
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -236,24 +236,25 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
 
             // The actual processing is here
-            processCall(walletResponse,
-                        paymentRequest, 
-                        payerAuthorization,
-                        session,
-                        request,
-                        response,
-                        debug,
-                        debugData,
-                        urlHolder);
+            if (processCall(walletResponse,
+                            paymentRequest, 
+                            payerAuthorization,
+                            session,
+                            request,
+                            response,
+                            debug,
+                            debugData,
+                            urlHolder)) {
            
-            // This may be a QR session
-            QRSessions.optionalSessionSetReady((String) session.getAttribute(QR_SESSION_ID_ATTR));
-
-            logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
-            /////////////////////////////////////////////////////////////////////////////////////////
-            // Normal return                                                                       //
-            /////////////////////////////////////////////////////////////////////////////////////////
-            returnJsonData(response, Messages.createBaseMessage(Messages.PAYMENT_CLIENT_SUCCESS));
+                // This may be a QR session
+                QRSessions.optionalSessionSetReady((String) session.getAttribute(QR_SESSION_ID_ATTR));
+    
+                logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
+                /////////////////////////////////////////////////////////////////////////////////////////
+                // Normal return                                                                       //
+                /////////////////////////////////////////////////////////////////////////////////////////
+                returnJsonData(response, Messages.createBaseMessage(Messages.PAYMENT_CLIENT_SUCCESS));
+            }
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();

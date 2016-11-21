@@ -52,15 +52,15 @@ public class TransactionServlet extends ProcessingBaseServlet {
     private static final long serialVersionUID = 1L;
     
     @Override
-    void processCall(JSONObjectReader walletResponse,
-                     PaymentRequest paymentRequest, 
-                     PayerAuthorization payerAuthorization,
-                     HttpSession session,
-                     HttpServletRequest request,
-                     HttpServletResponse response,
-                     boolean debug, 
-                     DebugData debugData, 
-                     UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+    boolean processCall(JSONObjectReader walletResponse,
+                        PaymentRequest paymentRequest, 
+                        PayerAuthorization payerAuthorization,
+                        HttpSession session,
+                        HttpServletRequest request,
+                        HttpServletResponse response,
+                        boolean debug, 
+                        DebugData debugData, 
+                        UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Basic credit is only applicable to account2account operations
         boolean acquirerBased = payerAuthorization.getAccountType().isCardPayment();
         urlHolder.setUrl(acquirerBased ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl);
@@ -116,7 +116,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
             // Parse for syntax only
             new ProviderUserResponse(resultMessage);
             returnJsonData(response, new JSONObjectWriter(resultMessage));
-            return;
+            return false;
         }
     
         // Additional consistency checking
@@ -142,6 +142,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         resultData.accountType = reserveOrBasicResponse.getPayerAccountType();
         resultData.accountReference = reserveOrBasicResponse.getFormattedAccountReference();
         session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
+        return true;
     }
 
     static void processFinalize(ReserveOrBasicResponse reserveOrBasicResponse,
