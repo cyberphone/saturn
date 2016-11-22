@@ -50,6 +50,7 @@ import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
+import org.webpki.saturn.common.WalletAlertMessage;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -75,6 +76,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                        UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Slightly different flows for card- and bank-to-bank authorizations
         boolean cardPayment = payerAuthorization.getAccountType().isCardPayment();
+        
+        if (!cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
+            JSONObjectWriter notImplemented = WalletAlertMessage.encode(
+                    "This card type doesn't support gas station payments yet...<p>Please select another card.");
+            returnJsonData(response, notImplemented);
+            return false;
+           
+        }
  
         // ugly fix to cope with local installation
         String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
@@ -176,6 +185,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         resultData.accountReference = accountReference;
         session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
+        
+        // Gas Station: Save reservation part for future fulfillment
+        if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
+            session.setAttribute(GAS_STATION_RES_SESSION_ATTR, authorizationResponse);
+        }
         return true;
     }
 

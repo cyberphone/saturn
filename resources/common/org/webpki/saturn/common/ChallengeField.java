@@ -23,7 +23,7 @@ import org.webpki.json.JSONObjectWriter;
 
 public class ChallengeField implements BaseProperties {
 
-    public static enum TYPE {NUMERIC, ALPHANUMERIC};
+    public static enum TYPE {NUMERIC, ALPHANUMERIC, NUMERIC_SECRET, ALPHANUMERIC_SECRET, GPS_COORDINATES, SMS_CALLBACK};
 
     public ChallengeField(String id,
                       TYPE type,

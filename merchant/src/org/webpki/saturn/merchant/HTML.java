@@ -129,23 +129,27 @@ public class HTML implements MerchantProperties {
 //                   "<tr style=\"text-align:left\"><td><a href=\"" + "hh" + "/cards\">Initialize Payment Cards&nbsp;&nbsp;</a></td><td><i>Mandatory</i> First Step</td></tr>" +
                    "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "shop" + 
                      "\">Go To Merchant</a></td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
-                   "<form name=\"options\" method=\"POST\"><tr>" +
-                   "<td style=\"text-align:center\"><input type=\"checkbox\" name=\"" + 
+                   "<form name=\"options\" method=\"POST\">" +
+/*
+                   "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" + 
                    RESERVE_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (reserveMode ? " checked" : "") +
                    "></td><td>Reserve+Finalize Payment Mode</td></tr>" +
+*/
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
                    DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (debugMode ? " checked" : "") +
                    "></td><td>Debug (JSON Message Dump) Option</td></tr>" +
+/*  
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
                    NATIVE_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (nativeMode ? " checked" : "") +
-                   "></td><td>Saturn &quot;Native&quot; Mode</td></form></tr>" +
-                   "<tr><td style=\"text-align:left;padding-top:10pt\"><a href=\"" + "gasstation" + 
+                   "></td><td>Saturn &quot;Native&quot; Mode</td></tr>" +
+*/
+                   "</form><tr><td style=\"text-align:left;padding-top:10pt\"><a href=\"" + "gasstation" + 
                    "\">Gas Station</a></td><td style=\"text-align:left;padding-top:10pt\">A <i>Different</i> Payment Scenario</td></tr>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
-                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"http://xmlns.webpki.org/webpay/v2\">Payment System</a>&nbsp;&nbsp;</td><td>State Diagram Etc.</td></tr>" +
+                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/\">Payment System</a>&nbsp;&nbsp;</td><td>Presentation Etc.</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Demo Source Code</a></td><td>For Nerds...</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge\">Web2Native Bridge</a>&nbsp;&nbsp;&nbsp;</td><td>API and &quot;Executive Level&quot; Description</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://mobilepki.org/jcs\">JCS</a></td><td>JSON Cleartext Signature</td></tr>" +

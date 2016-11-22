@@ -754,7 +754,10 @@ public class Wallet {
                 c.insets = new Insets(fontSize, fontSize * 2, 0, fontSize * 2);
                 for (ChallengeField challengeField : privateMessage.getOptionalChallengeFields()) {
                     c.gridy++;
-                    JPasswordField submitData = new JPasswordField(challengeField.getLength());
+                    JTextField submitData =
+                        (challengeField.getType() == ChallengeField.TYPE.NUMERIC_SECRET ||
+                         challengeField.getType() == ChallengeField.TYPE.ALPHANUMERIC_SECRET) ?
+                            new JPasswordField(challengeField.getLength()) : new JTextField(challengeField.getLength());
                     submitData.setFont(standardFont);
                     pane.add(submitData, c);
                     challengeTextFields.put(challengeField.getId(), submitData);
@@ -781,7 +784,9 @@ public class Wallet {
                     if (hasSubmit) {
                         Vector<ResponseToChallenge> results = new Vector<ResponseToChallenge>();
                         for (String id : challengeTextFields.keySet()) {
-                            results.add(new ResponseToChallenge(id, challengeTextFields.get(id).getText()));
+                            JTextField inputText = challengeTextFields.get(id);
+                            results.add(new ResponseToChallenge(id, inputText instanceof JPasswordField ?
+                                    new String(((JPasswordField)inputText).getPassword()) : inputText.getText()));
                         }
                         userPayEvent(results.toArray(new ResponseToChallenge[0]));
                     }

@@ -132,7 +132,8 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
                                             "<p>Since <i>this is a demo</i>, " +
                                             "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
                                         new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
-                                                                                ChallengeField.TYPE.ALPHANUMERIC,
+                                                paymentRequest.getAmount().compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
+                                                        ChallengeField.TYPE.ALPHANUMERIC : ChallengeField.TYPE.ALPHANUMERIC_SECRET,
                                                                                 20,
                                                                                 null)},
                                         authorizationData);

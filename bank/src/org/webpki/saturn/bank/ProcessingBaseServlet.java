@@ -73,9 +73,11 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     // Just a few demo values
     
-    static final BigDecimal DEMO_ACCOUNT_LIMIT     = new BigDecimal("1000000.00");
-    static final BigDecimal DEMO_RBA_LIMIT         = new BigDecimal("100000.00");
-    static final String RBA_PARM_MOTHER            = "mother";
+    static final BigDecimal DEMO_ACCOUNT_LIMIT      = new BigDecimal("1000000.00");
+    static final BigDecimal DEMO_RBA_LIMIT          = new BigDecimal("100000.00");
+    static final BigDecimal DEMO_RBA_LIMIT_CT       = new BigDecimal("473005.25");  // Clear text UI test (5 cars + 3 ice-cream)
+
+    static final String RBA_PARM_MOTHER             = "mother";
     
      // Authority object caches
     
