@@ -203,17 +203,15 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             // Check if it is the first (trigger) message from the client
             ////////////////////////////////////////////////////////////////////////////////////////////
             if (init) {
-                if (KeyProviderService.grantedVersions != null) {
-                    boolean found = false;;
-                    for (String version : KeyProviderService.grantedVersions) {
-                        if (version.equals(versionMacro)) {
-                            found = true;
-                            break;
-                          }
-                    }
-                    if (!found) {
-                        throw new IOException("Wrong version of WebPKI, you need to update");
-                    }
+                boolean found = false;;
+                for (String version : KeyProviderService.grantedVersions) {
+                    if (version.equals(versionMacro)) {
+                        found = true;
+                        break;
+                      }
+                }
+                if (!found) {
+                    throw new IOException("Wrong version of WebPKI, you need to update");
                 }
                 InvocationRequestEncoder invocationRequest =
                     new InvocationRequestEncoder(keygen2State,

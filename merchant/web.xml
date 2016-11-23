@@ -101,6 +101,12 @@
     </context-param>
     
     <context-param>
+        <description>Android WebPKI Version Check</description>
+        <param-name>android_webpki_versions</param-name>
+        <param-value>@android-webpki-versions@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Slow operation flag</description>
         <param-name>slow_operation</param-name>
         <param-value>@slow-operation@</param-value>

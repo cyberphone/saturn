@@ -95,7 +95,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static X509Certificate tlsCertificate;
 
-    static String grantedVersions[];
+    static String[] grantedVersions;
 
     static class PaymentCredential {
         KeyStoreEnumerator signatureKey;

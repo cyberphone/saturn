@@ -17,10 +17,13 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.net.URLEncoder;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -115,6 +118,17 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             logger.info(session.getId());
             if (session.getAttribute(RESULT_DATA_SESSION_ATTR) != null) {
                 ErrorServlet.systemFail(response, "Session already used");
+            }
+            String versionMacro = request.getParameter(ANDROID_WEBPKI_VERSION_TAG);
+            boolean found = false;;
+            for (String version : MerchantService.grantedVersions) {
+                if (version.equals(versionMacro)) {
+                    found = true;
+                    break;
+                  }
+            }
+            if (!found) {
+                ErrorServlet.systemFail(response, "Wrong version of WebPKI, you need to update");
             }
             String cancelUrl = getPluginUrl() + "?" + ANDROID_CANCEL + "=";
             if (qrMode) {

@@ -103,6 +103,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String BANKDIRECT_AUTH_SAMPLE       = "wallet-bankdirect-auth.png";
 
+    static final String VERSION_CHECK                = "android_webpki_versions";
+
     static final String BOUNCYCASTLE_FIRST           = "bouncycastle_first";
     
     static final String LOGGING                      = "logging";
@@ -145,7 +147,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     private static int referenceId = 1000000;
 
-    static String grantedVersions;
+    static String[] grantedVersions;
 
     static String getReferenceId() {
         return "#" + (referenceId++);
@@ -279,6 +281,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             logging = getPropertyBoolean(LOGGING);
 
             slowOperation = getPropertyBoolean(SLOW_OPERATION);
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Android WebPKI version check
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            grantedVersions = getPropertyStringList(VERSION_CHECK);
 
             logger.info("Saturn Merchant-server initiated");
         } catch (Exception e) {
