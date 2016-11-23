@@ -67,7 +67,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String SATURN_LOGO           = "saturn_logotype";
 
-    static final String VERSION_CHECK         = "version_check";
+    static final String VERSION_CHECK         = "android_webpki_versions";
 
     static final String KEYSTORE_PASSWORD     = "key_password";
 
@@ -232,12 +232,10 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             webpkiLogotype = getResourceAsString(WEBPKI_LOGO);
 
-                ////////////////////////////////////////////////////////////////////////////////////////////
-            // Optional check
             ////////////////////////////////////////////////////////////////////////////////////////////
-            if (getPropertyString(VERSION_CHECK).length() != 0) {
-                grantedVersions = getPropertyStringList(VERSION_CHECK);
-            }
+            // Android WebPKI version check
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            grantedVersions = getPropertyStringList(VERSION_CHECK);
  
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Show a sign that the user succeeded getting Saturn credentials

@@ -17,9 +17,9 @@
     </context-param>
 
     <context-param>
-        <description>Version Check</description>
-        <param-name>version_check</param-name>
-        <param-value>@version-check@</param-value>
+        <description>Android WebPKI Version Check</description>
+        <param-name>android_webpki_versions</param-name>
+        <param-value>@android-webpki-versions@</param-value>
     </context-param>
 
     <context-param>

@@ -84,7 +84,7 @@
 	  <replacefilter token="@key-password@" value="${keypassword}"/>
       <replacefilter token="@keyprov-host@" value="${keyprov.host}"/>
       <replacefilter token="@bank-host@" value="${bank.host}"/>
-      <replacefilter token="@version-check@" value="${plugin.ejbca.ant.custom.logon.version-check}"/>
+      <replacefilter token="@android-webpki-versions@" value="${android.webpki.versions}"/>
       <replacefilter token="@security@" value="${security.actual}"/>
       <replacefilter token="@paycred1@"
         value="${clientkey_super}.p12,SUPER_CARD,${account_id_super},supercard.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath},@"/>

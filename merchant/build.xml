@@ -104,6 +104,7 @@
       <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
       <replacefilter token="@w2nb-wallet@" value="${w2nb.webwallet}"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
+      <replacefilter token="@version-check@" value="1.15,1.16"/>
       <replacefilter token="@logging@" value="${logging}"/>
       <replacefilter token="@security-constraints@" value="${security.actual}"/>
     </replace>
