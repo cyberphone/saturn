@@ -120,8 +120,10 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 //                                                                      //
 // Note: This is not a product. It is an advanced prototype intended    //
 // for evaluating a bunch of WebPKI.org technologies including:         //
+//  - Saturn (Payment authorization system)                             //
 //  - SKS (Secure Key Store)                                            //
-//  - JCS (Java Clear-text Signature)                                   //
+//  - JCS (JSON Clear-text Signature)                                   //
+//  - JEF (JSON Encryption Format)                                      //
 //  - Federation using credentials with embedded links                  //
 // and (of course...), the Web2Native Bridge.                           //
 //                                                                      //
@@ -911,8 +913,7 @@ public class Wallet {
                                         .amountToDisplayString(paymentRequest.getAmount(), false);
                                     payeeCommonName = paymentRequest.getPayee().getCommonName();
     
-                                    // Enumerate keys but only go for those who are intended for
-                                    // Web Payments (according to our fictitious payment schemes...)
+                                    // Enumerate keys but only go for those who are intended for Saturn
                                     EnumeratedKey ek = new EnumeratedKey();
                                     while ((ek = sks.enumerateKeys(ek.getKeyHandle())) != null) {
                                         Extension ext = null;
@@ -920,15 +921,17 @@ public class Wallet {
                                             ext = sks.getExtension(ek.getKeyHandle(),
                                                                    BaseProperties.SATURN_WEB_PAY_CONTEXT_URI);
                                         } catch (SKSException e) {
+
+                                            // We found a key which isn't for Saturn but there may be more keys so we continue
                                             if (e.getError() == SKSException.ERROR_OPTION) {
                                                 continue;
                                             }
+                                            // Hard errors are hard errors...
                                             throw new Exception(e);
                                         }
     
-                                        // This key had the attribute signifying that it is a payment credential
-                                        // for the fictitious payment schemes this system is supporting but it
-                                        // might still not match the Payee's list of supported account types.
+                                        // This key had the attribute signifying that it is a Saturn payment credential
+                                        // but it might still not match the Payee's list of supported account types.
                                         collectPotentialCard(ek.getKeyHandle(),
                                                              JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
                                                              paymentRequest,
