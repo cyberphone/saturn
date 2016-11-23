@@ -2,4 +2,4 @@
 
 ##A (potentially) Universal Payment System
 
-More information to come :-)
+https://cyberphone.github.io/doc/saturn
