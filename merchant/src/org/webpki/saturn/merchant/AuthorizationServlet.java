@@ -144,7 +144,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         if (debug) {
             debugData.authorizationRequest = authorizationRequest;
             urlHolder.setUrl(payeeAuthorityUrl);
-            debugData.payeeAuthority = new PayeeAuthority(getData(urlHolder), urlHolder.getUrl()).getRoot();
+            PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder);
+            debugData.payeeAuthority = payeeAuthority.getRoot();
+            urlHolder.setUrl(payeeAuthority.getProviderAuthorityUrl());
+            debugData.payeeProviderAuthority = getProviderAuthority(urlHolder).getRoot();
             urlHolder.setUrl(null);
             debugData.authorizationResponse = resultMessage;
         }

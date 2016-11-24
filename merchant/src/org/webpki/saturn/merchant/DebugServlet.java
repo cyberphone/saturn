@@ -17,12 +17,16 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.security.GeneralSecurityException;
+
 import java.security.cert.X509Certificate;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +40,9 @@ import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONTypes;
 import org.webpki.json.JSONDecryptionDecoder;
+
 import org.webpki.util.Base64URL;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Version;
@@ -62,25 +68,24 @@ class DebugPrintout implements BaseProperties {
         return b64;
     }
     
+    boolean rewrittenUrl(StringBuffer originalBuffer, String pattern, String rewritten) {
+        String original = originalBuffer.toString();
+        int i = original.indexOf(pattern);
+        if (i < 0) return false;
+        originalBuffer.delete(0, i + pattern.length() - 1);
+        originalBuffer.insert(0, rewritten);
+        return true;
+    }
+    
     void updateUrls(JSONObjectReader jsonTree, JSONObjectWriter rewriter, String target) throws IOException {
         if (jsonTree.hasProperty(target)) {
-            String value = jsonTree.getString(target);
-            if (value.endsWith("webpay-bank/authority")) {
-                value = "https://mybank.com/authority";
+            StringBuffer value = new StringBuffer(jsonTree.getString(target));
+            if (rewrittenUrl(value, "/webpay-payerbank/", "https://payments.mybank.com") ||
+                rewrittenUrl(value, "/webpay-payeebank/", "https://payments.bigbank.com") ||
+                rewrittenUrl(value, "/webpay-acquirer/", "https://https://cardprocessor.com")) {
+                rewriter.setupForRewrite(target);
+                rewriter.setString(target, value.toString());
             }
-            else if (value.endsWith("webpay-acquirer/authority")) {
-                value = "https://cardprocessor.com/authority";
-            }
-            else if (value.endsWith("webpay-bank/transact")) {
-                value = "https://mybank.com/transact";
-            }
-            else if (value.endsWith("webpay-acquirer/transact")) {
-                value = "https://cardprocessor.com/transact";
-            } else {
-                return;
-            }
-            rewriter.setupForRewrite(target);
-            rewriter.setString(target, value);
         }
     }
 
@@ -119,6 +124,7 @@ class DebugPrintout implements BaseProperties {
             }
         }
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
+        updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, EXTENDED_SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, ACQUIRER_AUTHORITY_URL_JSON);
@@ -221,13 +227,12 @@ class DebugPrintout implements BaseProperties {
              " object of the <b>Bank</b> claimed to be the user's account holder for the selected card:</p>");
 
         fancyBox(debugData.providerAuthority);
-        descriptionStdMargin("An " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + 
-            " is a long-lived object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
+        descriptionStdMargin(keyWord(Messages.PROVIDER_AUTHORITY.toString()) + 
+            " is an object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
             "has the following tasks:<ul>" +
-            "<li>Provide credentials of an entity allowing relying parties verifying such before interacting with the entity</li>" +
-            "<li>Through a signature attest the authenticy of " +
-            keyWord(AUTHORITY_URL_JSON) + " and " + keyWord(EXTENDED_SERVICE_URL_JSON) + "</li>" +
-            "<li>Publish and attest the entity's current encryption key and parameters</li></ul>");
+            "<li style=\"padding:0pt\">Provide credentials of an entity allowing relying parties verifying such before interacting with the entity</li>" +
+            "<li>Through a signature attest the authenticy of core parameters including <i>service end points</i>, <i>encryption keys</i>, " +
+            "<i>supported payment methods</i>, <i>extensions</i>, and <i>algorithms</i></li></ul>");
         if (debugData.nativeMode) {
             nativeMode();
         } else {
@@ -243,8 +248,91 @@ class DebugPrintout implements BaseProperties {
     }
     
     void standardMode() throws Exception {
-        // TODO Auto-generated method stub
+        description(point + 
+                    "<p>After receiving the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
+                    " object including the " + keyWord(SERVICE_URL_JSON) + 
+                    ", the <b>Merchant</b> creates and sends an " +
+                    keyWord(Messages.AUTHORIZATION_REQUEST.toString()) + " object (comprising of " +
+                    "the user's encrypted authorization and the merchant's associated " +
+                    keyWord(PAYMENT_REQUEST_JSON) + "), to the <b>User&nbsp;Bank</b>:</p>");
         
+        fancyBox(debugData.authorizationRequest);
+        descriptionStdMargin("Note the use of " + keyWord(PAYEE_ACCOUNT_JSON) + 
+                " which holds an object that is compatible with the " + 
+                keyWord(PROVIDER_ACCOUNT_TYPES_JSON) + " of the received " + 
+                keyWord(Messages.PROVIDER_AUTHORITY.toString()) + ".");
+        
+        description(point + 
+                "<p>After receiving the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
+                " object, the <b>User&nbsp;Bank</b> uses the enclosed " +
+                keyWord(AUTHORITY_URL_JSON) + " to retrieve the <b>Merchant</b> " +
+                keyWord(Messages.PAYEE_AUTHORITY.toString()) + " object:</p>");
+
+        fancyBox(debugData.payeeAuthority);
+
+        description(point + 
+                "<p>After receiving the " + keyWord(Messages.PAYEE_AUTHORITY.toString()) +
+                " object, the <b>User&nbsp;Bank</b> uses the enclosed " +
+                keyWord(PROVIDER_AUTHORITY_URL_JSON) + " to retrieve the <b>Merchant</b> " +
+                keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object:</p>");
+
+        fancyBox(debugData.payeeProviderAuthority);
+        descriptionStdMargin("Now the <b>User&nbsp;Bank</b> (equipped with the " +
+                keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
+                " and " +
+                keyWord(Messages.PAYEE_AUTHORITY.toString()) +
+                " objects), can check the validity of the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+                " which includes:<ul>" +
+                "<li style=\"padding:0pt\">Verifying that the <b>Merchant</b> is vouched for by a provider belonging to a known trust network through " +
+                keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) +
+                " in " +
+                keyWord(Messages.PAYEE_AUTHORITY.toString()) +
+                "</li>" +
+                "<li>Verifying that the " +
+                keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) + " in " +
+                keyWord(Messages.PAYEE_AUTHORITY.toString()) +
+                " and " +
+                keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
+                " are identical</li>" +
+                "<li>Verifying that the " +
+                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in " +
+                keyWord(Messages.PAYEE_AUTHORITY.toString()) +
+                " and " +
+                keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+                " are identical</li>" +
+                "<li>Verifying that decrypting " +
+                keyWord(ENCRYPTED_AUTHORIZATION_JSON) +
+                " returns a valid user authorization object</li>" +
+                "<li>Verifying that the " +
+                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) +
+                " and " +
+                keyWord(ID_JSON) +
+                " in (" +
+                keyWord(ACCOUNT_JSON) +
+                ") in the user authorization object match a customer account</li>" +
+                "<li>Verifying that the " +
+                keyWord(TIME_STAMP_JSON) +
+                " in the user authorization object is within limits like " +
+                "<span style=\"white-space:nowrap\">-(<i>AllowedClientClockSkew</i> + <i>AuthorizationMaxAge</i>)" +
+                " to <i>AllowedClientClockSkew</i></span> with respect to current time</li>" +
+                "</ul>");
+        if (privateMessage(debugData.authorizationResponse)) {
+            return;
+        }
+    }
+
+    boolean privateMessage(JSONObjectReader response) throws IOException, GeneralSecurityException {
+        if (debugData.softReserveOrBasicError) {
+            description(point + 
+                "<p>The <b>User&nbsp;Bank</b> found some kind of account problem " +
+                "or other need to communicate with the user and therefore returned an <i>encrypted</i> " +
+                keyWord(Messages.PROVIDER_USER_RESPONSE.toString()) +
+                " which the <b>Merchant</b> is required to transmit &quot;as&nbsp;is&quot; to the <b>Wallet</b>:</p>");
+            fancyBox(response);
+            descriptionStdMargin("Although the Saturn protocol may continue after this point the debug mode won't currently show that");
+        }
+        return debugData.softReserveOrBasicError;
     }
 
     void nativeMode() throws Exception {

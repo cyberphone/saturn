@@ -202,7 +202,12 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             boolean debug = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             if (debug) {
                 debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
-                debugData.walletResponse = walletResponse;
+                if (debugData.softReserveOrBasicError) {
+                    debug = false;
+                    debugData = null;
+                } else {
+                    debugData.walletResponse = walletResponse;
+                }
             }
 
             // Decode the user's authorization.  The encrypted data is only parsed for correctness
@@ -215,7 +220,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 throw new IOException("Missing: " + payerAuthorization.getAccountType().getTypeUri());
             }
             PaymentRequest paymentRequest =
-                new PaymentRequest(JSONParser.parse(rawPaymentRequest.serializeToString(JSONOutputFormats.NORMALIZED)));
+                new PaymentRequest(JSONParser.parse(rawPaymentRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED)));
             
             // The actual processing is here
             if (processCall(walletResponse,
