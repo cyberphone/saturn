@@ -192,7 +192,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             // Check that the request is properly authenticated
             ////////////////////////////////////////////////////////////////////////////////////////////
             if (session == null) {
-                throw new IOException("Session timed out");
+                returnKeyGen2Error(response, "Session timed out");
+                return;
              }
             ServerState keygen2State =
                 (ServerState) session.getAttribute(KeyProviderInitServlet.KEYGEN2_SESSION_ATTR);
@@ -211,7 +212,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                       }
                 }
                 if (!found) {
-                    throw new IOException("Wrong version of WebPKI, you need to update");
+                    returnKeyGen2Error(response, "Wrong version of WebPKI, you need to update");
+                    return;
                 }
                 InvocationRequestEncoder invocationRequest =
                     new InvocationRequestEncoder(keygen2State,

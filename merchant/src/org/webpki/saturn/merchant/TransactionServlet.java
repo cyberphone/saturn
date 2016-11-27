@@ -105,7 +105,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         JSONObjectReader resultMessage = postData(urlHolder, reserveOrBasicRequest);
 
         if (debug) {
-            debugData.reserveOrBasicRequest = reserveOrBasicRequest;
+            debugData.reserveOrBasicRequest = makeReader(reserveOrBasicRequest);
             debugData.reserveOrBasicResponse = resultMessage;
         }
 
@@ -175,7 +175,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         JSONObjectReader response = postData(urlHolder, finalizeRequest);
 
         if (debugData != null) {
-            debugData.finalizeRequest = finalizeRequest;
+            debugData.finalizeRequest = makeReader(finalizeRequest);
             debugData.finalizeResponse = response;
         }
         

@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -113,6 +114,12 @@ class DebugPrintout implements BaseProperties {
                     rewriter.setupForRewrite(JSONSignatureDecoder.VALUE_JSON);
                     rewriter.setString(JSONSignatureDecoder.VALUE_JSON, getShortenedB64(value, 64));
                 }
+            } else if (property.equals(JSONSignatureDecoder.VALUE_JSON)) {
+                if (jsonTree.hasProperty(JSONSignatureDecoder.PUBLIC_KEY_JSON)) {
+                    byte[] value = jsonTree.getBinary(JSONSignatureDecoder.VALUE_JSON);
+                    rewriter.setupForRewrite(JSONSignatureDecoder.VALUE_JSON);
+                    rewriter.setString(JSONSignatureDecoder.VALUE_JSON, getShortenedB64(value, 64));
+                }
             } else if (property.equals(JSONDecryptionDecoder.CIPHER_TEXT_JSON)) {
                 byte[] cipherText = jsonTree.getBinary(JSONDecryptionDecoder.CIPHER_TEXT_JSON);
                 rewriter.setupForRewrite(JSONDecryptionDecoder.CIPHER_TEXT_JSON);
@@ -121,6 +128,15 @@ class DebugPrintout implements BaseProperties {
                 byte[] n = jsonTree.getBinary(JSONSignatureDecoder.N_JSON);
                 rewriter.setupForRewrite(JSONSignatureDecoder.N_JSON);
                 rewriter.setString(JSONSignatureDecoder.N_JSON, getShortenedB64(n, 64));
+            } else if (jsonTree.getPropertyType(property) == JSONTypes.ARRAY) {
+                JSONArrayReader array = jsonTree.getArray(property);
+                while (array.hasMore()) {
+                    if (array.getElementType() == JSONTypes.OBJECT) {
+                        cleanData(array.getObject());
+                    } else {
+                        array.scanAway();
+                    }
+                }
             }
         }
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
@@ -132,22 +148,14 @@ class DebugPrintout implements BaseProperties {
         updateSpecific(jsonTree, rewriter, CLIENT_IP_ADDRESS_JSON, "220.13.198.144");
     }
 
-    void fancyBox (byte[] json) throws IOException, GeneralSecurityException {
-        JSONObjectReader jsonTree = JSONParser.parse(json);
+    void fancyBox(JSONObjectReader reader) throws IOException, GeneralSecurityException {
         if (clean) {
-            cleanData(jsonTree);
+            reader = reader.clone();
+            cleanData(reader);
         }
         s.append("<div style=\"" + STATIC_BOX + COMMON_BOX + "\">" +
-              new String(jsonTree.serializeJSONObject(JSONOutputFormats.PRETTY_HTML), "UTF-8") +
+              new String(reader.serializeJSONObject(JSONOutputFormats.PRETTY_HTML), "UTF-8") +
               "</div>");
-    }
-
-    void fancyBox(JSONObjectReader json) throws IOException, GeneralSecurityException {
-        fancyBox(json.serializeJSONObject(JSONOutputFormats.NORMALIZED));
-    }
-
-    void fancyBox(JSONObjectWriter json) throws IOException, GeneralSecurityException {
-        fancyBox(json.serializeJSONObject(JSONOutputFormats.NORMALIZED));
     }
 
     void description(String string) {
@@ -242,7 +250,7 @@ class DebugPrintout implements BaseProperties {
             "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted.&nbsp;&nbsp;As shown it contains " +
             "user account and identity data which <i>usually</i> is of no importance for the <b>Merchant</b>:");
 
-        fancyBox(MerchantService.userAuthorization);
+        fancyBox(MerchantService.userAuthorizationSample);
 
         descriptionStdMargin("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }
@@ -259,11 +267,11 @@ class DebugPrintout implements BaseProperties {
         fancyBox(debugData.authorizationRequest);
         descriptionStdMargin("Note the use of " + keyWord(PAYEE_ACCOUNT_JSON) + 
                 " which holds an object that is compatible with the " + 
-                keyWord(PROVIDER_ACCOUNT_TYPES_JSON) + " of the received " + 
-                keyWord(Messages.PROVIDER_AUTHORITY.toString()) + ".");
+                keyWord(PROVIDER_ACCOUNT_TYPES_JSON) + " of the (by the <b>Merchant</b>) retrieved " + 
+                keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.");
         
         description(point + 
-                "<p>After receiving the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
+                "<p>After receiving the " + keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
                 " object, the <b>User&nbsp;Bank</b> uses the enclosed " +
                 keyWord(AUTHORITY_URL_JSON) + " to retrieve the <b>Merchant</b> " +
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) + " object:</p>");
@@ -316,10 +324,45 @@ class DebugPrintout implements BaseProperties {
                 " in the user authorization object is within limits like " +
                 "<span style=\"white-space:nowrap\">-(<i>AllowedClientClockSkew</i> + <i>AuthorizationMaxAge</i>)" +
                 " to <i>AllowedClientClockSkew</i></span> with respect to current time</li>" +
+                "<li>Verifying that <b>User</b> actually have funds matching the request</li>" +
                 "</ul>");
         if (privateMessage(debugData.authorizationResponse)) {
             return;
         }
+        
+        if (debugData.acquirerMode) {
+            acquirerEndPartStandardMode();
+        } else {
+            directEndPartStandardMode();
+        }
+    }
+
+    void acquirerEndPartStandardMode() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    void directEndPartStandardMode() throws IOException, GeneralSecurityException {
+        description(point +
+            "<p>After validating the " +
+            keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+            ", the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by " +
+            keyWord(PAYEE_ACCOUNT_JSON) +
+            " using a with both parties compatible payment scheme.</p>" +
+            "<p>Note that this process may be fully <i>asynchronous</i> where the " +
+            "user authorization is only used for <i>initation</i>.</p> ");
+        description(point +
+            "<p>After a <i>successful</i> preceeding step, the <b>User&nbsp;Bank</b> wraps the " +
+            keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+            " in a newly created " +
+            keyWord(Messages.AUTHORIZATION_RESPONSE.toString()) +
+            "object, adds some properties, and finally signs the completed object with " +
+            "its private key and certificate.  The result is then returned to the <b>Merchant</b>" +
+            " as a response to the " +
+            keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+            ":</p>");
+        fancyBox(debugData.authorizationResponse);
+        descriptionStdMargin("Core Now the <b>User&nbsp;Bank</b> (equipped with the ");
     }
 
     boolean privateMessage(JSONObjectReader response) throws IOException, GeneralSecurityException {
@@ -395,7 +438,7 @@ class DebugPrintout implements BaseProperties {
                         "</p><p>The following printout " +
                         "shows a <i>sample</i> of protected account data:</p>");
 
-                    fancyBox(MerchantService.protectedAccountData);
+                    fancyBox(JSONParser.parse(MerchantService.protectedAccountData));
                 
                     finalDescription = "<p>After this step the card network is invoked <i>which is outside of this specification and implementation</i>.</p>";
                 } else {

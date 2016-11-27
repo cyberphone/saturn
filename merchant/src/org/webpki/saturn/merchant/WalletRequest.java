@@ -92,7 +92,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         }
 
         if (debugMode) {
-            debugData.InvokeWallet = requestObject;
+            debugData.InvokeWallet = ProcessingBaseServlet.makeReader(requestObject);
         }
 
         // Must keep

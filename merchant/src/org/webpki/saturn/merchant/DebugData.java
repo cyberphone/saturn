@@ -19,7 +19,6 @@ package org.webpki.saturn.merchant;
 import java.io.Serializable;
 
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 
 public class DebugData implements Serializable {
 
@@ -27,7 +26,7 @@ public class DebugData implements Serializable {
     
     public boolean nativeMode;
     
-    public JSONObjectWriter InvokeWallet;
+    public JSONObjectReader InvokeWallet;
     
     public JSONObjectReader walletResponse;
 
@@ -41,16 +40,16 @@ public class DebugData implements Serializable {
     
     public JSONObjectReader payeeProviderAuthority;
 
-    public JSONObjectWriter authorizationRequest;
+    public JSONObjectReader authorizationRequest;
     
     public JSONObjectReader authorizationResponse;
 
-    public JSONObjectWriter cardPaymentRequest;
+    public JSONObjectReader cardPaymentRequest;
     
     public JSONObjectReader cardPaymentResponse;
 
     // Native mode
-    public JSONObjectWriter reserveOrBasicRequest;
+    public JSONObjectReader reserveOrBasicRequest;
     
     public JSONObjectReader reserveOrBasicResponse;
     
@@ -58,7 +57,7 @@ public class DebugData implements Serializable {
     
     public JSONObjectReader acquirerAuthority;
     
-    public JSONObjectWriter finalizeRequest;
+    public JSONObjectReader finalizeRequest;
 
     public JSONObjectReader finalizeResponse;
 

@@ -142,7 +142,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         urlHolder.setUrl(null);
 
         if (debug) {
-            debugData.authorizationRequest = authorizationRequest;
+            debugData.authorizationRequest = makeReader(authorizationRequest);
             urlHolder.setUrl(payeeAuthorityUrl);
             PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder);
             debugData.payeeAuthority = payeeAuthority.getRoot();
@@ -219,7 +219,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         JSONObjectReader response = postData(urlHolder, cardPaymentRequest);
 
         if (debugData != null) {
-            debugData.cardPaymentRequest = cardPaymentRequest;
+            debugData.cardPaymentRequest = makeReader(cardPaymentRequest);
             debugData.cardPaymentResponse = response;
         }
         

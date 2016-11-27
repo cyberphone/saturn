@@ -44,8 +44,6 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.net.HTTPSWrapper;
 
-import org.webpki.util.ArrayUtil;
-
 import org.webpki.webutil.ServletUtil;
 
 import org.webpki.saturn.common.ProviderAuthority;
@@ -72,7 +70,11 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
 
     static final int TIMEOUT_FOR_REQUEST = 5000;
-    
+
+    static JSONObjectReader makeReader(JSONObjectWriter writer) throws IOException {
+        return JSONParser.parse(writer.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+    }
+
     static String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
         if (MerchantService.serverPortMapping == null) {

@@ -25,6 +25,7 @@ import java.net.NetworkInterface;
 import java.net.URL;
 
 import java.security.GeneralSecurityException;
+
 import java.security.KeyStore;
 import java.security.PublicKey;
 
@@ -42,6 +43,7 @@ import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
+import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
@@ -131,7 +133,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String w2nbWalletName;
     
     // Debug mode samples
-    static byte[] userAuthorization;
+    static JSONObjectReader userAuthorizationSample;
 
     static byte[] protectedAccountData;
 
@@ -264,7 +266,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             merchantBaseUrl = getURL(getPropertyString(MERCHANT_BASE_URL));
 
-            new AuthorizationData(JSONParser.parse(userAuthorization =
+            new AuthorizationData(userAuthorizationSample = JSONParser.parse(
                     ArrayUtil.getByteArrayFromInputStream (this.getClass().getResourceAsStream(USER_AUTH_SAMPLE))));
 
             walletSupercardAuth = getImageDataURI(SUPERCARD_AUTH_SAMPLE);
