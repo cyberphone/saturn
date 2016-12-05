@@ -309,9 +309,27 @@ class DebugPrintout implements BaseProperties {
                 " and " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
                 " are identical</li>" +
+                "<li>Verifying that the " +
+                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in " +
+                keyWord(Messages.PAYEE_AUTHORITY.toString()) +
+                " and " +
+                keyWord(PAYMENT_REQUEST_JSON) +
+                " are identical</li>" +
                 "<li>Verifying that decrypting " +
                 keyWord(ENCRYPTED_AUTHORIZATION_JSON) +
-                " returns a valid user authorization object</li>" +
+                " returns a valid user authorization object including " +
+                keyWord(JSONSignatureDecoder.SIGNATURE_JSON) +
+                "</li>" +
+                "<li>Verifying that the " +
+                keyWord(REQUEST_HASH_JSON) +
+                " in the user authorization object matches the hash of the " +
+                keyWord(PAYMENT_REQUEST_JSON) +
+                "</li>" +
+                "<li>Verifying that the " +
+                keyWord(TIME_STAMP_JSON) +
+                " in the user authorization object is within limits like " +
+                "<span style=\"white-space:nowrap\">-(<i>AllowedClientClockSkew</i> + <i>AuthorizationMaxAge</i>)" +
+                " to <i>AllowedClientClockSkew</i></span> with respect to current time</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) +
                 " and " +
@@ -319,11 +337,6 @@ class DebugPrintout implements BaseProperties {
                 " in (" +
                 keyWord(ACCOUNT_JSON) +
                 ") in the user authorization object match a customer account</li>" +
-                "<li>Verifying that the " +
-                keyWord(TIME_STAMP_JSON) +
-                " in the user authorization object is within limits like " +
-                "<span style=\"white-space:nowrap\">-(<i>AllowedClientClockSkew</i> + <i>AuthorizationMaxAge</i>)" +
-                " to <i>AllowedClientClockSkew</i></span> with respect to current time</li>" +
                 "<li>Verifying that <b>User</b> actually have funds matching the request</li>" +
                 "</ul>");
         if (privateMessage(debugData.authorizationResponse)) {
