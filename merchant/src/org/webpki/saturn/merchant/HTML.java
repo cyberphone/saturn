@@ -405,6 +405,7 @@ public class HTML implements MerchantProperties {
                     "function setFail(message) {\n" +
                     "  closeWallet();\n" +
                     "  alert(message);\n" +
+                    "  document.location.href='home';\n" +
                     "}\n\n" +
 
                     "function activateWallet() {\n" +
@@ -414,7 +415,7 @@ public class HTML implements MerchantProperties {
              .append(") {\n" +
                     "    setFail('\"navigator.")
              .append(connectMethod)
-             .append("\" not found, \\ncheck Chrome extension settings');\n" +
+             .append("\" not found, \\ncheck browser extension install and settings');\n" +
                     "    return;\n" +
                     "  }\n" +
                     "  navigator.")

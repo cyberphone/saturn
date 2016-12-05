@@ -224,7 +224,7 @@ class DebugPrintout implements BaseProperties {
             "directly available to the <b>Merchant</b> since it contains potentially sensitive user data.&nbsp;&nbsp;" +
             "For an example turn to <a href=\"#secretdata\">Unecrypted User Authorization</a>.</p><p>" +
             point +
-            "</p><p>Therefore the result is <i>encrypted</i> (using a key supplied by the <b>Bank</b> as a part of the " +
+            "</p><p>Therefore the result is <i>encrypted</i> (using a key supplied by the <b>User&nbsp;Bank</b> as a part of the " +
             "payment credential) before it is returned to the <b>Merchant</b>:</p>");
 
         fancyBox(debugData.walletResponse);
@@ -232,7 +232,7 @@ class DebugPrintout implements BaseProperties {
         description(point +
             "<p>After receiving the <b>Wallet</b> response, the <b>Merchant</b> uses the supplied " +
              keyWord(PROVIDER_AUTHORITY_URL_JSON) + " to retrieve the associated " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
-             " object of the <b>Bank</b> claimed to be the user's account holder for the selected card:</p>");
+             " object of the <b>User&nbsp;Bank</b> claimed to be the user's account holder for the selected card:</p>");
 
         fancyBox(debugData.providerAuthority);
         descriptionStdMargin(keyWord(Messages.PROVIDER_AUTHORITY.toString()) + 
@@ -362,7 +362,7 @@ class DebugPrintout implements BaseProperties {
             keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
             ":</p>");
         fancyBox(debugData.authorizationResponse);
-        descriptionStdMargin("Core Now the <b>User&nbsp;Bank</b> (equipped with the ");
+     //   descriptionStdMargin("Core Now the <b>User&nbsp;Bank</b> (equipped with the ");
     }
 
     boolean privateMessage(JSONObjectReader response) throws IOException, GeneralSecurityException {
@@ -382,7 +382,7 @@ class DebugPrintout implements BaseProperties {
         description(point +
             "<p>Now the <b>Merchant</b> creates a <i>signed</i> request and sends it to the " + keyWord(EXTENDED_SERVICE_URL_JSON) +
             " extracted from the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.&nbsp;&nbsp;" +
-            "Since the <b>Wallet</b> response is encrypted, the <b>Merchant</b> needs to prove to the <b>Bank</b> " +
+            "Since the <b>Wallet</b> response is encrypted, the <b>Merchant</b> needs to prove to the <b>User&nbsp;Bank</b> " +
             "that it knows the embedded " + keyWord(PAYMENT_REQUEST_JSON) + " which it does through the " + keyWord(REQUEST_HASH_JSON) +
             " construct and " + keyWord(REFERENCE_ID_JSON) + " which must match the hash of the request and property respectively" +
             (debugData.acquirerMode ? ".&nbsp;&nbsp;Since this particular session was a card transaction, a pre-configured " + 
@@ -392,12 +392,12 @@ class DebugPrintout implements BaseProperties {
 
         if (debugData.acquirerMode) {
             description(point +
-                             "<p>In the <b>Acquirer</b> mode the received " + keyWord(ACQUIRER_AUTHORITY_URL_JSON) + " is used by the <b>Bank</b> " +
+                             "<p>In the <b>Acquirer</b> mode the received " + keyWord(ACQUIRER_AUTHORITY_URL_JSON) + " is used by the <b>User&nbsp;Bank</b> " +
                              "to retrieve the designated card processor's encryption keys:</p>");
             fancyBox(debugData.acquirerAuthority);
         }
         description("<p>After retrieving the <a href=\"#secretdata\">Unecrypted User Authorization</a>, " +
-            "the called <b>Bank</b> invokes the local payment backend (to verify the account, check funds, etc.) " +
+            "the called <b>User&nbsp;Bank</b> invokes the local payment backend (to verify the account, check funds, etc.) " +
             "<i>which is outside of this specification and implementation</i>.</p><p>" +
             point +
             "</p><p>" + (debugData.softReserveOrBasicError? errorDescription(true):
