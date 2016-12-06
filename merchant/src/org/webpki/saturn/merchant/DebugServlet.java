@@ -208,7 +208,7 @@ class DebugPrintout implements BaseProperties {
             point +
             "<p>When the ready signal has been received the <b>Merchant</b> Web-page sends a " +
             "list of accepted account types (aka payment instruments) and associated <i>signed</i> " + 
-            "<a target=\"_blank\" href=\"https://cyberphone.github.io/openkeystore/resources/docs/jcs.html\">[SIGNATURE]</a> " +
+            "<a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/jcs.html\">[SIGNATURE]</a> " +
             keyWord(PAYMENT_REQUEST_JSON) + " objects to the <b>Wallet</b>:</p>");
 
         fancyBox(debugData.InvokeWallet);
@@ -324,7 +324,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(REQUEST_HASH_JSON) +
                 " in the user authorization object matches the hash of the " +
                 keyWord(PAYMENT_REQUEST_JSON) +
-                "</li>" +
+                " object</li>" +
                 "<li>Verifying that the " +
                 keyWord(TIME_STAMP_JSON) +
                 " in the user authorization object is within limits like " +
@@ -337,7 +337,6 @@ class DebugPrintout implements BaseProperties {
                 " in (" +
                 keyWord(ACCOUNT_JSON) +
                 ") in the user authorization object match a customer account</li>" +
-                "<li>Verifying that <b>User</b> actually have funds matching the request</li>" +
                 "</ul>");
         if (privateMessage(debugData.authorizationResponse)) {
             return;
@@ -359,7 +358,8 @@ class DebugPrintout implements BaseProperties {
         description(point +
             "<p>After validating the " +
             keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
-            ", the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by " +
+            " and checking that the <b>User</b> actually have funds matching the request," +
+            " the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by " +
             keyWord(PAYEE_ACCOUNT_JSON) +
             " using a with both parties compatible payment scheme.</p>" +
             "<p>Note that this process may be fully <i>asynchronous</i> where the " +

@@ -147,7 +147,7 @@ public class HTML implements MerchantProperties {
                    "></td><td>Saturn &quot;Native&quot; Mode</td></tr>" +
 */
                    "</form><tr><td style=\"text-align:left;padding-top:10pt\"><a href=\"" + "gasstation" + 
-                   "\">Gas Station</a></td><td style=\"text-align:left;padding-top:10pt\">A <i>Different</i> Payment Scenario</td></tr>" +
+                   "\">Gas Station</a></td><td style=\"text-align:left;padding-top:10pt\">Another Payment Scenario</td></tr>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/\">Payment System</a>&nbsp;&nbsp;</td><td>Presentation Etc.</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Demo Source Code</a></td><td>For Nerds...</td></tr>" +
