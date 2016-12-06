@@ -61,7 +61,6 @@ public class ShoppingServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String userAgent = request.getHeader("User-Agent");
-        System.out.println(userAgent);
         if ((!userAgent.contains(" Chrome/") || userAgent.contains(" Edge/")) &&
             (!userAgent.contains("Mozilla/") || !userAgent.contains(" Firefox/"))) {
             ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium and Firefox");
