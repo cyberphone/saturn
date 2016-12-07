@@ -161,7 +161,7 @@ public class Wallet {
 
     static final String BUTTON_OK              = "OK";
     static final String BUTTON_CANCEL          = "Cancel";
-    static final String BUTTON_SUBMIT        = "Submit";
+    static final String BUTTON_SUBMIT          = "Submit";
 
     static final int TIMEOUT_FOR_REQUEST       = 10000;
     
