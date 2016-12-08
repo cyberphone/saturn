@@ -111,6 +111,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static final String LOGGING                      = "logging";
 
+    static final String TEST_MODE                    = "test-mode";
+
     static JSONX509Verifier paymentRoot;
     
     static JSONX509Verifier acquirerRoot;
@@ -142,6 +144,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String walletBankdirectAuth;
     
     static PaymentNetwork primaryMerchant;
+    
+    static Boolean testMode;
 
     static boolean logging;
     
@@ -279,6 +283,10 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                             new CardSpecificData("Luke Skywalker",
                                                                  ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
                                                                  "943")).serializeJSONObject(JSONOutputFormats.NORMALIZED);
+
+            if (getPropertyString(TEST_MODE).length () > 0) {
+                testMode = getPropertyBoolean(TEST_MODE);
+            }
 
             logging = getPropertyBoolean(LOGGING);
 

@@ -43,6 +43,7 @@ public class AuthorizationRequest implements BaseProperties {
 
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, root = rd);
+        testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
@@ -68,6 +69,11 @@ public class AuthorizationRequest implements BaseProperties {
     JSONDecryptionDecoder encryptedAuthorizationData;
 
     JSONObjectReader root;
+
+    boolean testMode;
+    public boolean getTestMode() {
+        return testMode;
+    }
 
     PayerAccountTypes accountType;
     public PayerAccountTypes getPayerAccountType() {
@@ -114,7 +120,8 @@ public class AuthorizationRequest implements BaseProperties {
         return paymentRequest;
     }
 
-    public static JSONObjectWriter encode(String authorityUrl,
+    public static JSONObjectWriter encode(Boolean testMode,
+                                          String authorityUrl,
                                           PayerAccountTypes accountType,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
@@ -123,11 +130,14 @@ public class AuthorizationRequest implements BaseProperties {
                                           String referenceId,
                                           Date expires,
                                           ServerAsymKeySigner signer) throws IOException {
-        JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST)
-            .setString(AUTHORITY_URL_JSON, authorityUrl)
-            .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
-            .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
-            .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);
+        JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST);
+        if (testMode != null) {
+            wr.setBoolean(TEST_MODE_JSON, testMode);
+        }
+        wr.setString(AUTHORITY_URL_JSON, authorityUrl)
+          .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
+          .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
+          .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);
         if (accountDescriptor != null) {
             wr.setObject(PAYEE_ACCOUNT_JSON, accountDescriptor.writeObject());
         }

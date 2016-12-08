@@ -104,9 +104,6 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         // Merchant provides the client's IP address which can be used for RBA
         String clientIpAddress = authorizationRequest.getClientIpAddress();
         
-        logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
-
-
         ////////////////////////////////////////////////////////////////////////////
         // We got an authentic request.  Now we need to check available funds etc.//
         // Since we don't have a real bank this part is rather simplistic :-)     //
@@ -153,6 +150,13 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         int q = accountId.length() - 4;
         for (char c : accountId.toCharArray()) {
             accountReference.append((--q < 0) ? c : '*');
+        }
+
+        // Here we would actually update things...
+        if (authorizationRequest.getTestMode()) {
+            logger.info("TEST ONLY: Authorized AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
+        } else {
+            logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
         }
 
         // We did it!

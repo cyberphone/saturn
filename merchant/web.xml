@@ -113,6 +113,12 @@
     </context-param>
 
     <context-param>
+        <description>Test Mode</description>
+        <param-name>test-mode</param-name>
+        <param-value></param-value>
+    </context-param>
+
+    <context-param>
         <description>Logging</description>
         <param-name>logging</param-name>
         <param-value>@logging@</param-value>
