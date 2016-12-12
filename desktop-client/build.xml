@@ -70,6 +70,7 @@
         <attribute name="Class-path" value="../../libs/${webpki-libext.jar} ../../libs/${bcprovider.jar} ../../libs/proxy-support.jar"/>
       </manifest>
     </jar>
+    <copy file="manifest.json" todir="${common.app.dir}/${w2nb.webwallet}" overwrite="true" preservelastmodified="true"/>
   </target>
   
 </project>
