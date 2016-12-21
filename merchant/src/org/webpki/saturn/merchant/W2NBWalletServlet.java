@@ -46,7 +46,7 @@ public class W2NBWalletServlet extends HttpServlet implements MerchantProperties
                            HomeServlet.getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
                            walletRequest.debugMode,
                            walletRequest.nativeMode,
-                           new String(walletRequest.requestObject.serializeJSONObject(JSONOutputFormats.PRETTY_JS_NATIVE), "UTF-8"));
+                           walletRequest.requestObject.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE));
     }
 
     @Override

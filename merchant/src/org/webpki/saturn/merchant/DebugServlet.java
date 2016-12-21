@@ -154,7 +154,7 @@ class DebugPrintout implements BaseProperties {
             cleanData(reader);
         }
         s.append("<div style=\"" + STATIC_BOX + COMMON_BOX + "\">" +
-              new String(reader.serializeJSONObject(JSONOutputFormats.PRETTY_HTML), "UTF-8") +
+              reader.serializeToString(JSONOutputFormats.PRETTY_HTML) +
               "</div>");
     }
 

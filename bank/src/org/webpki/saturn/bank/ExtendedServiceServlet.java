@@ -169,11 +169,11 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
                                             new CardSpecificData("Luke Skywalker",
                                                                  ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
                                                                  "943"));
-            encryptedCardData = new JSONObjectWriter()
-                .setEncryptionObject(protectedAccountData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
-                                     acquirerAuthority.getDataEncryptionAlgorithm(),
-                                     acquirerAuthority.getEncryptionKey(),
-                                     acquirerAuthority.getKeyEncryptionAlgorithm());
+            encryptedCardData = 
+                JSONObjectWriter.createEncryptionObject(protectedAccountData.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                                        acquirerAuthority.getDataEncryptionAlgorithm(),
+                                                        acquirerAuthority.getEncryptionKey(),
+                                                        acquirerAuthority.getKeyEncryptionAlgorithm());
         }
 
         StringBuffer accountReference = new StringBuffer();

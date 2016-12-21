@@ -19,11 +19,11 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONSignatureDecoder;
-
 
 public class RequestHash implements BaseProperties {
     
@@ -34,7 +34,7 @@ public class RequestHash implements BaseProperties {
     }
 
     public static byte[] getRequestHash(JSONObjectWriter request) throws IOException {
-        return getRequestHash(request.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+        return getRequestHash(request.serializeToBytes(JSONOutputFormats.NORMALIZED));
     }
 
     public static byte[] parse(JSONObjectReader rd) throws IOException {

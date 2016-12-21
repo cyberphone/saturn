@@ -85,7 +85,7 @@ public class JCSPaper implements BaseProperties {
         write(utf8.getBytes("UTF-8"));
     }
     static void write(JSONObjectWriter json) throws Exception {
-        write(json.serializeJSONObject(JSONOutputFormats.PRETTY_HTML));
+        write(json.serializeToBytes(JSONOutputFormats.PRETTY_HTML));
     }
 
     public static void main(String[] args) throws Exception {
@@ -189,7 +189,7 @@ public class JCSPaper implements BaseProperties {
         joseAuthorization.setupForRewrite(PAYMENT_REQUEST_JSON);
         joseAuthorization.setObject(PAYMENT_REQUEST_JSON, joseSignedPaymentRequest);
         writer.setSignature(authorizationSigner);
-        write(writer.serializeJSONObject(JSONOutputFormats.PRETTY_HTML));
+        write(writer.serializeToBytes(JSONOutputFormats.PRETTY_HTML));
         write("</div><div class=\"text\">" +
               "The example above would if converted to " + RFC7515() + " be slightly more convoluted " +
                "since data must be Base64-encoded (which was a core rationale for developing JCS):" +
@@ -206,9 +206,9 @@ public class JCSPaper implements BaseProperties {
         JSONObjectReader verifier = JSONParser.parse(joseWriter.toString());
         checkJws (verifier);
         checkJws(JSONParser.parse(verifier.getBinary(JOSE_PAYLOAD)).getObject(PAYMENT_REQUEST_JSON));
-        write(joseWriter.serializeJSONObject(JSONOutputFormats.PRETTY_HTML));
-        System.out.println("JCS=" + writer.serializeJSONObject(JSONOutputFormats.NORMALIZED).length +
-                           " JWS=" + joseWriter.serializeJSONObject(JSONOutputFormats.NORMALIZED).length);
+        write(joseWriter.serializeToBytes(JSONOutputFormats.PRETTY_HTML));
+        System.out.println("JCS=" + writer.serializeToBytes(JSONOutputFormats.NORMALIZED).length +
+                           " JWS=" + joseWriter.serializeToBytes(JSONOutputFormats.NORMALIZED).length);
         write("</div><div class=\"header\" style=\"margin-top:20pt\">JavaScript Usage<br></div>" +
            "<div class=\"text\">"+
               "Since " + JCS() + " is compatible with " + ECMASCRIPT() + " (JavaScript), you can also use " +
@@ -288,8 +288,8 @@ public class JCSPaper implements BaseProperties {
                                 JSONObjectWriter protectedHeader,
                                 KeyStoreEnumerator signatureKey) throws Exception {
         JSONObjectWriter signature = new JSONObjectWriter()
-            .setBinary(JOSE_PAYLOAD, payload.serializeJSONObject(JSONOutputFormats.NORMALIZED))
-            .setBinary(JOSE_PROTECTED, protectedHeader.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+            .setBinary(JOSE_PAYLOAD, payload.serializeToBytes(JSONOutputFormats.NORMALIZED))
+            .setBinary(JOSE_PROTECTED, protectedHeader.serializeToBytes(JSONOutputFormats.NORMALIZED));
         JSONObjectReader reader = JSONParser.parse(signature.toString());
         signature.setBinary(JOSE_SIGNATURE,
                              new SignatureWrapper(AsymSignatureAlgorithms.ECDSA_SHA256,

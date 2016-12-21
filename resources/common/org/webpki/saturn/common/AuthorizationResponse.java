@@ -89,12 +89,12 @@ public class AuthorizationResponse implements BaseProperties {
             .setObject(EMBEDDED_JSON, authorizationRequest.root)
             .setString(ACCOUNT_REFERENCE_JSON, accountReference)
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
-                       new JSONObjectWriter()
-                           .setEncryptionObject(ProtectedAccountData.encode(accountDescriptor, cardSpecificData)
-                                                    .serializeJSONObject(JSONOutputFormats.NORMALIZED),
-                                                providerAuthority.getDataEncryptionAlgorithm(),
-                                                providerAuthority.getEncryptionKey(),
-                                                providerAuthority.getKeyEncryptionAlgorithm()))
+                       JSONObjectWriter
+                           .createEncryptionObject(ProtectedAccountData.encode(accountDescriptor, cardSpecificData)
+                                                       .serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                                   providerAuthority.getDataEncryptionAlgorithm(),
+                                                   providerAuthority.getEncryptionKey(),
+                                                   providerAuthority.getKeyEncryptionAlgorithm()))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))

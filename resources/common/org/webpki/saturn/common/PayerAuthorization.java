@@ -59,10 +59,10 @@ public class PayerAuthorization implements BaseProperties {
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(ACCOUNT_TYPE_JSON, accountType)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, 
-                       new JSONObjectWriter()
-                          .setEncryptionObject(unencryptedAuthorizationData.serializeJSONObject(JSONOutputFormats.NORMALIZED),
-                                               dataEncryptionAlgorithm,
-                                               keyEncryptionKey,
-                                               keyEncryptionAlgorithm));
+                       JSONObjectWriter
+                          .createEncryptionObject(unencryptedAuthorizationData.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                                  dataEncryptionAlgorithm,
+                                                  keyEncryptionKey,
+                                                  keyEncryptionAlgorithm));
     }
 }

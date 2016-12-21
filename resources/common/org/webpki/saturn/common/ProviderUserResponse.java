@@ -116,9 +116,9 @@ public class ProviderUserResponse implements BaseProperties {
         wr.setDateTime(TIME_STAMP_JSON, new Date(), true);
         return Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
             .setObject(ENCRYPTED_MESSAGE_JSON,
-                       new JSONObjectWriter().setEncryptionObject(wr.serializeJSONObject(JSONOutputFormats.NORMALIZED),
-                                                                  dataEncryptionAlgorithm,
-                                                                  null,
-                                                                  dataEncryptionKey));
+                       JSONObjectWriter.createEncryptionObject(wr.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                                               dataEncryptionAlgorithm,
+                                                               null,
+                                                               dataEncryptionKey));
      }
 }

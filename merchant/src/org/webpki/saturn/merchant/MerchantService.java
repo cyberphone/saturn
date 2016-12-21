@@ -282,7 +282,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                                                   "6875056745552109"),
                                             new CardSpecificData("Luke Skywalker",
                                                                  ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
-                                                                 "943")).serializeJSONObject(JSONOutputFormats.NORMALIZED);
+                                                                 "943")).serializeToBytes(JSONOutputFormats.NORMALIZED);
 
             if (getPropertyString(TEST_MODE).length () > 0) {
                 testMode = getPropertyBoolean(TEST_MODE);

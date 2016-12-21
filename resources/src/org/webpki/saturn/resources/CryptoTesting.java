@@ -95,27 +95,27 @@ public class CryptoTesting {
                   "const JEF_TEST_STRING         = '" + JEF_TEST_STRING + "';\n" +
                   "const JEF_SYM_KEY             = '" + Base64URL.encode(symkey) + "';\n" +
                   "const JEF_ECDH_OBJECT = ");
-        JSONObjectWriter encryptedData  = new JSONObjectWriter()
-            .setEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
-                                 DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                                 alice.getPublic(),
-                                 KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
+        JSONObjectWriter encryptedData  =
+            JSONObjectWriter.createEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
+                                                    DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                                                    alice.getPublic(),
+                                                    KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
         js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
           .append(";\n\n" +
                   "const JEF_RSA_OBJECT = ");
-                  encryptedData  = new JSONObjectWriter()
-          .setEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
-                               DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                               rsa.getPublic(),
-                               KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID);
+                  encryptedData =
+                      JSONObjectWriter.createEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
+                                                              DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                                                              rsa.getPublic(),
+                                                              KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID);
       js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
         .append(";\n\n" +
                   "const JEF_SYM_OBJECT = ");
-        encryptedData  = new JSONObjectWriter()
-            .setEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
-                                 DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                                 null,
-                                 symkey);
+        encryptedData =
+            JSONObjectWriter.createEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
+                                                    DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                                                    null,
+                                                    symkey);
     js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
       .append(";\n\n");
         createPEM(false, "PRIVATE", createPKCS8PrivateKey(alice.getPublic().getEncoded(),

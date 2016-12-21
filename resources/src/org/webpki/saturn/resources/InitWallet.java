@@ -175,7 +175,7 @@ public class InitWallet {
             surrogateKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                                       SecureKeyStore.SUB_TYPE_EXTENSION,
                                       "",
-                                      ow.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+                                      ow.serializeToBytes(JSONOutputFormats.NORMALIZED));
             surrogateKey.addExtension(KeyGen2URIs.LOGOTYPES.CARD,
                                       SecureKeyStore.SUB_TYPE_LOGOTYPE,
                                       "image/png",
@@ -211,12 +211,12 @@ public class InitWallet {
                     .setPublicKey(sks.getKeyAttributes(ek.getKeyHandle()).getCertificatePath()[0].getPublicKey()));
             }
         }
-        ArrayUtil.writeFile(args[1], aw.serializeJSONArray(JSONOutputFormats.PRETTY_PRINT));
+        ArrayUtil.writeFile(args[1], aw.serializeToBytes(JSONOutputFormats.PRETTY_PRINT));
 
         // Report
         System.out.println("Imported Subject: " +
                 importedKey.getCertificatePath()[0].getSubjectX500Principal().getName() +
-                "\nID=#" + surrogateKey.key_handle + ", " + (rsa_flag ? "RSA" : "EC") +
+                "\nID=#" + surrogateKey.keyHandle + ", " + (rsa_flag ? "RSA" : "EC") +
                 (ow == null ? ", Not a card" : ", Card=\n" + ow));
     }
 }

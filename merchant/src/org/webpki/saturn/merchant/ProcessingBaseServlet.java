@@ -72,7 +72,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static final int TIMEOUT_FOR_REQUEST = 5000;
 
     static JSONObjectReader makeReader(JSONObjectWriter writer) throws IOException {
-        return JSONParser.parse(writer.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+        return JSONParser.parse(writer.serializeToString(JSONOutputFormats.NORMALIZED));
     }
 
     static String portFilter(String url) throws IOException {
@@ -113,7 +113,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setHeader("Content-Type", JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
         return fetchJSONData(wrap, urlHolder);
     }
 
@@ -132,7 +132,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         response.setContentType(JSON_CONTENT_TYPE);
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(data.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+        response.getOutputStream().write(data.serializeToBytes(JSONOutputFormats.NORMALIZED));
     }
 
     static ProviderAuthority getProviderAuthority(UrlHolder urlHolder) throws IOException {
@@ -222,7 +222,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 throw new IOException("Missing: " + payerAuthorization.getAccountType().getTypeUri());
             }
             PaymentRequest paymentRequest =
-                new PaymentRequest(JSONParser.parse(rawPaymentRequest.serializeJSONObject(JSONOutputFormats.NORMALIZED)));
+                new PaymentRequest(JSONParser.parse(rawPaymentRequest.serializeToString(JSONOutputFormats.NORMALIZED)));
             
             // The actual processing is here
             if (processCall(walletResponse,

@@ -56,7 +56,7 @@ public class AuthorityObjectManager extends Thread {
                                                              optionalProviderAccountTypes,
                                                              optionalEncryptionKey,
                                                              Expires.inSeconds(expiryTimeInSeconds),
-                                                             providerSigner).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT);
+                                                             providerSigner).serializeToBytes(JSONOutputFormats.PRETTY_PRINT);
         }
         if (logging) {
             logger.info("Updated \"" + Messages.PROVIDER_AUTHORITY.toString() + "\"");
@@ -71,7 +71,7 @@ public class AuthorityObjectManager extends Thread {
                                                               new Payee(payeeCoreProperties.getCommonName(), id),
                                                               payeeCoreProperties.getPublicKey(),
                                                               Expires.inSeconds(expiryTimeInSeconds),
-                                                              providerSigner).serializeJSONObject(JSONOutputFormats.PRETTY_PRINT));
+                                                              providerSigner).serializeToBytes(JSONOutputFormats.PRETTY_PRINT));
             }
             if (logging) {
                 logger.info("Updated \"" + Messages.PAYEE_AUTHORITY.toString() + "\" with id:" + id);

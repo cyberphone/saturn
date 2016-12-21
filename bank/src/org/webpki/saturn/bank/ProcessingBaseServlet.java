@@ -124,7 +124,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setHeader("Content-Type", JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
         return fetchJSONData(wrap, urlHolder);
     }
 
@@ -227,7 +227,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             response.setContentType(JSON_CONTENT_TYPE);
             response.setHeader("Pragma", "No-Cache");
             response.setDateHeader("EXPIRES", 0);
-            response.getOutputStream().write(providerResponse.serializeJSONObject(JSONOutputFormats.NORMALIZED));
+            response.getOutputStream().write(providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED));
             
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////

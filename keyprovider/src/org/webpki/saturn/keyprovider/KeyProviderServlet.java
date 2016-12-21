@@ -159,7 +159,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                   : 
                                KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
                     .setPublicKey(paymentCredential.encryptionKey, AlgorithmPreferences.JOSE))
-                             .serializeJSONObject(JSONOutputFormats.NORMALIZED));
+                             .serializeToBytes(JSONOutputFormats.NORMALIZED));
 
            key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, paymentCredential.cardImage);
         }
