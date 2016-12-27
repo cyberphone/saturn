@@ -22,13 +22,24 @@ package org.webpki.saturn.resources;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
+import java.io.IOException;
+
 import java.math.BigDecimal;
 
-import java.util.Date;
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
 
+import java.security.interfaces.RSAPublicKey;
+
+import org.webpki.crypto.AlgorithmPreferences;
+import org.webpki.crypto.AsymKeySignerInterface;
+import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CustomCryptoProvider;
 
+import org.webpki.crypto.test.DeterministicSignatureWrapper;
+
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
@@ -39,7 +50,6 @@ import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.ServerAsymKeySigner;
 
 import org.webpki.util.ISODateTime;
 
@@ -47,6 +57,31 @@ import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class InitTestPage implements BaseProperties {
     
+    public static class BotchedAsymKeySigner extends JSONAsymKeySigner {
+        
+        private static final long serialVersionUID = 1L;
+
+        public BotchedAsymKeySigner(final KeyStoreEnumerator key) throws IOException {
+            super(new AsymKeySignerInterface() {
+                @Override
+                public byte[] signData(byte[] data, AsymSignatureAlgorithms algorithm) throws IOException {
+                    try {
+                        return new DeterministicSignatureWrapper(algorithm, key.getPrivateKey()).update(data).sign();
+                    } catch (GeneralSecurityException e) {
+                        throw new IOException (e);
+                    }
+                }
+                @Override
+                public PublicKey getPublicKey() throws IOException {
+                    return key.getPublicKey();
+                }
+            });
+            setSignatureAlgorithm(key.getPublicKey() instanceof RSAPublicKey ?
+                      AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256);
+            setAlgorithmPreferences(AlgorithmPreferences.JOSE);
+        }
+    }
+
     enum TESTS {
         Normal      ("Normal"), 
         Slow        ("Slow (but legal) response"),
@@ -88,7 +123,7 @@ public class InitTestPage implements BaseProperties {
         fos = new FileOutputStream(args[0]);
         
         // Read key/certificate to be imported and create signer
-        ServerAsymKeySigner signer = new ServerAsymKeySigner(new KeyStoreEnumerator (new FileInputStream(args[1]), args[2]));
+        BotchedAsymKeySigner signer = new BotchedAsymKeySigner(new KeyStoreEnumerator (new FileInputStream(args[1]), args[2]));
 
         // Create signed payment request
         JSONObjectWriter standardRequest = 
@@ -97,7 +132,7 @@ public class InitTestPage implements BaseProperties {
                                   Currencies.USD,
                                   null,
                                   "#6100004",
-                                  new Date(),
+                                  ISODateTime.parseDateTime("2016-12-27T09:45:23Z").getTime(),
                                   ISODateTime.parseDateTime("2030-09-14T00:00:00Z").getTime(),
                                   signer);
         // Header
