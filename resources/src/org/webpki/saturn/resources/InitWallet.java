@@ -162,7 +162,8 @@ public class InitWallet {
                          rsa_flag ?
                     AsymSignatureAlgorithms.RSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE)
                                   :
-                    AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE));
+                    AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE))
+                 .setPublicKey(importedKey.getCertificatePath()[0].getPublicKey());
             PublicKey publicKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
             ow.setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
                   .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
@@ -207,8 +208,7 @@ public class InitWallet {
             url = url.substring(0, url.lastIndexOf('/'));  // Remove "/authority"
             if (args[1].substring(args[1].lastIndexOf(File.separator) + 7)
                     .startsWith(url.substring(url.lastIndexOf('/') + 1))) {
-                aw.setObject(new JSONObjectWriter(rd)
-                    .setPublicKey(sks.getKeyAttributes(ek.getKeyHandle()).getCertificatePath()[0].getPublicKey()));
+                aw.setObject(new JSONObjectWriter(rd));
             }
         }
         ArrayUtil.writeFile(args[1], aw.serializeToBytes(JSONOutputFormats.PRETTY_PRINT));
