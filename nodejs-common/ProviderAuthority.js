@@ -17,46 +17,50 @@
  
 'use strict';
 
-// JSON "Authority" object
+// Saturn "ProviderAuthority" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
 const Keys = require('webpki.org').Keys;
-const Encryption = require('webpki.org').Encryption;
+const Jef = require('webpki.org').Jef;
 
 const BaseProperties = require('./BaseProperties');
 const Messages = require('./Messages');
 
-function Authority() {
+function ProviderAuthority() {
 }
 
-Authority.encode = function(authorityUrl,
-                            transactionUrl,
-                            publicKey,
-                            expires,
-                            signer) {
-  return Messages.createBaseMessage(Messages.AUTHORITY)
+ProviderAuthority.encode = function(authorityUrl,
+                                    serviceUrl,
+                                    publicKey,
+                                    expiresInSeconds,
+                                    signer) {
+  var now = new Date();
+  var expires = new Date();
+  expires.setTime(now.getTime() + expiresInSeconds * 1000);
+  return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
+    .setString(BaseProperties.HTTP_VERSION_JSON, "HTTP/1.1")
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
-    .setString(BaseProperties.TRANSACTION_URL_JSON, transactionUrl)
+    .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
     .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JsonUtil.ObjectWriter()
-      .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Encryption.JOSE_A128CBC_HS256_ALG_ID)
+      .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Jef.JOSE_A128CBC_HS256_ALG_ID)
       .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
                          publicKey.jcs.type == 'RSA' ?
-                 Encryption.JOSE_RSA_OAEP_256_ALG_ID : Encryption.JOSE_ECDH_ES_ALG_ID)
+                        Jef.JOSE_RSA_OAEP_256_ALG_ID : Jef.JOSE_ECDH_ES_ALG_ID)
       .setPublicKey(publicKey))
-    .setDateTime(BaseProperties.TIME_STAMP_JSON, new Date())
+    .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
     .setSignature(signer);
 };
 
 /*
-    public Authority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
+    public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         root = Messages.parseBaseMessage(Messages.AUTHORITY, rd);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         if (!authorityUrl.equals(expectedAuthorityUrl)) {
             throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
                                   " expected=" + expectedAuthorityUrl);
         }
-        transactionUrl = rd.getString(TRANSACTION_URL_JSON);
+        serviceUrl = rd.getString(TRANSACTION_URL_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
         keyEncryptionAlgorithm = encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
@@ -73,9 +77,9 @@ Authority.encode = function(authorityUrl,
         return authorityUrl;
     }
 
-    String transactionUrl;
+    String serviceUrl;
     public String getTransactionUrl() {
-        return transactionUrl;
+        return serviceUrl;
     }
 
     String dataEncryptionAlgorithm;
@@ -114,4 +118,4 @@ Authority.encode = function(authorityUrl,
     }
 */
 
-module.exports = Authority;
+module.exports = ProviderAuthority;

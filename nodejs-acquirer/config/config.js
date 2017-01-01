@@ -23,7 +23,7 @@ const Url = require('url');
 
 var config = {};
 
-config.logging = true;
+config.logging = false;
 
 config.host = 'https://localhost:8888';
 
@@ -39,5 +39,7 @@ config.ownKeys = {
 };
 
 config.trustAnchors = __dirname + '/trustanchors/paymentnetworks.pem';
+
+config.payeeDb = __dirname + '/../../resources/credentials/merchants.webpay-acquirer.json';
 
 module.exports = config;

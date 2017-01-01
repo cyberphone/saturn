@@ -35,8 +35,8 @@ const Logging = require('webpki.org').Logging;
 
 const ServerCertificateSigner = require('../nodejs-common/ServerCertificateSigner');
 const BaseProperties = require('../nodejs-common/BaseProperties');
-const Authority = require('../nodejs-common/AuthorityObject');
-const Expires = require('../nodejs-common/Expires');
+const PayeeAuthority = require('../nodejs-common/PayeeAuthority');
+const ProviderAuthority = require('../nodejs-common/ProviderAuthority');
 const ErrorReturn = require('../nodejs-common/ErrorReturn');
 const FinalizeRequest = require('../nodejs-common/FinalizeRequest');
 const FinalizeResponse = require('../nodejs-common/FinalizeResponse');
@@ -55,6 +55,8 @@ function readFile(path) {
 }
 
 const homePage = readFile(__dirname + '/index.html');
+
+const AO_EXPIRY_TIME = 120;  // Authority object expiry time in seconds
 
 var referenceId = 194006;
 function getReferenceId() {
@@ -91,12 +93,24 @@ const encryptionKeys = [];
 encryptionKeys.push(Keys.createPrivateKeyFromPem(readFile(Config.ownKeys.ecEncryptionKey)));
 encryptionKeys.push(Keys.createPrivateKeyFromPem(readFile(Config.ownKeys.rsaEncryptionKey)));
 
-const authorityData = Authority.encode(Config.host + '/authority',
-                                       Config.host + '/transact',
-                                       encryptionKeys[0].getPublicKey(),
-                                       Expires.inDays(365),
-                                       serverCertificateSigner);
-  
+const payeeDb = new Map();
+JSON.parse(readFile(Config.payeeDb).toString('utf8')).forEach((entry) => {
+  entry[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
+  payeeDb.set(entry[BaseProperties.PAYEE_JSON][BaseProperties.ID_JSON], entry);
+});
+console.log(payeeDb);
+
+var providerAuthority;
+function updateProviderAuthority() {
+  providerAuthority = ProviderAuthority.encode(Config.host + '/authority',
+                                               Config.host + '/transact',
+                                               encryptionKeys[0].getPublicKey(),
+                                               AO_EXPIRY_TIME,
+                                               serverCertificateSigner);
+}
+updateProviderAuthority();
+setInterval(updateProviderAuthority, AO_EXPIRY_TIME * 500);
+
 /////////////////////////////////
 // The request processors
 /////////////////////////////////
@@ -149,10 +163,36 @@ const jsonPostProcessors = {
 
 const jsonGetProcessors = {
 
-  authority : function() {
-    return authorityData;
-  }
+  authority : function(getArgument) {
+    return getArgument ? null : providerAuthority;
+  },
 
+  payees : function(getArgument) {
+    // This call must have a REST like argument holding the merchant id
+    if (getArgument) {
+
+      // Valid merchant id?
+      var payeeInformation = payeeDb.get(getArgument);
+      if (payeeInformation !== undefined) {
+
+        // If the payee authority object has less than half of its life left, renew it
+        var now = new Date();
+        if (payeeInformation[BaseProperties.TIME_STAMP_JSON] < now.getTime() - (AO_EXPIRY_TIME * 500)) {
+          payeeInformation[BaseProperties.TIME_STAMP_JSON] = now.getTime();
+          payeeInformation.payeeAuthority = PayeeAuthority.encode(Config.host + '/payees/' + getArgument,
+                                                                  Config.host + '/authority',
+                                                                  payeeInformation,
+                                                                  now,
+                                                                  AO_EXPIRY_TIME,
+                                                                  serverCertificateSigner);
+        }
+        return payeeInformation.payeeAuthority;
+      }
+    }
+
+    // Missing or no such merchant id
+    return null;
+  }
 };
 
 /////////////////////////////////
@@ -180,13 +220,17 @@ function successLog(returnOrReceived, request, jsonReaderOrWriter) {
 }
 
 function returnJsonData(request, response, jsonWriter) {
-  var output = jsonWriter.getNormalizedData();
-  response.writeHead(200, {'Content-Type'  : BaseProperties.JSON_CONTENT_TYPE,
-                           'Connection'    : 'close',
-                           'Content-Length': output.length});
-  response.write(new Buffer(output));
-  response.end();
-  successLog('Returned data', request, jsonWriter);
+  if (jsonWriter) {
+    var output = jsonWriter.getNormalizedData();
+    response.writeHead(200, {'Content-Type'  : BaseProperties.JSON_CONTENT_TYPE,
+                             'Connection'    : 'close',
+                             'Content-Length': output.length});
+    response.write(new Buffer(output));
+    response.end();
+    successLog('Returned data', request, jsonWriter);
+  } else {
+    noSuchFileResponse(response, request);
+  }
 }
 
 function noSuchFileResponse(response, request) {
@@ -204,9 +248,19 @@ Https.createServer(options, (request, response) => {
     pathname = pathname.substring(applicationPath.length + 1);
   }
   if (request.method == 'GET') {
-    if (pathname in jsonGetProcessors) {
+    var i = pathname.indexOf('/');
+    var getPath = pathname;
+    var getArgument = null;
+    if (i > 0) {
+      getPath = pathname.substring(0, i);
+      getArgument = pathname.substring(i + 1);
+      if (getArgument.length == 0) {
+        getArgument = "/";
+      }
+    }
+    if (getPath in jsonGetProcessors) {
       try {
-        returnJsonData(request, response, jsonGetProcessors[pathname]());
+        returnJsonData(request, response, jsonGetProcessors[getPath](getArgument));
       } catch (e) {
         logger.error(e.stack)
         serverError(response, e.message);

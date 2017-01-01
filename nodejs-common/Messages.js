@@ -25,41 +25,24 @@ const BaseProperties = require('./BaseProperties');
 
 const Messages = {
 
-    WALLET_INITIALIZED     : 'WalletInitialized',       // Wallet to payee web page message
-    WALLET_REQUEST         : 'WalletRequest',           // Payee payment request + other data
-    PAYER_AUTHORIZATION    : 'PayerAuthorization',      // Created by the Wallet
+    CARD_PAYMENT_REQUEST   :  'CardPaymentRequest',            // Payee provider to Acquirer
+    CARD_PAYMENT_RESPONSE  :  'CardPaymentResponse',           // Response to the former
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // One-step payment operation in Account2Account mode
-    DIRECT_DEBIT_REQUEST   : 'DirectDebitRequest',      // Payee request to provider
-    DIRECT_DEBIT_RESPONSE  : 'DirectDebitResponse',     // Provider response to the above
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Two-step payment operation in Account2Account or Acquirer mode
-    //
-    // First step - Payee to Provider
-    RESERVE_FUNDS_REQUEST  : 'ReserveFundsRequest',     // Reserve funds at provider
-    RESERVE_FUNDS_RESPONSE : 'ReserveFundsResponse',    // Provider response to request
-    //
-    // Second step - Payee to Provider (Account2Account mode) or Acquirer (Acquirer mode)
-    FINALIZE_REQUEST       : 'FinalizeRequest',         // Perform the actual payment operation
-    FINALIZE_RESPONSE      : 'FinalizeResponse',        // Provider or Acquirer response to request
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    AUTHORITY              : 'Authority',               // Published entity data
+    PROVIDER_AUTHORITY     :  'ProviderAuthority',             // Published provider entity data
     
+    PAYEE_AUTHORITY        :  'PayeeAuthority',    
+
     CONTEXT_JSON           : '@context',
     QUALIFIER_JSON         : '@qualifier',
 
     createBaseMessage : function(message) {
       return new JsonUtil.ObjectWriter()
-        .setString(Messages.CONTEXT_JSON, BaseProperties.W2NB_WEB_PAY_CONTEXT_URI)
+        .setString(Messages.CONTEXT_JSON, BaseProperties.SATURN_WEB_PAY_CONTEXT_URI)
         .setString(Messages.QUALIFIER_JSON, message);
     },
     
     parseBaseMessage : function(expectedMessage, jsonReader) {
-      if (jsonReader.getString(Messages.CONTEXT_JSON) != BaseProperties.W2NB_WEB_PAY_CONTEXT_URI) {
+      if (jsonReader.getString(Messages.CONTEXT_JSON) != BaseProperties.SATURN_WEB_PAY_CONTEXT_URI) {
         throw new TypeError('Unknown context: ' + jsonReader.getString(Messages.CONTEXT_JSON));
       }
       if (jsonReader.getString(Messages.QUALIFIER_JSON) != expectedMessage) {
