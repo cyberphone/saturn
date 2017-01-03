@@ -38,8 +38,8 @@ const BaseProperties = require('../nodejs-common/BaseProperties');
 const PayeeAuthority = require('../nodejs-common/PayeeAuthority');
 const ProviderAuthority = require('../nodejs-common/ProviderAuthority');
 const ErrorReturn = require('../nodejs-common/ErrorReturn');
-const FinalizeRequest = require('../nodejs-common/FinalizeRequest');
-const FinalizeResponse = require('../nodejs-common/FinalizeResponse');
+const CardPaymentRequest = require('../nodejs-common/CardPaymentRequest');
+const CardPaymentResponse = require('../nodejs-common/CardPaymentResponse');
 
 const Config = require('./config/config');
 
@@ -98,12 +98,11 @@ JSON.parse(readFile(Config.payeeDb).toString('utf8')).forEach((entry) => {
   entry[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
   payeeDb.set(entry[BaseProperties.PAYEE_JSON][BaseProperties.ID_JSON], entry);
 });
-console.log(payeeDb);
 
 var providerAuthority;
 function updateProviderAuthority() {
   providerAuthority = ProviderAuthority.encode(Config.host + '/authority',
-                                               Config.host + '/transact',
+                                               Config.host + '/authorize',
                                                encryptionKeys[0].getPublicKey(),
                                                AO_EXPIRY_TIME,
                                                serverCertificateSigner);
@@ -117,12 +116,32 @@ setInterval(updateProviderAuthority, AO_EXPIRY_TIME * 500);
 
 const jsonPostProcessors = {
  
-  transact : function(reader) {
-    // Decode the finalize request message
-    var finalizeRequest = new FinalizeRequest(reader);
+  authorize : function(reader) {
 
+    // Decode the card payment request message
+    var cardPaymentRequest = new CardPaymentRequest(reader);
+
+    // Verify that the request comes from one of "our" merchants
+    var payee = cardPaymentRequest.getPayee();
+    var payeeDbEntry = payeeDb.get(payee[BaseProperties.ID_JSON]);
+    if (payeeDbEntry === undefined ||
+        payeeDbEntry[BaseProperties.PAYEE_JSON][BaseProperties.COMMON_NAME_JSON] !=
+          payee[BaseProperties.COMMON_NAME_JSON]) {
+      throw new TypeError('Unkown merchant ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
+    }
+    
+@BYGG OM DB!
+    if (!cardPaymentRequest.getPublicKey().equals(Keys.encodePublicKey(payeeDbEntry[Jcs.PUBLIC_KEY_JSON]))) {
+      throw new TypeError('Outer and inner public key differ');
+    }
+    
+    // Verify the the embedded response was created by a known bank (network)
+    cardPaymentRequest.verifyPayerProvider(paymentRoot);
+
+    cardPaymentRequest.getProtectedAccountData(encryptionKeys);
+/*
     // Get the embedded authorization from the payer's payment provider (bank)
-    var embeddedResponse = finalizeRequest.getEmbeddedResponse();
+    var embeddedResponse = cardPaymentRequest.getEmbeddedResponse();
 
     // Verify that the provider's signature belongs to a valid payment provider trust network
     embeddedResponse.getSignatureDecoder().verifyTrust(paymentRoot);
@@ -149,14 +168,12 @@ const jsonPostProcessors = {
     if (payeeBank != 'CN=mybank.com,2.5.4.5=#130434353031,C=FR') {
       throw new TypeError('Merchant: ID=' + payee.getId() + ' does not match bank: ' + payeeBank);
     }
-
+*/
     // We got an authentic request.  Now we need to check available funds etc.
     // Since we don't have a real acquirer this part is rather simplistic :-)
-    return paymentRequest.getAmount().cmp(new Big('1000000.00')) > 0 ?
-      // Sorry but you don't appear to have a million bucks :-)
-      FinalizeResponse.encode(new ErrorReturn(ErrorReturn.INSUFFICIENT_FUNDS))
-                                                                     :
-      FinalizeResponse.encode(finalizeRequest, getReferenceId(), serverCertificateSigner);
+    return CardPaymentResponse.encode(cardPaymentRequest,
+                                      getReferenceId(),
+                                      serverCertificateSigner);
   }
 
 };
@@ -164,11 +181,12 @@ const jsonPostProcessors = {
 const jsonGetProcessors = {
 
   authority : function(getArgument) {
+    // This call MUST NOT have any argument
     return getArgument ? null : providerAuthority;
   },
 
   payees : function(getArgument) {
-    // This call must have a REST like argument holding the merchant id
+    // This call MUST have a single REST-like argument holding a merchant id
     if (getArgument) {
 
       // Valid merchant id?
@@ -190,7 +208,7 @@ const jsonGetProcessors = {
       }
     }
 
-    // Missing or no such merchant id
+    // Missing or unknown merchant id
     return null;
   }
 };
@@ -248,6 +266,7 @@ Https.createServer(options, (request, response) => {
     pathname = pathname.substring(applicationPath.length + 1);
   }
   if (request.method == 'GET') {
+    // Find possible REST-like argument list
     var i = pathname.indexOf('/');
     var getPath = pathname;
     var getArgument = null;
@@ -255,7 +274,8 @@ Https.createServer(options, (request, response) => {
       getPath = pathname.substring(0, i);
       getArgument = pathname.substring(i + 1);
       if (getArgument.length == 0) {
-        getArgument = "/";
+        // Syntactic error in our implementation
+        getPath = pathname;
       }
     }
     if (getPath in jsonGetProcessors) {

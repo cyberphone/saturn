@@ -17,7 +17,7 @@
  
 'use strict';
 
-//Holds payer and payee account data
+//Saturn "AccountDescriptor" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
 

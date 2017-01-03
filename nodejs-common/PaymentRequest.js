@@ -17,7 +17,7 @@
  
 'use strict';
 
-// PaymentRequest object
+// Saturn "PaymentRequest" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
@@ -30,6 +30,10 @@ function PaymentRequest(rd) {
   this.root = rd;
   this.payee = new Payee(rd.getObject(BaseProperties.PAYEE_JSON));
   this.currency = new Currencies(rd.getString(BaseProperties.CURRENCY_JSON));
+  if (rd.hasProperty(BaseProperties.NON_DIRECT_PAYMENT_JSON)) {
+    // Converter missing
+    this.nonDirectPayment = rd.getString(BaseProperties.NON_DIRECT_PAYMENT_JSON);
+  }
   this.amount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON, this.currency.getDecimals());
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.dateTime = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);

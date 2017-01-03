@@ -28,6 +28,9 @@ const Messages = {
     CARD_PAYMENT_REQUEST   :  'CardPaymentRequest',            // Payee provider to Acquirer
     CARD_PAYMENT_RESPONSE  :  'CardPaymentResponse',           // Response to the former
 
+    AUTHORIZATION_REQUEST  :  'AuthorizationRequest',          // Payee provider to Payer provider
+    AUTHORIZATION_RESPONSE :  'AuthorizationResponse',         // Response to the former
+
     PROVIDER_AUTHORITY     :  'ProviderAuthority',             // Published provider entity data
     
     PAYEE_AUTHORITY        :  'PayeeAuthority',    
