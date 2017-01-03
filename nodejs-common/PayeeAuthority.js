@@ -38,14 +38,12 @@ PayeeAuthority.encode = function(authorityUrl,
                                  signer) {
   var expires = new Date();
   expires.setTime(now.getTime() + expiresInSeconds * 1000);
-  var payee = payeeInformation[BaseProperties.PAYEE_JSON];
   return Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
-    .setString(BaseProperties.COMMON_NAME_JSON, payee[BaseProperties.COMMON_NAME_JSON])
-    .setString(BaseProperties.ID_JSON, payee[BaseProperties.ID_JSON])
-    .setObject(Jcs.PUBLIC_KEY_JSON,
-               new JsonUtil.ObjectWriter(payeeInformation[Jcs.PUBLIC_KEY_JSON]))
+    .setString(BaseProperties.COMMON_NAME_JSON, payeeInformation[BaseProperties.COMMON_NAME_JSON])
+    .setString(BaseProperties.ID_JSON, payeeInformation[BaseProperties.ID_JSON])
+    .setPublicKey(payeeInformation[Jcs.PUBLIC_KEY_JSON])
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
     .setSignature(signer);

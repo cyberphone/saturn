@@ -95,8 +95,12 @@ encryptionKeys.push(Keys.createPrivateKeyFromPem(readFile(Config.ownKeys.rsaEncr
 
 const payeeDb = new Map();
 JSON.parse(readFile(Config.payeeDb).toString('utf8')).forEach((entry) => {
-  entry[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
-  payeeDb.set(entry[BaseProperties.PAYEE_JSON][BaseProperties.ID_JSON], entry);
+  var payeeInformation = {};
+  payeeInformation[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
+  payeeInformation[Jcs.PUBLIC_KEY_JSON] = Keys.encodePublicKey(entry[Jcs.PUBLIC_KEY_JSON]);
+  payeeInformation[BaseProperties.COMMON_NAME_JSON] = entry[BaseProperties.PAYEE_JSON][BaseProperties.COMMON_NAME_JSON];
+  payeeInformation[BaseProperties.ID_JSON] = entry[BaseProperties.PAYEE_JSON][BaseProperties.ID_JSON];
+  payeeDb.set(payeeInformation[BaseProperties.ID_JSON], payeeInformation);
 });
 
 var providerAuthority;
@@ -125,13 +129,10 @@ const jsonPostProcessors = {
     var payee = cardPaymentRequest.getPayee();
     var payeeDbEntry = payeeDb.get(payee[BaseProperties.ID_JSON]);
     if (payeeDbEntry === undefined ||
-        payeeDbEntry[BaseProperties.PAYEE_JSON][BaseProperties.COMMON_NAME_JSON] !=
-          payee[BaseProperties.COMMON_NAME_JSON]) {
-      throw new TypeError('Unkown merchant ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
+        payeeDbEntry[BaseProperties.COMMON_NAME_JSON] != payee[BaseProperties.COMMON_NAME_JSON]) {
+      throw new TypeError('Unknown merchant ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
     }
-    
-@BYGG OM DB!
-    if (!cardPaymentRequest.getPublicKey().equals(Keys.encodePublicKey(payeeDbEntry[Jcs.PUBLIC_KEY_JSON]))) {
+    if (!cardPaymentRequest.getPublicKey().equals(payeeDbEntry[Jcs.PUBLIC_KEY_JSON])) {
       throw new TypeError('Outer and inner public key differ');
     }
     
