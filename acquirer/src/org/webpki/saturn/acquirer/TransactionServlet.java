@@ -54,9 +54,6 @@ public class TransactionServlet extends ProcessingBaseServlet {
         if (!merchantProperties.getPublicKey().equals(finalizeRequest.getPublicKey())) {
             throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
         }
-        if (!finalizeRequest.getMerchantKeyIssuer().equals(merchantProperties.getIssuer())) {
-            throw new IOException("Non-matching issuer for merchant Id: " + payee.getId());
-        }
 
         logger.info("Card data: " + finalizeRequest.getProtectedAccountData(AcquirerService.decryptionKeys, true));
 

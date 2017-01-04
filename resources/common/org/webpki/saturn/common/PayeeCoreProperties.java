@@ -20,19 +20,16 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONSignatureDecoder;
 
 public class PayeeCoreProperties implements BaseProperties {
     PublicKey publicKey;
     String commonName;
     String id;
-    String issuer;
 
     public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
         commonName = rd.getObject(PAYEE_JSON).getString(COMMON_NAME_JSON);
         id = rd.getObject(PAYEE_JSON).getString(ID_JSON);
         publicKey = rd.getPublicKey();
-        issuer = rd.getString(JSONSignatureDecoder.ISSUER_JSON);
     }
 
     public String getCommonName() {
@@ -45,9 +42,5 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public PublicKey getPublicKey() {
         return publicKey;
-    }
-
-    public String getIssuer() {
-        return issuer;
     }
 }

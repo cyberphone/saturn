@@ -130,12 +130,6 @@ public class FinalizeRequest implements BaseProperties {
     }
 
     // Convenience method
-    public String getMerchantKeyIssuer() throws IOException {
-        return reserveOrBasicResponse
-            .signatureDecoder.getCertificatePath()[0].getSubjectX500Principal().getName();
-    }
-
-    // Convenience method
     public void verifyMerchantBank(JSONX509Verifier verifier) throws IOException {
         reserveOrBasicResponse.signatureDecoder.verify(verifier);
     }
