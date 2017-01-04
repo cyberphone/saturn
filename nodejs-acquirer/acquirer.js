@@ -140,38 +140,13 @@ const jsonPostProcessors = {
     cardPaymentRequest.verifyPayerProvider(paymentRoot);
 
     cardPaymentRequest.getProtectedAccountData(encryptionKeys);
-/*
-    // Get the embedded authorization from the payer's payment provider (bank)
-    var embeddedResponse = cardPaymentRequest.getEmbeddedResponse();
-
-    // Verify that the provider's signature belongs to a valid payment provider trust network
-    embeddedResponse.getSignatureDecoder().verifyTrust(paymentRoot);
-    var payeeBank = embeddedResponse.getSignatureDecoder().getCertificatePath()[0].getSubject();
-
-    // Get the the account data we sent encrypted through the merchant
-    var protectedAccountData = embeddedResponse.getProtectedAccountData(encryptionKeys);
-    if (Config.logging) {
-      logger.info('Account:\n' + protectedAccountData.toString());
-    }
-
-    // The original request contains some required data like currency
-    var paymentRequest = embeddedResponse.getPaymentRequest();
-    var payee = paymentRequest.getPayee();
-
-    // Verify that the merchant is one of our customers.
-    // Rudimentary customer "database": a single customer!
-    // Note that since a payee (merchant) is vouched for by a bank it is the combination
-    // of a payee ID and the name of the certifying bank that comprise a valid customer.
-    // The payee's public key is only of interest to the certifying bank.
-    if (payee.getId() != '86344') {
-      throw new TypeError('Unknown merchant: ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
-    }
-    if (payeeBank != 'CN=mybank.com,2.5.4.5=#130434353031,C=FR') {
-      throw new TypeError('Merchant: ID=' + payee.getId() + ' does not match bank: ' + payeeBank);
-    }
-*/
-    // We got an authentic request.  Now we need to check available funds etc.
-    // Since we don't have a real acquirer this part is rather simplistic :-)
+    // We got an authentic (good) request
+    
+    /////////////////////////////////////////////////////////////
+    // Insert call to payment network HERE
+    /////////////////////////////////////////////////////////////
+    
+    // We did it! :-)
     return CardPaymentResponse.encode(cardPaymentRequest,
                                       getReferenceId(),
                                       serverCertificateSigner);
@@ -192,24 +167,24 @@ const jsonGetProcessors = {
 
       // Valid merchant id?
       var payeeInformation = payeeDb.get(getArgument);
-      if (payeeInformation !== undefined) {
-
-        // If the payee authority object has less than half of its life left, renew it
-        var now = new Date();
-        if (payeeInformation[BaseProperties.TIME_STAMP_JSON] < now.getTime() - (AO_EXPIRY_TIME * 500)) {
-          payeeInformation[BaseProperties.TIME_STAMP_JSON] = now.getTime();
-          payeeInformation.payeeAuthority = PayeeAuthority.encode(Config.host + '/payees/' + getArgument,
-                                                                  Config.host + '/authority',
-                                                                  payeeInformation,
-                                                                  now,
-                                                                  AO_EXPIRY_TIME,
-                                                                  serverCertificateSigner);
-        }
-        return payeeInformation.payeeAuthority;
+      if (payeeInformation === undefined) {
+        throw new TypeError('No such merchant: ' + getArgument);
       }
-    }
 
-    // Missing or unknown merchant id
+      // If the payee authority object has less than half of its life left, renew it
+      var now = new Date();
+      if (payeeInformation[BaseProperties.TIME_STAMP_JSON] < now.getTime() - (AO_EXPIRY_TIME * 500)) {
+        payeeInformation[BaseProperties.TIME_STAMP_JSON] = now.getTime();
+        payeeInformation.payeeAuthority = PayeeAuthority.encode(Config.host + '/payees/' + getArgument,
+                                                                Config.host + '/authority',
+                                                                payeeInformation,
+                                                                now,
+                                                                AO_EXPIRY_TIME,
+                                                                serverCertificateSigner);
+      }
+      return payeeInformation.payeeAuthority;
+    }
+    // Missing merchant id
     return null;
   }
 };
