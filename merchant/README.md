@@ -1,2 +1,2 @@
-###Web Payment Application
+###Saturn Payment Authorization System
 This project holds the code for an Payee (Merchant)

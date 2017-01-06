@@ -17,29 +17,29 @@
  
 'use strict';
 
-//////////////////////////////////////////////////////////////////////////////////////
-// This is a Node.js version of the "Acquirer" server used in the Web2Native Bridge //
-// proof-of-concept payment system.                                                 //
-//////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// This is a Node.js version of the "Acquirer" server used in the "Saturn"   //
+// proof-of-concept payment authorization system.                            //
+///////////////////////////////////////////////////////////////////////////////
 
+// Node.js platform imports
 const Https = require('https');
-const Url = require('url');
-const Fs = require('fs');
+const Url   = require('url');
+const Fs    = require('fs');
 
-const Keys = require('webpki.org').Keys;
-const Jcs = require('webpki.org').Jcs;
-const Big = require('webpki.org').Big;
-const ByteArray = require('webpki.org').ByteArray;
-const JsonUtil = require('webpki.org').JsonUtil;
-const Logging = require('webpki.org').Logging;
+// WebPKI.org library imports
+const Keys      = require('webpki.org').Keys;
+const Jcs       = require('webpki.org').Jcs;
+const JsonUtil  = require('webpki.org').JsonUtil;
+const Logging   = require('webpki.org').Logging;
 
+// Saturn common library imports
 const ServerCertificateSigner = require('../nodejs-common/ServerCertificateSigner');
-const BaseProperties = require('../nodejs-common/BaseProperties');
-const PayeeAuthority = require('../nodejs-common/PayeeAuthority');
-const ProviderAuthority = require('../nodejs-common/ProviderAuthority');
-const ErrorReturn = require('../nodejs-common/ErrorReturn');
-const CardPaymentRequest = require('../nodejs-common/CardPaymentRequest');
-const CardPaymentResponse = require('../nodejs-common/CardPaymentResponse');
+const BaseProperties          = require('../nodejs-common/BaseProperties');
+const PayeeAuthority          = require('../nodejs-common/PayeeAuthority');
+const ProviderAuthority       = require('../nodejs-common/ProviderAuthority');
+const CardPaymentRequest      = require('../nodejs-common/CardPaymentRequest');
+const CardPaymentResponse     = require('../nodejs-common/CardPaymentResponse');
 
 const Config = require('./config/config');
 
@@ -92,6 +92,10 @@ const paymentRoot = Keys.createCertificatesFromPem(readFile(Config.trustAnchors)
 const encryptionKeys = [];
 encryptionKeys.push(Keys.createPrivateKeyFromPem(readFile(Config.ownKeys.ecEncryptionKey)));
 encryptionKeys.push(Keys.createPrivateKeyFromPem(readFile(Config.ownKeys.rsaEncryptionKey)));
+
+/////////////////////////////////
+//Initiate merchant database
+/////////////////////////////////
 
 const payeeDb = new Map();
 JSON.parse(readFile(Config.payeeDb).toString('utf8')).forEach((entry) => {
