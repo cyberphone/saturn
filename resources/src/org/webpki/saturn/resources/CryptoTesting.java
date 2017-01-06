@@ -92,7 +92,7 @@ public class CryptoTesting {
         js.append("// JEF test data\n\n" +
                   "const ECDH_RESULT_WITH_KDF    = '" + ECDH_RESULT_WITH_KDF + "';\n" +
                   "const ECDH_RESULT_WITHOUT_KDF = '" + ECDH_RESULT_WITHOUT_KDF + "';\n\n" +
-                  "const JEF_TEST_STRING         = '" + JEF_TEST_STRING + "';\n" +
+                  "const JEF_TEST_STRING         = ByteArray.stringToUtf8('" + JEF_TEST_STRING + "');\n" +
                   "const JEF_SYM_KEY             = '" + Base64URL.encode(symkey) + "';\n" +
                   "const JEF_ECDH_OBJECT = ");
         JSONObjectWriter encryptedData  =

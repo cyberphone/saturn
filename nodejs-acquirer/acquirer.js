@@ -291,7 +291,7 @@ Https.createServer(options, (request, response) => {
           serverError(response, 'Content type must be: ' + BaseProperties.JSON_CONTENT_TYPE);
           return;
         }
-        var jsonReader = new JsonUtil.ObjectReader(JSON.parse(Buffer.concat(chunks).toString('utf8')));
+        var jsonReader = JsonUtil.ObjectReader.parse(Buffer.concat(chunks));
         successLog('Received data', request, jsonReader);
         returnJsonData(request, response, jsonPostProcessors[pathname](jsonReader));
       } catch (e) {

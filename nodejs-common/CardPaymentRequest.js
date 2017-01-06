@@ -74,10 +74,9 @@ CardPaymentRequest.prototype.verifyPayerProvider = function(paymentRoot) {
 };
 
 CardPaymentRequest.prototype.getProtectedAccountData = function(decryptionKeys) {
-  return new ProtectedAccountData(new JsonUtil.ObjectReader(JSON.parse(ByteArray.utf8ToString(
-                                    this.authorizationResponse
-                                      .encryptedAccountData
-                                        .getDecryptedData(decryptionKeys)))),
+  return new ProtectedAccountData(JsonUtil.ObjectReader.parse(
+                                      this.authorizationResponse.encryptedAccountData
+                                          .getDecryptedData(decryptionKeys)),
                                   this.authorizationResponse.authorizationRequest.payerAccountType);
 };
 
