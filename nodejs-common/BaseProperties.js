@@ -85,9 +85,6 @@ const BaseProperties = {
     SOFTWARE_JSON                    : 'software',
     ID_JSON                          : 'id',
     TYPE_JSON                        : 'type',
-    FIELD1_JSON                      : 'field1',                     // Used for "additional" account data 
-    FIELD2_JSON                      : 'field2',
-    FIELD3_JSON                      : 'field3',
     VERSION_JSON                     : 'version',
    
     SATURN_WEB_PAY_CONTEXT_URI       : 'http://webpki.org/saturn/v3',

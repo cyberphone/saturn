@@ -17,35 +17,31 @@
  
 'use strict';
 
-//Saturn "AccountDescriptor" object
+//Saturn "NonDirectPayments" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
 const BaseProperties = require('./BaseProperties');
 
-function AccountDescriptor(typeUri_or_rd, id) {
-  if (typeUri_or_rd instanceof JsonUtil.ObjectReader) {
-    this.typeUri = typeUri_or_rd.getString(BaseProperties.TYPE_JSON);
-    this.id = typeUri_or_rd.getString(BaseProperties.ID_JSON);
-  } else {
-    this.typeUri = typeUri_or_rd;
-    this.id = id;
+const NON_DIRECT_PAYMENTS = ['GAS_STATION', 'BOOKING', 'DEPOSIT', 'OTHER'];
+
+var NonDirectPayments = {
+
+  fromType: function(type) {
+    var q = 0;
+    while (q < NON_DIRECT_PAYMENTS.length) {
+      var entry = NON_DIRECT_PAYMENTS[q++];
+      if (entry == type) {
+        return entry;
+      }
+    };
+    throw new TypeError('No such type: ' + type);
   }
-}
 
-AccountDescriptor.prototype.writeObject = function() {
-  return new JsonUtil.ObjectWriter()
-    .setString(BaseProperties.TYPE_JSON, this.typeUri)
-    .setString(BaseProperties.ID_JSON, this.id);
 };
 
-AccountDescriptor.prototype.getType = function() {
-  return this.typeUri;
-};
+NON_DIRECT_PAYMENTS.forEach((entry) => {
+  NonDirectPayments[entry] = entry;
+});
 
-AccountDescriptor.prototype.getId = function() {
-  return this.id;
-};
-
-
-module.exports = AccountDescriptor;
+module.exports = NonDirectPayments;

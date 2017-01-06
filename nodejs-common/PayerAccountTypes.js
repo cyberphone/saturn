@@ -17,31 +17,24 @@
  
 'use strict';
 
-//Holds payer account type
+// Saturn "PayerAccountTypes" object
 
 const ACCOUNT_TYPES = [
-    true,  'https://supercard.com',   'SuperCard', 
-    false, 'https://bankdirect.net',  'Bank Direct',
-    false, 'https://unusualcard.com', 'UnusualCard'
+  ['SUPER_CARD',   true,  'https://supercard.com',   'SuperCard'], 
+  ['BANK_DIRECT',  false, 'https://bankdirect.net',  'Bank Direct'],
+  ['UNUSUAL_CARD', false, 'https://unusualcard.com', 'UnusualCard']
 ];
 
-function PayerAccountTypes (acquirerBased_or_entry, typeUri, commonName) {
-  if (typeof acquirerBased_or_entry == 'number') {
-    typeUri = ACCOUNT_TYPES[acquirerBased_or_entry + 1];
-    commonName = ACCOUNT_TYPES[acquirerBased_or_entry + 2];
-    acquirerBased_or_entry = ACCOUNT_TYPES[acquirerBased_or_entry];
-  }
-  this.acquirerBased = acquirerBased_or_entry;
+const toAccountType = new Map();
+
+function PayerAccountTypes(cardPayment, typeUri, commonName) {
+  this.cardPayment = cardPayment;
   this.typeUri = typeUri;
   this.commonName = commonName;
 }
 
-PayerAccountTypes.SUPER_CARD   = new PayerAccountTypes(0);
-PayerAccountTypes.BANK_DIRECT  = new PayerAccountTypes(3);
-PayerAccountTypes.UNUSUAL_CARD = new PayerAccountTypes(6);
-
-PayerAccountTypes.prototype.isAcquirerBased = function() {
-  return this.acquirerBased;
+PayerAccountTypes.prototype.isCardPayment = function() {
+  return this.cardPayment;
 };
 
 PayerAccountTypes.prototype.getTypeUri = function() {
@@ -53,13 +46,17 @@ PayerAccountTypes.prototype.getCommonName = function() {
 };
 
 PayerAccountTypes.fromTypeUri = function(typeUri) {
-  for (var i = 0; i < ACCOUNT_TYPES.length; i++) {
-    if (ACCOUNT_TYPES[i + 1] == typeUri) {
-      return new PayerAccountTypes(i);
-    }
+  var payerAccountType = toAccountType.get(typeUri);
+  if (payerAccountType === undefined) {
+    throw new TypeError('No such account type: ' + typeUri);
   }
-  throw new TypeError('No such account type: ' + typeUri);
+  return payerAccountType;
 };
 
+ACCOUNT_TYPES.forEach((entry) => {
+  var payerAccountType = new PayerAccountTypes(entry[1], entry[2], entry[3]);
+  toAccountType.set(entry[2], payerAccountType)
+  PayerAccountTypes[entry[0]] = payerAccountType;
+});
 
 module.exports = PayerAccountTypes;

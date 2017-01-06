@@ -23,10 +23,10 @@ import org.webpki.json.JSONObjectWriter;
 
 public class ProtectedAccountData implements BaseProperties {
     
-    public static JSONObjectWriter encode(AccountDescriptor accountDescriptor,
+    public static JSONObjectWriter encode(AccountDescriptor account,
                                           CardSpecificData cardSpecificData) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
-            .setObject(ACCOUNT_JSON, accountDescriptor.writeObject());
+            .setObject(ACCOUNT_JSON, account.writeObject());
         if (cardSpecificData != null) {
             cardSpecificData.writeData(wr);
         }
@@ -35,18 +35,21 @@ public class ProtectedAccountData implements BaseProperties {
     
     JSONObjectReader root;
 
-    public ProtectedAccountData(JSONObjectReader rd, boolean cardAccount) throws IOException {
+    public ProtectedAccountData(JSONObjectReader rd, PayerAccountTypes payerAccountType) throws IOException {
         root = rd;
-        accountDescriptor = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
-        if (cardAccount) {
+        account = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
+        if (payerAccountType.cardPayment) {
+            if (!payerAccountType.typeUri.equals(account.typeUri)) {
+                throw new IOException("Non-matching card payment type: " + payerAccountType.typeUri);
+            }
             cardSpecificData = new CardSpecificData(rd);
         }
         rd.checkForUnread();
     }
 
-    AccountDescriptor accountDescriptor;
-    public AccountDescriptor getAccountDescriptor() {
-        return accountDescriptor;
+    AccountDescriptor account;
+    public AccountDescriptor getAccount() {
+        return account;
     }
 
     CardSpecificData cardSpecificData;

@@ -17,25 +17,18 @@
  
 'use strict';
 
-// Currencies used by the Web2Native Bridge PoC
+// Saturn "Currencies" object
 
 const CURRENCIES = [
-  'USD', '$\u200a',      true,  2, 
-  'EUR', '\u2009\u20ac', false, 2,
-  'GBP', '\u00a3\u200a', true,  2
+  ['USD', '$\u200a',      true,  2], 
+  ['EUR', '\u2009\u20ac', false, 2],
+  ['GBP', '\u00a3\u200a', true,  2]
 ];
 
-function Currencies(currency) {
-  for (var i = 0; i < CURRENCIES.length; i += 4) {
-      if (CURRENCIES[i++] == currency) {
-          this.currency = currency;
-          this.symbol = CURRENCIES[i++];
-          this.symbolFirst = CURRENCIES[i++];
-          this.decimals = CURRENCIES[i];
-          return;
-      }
-  }
-  throw new TypeError('Unknown currency: ' + currency);
+function Currencies(textual, textFirst, decimals) {
+  this.textual = textual;
+  this.textFirst = textFirst;
+  this.decimals = decimals;
 }
 
 Currencies.prototype.getDecimals = function() {
@@ -44,12 +37,23 @@ Currencies.prototype.getDecimals = function() {
 
 Currencies.prototype.amountToDisplayString = function(amount) {
   var amountString = amount.toFixed(this.decimals);
-  return this.symbolFirst ? this.symbol + amountString : amountString + this.symbol;
+  return this.textFirst ? this.textual + amountString : amountString + this.textual;
 };
 
 Currencies.prototype.toString = function() {
-  return this.currency;
+  return this;
 };
 
-  
+Currencies.valueOf = function(currencySymbol) {
+  var currency = Currencies[currencySymbol];
+  if (currency === undefined) {
+    throw new TypeError('No such currency: ' + currencySymbol);
+  }
+  return currency;
+};
+
+CURRENCIES.forEach((entry) => {
+  Currencies[entry[0]] = new Currencies(entry[1], entry[2], entry[3]);
+});
+
 module.exports = Currencies;

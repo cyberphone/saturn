@@ -101,8 +101,8 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
                reserveOrBasicRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         // Verify that the there is a matching user account
-        String accountId = authorizationData.getAccountDescriptor().getAccountId();
-        String accountType = authorizationData.getAccountDescriptor().getAccountType();
+        String accountId = authorizationData.getAccount().getId();
+        String accountType = authorizationData.getAccount().getType();
         UserAccountEntry account = BankService.userAccountDb.get(accountId);
         if (account == null) {
             logger.severe("No such account ID: " + accountId);
@@ -165,7 +165,7 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
 
             // Pure sample data...
             JSONObjectWriter protectedAccountData =
-                ProtectedAccountData.encode(authorizationData.getAccountDescriptor(),
+                ProtectedAccountData.encode(authorizationData.getAccount(),
                                             new CardSpecificData("Luke Skywalker",
                                                                  ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
                                                                  "943"));
@@ -272,7 +272,7 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
         // Decode the finalize cardpay request
         FinalizeRequest finalizeRequest = new FinalizeRequest(payeeRequest);
         
-        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(BankService.decryptionKeys, true));
+        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(BankService.decryptionKeys));
 
         // Here we are supposed to talk to the card payment network....
 

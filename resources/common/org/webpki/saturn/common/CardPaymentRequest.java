@@ -47,6 +47,10 @@ public class CardPaymentRequest implements BaseProperties {
                                                authorizationResponse
                                                    .authorizationRequest
                                                        .paymentRequest);
+        if (!authorizationResponse.authorizationRequest.payerAccountType.isCardPayment()) {
+            throw new IOException("Payment method is not card: " + 
+                authorizationResponse.authorizationRequest.payerAccountType.getTypeUri());
+        }
         rd.checkForUnread();
     }
 
@@ -90,11 +94,12 @@ public class CardPaymentRequest implements BaseProperties {
             .setSignature(signer);
     }
 
-    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys, boolean cardAccount)
+    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
         return new ProtectedAccountData(JSONParser.parse(authorizationResponse
                                                              .encryptedAccountData
-                                                                 .getDecryptedData(decryptionKeys)), cardAccount);
+                                                                 .getDecryptedData(decryptionKeys)),
+                                        authorizationResponse.authorizationRequest.payerAccountType);
     }
 
     public void verifyUserBank(JSONX509Verifier paymentRoot) throws IOException {

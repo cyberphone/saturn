@@ -21,18 +21,18 @@
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
-const BaseProperties = require('./BaseProperties');
-const Currencies = require('./Currencies');
-const Software = require('./Software');
-const Payee = require('./Payee');
+const BaseProperties    = require('./BaseProperties');
+const Currencies        = require('./Currencies');
+const Software          = require('./Software');
+const Payee             = require('./Payee');
+const NonDirectPayments = require('./NonDirectPayments');
 
 function PaymentRequest(rd) {
   this.root = rd;
   this.payee = new Payee(rd.getObject(BaseProperties.PAYEE_JSON));
-  this.currency = new Currencies(rd.getString(BaseProperties.CURRENCY_JSON));
+  this.currency = Currencies.valueOf(rd.getString(BaseProperties.CURRENCY_JSON));
   if (rd.hasProperty(BaseProperties.NON_DIRECT_PAYMENT_JSON)) {
-    // Converter missing
-    this.nonDirectPayment = rd.getString(BaseProperties.NON_DIRECT_PAYMENT_JSON);
+    this.nonDirectPayment = NonDirectPayments.fromType(rd.getString(BaseProperties.NON_DIRECT_PAYMENT_JSON));
   }
   this.amount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON, this.currency.getDecimals());
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);

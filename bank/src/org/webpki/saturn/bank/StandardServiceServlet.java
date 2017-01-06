@@ -71,8 +71,8 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         // Verify that the there is a matching user account
-        String accountId = authorizationData.getAccountDescriptor().getAccountId();
-        String accountType = authorizationData.getAccountDescriptor().getAccountType();
+        String accountId = authorizationData.getAccount().getId();
+        String accountType = authorizationData.getAccount().getType();
         UserAccountEntry account = BankService.userAccountDb.get(accountId);
         if (account == null) {
             logger.severe("No such account ID: " + accountId);
@@ -139,7 +139,7 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         // Pure sample data...
         // Separate credit-card and account2account payments
         AccountDescriptor accountDescriptor = cardPayment ?
-            authorizationData.getAccountDescriptor() : new AccountDescriptor("https://swift.com", "IBAN:FGFGFGFFGFGFGFGF");
+            authorizationData.getAccount() : new AccountDescriptor("https://swift.com", "IBAN:FGFGFGFFGFGFGFGF");
         CardSpecificData cardSpecificData = cardPayment ? 
             new CardSpecificData("Luke Skywalker",
                                  ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),

@@ -82,9 +82,6 @@ public interface BaseProperties {
     String SOFTWARE_JSON                    = "software";
     String ID_JSON                          = "id";
     String TYPE_JSON                        = "type";
-    String FIELD1_JSON                      = "field1";                     // Used for "additional" account data 
-    String FIELD2_JSON                      = "field2";
-    String FIELD3_JSON                      = "field3";
     String VERSION_JSON                     = "version";
     
     String SATURN_WEB_PAY_CONTEXT_URI       = "http://webpki.org/saturn/v3";

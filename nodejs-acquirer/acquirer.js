@@ -133,14 +133,16 @@ const jsonPostProcessors = {
       throw new TypeError('Unknown merchant ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
     }
     if (!cardPaymentRequest.getPublicKey().equals(payeeDbEntry[Jcs.PUBLIC_KEY_JSON])) {
-      throw new TypeError('Outer and inner public key differ');
+      throw new TypeError('Public key doesn\'t merchant ID=' + payee.getId());
     }
     
     // Verify the the embedded response was created by a known bank (network)
     cardPaymentRequest.verifyPayerProvider(paymentRoot);
 
-    cardPaymentRequest.getProtectedAccountData(encryptionKeys);
-    // We got an authentic (good) request
+    // This is the account we are processing
+    var accountData = cardPaymentRequest.getProtectedAccountData(encryptionKeys);
+    logger.info('Account, ID=' + accountData.getAccount().getId() + 
+                ', Holder=' + accountData.getCardSpecificData().getAccountHolder());
     
     /////////////////////////////////////////////////////////////
     // Insert call to payment network HERE

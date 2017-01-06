@@ -27,6 +27,7 @@ const Messages              = require('./Messages');
 const Software              = require('./Software');
 const AuthorizationResponse = require('./AuthorizationResponse');
 const AuthorizationRequest  = require('./AuthorizationRequest');
+const ProtectedAccountData  = require('./ProtectedAccountData');
 
 function CardPaymentRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.CARD_PAYMENT_REQUEST, rd);
@@ -37,6 +38,10 @@ function CardPaymentRequest(rd) {
   this.publicKey = rd.getSignature().getPublicKey();
   AuthorizationRequest.comparePublicKeys(this.publicKey,
                                          this.authorizationResponse.authorizationRequest.paymentRequest);
+  if (!this.authorizationResponse.authorizationRequest.payerAccountType.isCardPayment()) {
+    throw new TypeError('Payment method is not card: ' + 
+        this.authorizationResponse.authorizationRequest.payerAccountType.getTypeUri());
+  }
   rd.checkForUnread();
 }
 
@@ -68,16 +73,12 @@ CardPaymentRequest.prototype.verifyPayerProvider = function(paymentRoot) {
   this.authorizationResponse.signatureDecoder.verifyTrust(paymentRoot);
 };
 
-CardPaymentRequest.prototype.getProtectedAccountData = function(decryptionKeys, cardAccount) {
-   console.log('account=\n' +ByteArray.utf8ToString(this.authorizationResponse
-       .encryptedAccountData
-       .getDecryptedData(decryptionKeys)));
-/*
-  .getEncryptionObject().getDecryptedData(symRefKey))  return new ProtectedAccountData(JSONParser.parse(authorizationResponse
-                                                     .encryptedAccountData
-                                                        .getDecryptedData(decryptionKeys)),
-                                  cardAccount);
-*/
+CardPaymentRequest.prototype.getProtectedAccountData = function(decryptionKeys) {
+  return new ProtectedAccountData(new JsonUtil.ObjectReader(JSON.parse(ByteArray.utf8ToString(
+                                    this.authorizationResponse
+                                      .encryptedAccountData
+                                        .getDecryptedData(decryptionKeys)))),
+                                  this.authorizationResponse.authorizationRequest.payerAccountType);
 };
 
 /*

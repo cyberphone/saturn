@@ -45,11 +45,11 @@ public class AuthorizationRequest implements BaseProperties {
         Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, root = rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-        accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
+        payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         if (rd.hasProperty(PAYEE_ACCOUNT_JSON)) {
-            accountDescriptor = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
+            payeeAccount = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
         }
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
@@ -75,9 +75,9 @@ public class AuthorizationRequest implements BaseProperties {
         return testMode;
     }
 
-    PayerAccountTypes accountType;
+    PayerAccountTypes payerAccountType;
     public PayerAccountTypes getPayerAccountType() {
-        return accountType;
+        return payerAccountType;
     }
 
     PublicKey publicKey;
@@ -85,9 +85,9 @@ public class AuthorizationRequest implements BaseProperties {
         return publicKey;
     }
 
-    AccountDescriptor accountDescriptor;
+    AccountDescriptor payeeAccount;
     public AccountDescriptor getAccountDescriptor() {
-        return accountDescriptor;
+        return payeeAccount;
     }
 
     GregorianCalendar expires;
@@ -122,11 +122,11 @@ public class AuthorizationRequest implements BaseProperties {
 
     public static JSONObjectWriter encode(Boolean testMode,
                                           String authorityUrl,
-                                          PayerAccountTypes accountType,
+                                          PayerAccountTypes payerAccountType,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          AccountDescriptor accountDescriptor,
+                                          AccountDescriptor payeeAccount,
                                           String referenceId,
                                           Date expires,
                                           ServerAsymKeySigner signer) throws IOException {
@@ -135,11 +135,11 @@ public class AuthorizationRequest implements BaseProperties {
             wr.setBoolean(TEST_MODE_JSON, testMode);
         }
         wr.setString(AUTHORITY_URL_JSON, authorityUrl)
-          .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
+          .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
           .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
           .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);
-        if (accountDescriptor != null) {
-            wr.setObject(PAYEE_ACCOUNT_JSON, accountDescriptor.writeObject());
+        if (payeeAccount != null) {
+            wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
         }
         wr.setString(REFERENCE_ID_JSON, referenceId)
           .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress);
@@ -162,8 +162,11 @@ public class AuthorizationRequest implements BaseProperties {
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
             new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));
-        if (!ArrayUtil.compare(authorizationData.getRequestHash(), paymentRequest.getRequestHash())) {
+        if (!ArrayUtil.compare(authorizationData.requestHash, paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
+        }
+        if (!authorizationData.account.typeUri.equals(payerAccountType.typeUri)) {
+            throw new IOException("Non-matching account \"" + TYPE_JSON + "\" value");
         }
         return authorizationData;
     }

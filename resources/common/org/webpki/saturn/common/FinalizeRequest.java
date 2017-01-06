@@ -122,11 +122,15 @@ public class FinalizeRequest implements BaseProperties {
     }
 
     // Convenience method
-    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys, boolean cardAccount)
+    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
         return new ProtectedAccountData(JSONParser.parse(reserveOrBasicResponse
                                                              .transactionResponse
-                                                                 .encryptedCardData.getDecryptedData(decryptionKeys)), cardAccount);
+                                                                 .encryptedCardData.getDecryptedData(decryptionKeys)),
+                                         reserveOrBasicResponse
+                                             .transactionResponse
+                                                 .transactionRequest
+                                                     .reserveOrBasicRequest.accountType);
     }
 
     // Convenience method

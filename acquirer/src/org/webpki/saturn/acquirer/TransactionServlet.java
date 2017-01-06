@@ -55,7 +55,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
             throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
         }
 
-        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(AcquirerService.decryptionKeys, true));
+        logger.info("Card data: " + finalizeRequest.getProtectedAccountData(AcquirerService.decryptionKeys));
 
         // Here we are supposed to talk to the card payment network....
 

@@ -35,11 +35,11 @@ function AuthorizationRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, rd);
   this.testMode = rd.getBooleanConditional(BaseProperties.TEST_MODE_JSON);
   this.authorityUrl = rd.getString(BaseProperties.AUTHORITY_URL_JSON);
-  this.accountType = PayerAccountTypes.fromTypeUri(rd.getString(BaseProperties.ACCOUNT_TYPE_JSON));
+  this.payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(BaseProperties.ACCOUNT_TYPE_JSON));
   this.paymentRequest = new PaymentRequest(rd.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
   this.encryptedAuthorizationData = rd.getObject(BaseProperties.ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject();
   if (rd.hasProperty(BaseProperties.PAYEE_ACCOUNT_JSON)) {
-    this.accountDescriptor = new AccountDescriptor(rd.getObject(BaseProperties.PAYEE_ACCOUNT_JSON));
+    this.payeeAccount = new AccountDescriptor(rd.getObject(BaseProperties.PAYEE_ACCOUNT_JSON));
   }
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.clientIpAddress = rd.getString(BaseProperties.CLIENT_IP_ADDRESS_JSON);
@@ -65,7 +65,7 @@ AuthorizationRequest.comparePublicKeys = function(publicKey, paymentRequest) {
     }
 
     public PayerAccountTypes getPayerAccountType() {
-        return accountType;
+        return payerAccountType;
     }
 
     public PublicKey getPublicKey() {
@@ -73,7 +73,7 @@ AuthorizationRequest.comparePublicKeys = function(publicKey, paymentRequest) {
     }
 
     public AccountDescriptor getAccountDescriptor() {
-        return accountDescriptor;
+        return payeeAccount;
     }
 
     public GregorianCalendar getExpires() {
@@ -102,11 +102,11 @@ AuthorizationRequest.comparePublicKeys = function(publicKey, paymentRequest) {
 
     public static JSONObjectWriter encode(Boolean testMode,
                                           String authorityUrl,
-                                          PayerAccountTypes accountType,
+                                          PayerAccountTypes payerAccountType,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          AccountDescriptor accountDescriptor,
+                                          AccountDescriptor payeeAccount,
                                           String referenceId,
                                           Date expires,
                                           ServerAsymKeySigner signer) throws IOException {
@@ -115,11 +115,11 @@ AuthorizationRequest.comparePublicKeys = function(publicKey, paymentRequest) {
             wr.setBoolean(TEST_MODE_JSON, testMode);
         }
         wr.setString(AUTHORITY_URL_JSON, authorityUrl)
-          .setString(ACCOUNT_TYPE_JSON, accountType.getTypeUri())
+          .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
           .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
           .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);
-        if (accountDescriptor != null) {
-            wr.setObject(PAYEE_ACCOUNT_JSON, accountDescriptor.writeObject());
+        if (payeeAccount != null) {
+            wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
         }
         wr.setString(REFERENCE_ID_JSON, referenceId)
           .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress);

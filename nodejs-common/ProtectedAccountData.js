@@ -21,49 +21,41 @@
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
-const BaseProperties = require('./BaseProperties');
+const BaseProperties   = require('./BaseProperties');
 const AccountDescriptor = require('./AccountDescriptor');
+const CardSpecificData  = require('./CardSpecificData');
 
-function ProtectedAccountData(rd) {
+function ProtectedAccountData(rd, payerAccountType) {
   this.root = rd;
-  this.accountDescriptor = new AccountDescriptor(rd.getObject(BaseProperties.PAYER_ACCOUNT_JSON));
-  this.accountHolder = rd.getString(BaseProperties.ACCOUNT_HOLDER_JSON);
-  this.expires = rd.getDateTime(BaseProperties.EXPIRES_JSON);
-  this.accountSecurityCode = rd.getString(BaseProperties.ACCOUNT_SECURITY_CODE_JSON);
+  this.account = new AccountDescriptor(rd.getObject(BaseProperties.ACCOUNT_JSON));
+  if (payerAccountType.cardPayment) {
+      if (payerAccountType.typeUri != this.account.typeUri) {
+          throw new TypeError('Payment type mismatch');
+      }
+      this.cardSpecificData = new CardSpecificData(rd);
+  }
   rd.checkForUnread();
 }
 
-ProtectedAccountData.prototype.getAccountDescriptor = function() {
-  return this.accountDescriptor;
+ProtectedAccountData.prototype.getAccount = function() {
+  return this.account;
 };
 
-ProtectedAccountData.prototype.getAccountHolder = function() {
-  return this.accountHolder;
+ProtectedAccountData.prototype.getCardSpecificData = function() {
+  return this.cardSpecificData;
 };
 
-ProtectedAccountData.prototype.getExpires = function() {
-  return this.expires;
-};
-
-ProtectedAccountData.prototype.getAccountSecurityCode = function() {
-  return this.accountSecurityCode;
-};
- 
 ProtectedAccountData.prototype.toString = function() {
     return this.root.toString();
 };
 
-ProtectedAccountData.encode = function(accountDescriptor,
-                                       accountHolder,
-                                       expires,
-                                       accountSecurityCode) {
-  return new JsonUtil.ObjectWriter()
-    .setObject(BaseProperties.PAYER_ACCOUNT_JSON, accountDescriptor.writeObject())
-    .setString(BaseProperties.ACCOUNT_HOLDER_JSON, accountHolder)
-    .setDateTime(BaseProperties.EXPIRES_JSON, expires)
-    .setString(BaseProperties.ACCOUNT_SECURITY_CODE_JSON, accountSecurityCode);
+ProtectedAccountData.encode = function(account, cardSpecificData) {
+  var wr = new JsonUtil.ObjectWriter().setObject(BaseProperties.PAYER_ACCOUNT_JSON, account.writeObject());
+  if (cardSpecificData) {
+    cardSpecificData.writeData(wr);
+  }
+  return wr;
 };
-
 
 module.exports = ProtectedAccountData;
   

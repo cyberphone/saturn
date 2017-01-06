@@ -18,63 +18,36 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.Vector;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-// Holds payer and payee account data
+// Holds Saturn payer and payee account data
 
 public class AccountDescriptor implements BaseProperties {
-    String type;              // URI
+    String typeUri;           // URI
     String id;                // Account ID
-    String[] optionalFields;  // 0..2.  In case the primary aren't enough...
     
-    static final String[] fields = {FIELD1_JSON, FIELD2_JSON, FIELD3_JSON};
-    
-    public AccountDescriptor(String type, String id, String[] optionalFields) throws IOException {
-        this.type = type;
+    public AccountDescriptor(String type, String id) {
+        this.typeUri = type;
         this.id = id;
-        this.optionalFields = optionalFields;
-        if (optionalFields.length > 3) {
-            throw new IOException("There can be 3 fields max");
-        }
-    }
-
-    public AccountDescriptor(String type, String id) throws IOException {
-        this(type, id, new String[0]);
     }
 
     public AccountDescriptor(JSONObjectReader rd) throws IOException {
-        type = rd.getString(TYPE_JSON);
+        typeUri = rd.getString(TYPE_JSON);
         id = rd.getString(ID_JSON);
-        Vector<String> optionalFields = new Vector<String>();
-        for (String field : fields) {
-            if (rd.hasProperty(field)) {
-                optionalFields.add(rd.getString(field));
-            } else {
-                break;
-            }
-        }
-        this.optionalFields = optionalFields.toArray(new String[0]);
     }
 
     public JSONObjectWriter writeObject() throws IOException {
-        JSONObjectWriter wr = new JSONObjectWriter()
-            .setString(TYPE_JSON, type)
+        return new JSONObjectWriter()
+            .setString(TYPE_JSON, typeUri)
             .setString(ID_JSON, id);
-        int q = 0;
-        for (String field : optionalFields) {
-            wr.setString(fields[q++], field);
-        }
-        return wr;
     }
 
-    public String getAccountType() {
-        return type;
+    public String getType() {
+        return typeUri;
     }
 
-    public String getAccountId() {
+    public String getId() {
         return id;
     }
 }
