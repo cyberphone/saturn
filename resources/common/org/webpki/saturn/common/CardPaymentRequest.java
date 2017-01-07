@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
@@ -39,14 +41,16 @@ public class CardPaymentRequest implements BaseProperties {
     public CardPaymentRequest(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.CARD_PAYMENT_REQUEST, root = rd);
         authorizationResponse = new AuthorizationResponse(rd.getObject(EMBEDDED_JSON));
+        actualAmount = rd.getBigDecimal(AMOUNT_JSON,
+                                        authorizationResponse
+                                            .authorizationRequest.paymentRequest.currency.decimals);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
         AuthorizationRequest.comparePublicKeys(publicKey,
                                                authorizationResponse
-                                                   .authorizationRequest
-                                                       .paymentRequest);
+                                                   .authorizationRequest.paymentRequest);
         if (!authorizationResponse.authorizationRequest.payerAccountType.isCardPayment()) {
             throw new IOException("Payment method is not card: " + 
                 authorizationResponse.authorizationRequest.payerAccountType.getTypeUri());
@@ -61,6 +65,11 @@ public class CardPaymentRequest implements BaseProperties {
     GregorianCalendar timeStamp;
     public GregorianCalendar getTimeStamp() {
         return timeStamp;
+    }
+
+    BigDecimal actualAmount;
+    public BigDecimal getAmount() {
+        return actualAmount;
     }
 
     String referenceId;
@@ -83,10 +92,14 @@ public class CardPaymentRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
+                                          BigDecimal actualAmount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.createBaseMessage(Messages.CARD_PAYMENT_REQUEST)
             .setObject(EMBEDDED_JSON, authorizationResponse.root)
+            .setBigDecimal(AMOUNT_JSON,
+                           actualAmount,
+                           authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(AuthorizationRequest.SOFTWARE_NAME, 

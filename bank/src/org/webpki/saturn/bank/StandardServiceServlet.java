@@ -18,6 +18,8 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.security.GeneralSecurityException;
 
 import java.util.Date;
@@ -109,17 +111,18 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         // Since we don't have a real bank this part is rather simplistic :-)     //
         ////////////////////////////////////////////////////////////////////////////
 
+        BigDecimal amount = paymentRequest.getAmount();
         // Sorry but you don't appear to have a million bucks :-)
-        if (paymentRequest.getAmount().compareTo(DEMO_ACCOUNT_LIMIT) >= 0) {
+        if (amount.compareTo(DEMO_ACCOUNT_LIMIT) >= 0) {
             return createPrivateMessage("Your request for " + 
-                                            amountInHtml(paymentRequest, paymentRequest.getAmount()) +
+                                            amountInHtml(paymentRequest, amount) +
                                             " appears to be slightly out of your current capabilities...",
                                         null,
                                         authorizationData);
         }
 
         // RBA v0.001...
-        if (paymentRequest.getAmount().compareTo(DEMO_RBA_LIMIT) >= 0 &&
+        if (amount.compareTo(DEMO_RBA_LIMIT) >= 0 &&
             (authorizationData.getOptionalChallengeResults() == null ||
              !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
             return createPrivateMessage("Transaction requests exceeding " +
@@ -129,7 +132,7 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
                                             "<p>Since <i>this is a demo</i>, " +
                                             "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
                                         new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
-                                                paymentRequest.getAmount().compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
+                                                amount.compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
                                                         ChallengeField.TYPE.ALPHANUMERIC : ChallengeField.TYPE.ALPHANUMERIC_SECRET,
                                                                                 20,
                                                                                 null)},
@@ -154,9 +157,9 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
 
         // Here we would actually update things...
         if (authorizationRequest.getTestMode()) {
-            logger.info("TEST ONLY: Authorized AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
+            logger.info("TEST ONLY: Authorized Amount=" + amount.toString() + ", AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
         } else {
-            logger.info("Authorized AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
+            logger.info("Authorized Amount=" + amount.toString() + ", AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
         }
 
         // We did it!

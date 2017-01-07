@@ -198,7 +198,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     }
 
     static void processCardPayment(AuthorizationResponse authorizationResponse,
-                                   BigDecimal amount,
+                                   BigDecimal actualAmount,
                                    UrlHolder urlHolder,
                                    DebugData debugData) throws IOException {
         // Lookup of acquirer authority
@@ -212,6 +212,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         JSONObjectWriter cardPaymentRequest =
             CardPaymentRequest.encode(authorizationResponse,
+                                      actualAmount,
                                       MerchantService.getReferenceId(),
                                       MerchantService.paymentNetworks.get(authorizationResponse
                                                                               .getAuthorizationRequest()

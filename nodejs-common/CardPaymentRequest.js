@@ -32,6 +32,8 @@ const ProtectedAccountData  = require('./ProtectedAccountData');
 function CardPaymentRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.CARD_PAYMENT_REQUEST, rd);
   this.authorizationResponse = new AuthorizationResponse(rd.getObject(BaseProperties.EMBEDDED_JSON));
+  this.actualAmount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON,
+                                       this.authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
@@ -51,6 +53,10 @@ CardPaymentRequest.prototype.getTimeStamp = function() {
 
 CardPaymentRequest.prototype.getReferenceId = function() {
   return this.referenceId;
+};
+
+CardPaymentRequest.prototype.getAmount = function() {
+  return this.actualAmount;
 };
 
 CardPaymentRequest.prototype.getPayee = function() {
