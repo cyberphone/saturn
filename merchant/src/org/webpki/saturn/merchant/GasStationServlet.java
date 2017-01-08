@@ -48,9 +48,7 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        String userAgent = request.getHeader("User-Agent");
-        if (!userAgent.contains(" Chrome/") || userAgent.contains(" Edge/")) {
-            ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium");
+        if (!HomeServlet.browserIsSupported(request, response)) {
             return;
         }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());

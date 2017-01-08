@@ -900,7 +900,7 @@ public class HTML implements MerchantProperties {
             "  document.getElementById('pumpbtn').innerHTML = 'Please wait while we are finalizing the payment...';\n" +
             "  setTimeout(function() {\n" +
             "    doneFilling();\n" +
-            "  }, 5000);\n" +
+            "  }, 1000);\n" +
             "}\n" +
             "function execute() {\n" +
             "  if (timer) {\n"+

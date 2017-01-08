@@ -37,6 +37,16 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
         return session.getAttribute(name) != null && (Boolean)session.getAttribute(name);
     }
 
+    static boolean browserIsSupported(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String userAgent = request.getHeader("User-Agent");
+        if ((!userAgent.contains(" Chrome/") || userAgent.contains(" Edge/")) &&
+            (!userAgent.contains("Mozilla/") || !userAgent.contains(" Firefox/"))) {
+            ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium and Firefox");
+            return false;
+        }
+        return true;
+    }
+
     boolean checkBoxGet(HttpSession session, String name) {
         boolean argument = false;
         if (session.getAttribute(name) == null) {

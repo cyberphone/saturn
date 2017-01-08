@@ -322,7 +322,7 @@ public class InitTestPage implements BaseProperties {
         write("</form>\n" +
               "<input type=\"checkbox\" id=\"positionWallet\" style=\"margin-top:10pt\" onchange=\"setTargetState()\">Position/update target element (default is centered)\n" +
               "<div style=\"margin-top:10pt;margin-bottom:10pt\">Result:</div>\n" +
-              "<div id=\"response\" style=\"font-family:courier;font-size:10pt;word-wrap:break-word;width:800pt\"></div>\n" +
+              "<div id=\"response\" style=\"font-family:courier;font-size:10pt;word-break:break-all;width:800pt\"></div>\n" +
               "<div id=\"wallet\" style=\"position:absolute;top:50px;background:yellow;" +
               "right:50px;z-index:5;visibility:hidden\">The wallet should launch in this<br>corner and update width+height</div>" +
               "\n</body></html>");
