@@ -25,7 +25,8 @@ const CURRENCIES = [
   ['GBP', '\u00a3\u200a', true,  2]
 ];
 
-function Currencies(textual, textFirst, decimals) {
+function Currencies(symbol,textual, textFirst, decimals) {
+  this.symbol = symbol;
   this.textual = textual;
   this.textFirst = textFirst;
   this.decimals = decimals;
@@ -33,6 +34,10 @@ function Currencies(textual, textFirst, decimals) {
 
 Currencies.prototype.getDecimals = function() {
   return this.decimals;
+}
+
+Currencies.prototype.getSymbol = function() {
+  return this.symbol;
 }
 
 Currencies.prototype.amountToDisplayString = function(amount) {
@@ -53,7 +58,7 @@ Currencies.valueOf = function(currencySymbol) {
 };
 
 CURRENCIES.forEach((entry) => {
-  Currencies[entry[0]] = new Currencies(entry[1], entry[2], entry[3]);
+  Currencies[entry[0]] = new Currencies(entry[0], entry[1], entry[2], entry[3]);
 });
 
 module.exports = Currencies;

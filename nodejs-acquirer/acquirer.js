@@ -145,7 +145,9 @@ const jsonPostProcessors = {
 
     // This is the account we are processing
     var accountData = cardPaymentRequest.getProtectedAccountData(encryptionKeys);
-    logger.info('Amount=' + cardPaymentRequest.getAmount() + ' Account, ID=' + accountData.getAccount().getId() + 
+    var currency = cardPaymentRequest.getPaymentRequest().getCurrency();
+    var amountString = cardPaymentRequest.getAmount().toFixed(currency.getDecimals());
+    logger.info('Amount=' + amountString + ' ' + currency.getSymbol() + ', Account ID=' + accountData.getAccount().getId() + 
                 ', Holder=' + accountData.getCardSpecificData().getAccountHolder());
     
     /////////////////////////////////////////////////////////////
