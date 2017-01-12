@@ -276,13 +276,9 @@ Https.createServer(options, (request, response) => {
     } else {
       noSuchFileResponse(response, request);
     }
-    return;
-  }
-  if (request.method != 'POST') {
+  } else if (request.method != 'POST') {
     serverError(response, '"POST" method expected');
-    return;
-  }
-  if (pathname in jsonPostProcessors) {
+  } else if (pathname in jsonPostProcessors) {
     var chunks = [];
     request.on('data', (chunk) => {
       chunks.push(chunk);
@@ -291,11 +287,11 @@ Https.createServer(options, (request, response) => {
       try {
         if (request.headers['content-type'] != BaseProperties.JSON_CONTENT_TYPE) {
           serverError(response, 'Content type must be: ' + BaseProperties.JSON_CONTENT_TYPE);
-          return;
+        } else {
+          var jsonReader = JsonUtil.ObjectReader.parse(Buffer.concat(chunks));
+          successLog('Received data', request, jsonReader);
+          returnJsonData(request, response, jsonPostProcessors[pathname](jsonReader));
         }
-        var jsonReader = JsonUtil.ObjectReader.parse(Buffer.concat(chunks));
-        successLog('Received data', request, jsonReader);
-        returnJsonData(request, response, jsonPostProcessors[pathname](jsonReader));
       } catch (e) {
         logger.error(e.stack)
         serverError(response, e.message);
