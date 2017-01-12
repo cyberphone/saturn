@@ -61,8 +61,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         if (AcquirerService.logging) {
             logger.info("Card data: " + protectedAccountData);
         }
-        logger.info("Acquiring for " + protectedAccountData.getAccount().getId() + " amount=" + cardPaymentRequest.getAmount().toString());
-        // Here we are supposed to talk to the card payment network....
+        boolean testMode = cardPaymentRequest.getTestMode();
+        logger.info((testMode ? "TEST ONLY: ":"") +
+                    "Acquiring for " + protectedAccountData.getAccount().getId() + 
+                    " amount=" + cardPaymentRequest.getAmount().toString() +
+                    " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
+        
+        if (!testMode) {
+
+            // Here we are supposed to talk to the card payment network....
+
+        }
 
         // It appears that we succeeded
         return CardPaymentResponse.encode(cardPaymentRequest,

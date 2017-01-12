@@ -147,13 +147,17 @@ const jsonPostProcessors = {
     var accountData = cardPaymentRequest.getProtectedAccountData(encryptionKeys);
     var currency = cardPaymentRequest.getPaymentRequest().getCurrency();
     var amountString = cardPaymentRequest.getAmount().toFixed(currency.getDecimals());
-    logger.info('Amount=' + amountString + ' ' + currency.getSymbol() + ', Account ID=' + accountData.getAccount().getId() + 
-                ', Holder=' + accountData.getCardSpecificData().getAccountHolder());
+    var testMode = cardPaymentRequest.getTestMode();
+    logger.info((testMode ? 'TEST ONLY: ' : '') + 
+                  'Amount=' + amountString + ' ' + currency.getSymbol() + ', Account ID=' + accountData.getAccount().getId() + 
+                  ', Holder=' + accountData.getCardSpecificData().getAccountHolder());
+    if (!testMode) {
     
-    /////////////////////////////////////////////////////////////
-    // Insert call to payment network HERE
-    /////////////////////////////////////////////////////////////
-    
+      /////////////////////////////////////////////////////////////
+      // Insert call to payment network HERE
+      /////////////////////////////////////////////////////////////
+
+    }
     // We did it! :-)
     return CardPaymentResponse.encode(cardPaymentRequest,
                                       getReferenceId(),

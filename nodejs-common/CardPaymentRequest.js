@@ -59,6 +59,10 @@ CardPaymentRequest.prototype.getAmount = function() {
   return this.actualAmount;
 };
 
+CardPaymentRequest.prototype.getTestMode = function() {
+  return this.authorizationResponse.authorizationRequest.testMode;
+};
+
 CardPaymentRequest.prototype.getPayee = function() {
   return this.authorizationResponse.authorizationRequest.paymentRequest.payee;
 };

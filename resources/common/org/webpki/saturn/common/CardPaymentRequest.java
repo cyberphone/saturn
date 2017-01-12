@@ -77,8 +77,16 @@ public class CardPaymentRequest implements BaseProperties {
         return referenceId;
     }
 
+    public boolean getTestMode() {
+        return authorizationResponse.authorizationRequest.testMode;
+    }
+
     public Payee getPayee() {
         return authorizationResponse.authorizationRequest.paymentRequest.payee;
+    }
+
+    public PaymentRequest getPaymentRequest() {
+        return authorizationResponse.authorizationRequest.paymentRequest;
     }
 
     PublicKey publicKey;
