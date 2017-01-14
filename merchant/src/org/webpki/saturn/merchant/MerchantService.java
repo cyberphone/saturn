@@ -226,12 +226,12 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent event) {
+    public void contextDestroyed(ServletContextEvent sce) {
     }
 
     @Override
-    public void contextInitialized(ServletContextEvent event) {
-        initProperties (event);
+    public void contextInitialized(ServletContextEvent sce) {
+        initProperties (sce);
         try {
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 

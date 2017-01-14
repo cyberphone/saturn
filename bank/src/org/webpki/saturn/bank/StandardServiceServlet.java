@@ -50,7 +50,7 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
     private static final long serialVersionUID = 1L;
     
     @Override
-    JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder)
+    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest)
     throws IOException, GeneralSecurityException {
 
         // Decode authorization request message

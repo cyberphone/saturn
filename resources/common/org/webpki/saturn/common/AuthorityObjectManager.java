@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 
 import java.util.logging.Logger;
 
+import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 
 public class AuthorityObjectManager extends Thread {
@@ -35,6 +36,7 @@ public class AuthorityObjectManager extends Thread {
     String providerAuthorityUrl;
     String serviceUrl;
     String extendedServiceUrl;
+    JSONObjectReader optionalExtensions;
     String[] optionalProviderAccountTypes;
     PublicKey optionalEncryptionKey;
     
@@ -47,12 +49,14 @@ public class AuthorityObjectManager extends Thread {
     ServerX509Signer providerSigner;
 
     boolean logging;
+
     
     void update() throws IOException {
         synchronized(this) {
             providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,
                                                              serviceUrl,
                                                              extendedServiceUrl,
+                                                             optionalExtensions,
                                                              optionalProviderAccountTypes,
                                                              optionalEncryptionKey,
                                                              Expires.inSeconds(expiryTimeInSeconds),
@@ -83,6 +87,7 @@ public class AuthorityObjectManager extends Thread {
     public AuthorityObjectManager(String providerAuthorityUrl,
                                   String serviceUrl,
                                   String extendedServiceUrl,
+                                  JSONObjectReader optionalExtensions,
                                   String[] optionalProviderAccountTypes,
                                   PublicKey optionalEncryptionKey,
                                     
@@ -96,6 +101,7 @@ public class AuthorityObjectManager extends Thread {
         this.providerAuthorityUrl = providerAuthorityUrl;
         this.serviceUrl = serviceUrl;
         this.extendedServiceUrl = extendedServiceUrl;
+        this.optionalExtensions = optionalExtensions;
         this.optionalProviderAccountTypes = optionalProviderAccountTypes;
         this.optionalEncryptionKey = optionalEncryptionKey;
 

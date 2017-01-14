@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.acquirer;
+package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
@@ -27,38 +27,23 @@ import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.CardPaymentRequest;
 import org.webpki.saturn.common.CardPaymentResponse;
-import org.webpki.saturn.common.PayeeCoreProperties;
-import org.webpki.saturn.common.Payee;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// This is the core Acquirer (Card-Processor) Saturn basic mode payment authorization servlet //
+// This is the Saturn "hybrid" mode decoder servlet                                           //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-public class AuthorizationServlet extends ProcessingBaseServlet {
+public class HybridPaymentServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
-        // Decode and finalize the cardpay request
+        // Decode and finalize the cardpay request which in hybrid mode actually is account-2-account
         CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest);
 
-        // Verify that the user's bank is known
-        cardPaymentRequest.verifyUserBank(AcquirerService.paymentRoot);
-
-        // Verify that the merchant is one of our customers
-        Payee payee = cardPaymentRequest.getPayee();
-        PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
-        if (merchantProperties == null) {
-            throw new IOException("Unknown merchant Id: " + payee.getId());
-        }
-        if (!merchantProperties.getPublicKey().equals(cardPaymentRequest.getPublicKey())) {
-            throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
-        }
-
-        // Get card data
-        ProtectedAccountData protectedAccountData = cardPaymentRequest.getProtectedAccountData(AcquirerService.decryptionKeys);
-        if (AcquirerService.logging) {
+        // Get account data.  Note: this may also be derived from a transaction DB
+        ProtectedAccountData protectedAccountData = cardPaymentRequest.getProtectedAccountData(BankService.decryptionKeys);
+        if (BankService.logging) {
             logger.info("Payer account data: " + protectedAccountData);
         }
         boolean testMode = cardPaymentRequest.getTestMode();
@@ -69,13 +54,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         if (!testMode) {
 
-            // Here we are supposed to talk to the card payment network....
+            // Here we are supposed to do the actual payment
 
         }
 
         // It appears that we succeeded
         return CardPaymentResponse.encode(cardPaymentRequest,
                                           getReferenceId(),
-                                          AcquirerService.acquirerKey);
+                                          BankService.bankKey);
     }
+
 }

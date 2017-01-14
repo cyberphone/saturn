@@ -50,6 +50,7 @@ public class ProviderAuthority implements BaseProperties {
     public static JSONObjectWriter encode(String authorityUrl,
                                           String serviceUrl,
                                           String extendedServiceUrl,
+                                          JSONObjectReader optionalExtensions,
                                           String[] optionalProviderAccountTypes,
                                           PublicKey encryptionKey,
                                           Date expires,
@@ -65,6 +66,9 @@ public class ProviderAuthority implements BaseProperties {
     
         if (extendedServiceUrl != null) {
             wr.setString(EXTENDED_SERVICE_URL_JSON, extendedServiceUrl);
+        }
+        if (optionalExtensions != null) {
+            wr.setObject(EXTENSIONS_JSON, optionalExtensions);
         }
         if (optionalProviderAccountTypes != null) {
             wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes);
@@ -95,6 +99,13 @@ public class ProviderAuthority implements BaseProperties {
         serviceUrl = rd.getStringConditional(SERVICE_URL_JSON);
         extendedServiceUrl = rd.getStringConditional(EXTENDED_SERVICE_URL_JSON);
         test(serviceUrl, extendedServiceUrl);
+        if (rd.hasProperty(EXTENSIONS_JSON)) {
+            optionalExtensions = rd.getObject(EXTENSIONS_JSON);
+            if (optionalExtensions.getProperties().length == 0) {
+                throw new IOException("Empty \"" + EXTENSIONS_JSON + "\" not allowed");
+            }
+            rd.scanAway(EXTENSIONS_JSON);
+        }
         optionalProviderAccountTypes = rd.getStringArrayConditional(PROVIDER_ACCOUNT_TYPES_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
@@ -127,6 +138,11 @@ public class ProviderAuthority implements BaseProperties {
     String extendedServiceUrl;
     public String getExtendedServiceUrl() {
         return extendedServiceUrl;
+    }
+
+    JSONObjectReader optionalExtensions;
+    public JSONObjectReader getExtensions() {
+        return optionalExtensions;
     }
 
     String[] optionalProviderAccountTypes;

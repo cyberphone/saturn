@@ -197,7 +197,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     }
 
 
-    abstract JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder) 
+    abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) 
     throws IOException, GeneralSecurityException;
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -216,7 +216,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // We rationalize here by using a single end-point for all requests                    //
             /////////////////////////////////////////////////////////////////////////////////////////
-            JSONObjectWriter providerResponse = processCall(providerRequest, urlHolder); 
+            JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest); 
             if (BankService.logging) {
                 logger.info("Responded to caller"  + urlHolder.getCallerAddress() + "with data:\n" + providerResponse);
             }

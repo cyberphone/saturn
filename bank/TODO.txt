@@ -1,0 +1,9 @@
+CACHING
+=======
+There should be a cache holding *successfully* processed messages in order to support
+fully idempotent retransmissions. The expiration time for the cache should be:
+Receival Time + Message Max Age + Max Clock Sync Deviation + Retransmission Window
+That is, each message decoder MUST reject messages received outside of their
+(potentially specific) time limit.  For user authorizations timeout-related rejections
+are already made in a user friendly way through private messaging, while server-only
+operations should simply return HTTP 400 (bad request) and a textual description.

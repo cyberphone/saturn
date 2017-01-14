@@ -18,42 +18,37 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-
 import java.security.cert.X509Certificate;
-
 import java.security.interfaces.RSAPublicKey;
-
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
-
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
-
 import org.webpki.json.encryption.DecryptionKeyHolder;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
-
 import org.webpki.util.ArrayUtil;
-
 import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.KeyStoreEnumerator;
+import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.UserAccountEntry;
-
 import org.webpki.webutil.InitPropertyReader;
 
 public class BankService extends InitPropertyReader implements ServletContextListener {
@@ -72,6 +67,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String PAYMENT_ROOT          = "payment_root";
 
     static final String ACQUIRER_ROOT         = "acquirer_root";
+
+    static final String EXTENSIONS            = "provider_extensions";
 
     static final String USER_ACCOUNT_DB       = "user_account_db";
     
@@ -100,6 +97,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static JSONX509Verifier acquirerRoot;
     
     static X509Certificate[] bankCertificatePath;
+    
+    static JSONObjectReader optionalProviderExtensions;
     
     static Integer serverPortMapping;
     
@@ -134,7 +133,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     }
 
     @Override
-    public void contextDestroyed(ServletContextEvent event) {
+    public void contextDestroyed(ServletContextEvent sce) {
         if (authorityObjectManager != null) {
             try {
                 authorityObjectManager.interrupt();
@@ -145,8 +144,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     }
 
     @Override
-    public void contextInitialized(ServletContextEvent event) {
-        initProperties (event);
+    public void contextInitialized(ServletContextEvent sce) {
+        initProperties (sce);
         try {
             logging = getPropertyBoolean(LOGGING);
 
@@ -187,12 +186,22 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             addDecryptionKey(DECRYPTION_KEY2);
 
             referenceId = getPropertyInt(REFERENCE_ID_START);
-
+            
             String bankHost = getPropertyString(BANK_HOST);
+            
+            String extensions =
+                new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
+
+            if (extensions.length() > 0) {
+                extensions = extensions.replace("${host}", bankHost);
+                optionalProviderExtensions = JSONParser.parse(extensions);
+            }
+
             authorityObjectManager = 
                 new AuthorityObjectManager(authorityUrl = bankHost + "/authority",
                                            bankHost + "/service",
                                            bankHost + "/extended",
+                                           optionalProviderExtensions,
                                            new String[]{"https://swift.com", "https://ultragiro.se"},
                                            decryptionKeys.get(0).getPublicKey(),
 
@@ -203,6 +212,19 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            bankKey,
 
                                            logging);
+            if (optionalProviderExtensions != null &&
+                optionalProviderExtensions.hasProperty(KnownExtensions.HYBRID_PAYMENT)) {
+                final ServletContext servletContext = sce.getServletContext();
+                final ServletRegistration.Dynamic dynamic =
+                        servletContext.addServlet("Hybrid Payment Servlet", HybridPaymentServlet.class);
+                String url = optionalProviderExtensions.getString(KnownExtensions.HYBRID_PAYMENT);
+                dynamic.addMapping(url.substring(url.lastIndexOf('/')));
+         
+                final Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
+                for (String key : map.keySet()) {
+                    logger.info("Registered Servlet: " + map.get(key).getName());
+                }
+            }
 
             logger.info("Saturn \"" + bankCommonName + "\" server initiated");
         } catch (Exception e) {

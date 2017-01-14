@@ -2,6 +2,7 @@
 
   <!-- set properties for this build -->
   <property name="src.dir" value="src"/>
+  <property name="conf.dir" value="conf"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/bank"/>
   
   <property name="debug" value="on"/>
@@ -25,6 +26,7 @@
   </target>
 
   <target name="_build">
+  	<property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="logging" value="false"/>
     <property name="bank.host" value="https://localhost:8442/"/>
     <property name="server.port.map" value=""/>
@@ -58,6 +60,7 @@
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
 	  <replacefilter token="@key-password@" value="${keypassword}"/>
 	  <replacefilter token="@bank-name@" value="${common.name}"/>
+  	  <replacefilter token="@provider-extensions@" value="${extensions.file}"/>
 	  <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
 	  <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
@@ -93,6 +96,9 @@
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
          <include name="${users.db}"/>
          <include name="${merchants.db}"/>
+      </zipfileset>
+      <zipfileset dir="${conf.dir}" prefix="${class_war_path}">
+         <include name="${extensions.file}"/>
       </zipfileset>
       <fileset dir="web"/>
     </war>

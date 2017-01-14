@@ -27,6 +27,12 @@
         <param-name>bank_host</param-name>
         <param-value>@bank-host@</param-value>
     </context-param>
+
+    <context-param>
+        <description>Provider Extension JSON File</description>
+        <param-name>provider_extensions</param-name>
+        <param-value>@provider-extensions@</param-value>
+    </context-param>
     
     <context-param>
         <description>Bank Decryption Key #1</description>

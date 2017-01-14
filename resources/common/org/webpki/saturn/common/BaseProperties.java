@@ -66,6 +66,7 @@ public interface BaseProperties {
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider
     String PROVIDER_ACCOUNT_TYPES_JSON      = "providerAccountTypes";       // List of Account2Account types "understood" by provider
     String ACCEPTED_ACCOUNT_TYPES_JSON      = "acceptedAccountTypes";       // List of ACCOUNT_TYPE_JSON
+    String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_JSON                     = "account";                    // Payer Account2Account or Card
     String ACCOUNT_REFERENCE_JSON           = "accountReference";           // Account/Card number for payee (like ************5678)
     String ACCOUNT_TYPE_JSON                = "accountType";                // Account/Card type in the form of a URI

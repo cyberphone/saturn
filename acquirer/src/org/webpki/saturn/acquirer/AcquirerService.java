@@ -113,7 +113,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     }
     
     @Override
-    public void contextDestroyed(ServletContextEvent event) {
+    public void contextDestroyed(ServletContextEvent sce) {
         if (authorityObjectManager != null) {
             try {
                 authorityObjectManager.interrupt();
@@ -124,8 +124,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     }
 
     @Override
-    public void contextInitialized(ServletContextEvent event) {
-        initProperties (event);
+    public void contextInitialized(ServletContextEvent sce) {
+        initProperties (sce);
         try {
             logging = getPropertyBoolean(LOGGING);
 
@@ -153,6 +153,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 new AuthorityObjectManager(authorityUrl = aquirerHost + "/authority",
                                            aquirerHost + "/authorize",
                                            aquirerHost + "/transact",
+                                           null,
                                            null,
                                            decryptionKeys.get(0).getPublicKey(),
 

@@ -296,7 +296,7 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
     }
 
     @Override
-    JSONObjectWriter processCall(JSONObjectReader providerRequest, UrlHolder urlHolder)
+    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest)
     throws IOException, GeneralSecurityException {
         Integer requestType = requestTypes.get(providerRequest.getString(JSONDecoderCache.QUALIFIER_JSON));
         if (requestType == null) {
