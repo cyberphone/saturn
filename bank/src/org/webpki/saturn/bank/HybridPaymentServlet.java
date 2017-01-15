@@ -23,7 +23,8 @@ import java.security.GeneralSecurityException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.ProtectedAccountData;
+import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.CardPaymentRequest;
 import org.webpki.saturn.common.CardPaymentResponse;
@@ -39,17 +40,16 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
         // Decode and finalize the cardpay request which in hybrid mode actually is account-2-account
-        CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest);
-
+        CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest, false);
+        
         // Get account data.  Note: this may also be derived from a transaction DB
-        ProtectedAccountData protectedAccountData = cardPaymentRequest.getProtectedAccountData(BankService.decryptionKeys);
-        if (BankService.logging) {
-            logger.info("Payer account data: " + protectedAccountData);
-        }
+        AuthorizationRequest authorizationRequest = cardPaymentRequest.getAuthorizationResponse().getAuthorizationRequest();
+        AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
+
         boolean testMode = cardPaymentRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
-                    "Acquiring for " + protectedAccountData.getAccount().getId() + 
-                    " amount=" + cardPaymentRequest.getAmount().toString() +
+                    "Charging for AccountID=" + authorizationData.getAccount().getId() + 
+                    ", Amount=" + cardPaymentRequest.getAmount().toString() +
                     " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
         
         if (!testMode) {

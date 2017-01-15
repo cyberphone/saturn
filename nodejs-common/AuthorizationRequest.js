@@ -43,9 +43,6 @@ function AuthorizationRequest(rd) {
   }
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.clientIpAddress = rd.getString(BaseProperties.CLIENT_IP_ADDRESS_JSON);
-  if (rd.hasProperty(BaseProperties.EXPIRES_JSON)) {
-    this.expires = rd.getDateTime(BaseProperties.EXPIRES_JSON);
-  }
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
   this.publicKey = rd.getSignature().getPublicKey();

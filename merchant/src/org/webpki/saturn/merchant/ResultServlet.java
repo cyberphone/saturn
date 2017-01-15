@@ -17,17 +17,19 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.UrlHolder;
 
@@ -87,8 +89,8 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
             BigDecimal actualAmount = new BigDecimal(priceX1000).divide(new BigDecimal(1000));
             resultData.amount = actualAmount;
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
-            if (reservation instanceof AuthorizationResponse) {
-                AuthorizationServlet.processCardPayment((AuthorizationResponse) reservation,
+            if (reservation instanceof CardOperation) {
+                AuthorizationServlet.processCardPayment((CardOperation) reservation,
                                                         actualAmount,                               
                                                         urlHolder,
                                                         debugData);

@@ -46,6 +46,7 @@ import org.webpki.net.HTTPSWrapper;
 
 import org.webpki.webutil.ServletUtil;
 
+import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.UrlHolder;
@@ -165,6 +166,14 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
         }
         return payeeAuthority;
+    }
+    
+    static String getHybridModeUrl(ProviderAuthority providerAuthority) throws IOException {
+        JSONObjectReader extensions = providerAuthority.getExtensions();
+        if (extensions != null) {
+            return extensions.getStringConditional(KnownExtensions.HYBRID_PAYMENT);
+        }
+        return null;
     }
 
     abstract boolean processCall(JSONObjectReader walletResponse,

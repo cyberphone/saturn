@@ -1,3 +1,3 @@
 {
-  "http://webpki.org/saturn/v3/hybrid": "${host}/hybridpay"
+  "http://webpki.org/saturn/v3/extensions#hybrid": "${host}/hybridpay"
 }

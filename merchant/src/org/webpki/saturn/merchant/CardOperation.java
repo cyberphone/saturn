@@ -14,12 +14,14 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package org.webpki.saturn.merchant;
 
-// Holds Saturn pre-defined extensions
+import org.webpki.json.JSONX509Verifier;
 
-public interface KnownExtensions {
-    
-    String HYBRID_PAYMENT  = "http://webpki.org/saturn/v3/extensions#hybrid";
-    
+import org.webpki.saturn.common.AuthorizationResponse;
+
+public class CardOperation {
+    String urlToCall;
+    JSONX509Verifier verifier;
+    AuthorizationResponse authorizationResponse;
 }

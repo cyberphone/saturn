@@ -35,7 +35,7 @@ public class CardPaymentResponse implements BaseProperties {
 
     public CardPaymentResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.CARD_PAYMENT_RESPONSE, root = rd);
-        cardPaymentRequest = new CardPaymentRequest(rd.getObject(EMBEDDED_JSON));
+        cardPaymentRequest = new CardPaymentRequest(rd.getObject(EMBEDDED_JSON), null);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);

@@ -156,6 +156,8 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         }
 
         // Here we would actually update things...
+        // If Payer and Payee are in the same bank it will not require any networking of course.
+        
         if (authorizationRequest.getTestMode()) {
             logger.info("TEST ONLY: Authorized Amount=" + amount.toString() + ", AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
         } else {

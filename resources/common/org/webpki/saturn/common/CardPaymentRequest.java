@@ -38,7 +38,7 @@ import org.webpki.json.encryption.DecryptionKeyHolder;
 
 public class CardPaymentRequest implements BaseProperties {
     
-    public CardPaymentRequest(JSONObjectReader rd) throws IOException {
+    public CardPaymentRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         Messages.parseBaseMessage(Messages.CARD_PAYMENT_REQUEST, root = rd);
         authorizationResponse = new AuthorizationResponse(rd.getObject(EMBEDDED_JSON));
         actualAmount = rd.getBigDecimal(AMOUNT_JSON,
@@ -51,8 +51,9 @@ public class CardPaymentRequest implements BaseProperties {
         AuthorizationRequest.comparePublicKeys(publicKey,
                                                authorizationResponse
                                                    .authorizationRequest.paymentRequest);
-        if (!authorizationResponse.authorizationRequest.payerAccountType.isCardPayment()) {
-            throw new IOException("Payment method is not card: " + 
+        if (cardNetwork != null &&
+            authorizationResponse.authorizationRequest.payerAccountType.isCardPayment() ^ cardNetwork) {
+            throw new IOException("Incompatible payment method: " + 
                 authorizationResponse.authorizationRequest.payerAccountType.getTypeUri());
         }
         rd.checkForUnread();

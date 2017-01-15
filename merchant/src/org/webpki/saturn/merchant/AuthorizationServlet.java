@@ -24,8 +24,6 @@ import java.net.URL;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Date;
-
 import javax.servlet.ServletException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,7 +40,6 @@ import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.CardPaymentRequest;
 import org.webpki.saturn.common.CardPaymentResponse;
-import org.webpki.saturn.common.Expires;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
@@ -77,14 +74,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Slightly different flows for card- and bank-to-bank authorizations
         boolean cardPayment = payerAuthorization.getAccountType().isCardPayment();
         
-        if (!cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
-            JSONObjectWriter notImplemented = WalletAlertMessage.encode(
-                    "This card type doesn't support gas station payments yet...<p>Please select another card.");
-            returnJsonData(response, notImplemented);
-            return false;
-           
-        }
- 
         // ugly fix to cope with local installation
         String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
         if (MerchantService.payeeProviderAuthorityUrl.contains("localhost")) {
@@ -105,9 +94,31 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             debugData.basicCredit = !cardPayment;
             debugData.acquirerMode = cardPayment;
         }
+        
 
+        if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null &&
+                !cardPayment && getHybridModeUrl(providerAuthority) == null) {
+            JSONObjectWriter notImplemented = WalletAlertMessage.encode(
+                    "This card type doesn't support gas station payments yet...<p>Please select another card.");
+            returnJsonData(response, notImplemented);
+            return false;
+           
+        }
+ 
         AccountDescriptor accountDescriptor = null;
-        if (!cardPayment) {
+        CardOperation cardOperation = new CardOperation();
+        if (cardPayment) {
+            // Lookup of acquirer authority
+            urlHolder.setUrl(MerchantService.payeeAcquirerAuthorityUrl);
+            urlHolder.setUrl(getPayeeAuthority(urlHolder).getProviderAuthorityUrl());
+            ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
+            urlHolder.setUrl(null);
+            cardOperation.urlToCall = acquirerAuthority.getServiceUrl();
+            cardOperation.verifier = MerchantService.acquirerRoot;
+            if (debugData != null) {
+                debugData.acquirerAuthority = acquirerAuthority.getRoot();
+            }
+        } else {
             for (String accountType : providerAuthority.getProviderAccountTypes(true)) {
                 if (accountType.equals(MERCHANT_ACCOUNT_TYPE)) {
                     accountDescriptor = new AccountDescriptor(accountType, MERCHANT_ACCOUNT_ID);
@@ -118,9 +129,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 throw new IOException("No matching account type: " + providerAuthority.getProviderAccountTypes(true));
             }
         }
-
-        // Card payments are actually reservations and they are not indefinite
-        Date expires = cardPayment ? Expires.inMinutes(10) : null;
 
         String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
 
@@ -134,7 +142,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         paymentRequest,
                                         accountDescriptor,
                                         MerchantService.getReferenceId(),
-                                        expires,
                                         MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
 
         // Call Payer bank
@@ -168,10 +175,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // No error return, then we can verify the response fully
         authorizationResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
+        cardOperation.authorizationResponse = authorizationResponse;
    
         // Two-phase operation: perform the final step
         if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
-            processCardPayment(authorizationResponse,
+            processCardPayment(cardOperation,
                                paymentRequest.getAmount(),  // Just a copy since we don't have a complete scenario                                
                                urlHolder,
                                debugData);
@@ -192,32 +200,29 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         // Gas Station: Save reservation part for future fulfillment
         if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
-            session.setAttribute(GAS_STATION_RES_SESSION_ATTR, authorizationResponse);
+            if (!cardPayment) {
+                cardOperation.urlToCall = getHybridModeUrl(providerAuthority);
+                cardOperation.verifier = MerchantService.paymentRoot;
+            }
+            session.setAttribute(GAS_STATION_RES_SESSION_ATTR, cardOperation);
         }
         return true;
     }
 
-    static void processCardPayment(AuthorizationResponse authorizationResponse,
+    static void processCardPayment(CardOperation cardOperation,
                                    BigDecimal actualAmount,
                                    UrlHolder urlHolder,
                                    DebugData debugData) throws IOException {
-        // Lookup of acquirer authority
-        urlHolder.setUrl(MerchantService.payeeAcquirerAuthorityUrl);
-        urlHolder.setUrl(getPayeeAuthority(urlHolder).getProviderAuthorityUrl());
-        ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
-        urlHolder.setUrl(acquirerAuthority.getServiceUrl());
-        if (debugData != null) {
-            debugData.acquirerAuthority = acquirerAuthority.getRoot();
-        }
 
         JSONObjectWriter cardPaymentRequest =
-            CardPaymentRequest.encode(authorizationResponse,
+            CardPaymentRequest.encode(cardOperation.authorizationResponse,
                                       actualAmount,
                                       MerchantService.getReferenceId(),
-                                      MerchantService.paymentNetworks.get(authorizationResponse
+                                      MerchantService.paymentNetworks.get(cardOperation.authorizationResponse
                                                                               .getAuthorizationRequest()
                                                                                   .getPublicKey()).signer);
-        // Call the Acquirer
+        // Acquirer or Hybrid call
+        urlHolder.setUrl(cardOperation.urlToCall);
         JSONObjectReader response = postData(urlHolder, cardPaymentRequest);
 
         if (debugData != null) {
@@ -226,7 +231,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         
         CardPaymentResponse cardPaymentResponse = new CardPaymentResponse(response);
-        cardPaymentResponse.getSignatureDecoder().verify(MerchantService.acquirerRoot);
+        cardPaymentResponse.getSignatureDecoder().verify(cardOperation.verifier);
     }
 
     @Override

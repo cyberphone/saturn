@@ -41,7 +41,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
         // Decode and finalize the cardpay request
-        CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest);
+        CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest, true);
 
         // Verify that the user's bank is known
         cardPaymentRequest.verifyUserBank(AcquirerService.paymentRoot);
@@ -63,8 +63,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         boolean testMode = cardPaymentRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
-                    "Acquiring for " + protectedAccountData.getAccount().getId() + 
-                    " amount=" + cardPaymentRequest.getAmount().toString() +
+                    "Acquiring for AccountID=" + protectedAccountData.getAccount().getId() + 
+                    ", Amount=" + cardPaymentRequest.getAmount().toString() +
                     " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
         
         if (!testMode) {

@@ -53,9 +53,6 @@ public class AuthorizationRequest implements BaseProperties {
         }
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
-        if (rd.hasProperty(EXPIRES_JSON)) {
-            expires = rd.getDateTime(EXPIRES_JSON);
-        }
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
@@ -88,11 +85,6 @@ public class AuthorizationRequest implements BaseProperties {
     AccountDescriptor payeeAccount;
     public AccountDescriptor getAccountDescriptor() {
         return payeeAccount;
-    }
-
-    GregorianCalendar expires;
-    public GregorianCalendar getExpires() {
-        return expires;
     }
 
     GregorianCalendar timeStamp;
@@ -128,7 +120,6 @@ public class AuthorizationRequest implements BaseProperties {
                                           PaymentRequest paymentRequest,
                                           AccountDescriptor payeeAccount,
                                           String referenceId,
-                                          Date expires,
                                           ServerAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST);
         if (testMode != null) {
@@ -143,9 +134,6 @@ public class AuthorizationRequest implements BaseProperties {
         }
         wr.setString(REFERENCE_ID_JSON, referenceId)
           .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress);
-        if (expires != null) {
-            wr.setDateTime(EXPIRES_JSON, expires, true);
-        }
         return wr
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
