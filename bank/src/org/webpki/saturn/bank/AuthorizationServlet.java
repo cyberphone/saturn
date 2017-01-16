@@ -22,7 +22,10 @@ import java.math.BigDecimal;
 
 import java.security.GeneralSecurityException;
 
+import java.text.SimpleDateFormat;
+
 import java.util.Date;
+import java.util.Locale;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -92,11 +95,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // We don't accept requests that are old or ahead of time
         long diff = new Date().getTime() - authorizationData.getTimeStamp().getTimeInMillis();
         if (diff > (MAX_CLIENT_CLOCK_SKEW + MAX_CLIENT_AUTH_AGE) || diff < -MAX_CLIENT_CLOCK_SKEW) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
+            sdf.setTimeZone(authorizationData.getTimeStamp().getTimeZone());
             return createPrivateMessage("Either your request is older than " + 
                                             (MAX_CLIENT_AUTH_AGE / 60000) +
                                             " minutes, or your device clock is incorrect.<p>Timestamp=" +
                                             "<span style=\"white-space:nowrap\">" + 
-                                            ISODateTime.formatDateTime(authorizationData.getTimeStamp().getTime(), false) +
+                                            sdf.format(authorizationData.getTimeStamp().getTime()) +
                                             "</span>.</p>",
                                         null,
                                         authorizationData);
