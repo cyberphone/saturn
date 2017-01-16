@@ -18,13 +18,18 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+
 import java.security.cert.X509Certificate;
+
 import java.security.interfaces.RSAPublicKey;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Vector;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,19 +41,24 @@ import javax.servlet.ServletRegistration;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
+
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
+
 import org.webpki.json.encryption.DecryptionKeyHolder;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+
 import org.webpki.util.ArrayUtil;
+
 import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.UserAccountEntry;
+
 import org.webpki.webutil.InitPropertyReader;
 
 public class BankService extends InitPropertyReader implements ServletContextListener {

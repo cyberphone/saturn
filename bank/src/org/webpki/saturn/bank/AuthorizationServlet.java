@@ -107,7 +107,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         authorizationData);
         }
             
-
         // Merchant provides the client's IP address which can be used for RBA
         String clientIpAddress = authorizationRequest.getClientIpAddress();
         
