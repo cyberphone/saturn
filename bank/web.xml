@@ -104,8 +104,8 @@
     </servlet>
 
     <servlet>
-        <servlet-name>StandardServiceServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.bank.StandardServiceServlet</servlet-class>
+        <servlet-name>AuthorizationServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.AuthorizationServlet</servlet-class>
     </servlet>
 
     <servlet>
@@ -124,7 +124,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>StandardServiceServlet</servlet-name>
+        <servlet-name>AuthorizationServlet</servlet-name>
         <url-pattern>/service</url-pattern>
     </servlet-mapping>
 

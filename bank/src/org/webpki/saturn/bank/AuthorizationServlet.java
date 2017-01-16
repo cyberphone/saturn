@@ -45,7 +45,7 @@ import org.webpki.util.ISODateTime;
 // This is the Saturn basic mode Payment Provider (Bank) authorization servlet //
 /////////////////////////////////////////////////////////////////////////////////
 
-public class StandardServiceServlet extends ProcessingBaseServlet {
+public class AuthorizationServlet extends ProcessingBaseServlet {
   
     private static final long serialVersionUID = 1L;
     
@@ -154,16 +154,19 @@ public class StandardServiceServlet extends ProcessingBaseServlet {
         for (char c : accountId.toCharArray()) {
             accountReference.append((--q < 0) ? c : '*');
         }
+        boolean testMode = authorizationRequest.getTestMode();
+        logger.info((testMode ? "TEST ONLY: ": "") +
+                "Authorized Amount=" + amount.toString() + 
+                ", AccountID=" + accountId + 
+                ", AccountType=" + accountType + 
+                ", Client IP=" + clientIpAddress);
 
-        // Here we would actually update things...
-        // If Payer and Payee are in the same bank it will not require any networking of course.
-        
-        if (authorizationRequest.getTestMode()) {
-            logger.info("TEST ONLY: Authorized Amount=" + amount.toString() + ", AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
-        } else {
-            logger.info("Authorized Amount=" + amount.toString() + ", AccountID=" + accountId + ", AccountType=" + accountType + ", Client IP=" + clientIpAddress);
+        if (!testMode) {
+            // Here we would actually update things...
+            // If Payer and Payee are in the same bank it will not require any networking of course.
+            // Note that card payments only reserve an amount.
         }
-
+        
         // We did it!
         return AuthorizationResponse.encode(authorizationRequest,
                                             accountReference.toString(),
