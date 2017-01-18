@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 
 import java.security.PublicKey;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -38,8 +37,8 @@ public class PaymentRequest implements BaseProperties {
                                           Currencies currency,
                                           NonDirectPayments optionalNonDirectPayment,
                                           String referenceId,
-                                          Date timeStamp,
-                                          Date expires,
+                                          GregorianCalendar timeStamp,
+                                          GregorianCalendar expires,
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter paymentRequest = new JSONObjectWriter()
             .setObject(PAYEE_JSON, payee.writeObject())

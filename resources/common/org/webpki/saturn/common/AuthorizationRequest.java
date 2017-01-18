@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
@@ -135,7 +134,7 @@ public class AuthorizationRequest implements BaseProperties {
         wr.setString(REFERENCE_ID_JSON, referenceId)
           .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress);
         return wr
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
     }

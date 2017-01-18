@@ -51,7 +51,6 @@ import org.webpki.keygen2.ProvisioningInitializationResponseDecoder;
 import org.webpki.net.HTTPSWrapper;
 
 import org.webpki.util.ArrayUtil;
-import org.webpki.util.Base64;
 import org.webpki.util.MIMETypedObject;
 
 import org.webpki.saturn.common.KeyStoreEnumerator;

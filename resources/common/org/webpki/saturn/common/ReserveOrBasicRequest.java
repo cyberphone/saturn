@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
@@ -119,7 +118,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
                                           PaymentRequest paymentRequest,
                                           String acquirerAuthorityUrl,
                                           AccountDescriptor accountDescriptor,
-                                          Date expires,
+                                          GregorianCalendar expires,
                                           ServerAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = Messages.createBaseMessage(basicCredit ? Messages.BASIC_CREDIT_REQUEST : 
             accountType.isCardPayment() ? Messages.RESERVE_CARDPAY_REQUEST : Messages.RESERVE_CREDIT_REQUEST)
@@ -136,7 +135,7 @@ public class ReserveOrBasicRequest implements BaseProperties {
             wr.setDateTime(EXPIRES_JSON, expires, true);
         }
         return wr.setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
-                 .setDateTime(TIME_STAMP_JSON, new Date(), true)
+                 .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
                  .setSignature(signer);
     }
 

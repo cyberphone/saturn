@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 
@@ -113,7 +112,7 @@ public class ProviderUserResponse implements BaseProperties {
                 aw.setObject(challengeField.writeObject());
             }
         }
-        wr.setDateTime(TIME_STAMP_JSON, new Date(), true);
+        wr.setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true);
         return Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
             .setObject(ENCRYPTED_MESSAGE_JSON,
                        JSONObjectWriter.createEncryptionObject(wr.serializeToBytes(JSONOutputFormats.NORMALIZED),

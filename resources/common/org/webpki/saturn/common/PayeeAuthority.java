@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.security.PublicKey;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -36,13 +35,13 @@ public class PayeeAuthority implements BaseProperties {
                                           String providerAuthorityUrl,
                                           Payee payee,
                                           PublicKey payeePublicKey,
-                                          Date expires,
+                                          GregorianCalendar expires,
                                           ServerX509Signer attestSigner) throws IOException {
         return payee.writeObject(Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
                                      .setString(AUTHORITY_URL_JSON, authorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
             .setPublicKey(payeePublicKey, AlgorithmPreferences.JOSE)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
             .setSignature(attestSigner);
     }

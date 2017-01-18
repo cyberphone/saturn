@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.security.PublicKey;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -49,7 +48,7 @@ public class ReserveOrBasicResponse implements BaseProperties {
                                           JSONX509Signer signer) throws IOException {
         return Messages.createBaseMessage(matching(transactionResponse))
             .setObject(EMBEDDED_JSON, transactionResponse.root)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setSignature (signer);
     }
 

@@ -18,7 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -78,7 +77,7 @@ public class TransactionRequest implements BaseProperties {
             .setObject(EMBEDDED_JSON, reserveOrBasicRequest.root)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setObject(SOFTWARE_JSON, Software.encode(AuthorizationResponse.SOFTWARE_NAME, AuthorizationResponse.SOFTWARE_VERSION))
             .setSignature(signer);
     }

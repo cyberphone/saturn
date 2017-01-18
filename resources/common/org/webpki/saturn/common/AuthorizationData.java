@@ -18,7 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 
@@ -48,7 +47,7 @@ public class AuthorizationData implements BaseProperties {
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           ResponseToChallenge[] optionalChallengeResults,
-                                          Date timeStamp,
+                                          GregorianCalendar timeStamp,
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
@@ -86,7 +85,7 @@ public class AuthorizationData implements BaseProperties {
                       dataEncryptionKey,
                       dataEncryptionAlgorithm,
                       optionalChallengeResults,
-                      new Date(),
+                      new GregorianCalendar(),
                       new JSONAsymKeySigner(signer)
                           .setSignatureAlgorithm(signatureAlgorithm)
                           .setAlgorithmPreferences(AlgorithmPreferences.JOSE));

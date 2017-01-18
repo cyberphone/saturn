@@ -16,25 +16,32 @@
  */
 package org.webpki.saturn.common;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Expires {
 
     private Expires() {}
-
-    public static Date inSeconds(int seconds) {
-        return new Date(((new Date().getTime() + 999) / 1000 + seconds) * 1000);
+    
+    private static GregorianCalendar upwardTime(long upfactor, int argument, long divisor) {
+        GregorianCalendar gregorianCalendar = new GregorianCalendar();
+        gregorianCalendar.setTimeInMillis((((gregorianCalendar.getTimeInMillis() + upfactor) / divisor) +
+                                           argument) * divisor);
+        return gregorianCalendar;
     }
 
-    public static Date inMinutes(int minutes) {
-        return new Date(((new Date().getTime() + 59000) / 60000 + minutes) * 60000);
+    public static GregorianCalendar inSeconds(int seconds) {
+        return upwardTime(999, seconds, 1000);
     }
 
-    public static Date inHours(int hours) {
-        return new Date(((new Date().getTime() + 3540000) / 3600000 + hours) * 3600000);
+    public static GregorianCalendar inMinutes(int minutes) {
+        return upwardTime(59000, minutes, 60000);
     }
 
-    public static Date inDays(int days) {
-        return new Date(((new Date().getTime() + 82800000l) / 86400000l + days) * 86400000l);
+    public static GregorianCalendar inHours(int hours) {
+        return upwardTime(3540000, hours, 3600000);
+    }
+
+    public static GregorianCalendar inDays(int days) {
+        return upwardTime(82800000l, days, 86400000l);
     }
 }

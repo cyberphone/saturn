@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
@@ -110,7 +109,7 @@ public class CardPaymentRequest implements BaseProperties {
                            actualAmount,
                            authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setObject(SOFTWARE_JSON, Software.encode(AuthorizationRequest.SOFTWARE_NAME, 
                                                       AuthorizationRequest.SOFTWARE_VERSION))
             .setSignature(signer);

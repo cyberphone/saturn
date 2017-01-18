@@ -132,8 +132,8 @@ public class InitTestPage implements BaseProperties {
                                   Currencies.USD,
                                   null,
                                   "#6100004",
-                                  ISODateTime.parseDateTime("2016-12-27T09:45:23Z").getTime(),
-                                  ISODateTime.parseDateTime("2030-09-14T00:00:00Z").getTime(),
+                                  ISODateTime.parseDateTime("2016-12-27T09:45:23Z"),
+                                  ISODateTime.parseDateTime("2030-09-14T00:00:00Z"),
                                   signer);
         // Header
         write("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Payment Agent (Wallet) Tester</title>"

@@ -42,7 +42,7 @@ public class CardSpecificData implements BaseProperties {
 
     public JSONObjectWriter writeData(JSONObjectWriter wr) throws IOException {
         return wr.setString(ACCOUNT_HOLDER_JSON, accountHolder)
-                 .setDateTime(EXPIRES_JSON, expirationDate.getTime(), true)
+                 .setDateTime(EXPIRES_JSON, expirationDate, true)
                  .setString(ACCOUNT_SECURITY_CODE_JSON, securityCode);
     }
 

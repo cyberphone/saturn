@@ -18,7 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -77,7 +76,7 @@ public class CardPaymentResponse implements BaseProperties {
         return Messages.createBaseMessage(Messages.CARD_PAYMENT_RESPONSE)
             .setObject(EMBEDDED_JSON, cardPaymentRequest.root)
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
     }

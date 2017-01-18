@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -74,7 +73,7 @@ public class FinalizeTransactionResponse implements BaseProperties {
         return Messages.createBaseMessage(Messages.FINALIZE_TRANSACTION_RESPONSE)
             .setObject(EMBEDDED_JSON, finalizeTransactionRequest.root)
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setSignature(signer);
     }
 }

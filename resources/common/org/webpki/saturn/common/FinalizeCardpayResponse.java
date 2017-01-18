@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -67,7 +66,7 @@ public class FinalizeCardpayResponse implements BaseProperties {
         return Messages.createBaseMessage(Messages.FINALIZE_CARDPAY_RESPONSE)
             .setObject(EMBEDDED_JSON, finalizeRequest.root)
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setSignature(signer);
     }
 }

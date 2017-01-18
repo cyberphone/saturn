@@ -23,7 +23,6 @@ import java.security.PublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -53,7 +52,7 @@ public class ProviderAuthority implements BaseProperties {
                                           JSONObjectReader optionalExtensions,
                                           String[] optionalProviderAccountTypes,
                                           PublicKey encryptionKey,
-                                          Date expires,
+                                          GregorianCalendar expires,
                                           ServerX509Signer signer) throws IOException {
         test(serviceUrl, extendedServiceUrl);
         JSONObjectWriter wr = Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
@@ -79,7 +78,7 @@ public class ProviderAuthority implements BaseProperties {
                          (encryptionKey instanceof RSAPublicKey ?
            KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
             .setPublicKey(encryptionKey, AlgorithmPreferences.JOSE))
-          .setDateTime(TIME_STAMP_JSON, new Date(), true)
+          .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
           .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
           .setSignature(signer);
         return wr;

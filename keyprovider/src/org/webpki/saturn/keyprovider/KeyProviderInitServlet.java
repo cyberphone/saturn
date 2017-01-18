@@ -34,7 +34,6 @@ import org.webpki.keygen2.ServerState;
 
 import org.webpki.util.Base64URL;
 
-
 public class KeyProviderInitServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;

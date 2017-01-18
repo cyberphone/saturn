@@ -17,10 +17,11 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-import java.util.Date;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
@@ -84,7 +85,7 @@ public class TransactionResponse implements BaseProperties {
             wr.setObject(ENCRYPTED_ACCOUNT_DATA_JSON, encryptedCardData);
         }
         wr.setString(REFERENCE_ID_JSON, referenceId)
-          .setDateTime(TIME_STAMP_JSON, new Date(), true)
+          .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
           .setObject(SOFTWARE_JSON, Software.encode(AuthorizationResponse.SOFTWARE_NAME,
                                                     AuthorizationResponse.SOFTWARE_VERSION))
           .setSignature(signer);

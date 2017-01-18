@@ -369,9 +369,9 @@ public class Wallet {
 
         String formatAccountId(Account card) {
             return card.cardFormatAccountId ?
-                AuthorizationData.formatCardNumber(card.accountDescriptor.getAccountId()) 
+                AuthorizationData.formatCardNumber(card.accountDescriptor.getId()) 
                                             :
-                card.accountDescriptor.getAccountId();
+                card.accountDescriptor.getId();
         }
 
         String processExternalHtml(String simpleHtml) {
@@ -662,7 +662,7 @@ public class Wallet {
         void showAuthorizationView(int keyHandle) {
             selectedCard = cardCollection.get(keyHandle);
             logger.info("Selected Account: Key=" + keyHandle +
-                        ", Number=" + selectedCard.accountDescriptor.getAccountId() +
+                        ", Number=" + selectedCard.accountDescriptor.getId() +
                         ", URL=" + selectedCard.authorityUrl +
                         ", KeyEncryptionKey=" + selectedCard.keyEncryptionKey);
             this.keyHandle = keyHandle;
@@ -996,7 +996,7 @@ public class Wallet {
                                   PaymentRequest paymentRequest, String[] accountTypes) throws IOException {
             AccountDescriptor cardAccount = new AccountDescriptor(cardProperties.getObject(BaseProperties.ACCOUNT_JSON));
             for (String accountType : accountTypes) {
-                if (cardAccount.getAccountType().equals(accountType)) {
+                if (cardAccount.getType().equals(accountType)) {
                     Account card =
                         new Account(cardAccount,
                                     cardProperties.getBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON),
@@ -1012,7 +1012,7 @@ public class Wallet {
                     card.keyEncryptionAlgorithm = KeyEncryptionAlgorithms
                              .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
                     if (!EncryptionCore.permittedKeyEncryptionAlgorithm(card.keyEncryptionAlgorithm)) {
-                        logger.warning("Account " + cardAccount.getAccountId() + " contained an unknown \"" +
+                        logger.warning("Account " + cardAccount.getId() + " contained an unknown \"" +
                                        BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON + "\": " +
                                        card.keyEncryptionAlgorithm);
                         break;
@@ -1020,7 +1020,7 @@ public class Wallet {
                     card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
                              .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
                     if (!EncryptionCore.permittedDataEncryptionAlgorithm(card.dataEncryptionAlgorithm)) {
-                        logger.warning("Account " + cardAccount.getAccountId() + " contained an unknown \"" +
+                        logger.warning("Account " + cardAccount.getId() + " contained an unknown \"" +
                                        BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON + "\": " +
                                        card.dataEncryptionAlgorithm);
                         break;
@@ -1079,7 +1079,7 @@ public class Wallet {
                     // and process user authorizations.
                     resultMessage = PayerAuthorization.encode(authorizationData,
                                                               selectedCard.authorityUrl,
-                                                              selectedCard.accountDescriptor.getAccountType(),
+                                                              selectedCard.accountDescriptor.getType(),
                                                               selectedCard.dataEncryptionAlgorithm,
                                                               selectedCard.keyEncryptionKey,
                                                               selectedCard.keyEncryptionAlgorithm);

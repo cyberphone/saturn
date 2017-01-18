@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpSession;
@@ -57,8 +57,8 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         requestObject = Messages.createBaseMessage(Messages.PAYMENT_CLIENT_REQUEST);
         JSONArrayWriter paymentNetworksArray = requestObject.setArray(PAYMENT_NETWORKS_JSON);
-        Date timeStamp = new Date();
-        Date expires = Expires.inMinutes(30);
+        GregorianCalendar timeStamp = new GregorianCalendar();
+        GregorianCalendar expires = Expires.inMinutes(30);
         String currentReferenceId = MerchantService.getReferenceId();
         LinkedHashMap<String,JSONObjectWriter> requests = new LinkedHashMap<String,JSONObjectWriter>();
 
