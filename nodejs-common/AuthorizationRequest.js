@@ -34,6 +34,7 @@ const SOFTWARE_VERSION = "1.00";
 function AuthorizationRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, rd);
   this.testMode = rd.getBooleanConditional(BaseProperties.TEST_MODE_JSON);
+  this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
   this.authorityUrl = rd.getString(BaseProperties.AUTHORITY_URL_JSON);
   this.payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(BaseProperties.ACCOUNT_TYPE_JSON));
   this.paymentRequest = new PaymentRequest(rd.getObject(BaseProperties.PAYMENT_REQUEST_JSON));

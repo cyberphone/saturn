@@ -49,6 +49,7 @@ public interface BaseProperties {
     String ACQUIRER_AUTHORITY_URL_JSON      = "acquirerAuthorityUrl";       // For CreditCard payments
     String PAYEE_ACCOUNT_JSON               = "payeeAccount";               // Selected payee Account2Account
     String EXPIRES_JSON                     = "expires";                    // Object expiration time
+    String RECEPIENT_URL_JSON               = "recepientUrl";               // Where we are sending (target address)
     String AUTHORITY_URL_JSON               = "authorityUrl";               // Double use self in *Authority objects and initiator
     String SERVICE_URL_JSON                 = "serviceUrl";                 // Saturn "lite" (standard)
     String EXTENDED_SERVICE_URL_JSON        = "extendedServiceUrl";         // Native Saturn payment system

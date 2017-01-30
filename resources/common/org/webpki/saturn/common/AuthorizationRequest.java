@@ -43,6 +43,7 @@ public class AuthorizationRequest implements BaseProperties {
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, root = rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
+        recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
@@ -91,6 +92,11 @@ public class AuthorizationRequest implements BaseProperties {
         return timeStamp;
     }
 
+    String recepientUrl;
+    public String getRecepientUrl() {
+        return recepientUrl;
+    }
+
     String authorityUrl;
     public String getAuthorityUrl() {
         return authorityUrl;
@@ -112,6 +118,7 @@ public class AuthorizationRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(Boolean testMode,
+                                          String recepientUrl,
                                           String authorityUrl,
                                           PayerAccountTypes payerAccountType,
                                           JSONObjectReader encryptedAuthorizationData,
@@ -124,7 +131,8 @@ public class AuthorizationRequest implements BaseProperties {
         if (testMode != null) {
             wr.setBoolean(TEST_MODE_JSON, testMode);
         }
-        wr.setString(AUTHORITY_URL_JSON, authorityUrl)
+        wr.setString(RECEPIENT_URL_JSON, recepientUrl)
+          .setString(AUTHORITY_URL_JSON, authorityUrl)
           .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
           .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
           .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);

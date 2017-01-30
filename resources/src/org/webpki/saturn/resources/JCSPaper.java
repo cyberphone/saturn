@@ -192,7 +192,12 @@ public class JCSPaper implements BaseProperties {
         write(writer.serializeToBytes(JSONOutputFormats.PRETTY_HTML));
         write("</div><div class=\"text\">" +
               "The example above would if converted to " + RFC7515() + " be slightly more convoluted " +
-               "since data must be Base64-encoded (which was a core rationale for developing JCS):" +
+               "since data must be Base64-encoded (which was a core rationale for developing JCS). " +
+              "Some protocols using " + RFC7515() +
+              " even add an <i>extra outer object and property</i> to make the message type readable. This is " +
+              "unessesary using JCS because it only manifests itself as a property " +
+              "among other properties in a message. " +
+              "Anyway, here is the sample message using " +  RFC7515() + " notation:" +
               "</div><div class=\"json\">");
         JSONObjectWriter joseAuthorizationHeader = new JSONObjectWriter()
             .setString(JOSE_ALG, AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE));
@@ -223,7 +228,7 @@ public class JCSPaper implements BaseProperties {
         write("<span style=\"color:orange\">var</span>&nbsp;<span style=\"color:purple\">" +
               PAYMENT_REQUEST_JSON + "</span>&nbsp;=&nbsp;" + jsPaymentRequest.replaceAll("<br>}", "<br>};"));
         write("</div>" +
-              "V0.7, A.Rundgren, 2016-08-05" +
+              "V0.8, A.Rundgren, 2017-01-21" +
               "</body></html>");
         fos.close();
     }

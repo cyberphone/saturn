@@ -52,6 +52,7 @@ const BaseProperties = {
     ACQUIRER_AUTHORITY_URL_JSON      : 'acquirerAuthorityUrl',       // For CreditCard payments
     PAYEE_ACCOUNT_JSON               : 'payeeAccount',               // Selected payee Account2Account
     EXPIRES_JSON                     : 'expires',                    // Object expiration time
+    RECEPIENT_URL_JSON               : 'recepientUrl',               // Where we are sending (target address)
     AUTHORITY_URL_JSON               : 'authorityUrl',               // Double use self in *Authority objects and initiator
     SERVICE_URL_JSON                 : 'serviceUrl',                 // Saturn "lite" (standard)
     EXTENDED_SERVICE_URL_JSON        : 'extendedServiceUrl',         // Native Saturn payment system

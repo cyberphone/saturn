@@ -135,6 +135,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
             AuthorizationRequest.encode(MerchantService.testMode,
+                                        providerAuthority.getServiceUrl(),
                                         payeeAuthorityUrl,
                                         payerAuthorization.getAccountType(),
                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
