@@ -165,8 +165,7 @@
        </fileset>
      </path>
      <antcall target="_build">
-       <param name="card.font" value="Arial Unicode MS"/>
-       <param name="javaversion" value="1.7"/>
+       <param name="javaversion" value="1.8"/>
 
        <param name="compile.common.src.dir" value="${common.src.dir}"/>
        
@@ -218,7 +217,6 @@
 	    <pathelement path="${ejbca.classpath}"/>
 	 </path>
      <antcall target="_build">
-       <param name="card.font" value="Arial Unicode MS"/>
        <param name="javaversion" value="1.6"/>
 
        <param name="compile.common.src.dir" value="common.src"/>
