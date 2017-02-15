@@ -154,6 +154,7 @@ public class HTML implements MerchantProperties {
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge\">Web2Native Bridge</a>&nbsp;&nbsp;&nbsp;</td><td>API and &quot;Executive Level&quot; Description</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://mobilepki.org/jcs\">JCS</a></td><td>JSON Cleartext Signature</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/jef.html\">JEF</a></td><td>JSON Encryption Format</td></tr>" +
+                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/web/yasmin.html\">YASMIN</a></td><td>Message Scheme</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/keygen2.html\">KeyGen2</a></td><td>Wallet Credential Enrollment Protocol</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/sks-api-arch.pdf\">SKS</a></td><td>Wallet Credential Store</td></tr>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Related Application</b></td></tr>" +
