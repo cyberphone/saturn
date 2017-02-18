@@ -214,7 +214,7 @@ public class JCSPaper implements BaseProperties {
         write(joseWriter.serializeToBytes(JSONOutputFormats.PRETTY_HTML));
         System.out.println("JCS=" + writer.serializeToBytes(JSONOutputFormats.NORMALIZED).length +
                            " JWS=" + joseWriter.serializeToBytes(JSONOutputFormats.NORMALIZED).length);
-        write("</div><div class=\"header\" style=\"margin-top:20pt\">JavaScript Usage<br></div>" +
+        write("</div><div id=\"jsmode\" class=\"header\" style=\"margin-top:20pt\">JavaScript Usage<br></div>" +
            "<div class=\"text\">"+
               "Since " + JCS() + " is compatible with " + ECMASCRIPT() + " (JavaScript), you can also use " +
                " JCS signatures in browsers. The following shows how the <code>" + PAYMENT_REQUEST +
