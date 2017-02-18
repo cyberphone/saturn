@@ -114,6 +114,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static String authorityUrl;
     
+    static String serviceUrl;
+
     static int referenceId;
     
     static AuthorityObjectManager authorityObjectManager;
@@ -209,7 +211,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             authorityObjectManager = 
                 new AuthorityObjectManager(authorityUrl = bankHost + "/authority",
-                                           bankHost + "/service",
+                                           serviceUrl = bankHost + "/service",
                                            bankHost + "/extended",
                                            optionalProviderExtensions,
                                            new String[]{"https://swift.com", "https://ultragiro.se"},

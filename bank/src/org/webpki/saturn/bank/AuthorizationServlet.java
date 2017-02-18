@@ -59,6 +59,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Decode authorization request message
         AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);
 
+        // Check that we actually were the intended party
+        if (!BankService.serviceUrl.equals(authorizationRequest.getRecepientUrl())) {
+            throw new IOException("Unexpected \"" + RECEPIENT_URL_JSON + "\" : " + authorizationRequest.getRecepientUrl());
+        }
+
         // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
         boolean cardPayment = authorizationRequest.getPayerAccountType().isCardPayment();

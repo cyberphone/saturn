@@ -291,8 +291,14 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) +
                 " objects), can check the validity of the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
-                " which includes:<ul>" +
-                "<li style=\"padding:0pt\">Verifying that the <b>Merchant</b> is vouched for by a provider belonging to a known trust network through " +
+                " including:<ul>" +
+                "<li style=\"padding:0pt\">Verifying that the " +
+                keyWord(RECEPIENT_URL_JSON) + " of the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST.toString()) + " matches the " +
+                keyWord(SERVICE_URL_JSON) + " of the <b>User&nbsp;Bank</b>" +
+                "</li>" +
+                "<li>Verifying that the <b>Merchant</b> is vouched for by a provider belonging to a for the <b>User&nbsp;Bank</b> " +
+                "known trust network through " +
                 keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) +
                 " in " +
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) +
@@ -336,7 +342,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(ID_JSON) +
                 " in (" +
                 keyWord(ACCOUNT_JSON) +
-                ") in the user authorization object match a customer account</li>" +
+                ") in the user authorization object match a <b>User&nbsp;Bank</b> customer account</li>" +
                 "</ul>");
         if (privateMessage(debugData.authorizationResponse)) {
             return;
