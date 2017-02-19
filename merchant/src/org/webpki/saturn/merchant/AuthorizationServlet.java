@@ -204,6 +204,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             if (!cardPayment) {
                 cardOperation.urlToCall = getHybridModeUrl(providerAuthority);
                 cardOperation.verifier = MerchantService.paymentRoot;
+                if (debug) {
+                    debugData.hybridMode = true;
+                }
             }
             session.setAttribute(GAS_STATION_RES_SESSION_ATTR, cardOperation);
         }

@@ -43,10 +43,16 @@ import org.webpki.json.JSONTypes;
 import org.webpki.json.JSONDecryptionDecoder;
 
 import org.webpki.util.Base64URL;
+import org.webpki.util.ISODateTime;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Version;
+import org.webpki.saturn.common.ProtectedAccountData;
+import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.AccountDescriptor;
+import org.webpki.saturn.common.CardSpecificData;
+import org.webpki.saturn.common.KnownExtensions;
 
 class DebugPrintout implements BaseProperties {
     
@@ -139,6 +145,8 @@ class DebugPrintout implements BaseProperties {
                 }
             }
         }
+        updateUrls(jsonTree, rewriter, KnownExtensions.HYBRID_PAYMENT);
+        updateUrls(jsonTree, rewriter, RECEPIENT_URL_JSON);
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, EXTENDED_SERVICE_URL_JSON);
@@ -354,10 +362,59 @@ class DebugPrintout implements BaseProperties {
             directEndPartStandardMode();
         }
     }
+    
+    private void authorizationResponse() throws IOException, GeneralSecurityException {
+        JSONObjectReader sampleAccountData = JSONParser.parse(ProtectedAccountData.encode(
+            new AccountDescriptor(debugData.acquirerMode ?
+                    PayerAccountTypes.SUPER_CARD.getTypeUri() : PayerAccountTypes.BANK_DIRECT.getTypeUri(),
+                                  debugData.acquirerMode ? "6875056745552109" : "8645-7800239403"),
+            debugData.acquirerMode ?
+                new CardSpecificData("Luke Skywalker", 
+                                     ISODateTime.parseDateTime("2022-03-14T00:00:00Z"),
+                                     "953") : null).toString());
+        description(point +
+                "<p>After a <i>successful</i> preceeding step, the <b>User&nbsp;Bank</b> wraps the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+                " in a newly created " +
+                keyWord(Messages.AUTHORIZATION_RESPONSE.toString()) +
+                "object.</p><p>" +
+                "Then a number of properties are added including " +
+                keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) + " which holds " +
+                (debugData.acquirerMode ? "the encrypted PAN etc" : "an encrypted version of the <b>User</b> account which can be used for possible reversals") +
+                ". Note that the encryption is performed using the key of the <b>Merchant</b> " +
+                keyWord(Messages.PROVIDER_AUTHORITY.toString()) + ". " +
+                "The following shows typical account data <i>before</i> encryption:</p>");
+        fancyBox(sampleAccountData);
+        description(point +
+                "<p>Finally <b>User&nbsp;Bank</b> signs the completed object with " +
+                "its private key and certificate.  The result is then returned to the <b>Merchant</b>" +
+                " as a response to the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+                ":</p>");
+        fancyBox(debugData.authorizationResponse);
+    }
 
-    void acquirerEndPartStandardMode() {
-        // TODO Auto-generated method stub
-        
+    void cardOrHybridPayment() throws IOException, GeneralSecurityException {
+        description(point + 
+                "<p>The <b>Merchant</b> does something...</p>");
+            fancyBox(debugData.cardPaymentRequest);
+            description(point + 
+                    "<p>The <b>Acquirer</b> does something...</p>");
+            fancyBox(debugData.cardPaymentResponse);
+    }
+
+    void acquirerEndPartStandardMode() throws IOException, GeneralSecurityException {
+        description(point +
+                "<p>After validating the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+                " and checking that the <b>User</b> actually have funds matching the request," +
+                " the <b>User&nbsp;Bank</b> <i>reserves</i> the specified amount including a reference to the " +
+                keyWord(PAYEE_JSON) + " and the " +
+                keyWord(REFERENCE_ID_JSON) + " of the " +
+                keyWord(PAYMENT_REQUEST_JSON) +
+                ".</p> ");
+        authorizationResponse();
+        cardOrHybridPayment();
     }
 
     void directEndPartStandardMode() throws IOException, GeneralSecurityException {
@@ -370,18 +427,10 @@ class DebugPrintout implements BaseProperties {
             " using a with both parties compatible payment scheme.</p>" +
             "<p>Note that this process may be fully <i>asynchronous</i> where the " +
             "user authorization is only used for <i>initation</i>.</p> ");
-        description(point +
-            "<p>After a <i>successful</i> preceeding step, the <b>User&nbsp;Bank</b> wraps the " +
-            keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
-            " in a newly created " +
-            keyWord(Messages.AUTHORIZATION_RESPONSE.toString()) +
-            "object, adds some properties, and finally signs the completed object with " +
-            "its private key and certificate.  The result is then returned to the <b>Merchant</b>" +
-            " as a response to the " +
-            keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
-            ":</p>");
-        fancyBox(debugData.authorizationResponse);
-     //   descriptionStdMargin("Core Now the <b>User&nbsp;Bank</b> (equipped with the ");
+        authorizationResponse();
+        if (debugData.hybridMode) {
+            cardOrHybridPayment();
+        }
     }
 
     boolean privateMessage(JSONObjectReader response) throws IOException, GeneralSecurityException {

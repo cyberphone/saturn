@@ -55,6 +55,8 @@ public class DebugData implements Serializable {
     
     public boolean acquirerMode;
     
+    public boolean hybridMode;
+    
     public JSONObjectReader acquirerAuthority;
     
     public JSONObjectReader finalizeRequest;
