@@ -40,6 +40,7 @@ public class CardPaymentRequest implements BaseProperties {
     public CardPaymentRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         Messages.parseBaseMessage(Messages.CARD_PAYMENT_REQUEST, root = rd);
         authorizationResponse = new AuthorizationResponse(rd.getObject(EMBEDDED_JSON));
+        recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         actualAmount = rd.getBigDecimal(AMOUNT_JSON,
                                         authorizationResponse
                                             .authorizationRequest.paymentRequest.currency.decimals);
@@ -61,6 +62,11 @@ public class CardPaymentRequest implements BaseProperties {
     Software software;
 
     JSONObjectReader root;
+
+    String recepientUrl;
+    public String getRecepientUrl() {
+        return recepientUrl;
+    }
 
     GregorianCalendar timeStamp;
     public GregorianCalendar getTimeStamp() {
@@ -100,11 +106,13 @@ public class CardPaymentRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
+                                          String recepientUrl,
                                           BigDecimal actualAmount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.createBaseMessage(Messages.CARD_PAYMENT_REQUEST)
             .setObject(EMBEDDED_JSON, authorizationResponse.root)
+            .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setBigDecimal(AMOUNT_JSON,
                            actualAmount,
                            authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)

@@ -175,9 +175,21 @@ class DebugPrintout implements BaseProperties {
     }
 
     class Point {
-        int i = 1;
+        int i;
+        char j;
+        private String out(String number) {
+            return "<div id=\"p" + number + "\" class=\"point\">" + number + "</div>";
+        }
         public String toString() {
-            return "<div id=\"p" + i + "\" class=\"point\">" + (i++) + "</div>";
+            j = 'a';
+            return out(String.valueOf(++i));
+        }
+        public String sub() {
+            return out(String.valueOf(i) + String.valueOf(j++));
+        }
+        
+        public String var(boolean subFlag) {
+            return subFlag ? sub() : toString();
         }
     }
 
@@ -201,15 +213,15 @@ class DebugPrintout implements BaseProperties {
             "For traditional card payments there is also an <b>Acquirer</b> (aka &quot;card processor&quot;) involved.</p><p>Current mode: <i>" +
             (debugData.nativeMode ? "Saturn &quot;Native&quot; " +
             (debugData.acquirerMode ? "Card payment" : "Account-2-Account payment using " + (debugData.basicCredit ? "direct debit" : "reserve+finalize")) :
-            (debugData.basicCredit ? "Bank-to-Bank payment" : "Card payment")) +
+            (debugData.basicCredit ? "Bank-to-Bank Payment" + (debugData.hybridMode ? " + Hybrid" :"") : "Card Payment")) +
             "</i></p>" +
-            point+
+            point +
             "<p>The user performs &quot;Checkout&quot; (after <i>optionally</i> selecting payment method), " +
             "causing the <b>Merchant</b> server returning a " +
             "<b>Wallet</b> invocation Web-page featuring a call to the " +
             keyWord("navigator.nativeConnect()") + 
             " <a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge#api\">[CONNECT]</a> browser API.</p>" +
-            point +
+            point.sub() +
             "<p>Then the invoking Web-page waits for a ready signal from the <b>Wallet</b>.</p>");
 
          descriptionStdMargin(
@@ -221,13 +233,13 @@ class DebugPrintout implements BaseProperties {
 
         fancyBox(debugData.InvokeWallet);
 
-        description(point +
+        description(point.sub() +
             "<p>After an <i>optional</i> selection of account (card) in the <b>Wallet</b> UI, the user " +
             "authorizes the payment request (typically using a PIN):</p>" +
             "<img style=\"display:block;margin-left:auto;margin-right:auto;height:33%;width:33%\" src=\"" +
             (debugData.acquirerMode ? MerchantService.walletSupercardAuth : MerchantService.walletBankdirectAuth) + 
             "\"><p>" +
-            point +
+            point.sub() +
             "</p><p>The result of this process is not supposed be " +
             "directly available to the <b>Merchant</b> since it contains potentially sensitive user data.&nbsp;&nbsp;" +
             "For an example turn to <a href=\"#secretdata\">Unecrypted User Authorization</a>.</p><p>" +
@@ -236,8 +248,12 @@ class DebugPrintout implements BaseProperties {
             "payment credential) before it is returned to the <b>Merchant</b>:</p>");
 
         fancyBox(debugData.walletResponse);
+        descriptionStdMargin("Note that " +
+             keyWord(PROVIDER_AUTHORITY_URL_JSON) + " and " +
+             keyWord(ACCOUNT_TYPE_JSON) + " are sent in clear as well (otherwise the <b>Merchant</b>" +
+             " would not know what to do with the received data)."); 
 
-        description(point +
+        description(point.sub() +
             "<p>After receiving the <b>Wallet</b> response, the <b>Merchant</b> uses the supplied " +
              keyWord(PROVIDER_AUTHORITY_URL_JSON) + " to retrieve the associated " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
              " object of the <b>User&nbsp;Bank</b> claimed to be the user's account holder for the selected card:</p>");
@@ -246,21 +262,34 @@ class DebugPrintout implements BaseProperties {
         descriptionStdMargin(keyWord(Messages.PROVIDER_AUTHORITY.toString()) + 
             " is an object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
             "has the following tasks:<ul>" +
-            "<li style=\"padding:0pt\">Provide credentials of an entity allowing relying parties verifying such before interacting with the entity</li>" +
+            "<li style=\"padding:0pt\">Provide credentials of an entity allowing relying parties verifying such before interacting with the entity.</li>" +
             "<li>Through a signature attest the authenticy of core parameters including <i>service end points</i>, <i>encryption keys</i>, " +
-            "<i>supported payment methods</i>, <i>extensions</i>, and <i>algorithms</i></li></ul>");
+            "<i>supported payment methods</i>, <i>extensions</i>, and <i>algorithms</i>.</li></ul>");
         if (debugData.nativeMode) {
             nativeMode();
         } else {
             standardMode();
         }
         description("<p id=\"secretdata\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">Unencrypted User Authorization</p>" +
-            "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted.&nbsp;&nbsp;As shown it contains " +
-            "user account and identity data which <i>usually</i> is of no importance for the <b>Merchant</b>:");
+            "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted:");
 
         fancyBox(MerchantService.userAuthorizationSample);
+        descriptionStdMargin("Explanations:<p>" +
+            keyWord(REQUEST_HASH_JSON) + " holds the hash of the " +
+            keyWord(PAYMENT_REQUEST_JSON) + " object.</p><p>" +
+            keyWord(DOMAIN_NAME_JSON) + " holds the DNS name of the <b>Merchant</b>.</p><p>" +
+            keyWord(ACCOUNT_JSON) + " holds the user account information usually only known by <b>User&nbsp;Bank</b>" +
+            " but is also handed over to the <i>provider</i> (of the <b>Merchant</b>) using the " +
+            keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) +
+            " object.</p><p>" +
+            keyWord(ENCRYPTION_PARAMETERS_JSON) + " holds session specific encryption parameters used by " +
+            keyWord(Messages.PROVIDER_USER_RESPONSE.toString()) +
+            " which may be returned by <b>User&nbsp;Bank</b> if there is something wrong with " +
+            keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+            " like insufficient funds or a need asking the user to provide additional authorization information.</p><p>" +
+            keyWord(JSONSignatureDecoder.SIGNATURE_JSON) + " holds the user's authorization signature.</p>");
 
-        descriptionStdMargin("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
+        description("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }
     
     void standardMode() throws Exception {
@@ -273,12 +302,14 @@ class DebugPrintout implements BaseProperties {
                     keyWord(PAYMENT_REQUEST_JSON) + "), to the <b>User&nbsp;Bank</b>:</p>");
         
         fancyBox(debugData.authorizationRequest);
-        descriptionStdMargin("Note the use of " + keyWord(PAYEE_ACCOUNT_JSON) + 
-                " which holds an object that is compatible with the " + 
-                keyWord(PROVIDER_ACCOUNT_TYPES_JSON) + " of the (by the <b>Merchant</b>) retrieved " + 
-                keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.");
+        if (!debugData.acquirerMode) {
+            descriptionStdMargin("Note the use of " + keyWord(PAYEE_ACCOUNT_JSON) + 
+                    " which holds an object that is compatible with the " + 
+                    keyWord(PROVIDER_ACCOUNT_TYPES_JSON) + " of the (by the <b>Merchant</b>) retrieved " + 
+                    keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.");
+        }
         
-        description(point + 
+        description(point.sub() + 
                 "<p>After receiving the " + keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
                 " object, the <b>User&nbsp;Bank</b> uses the enclosed " +
                 keyWord(AUTHORITY_URL_JSON) + " to retrieve the <b>Merchant</b> " +
@@ -286,7 +317,7 @@ class DebugPrintout implements BaseProperties {
 
         fancyBox(debugData.payeeAuthority);
 
-        description(point + 
+        description(point.sub() + 
                 "<p>After receiving the " + keyWord(Messages.PAYEE_AUTHORITY.toString()) +
                 " object, the <b>User&nbsp;Bank</b> uses the enclosed " +
                 keyWord(PROVIDER_AUTHORITY_URL_JSON) + " to retrieve the <b>Merchant</b> " +
@@ -304,53 +335,53 @@ class DebugPrintout implements BaseProperties {
                 keyWord(RECEPIENT_URL_JSON) + " of the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) + " matches the " +
                 keyWord(SERVICE_URL_JSON) + " of the <b>User&nbsp;Bank</b>" +
-                "</li>" +
+                ".</li>" +
                 "<li>Verifying that the <b>Merchant</b> is vouched for by a provider belonging to a for the <b>User&nbsp;Bank</b> " +
                 "known trust network through " +
                 keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) +
                 " in " +
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) +
-                "</li>" +
+                ".</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) + " in " +
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) +
                 " and " +
                 keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
-                " are identical</li>" +
+                " are identical.</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in " +
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) +
                 " and " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
-                " are identical</li>" +
+                " are identical.</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in " +
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) +
                 " and " +
                 keyWord(PAYMENT_REQUEST_JSON) +
-                " are identical</li>" +
+                " are identical.</li>" +
                 "<li>Verifying that decrypting " +
                 keyWord(ENCRYPTED_AUTHORIZATION_JSON) +
                 " returns a valid user authorization object including " +
                 keyWord(JSONSignatureDecoder.SIGNATURE_JSON) +
-                "</li>" +
+                ".</li>" +
                 "<li>Verifying that the " +
                 keyWord(REQUEST_HASH_JSON) +
                 " in the user authorization object matches the hash of the " +
                 keyWord(PAYMENT_REQUEST_JSON) +
-                " object</li>" +
+                " object.</li>" +
                 "<li>Verifying that the " +
                 keyWord(TIME_STAMP_JSON) +
                 " in the user authorization object is within limits like " +
                 "<span style=\"white-space:nowrap\">-(<i>AllowedClientClockSkew</i> + <i>AuthorizationMaxAge</i>)" +
-                " to <i>AllowedClientClockSkew</i></span> with respect to current time</li>" +
+                " to <i>AllowedClientClockSkew</i></span> with respect to current time.</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) +
                 " and " +
                 keyWord(ID_JSON) +
                 " in (" +
                 keyWord(ACCOUNT_JSON) +
-                ") in the user authorization object match a <b>User&nbsp;Bank</b> customer account</li>" +
+                ") in the user authorization object match a <b>User&nbsp;Bank</b> customer account.</li>" +
                 "</ul>");
         if (privateMessage(debugData.authorizationResponse)) {
             return;
@@ -372,7 +403,7 @@ class DebugPrintout implements BaseProperties {
                 new CardSpecificData("Luke Skywalker", 
                                      ISODateTime.parseDateTime("2022-03-14T00:00:00Z"),
                                      "953") : null).toString());
-        description(point +
+        description(point.sub() +
                 "<p>After a <i>successful</i> preceeding step, the <b>User&nbsp;Bank</b> wraps the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
                 " in a newly created " +
@@ -394,43 +425,61 @@ class DebugPrintout implements BaseProperties {
         fancyBox(debugData.authorizationResponse);
     }
 
-    void cardOrHybridPayment() throws IOException, GeneralSecurityException {
+    void cardOrHybridPayment(String recepient) throws IOException, GeneralSecurityException {
         description(point + 
-                "<p>The <b>Merchant</b> does something...</p>");
-            fancyBox(debugData.cardPaymentRequest);
-            description(point + 
-                    "<p>The <b>Acquirer</b> does something...</p>");
-            fancyBox(debugData.cardPaymentResponse);
+            "<p>To finalize the transaction the <b>Merchant</b> wraps the " +
+            keyWord(Messages.AUTHORIZATION_RESPONSE.toString()) +
+            " in a newly created " +
+            keyWord(Messages.CARD_PAYMENT_REQUEST.toString()) +
+            " including a possibly updated " +
+            keyWord(AMOUNT_JSON) +
+            " and sends the completed object to the <b>" + recepient + 
+            "</b>:</p>");
+        fancyBox(debugData.cardPaymentRequest);
+        description(point + 
+            "<p>After successful validation the <b>" + recepient + "</b> returns a matching response to the <b>Merchant</b>:</p>");
+        fancyBox(debugData.cardPaymentResponse);
     }
-
-    void acquirerEndPartStandardMode() throws IOException, GeneralSecurityException {
-        description(point +
+    
+    void reserveMode() {
+        description(point.sub() +
                 "<p>After validating the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
                 " and checking that the <b>User</b> actually have funds matching the request," +
                 " the <b>User&nbsp;Bank</b> <i>reserves</i> the specified amount including a reference to the " +
-                keyWord(PAYEE_JSON) + " and the " +
+                keyWord(PAYEE_JSON) + " and " +
                 keyWord(REFERENCE_ID_JSON) + " of the " +
                 keyWord(PAYMENT_REQUEST_JSON) +
                 ".</p> ");
+    }
+    
+    void acquirerEndPartStandardMode() throws IOException, GeneralSecurityException {
+        reserveMode();
         authorizationResponse();
-        cardOrHybridPayment();
+        cardOrHybridPayment("Acquirer");
     }
 
     void directEndPartStandardMode() throws IOException, GeneralSecurityException {
-        description(point +
-            "<p>After validating the " +
-            keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
-            " and checking that the <b>User</b> actually have funds matching the request," +
-            " the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by " +
-            keyWord(PAYEE_ACCOUNT_JSON) +
-            " using a with both parties compatible payment scheme.</p>" +
-            "<p>Note that this process may be fully <i>asynchronous</i> where the " +
-            "user authorization is only used for <i>initation</i>.</p> ");
+        if (debugData.hybridMode) {
+            reserveMode();
+        } else {
+            description(point +
+                "<p>After validating the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
+                " and checking that the <b>User</b> actually have funds matching the request," +
+                " the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by " +
+                keyWord(PAYEE_ACCOUNT_JSON) +
+                " using a with both parties compatible payment scheme.</p>" +
+                "<p>Note that the actual payment process may be fully <i>asynchronous</i> where the " +
+                "authorization is only used for <i>initation</i>.</p> ");
+        }
         authorizationResponse();
         if (debugData.hybridMode) {
-            cardOrHybridPayment();
-        }
+            cardOrHybridPayment("User&nbspBank");
+            descriptionStdMargin(
+                "<p>Note that the actual payment process may be fully <i>asynchronous</i> where the " +
+                "authorization is only used for <i>initation</i>.</p>");
+       }
     }
 
     boolean privateMessage(JSONObjectReader response) throws IOException, GeneralSecurityException {
@@ -523,10 +572,10 @@ class DebugPrintout implements BaseProperties {
 
                 if (!debugData.softFinalizeError) {
                     descriptionStdMargin("Not embedding the request in the response may appear illogical but since<ul>" +
-                        "<li>the communication is assumed to be <i>synchronous</i> (using HTTP)</li>" +
+                        "<li>the communication is assumed to be <i>synchronous</i> (using HTTP).</li>" +
                         "<li>there is no additional information needed by the transaction, only a sender-unique " +
                         keyWord(REFERENCE_ID_JSON) +
-                        "</li><li>the signed 256-bit hash fully binds the response to the request</li></ul>this would not add any security, " +
+                        ".</li><li>the signed 256-bit hash fully binds the response to the request.</li></ul>this would not add any security, " +
                         "assuming that logging is working.");
                 }
             }

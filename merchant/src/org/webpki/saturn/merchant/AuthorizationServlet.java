@@ -220,6 +220,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         JSONObjectWriter cardPaymentRequest =
             CardPaymentRequest.encode(cardOperation.authorizationResponse,
+                                      cardOperation.urlToCall,
                                       actualAmount,
                                       MerchantService.getReferenceId(),
                                       MerchantService.paymentNetworks.get(cardOperation.authorizationResponse
