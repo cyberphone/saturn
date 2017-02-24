@@ -55,33 +55,22 @@ public class ProviderAuthority implements BaseProperties {
                                           GregorianCalendar expires,
                                           ServerX509Signer signer) throws IOException {
         test(serviceUrl, extendedServiceUrl);
-        JSONObjectWriter wr = Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
+        return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
             .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
-            .setString(AUTHORITY_URL_JSON, authorityUrl);
-        
-        if (serviceUrl != null) {
-            wr.setString(SERVICE_URL_JSON, serviceUrl);
-        }
-    
-        if (extendedServiceUrl != null) {
-            wr.setString(EXTENDED_SERVICE_URL_JSON, extendedServiceUrl);
-        }
-        if (optionalExtensions != null) {
-            wr.setObject(EXTENSIONS_JSON, optionalExtensions);
-        }
-        if (optionalProviderAccountTypes != null) {
-            wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes);
-        }
-        wr.setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-            .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
-            .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
-                         (encryptionKey instanceof RSAPublicKey ?
-           KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
-            .setPublicKey(encryptionKey, AlgorithmPreferences.JOSE))
-          .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
-          .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
-          .setSignature(signer);
-        return wr;
+            .setString(AUTHORITY_URL_JSON, authorityUrl)
+            .setDynamic((wr) -> serviceUrl == null ? wr : wr.setString(SERVICE_URL_JSON, serviceUrl))
+            .setDynamic((wr) -> extendedServiceUrl == null ? wr : wr.setString(EXTENDED_SERVICE_URL_JSON, extendedServiceUrl))
+            .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
+            .setDynamic((wr) -> optionalProviderAccountTypes == null ?
+                    wr : wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes))
+            .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
+                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
+                .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, (encryptionKey instanceof RSAPublicKey ?
+                     KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
+                .setPublicKey(encryptionKey, AlgorithmPreferences.JOSE))
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
+            .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
+            .setSignature(signer);
     }
 
     public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
