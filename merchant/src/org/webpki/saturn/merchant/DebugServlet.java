@@ -181,7 +181,7 @@ class DebugPrintout implements BaseProperties {
         int i;
         char j;
         private String out(String number) {
-            return "<div id=\"p" + number + "\" class=\"point\">" + number + "</div>";
+            return "<div id=\"" + number + "\" class=\"point\">" + number + "</div>";
         }
         public String toString() {
             j = 'a';
@@ -341,7 +341,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
                 " including:<ul>" +
                 "<li style=\"padding:0pt\">Verifying that the " +
-                keyWord(RECEPIENT_URL_JSON) + "in the " +
+                keyWord(RECEPIENT_URL_JSON) + " in the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) + " matches the " +
                 keyWord(SERVICE_URL_JSON) + " of the <b>User&nbsp;Bank</b>" +
                 ".</li>" +
