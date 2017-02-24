@@ -41,6 +41,7 @@ import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UserAccountEntry;
+import org.webpki.saturn.common.NonDirectPayments;
 
 import org.webpki.util.ISODateTime;
 
@@ -66,6 +67,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
+        NonDirectPayments nonDirectPayment = paymentRequest.getNonDirectPayment();
         boolean cardPayment = authorizationRequest.getPayerAccountType().isCardPayment();
         
         // Verify that the authorization request is signed by a payment partner
@@ -170,10 +172,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 ", AccountType=" + accountType + 
                 ", Client IP=" + clientIpAddress);
 
+        String optionalLogData = null;
         if (!testMode) {
             // Here we would actually update things...
             // If Payer and Payee are in the same bank it will not require any networking of course.
-            // Note that card payments only reserve an amount.
+            // Note that card and nonDirectPayments payments only reserve an amount.
+            if (!cardPayment && nonDirectPayment == null) {
+                optionalLogData = "Bank payment network log data...";
+            }
         }
         
         // We did it!
@@ -183,6 +189,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                             accountDescriptor,
                                             cardSpecificData,
                                             getReferenceId(),
+                                            optionalLogData,
                                             BankService.bankKey);
     }
 }

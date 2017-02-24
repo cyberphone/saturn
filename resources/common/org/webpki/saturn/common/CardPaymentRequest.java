@@ -118,8 +118,8 @@ public class CardPaymentRequest implements BaseProperties {
                            authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(AuthorizationRequest.SOFTWARE_NAME, 
-                                                      AuthorizationRequest.SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 
+                                                      PaymentRequest.SOFTWARE_VERSION))
             .setSignature(signer);
     }
 

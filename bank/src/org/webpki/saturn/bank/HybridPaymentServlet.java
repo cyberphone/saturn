@@ -51,16 +51,17 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     "Charging for AccountID=" + authorizationData.getAccount().getId() + 
                     ", Amount=" + cardPaymentRequest.getAmount().toString() +
                     " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
-        
+        String optionalLogData = null;
         if (!testMode) {
 
             // Here we are supposed to do the actual payment
-
+            optionalLogData = "Bank payment network log data...";
         }
 
         // It appears that we succeeded
         return CardPaymentResponse.encode(cardPaymentRequest,
                                           getReferenceId(),
+                                          optionalLogData,
                                           BankService.bankKey);
     }
 

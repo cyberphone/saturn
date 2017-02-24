@@ -52,6 +52,7 @@ import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.Date;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -124,6 +125,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 //  - SKS (Secure Key Store)                                            //
 //  - JCS (JSON Clear-text Signature)                                   //
 //  - JEF (JSON Encryption Format)                                      //
+//  - YASMIN (JSON Message Format)                                           //
 //  - Federation using credentials with embedded links                  //
 // and (of course...), the Web2Native Bridge.                           //
 //                                                                      //
@@ -1057,6 +1059,7 @@ public class Wallet {
                         dataEncryptionKey,
                         DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                         challengeResults,
+                        "#" + Long.toString(new Date().getTime()),
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
                             @Override

@@ -60,6 +60,7 @@ public interface BaseProperties {
     String TRANSACTION_ID_JSON              = "transactionId";
     String CLIENT_IP_ADDRESS_JSON           = "clientIpAddress";            // Security data for the payment provider
     String CLIENT_GEO_LOCATION_JSON         = "clientGeoLocation";          // Optional security data that client devices may supply
+    String LOG_DATA_JSON                    = "logData";                    // Insertion of external log data
     String REFERENCE_ID_JSON                = "referenceId";
     String PAYEE_JSON                       = "payee";                      // Payee object
     String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved

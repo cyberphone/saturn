@@ -47,6 +47,7 @@ public class AuthorizationData implements BaseProperties {
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           ResponseToChallenge[] optionalChallengeResults,
+                                          String referenceId,
                                           GregorianCalendar timeStamp,
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
@@ -64,7 +65,9 @@ public class AuthorizationData implements BaseProperties {
             for (ResponseToChallenge challengeResult : optionalChallengeResults) {
                 aw.setObject(challengeResult.writeObject());
             }
-            
+        }
+        if (referenceId != null) {
+            wr.setString(REFERENCE_ID_JSON, referenceId);
         }
         return wr.setDateTime(TIME_STAMP_JSON, timeStamp, false)
                  .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
@@ -77,6 +80,7 @@ public class AuthorizationData implements BaseProperties {
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           ResponseToChallenge[] optionalChallengeResults,
+                                          String referenceId,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
@@ -85,6 +89,7 @@ public class AuthorizationData implements BaseProperties {
                       dataEncryptionKey,
                       dataEncryptionAlgorithm,
                       optionalChallengeResults,
+                      referenceId,
                       new GregorianCalendar(),
                       new JSONAsymKeySigner(signer)
                           .setSignatureAlgorithm(signatureAlgorithm)
@@ -123,7 +128,7 @@ public class AuthorizationData implements BaseProperties {
             } while (ar.hasMore());
             optionalChallengeResults = results.values().toArray(new ResponseToChallenge[0]);
         }
-        
+        referenceId = rd.getStringConditional(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
@@ -133,6 +138,11 @@ public class AuthorizationData implements BaseProperties {
     DataEncryptionAlgorithms dataEncryptionAlgorithm;
     public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
         return dataEncryptionAlgorithm;
+    }
+
+    String referenceId;
+    public String getReferenceId() {
+        return referenceId;
     }
 
     byte[] dataEncryptionKey;

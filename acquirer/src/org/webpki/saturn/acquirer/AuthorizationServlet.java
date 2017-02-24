@@ -67,15 +67,18 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     ", Amount=" + cardPaymentRequest.getAmount().toString() +
                     " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
         
+        String optionalLogData = null;
         if (!testMode) {
 
             // Here we are supposed to talk to the card payment network....
+            optionalLogData = "Card payment network log data...";
 
         }
 
         // It appears that we succeeded
         return CardPaymentResponse.encode(cardPaymentRequest,
                                           getReferenceId(),
+                                          optionalLogData,
                                           AcquirerService.acquirerKey);
     }
 }

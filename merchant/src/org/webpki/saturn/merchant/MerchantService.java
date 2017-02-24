@@ -44,6 +44,7 @@ import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
@@ -137,7 +138,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     // Debug mode samples
     static JSONObjectReader userAuthorizationSample;
 
-    static byte[] protectedAccountData;
+    static JSONObjectWriter protectedAccountData;
 
     static String walletSupercardAuth;
 
@@ -282,7 +283,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                                                   "6875056745552109"),
                                             new CardSpecificData("Luke Skywalker",
                                                                  ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
-                                                                 "943")).serializeToBytes(JSONOutputFormats.NORMALIZED);
+                                                                 "943"));
 
             if (getPropertyString(TEST_MODE).length () > 0) {
                 testMode = getPropertyBoolean(TEST_MODE);

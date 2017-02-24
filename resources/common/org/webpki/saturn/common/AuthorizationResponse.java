@@ -42,6 +42,7 @@ public class AuthorizationResponse implements BaseProperties {
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         encryptedAccountData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
         referenceId = rd.getString(REFERENCE_ID_JSON);
+        optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -54,6 +55,11 @@ public class AuthorizationResponse implements BaseProperties {
     Software software;
 
     GregorianCalendar dateTime;
+
+    String optionalLogData;
+    public String getOptionalLogData() {
+        return optionalLogData;
+    }
 
     String referenceId;
     public String getReferenceId() {
@@ -83,6 +89,7 @@ public class AuthorizationResponse implements BaseProperties {
                                           AccountDescriptor accountDescriptor,
                                           CardSpecificData cardSpecificData,
                                           String referenceId,
+                                          String optionalLogData,
                                           ServerX509Signer signer) throws IOException, GeneralSecurityException {
         return Messages.createBaseMessage(Messages.AUTHORIZATION_RESPONSE)
             .setObject(EMBEDDED_JSON, authorizationRequest.root)
@@ -95,6 +102,7 @@ public class AuthorizationResponse implements BaseProperties {
                                                    providerAuthority.getEncryptionKey(),
                                                    providerAuthority.getKeyEncryptionAlgorithm()))
             .setString(REFERENCE_ID_JSON, referenceId)
+            .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);

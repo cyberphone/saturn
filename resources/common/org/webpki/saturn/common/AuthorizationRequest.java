@@ -37,9 +37,6 @@ import org.webpki.util.ArrayUtil;
 
 public class AuthorizationRequest implements BaseProperties {
     
-    public static final String SOFTWARE_NAME    = "WebPKI.org - Payee";
-    public static final String SOFTWARE_VERSION = "1.00";
-
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, root = rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
@@ -127,23 +124,19 @@ public class AuthorizationRequest implements BaseProperties {
                                           AccountDescriptor payeeAccount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
-        JSONObjectWriter wr = Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST);
-        if (testMode != null) {
-            wr.setBoolean(TEST_MODE_JSON, testMode);
-        }
-        wr.setString(RECEPIENT_URL_JSON, recepientUrl)
-          .setString(AUTHORITY_URL_JSON, authorityUrl)
-          .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
-          .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
-          .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData);
-        if (payeeAccount != null) {
-            wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject());
-        }
-        wr.setString(REFERENCE_ID_JSON, referenceId)
-          .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress);
-        return wr
+        return Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST)
+            .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
+            .setString(RECEPIENT_URL_JSON, recepientUrl)
+            .setString(AUTHORITY_URL_JSON, authorityUrl)
+            .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
+            .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
+            .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
+            .setDynamic((wr) -> payeeAccount == null ? wr 
+                      : wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject()))
+            .setString(REFERENCE_ID_JSON, referenceId)
+            .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, PaymentRequest.SOFTWARE_VERSION))
             .setSignature(signer);
     }
 

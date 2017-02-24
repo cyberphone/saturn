@@ -35,6 +35,7 @@ public class CardPaymentResponse implements BaseProperties {
     public CardPaymentResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.CARD_PAYMENT_RESPONSE, root = rd);
         cardPaymentRequest = new CardPaymentRequest(rd.getObject(EMBEDDED_JSON), null);
+        optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
@@ -48,6 +49,11 @@ public class CardPaymentResponse implements BaseProperties {
     Software software;
 
     GregorianCalendar dateTime;
+
+    String optionalLogData;
+    public String getOptionalLogData() {
+        return optionalLogData;
+    }
 
     String referenceId;
     public String getReferenceId() {
@@ -72,9 +78,11 @@ public class CardPaymentResponse implements BaseProperties {
 
     public static JSONObjectWriter encode(CardPaymentRequest cardPaymentRequest,
                                           String referenceId,
+                                          String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
         return Messages.createBaseMessage(Messages.CARD_PAYMENT_RESPONSE)
             .setObject(EMBEDDED_JSON, cardPaymentRequest.root)
+            .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
