@@ -26,9 +26,9 @@ public class ChallengeField implements BaseProperties {
     public static enum TYPE {NUMERIC, ALPHANUMERIC, NUMERIC_SECRET, ALPHANUMERIC_SECRET, GPS_COORDINATES, SMS_CALLBACK};
 
     public ChallengeField(String id,
-                      TYPE type,
-                      int length,
-                      String optionalLabel) {
+                          TYPE type,
+                          int length,
+                          String optionalLabel) {
         this.id = id;
         this.type = type;
         this.length = length;
@@ -36,14 +36,11 @@ public class ChallengeField implements BaseProperties {
     }
  
     public JSONObjectWriter writeObject() throws IOException {
-        JSONObjectWriter wr = new JSONObjectWriter()
+        return new JSONObjectWriter()
             .setString(ID_JSON, id)
             .setString(TYPE_JSON, type.toString())
-            .setInt(LENGTH_JSON, length);
-        if (optionalLabel != null) {
-            wr.setString(LABEL_JSON, optionalLabel);
-        }
-        return wr;
+            .setInt(LENGTH_JSON, length)
+            .setDynamic((wr) -> optionalLabel == null ? wr : wr.setString(LABEL_JSON, optionalLabel));
     }
 
     TYPE type;
