@@ -47,7 +47,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.net.HTTPSWrapper;
 
 import org.webpki.saturn.common.AuthorizationData;
-import org.webpki.saturn.common.ChallengeField;
+import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
@@ -187,11 +187,11 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     }
 
     static JSONObjectWriter createPrivateMessage(String text,
-                                                 ChallengeField[] optionalChallengeFields,
+                                                 UserChallengeItem[] optionalUserChallengeItems,
                                                  AuthorizationData authorizationData) throws IOException, GeneralSecurityException {
         return ProviderUserResponse.encode(BankService.bankCommonName,
                                            text,
-                                           optionalChallengeFields,
+                                           optionalUserChallengeItems,
                                            authorizationData.getDataEncryptionKey(),
                                            authorizationData.getDataEncryptionAlgorithm());
     }

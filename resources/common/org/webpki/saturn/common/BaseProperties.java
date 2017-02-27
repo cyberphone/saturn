@@ -33,15 +33,16 @@ public interface BaseProperties {
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
     String NAME_JSON                        = "name";
 
+    String REQUESTER_JSON                   = "requester";                  // ProviderUserResponse
     String TEXT_JSON                        = "text";                       // ProviderUserResponse
-    String CHALLENGE_FIELDS_JSON            = "challengeFields";            // ProviderUserResponse
+    String USER_CHALLENGE_ITEMS_JSON        = "userChallengeItems";         // ProviderUserResponse
     String LABEL_JSON                       = "label";                      // ProviderUserResponse
     String LENGTH_JSON                      = "length";                     // ProviderUserResponse
     String ENCRYPTED_MESSAGE_JSON           = "encryptedMessage";           // ProviderUserResponse
 
     String KEY_JSON                         = "key";                        // Wallet-originated encryption key
 
-    String RESPONSE_TO_CHALLENGE_JSON       = "responseToChallenge";        // Result of ProviderUserResponse 
+    String USER_RESPONSE_ITEMS_JSON         = "userResponseItems";          // Result of ProviderUserResponse 
 
     String PAYMENT_NETWORKS_JSON            = "paymentNetworks";
     String PAYMENT_REQUEST_JSON             = "paymentRequest";

@@ -165,6 +165,13 @@ class DebugPrintout implements BaseProperties {
               "</div>");
     }
 
+    void fancyBoxNoClean(JSONObjectReader reader) throws IOException, GeneralSecurityException {
+        boolean temp = clean;
+        clean = false;
+        fancyBox(reader);
+        clean = temp;
+    }
+
     void fancyBox(JSONObjectWriter writer) throws IOException, GeneralSecurityException {
         fancyBox(new JSONObjectReader(writer));
     }
@@ -243,7 +250,7 @@ class DebugPrintout implements BaseProperties {
             "<p>After an <i>optional</i> selection of account (card) in the <b>Wallet</b> UI, the user " +
             "authorizes the payment request (typically using a PIN):</p>" +
             "<img style=\"display:block;margin-left:auto;margin-right:auto;height:33%;width:33%\" src=\"" +
-            (debugData.acquirerMode ? MerchantService.walletSupercardAuth : MerchantService.walletBankdirectAuth) + 
+            (debugData.acquirerMode ? MerchantService.walletSupercardAuthz : MerchantService.walletBankdirectAuthz) + 
             "\"><p>" +
             point.sub() +
             "</p><p>The result of this process is not supposed be " +
@@ -279,7 +286,7 @@ class DebugPrintout implements BaseProperties {
         description("<p id=\"secretdata\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">Unencrypted User Authorization</p>" +
             "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted:");
 
-        fancyBox(MerchantService.userAuthorizationSample);
+        fancyBoxNoClean(MerchantService.userAuthzSample);
         descriptionStdMargin("Explanations:<p>" +
             keyWord(REQUEST_HASH_JSON) + " holds the hash of the " +
             keyWord(PAYMENT_REQUEST_JSON) + " object.</p><p>" +
@@ -293,9 +300,12 @@ class DebugPrintout implements BaseProperties {
             " which may be returned by <b>User&nbsp;Bank</b> if there is something wrong with " +
             keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
             " like insufficient funds or a need asking the user to provide additional authorization information.</p><p>" + 
-            keyWord(REFERENCE_ID_JSON) +
-            " holds a locally generated reference to the authorization.</p><p>" +
             keyWord(JSONSignatureDecoder.SIGNATURE_JSON) + " holds the user's authorization signature.</p>");
+        fancyBox(MerchantService.providerUserResponseSample);
+
+        fancyBoxNoClean(MerchantService.encryptedMessageSample);
+        
+        fancyBoxNoClean(MerchantService.userChallAuthzSample);
 
         description("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }

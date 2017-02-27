@@ -46,8 +46,7 @@ public class AuthorizationData implements BaseProperties {
                                           AccountDescriptor account,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
-                                          ResponseToChallenge[] optionalChallengeResults,
-                                          String referenceId,
+                                          UserResponseItem[] optionalUserResponseItems,
                                           GregorianCalendar timeStamp,
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
@@ -60,14 +59,11 @@ public class AuthorizationData implements BaseProperties {
                        new JSONObjectWriter()
                 .setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setBinary(KEY_JSON, dataEncryptionKey));
-        if (optionalChallengeResults != null && optionalChallengeResults.length > 0) {
-            JSONArrayWriter aw = wr.setArray(RESPONSE_TO_CHALLENGE_JSON);
-            for (ResponseToChallenge challengeResult : optionalChallengeResults) {
+        if (optionalUserResponseItems != null && optionalUserResponseItems.length > 0) {
+            JSONArrayWriter aw = wr.setArray(USER_RESPONSE_ITEMS_JSON);
+            for (UserResponseItem challengeResult : optionalUserResponseItems) {
                 aw.setObject(challengeResult.writeObject());
             }
-        }
-        if (referenceId != null) {
-            wr.setString(REFERENCE_ID_JSON, referenceId);
         }
         return wr.setDateTime(TIME_STAMP_JSON, timeStamp, false)
                  .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
@@ -79,8 +75,7 @@ public class AuthorizationData implements BaseProperties {
                                           AccountDescriptor account,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
-                                          ResponseToChallenge[] optionalChallengeResults,
-                                          String referenceId,
+                                          UserResponseItem[] optionalUserResponseItems,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
@@ -88,8 +83,7 @@ public class AuthorizationData implements BaseProperties {
                       account,
                       dataEncryptionKey,
                       dataEncryptionAlgorithm,
-                      optionalChallengeResults,
-                      referenceId,
+                      optionalUserResponseItems,
                       new GregorianCalendar(),
                       new JSONAsymKeySigner(signer)
                           .setSignatureAlgorithm(signatureAlgorithm)
@@ -117,18 +111,17 @@ public class AuthorizationData implements BaseProperties {
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
             .getAlgorithmFromString(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
-        if (rd.hasProperty(RESPONSE_TO_CHALLENGE_JSON)) {
-            LinkedHashMap<String,ResponseToChallenge> results = new LinkedHashMap<String,ResponseToChallenge>();
-            JSONArrayReader ar = rd.getArray(RESPONSE_TO_CHALLENGE_JSON);
+        if (rd.hasProperty(USER_RESPONSE_ITEMS_JSON)) {
+            LinkedHashMap<String,UserResponseItem> results = new LinkedHashMap<String,UserResponseItem>();
+            JSONArrayReader ar = rd.getArray(USER_RESPONSE_ITEMS_JSON);
              do {
-                 ResponseToChallenge challengeResult = new ResponseToChallenge(ar.getObject());
+                 UserResponseItem challengeResult = new UserResponseItem(ar.getObject());
                 if (results.put(challengeResult.getId(), challengeResult) != null) {
                     throw new IOException("Duplicate: " + challengeResult.getId());
                 }
             } while (ar.hasMore());
-            optionalChallengeResults = results.values().toArray(new ResponseToChallenge[0]);
+            optionalUserResponseItems = results.values().toArray(new UserResponseItem[0]);
         }
-        referenceId = rd.getStringConditional(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
         publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
@@ -140,19 +133,14 @@ public class AuthorizationData implements BaseProperties {
         return dataEncryptionAlgorithm;
     }
 
-    String referenceId;
-    public String getReferenceId() {
-        return referenceId;
-    }
-
     byte[] dataEncryptionKey;
     public byte[] getDataEncryptionKey() {
         return dataEncryptionKey;
     }
 
-    ResponseToChallenge[] optionalChallengeResults;
-    public ResponseToChallenge[] getOptionalChallengeResults() {
-        return optionalChallengeResults;
+    UserResponseItem[] optionalUserResponseItems;
+    public UserResponseItem[] getOptionalUserResponseItems() {
+        return optionalUserResponseItems;
     }
 
     byte[] requestHash;

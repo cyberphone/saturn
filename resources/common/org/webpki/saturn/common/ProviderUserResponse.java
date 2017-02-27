@@ -21,9 +21,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
 
-import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -34,36 +32,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.json.encryption.DataEncryptionAlgorithms;
 
 public class ProviderUserResponse implements BaseProperties {
-
-    public class PrivateMessage {
-        
-        private PrivateMessage(JSONObjectReader rd) {
-            this.root = rd;
-        }
-
-        GregorianCalendar dateTime;
-
-        JSONObjectReader root;
-        public JSONObjectReader getRoot() {
-            return root;
-        }
-
-        String commonName;
-        public String getCommonName() {
-            return commonName;
-        }
-
-        String text;
-        public String getText() {
-            return text;
-        }
-
-        ChallengeField[] optionalChallengeFields;
-        public ChallengeField[] getOptionalChallengeFields() {
-            return optionalChallengeFields;
-        }
-    }
-
+ 
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, rd);
         encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON).getEncryptionObject().require(false);
@@ -72,44 +41,27 @@ public class ProviderUserResponse implements BaseProperties {
 
     JSONDecryptionDecoder encryptedData;
     
-    public PrivateMessage getPrivateMessage(byte[] dataEncryptionKey,
-                                            DataEncryptionAlgorithms dataEncryptionAlgorithm)
+    public EncryptedMessage getEncryptedMessage(byte[] dataEncryptionKey,
+                                                DataEncryptionAlgorithms dataEncryptionAlgorithm)
     throws IOException, GeneralSecurityException {
         if (encryptedData.getDataEncryptionAlgorithm() != dataEncryptionAlgorithm) {
             throw new IOException("Unexpected data encryption algorithm:" + encryptedData.getDataEncryptionAlgorithm().toString());
         }
-        JSONObjectReader rd = JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey)); 
-        PrivateMessage privateMessage = new PrivateMessage(rd);
-        privateMessage.commonName = rd.getString(COMMON_NAME_JSON);
-        privateMessage.text = rd.getString(TEXT_JSON);
-        if (rd.hasProperty(CHALLENGE_FIELDS_JSON)) {
-            LinkedHashMap<String,ChallengeField> fields = new LinkedHashMap<String,ChallengeField>();
-            JSONArrayReader ar = rd.getArray(CHALLENGE_FIELDS_JSON);
-             do {
-                ChallengeField challengeField = new ChallengeField(ar.getObject());
-                if (fields.put(challengeField.getId(), challengeField) != null) {
-                    throw new IOException("Duplicate: " + challengeField.getId());
-                }
-            } while (ar.hasMore());
-             privateMessage.optionalChallengeFields = fields.values().toArray(new ChallengeField[0]);
-        }
-        privateMessage.dateTime = rd.getDateTime(TIME_STAMP_JSON);
-        rd.checkForUnread();
-        return privateMessage;
+        return new EncryptedMessage(JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey))); 
     }
 
-    public static JSONObjectWriter encode(String commonName,
+    public static JSONObjectWriter encode(String requester,
                                           String text,
-                                          ChallengeField[] optionalChallengeFields,
+                                          UserChallengeItem[] optionalUserChallengeItems,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm) throws IOException, GeneralSecurityException {
         JSONObjectWriter wr = new JSONObjectWriter()
-            .setString(COMMON_NAME_JSON, commonName)
+            .setString(REQUESTER_JSON, requester)
             .setString(TEXT_JSON, text);
-        if (optionalChallengeFields != null && optionalChallengeFields.length > 0) {
-            JSONArrayWriter aw = wr.setArray(CHALLENGE_FIELDS_JSON);
-            for (ChallengeField challengeField : optionalChallengeFields) {
-                aw.setObject(challengeField.writeObject());
+        if (optionalUserChallengeItems != null && optionalUserChallengeItems.length > 0) {
+            JSONArrayWriter aw = wr.setArray(USER_CHALLENGE_ITEMS_JSON);
+            for (UserChallengeItem UserChallengeItem : optionalUserChallengeItems) {
+                aw.setObject(UserChallengeItem.writeObject());
             }
         }
         wr.setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true);
@@ -119,5 +71,5 @@ public class ProviderUserResponse implements BaseProperties {
                                                                dataEncryptionAlgorithm,
                                                                null,
                                                                dataEncryptionKey));
-     }
+    }
 }

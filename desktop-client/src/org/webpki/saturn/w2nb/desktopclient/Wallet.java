@@ -52,7 +52,6 @@ import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-import java.util.Date;
 
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -99,13 +98,14 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.ResponseToChallenge;
+import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderUserResponse;
-import org.webpki.saturn.common.ChallengeField;
+import org.webpki.saturn.common.EncryptedMessage;
+import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.WalletAlertMessage;
 
 import org.webpki.w2nbproxy.BrowserWindow;
@@ -486,7 +486,7 @@ public class Wallet {
             ((CardLayout)views.getLayout()).show(views, VIEW_SELECTION);
         }
 
-        void userPayEvent(ResponseToChallenge[] challengeResults) {
+        void userPayEvent(UserResponseItem[] challengeResults) {
             if (userAuthorizationSucceeded(challengeResults)) {
 
                 // The user have done his/her part, now it is up to the rest of
@@ -737,10 +737,10 @@ public class Wallet {
             dialog.setVisible(true);
         }
 
-        void showProviderDialog (ProviderUserResponse.PrivateMessage privateMessage) {
+        void showProviderDialog (EncryptedMessage encryptedMessage) {
             final LinkedHashMap<String,JTextField> challengeTextFields = new LinkedHashMap<String,JTextField>();
             final JDialog dialog =
-                new JDialog(frame, "Message from: " + privateMessage.getCommonName(), true);
+                new JDialog(frame, "Message from: " + encryptedMessage.getRequester(), true);
             Container pane = dialog.getContentPane();
             pane.setLayout(new GridBagLayout());
             pane.setBackground(Color.WHITE);
@@ -748,23 +748,23 @@ public class Wallet {
             c.anchor = GridBagConstraints.WEST;
             c.insets = new Insets(fontSize, fontSize * 2, fontSize, fontSize * 2);
             pane.add(getImageLabel("information.png"), c);
-            JLabel messageText = new JLabel(processExternalHtml(privateMessage.getText()));
+            JLabel messageText = new JLabel(processExternalHtml(encryptedMessage.getText()));
             messageText.setFont(standardFont);
             c.insets = new Insets(0, fontSize * 2, 0, fontSize * 2);
             c.gridy = 1;
             pane.add(messageText, c);
-            final boolean hasSubmit = privateMessage.getOptionalChallengeFields() != null;
+            final boolean hasSubmit = encryptedMessage.getOptionalUserChallengeItems() != null;
             if (hasSubmit) {
                 c.insets = new Insets(fontSize, fontSize * 2, 0, fontSize * 2);
-                for (ChallengeField challengeField : privateMessage.getOptionalChallengeFields()) {
+                for (UserChallengeItem userChallengeItem : encryptedMessage.getOptionalUserChallengeItems()) {
                     c.gridy++;
                     JTextField submitData =
-                        (challengeField.getType() == ChallengeField.TYPE.NUMERIC_SECRET ||
-                         challengeField.getType() == ChallengeField.TYPE.ALPHANUMERIC_SECRET) ?
-                            new JPasswordField(challengeField.getLength()) : new JTextField(challengeField.getLength());
+                        (userChallengeItem.getType() == UserChallengeItem.TYPE.NUMERIC_SECRET ||
+                         userChallengeItem.getType() == UserChallengeItem.TYPE.ALPHANUMERIC_SECRET) ?
+                            new JPasswordField(userChallengeItem.getLength()) : new JTextField(userChallengeItem.getLength());
                     submitData.setFont(standardFont);
                     pane.add(submitData, c);
-                    challengeTextFields.put(challengeField.getId(), submitData);
+                    challengeTextFields.put(userChallengeItem.getId(), submitData);
                 }
             }
             JButton okOrSubmitButton = hasSubmit ? new JButton(BUTTON_SUBMIT) : new JButtonSlave(BUTTON_OK, authorizationCancelButton);
@@ -786,13 +786,13 @@ public class Wallet {
                     dialog.setVisible(false);
                     windowAdapter.windowClosing(null);
                     if (hasSubmit) {
-                        Vector<ResponseToChallenge> results = new Vector<ResponseToChallenge>();
+                        Vector<UserResponseItem> results = new Vector<UserResponseItem>();
                         for (String id : challengeTextFields.keySet()) {
                             JTextField inputText = challengeTextFields.get(id);
-                            results.add(new ResponseToChallenge(id, inputText instanceof JPasswordField ?
+                            results.add(new UserResponseItem(id, inputText instanceof JPasswordField ?
                                     new String(((JPasswordField)inputText).getPassword()) : inputText.getText()));
                         }
-                        userPayEvent(results.toArray(new ResponseToChallenge[0]));
+                        userPayEvent(results.toArray(new UserResponseItem[0]));
                     }
                 }
             });
@@ -977,10 +977,10 @@ public class Wallet {
                                                                      optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
-                            ProviderUserResponse.PrivateMessage privateMessage = new ProviderUserResponse(optionalMessage)
-                                .getPrivateMessage(dataEncryptionKey, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
-                            logger.info("Decrypted private message:\n" + privateMessage.getRoot());
-                            showProviderDialog(privateMessage);
+                            EncryptedMessage encryptedMessage = new ProviderUserResponse(optionalMessage)
+                                .getEncryptedMessage(dataEncryptionKey, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
+                            logger.info("Decrypted private message:\n" + encryptedMessage.getRoot());
+                            showProviderDialog(encryptedMessage);
                         } else {
                             terminatingError(processExternalHtml(new WalletAlertMessage(optionalMessage).getText()));
                         }
@@ -1044,7 +1044,7 @@ public class Wallet {
             return false;
         }
 
-        boolean userAuthorizationSucceeded(ResponseToChallenge[] challengeResults) {
+        boolean userAuthorizationSucceeded(UserResponseItem[] challengeResults) {
             try {
                 if (pinBlockCheck()) {
                     return false;
@@ -1059,7 +1059,6 @@ public class Wallet {
                         dataEncryptionKey,
                         DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                         challengeResults,
-                        "#" + Long.toString(new Date().getTime()),
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
                             @Override

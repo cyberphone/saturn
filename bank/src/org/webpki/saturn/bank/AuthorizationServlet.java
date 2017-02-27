@@ -33,7 +33,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
-import org.webpki.saturn.common.ChallengeField;
+import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AccountDescriptor;
@@ -134,17 +134,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // RBA v0.001...
         if (amount.compareTo(DEMO_RBA_LIMIT) >= 0 &&
-            (authorizationData.getOptionalChallengeResults() == null ||
-             !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
+            (authorizationData.getOptionalUserResponseItems() == null ||
+             !authorizationData.getOptionalUserResponseItems()[0].getText().equals("garbo"))) {
             return createPrivateMessage("Transaction requests exceeding " +
                                             amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
                                             " requires additional user authentication to " +
                                             "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
                                             "<p>Since <i>this is a demo</i>, " +
                                             "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
-                                        new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
+                                        new UserChallengeItem[]{new UserChallengeItem(RBA_PARM_MOTHER,
                                                 amount.compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
-                                                        ChallengeField.TYPE.ALPHANUMERIC : ChallengeField.TYPE.ALPHANUMERIC_SECRET,
+                                                        UserChallengeItem.TYPE.ALPHANUMERIC : UserChallengeItem.TYPE.ALPHANUMERIC_SECRET,
                                                                                 20,
                                                                                 null)},
                                         authorizationData);

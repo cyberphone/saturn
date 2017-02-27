@@ -25,7 +25,6 @@ import java.net.NetworkInterface;
 import java.net.URL;
 
 import java.security.GeneralSecurityException;
-
 import java.security.KeyStore;
 import java.security.PublicKey;
 
@@ -45,7 +44,6 @@ import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 
@@ -55,11 +53,13 @@ import org.webpki.util.ISODateTime;
 
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ProtectedAccountData;
+import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 
 import org.webpki.webutil.InitPropertyReader;
@@ -100,11 +100,17 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String W2NB_WALLET                  = "w2nb_wallet";
     
-    static final String USER_AUTH_SAMPLE             = "user-authorization.json";
+    static final String USER_AUTHZ_SAMPLE            = "user-authorization.json";
 
-    static final String SUPERCARD_AUTH_SAMPLE        = "wallet-supercard-auth.png";
+    static final String USER_CHALL_AUTHZ_SAMPLE      = "user-challenged-authorization.json";
 
-    static final String BANKDIRECT_AUTH_SAMPLE       = "wallet-bankdirect-auth.png";
+    static final String ENCRYPTED_MESSAGE_SAMPLE     = "encrypted-message.json";
+
+    static final String PROV_USER_RESPONSE_SAMPLE    = "provider-user-response.json";
+
+    static final String SUPERCARD_AUTHZ_SAMPLE       = "wallet-supercard-auth.png";
+
+    static final String BANKDIRECT_AUTHZ_SAMPLE      = "wallet-bankdirect-auth.png";
 
     static final String VERSION_CHECK                = "android_webpki_versions";
 
@@ -136,13 +142,19 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String w2nbWalletName;
     
     // Debug mode samples
-    static JSONObjectReader userAuthorizationSample;
+    static JSONObjectReader userAuthzSample;
+
+    static JSONObjectReader userChallAuthzSample;
+
+    static JSONObjectReader encryptedMessageSample;
+
+    static JSONObjectReader providerUserResponseSample;
 
     static JSONObjectWriter protectedAccountData;
 
-    static String walletSupercardAuth;
+    static String walletSupercardAuthz;
 
-    static String walletBankdirectAuth;
+    static String walletBankdirectAuthz;
     
     static PaymentNetwork primaryMerchant;
     
@@ -168,6 +180,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
+    }
+
+    JSONObjectReader readJSONFile(String name) throws IOException {
+        return JSONParser.parse(
+                ArrayUtil.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name)));        
     }
 
     String getImageDataURI (String name) throws IOException  {
@@ -271,12 +288,17 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             merchantBaseUrl = getURL(getPropertyString(MERCHANT_BASE_URL));
 
-            new AuthorizationData(userAuthorizationSample = JSONParser.parse(
-                    ArrayUtil.getByteArrayFromInputStream (this.getClass().getResourceAsStream(USER_AUTH_SAMPLE))));
+            new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
 
-            walletSupercardAuth = getImageDataURI(SUPERCARD_AUTH_SAMPLE);
+            new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));
 
-            walletBankdirectAuth = getImageDataURI(BANKDIRECT_AUTH_SAMPLE);
+            new EncryptedMessage(encryptedMessageSample = readJSONFile(ENCRYPTED_MESSAGE_SAMPLE));
+
+            new ProviderUserResponse(providerUserResponseSample = readJSONFile(PROV_USER_RESPONSE_SAMPLE));
+
+            walletSupercardAuthz = getImageDataURI(SUPERCARD_AUTHZ_SAMPLE);
+
+            walletBankdirectAuthz = getImageDataURI(BANKDIRECT_AUTHZ_SAMPLE);
 
             protectedAccountData = 
                 ProtectedAccountData.encode(new AccountDescriptor(PayerAccountTypes.SUPER_CARD.getTypeUri(),

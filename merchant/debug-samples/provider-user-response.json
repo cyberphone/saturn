@@ -1,0 +1,10 @@
+{
+  "@context": "http://webpki.org/saturn/v3",
+  "@qualifier": "ProviderUserResponse",
+  "encryptedMessage": {
+    "algorithm": "A128CBC-HS256",
+    "iv": "sL0nvNEn6y8dt-JSHhedXg",
+    "tag": "T059QPXfYv4-lxdV-Xmnkg",
+    "cipherText": "OykWvXr15oK2_TuoL8xbs1ysUbEzM6cJW1ZKycKF_Db2GMyuUdezWiWUjFV33Ia6tukRI9LtXU4W6FyzCKgLQiIt25lW6b_uze9bXfytwHKOK1_0IlcaK4U9GoiWMKku6nEr4V4jaezRk5sABU4VGRHXNW5GMXaRZRbR7kuWItmNnfO-8erb6503eO2r9J2RNi3bnQJ67FHsgM2LdTrgN1OvcTi9qGnyw2N1VvPt_ZZuz8lKgj13gmy4S1McZAmuFDtFc5hNOlZkiUlFevcvmLazSeKWiR26Rsz6QkVNRA4aS3ZQG92p4P6PFH1BaPEXCwKWrhQ5FVeg0gI8FIs4XNlLjpEDN0EPS1yjtNMv6J1ZyVWg1S5Si1760eh9gjGK9I14AKTak9N8Ol1wzIgtcKgxzv5ee8wfWIUzPzFzu_jNJYoiIZHzxt-aFfE-8omYhqFB7757S4Fa_z2yYkxXd4EwjIVbIpcJCkaPonjq2yNrFBDQvr3d-SmlF220reiw"
+  }
+}

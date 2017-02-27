@@ -34,7 +34,7 @@ import org.webpki.saturn.common.FinalizeCardpayResponse;
 import org.webpki.saturn.common.FinalizeCreditResponse;
 import org.webpki.saturn.common.FinalizeTransactionRequest;
 import org.webpki.saturn.common.FinalizeTransactionResponse;
-import org.webpki.saturn.common.ChallengeField;
+import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.FinalizeRequest;
@@ -139,8 +139,8 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
 
         // RBA v0.001...
         if (paymentRequest.getAmount().compareTo(DEMO_RBA_LIMIT) >= 0 &&
-            (authorizationData.getOptionalChallengeResults() == null ||
-             !authorizationData.getOptionalChallengeResults()[0].getText().equals("garbo"))) {
+            (authorizationData.getOptionalUserResponseItems() == null ||
+             !authorizationData.getOptionalUserResponseItems()[0].getText().equals("garbo"))) {
             return ProviderUserResponse.encode(BankService.bankCommonName,
                                                "Transaction requests exceeding " +
                                                amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
@@ -148,8 +148,8 @@ public class ExtendedServiceServlet extends ProcessingBaseServlet {
                                                "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
                                                "<p>Since <i>this is a demo</i>, " +
                                                "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
-                                               new ChallengeField[]{new ChallengeField(RBA_PARM_MOTHER,
-                                                                        ChallengeField.TYPE.ALPHANUMERIC,
+                                               new UserChallengeItem[]{new UserChallengeItem(RBA_PARM_MOTHER,
+                                                                        UserChallengeItem.TYPE.ALPHANUMERIC,
                                                                     20,
                                                                     null)},
                                                authorizationData.getDataEncryptionKey(),
