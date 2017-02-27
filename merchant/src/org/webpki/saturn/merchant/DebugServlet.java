@@ -255,7 +255,7 @@ class DebugPrintout implements BaseProperties {
             point.sub() +
             "</p><p>The result of this process is not supposed be " +
             "directly available to the <b>Merchant</b> since it contains potentially sensitive user data.&nbsp;&nbsp;" +
-            "For an example turn to <a href=\"#secretdata\">Unecrypted User Authorization</a>.</p><p>" +
+            "For an example turn to <a href=\"#userauthz\">Unecrypted User Authorization</a>.</p><p>" +
             point +
             "</p><p>Therefore the result is <i>encrypted</i> (using a key supplied by the <b>User&nbsp;Bank</b> as a part of the " +
             "payment credential) before it is returned to the <b>Merchant</b>:</p>");
@@ -283,7 +283,7 @@ class DebugPrintout implements BaseProperties {
         } else {
             standardMode();
         }
-        description("<p id=\"secretdata\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">Unencrypted User Authorization</p>" +
+        description("<p id=\"userauthz\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">Unencrypted User Authorization</p>" +
             "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted:");
 
         fancyBoxNoClean(MerchantService.userAuthzSample);
@@ -301,11 +301,48 @@ class DebugPrintout implements BaseProperties {
             keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
             " like insufficient funds or a need asking the user to provide additional authorization information.</p><p>" + 
             keyWord(JSONSignatureDecoder.SIGNATURE_JSON) + " holds the user's authorization signature.</p>");
+        description("<p id=\"provuserresp\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">" +
+            Messages.PROVIDER_USER_RESPONSE.toString() +
+            "</p>" +
+                "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted:");
         fancyBox(MerchantService.providerUserResponseSample);
-
-        fancyBoxNoClean(MerchantService.encryptedMessageSample);
-        
+        description("The message in the " +
+        keyWord(ENCRYPTED_MESSAGE_JSON) +
+        " object is then decrypted using the " +
+        keyWord(ENCRYPTION_PARAMETERS_JSON) +
+        " the <b>Wallet</b> included in the preceding " +
+        "user authentication object.");
+        fancyBoxNoClean(MerchantService.encryptedMessageSample.getRoot());
+        descriptionStdMargin("<p>Note that if there are no " +
+        keyWord(USER_CHALLENGE_ITEMS_JSON) +
+        " elements, there is only a text message to the user like &quot;Out of funds&quot; " +
+        "and the payment process terminates.</p><p>" +
+        "However, in the case above there is a " +
+        keyWord(USER_CHALLENGE_ITEMS_JSON) +
+        " list which must be handled by a specific RBA dialog:</p>");
+        descriptionStdMargin("<div style=\"margin-left:auto;margin-right:auto;width:30em;background-color:#f0f0f0;border-width:1px;" +
+        "border-style:solid;border-color:black;box-shadow:3pt 3pt 3pt #D0D0D0;\">" +
+        "<style scoped>" +
+        " .button {border-radius:3pt;background-color:#e0e0e0;width:6em;text-align:center;border-width:1px;border-style:solid;border-color:#a9a9a9;padding:2pt}" +
+        "</style>" +
+        "<div style=\"background-color:blue;color:white;font-size:larger;text-align:center;padding:5pt\">Requester: " +
+        MerchantService.encryptedMessageSample.getRequester() +        
+        "</div><div style=\"margin:10pt 10pt 0pt 10pt\">" +
+        MerchantService.encryptedMessageSample.getText() +
+        "</div><div style=\"margin:5pt 10pt 0pt 10pt;width:" + 
+        MerchantService.encryptedMessageSample.getOptionalUserChallengeItems()[0].getLength() +
+        "em;background-color:white;border-width:1px;padding:1pt 0pt 2pt 4pt;border-style:solid;border-color:#a9a9a9;margin-top:3pt\">"+
+        "\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf</div>" +
+        "<table style=\"margin-left:auto;margin-right:auto;margin-top:12pt;margin-bottom:12pt\"><tr><td><div class=\"button\">Cancel</div></td><td style=\"width:4em\"></td><td><div class=\"button\">Submit!</div></tr></table>" +
+        "</div>");
+        description("When the user have issued the requested data the <b>Wallet</b> creates a new user authentication object which " +
+        "now also contains a matching " +
+        keyWord(USER_RESPONSE_ITEMS_JSON) +
+        " list:");
         fancyBoxNoClean(MerchantService.userChallAuthzSample);
+        descriptionStdMargin("<p>This object is returned to the <b>Merchant</b> in a " +
+        keyWord(Messages.PAYER_AUTHORIZATION.toString()) + " message.</p><p>This process may be repeated " +
+        "until <b>User&nbsp;Bank</b> is satisfied or blocks further attempts.</p>");
 
         description("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }
@@ -566,7 +603,7 @@ class DebugPrintout implements BaseProperties {
                              "to retrieve the designated card processor's encryption keys:</p>");
             fancyBox(debugData.acquirerAuthority);
         }
-        description("<p>After retrieving the <a href=\"#secretdata\">Unencrypted User Authorization</a>, " +
+        description("<p>After retrieving the <a href=\"#userauthz\">Unencrypted User Authorization</a>, " +
             "the called <b>User&nbsp;Bank</b> invokes the local payment backend (to verify the account, check funds, etc.) " +
             "<i>which is outside of this specification and implementation</i>.</p><p>" +
             point +
@@ -608,7 +645,7 @@ class DebugPrintout implements BaseProperties {
                         "</p><p>The following printout " +
                         "shows a <i>sample</i> of protected account data:</p>");
 
-                    fancyBox(MerchantService.protectedAccountData);
+     //               fancyBox(MerchantService.protectedAccountData);
                 
                     finalDescription = "<p>After this step the card network is invoked <i>which is outside of this specification and implementation</i>.</p>";
                 } else {

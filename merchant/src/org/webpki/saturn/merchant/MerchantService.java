@@ -49,16 +49,12 @@ import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
-import org.webpki.util.ISODateTime;
 
-import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PayerAccountTypes;
-import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
-import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 
@@ -146,7 +142,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static JSONObjectReader userChallAuthzSample;
 
-    static JSONObjectReader encryptedMessageSample;
+    static EncryptedMessage encryptedMessageSample;
 
     static JSONObjectReader providerUserResponseSample;
 
@@ -292,20 +288,13 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));
 
-            new EncryptedMessage(encryptedMessageSample = readJSONFile(ENCRYPTED_MESSAGE_SAMPLE));
+            encryptedMessageSample = new EncryptedMessage(readJSONFile(ENCRYPTED_MESSAGE_SAMPLE));
 
             new ProviderUserResponse(providerUserResponseSample = readJSONFile(PROV_USER_RESPONSE_SAMPLE));
 
             walletSupercardAuthz = getImageDataURI(SUPERCARD_AUTHZ_SAMPLE);
 
             walletBankdirectAuthz = getImageDataURI(BANKDIRECT_AUTHZ_SAMPLE);
-
-            protectedAccountData = 
-                ProtectedAccountData.encode(new AccountDescriptor(PayerAccountTypes.SUPER_CARD.getTypeUri(),
-                                                                  "6875056745552109"),
-                                            new CardSpecificData("Luke Skywalker",
-                                                                 ISODateTime.parseDateTime("2019-12-31T00:00:00Z"),
-                                                                 "943"));
 
             if (getPropertyString(TEST_MODE).length () > 0) {
                 testMode = getPropertyBoolean(TEST_MODE);
