@@ -1,6 +1,7 @@
 {
   "requestHash": {
     "algorithm": "S256",
+    "value": "-4eOBmRokt6j8EcfYPYl0l72Zqjb_T1C_W-zEiEA3Go"
   },
   "domainName": "demomerchant.com",
   "account": {
@@ -9,7 +10,9 @@
   },
   "encryptionParameters": {
     "algorithm": "A128CBC-HS256",
+    "key": "TUHDPlBvft_UpeR0DglGp6lDVjOhfDyVVuk1wy8wvTs"
   },
+  "timeStamp": "2017-02-27T09:06:32+01:00",
   "software": {
     "name": "WebPKI.org - Wallet",
     "version": "1.00"
@@ -22,5 +25,6 @@
       "x": "rQ4WXMB6_wQKHSiY_mbJ4QkGpfWLssF7hvIiiFpDEx8",
       "y": "Fh2rl0LGTtvaomOuhuRNo9Drz9o0--WXV2ITvdVQFRY"
     },
+    "value": "iy8tcUpiOimvPJDv9GdHWwBmItl290iU-32CAYGyaIJIOS8N-lfQCoAJ4D0FETEt6RhcDGgBKk2gnzoZBT4WyA"
   }
 }
