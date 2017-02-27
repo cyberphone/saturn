@@ -104,14 +104,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         if (diff > (MAX_CLIENT_CLOCK_SKEW + MAX_CLIENT_AUTH_AGE) || diff < -MAX_CLIENT_CLOCK_SKEW) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
             sdf.setTimeZone(authorizationData.getTimeStamp().getTimeZone());
-            return createPrivateMessage("Either your request is older than " + 
-                                            (MAX_CLIENT_AUTH_AGE / 60000) +
-                                            " minutes, or your device clock is incorrect.<p>Timestamp=" +
-                                            "<span style=\"white-space:nowrap\">" + 
-                                            sdf.format(authorizationData.getTimeStamp().getTime()) +
-                                            "</span>.</p>",
-                                        null,
-                                        authorizationData);
+            return createProviderUserResponse("Either your request is older than " + 
+                                                (MAX_CLIENT_AUTH_AGE / 60000) +
+                                                " minutes, or your device clock is incorrect.<p>Timestamp=" +
+                                                "<span style=\"white-space:nowrap\">" + 
+                                                sdf.format(authorizationData.getTimeStamp().getTime()) +
+                                                "</span>.</p>",
+                                              null,
+                                              authorizationData);
         }
             
         // Merchant provides the client's IP address which can be used for RBA
@@ -125,29 +125,29 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         BigDecimal amount = paymentRequest.getAmount();
         // Sorry but you don't appear to have a million bucks :-)
         if (amount.compareTo(DEMO_ACCOUNT_LIMIT) >= 0) {
-            return createPrivateMessage("Your request for " + 
-                                            amountInHtml(paymentRequest, amount) +
-                                            " appears to be slightly out of your current capabilities...",
-                                        null,
-                                        authorizationData);
+            return createProviderUserResponse("Your request for " + 
+                                                amountInHtml(paymentRequest, amount) +
+                                                " appears to be slightly out of your current capabilities...",
+                                              null,
+                                              authorizationData);
         }
 
         // RBA v0.001...
         if (amount.compareTo(DEMO_RBA_LIMIT) >= 0 &&
             (authorizationData.getOptionalUserResponseItems() == null ||
              !authorizationData.getOptionalUserResponseItems()[0].getText().equals("garbo"))) {
-            return createPrivateMessage("Transaction requests exceeding " +
-                                            amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
-                                            " require additional user authentication to " +
-                                            "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
-                                            "<p>Since <i>this is a demo</i>, " +
-                                            "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
-                                        new UserChallengeItem[]{new UserChallengeItem(RBA_PARM_MOTHER,
-                                                amount.compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
-                                                        UserChallengeItem.TYPE.ALPHANUMERIC : UserChallengeItem.TYPE.ALPHANUMERIC_SECRET,
-                                                                                20,
-                                                                                null)},
-                                        authorizationData);
+            return createProviderUserResponse("Transaction requests exceeding " +
+                                                amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
+                                                " require additional user authentication to " +
+                                                "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
+                                                "<p>Since <i>this is a demo</i>, " +
+                                                "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
+                                              new UserChallengeItem[]{new UserChallengeItem(RBA_PARM_MOTHER,
+                                                    amount.compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
+                                                         UserChallengeItem.TYPE.ALPHANUMERIC : UserChallengeItem.TYPE.ALPHANUMERIC_SECRET,
+                                                                                           20,
+                                                                                           null)},
+                                              authorizationData);
         }
 
         // Pure sample data...

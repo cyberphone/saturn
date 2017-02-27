@@ -186,9 +186,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                "</span>";
     }
 
-    static JSONObjectWriter createPrivateMessage(String text,
-                                                 UserChallengeItem[] optionalUserChallengeItems,
-                                                 AuthorizationData authorizationData) throws IOException, GeneralSecurityException {
+    throws IOException, GeneralSecurityException {
         return ProviderUserResponse.encode(BankService.bankCommonName,
                                            text,
                                            optionalUserChallengeItems,
