@@ -25,12 +25,9 @@ public class ProtectedAccountData implements BaseProperties {
     
     public static JSONObjectWriter encode(AccountDescriptor account,
                                           CardSpecificData cardSpecificData) throws IOException {
-        JSONObjectWriter wr = new JSONObjectWriter()
-            .setObject(ACCOUNT_JSON, account.writeObject());
-        if (cardSpecificData != null) {
-            cardSpecificData.writeData(wr);
-        }
-        return wr;
+        return new JSONObjectWriter()
+            .setObject(ACCOUNT_JSON, account.writeObject())
+            .setDynamic((wr) -> cardSpecificData == null ? wr : cardSpecificData.writeData(wr));
     }
     
     JSONObjectReader root;

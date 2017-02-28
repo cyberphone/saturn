@@ -43,14 +43,12 @@ public class PaymentRequest implements BaseProperties {
                                           GregorianCalendar timeStamp,
                                           GregorianCalendar expires,
                                           JSONAsymKeySigner signer) throws IOException {
-        JSONObjectWriter paymentRequest = new JSONObjectWriter()
+        return new JSONObjectWriter()
             .setObject(PAYEE_JSON, payee.writeObject())
             .setBigDecimal(AMOUNT_JSON, amount, currency.getDecimals())
-            .setString(CURRENCY_JSON, currency.toString());
-        if (optionalNonDirectPayment != null) {
-            paymentRequest.setString(NON_DIRECT_PAYMENT_JSON, optionalNonDirectPayment.toString());
-        }
-        return paymentRequest
+            .setString(CURRENCY_JSON, currency.toString())
+            .setDynamic((wr) -> optionalNonDirectPayment == null ?
+                    wr : wr.setString(NON_DIRECT_PAYMENT_JSON, optionalNonDirectPayment.toString()))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, timeStamp, true)
             .setDateTime(EXPIRES_JSON, expires, true)
