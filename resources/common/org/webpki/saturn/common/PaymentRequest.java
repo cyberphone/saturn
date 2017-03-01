@@ -47,8 +47,13 @@ public class PaymentRequest implements BaseProperties {
             .setObject(PAYEE_JSON, payee.writeObject())
             .setBigDecimal(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
-            .setDynamic((wr) -> optionalNonDirectPayment == null ?
-                    wr : wr.setString(NON_DIRECT_PAYMENT_JSON, optionalNonDirectPayment.toString()))
+            .setDynamic(new org.webpki.json.JSONObjectWriter.JSONSetDynamic() {
+                
+                @Override
+                public JSONObjectWriter set(JSONObjectWriter wr) throws IOException {
+                    return optionalNonDirectPayment == null ?
+                   wr : wr.setString(NON_DIRECT_PAYMENT_JSON, optionalNonDirectPayment.toString());
+                }})
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, timeStamp, true)
             .setDateTime(EXPIRES_JSON, expires, true)

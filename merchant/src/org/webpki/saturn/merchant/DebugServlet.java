@@ -46,6 +46,7 @@ import org.webpki.util.ISODateTime;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
+import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.Version;
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.PayerAccountTypes;
@@ -245,6 +246,16 @@ class DebugPrintout implements BaseProperties {
             keyWord(PAYMENT_REQUEST_JSON) + " objects to the <b>Wallet</b>:</p>");
 
         fancyBox(debugData.InvokeWallet);
+        if (debugData.gasStation) {
+            descriptionStdMargin("Note that there is a property " +
+                keyWord(NON_DIRECT_PAYMENT_JSON) + 
+                " having the value " +
+                keyWord(NonDirectPayments.GAS_STATION.toString()) +
+                " which means that there is a <i>reservation phase</i> involving the user, " +
+                "followed by an actual payment operation for a usually considerably lower " +
+                keyWord(AMOUNT_JSON) + ". This mode should preferably be indicated " +
+                "in the <b>Wallet</b> UI.");
+        }
         
         description(point.sub() +
             "<p>After an <i>optional</i> selection of account (card) in the <b>Wallet</b> UI, the user " +

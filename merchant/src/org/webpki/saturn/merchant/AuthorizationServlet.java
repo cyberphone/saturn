@@ -209,6 +209,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 }
             }
             session.setAttribute(GAS_STATION_RES_SESSION_ATTR, cardOperation);
+            if (debug) {
+                debugData.gasStation = true;
+            }
         }
         return true;
     }
