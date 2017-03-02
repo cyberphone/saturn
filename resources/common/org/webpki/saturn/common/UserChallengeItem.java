@@ -26,9 +26,9 @@ public class UserChallengeItem implements BaseProperties {
     public static enum TYPE {NUMERIC, ALPHANUMERIC, NUMERIC_SECRET, ALPHANUMERIC_SECRET, GPS_COORDINATES, SMS_CALLBACK};
 
     public UserChallengeItem(String id,
-                          TYPE type,
-                          int length,
-                          String optionalLabel) {
+                             TYPE type,
+                             int length,
+                             String optionalLabel) {
         this.id = id;
         this.type = type;
         this.length = length;
