@@ -19,8 +19,8 @@
   <fail message="&quot;common.app.dir&quot; does not point to a valid installation directory!" unless="install.dir.found"/>
 
   <path id="compile.classpath">
-	 <fileset dir="${common.lib.dir}">
-	   <include name="*.jar"/>
+     <fileset dir="${common.lib.dir}">
+       <include name="*.jar"/>
     </fileset>
   </path>
   
@@ -30,15 +30,15 @@
   </target>
   
   <target name="build" depends="clean">
-	<loadresource property="java.dotted.path">
-	  <propertyresource name="client.package.dir"/>
-	  <filterchain>
-	    <tokenfilter>
-	      <filetokenizer/>
-	      <replacestring from="/" to="."/>
-	    </tokenfilter>
-	  </filterchain>
-	</loadresource>
+    <loadresource property="java.dotted.path">
+      <propertyresource name="client.package.dir"/>
+      <filterchain>
+        <tokenfilter>
+          <filetokenizer/>
+          <replacestring from="/" to="."/>
+        </tokenfilter>
+      </filterchain>
+    </loadresource>
     <mkdir dir="${temp.dir}" />
     <mkdir dir="${common.app.dir}/${w2nb.webwallet}" />
     <fixcrlf srcdir="${src.dir}"
@@ -54,7 +54,7 @@
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
-	       <include name="**/Wallet.java"/>
+           <include name="**/Wallet.java"/>
     </javac>
     <jar jarfile="${common.app.dir}/${w2nb.webwallet}/${w2nb.webwallet}.jar">
       <fileset dir="${temp.dir}">

@@ -286,15 +286,15 @@
 -->  
   <target name="_exportkey">
     <echo message="${original.file} ${keypassword} ${nodejs.file} ${qualifiers}"/>
-  	<java fork="yes"
-  		  classname="org.webpki.tools.KeyStore2PEMConverter"
-  		  dir="${key.dir}"
-		  failonerror="true">
-  		<classpath>
-  			 <fileset dir="${common.lib.dir}">
-  		        <include name="*.jar"/>
-  			 </fileset>
-  		</classpath>
+    <java fork="yes"
+          classname="org.webpki.tools.KeyStore2PEMConverter"
+          dir="${key.dir}"
+          failonerror="true">
+        <classpath>
+             <fileset dir="${common.lib.dir}">
+                <include name="*.jar"/>
+             </fileset>
+        </classpath>
         <arg line="${original.file} ${keypassword} ${nodejs.file} ${qualifiers}"/>
     </java>
   </target>

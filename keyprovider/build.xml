@@ -81,7 +81,7 @@
       <replacefilter token="@webpki-logotype@" value="${webpki-logotype.file}"/>
       <replacefilter token="@saturn-logotype@" value="${saturn-logotype.file}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
-	  <replacefilter token="@key-password@" value="${keypassword}"/>
+      <replacefilter token="@key-password@" value="${keypassword}"/>
       <replacefilter token="@keyprov-host@" value="${keyprov.host}"/>
       <replacefilter token="@bank-host@" value="${bank.host}"/>
       <replacefilter token="@android-webpki-versions@" value="${android.webpki.versions}"/>
@@ -170,11 +170,11 @@
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
      <property name="dist.dir" value="${ejbca.gen.path}"/>
      <path id="ejbca.compile.classpath">
-	    <fileset dir="${plugin.ejbca.ant.custom.enrollment_plugin_directory}/lib.common">
+        <fileset dir="${plugin.ejbca.ant.custom.enrollment_plugin_directory}/lib.common">
            <include name="*.jar"/>
         </fileset>
         <pathelement path="${ejbca.classpath}"/>
-	 </path>
+     </path>
      <antcall target="_build">
        <param name="javaversion" value="1.6"/>
 
@@ -192,7 +192,7 @@
      </antcall>
      <!-- Update application.xml -->
      <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">
-	    <replacetoken><![CDATA[</application>]]></replacetoken>
+        <replacetoken><![CDATA[</application>]]></replacetoken>
      </replace>
   </target>
   
@@ -218,16 +218,16 @@
  Optionally you can specify -Duu=0 which deletes ${appcorename}&#10;
  and replaces the directory with the unzipped content&#10;
 ***************************************************************&#10;"/>
-	<echo message="Producing ${appcorename} .zip and .zip.SHA1 files..."/> 
+    <echo message="Producing ${appcorename} .zip and .zip.SHA1 files..."/> 
     <property file="../resources/common.properties"/>
-	<delete file="${dd}/${appcorename}.zip" failonerror="false"/>
+    <delete file="${dd}/${appcorename}.zip" failonerror="false"/>
     <zip destfile="${dd}/${appcorename}.zip">
       <zipfileset dir="." prefix="${appcorename}">
-       	<exclude name="/**/.*"/>
+        <exclude name="/**/.*"/>
         <exclude name="/.tmp/**"/>
-       	<exclude name="**/.settings/**"/>
-       	<exclude name="**/bin/**"/>
-       	<exclude name="dist/**"/>
+        <exclude name="**/.settings/**"/>
+        <exclude name="**/bin/**"/>
+        <exclude name="dist/**"/>
       </zipfileset>
       <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
       <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>

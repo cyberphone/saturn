@@ -13,8 +13,8 @@
   <property file="../resources/common.properties"/>
   
   <path id="compile.classpath">
-	 <fileset dir="${common.lib.dir}">
-	   <include name="*.jar"/>
+     <fileset dir="${common.lib.dir}">
+       <include name="*.jar"/>
     </fileset>
   </path>
   

@@ -21,7 +21,7 @@
   
   <property environment="env"/>
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
-	
+    
   <path id="compile.classpath">
      <fileset dir="${common.lib.dir}">
        <include name="*.jar"/>
@@ -37,11 +37,11 @@
  
   <target name="_openkeystoresrc">
       <!-- The following MUST be set to match your installation/setup -->
-	  <property name="openkeystore.src" location="../../openkeystore/library/src"/>
-	  <condition property="openkeystore.src.found">
-	      <available file="${openkeystore.src}" type="dir"/>
-	  </condition>
-	  <fail message="&quot;openkeystore.src&quot; does not point to a valid installation directory!" unless="openkeystore.src.found"/>
+      <property name="openkeystore.src" location="../../openkeystore/library/src"/>
+      <condition property="openkeystore.src.found">
+          <available file="${openkeystore.src}" type="dir"/>
+      </condition>
+      <fail message="&quot;openkeystore.src&quot; does not point to a valid installation directory!" unless="openkeystore.src.found"/>
   </target>
   
   <target name="inittestpage">
@@ -325,23 +325,23 @@
   </target>
   
   <target name="_createcert">
-  	<java fork="yes"
-  		  classname="org.webpki.ca.CommandLineCA"
-  		  dir="${key.dir}"
-		  failonerror="true">
-  		<classpath>
-  			 <fileset dir="${common.lib.dir}">
-  		        <include name="*.jar"/>
-  			 </fileset>
-  		</classpath>
-  	    <arg line="${cmd} -out/keyalias mykey"/>
-  	</java>
+    <java fork="yes"
+          classname="org.webpki.ca.CommandLineCA"
+          dir="${key.dir}"
+          failonerror="true">
+        <classpath>
+             <fileset dir="${common.lib.dir}">
+                <include name="*.jar"/>
+             </fileset>
+        </classpath>
+        <arg line="${cmd} -out/keyalias mykey"/>
+    </java>
   </target>
 
   <target name="_getroot">
-	<exec executable="keytool" failonerror="true" dir="${key.dir}">
-	  <arg line="-exportcert -keystore ${rootfile}.p12 -alias mykey -storepass ${keypassword} -storetype PKCS12 -file ${rootfile}.cer"/>
-	</exec>
+    <exec executable="keytool" failonerror="true" dir="${key.dir}">
+      <arg line="-exportcert -keystore ${rootfile}.p12 -alias mykey -storepass ${keypassword} -storetype PKCS12 -file ${rootfile}.cer"/>
+    </exec>
   </target>
   
   <target name="_certpaymentnetwork">
@@ -453,7 +453,7 @@
        eol="lf"
        eof="remove"
        excludes=".git/**"
-       includes="**/*.java, **/*.json, **/*.js, **/*.properties, **/web.xml, **/*.html, **/*.svg"/>
+       includes="**/*.java, **/*.json, **/*.js, **/*.properties, **/web.xml, **/*.html, **/*.svg, **/build.xml"/>
   </target>
   
   <target name="createcerts">
