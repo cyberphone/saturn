@@ -445,6 +445,16 @@
        <param name="cmd" value="-selfsigned -entity/ee -subject &quot;CN=Mybank Key Management Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${kg2kmkey_ec}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
   </target>
+
+  <target name="srcclean">
+    <fixcrlf srcdir="../"
+       tab="remove"
+       tablength="4"
+       eol="lf"
+       eof="remove"
+       excludes=".git/**"
+       includes="**/*.java, **/*.json, **/*.js, **/*.properties, **/web.xml, **/*.html, **/*.svg"/>
+  </target>
   
   <target name="createcerts">
     <antcall target="_certpaymentnetwork"/>
