@@ -229,7 +229,7 @@ class DebugPrintout implements BaseProperties {
             "<p>Current mode: <i>" +
             (debugData.nativeMode ? "Saturn &quot;Native&quot; " +
             (debugData.acquirerMode ? "Card payment" : "Account-2-Account payment using " + (debugData.basicCredit ? "direct debit" : "reserve+finalize")) :
-            (debugData.basicCredit ? "Bank-to-Bank Payment" + (debugData.hybridMode ? " + Hybrid" :"") : "Card Payment")) +
+            (debugData.basicCredit ? debugData.hybridMode ? "Hybrid Payment" :"Bank-to-Bank Payment" : "Card Payment")) +
             "</i></p>");
         description(point +
             "<p>The user performs &quot;Checkout&quot; (after <i>optionally</i> selecting payment method), " +
@@ -254,7 +254,7 @@ class DebugPrintout implements BaseProperties {
                 " which means that there is a <i>reservation phase</i> involving the user, " +
                 "followed by an actual payment operation for a usually considerably lower " +
                 keyWord(AMOUNT_JSON) + ". This mode should preferably be indicated " +
-                "in the <b>Wallet</b> UI.");
+                "in the <b>Wallet</b> user interface.  See <a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/ui-demo/personalpaymentterminal.html\">[UIDEMO]</a>.");
         }
         
         description(point.sub() +
@@ -576,9 +576,6 @@ class DebugPrintout implements BaseProperties {
         authorizationResponse();
         if (debugData.hybridMode) {
             cardOrHybridPayment("User&nbspBank");
-            descriptionStdMargin(
-                "<p>Note that the actual payment process may be fully <i>asynchronous</i> where the " +
-                "authorization is only used for <i>initiation</i>.</p>");
        }
     }
 
