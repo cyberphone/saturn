@@ -450,8 +450,8 @@ class DebugPrintout implements BaseProperties {
                 "<li>Verifying that the " +
                 keyWord(TIME_STAMP_JSON) +
                 " in the user authorization object is within limits like " +
-                "<span style=\"white-space:nowrap\">-(<i>AllowedClientClockSkew</i> + <i>AuthorizationMaxAge</i>)" +
-                " to <i>AllowedClientClockSkew</i></span> with respect to current time.</li>" +
+                "<span style=\"white-space:nowrap\">-<i>AllowedClientClockSkew</i>" +
+                " to (<i>AllowedClientClockSkew</i> + <i>AuthorizationMaxAge</i>)</span> with respect to current time.</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) +
                 " and " +
