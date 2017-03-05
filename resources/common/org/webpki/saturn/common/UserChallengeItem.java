@@ -23,23 +23,44 @@ import org.webpki.json.JSONObjectWriter;
 
 public class UserChallengeItem implements BaseProperties {
 
-    public static enum TYPE {NUMERIC, ALPHANUMERIC, NUMERIC_SECRET, ALPHANUMERIC_SECRET, GPS_COORDINATES, SMS_CALLBACK};
+    public static enum TYPE {
+
+        NUMERIC(true),
+        ALPHANUMERIC(true),
+        NUMERIC_SECRET(true),
+        ALPHANUMERIC_SECRET(true),
+        GPS_COORDINATES(false),
+        SMS_CALLBACK(true);
+        
+        boolean needsLength;
+
+        TYPE(boolean needsLength) {
+            this.needsLength = needsLength;                   
+        }
+    }
+
+    private void testLength() throws IOException {
+        if (type.needsLength ^ (optionalLength != null)) {
+            throw new IOException("Incorrect use of \"" + LENGTH_JSON + "\".");
+        }
+    }
 
     public UserChallengeItem(String id,
                              TYPE type,
-                             int length,
+                             Integer optionalLength,
                              String optionalLabel) {
         this.id = id;
         this.type = type;
-        this.length = length;
+        this.optionalLength = optionalLength;
         this.optionalLabel = optionalLabel;
     }
  
     public JSONObjectWriter writeObject() throws IOException {
+        testLength();
         return new JSONObjectWriter()
             .setString(ID_JSON, id)
             .setString(TYPE_JSON, type.toString())
-            .setInt(LENGTH_JSON, length)
+            .setDynamic((wr) -> optionalLength == null ? wr : wr.setInt(LENGTH_JSON, optionalLength))
             .setDynamic((wr) -> optionalLabel == null ? wr : wr.setString(LABEL_JSON, optionalLabel));
     }
 
@@ -48,9 +69,9 @@ public class UserChallengeItem implements BaseProperties {
         return type;
     }
 
-    int length;
-    public int getLength() {
-        return length;
+    Integer optionalLength;
+    public Integer getOptionalLength() {
+        return optionalLength;
     }
 
     String id;
@@ -66,7 +87,10 @@ public class UserChallengeItem implements BaseProperties {
     public UserChallengeItem(JSONObjectReader rd) throws IOException {
         id = rd.getString(ID_JSON);
         type = TYPE.valueOf(rd.getString(TYPE_JSON));
-        length = rd.getInt(LENGTH_JSON);
+        if (rd.hasProperty(LENGTH_JSON)) {
+            optionalLength = rd.getInt(LENGTH_JSON);
+        }
         optionalLabel = rd.getStringConditional(LABEL_JSON);
+        testLength();
     }
 }

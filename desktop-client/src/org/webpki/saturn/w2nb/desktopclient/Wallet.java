@@ -758,10 +758,11 @@ public class Wallet {
                 c.insets = new Insets(fontSize, fontSize * 2, 0, fontSize * 2);
                 for (UserChallengeItem userChallengeItem : encryptedMessage.getOptionalUserChallengeItems()) {
                     c.gridy++;
+                    Integer optionalLength = userChallengeItem.getOptionalLength();
                     JTextField submitData =
                         (userChallengeItem.getType() == UserChallengeItem.TYPE.NUMERIC_SECRET ||
                          userChallengeItem.getType() == UserChallengeItem.TYPE.ALPHANUMERIC_SECRET) ?
-                            new JPasswordField(userChallengeItem.getLength()) : new JTextField(userChallengeItem.getLength());
+                            new JPasswordField(optionalLength) : new JTextField(optionalLength);
                     submitData.setFont(standardFont);
                     pane.add(submitData, c);
                     challengeTextFields.put(userChallengeItem.getId(), submitData);

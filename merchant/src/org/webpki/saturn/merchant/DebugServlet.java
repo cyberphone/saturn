@@ -346,7 +346,7 @@ class DebugPrintout implements BaseProperties {
         "</div><div style=\"margin:10pt 10pt 0pt 10pt\">" +
         MerchantService.encryptedMessageSample.getText() +
         "</div><div style=\"margin:5pt 10pt 0pt 10pt;width:" + 
-        MerchantService.encryptedMessageSample.getOptionalUserChallengeItems()[0].getLength() +
+        MerchantService.encryptedMessageSample.getOptionalUserChallengeItems()[0].getOptionalLength() +
         "em;background-color:white;border-width:1px;padding:1pt 0pt 2pt 4pt;border-style:solid;border-color:#a9a9a9;margin-top:3pt\">"+
         "\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf</div>" +
         "<table style=\"margin-left:auto;margin-right:auto;margin-top:12pt;margin-bottom:12pt\"><tr><td><div class=\"button\">Cancel</div></td><td style=\"width:4em\"></td><td><div class=\"button\">Submit!</div></tr></table>" +
@@ -423,12 +423,8 @@ class DebugPrintout implements BaseProperties {
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in " +
                 keyWord(Messages.PAYEE_AUTHORITY.toString()) +
-                " and " +
+                ", " +
                 keyWord(Messages.AUTHORIZATION_REQUEST.toString()) +
-                " are identical.</li>" +
-                "<li>Verifying that the " +
-                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in " +
-                keyWord(Messages.PAYEE_AUTHORITY.toString()) +
                 " and " +
                 keyWord(PAYMENT_REQUEST_JSON) +
                 " are identical.</li>" +
