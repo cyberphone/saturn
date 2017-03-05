@@ -26,8 +26,8 @@ public enum PayerAccountTypes implements Serializable {
     UNUSUAL_CARD (false, "https://unusualcard.com", "UnusualCard");
 
     boolean cardPayment;  // True => card processor model, false = > 3 or 4 corner distributed model
-    String typeUri;            // A brand URI
-    String commonName;      // What it is usually called
+    String typeUri;       // A brand & method URI
+    String commonName;    // What it is usually called
     
     PayerAccountTypes (boolean cardPayment, String typeUri, String commonName) {
         this.cardPayment = cardPayment;
