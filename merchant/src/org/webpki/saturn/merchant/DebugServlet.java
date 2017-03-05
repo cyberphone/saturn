@@ -367,7 +367,7 @@ class DebugPrintout implements BaseProperties {
         description(point + 
                     "<p>After receiving the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) +
                     " object including the " + keyWord(SERVICE_URL_JSON) + 
-                    ", the <b>Merchant</b> creates and sends an " +
+                    ", the <b>Merchant</b> creates and sends a <i>counter signed</i> " +
                     keyWord(Messages.AUTHORIZATION_REQUEST.toString()) + " object (comprising of " +
                     "the user's encrypted authorization and the merchant's associated " +
                     keyWord(PAYMENT_REQUEST_JSON) + "), to the <b>User&nbsp;Bank</b>:</p>");
