@@ -74,10 +74,14 @@ function CardPaymentResponse() {
 
 CardPaymentResponse.encode = function(cardPaymentRequest,
                                       referenceId,
+                                      optionalLogData,
                                       signer) {
   return Messages.createBaseMessage(Messages.CARD_PAYMENT_RESPONSE)
     .setObject(BaseProperties.EMBEDDED_JSON, cardPaymentRequest.root)
     .setString(BaseProperties.REFERENCE_ID_JSON, referenceId)
+    .setDynamic((wr) => {
+        return optionalLogData == null ? wr :wr.setString(BaseProperties.LOG_DATA_JSON, optionalLogData)
+      })
     .setDateTime(BaseProperties.TIME_STAMP_JSON, new Date())
     .setObject(BaseProperties.SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
     .setSignature(signer);

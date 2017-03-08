@@ -161,6 +161,7 @@ const jsonPostProcessors = {
     // We did it! :-)
     return CardPaymentResponse.encode(cardPaymentRequest,
                                       getReferenceId(),
+                                      'Card payment network log data...',
                                       serverCertificateSigner);
   }
 

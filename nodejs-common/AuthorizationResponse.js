@@ -35,6 +35,7 @@ function AuthorizationResponse(rd) {
   this.accountReference = rd.getString(BaseProperties.ACCOUNT_REFERENCE_JSON);
   this.encryptedAccountData = rd.getObject(BaseProperties.ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
+  this.optionalLogData = rd.getStringConditional(BaseProperties.LOG_DATA_JSON);
   this.dateTime = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
   this.signatureDecoder = rd.getSignature();
