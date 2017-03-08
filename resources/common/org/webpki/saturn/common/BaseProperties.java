@@ -20,12 +20,12 @@ public interface BaseProperties {
 
     String EMBEDDED_JSON                    = "@embedded";
 
-     // For the Web2Native Bridge wallet 
+    // For the Web2Native Bridge wallet 
     String WINDOW_JSON                      = "window";
     String HEIGHT_JSON                      = "height";
     String WIDTH_JSON                       = "width";
 
-     // For the Android/QR wallet
+    // For the Android/QR wallet
     String ANDROID_CANCEL_URL_JSON          = "androidCancelUrl";
     String ANDROID_SUCCESS_URL_JSON         = "androidSuccessUrl";
     String ANDROID_TRANSACTION_URL_JSON     = "androidTransactionUrl";
@@ -87,7 +87,7 @@ public interface BaseProperties {
     String ID_JSON                          = "id";
     String TYPE_JSON                        = "type";
     String VERSION_JSON                     = "version";
-    
+
     String SATURN_WEB_PAY_CONTEXT_URI       = "http://webpki.org/saturn/v3";
 
     String JSON_CONTENT_TYPE                = "application/json";

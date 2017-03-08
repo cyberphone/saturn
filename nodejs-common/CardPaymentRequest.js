@@ -32,6 +32,7 @@ const ProtectedAccountData  = require('./ProtectedAccountData');
 function CardPaymentRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.CARD_PAYMENT_REQUEST, rd);
   this.authorizationResponse = new AuthorizationResponse(rd.getObject(BaseProperties.EMBEDDED_JSON));
+  this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
   this.actualAmount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON,
                                        this.authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);

@@ -36,15 +36,16 @@ const BaseProperties = {
     COMMON_NAME_JSON                 : 'commonName',                 // Common name of providers to be used in UIs
     NAME_JSON                        : 'name',
 
+    REQUESTER_JSON                   : 'requester',                  // ProviderUserResponse
     TEXT_JSON                        : 'text',                       // ProviderUserResponse
-    CHALLENGE_FIELDS_JSON            : 'challengeFields',            // ProviderUserResponse
+    USER_CHALLENGE_ITEMS_JSON        : 'userChallengeItems',         // ProviderUserResponse
     LABEL_JSON                       : 'label',                      // ProviderUserResponse
     LENGTH_JSON                      : 'length',                     // ProviderUserResponse
     ENCRYPTED_MESSAGE_JSON           : 'encryptedMessage',           // ProviderUserResponse
 
     KEY_JSON                         : 'key',                        // Wallet-originated encryption key
 
-    RESPONSE_TO_CHALLENGE_JSON       : 'responseToChallenge',        // Result of ProviderUserResponse 
+    USER_RESPONSE_ITEMS_JSON         : 'userResponseItems',          // Result of ProviderUserResponse 
 
     PAYMENT_NETWORKS_JSON            : 'paymentNetworks',
     PAYMENT_REQUEST_JSON             : 'paymentRequest',
@@ -63,6 +64,7 @@ const BaseProperties = {
     TRANSACTION_ID_JSON              : 'transactionId',
     CLIENT_IP_ADDRESS_JSON           : 'clientIpAddress',            // Security data for the payment provider
     CLIENT_GEO_LOCATION_JSON         : 'clientGeoLocation',          // Optional security data that client devices may supply
+    LOG_DATA_JSON                    : 'logData',                    // Insertion of external log data
     REFERENCE_ID_JSON                : 'referenceId',
     PAYEE_JSON                       : 'payee',                      // Payee object
     TEST_MODE_JSON                   : 'testMode',                   // Test mode = no real money involved
@@ -70,6 +72,7 @@ const BaseProperties = {
     PROVIDER_AUTHORITY_URL_JSON      : 'providerAuthorityUrl',       // URL to payment provider
     PROVIDER_ACCOUNT_TYPES_JSON      : 'providerAccountTypes',       // List of Account2Account types "understood" by provider
     ACCEPTED_ACCOUNT_TYPES_JSON      : 'acceptedAccountTypes',       // List of ACCOUNT_TYPE_JSON
+    EXTENSIONS_JSON                  : 'extensions',                 // Optional provider authority data
     ACCOUNT_JSON                     : 'account',                    // Payer Account2Account or Card
     ACCOUNT_REFERENCE_JSON           : 'accountReference',           // Account/Card number for payee (like ************5678)
     ACCOUNT_TYPE_JSON                : 'accountType',                // Account/Card type in the form of a URI
@@ -87,11 +90,10 @@ const BaseProperties = {
     ID_JSON                          : 'id',
     TYPE_JSON                        : 'type',
     VERSION_JSON                     : 'version',
-   
+
     SATURN_WEB_PAY_CONTEXT_URI       : 'http://webpki.org/saturn/v3',
 
     JSON_CONTENT_TYPE                : 'application/json'
-
 };
     
 module.exports = BaseProperties;
