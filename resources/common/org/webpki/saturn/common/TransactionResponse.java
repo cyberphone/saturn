@@ -72,7 +72,7 @@ public class TransactionResponse implements BaseProperties {
 
 
     TransactionRequest transactionRequest;
-    public TransactionRequest getCardPaymentRequest() {
+    public TransactionRequest getTransactionRequest() {
         return transactionRequest;
     }
 

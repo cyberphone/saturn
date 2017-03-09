@@ -70,11 +70,11 @@
         replace="// REMOVED"
         flags="s"/>
   	<replaceregexp file="${dd}/webpay-bank/web.xml"
-        match="(ExtendedServiceServlet.*?&lt;\/servlet&gt;)"
+        match="(AuthorizationServlet.*?&lt;\/servlet&gt;)"
         replace="\1&#10;&#10;    &lt;servlet&gt;&#10;        &lt;servlet-name&gt;HybridPaymentServlet&lt;/servlet-name&gt;&#10;        &lt;servlet-class&gt;org.webpki.saturn.bank.HybridPaymentServlet&lt;/servlet-class&gt;&#10;    &lt;/servlet&gt;"
         flags="s"/>
   	<replaceregexp file="${dd}/webpay-bank/web.xml"
-        match="(&lt;url-pattern&gt;/extended&lt;.*?&lt;\/servlet-mapping&gt;)"
+        match="(&lt;url-pattern&gt;/service&lt;.*?&lt;\/servlet-mapping&gt;)"
         replace="\1&#10;&#10;    &lt;servlet-mapping&gt;&#10;        &lt;servlet-name&gt;HybridPaymentServlet&lt;/servlet-name&gt;&#10;        &lt;url-pattern&gt;/hybridpay&lt;/url-pattern&gt;&#10;    &lt;/servlet-mapping&gt;"
         flags="s"/>
     <antcall target="_nolambda"><param name="subdir" value="${dd}/webpay-acquirer/common.src"/></antcall>
