@@ -52,6 +52,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     ", Amount=" + transactionRequest.getAmount().toString() +
                     " " + transactionRequest.getPaymentRequest().getCurrency().toString());
         String optionalLogData = null;
+        TransactionResponse.ERROR transactionError = null;
         if (!testMode) {
 
             // Here we are supposed to do the actual payment
@@ -60,6 +61,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         // It appears that we succeeded
         return TransactionResponse.encode(transactionRequest,
+                                          transactionError,
                                           getReferenceId(),
                                           optionalLogData,
                                           BankService.bankKey);

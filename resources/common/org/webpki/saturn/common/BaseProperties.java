@@ -57,7 +57,7 @@ public interface BaseProperties {
     String CURRENCY_JSON                    = "currency";
     String NON_DIRECT_PAYMENT_JSON          = "nonDirectPayment";           // Deposit, automated gas station, booking
     String TIME_STAMP_JSON                  = "timeStamp";
-    String TRANSACTION_ID_JSON              = "transactionId";
+    String TRANSACTION_ERROR_JSON           = "transactionError";
     String CLIENT_IP_ADDRESS_JSON           = "clientIpAddress";            // Security data for the payment provider
     String CLIENT_GEO_LOCATION_JSON         = "clientGeoLocation";          // Optional security data that client devices may supply
     String LOG_DATA_JSON                    = "logData";                    // Insertion of external log data

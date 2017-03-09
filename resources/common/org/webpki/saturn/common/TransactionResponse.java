@@ -31,10 +31,15 @@ public class TransactionResponse implements BaseProperties {
     
     public static final String SOFTWARE_NAME    = "WebPKI.org - Acquirer";
     public static final String SOFTWARE_VERSION = "1.00";
+    
+    public static enum ERROR {OUT_OF_FUNDS, DELETED_AUTHORIZATION}
 
     public TransactionResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.TRANSACTION_RESPONSE, root = rd);
         transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON), null);
+        if (rd.hasProperty(TRANSACTION_ERROR_JSON)) {
+            transactionError = ERROR.valueOf(rd.getString(TRANSACTION_ERROR_JSON));
+        }
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
@@ -49,6 +54,11 @@ public class TransactionResponse implements BaseProperties {
     Software software;
 
     GregorianCalendar dateTime;
+
+    ERROR transactionError;
+    public ERROR getTransactionError() {
+        return transactionError;
+    }
 
     String optionalLogData;
     public String getOptionalLogData() {
@@ -77,11 +87,13 @@ public class TransactionResponse implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(TransactionRequest transactionRequest,
+                                          ERROR transactionError,
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
         return Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
             .setObject(EMBEDDED_JSON, transactionRequest.root)
+            .setDynamic((wr) -> transactionError == null ? wr : wr.setString(TRANSACTION_ERROR_JSON, transactionError.toString()))
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)

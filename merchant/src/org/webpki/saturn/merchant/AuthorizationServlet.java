@@ -178,14 +178,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         authorizationResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
         transactionOperation.authorizationResponse = authorizationResponse;
    
-        // Two-phase operation: perform the final step
-        if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
-            processCardPayment(transactionOperation,
-                               paymentRequest.getAmount(),  // Just a copy since we don't have a complete scenario                                
-                               urlHolder,
-                               debugData);
-        }
-
         // Create a viewable response
         ResultData resultData = new ResultData();
         resultData.amount = paymentRequest.getAmount();  // Gas Station will upgrade amount
@@ -197,6 +189,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             accountReference = AuthorizationData.formatCardNumber(accountReference);
         }
         resultData.accountReference = accountReference;
+
+        // Two-phase operation: perform the final step
+        if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
+            resultData.transactionError =
+                processTransaction(transactionOperation,
+                                   // Just a copy since we don't have a complete scenario 
+                                   paymentRequest.getAmount(),                                
+                                   urlHolder,
+                                   debugData);
+        }
+
         session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
         
         // Gas Station: Save reservation part for future fulfillment
@@ -216,12 +219,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return true;
     }
 
-    static void processCardPayment(TransactionOperation transactionOperation,
-                                   BigDecimal actualAmount,
-                                   UrlHolder urlHolder,
-                                   DebugData debugData) throws IOException {
+    static TransactionResponse.ERROR processTransaction(TransactionOperation transactionOperation,
+                                                        BigDecimal actualAmount,
+                                                        UrlHolder urlHolder,
+                                                        DebugData debugData) throws IOException {
 
-        JSONObjectWriter cardPaymentRequest =
+        JSONObjectWriter transactionRequest =
             TransactionRequest.encode(transactionOperation.authorizationResponse,
                                       transactionOperation.urlToCall,
                                       actualAmount,
@@ -231,15 +234,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                                   .getPublicKey()).signer);
         // Acquirer or Hybrid call
         urlHolder.setUrl(transactionOperation.urlToCall);
-        JSONObjectReader response = postData(urlHolder, cardPaymentRequest);
+        JSONObjectReader response = postData(urlHolder, transactionRequest);
 
         if (debugData != null) {
-            debugData.cardPaymentRequest = makeReader(cardPaymentRequest);
-            debugData.cardPaymentResponse = response;
+            debugData.transactionRequest = makeReader(transactionRequest);
+            debugData.transactionResponse = response;
         }
         
-        TransactionResponse cardPaymentResponse = new TransactionResponse(response);
-        cardPaymentResponse.getSignatureDecoder().verify(transactionOperation.verifier);
+        TransactionResponse transactionResponse = new TransactionResponse(response);
+        transactionResponse.getSignatureDecoder().verify(transactionOperation.verifier);
+
+        return transactionResponse.getTransactionError();
     }
 
     @Override

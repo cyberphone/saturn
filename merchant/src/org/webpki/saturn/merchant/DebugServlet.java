@@ -514,7 +514,7 @@ class DebugPrintout implements BaseProperties {
             keyWord(AMOUNT_JSON) +
             " and sends the completed object to the <b>" + recepient + 
             "</b>:</p>");
-        fancyBox(debugData.cardPaymentRequest);
+        fancyBox(debugData.transactionRequest);
         if (debugData.hybridMode) {
             directTransfer(Messages.TRANSACTION_REQUEST);
         } else {
@@ -525,7 +525,7 @@ class DebugPrintout implements BaseProperties {
         }
         description(point + 
             "<p>After successful processing of the payment request the <b>" + recepient + "</b> returns a matching response to the <b>Merchant</b>:</p>");
-        fancyBox(debugData.cardPaymentResponse);
+        fancyBox(debugData.transactionResponse);
     }
     
     void reserveMode() {

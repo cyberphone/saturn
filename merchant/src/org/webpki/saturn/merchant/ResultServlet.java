@@ -88,10 +88,10 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
             BigDecimal actualAmount = new BigDecimal(priceX1000).divide(new BigDecimal(1000));
             resultData.amount = actualAmount;
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
-            AuthorizationServlet.processCardPayment(reservation,
-                                                    actualAmount,                               
-                                                    urlHolder,
-                                                    debugData);
+            resultData.transactionError = AuthorizationServlet.processTransaction(reservation,
+                                                                                  actualAmount,
+                                                                                  urlHolder,
+                                                                                  debugData);
             HTML.gasStationResultPage(response,
                                       fuelType,
                                       decilitres,

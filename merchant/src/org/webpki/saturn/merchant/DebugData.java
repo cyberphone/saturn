@@ -42,9 +42,9 @@ public class DebugData implements Serializable {
     
     public JSONObjectReader authorizationResponse;
 
-    public JSONObjectReader cardPaymentRequest;
+    public JSONObjectReader transactionRequest;
     
-    public JSONObjectReader cardPaymentResponse;
+    public JSONObjectReader transactionResponse;
 
     // Native mode
     public JSONObjectReader reserveOrBasicRequest;

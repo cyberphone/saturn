@@ -68,6 +68,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                     " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
         
         String optionalLogData = null;
+        TransactionResponse.ERROR transactionError = null;
         if (!testMode) {
 
             // Here we are supposed to talk to the card payment network....
@@ -77,6 +78,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
         // It appears that we succeeded
         return TransactionResponse.encode(cardPaymentRequest,
+                                          transactionError,
                                           getReferenceId(),
                                           optionalLogData,
                                           AcquirerService.acquirerKey);
