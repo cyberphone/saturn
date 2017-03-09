@@ -41,31 +41,31 @@ public class TransactionServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
         // Decode and finalize the cardpay request
-        TransactionRequest cardPaymentRequest = new TransactionRequest(providerRequest, true);
+        TransactionRequest transactionRequest = new TransactionRequest(providerRequest, true);
 
         // Verify that the user's bank is known
-        cardPaymentRequest.verifyUserBank(AcquirerService.paymentRoot);
+        transactionRequest.verifyUserBank(AcquirerService.paymentRoot);
 
         // Verify that the merchant is one of our customers
-        Payee payee = cardPaymentRequest.getPayee();
+        Payee payee = transactionRequest.getPayee();
         PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
         if (merchantProperties == null) {
             throw new IOException("Unknown merchant Id: " + payee.getId());
         }
-        if (!merchantProperties.getPublicKey().equals(cardPaymentRequest.getPublicKey())) {
+        if (!merchantProperties.getPublicKey().equals(transactionRequest.getPublicKey())) {
             throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
         }
 
         // Get card data
-        ProtectedAccountData protectedAccountData = cardPaymentRequest.getProtectedAccountData(AcquirerService.decryptionKeys);
+        ProtectedAccountData protectedAccountData = transactionRequest.getProtectedAccountData(AcquirerService.decryptionKeys);
         if (AcquirerService.logging) {
             logger.info("Payer account data: " + protectedAccountData);
         }
-        boolean testMode = cardPaymentRequest.getTestMode();
+        boolean testMode = transactionRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Acquiring for AccountID=" + protectedAccountData.getAccount().getId() + 
-                    ", Amount=" + cardPaymentRequest.getAmount().toString() +
-                    " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
+                    ", Amount=" + transactionRequest.getAmount().toString() +
+                    " " + transactionRequest.getPaymentRequest().getCurrency().toString());
         
         String optionalLogData = null;
         TransactionResponse.ERROR transactionError = null;
@@ -77,7 +77,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         }
 
         // It appears that we succeeded
-        return TransactionResponse.encode(cardPaymentRequest,
+        return TransactionResponse.encode(transactionRequest,
                                           transactionError,
                                           getReferenceId(),
                                           optionalLogData,

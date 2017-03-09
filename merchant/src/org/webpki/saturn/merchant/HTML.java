@@ -539,12 +539,16 @@ public class HTML implements MerchantProperties {
                                ResultData resultData) throws IOException, ServletException {
         StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
             .append("<table>" +
-                    "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Order Status<br>&nbsp;</td></tr>" +
-                    "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">Dear customer, your order has been successfully processed!</td></tr>")
+                    "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL)
+            .append(resultData.transactionError == null ?
+                      "\">Order Status" : ";color:red\">Failed = " + resultData.transactionError.toString())
+            .append("<br>&nbsp;</td></tr>")
+            .append(resultData.transactionError == null ?
+                    "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">" +
+                    "Dear customer, your order has been successfully processed!</td></tr>" : "")
             .append(receiptCore(resultData, debugMode))
             .append("</table></td></tr></table></td></tr>");
-        HTML.output(response, 
-                    HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
+        HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
     }
 
     static String updatePumpDisplay(FuelTypes fuelType) {
@@ -569,17 +573,21 @@ public class HTML implements MerchantProperties {
                                      int decilitres,
                                      boolean debugMode,
                                      ResultData resultData) throws IOException, ServletException {
-        StringBuffer s = new StringBuffer()
-            .append(gasStation("Thank You - Welcome Back!", true))
-            .append(selectionButtons(new FuelTypes[]{fuelType}))
-            .append("<tr><td style=\"height:15pt\"></td></tr>")
-            .append(receiptCore(resultData, debugMode))
-            .append("</table></td></tr></table></td></tr>");
-        HTML.output(response, 
-                    HTML.getHTML(STICK_TO_HOME_URL + updatePumpDisplay(fuelType),
-                                 "onload=\"updatePumpDisplay(" + decilitres + ")\">" +
-                                 GAS_PUMP_LOGO,
-                                 s.toString()));
+        if (resultData.transactionError == null) {
+            StringBuffer s = new StringBuffer()
+                .append(gasStation("Thank You - Welcome Back!", true))
+                .append(selectionButtons(new FuelTypes[]{fuelType}))
+                .append("<tr><td style=\"height:15pt\"></td></tr>")
+                .append(receiptCore(resultData, debugMode))
+                .append("</table></td></tr></table></td></tr>");
+            HTML.output(response, 
+                        HTML.getHTML(STICK_TO_HOME_URL + updatePumpDisplay(fuelType),
+                                     "onload=\"updatePumpDisplay(" + decilitres + ")\">" +
+                                     GAS_PUMP_LOGO,
+                                     s.toString()));
+        } else {
+            shopResultPage(response, debugMode, resultData);
+        }
     }
 
     static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
