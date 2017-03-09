@@ -35,7 +35,6 @@ public class AuthorityObjectManager extends Thread {
 
     String providerAuthorityUrl;
     String serviceUrl;
-    String extendedServiceUrl;
     JSONObjectReader optionalExtensions;
     String[] optionalProviderAccountTypes;
     PublicKey optionalEncryptionKey;
@@ -55,7 +54,6 @@ public class AuthorityObjectManager extends Thread {
         synchronized(this) {
             providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,
                                                              serviceUrl,
-                                                             extendedServiceUrl,
                                                              optionalExtensions,
                                                              optionalProviderAccountTypes,
                                                              optionalEncryptionKey,
@@ -86,7 +84,6 @@ public class AuthorityObjectManager extends Thread {
 
     public AuthorityObjectManager(String providerAuthorityUrl,
                                   String serviceUrl,
-                                  String extendedServiceUrl,
                                   JSONObjectReader optionalExtensions,
                                   String[] optionalProviderAccountTypes,
                                   PublicKey optionalEncryptionKey,
@@ -100,7 +97,6 @@ public class AuthorityObjectManager extends Thread {
                                   boolean logging) throws IOException {
         this.providerAuthorityUrl = providerAuthorityUrl;
         this.serviceUrl = serviceUrl;
-        this.extendedServiceUrl = extendedServiceUrl;
         this.optionalExtensions = optionalExtensions;
         this.optionalProviderAccountTypes = optionalProviderAccountTypes;
         this.optionalEncryptionKey = optionalEncryptionKey;

@@ -20,7 +20,7 @@ import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.saturn.common.AuthorizationResponse;
 
-public class CardOperation {
+public class TransactionOperation {
     String urlToCall;
     JSONX509Verifier verifier;
     AuthorizationResponse authorizationResponse;

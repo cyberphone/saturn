@@ -149,11 +149,6 @@
     </servlet>
     
     <servlet>
-        <servlet-name>TransactionServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.merchant.TransactionServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>AuthorizationServlet</servlet-name>
         <servlet-class>org.webpki.saturn.merchant.AuthorizationServlet</servlet-class>
     </servlet>
@@ -218,11 +213,6 @@
         <url-pattern>/choose</url-pattern>
     </servlet-mapping>
     
-    <servlet-mapping>
-        <servlet-name>TransactionServlet</servlet-name>
-        <url-pattern>/transact</url-pattern>
-    </servlet-mapping>
-
     <servlet-mapping>
         <servlet-name>AuthorizationServlet</servlet-name>
         <url-pattern>/authorize</url-pattern>

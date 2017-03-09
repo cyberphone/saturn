@@ -151,7 +151,6 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             String aquirerHost = getPropertyString(ACQUIRER_HOST);
             authorityObjectManager =
                 new AuthorityObjectManager(authorityUrl = aquirerHost + "/authority",
-                                           aquirerHost + "/authorize",
                                            aquirerHost + "/transact",
                                            null,
                                            null,

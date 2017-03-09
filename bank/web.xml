@@ -99,11 +99,6 @@
     </listener>
 
     <servlet>
-        <servlet-name>ExtendedServiceServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.bank.ExtendedServiceServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>AuthorizationServlet</servlet-name>
         <servlet-class>org.webpki.saturn.bank.AuthorizationServlet</servlet-class>
     </servlet>
@@ -117,11 +112,6 @@
         <servlet-name>PayeeAuthorityServlet</servlet-name>
         <servlet-class>org.webpki.saturn.bank.PayeeAuthorityServlet</servlet-class>
     </servlet>
-
-    <servlet-mapping>
-        <servlet-name>ExtendedServiceServlet</servlet-name>
-        <url-pattern>/extended</url-pattern>
-    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>AuthorizationServlet</servlet-name>

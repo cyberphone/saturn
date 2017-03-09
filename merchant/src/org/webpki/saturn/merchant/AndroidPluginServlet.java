@@ -138,12 +138,12 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                                        :
                     MerchantService.merchantBaseUrl + "/result";
             String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
-            TransactionServlet.returnJsonData(response, 
-                                              new WalletRequest(session,
-                                                                nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
-                                                                MerchantService.merchantBaseUrl,
-                                                                cancelUrl,
-                                                                successUrl).requestObject);
+            ProcessingBaseServlet.returnJsonData(response, 
+                                                 new WalletRequest(session,
+                                                                   nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
+                                                                   MerchantService.merchantBaseUrl,
+                                                                   cancelUrl,
+                                                                   successUrl).requestObject);
         } else {
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {

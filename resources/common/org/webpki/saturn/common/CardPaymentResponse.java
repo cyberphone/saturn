@@ -33,7 +33,7 @@ public class CardPaymentResponse implements BaseProperties {
     public static final String SOFTWARE_VERSION = "1.00";
 
     public CardPaymentResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.CARD_PAYMENT_RESPONSE, root = rd);
+        Messages.parseBaseMessage(Messages.TRANSACTION_RESPONSE, root = rd);
         cardPaymentRequest = new CardPaymentRequest(rd.getObject(EMBEDDED_JSON), null);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
@@ -80,7 +80,7 @@ public class CardPaymentResponse implements BaseProperties {
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(Messages.CARD_PAYMENT_RESPONSE)
+        return Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
             .setObject(EMBEDDED_JSON, cardPaymentRequest.root)
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)

@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.saturn.common.ReserveOrBasicResponse;
 import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
@@ -73,7 +72,7 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
             ErrorServlet.systemFail(response, "Missing result data");
             return;
         }
-        Object reservation = session.getAttribute(GAS_STATION_RES_SESSION_ATTR);
+        TransactionOperation reservation = (TransactionOperation)session.getAttribute(GAS_STATION_RES_SESSION_ATTR);
         if (reservation == null) {
             ErrorServlet.systemFail(response, "Missing reservation object");
             return;
@@ -89,19 +88,10 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
             BigDecimal actualAmount = new BigDecimal(priceX1000).divide(new BigDecimal(1000));
             resultData.amount = actualAmount;
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
-            if (reservation instanceof CardOperation) {
-                AuthorizationServlet.processCardPayment((CardOperation) reservation,
-                                                        actualAmount,                               
-                                                        urlHolder,
-                                                        debugData);
-            } else {
-                ReserveOrBasicResponse reserveOrBasicResponse = (ReserveOrBasicResponse) reservation;
-                TransactionServlet.processFinalize(reserveOrBasicResponse,
-                                                   actualAmount,
-                                                   urlHolder,
-                                                   reserveOrBasicResponse.getPayerAccountType().isCardPayment(),
-                                                   debugData);
-            }
+            AuthorizationServlet.processCardPayment(reservation,
+                                                    actualAmount,                               
+                                                    urlHolder,
+                                                    debugData);
             HTML.gasStationResultPage(response,
                                       fuelType,
                                       decilitres,

@@ -212,7 +212,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             authorityObjectManager = 
                 new AuthorityObjectManager(authorityUrl = bankHost + "/authority",
                                            serviceUrl = bankHost + "/service",
-                                           bankHost + "/extended",
                                            optionalProviderExtensions,
                                            new String[]{"https://swift.com", "https://ultragiro.se"},
                                            decryptionKeys.get(0).getPublicKey(),

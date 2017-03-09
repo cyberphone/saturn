@@ -39,27 +39,17 @@ public class ProviderAuthority implements BaseProperties {
 
     public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
 
-    private static void test(String serviceUrl, String extendedServiceUrl) throws IOException {
-        if (serviceUrl == null && extendedServiceUrl == null) {
-            throw new IOException("At least one of \"" + SERVICE_URL_JSON + "\" and \"" +
-                                  EXTENDED_SERVICE_URL_JSON + "\" must be defined");
-        }
-    }
-    
     public static JSONObjectWriter encode(String authorityUrl,
                                           String serviceUrl,
-                                          String extendedServiceUrl,
                                           JSONObjectReader optionalExtensions,
                                           String[] optionalProviderAccountTypes,
                                           PublicKey encryptionKey,
                                           GregorianCalendar expires,
                                           ServerX509Signer signer) throws IOException {
-        test(serviceUrl, extendedServiceUrl);
         return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
             .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
-            .setDynamic((wr) -> serviceUrl == null ? wr : wr.setString(SERVICE_URL_JSON, serviceUrl))
-            .setDynamic((wr) -> extendedServiceUrl == null ? wr : wr.setString(EXTENDED_SERVICE_URL_JSON, extendedServiceUrl))
+            .setString(SERVICE_URL_JSON, serviceUrl)
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
             .setDynamic((wr) -> optionalProviderAccountTypes == null ?
                     wr : wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes))
@@ -84,9 +74,7 @@ public class ProviderAuthority implements BaseProperties {
             throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
                                   " expected=" + expectedAuthorityUrl);
         }
-        serviceUrl = rd.getStringConditional(SERVICE_URL_JSON);
-        extendedServiceUrl = rd.getStringConditional(EXTENDED_SERVICE_URL_JSON);
-        test(serviceUrl, extendedServiceUrl);
+        serviceUrl = rd.getString(SERVICE_URL_JSON);
         if (rd.hasProperty(EXTENSIONS_JSON)) {
             optionalExtensions = rd.getObject(EXTENSIONS_JSON);
             if (optionalExtensions.getProperties().length == 0) {
@@ -121,11 +109,6 @@ public class ProviderAuthority implements BaseProperties {
     String serviceUrl;
     public String getServiceUrl() {
         return serviceUrl;
-    }
-
-    String extendedServiceUrl;
-    public String getExtendedServiceUrl() {
-        return extendedServiceUrl;
     }
 
     JSONObjectReader optionalExtensions;

@@ -24,8 +24,6 @@ public class DebugData implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
-    public boolean nativeMode;
-    
     public JSONObjectReader InvokeWallet;
     
     public JSONObjectReader walletResponse;

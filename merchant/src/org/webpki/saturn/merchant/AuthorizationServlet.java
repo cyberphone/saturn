@@ -106,15 +106,15 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
  
         AccountDescriptor accountDescriptor = null;
-        CardOperation cardOperation = new CardOperation();
+        TransactionOperation transactionOperation = new TransactionOperation();
         if (cardPayment) {
             // Lookup of acquirer authority
             urlHolder.setUrl(MerchantService.payeeAcquirerAuthorityUrl);
             urlHolder.setUrl(getPayeeAuthority(urlHolder).getProviderAuthorityUrl());
             ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
             urlHolder.setUrl(null);
-            cardOperation.urlToCall = acquirerAuthority.getServiceUrl();
-            cardOperation.verifier = MerchantService.acquirerRoot;
+            transactionOperation.urlToCall = acquirerAuthority.getServiceUrl();
+            transactionOperation.verifier = MerchantService.acquirerRoot;
             if (debugData != null) {
                 debugData.acquirerAuthority = acquirerAuthority.getRoot();
             }
@@ -176,11 +176,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // No error return, then we can verify the response fully
         authorizationResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
-        cardOperation.authorizationResponse = authorizationResponse;
+        transactionOperation.authorizationResponse = authorizationResponse;
    
         // Two-phase operation: perform the final step
         if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
-            processCardPayment(cardOperation,
+            processCardPayment(transactionOperation,
                                paymentRequest.getAmount(),  // Just a copy since we don't have a complete scenario                                
                                urlHolder,
                                debugData);
@@ -202,13 +202,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Gas Station: Save reservation part for future fulfillment
         if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
             if (!cardPayment) {
-                cardOperation.urlToCall = getHybridModeUrl(providerAuthority);
-                cardOperation.verifier = MerchantService.paymentRoot;
+                transactionOperation.urlToCall = getHybridModeUrl(providerAuthority);
+                transactionOperation.verifier = MerchantService.paymentRoot;
                 if (debug) {
                     debugData.hybridMode = true;
                 }
             }
-            session.setAttribute(GAS_STATION_RES_SESSION_ATTR, cardOperation);
+            session.setAttribute(GAS_STATION_RES_SESSION_ATTR, transactionOperation);
             if (debug) {
                 debugData.gasStation = true;
             }
@@ -216,21 +216,21 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return true;
     }
 
-    static void processCardPayment(CardOperation cardOperation,
+    static void processCardPayment(TransactionOperation transactionOperation,
                                    BigDecimal actualAmount,
                                    UrlHolder urlHolder,
                                    DebugData debugData) throws IOException {
 
         JSONObjectWriter cardPaymentRequest =
-            CardPaymentRequest.encode(cardOperation.authorizationResponse,
-                                      cardOperation.urlToCall,
+            CardPaymentRequest.encode(transactionOperation.authorizationResponse,
+                                      transactionOperation.urlToCall,
                                       actualAmount,
                                       MerchantService.getReferenceId(),
-                                      MerchantService.paymentNetworks.get(cardOperation.authorizationResponse
+                                      MerchantService.paymentNetworks.get(transactionOperation.authorizationResponse
                                                                               .getAuthorizationRequest()
                                                                                   .getPublicKey()).signer);
         // Acquirer or Hybrid call
-        urlHolder.setUrl(cardOperation.urlToCall);
+        urlHolder.setUrl(transactionOperation.urlToCall);
         JSONObjectReader response = postData(urlHolder, cardPaymentRequest);
 
         if (debugData != null) {
@@ -239,7 +239,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         
         CardPaymentResponse cardPaymentResponse = new CardPaymentResponse(response);
-        cardPaymentResponse.getSignatureDecoder().verify(cardOperation.verifier);
+        cardPaymentResponse.getSignatureDecoder().verify(transactionOperation.verifier);
     }
 
     @Override

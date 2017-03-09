@@ -149,7 +149,6 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, RECEPIENT_URL_JSON);
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
-        updateUrls(jsonTree, rewriter, EXTENDED_SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, ACQUIRER_AUTHORITY_URL_JSON);
         updateSpecific(jsonTree, rewriter, DOMAIN_NAME_JSON, "demomerchant.com");
@@ -227,9 +226,7 @@ class DebugPrintout implements BaseProperties {
             "<p>Saturn uses a JSON based message notation described in " +
             "<a target=\"_blank\" href=\"https://cyberphone.github.io/doc/web/yasmin.html\">[YASMIN]</a>.</p>" +
             "<p>Current mode: <i>" +
-            (debugData.nativeMode ? "Saturn &quot;Native&quot; " +
-            (debugData.acquirerMode ? "Card payment" : "Account-2-Account payment using " + (debugData.basicCredit ? "direct debit" : "reserve+finalize")) :
-            (debugData.basicCredit ? debugData.hybridMode ? "Hybrid Payment" :"Bank-to-Bank Payment" : "Card Payment")) +
+            (debugData.basicCredit ? debugData.hybridMode ? "Hybrid Payment" :"Bank-to-Bank Payment" : "Card Payment") +
             "</i></p>");
         description(point +
             "<p>The user performs &quot;Checkout&quot; (after <i>optionally</i> selecting payment method), " +
@@ -289,11 +286,9 @@ class DebugPrintout implements BaseProperties {
             "<li style=\"padding:0pt\">Provide credentials of an entity allowing relying parties verifying such before interacting with the entity.</li>" +
             "<li>Through a signature attest the authenticity of core parameters including <i>service end points</i>, <i>encryption keys</i>, " +
             "<i>supported payment methods</i>, <i>extensions</i>, and <i>algorithms</i>.</li></ul>");
-        if (debugData.nativeMode) {
-            nativeMode();
-        } else {
-            standardMode();
-        }
+
+        standardMode();
+
         description("<p id=\"userauthz\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + HTML.FONT_ARIAL + "\">Unencrypted User Authorization</p>" +
             "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted:");
 
@@ -514,18 +509,18 @@ class DebugPrintout implements BaseProperties {
             "<p>To finalize the transaction the <b>Merchant</b> wraps the " +
             keyWord(Messages.AUTHORIZATION_RESPONSE.toString()) +
             " in a newly created " +
-            keyWord(Messages.CARD_PAYMENT_REQUEST.toString()) +
+            keyWord(Messages.TRANSACTION_REQUEST.toString()) +
             " including a possibly updated " +
             keyWord(AMOUNT_JSON) +
             " and sends the completed object to the <b>" + recepient + 
             "</b>:</p>");
         fancyBox(debugData.cardPaymentRequest);
         if (debugData.hybridMode) {
-            directTransfer(Messages.CARD_PAYMENT_REQUEST);
+            directTransfer(Messages.TRANSACTION_REQUEST);
         } else {
             description(point + 
                     "<p>After successful validation of the " +
-                    keyWord(Messages.CARD_PAYMENT_REQUEST.toString()) +
+                    keyWord(Messages.TRANSACTION_REQUEST.toString()) +
                     " the <b>Acquirer</b> performs a request to the associated card network.</p>");
         }
         description(point + 
@@ -584,93 +579,6 @@ class DebugPrintout implements BaseProperties {
                 "<p>Although the Saturn protocol may continue after this point the debug mode won't currently show that...</p>");
         }
         return debugData.softReserveOrBasicError;
-    }
-
-    void nativeMode() throws Exception {
-        description(point +
-            "<p>Now the <b>Merchant</b> creates a <i>signed</i> request and sends it to the " + keyWord(EXTENDED_SERVICE_URL_JSON) +
-            " extracted from the " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object.&nbsp;&nbsp;" +
-            "Since the <b>Wallet</b> response is encrypted, the <b>Merchant</b> needs to prove to the <b>User&nbsp;Bank</b> " +
-            "that it knows the embedded " + keyWord(PAYMENT_REQUEST_JSON) + " which it does through the " + keyWord(REQUEST_HASH_JSON) +
-            " construct and " + keyWord(REFERENCE_ID_JSON) + " which must match the hash of the request and property respectively" +
-            (debugData.acquirerMode ? ".&nbsp;&nbsp;Since this particular session was a card transaction, a pre-configured " + 
-            keyWord(ACQUIRER_AUTHORITY_URL_JSON) + " is also supplied" : "") + ":</p>");
-
-        fancyBox(debugData.reserveOrBasicRequest);
-
-        if (debugData.acquirerMode) {
-            description(point +
-                             "<p>In the <b>Acquirer</b> mode the received " + keyWord(ACQUIRER_AUTHORITY_URL_JSON) + " is used by the <b>User&nbsp;Bank</b> " +
-                             "to retrieve the designated card processor's encryption keys:</p>");
-            fancyBox(debugData.acquirerAuthority);
-        }
-        description("<p>After retrieving the <a href=\"#userauthz\">Unencrypted User Authorization</a>, " +
-            "the called <b>User&nbsp;Bank</b> invokes the local payment backend (to verify the account, check funds, etc.) " +
-            "<i>which is outside of this specification and implementation</i>.</p><p>" +
-            point +
-            "</p><p>" + (debugData.softReserveOrBasicError? errorDescription(true):
-            "If the operation is successful, the <b>Bank</b> responds with a <i>signed</i> message containing both the original <b>Merchant</b> " +
-            keyWord(PAYMENT_REQUEST_JSON) + " as well as a minimal set of user account data.</p>" +
-            (debugData.acquirerMode ?
-                 "Also note the inclusion of " +
-                 keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) + " which only the <b>Acquirer</b> can decrypt"
-                                    :
-                 "Also note the inclusion of the (by the <b>Bank</b>) selected <b>Merchant</b> receiver account (" +
-                 keyWord(PAYEE_ACCOUNT_JSON) + ")") +
-                     (debugData.basicCredit?
-                             ".<p>This is the final interaction in the direct debit mode:</p>"
-                                           :
-                             ":")));
-
-        fancyBox(debugData.reserveOrBasicResponse);
-
-        if (!debugData.softReserveOrBasicError) {
-            if (!debugData.basicCredit) {
-                description(point +
-                     "<p>For finalization of the payment, the <b>Merchant</b> sets an " + keyWord(AMOUNT_JSON) + 
-                     " which must be <i>equal or lower</i> than in the original request, <i>counter-signs</i> the request, " +
-                     "and sends it to the " + (debugData.acquirerMode ? keyWord(EXTENDED_SERVICE_URL_JSON) +
-                     " retrievable from the <b>Acquirer</b> " + keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object:" :
-                     "<b>Bank</b> again:</p>"));
-
-                fancyBox(debugData.finalizeRequest);
-
-                String finalDescription = null;
-                if (debugData.acquirerMode) {
-                    descriptionStdMargin("After receiving the request, the " +
-                         keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) + " object is <i>decrypted</i>.&nbsp;&nbsp;" +
-                        "This mechanism effectively replaces a <b>Merchant</b>-based &quot;tokenization&quot; scheme with the added advantage "+
-                        "that the <b>Acquirer</b> also can be included in a protection model by " +
-                        "for example randomizing CCVs per request (&quot;upstreams tokenization&quot;).<p>" +
-                        point +
-                        "</p><p>The following printout " +
-                        "shows a <i>sample</i> of protected account data:</p>");
-
-     //               fancyBox(MerchantService.protectedAccountData);
-                
-                    finalDescription = "<p>After this step the card network is invoked <i>which is outside of this specification and implementation</i>.</p>";
-                } else {
-                    finalDescription = "<p>After receiving the request, the actual payment operation is performed " +
-                        "<i>which is outside of this specification and implementation</i>.</p>";
-                }
-                descriptionStdMargin(finalDescription + 
-                     point + "<p>" +
-                    (debugData.softFinalizeError ? errorDescription(!debugData.acquirerMode) : 
-                        "If the operation is successful, a <i>signed</i> hash of the request is returned:") +
-                     "</p>");
-
-                fancyBox(debugData.finalizeResponse);
-
-                if (!debugData.softFinalizeError) {
-                    descriptionStdMargin("Not embedding the request in the response may appear illogical but since<ul>" +
-                        "<li>the communication is assumed to be <i>synchronous</i> (using HTTP).</li>" +
-                        "<li>there is no additional information needed by the transaction, only a sender-unique " +
-                        keyWord(REFERENCE_ID_JSON) +
-                        ".</li><li>the signed 256-bit hash fully binds the response to the request.</li></ul>this would not add any security, " +
-                        "assuming that logging is working.");
-                }
-            }
-        }
     }
 
     public String toString() {

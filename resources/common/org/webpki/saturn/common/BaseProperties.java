@@ -53,7 +53,6 @@ public interface BaseProperties {
     String RECEPIENT_URL_JSON               = "recepientUrl";               // Where we are sending (target address)
     String AUTHORITY_URL_JSON               = "authorityUrl";               // Double use self in *Authority objects and initiator
     String SERVICE_URL_JSON                 = "serviceUrl";                 // Saturn "lite" (standard)
-    String EXTENDED_SERVICE_URL_JSON        = "extendedServiceUrl";         // Native Saturn payment system
     String AMOUNT_JSON                      = "amount";
     String CURRENCY_JSON                    = "currency";
     String NON_DIRECT_PAYMENT_JSON          = "nonDirectPayment";           // Deposit, automated gas station, booking
