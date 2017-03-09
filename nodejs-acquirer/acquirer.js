@@ -38,8 +38,8 @@ const ServerCertificateSigner = require('../nodejs-common/ServerCertificateSigne
 const BaseProperties          = require('../nodejs-common/BaseProperties');
 const PayeeAuthority          = require('../nodejs-common/PayeeAuthority');
 const ProviderAuthority       = require('../nodejs-common/ProviderAuthority');
-const CardPaymentRequest      = require('../nodejs-common/CardPaymentRequest');
-const CardPaymentResponse     = require('../nodejs-common/CardPaymentResponse');
+const TransactionRequest      = require('../nodejs-common/TransactionRequest');
+const TransactionResponse     = require('../nodejs-common/TransactionResponse');
 
 const Config = require('./config/config');
 
@@ -127,7 +127,7 @@ const jsonPostProcessors = {
   authorize : function(reader) {
 
     // Decode the card payment request message
-    var cardPaymentRequest = new CardPaymentRequest(reader);
+    var cardPaymentRequest = new TransactionRequest(reader);
 
     // Verify that the request comes from one of "our" merchants
     var payee = cardPaymentRequest.getPayee();
@@ -159,7 +159,7 @@ const jsonPostProcessors = {
 
     }
     // We did it! :-)
-    return CardPaymentResponse.encode(cardPaymentRequest,
+    return TransactionResponse.encode(cardPaymentRequest,
                                       getReferenceId(),
                                       'Card payment network log data...',
                                       serverCertificateSigner);

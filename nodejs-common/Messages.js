@@ -25,8 +25,8 @@ const BaseProperties = require('./BaseProperties');
 
 const Messages = {
 
-    CARD_PAYMENT_REQUEST   :  'CardPaymentRequest',            // Payee provider to Acquirer
-    CARD_PAYMENT_RESPONSE  :  'CardPaymentResponse',           // Response to the former
+    TRANSACTION_REQUEST    :  'TransactionRequest',            // Payee provider to Acquirer
+    TRANSACTION_RESPONSE   :  'TransactionResponse',           // Response to the former
 
     AUTHORIZATION_REQUEST  :  'AuthorizationRequest',          // Payee provider to Payer provider
     AUTHORIZATION_RESPONSE :  'AuthorizationResponse',         // Response to the former

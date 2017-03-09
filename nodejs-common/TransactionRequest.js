@@ -17,7 +17,7 @@
 
 'use strict';
 
-// Saturn "CardPaymentRequest" object
+// Saturn "TransactionRequest" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
 const ByteArray = require('webpki.org').ByteArray;
@@ -29,8 +29,8 @@ const AuthorizationResponse = require('./AuthorizationResponse');
 const AuthorizationRequest  = require('./AuthorizationRequest');
 const ProtectedAccountData  = require('./ProtectedAccountData');
 
-function CardPaymentRequest(rd) {
-  this.root = Messages.parseBaseMessage(Messages.CARD_PAYMENT_REQUEST, rd);
+function TransactionRequest(rd) {
+  this.root = Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, rd);
   this.authorizationResponse = new AuthorizationResponse(rd.getObject(BaseProperties.EMBEDDED_JSON));
   this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
   this.actualAmount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON,
@@ -48,43 +48,43 @@ function CardPaymentRequest(rd) {
   rd.checkForUnread();
 }
 
-CardPaymentRequest.prototype.getTimeStamp = function() {
+TransactionRequest.prototype.getTimeStamp = function() {
   return this.timeStamp;
 };
 
-CardPaymentRequest.prototype.getReferenceId = function() {
+TransactionRequest.prototype.getReferenceId = function() {
   return this.referenceId;
 };
 
-CardPaymentRequest.prototype.getAmount = function() {
+TransactionRequest.prototype.getAmount = function() {
   return this.actualAmount;
 };
 
-CardPaymentRequest.prototype.getTestMode = function() {
+TransactionRequest.prototype.getTestMode = function() {
   return this.authorizationResponse.authorizationRequest.testMode;
 };
 
-CardPaymentRequest.prototype.getPayee = function() {
+TransactionRequest.prototype.getPayee = function() {
   return this.authorizationResponse.authorizationRequest.paymentRequest.payee;
 };
 
-CardPaymentRequest.prototype.getPublicKey = function() {
+TransactionRequest.prototype.getPublicKey = function() {
   return this.publicKey;
 };
 
-CardPaymentRequest.prototype.getAuthorizationResponse = function() {
+TransactionRequest.prototype.getAuthorizationResponse = function() {
   return this.authorizationResponse;
 };
 
-CardPaymentRequest.prototype.getPaymentRequest = function() {
+TransactionRequest.prototype.getPaymentRequest = function() {
   return this.authorizationResponse.authorizationRequest.paymentRequest;
 };
 
-CardPaymentRequest.prototype.verifyPayerProvider = function(paymentRoot) {
+TransactionRequest.prototype.verifyPayerProvider = function(paymentRoot) {
   this.authorizationResponse.signatureDecoder.verifyTrust(paymentRoot);
 };
 
-CardPaymentRequest.prototype.getProtectedAccountData = function(decryptionKeys) {
+TransactionRequest.prototype.getProtectedAccountData = function(decryptionKeys) {
   return new ProtectedAccountData(JsonUtil.ObjectReader.parse(
                                       this.authorizationResponse.encryptedAccountData
                                           .getDecryptedData(decryptionKeys)),
@@ -95,7 +95,7 @@ CardPaymentRequest.prototype.getProtectedAccountData = function(decryptionKeys) 
     public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
-        return Messages.createBaseMessage(Messages.CARD_PAYMENT_REQUEST)
+        return Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
             .setObject(EMBEDDED_JSON, authorizationResponse.root)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new Date(), true)
@@ -116,4 +116,4 @@ CardPaymentRequest.prototype.getProtectedAccountData = function(decryptionKeys) 
     }
 */
 
-module.exports = CardPaymentRequest;
+module.exports = TransactionRequest;

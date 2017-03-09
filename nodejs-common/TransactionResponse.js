@@ -17,7 +17,7 @@
 
 'use strict';
 
-// Saturn "CardPaymentResponse" object
+// Saturn "TransactionResponse" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
@@ -28,13 +28,13 @@ const Software       = require('./Software');
 const SOFTWARE_NAME    = "WebPKI.org - Acquirer";
 const SOFTWARE_VERSION = "1.00";
 
-function CardPaymentResponse() {
+function TransactionResponse() {
 }
 
 /*
-    public CardPaymentResponse(JSONObjectReader rd) throws IOException {
+    public TransactionResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.CARD_PAYMENT_RESPONSE, root = rd);
-        cardPaymentRequest = new CardPaymentRequest(rd.getObject(EMBEDDED_JSON));
+        cardPaymentRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
@@ -65,18 +65,18 @@ function CardPaymentResponse() {
     }
 
 
-    CardPaymentRequest cardPaymentRequest;
-    public CardPaymentRequest getCardPaymentRequest() {
+    TransactionRequest cardPaymentRequest;
+    public TransactionRequest getCardPaymentRequest() {
         return cardPaymentRequest;
     }
 
 */
 
-CardPaymentResponse.encode = function(cardPaymentRequest,
+TransactionResponse.encode = function(cardPaymentRequest,
                                       referenceId,
                                       optionalLogData,
                                       signer) {
-  return Messages.createBaseMessage(Messages.CARD_PAYMENT_RESPONSE)
+  return Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
     .setObject(BaseProperties.EMBEDDED_JSON, cardPaymentRequest.root)
     .setString(BaseProperties.REFERENCE_ID_JSON, referenceId)
     .setDynamic((wr) => {
@@ -87,5 +87,5 @@ CardPaymentResponse.encode = function(cardPaymentRequest,
     .setSignature(signer);
 };
 
-module.exports = CardPaymentResponse;
+module.exports = TransactionResponse;
 

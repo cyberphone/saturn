@@ -55,8 +55,7 @@ const BaseProperties = {
     EXPIRES_JSON                     : 'expires',                    // Object expiration time
     RECEPIENT_URL_JSON               : 'recepientUrl',               // Where we are sending (target address)
     AUTHORITY_URL_JSON               : 'authorityUrl',               // Double use self in *Authority objects and initiator
-    SERVICE_URL_JSON                 : 'serviceUrl',                 // Saturn "lite" (standard)
-    EXTENDED_SERVICE_URL_JSON        : 'extendedServiceUrl',         // Native Saturn payment system
+    SERVICE_URL_JSON                 : 'serviceUrl',                 // Saturn core
     AMOUNT_JSON                      : 'amount',
     CURRENCY_JSON                    : 'currency',
     NON_DIRECT_PAYMENT_JSON          : 'nonDirectPayment',           // Deposit, automated gas station, booking
