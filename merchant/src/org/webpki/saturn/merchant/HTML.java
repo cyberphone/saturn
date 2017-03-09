@@ -125,27 +125,13 @@ public class HTML implements MerchantProperties {
                    "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">Install Wallet</a>.&nbsp; " +
                    "There is also an <a href=\"android\">Android version</a> of the Wallet.</td></tr>" +
                    "<tr><td align=\"center\"><table cellspacing=\"0\">" +
-//TODO
-//                   "<tr style=\"text-align:left\"><td><a href=\"" + "hh" + "/cards\">Initialize Payment Cards&nbsp;&nbsp;</a></td><td><i>Mandatory</i> First Step</td></tr>" +
                    "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "shop" + 
                      "\">Go To Merchant</a></td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
                    "<form name=\"options\" method=\"POST\">" +
-/*
-                   "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" + 
-                   RESERVE_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
-                   (reserveMode ? " checked" : "") +
-                   "></td><td>Reserve+Finalize Payment Mode</td></tr>" +
-*/
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
                    DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (debugMode ? " checked" : "") +
                    "></td><td>Debug (JSON Message Dump) Option</td></tr>" +
-/*  
-                   "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
-                   NATIVE_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
-                   (nativeMode ? " checked" : "") +
-                   "></td><td>Saturn &quot;Native&quot; Mode</td></tr>" +
-*/
                    "</form><tr><td style=\"text-align:left;padding-top:10pt\"><a href=\"" + "gasstation" + 
                    "\">Gas Station</a></td><td style=\"text-align:left;padding-top:10pt\">Another Payment Scenario</td></tr>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +

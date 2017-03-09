@@ -35,9 +35,9 @@ import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.json.encryption.DecryptionKeyHolder;
 
-public class CardPaymentRequest implements BaseProperties {
+public class TransactionRequest implements BaseProperties {
     
-    public CardPaymentRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
+    public TransactionRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, root = rd);
         authorizationResponse = new AuthorizationResponse(rd.getObject(EMBEDDED_JSON));
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);

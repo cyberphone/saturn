@@ -26,8 +26,8 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.UrlHolder;
-import org.webpki.saturn.common.CardPaymentRequest;
-import org.webpki.saturn.common.CardPaymentResponse;
+import org.webpki.saturn.common.TransactionRequest;
+import org.webpki.saturn.common.TransactionResponse;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // This is the Saturn "hybrid" mode decoder servlet                                           //
@@ -40,17 +40,17 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
         // Decode and finalize the cardpay request which in hybrid mode actually is account-2-account
-        CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest, false);
+        TransactionRequest transactionRequest = new TransactionRequest(providerRequest, false);
         
         // Get account data.  Note: this may also be derived from a transaction DB
-        AuthorizationRequest authorizationRequest = cardPaymentRequest.getAuthorizationResponse().getAuthorizationRequest();
+        AuthorizationRequest authorizationRequest = transactionRequest.getAuthorizationResponse().getAuthorizationRequest();
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
-        boolean testMode = cardPaymentRequest.getTestMode();
+        boolean testMode = transactionRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Charging for AccountID=" + authorizationData.getAccount().getId() + 
-                    ", Amount=" + cardPaymentRequest.getAmount().toString() +
-                    " " + cardPaymentRequest.getPaymentRequest().getCurrency().toString());
+                    ", Amount=" + transactionRequest.getAmount().toString() +
+                    " " + transactionRequest.getPaymentRequest().getCurrency().toString());
         String optionalLogData = null;
         if (!testMode) {
 
@@ -59,7 +59,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         }
 
         // It appears that we succeeded
-        return CardPaymentResponse.encode(cardPaymentRequest,
+        return TransactionResponse.encode(transactionRequest,
                                           getReferenceId(),
                                           optionalLogData,
                                           BankService.bankKey);

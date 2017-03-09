@@ -27,14 +27,14 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
 
-public class CardPaymentResponse implements BaseProperties {
+public class TransactionResponse implements BaseProperties {
     
     public static final String SOFTWARE_NAME    = "WebPKI.org - Acquirer";
     public static final String SOFTWARE_VERSION = "1.00";
 
-    public CardPaymentResponse(JSONObjectReader rd) throws IOException {
+    public TransactionResponse(JSONObjectReader rd) throws IOException {
         Messages.parseBaseMessage(Messages.TRANSACTION_RESPONSE, root = rd);
-        cardPaymentRequest = new CardPaymentRequest(rd.getObject(EMBEDDED_JSON), null);
+        transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON), null);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
@@ -71,17 +71,17 @@ public class CardPaymentResponse implements BaseProperties {
     }
 
 
-    CardPaymentRequest cardPaymentRequest;
-    public CardPaymentRequest getCardPaymentRequest() {
-        return cardPaymentRequest;
+    TransactionRequest transactionRequest;
+    public TransactionRequest getCardPaymentRequest() {
+        return transactionRequest;
     }
 
-    public static JSONObjectWriter encode(CardPaymentRequest cardPaymentRequest,
+    public static JSONObjectWriter encode(TransactionRequest transactionRequest,
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
         return Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
-            .setObject(EMBEDDED_JSON, cardPaymentRequest.root)
+            .setObject(EMBEDDED_JSON, transactionRequest.root)
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)

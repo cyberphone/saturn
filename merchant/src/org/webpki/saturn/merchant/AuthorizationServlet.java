@@ -38,8 +38,8 @@ import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
-import org.webpki.saturn.common.CardPaymentRequest;
-import org.webpki.saturn.common.CardPaymentResponse;
+import org.webpki.saturn.common.TransactionRequest;
+import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
@@ -222,7 +222,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                    DebugData debugData) throws IOException {
 
         JSONObjectWriter cardPaymentRequest =
-            CardPaymentRequest.encode(transactionOperation.authorizationResponse,
+            TransactionRequest.encode(transactionOperation.authorizationResponse,
                                       transactionOperation.urlToCall,
                                       actualAmount,
                                       MerchantService.getReferenceId(),
@@ -238,7 +238,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             debugData.cardPaymentResponse = response;
         }
         
-        CardPaymentResponse cardPaymentResponse = new CardPaymentResponse(response);
+        TransactionResponse cardPaymentResponse = new TransactionResponse(response);
         cardPaymentResponse.getSignatureDecoder().verify(transactionOperation.verifier);
     }
 

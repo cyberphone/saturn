@@ -25,8 +25,8 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.UrlHolder;
-import org.webpki.saturn.common.CardPaymentRequest;
-import org.webpki.saturn.common.CardPaymentResponse;
+import org.webpki.saturn.common.TransactionRequest;
+import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.Payee;
 
@@ -41,7 +41,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
         // Decode and finalize the cardpay request
-        CardPaymentRequest cardPaymentRequest = new CardPaymentRequest(providerRequest, true);
+        TransactionRequest cardPaymentRequest = new TransactionRequest(providerRequest, true);
 
         // Verify that the user's bank is known
         cardPaymentRequest.verifyUserBank(AcquirerService.paymentRoot);
@@ -76,7 +76,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         }
 
         // It appears that we succeeded
-        return CardPaymentResponse.encode(cardPaymentRequest,
+        return TransactionResponse.encode(cardPaymentRequest,
                                           getReferenceId(),
                                           optionalLogData,
                                           AcquirerService.acquirerKey);
