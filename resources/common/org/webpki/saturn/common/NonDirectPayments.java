@@ -21,10 +21,11 @@ import java.io.Serializable;
 
 public enum NonDirectPayments implements Serializable {
 
-    GAS_STATION (), 
-    BOOKING     (),
-    DEPOSIT     (),
-    OTHER       ();
+    GAS_STATION  (),  // Single shot payment up to specified amount
+    BOOKING      (),  // Single shot payment up to specified amount
+    DEPOSIT      (),  // Single shot payment up to specified amount
+    REOCCURRING  (),  // Auto transactions, terminated by a zero-amount request
+    OTHER        ();
 
     NonDirectPayments () {
     }

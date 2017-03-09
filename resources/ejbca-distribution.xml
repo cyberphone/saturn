@@ -30,7 +30,7 @@
     </antcall>
   	<antcall target="_final">
   		<param name="var" value="optionalLogData"/>
-  		<param name="file" value="CardPaymentResponse"/>
+  		<param name="file" value="TransactionResponse"/>
     </antcall>
   	<antcall target="_final">
   		<param name="var" value="optionalNonDirectPayment"/>

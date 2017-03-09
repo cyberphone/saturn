@@ -23,7 +23,7 @@ const JsonUtil = require('webpki.org').JsonUtil;
 
 const BaseProperties = require('./BaseProperties');
 
-const NON_DIRECT_PAYMENTS = ['GAS_STATION', 'BOOKING', 'DEPOSIT', 'OTHER'];
+const NON_DIRECT_PAYMENTS = ['GAS_STATION', 'BOOKING', 'DEPOSIT', 'REOCCURRING', 'OTHER'];
 
 var NonDirectPayments = {
 
