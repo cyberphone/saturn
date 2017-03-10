@@ -46,7 +46,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         // Verify that the user's bank is known
         transactionRequest.verifyUserBank(AcquirerService.paymentRoot);
 
-        // Verify that the merchant is one of our customers
+        // Verify that the payee (merchant) is one of our customers
         Payee payee = transactionRequest.getPayee();
         PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
         if (merchantProperties == null) {

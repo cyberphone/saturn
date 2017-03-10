@@ -40,6 +40,8 @@ public enum Messages {
     TRANSACTION_REQUEST           ("TransactionRequest"),            // Payee to Acquirer or Payer provider
     TRANSACTION_RESPONSE          ("TransactionResponse"),           // Response to the former
 
+    REFUND_REQUEST                ("RefundRequest"),                 // Payee to Acquirer or Payee provider
+    REFUND_RESPONSE               ("RefundResponse"),                // Response to the former
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     PROVIDER_AUTHORITY            ("ProviderAuthority"),             // Published provider entity data

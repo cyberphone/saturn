@@ -22,4 +22,5 @@ public interface KnownExtensions {
     
     String HYBRID_PAYMENT  = "http://webpki.org/saturn/v3/extensions#hybrid";
     
+    String REFUND_REQUEST  = "http://webpki.org/saturn/v3/extensions#refund";
 }

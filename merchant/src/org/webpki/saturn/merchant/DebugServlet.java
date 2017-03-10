@@ -489,7 +489,7 @@ class DebugPrintout implements BaseProperties {
                 "object.</p><p>" +
                 "Then a number of properties are added including " +
                 keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) + " which holds " +
-                (debugData.acquirerMode ? "the encrypted PAN etc" : "an encrypted version of the <b>User</b> account which can be used for possible reversals") +
+                (debugData.acquirerMode ? "the encrypted PAN etc" : "an encrypted version of the <b>User</b> account which can be used for possible <i>refunds</i>") +
                 ". Note that the encryption is performed using the " +
                 keyWord(ENCRYPTION_PARAMETERS_JSON) + " of the <b>Merchant</b> " +
                 keyWord(Messages.PROVIDER_AUTHORITY.toString()) + " object. " +
