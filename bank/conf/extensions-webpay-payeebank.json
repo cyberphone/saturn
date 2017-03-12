@@ -1,1 +1,4 @@
+{
+  "http://webpki.org/saturn/v3/extensions#refund": "${host}/refund"
+}
 

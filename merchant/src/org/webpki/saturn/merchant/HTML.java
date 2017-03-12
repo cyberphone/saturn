@@ -102,8 +102,7 @@ public class HTML implements MerchantProperties {
 
     static void homePage(HttpServletResponse response,
                          boolean debugMode,
-                         boolean reserveMode,
-                         boolean nativeMode) throws IOException, ServletException {
+                         boolean refundMode) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(null, null,
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
@@ -126,14 +125,19 @@ public class HTML implements MerchantProperties {
                    "There is also an <a href=\"android\">Android version</a> of the Wallet.</td></tr>" +
                    "<tr><td align=\"center\"><table cellspacing=\"0\">" +
                    "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "shop" + 
-                     "\">Go To Merchant</a></td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
+                   "\">Go To Merchant</a></td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
+                   "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "gasstation" + 
+                   "\">Gas Station</a></td><td style=\"text-align:left;padding-bottom:5pt\">Another Payment Scenario</td></tr>" +
                    "<form name=\"options\" method=\"POST\">" +
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
                    DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
                    (debugMode ? " checked" : "") +
                    "></td><td>Debug (JSON Message Dump) Option</td></tr>" +
-                   "</form><tr><td style=\"text-align:left;padding-top:10pt\"><a href=\"" + "gasstation" + 
-                   "\">Gas Station</a></td><td style=\"text-align:left;padding-top:10pt\">Another Payment Scenario</td></tr>" +
+                   "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
+                   REFUND_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
+                   (refundMode ? " checked" : "") +
+                   "></td><td>Refund Option</td></tr>" +
+                   "</form>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/\">Saturn Home</a>&nbsp;&nbsp;</td><td>Presentation Etc.</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Demo Source Code</a></td><td>For Nerds...</td></tr>" +
@@ -361,7 +365,6 @@ public class HTML implements MerchantProperties {
                               SavedShoppingCart savedShoppingCart, 
                               boolean tapConnectMode,
                               boolean debugMode,
-                              boolean nativeMode,
                               String walletRequest) throws IOException, ServletException {
         String connectMethod = tapConnectMode ? "tapConnect" : "nativeConnect";
         StringBuffer s = currentOrder(savedShoppingCart);
@@ -445,9 +448,7 @@ public class HTML implements MerchantProperties {
                     "        nativePort.postMessage(invocationData);\n" +
                     "      } else {\n" +
                     "// This is it...transfer the Wallet authorization data back to the Merchant server\n" +
-                    "        fetch('")
-                  .append(nativeMode ? "transact" : "authorize")
-                  .append("', {\n" +
+                    "        fetch('authorize', {\n" +
                     "           headers: {\n" +
                     "             'Content-Type': 'application/json'\n" +
                     "           },\n" +
@@ -547,6 +548,7 @@ public class HTML implements MerchantProperties {
                     "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">" +
                     "Dear customer, your order has been successfully processed!</td></tr>" : "")
             .append(receiptCore(resultData, debugMode))
+            .append(optionalRefund(resultData))
             .append("</table></td></tr></table></td></tr>");
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
     }
@@ -579,6 +581,7 @@ public class HTML implements MerchantProperties {
                 .append(selectionButtons(new FuelTypes[]{fuelType}))
                 .append("<tr><td style=\"height:15pt\"></td></tr>")
                 .append(receiptCore(resultData, debugMode))
+                .append(optionalRefund(resultData))
                 .append("</table></td></tr></table></td></tr>");
             HTML.output(response, 
                         HTML.getHTML(STICK_TO_HOME_URL + updatePumpDisplay(fuelType),
@@ -588,6 +591,11 @@ public class HTML implements MerchantProperties {
         } else {
             shopResultPage(response, debugMode, resultData);
         }
+    }
+
+    static String optionalRefund(ResultData resultData) {
+        return resultData.optionalRefund == null ? "" :
+            "<tr><td style=\"text-align:center;padding-top:20pt\"><input type=\"button\" value=\"Refund!\" onclick=\"location.href='refund'\"></td></tr>";
     }
 
     static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
@@ -929,4 +937,15 @@ public class HTML implements MerchantProperties {
             "</table></td></tr>"));
     }
 
+    static void refundResultPage(HttpServletResponse response, boolean debugMode, ResultData resultData) throws IOException, ServletException {
+        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
+            .append("<table>" +
+                "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL +
+                "\">Refund Result<br>&nbsp;</td></tr>" +
+                 "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">" +
+                "Dear customer, your payment has been refunded!</td></tr>")
+            .append(receiptCore(resultData, debugMode))
+            .append("</table></td></tr></table></td></tr>");
+        HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
+    }
 }

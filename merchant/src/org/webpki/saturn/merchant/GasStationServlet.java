@@ -52,7 +52,6 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
             return;
         }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
-        session.setAttribute(RESERVE_MODE_SESSION_ATTR, true);
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
         savedShoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;
         session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);

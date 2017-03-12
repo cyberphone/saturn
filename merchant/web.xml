@@ -159,6 +159,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>RefundServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.RefundServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>DebugServlet</servlet-name>
         <servlet-class>org.webpki.saturn.merchant.DebugServlet</servlet-class>
     </servlet>
@@ -221,6 +226,11 @@
     <servlet-mapping>
         <servlet-name>ResultServlet</servlet-name>
         <url-pattern>/result</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>RefundServlet</servlet-name>
+        <url-pattern>/refund</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

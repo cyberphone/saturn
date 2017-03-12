@@ -64,4 +64,8 @@ public class DebugData implements Serializable {
     public boolean softFinalizeError;
 
     public boolean gasStation;
+
+    public JSONObjectReader refundRequest;
+
+    public JSONObjectReader refundResponse;
 }

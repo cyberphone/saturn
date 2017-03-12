@@ -69,21 +69,17 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
         session = request.getSession(true);
         if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
             session.removeAttribute(GAS_STATION_SESSION_ATTR);
-            session.removeAttribute(RESERVE_MODE_SESSION_ATTR);
-            session.removeAttribute(NATIVE_MODE_SESSION_ATTR);
         }
         session.setAttribute(TAP_CONNECT_MODE_SESSION_ATTR, isTapConnect());
         HTML.homePage(response,
                       checkBoxGet(session, DEBUG_MODE_SESSION_ATTR),
-                      checkBoxGet(session, RESERVE_MODE_SESSION_ATTR),
-                      checkBoxGet(session, NATIVE_MODE_SESSION_ATTR));
+                      checkBoxGet(session, REFUND_MODE_SESSION_ATTR));
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(true);
         checkBoxSet(session, request, DEBUG_MODE_SESSION_ATTR);
-        checkBoxSet(session, request, RESERVE_MODE_SESSION_ATTR);
-        checkBoxSet(session, request, NATIVE_MODE_SESSION_ATTR);
+        checkBoxSet(session, request, REFUND_MODE_SESSION_ATTR);
         response.sendRedirect("home");
     }
 }

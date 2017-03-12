@@ -125,7 +125,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        initProperties (sce);
+        initProperties(sce);
         try {
             logging = getPropertyBoolean(LOGGING);
 

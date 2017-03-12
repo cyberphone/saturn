@@ -17,8 +17,10 @@
 package org.webpki.saturn.merchant;
 
 import java.io.Serializable;
+
 import java.math.BigDecimal;
 
+import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.TransactionResponse.ERROR;
@@ -38,5 +40,7 @@ public class ResultData implements Serializable {
     public PayerAccountTypes accountType;
 
     public ERROR transactionError;
+    
+    public AuthorizationResponse optionalRefund;
     
 }

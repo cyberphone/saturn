@@ -39,7 +39,6 @@ import org.webpki.saturn.common.PaymentRequest;
 public class WalletRequest implements BaseProperties, MerchantProperties {
 
     boolean debugMode;
-    boolean nativeMode;
     SavedShoppingCart savedShoppingCart;
     JSONObjectWriter requestObject;
     
@@ -49,7 +48,6 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                   String androidCancelUrl,
                   String androidSuccessUrl) throws IOException {
         debugMode = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
-        nativeMode = HomeServlet.getOption(session, NATIVE_MODE_SESSION_ATTR);
         DebugData debugData = null;
         if (debugMode) {
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
@@ -88,7 +86,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         if (androidCancelUrl != null) {
             requestObject.setString(ANDROID_CANCEL_URL_JSON, androidCancelUrl)
                          .setString(ANDROID_SUCCESS_URL_JSON, androidSuccessUrl)
-                         .setString(ANDROID_TRANSACTION_URL_JSON, androidTransactionUrl + (nativeMode ? "/transact" : "/authorize"));
+                         .setString(ANDROID_TRANSACTION_URL_JSON, androidTransactionUrl + "/authorize");
         }
 
         if (debugMode) {

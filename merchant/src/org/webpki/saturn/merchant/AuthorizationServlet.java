@@ -17,15 +17,11 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.math.BigDecimal;
-
 import java.net.URL;
-
 import java.security.GeneralSecurityException;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -33,7 +29,6 @@ import javax.servlet.http.HttpSession;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -189,6 +184,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             accountReference = AuthorizationData.formatCardNumber(accountReference);
         }
         resultData.accountReference = accountReference;
+
+        // Special treatment of the refund mode
+        if (HomeServlet.getOption(session, REFUND_MODE_SESSION_ATTR)) {
+            resultData.optionalRefund = authorizationResponse;
+        }
 
         // Two-phase operation: perform the final step
         if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {

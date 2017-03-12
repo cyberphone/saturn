@@ -38,6 +38,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 
+import javax.servlet.http.HttpServlet;
+
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
@@ -144,6 +146,23 @@ public class BankService extends InitPropertyReader implements ServletContextLis
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
 
+    static void dynamicServlet(ServletContextEvent sce,
+                               String extension,
+                               Class<? extends HttpServlet> servlet,
+                               String description) throws IOException {
+        if (optionalProviderExtensions != null && optionalProviderExtensions.hasProperty(extension)) {
+            final ServletContext servletContext = sce.getServletContext();
+            final ServletRegistration.Dynamic dynamic = servletContext.addServlet(description, servlet);
+            String url = optionalProviderExtensions.getString(extension);
+            dynamic.addMapping(url.substring(url.lastIndexOf('/')));
+     
+            final Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
+            for (String key : map.keySet()) {
+                logger.info("Registered Servlet: " + map.get(key).getName());
+            }
+        }
+    }
+
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         if (authorityObjectManager != null) {
@@ -157,7 +176,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        initProperties (sce);
+        initProperties(sce);
         try {
             logging = getPropertyBoolean(LOGGING);
 
@@ -223,19 +242,15 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            bankKey,
 
                                            logging);
-            if (optionalProviderExtensions != null &&
-                optionalProviderExtensions.hasProperty(KnownExtensions.HYBRID_PAYMENT)) {
-                final ServletContext servletContext = sce.getServletContext();
-                final ServletRegistration.Dynamic dynamic =
-                        servletContext.addServlet("Hybrid Payment Servlet", HybridPaymentServlet.class);
-                String url = optionalProviderExtensions.getString(KnownExtensions.HYBRID_PAYMENT);
-                dynamic.addMapping(url.substring(url.lastIndexOf('/')));
-         
-                final Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
-                for (String key : map.keySet()) {
-                    logger.info("Registered Servlet: " + map.get(key).getName());
-                }
-            }
+
+            dynamicServlet(sce,
+                           KnownExtensions.HYBRID_PAYMENT,
+                           HybridPaymentServlet.class,
+                           "Hybrid Payment Servlet");
+            dynamicServlet(sce,
+                           KnownExtensions.REFUND_REQUEST,
+                           RefundServlet.class,
+                           "Refund Servlet");
 
             logger.info("Saturn \"" + bankCommonName + "\" server initiated");
         } catch (Exception e) {
