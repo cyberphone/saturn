@@ -153,7 +153,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Pure sample data...
         // Separate credit-card and account2account payments
         AccountDescriptor accountDescriptor = cardPayment ?
-            authorizationData.getAccount() : new AccountDescriptor("https://swift.com", "IBAN:FGFGFGFFGFGFGFGF");
+            authorizationData.getAccount() : new AccountDescriptor("https://swift.com", "IBAN:FR1420041010050500013M02606");
         CardSpecificData cardSpecificData = cardPayment ? 
             new CardSpecificData("Luke Skywalker",
                                  ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),

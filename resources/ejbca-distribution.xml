@@ -33,12 +33,16 @@
   		<param name="file" value="TransactionResponse"/>
     </antcall>
   	<antcall target="_final">
-  		<param name="var" value="optionalNonDirectPayment"/>
-  		<param name="file" value="PaymentRequest"/>
+  		<param name="var" value="transactionError"/>
+  		<param name="file" value="TransactionResponse"/>
     </antcall>
   	<antcall target="_final">
-  		<param name="var" value="serviceUrl"/>
-  		<param name="file" value="ProviderAuthority"/>
+  		<param name="var" value="optionalLogData"/>
+  		<param name="file" value="RefundResponse"/>
+    </antcall>
+  	<antcall target="_final">
+  		<param name="var" value="optionalNonDirectPayment"/>
+  		<param name="file" value="PaymentRequest"/>
     </antcall>
   	<antcall target="_final">
   		<param name="var" value="extendedServiceUrl"/>
@@ -66,7 +70,7 @@
         replace="// REMOVED"
         flags="s"/>
   	<replaceregexp file="${dd}/webpay-bank/src/org/webpki/saturn/bank/BankService.java"
-        match="if \(optionalProviderExtensions \!\= .*\n            }"
+        match="if \(optionalProviderExtensions \!\= .*?            }\n        }"
         replace="// REMOVED"
         flags="s"/>
   	<replaceregexp file="${dd}/webpay-bank/web.xml"
@@ -76,6 +80,30 @@
   	<replaceregexp file="${dd}/webpay-bank/web.xml"
         match="(&lt;url-pattern&gt;/service&lt;.*?&lt;\/servlet-mapping&gt;)"
         replace="\1&#10;&#10;    &lt;servlet-mapping&gt;&#10;        &lt;servlet-name&gt;HybridPaymentServlet&lt;/servlet-name&gt;&#10;        &lt;url-pattern&gt;/hybridpay&lt;/url-pattern&gt;&#10;    &lt;/servlet-mapping&gt;"
+        flags="s"/>
+  	<replaceregexp file="${dd}/webpay-bank/web.xml"
+        match="(AuthorizationServlet.*?&lt;\/servlet&gt;)"
+        replace="\1&#10;&#10;    &lt;servlet&gt;&#10;        &lt;servlet-name&gt;RefundServlet&lt;/servlet-name&gt;&#10;        &lt;servlet-class&gt;org.webpki.saturn.bank.RefundServlet&lt;/servlet-class&gt;&#10;    &lt;/servlet&gt;"
+        flags="s"/>
+  	<replaceregexp file="${dd}/webpay-bank/web.xml"
+        match="(&lt;url-pattern&gt;/service&lt;.*?&lt;\/servlet-mapping&gt;)"
+        replace="\1&#10;&#10;    &lt;servlet-mapping&gt;&#10;        &lt;servlet-name&gt;RefundServlet&lt;/servlet-name&gt;&#10;        &lt;url-pattern&gt;/refund&lt;/url-pattern&gt;&#10;    &lt;/servlet-mapping&gt;"
+        flags="s"/>
+  	<replaceregexp file="${dd}/webpay-acquirer/src/org/webpki/saturn/acquirer/AcquirerService.java"
+        match="import\ javax\.servlet\.ServletRegistration\;"
+        replace="// REMOVED"
+        flags="s"/>
+  	<replaceregexp file="${dd}/webpay-acquirer/src/org/webpki/saturn/acquirer/AcquirerService.java"
+        match="if \(optionalProviderExtensions \!\= .*?            }\n        }"
+        replace="// REMOVED"
+        flags="s"/>
+  	<replaceregexp file="${dd}/webpay-acquirer/web.xml"
+        match="(TransactionServlet.*?&lt;\/servlet&gt;)"
+        replace="\1&#10;&#10;    &lt;servlet&gt;&#10;        &lt;servlet-name&gt;RefundServlet&lt;/servlet-name&gt;&#10;        &lt;servlet-class&gt;org.webpki.saturn.acquirer.RefundServlet&lt;/servlet-class&gt;&#10;    &lt;/servlet&gt;"
+        flags="s"/>
+  	<replaceregexp file="${dd}/webpay-acquirer/web.xml"
+        match="(&lt;url-pattern&gt;/transact&lt;.*?&lt;\/servlet-mapping&gt;)"
+        replace="\1&#10;&#10;    &lt;servlet-mapping&gt;&#10;        &lt;servlet-name&gt;RefundServlet&lt;/servlet-name&gt;&#10;        &lt;url-pattern&gt;/refund&lt;/url-pattern&gt;&#10;    &lt;/servlet-mapping&gt;"
         flags="s"/>
     <antcall target="_nolambda"><param name="subdir" value="${dd}/webpay-acquirer/common.src"/></antcall>
     <antcall target="_nolambda"><param name="subdir" value="${dd}/webpay-bank/common.src"/></antcall>

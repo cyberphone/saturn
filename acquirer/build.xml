@@ -2,6 +2,7 @@
 
   <!-- set properties for this build -->
   <property name="src.dir" value="src"/>
+  <property name="conf.dir" value="conf"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/acquirer"/>
   
   <property name="appcorename" value="webpay-acquirer"/>
@@ -41,6 +42,7 @@
   </target>
 
   <target name="_build">
+    <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="logging" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
@@ -67,6 +69,7 @@
            includeAntRuntime="false"/>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@key-password@" value="${keypassword}"/>
+      <replacefilter token="@provider-extensions@" value="${extensions.file}"/>
       <replacefilter token="@acquirer-eecert@" value="${acquirersignaturekey}.p12"/>
       <replacefilter token="@acquirer-decryptionkey1@" value="${acquirerencryptionkey_ec}.p12"/>
       <replacefilter token="@acquirer-decryptionkey2@" value="${acquirerencryptionkey_rsa}.p12"/>
@@ -97,6 +100,9 @@
       </zipfileset>
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
          <include name="${merchants.db}"/>
+      </zipfileset>
+      <zipfileset dir="${conf.dir}" prefix="${class_war_path}">
+         <include name="${extensions.file}"/>
       </zipfileset>
       <fileset dir="web"/>
     </war>

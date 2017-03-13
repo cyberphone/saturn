@@ -41,7 +41,7 @@ public class RefundServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
 
         // Decode refund request which embeds the authorization response
-        RefundRequest refundRequest = new RefundRequest(providerRequest, false);
+        RefundRequest refundRequest = new RefundRequest(providerRequest, true);
         refundRequest.verifyUserBank(AcquirerService.paymentRoot);
         
         // Verify that the payee (merchant) is one of our customers

@@ -190,7 +190,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             authorityObjectManager =
                 new AuthorityObjectManager(authorityUrl = aquirerHost + "/authority",
                                            aquirerHost + "/transact",
-                                           null,
+                                           optionalProviderExtensions,
                                            null,
                                            decryptionKeys.get(0).getPublicKey(),
     

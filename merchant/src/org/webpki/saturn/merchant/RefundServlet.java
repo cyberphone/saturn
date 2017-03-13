@@ -17,10 +17,12 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,12 +30,14 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.RefundRequest;
 import org.webpki.saturn.common.RefundResponse;
+
 import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
