@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.bank;
+package org.webpki.saturn.acquirer;
 
 import java.io.IOException;
 
@@ -42,11 +42,11 @@ public class RefundServlet extends ProcessingBaseServlet {
 
         // Decode refund request which embeds the authorization response
         RefundRequest refundRequest = new RefundRequest(providerRequest, false);
-        refundRequest.verifyUserBank(BankService.paymentRoot);
+        refundRequest.verifyUserBank(AcquirerService.paymentRoot);
         
         // Verify that the payee (merchant) is one of our customers
         Payee payee = refundRequest.getPayee();
-        PayeeCoreProperties merchantProperties = BankService.merchantAccountDb.get(payee.getId());
+        PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
         if (merchantProperties == null) {
             throw new IOException("Unknown merchant Id: " + payee.getId());
         }
@@ -55,7 +55,7 @@ public class RefundServlet extends ProcessingBaseServlet {
         }
 
         // Get payer account data.
-        AccountDescriptor accountDescriptor = refundRequest.getProtectedAccountData(BankService.decryptionKeys).getAccount();
+        AccountDescriptor accountDescriptor = refundRequest.getProtectedAccountData(AcquirerService.decryptionKeys).getAccount();
 
         boolean testMode = refundRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
@@ -67,13 +67,13 @@ public class RefundServlet extends ProcessingBaseServlet {
         if (!testMode) {
 
             // Here we are supposed to do the actual payment
-            optionalLogData = "Bank payment network log data...";
+            optionalLogData = "Card payment network log data...";
         }
 
         // It appears that we succeeded
         return RefundResponse.encode(refundRequest,
                                      getReferenceId(),
                                      optionalLogData,
-                                     BankService.bankKey);
+                                     AcquirerService.acquirerKey);
     }
 }

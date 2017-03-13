@@ -547,7 +547,7 @@ public class HTML implements MerchantProperties {
             .append(resultData.transactionError == null ?
                     "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">" +
                     "Dear customer, your order has been successfully processed!</td></tr>" : "")
-            .append(receiptCore(resultData, debugMode))
+            .append(receiptCore(resultData, debugMode && resultData.optionalRefund == null))
             .append(optionalRefund(resultData))
             .append("</table></td></tr></table></td></tr>");
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
@@ -580,7 +580,7 @@ public class HTML implements MerchantProperties {
                 .append(gasStation("Thank You - Welcome Back!", true))
                 .append(selectionButtons(new FuelTypes[]{fuelType}))
                 .append("<tr><td style=\"height:15pt\"></td></tr>")
-                .append(receiptCore(resultData, debugMode))
+                .append(receiptCore(resultData, debugMode && resultData.optionalRefund == null))
                 .append(optionalRefund(resultData))
                 .append("</table></td></tr></table></td></tr>");
             HTML.output(response, 
@@ -595,7 +595,8 @@ public class HTML implements MerchantProperties {
 
     static String optionalRefund(ResultData resultData) {
         return resultData.optionalRefund == null ? "" :
-            "<tr><td style=\"text-align:center;padding-top:20pt\"><input type=\"button\" value=\"Refund!\" onclick=\"location.href='refund'\"></td></tr>";
+            "<tr><td style=\"text-align:center;padding-top:20pt\">" +
+            "<input type=\"button\" style=\"font-size:11pt;padding:4pt\" value=\"Please refund this transaction...\" onclick=\"location.href='refund'\"></td></tr>";
     }
 
     static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {

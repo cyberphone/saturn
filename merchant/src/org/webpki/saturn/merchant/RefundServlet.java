@@ -78,7 +78,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
             String refundUrl = providerAuthority.getExtensions() == null ? null :
                 providerAuthority.getExtensions().getStringConditional(KnownExtensions.REFUND_REQUEST);
             if (refundUrl == null) {
-                ErrorServlet.systemFail(response, "Payment method doesn't support refund!");
+                ErrorServlet.systemFail(response, "Selected payment method doesn't support refund!");
                 return;
             }
             

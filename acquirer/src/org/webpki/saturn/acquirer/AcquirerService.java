@@ -25,19 +25,25 @@ import java.security.KeyStore;
 import java.security.interfaces.RSAPublicKey;
 
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
+
+import javax.servlet.http.HttpServlet;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 
@@ -47,6 +53,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.AuthorityObjectManager;
+import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerX509Signer;
@@ -66,6 +73,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static final String PAYMENT_ROOT          = "payment_root";
     
+    static final String EXTENSIONS            = "provider_extensions";
+
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
 
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
@@ -85,6 +94,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static String authorityUrl;
     
     static String payeeId;
+    
+    static JSONObjectReader optionalProviderExtensions;
     
     static AuthorityObjectManager authorityObjectManager;
     
@@ -112,6 +123,24 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
+    static void dynamicServlet(ServletContextEvent sce, 
+                               String extension,
+                               Class<? extends HttpServlet> servlet,
+                               String description) throws IOException {
+        if (optionalProviderExtensions != null
+                && optionalProviderExtensions.hasProperty(extension)) {
+            final ServletContext servletContext = sce.getServletContext();
+            final ServletRegistration.Dynamic dynamic = servletContext.addServlet(description, servlet);
+            String url = optionalProviderExtensions.getString(extension);
+            dynamic.addMapping(url.substring(url.lastIndexOf('/')));
+
+            final Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
+            for (String key : map.keySet()) {
+                logger.info("Registered Servlet: " + map.get(key).getName());
+            }
+        }
+    }
+
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         if (authorityObjectManager != null) {
@@ -149,21 +178,34 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             addDecryptionKey(DECRYPTION_KEY2);
             
             String aquirerHost = getPropertyString(ACQUIRER_HOST);
+
+            String extensions =
+                    new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
+
+            if (extensions.length() > 0) {
+                extensions = extensions.replace("${host}", aquirerHost);
+                optionalProviderExtensions = JSONParser.parse(extensions);
+            }
+
             authorityObjectManager =
                 new AuthorityObjectManager(authorityUrl = aquirerHost + "/authority",
                                            aquirerHost + "/transact",
                                            null,
                                            null,
                                            decryptionKeys.get(0).getPublicKey(),
-
+    
                                            merchantAccountDb, 
                                            aquirerHost + "/payees/",
-
+    
                                            PROVIDER_EXPIRATION_TIME,
                                            acquirerKey,
-
+    
                                            logging);
 
+            dynamicServlet(sce,
+                           KnownExtensions.REFUND_REQUEST,
+                           RefundServlet.class,
+                           "Refund Servlet");
 
             logger.info("Saturn Acquirer-server initiated");
         } catch (Exception e) {
