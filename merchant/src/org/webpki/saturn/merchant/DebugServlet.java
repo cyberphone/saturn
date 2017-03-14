@@ -490,7 +490,7 @@ class DebugPrintout implements BaseProperties {
     
     void refundMode() throws IOException, GeneralSecurityException {
         description("<p id=\"refund\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + 
-                HTML.FONT_ARIAL + "\">" +REFUND_TRANSACTION +
+                HTML.FONT_ARIAL + "\">" + REFUND_TRANSACTION +
                 "</p>Refund in Saturn is initiated by the <b>Merchant</b>." +
                 "<p>A refund message is created by embedding the originating" +
                 keyWord(Messages.AUTHORIZATION_RESPONSE) +
@@ -499,7 +499,14 @@ class DebugPrintout implements BaseProperties {
                 " object and sending the completed and <i>signed</i> result to " +
                 "the merchant's <i>payment provider</i>:</p>");
         fancyBox(debugData.refundRequest);
-        descriptionStdMargin("Also see <a href=\"" + encryptedAccount + "\">Encrypted Account Data</a>.");
+        descriptionStdMargin("Also see <a href=\"" + encryptedAccount + "\">Encrypted Account Data</a>. " +
+            "Note that " +
+            keyWord(RECEPIENT_URL_JSON) +
+            " for the refund operation is derived from the " +
+            keyWord(EXTENSIONS_JSON) +
+            " object of the " +
+            keyWord(Messages.PROVIDER_AUTHORITY) +
+            " of the <b>Merchant</b>.");
         description("The actual transfer is using existing payment schemes.  If successful a " +
             keyWord(Messages.REFUND_RESPONSE) +
             " message is returned:");
@@ -561,6 +568,15 @@ class DebugPrintout implements BaseProperties {
             "</b>:</p>");
         fancyBox(debugData.transactionRequest);
         if (debugData.hybridMode) {
+            descriptionStdMargin("Note that " +
+            keyWord(RECEPIENT_URL_JSON) +
+            " for the " +
+            keyWord(Messages.TRANSACTION_REQUEST) +
+            " is derived from the " +
+            keyWord(EXTENSIONS_JSON) +
+            " object of the " +
+            keyWord(Messages.PROVIDER_AUTHORITY) +
+            " of the <b>User&nbsp;Bank</b>.");
             directTransfer(Messages.TRANSACTION_REQUEST);
         } else {
             description(point + 

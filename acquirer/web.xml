@@ -95,7 +95,7 @@
 
     <servlet-mapping>
         <servlet-name>TransactionServlet</servlet-name>
-        <url-pattern>/transact</url-pattern>
+        <url-pattern>/service</url-pattern>
     </servlet-mapping>
 
     <security-constraint>

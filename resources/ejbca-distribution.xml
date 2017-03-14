@@ -102,7 +102,7 @@
         replace="\1&#10;&#10;    &lt;servlet&gt;&#10;        &lt;servlet-name&gt;RefundServlet&lt;/servlet-name&gt;&#10;        &lt;servlet-class&gt;org.webpki.saturn.acquirer.RefundServlet&lt;/servlet-class&gt;&#10;    &lt;/servlet&gt;"
         flags="s"/>
   	<replaceregexp file="${dd}/webpay-acquirer/web.xml"
-        match="(&lt;url-pattern&gt;/transact&lt;.*?&lt;\/servlet-mapping&gt;)"
+        match="(&lt;url-pattern&gt;/service&lt;.*?&lt;\/servlet-mapping&gt;)"
         replace="\1&#10;&#10;    &lt;servlet-mapping&gt;&#10;        &lt;servlet-name&gt;RefundServlet&lt;/servlet-name&gt;&#10;        &lt;url-pattern&gt;/refund&lt;/url-pattern&gt;&#10;    &lt;/servlet-mapping&gt;"
         flags="s"/>
     <antcall target="_nolambda"><param name="subdir" value="${dd}/webpay-acquirer/common.src"/></antcall>
