@@ -147,7 +147,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static ProviderAuthority getProviderAuthority(UrlHolder urlHolder, String url) throws IOException {
         urlHolder.setUrl(url);
         ProviderAuthority providerAuthority = providerAuthorityObjects.get(url);
-        if (providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
+        if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
+                providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
             providerAuthority = new ProviderAuthority(getData(urlHolder), url);
             providerAuthorityObjects.put(url, providerAuthority);
             if (BankService.logging) {
@@ -165,7 +166,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder, String url) throws IOException {
         urlHolder.setUrl(url);
         PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(url);
-        if (payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
+        if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
+                payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
             payeeAuthority = new PayeeAuthority(getData(urlHolder), url);
             payeeAuthorityObjects.put(url, payeeAuthority);
             if (BankService.logging) {

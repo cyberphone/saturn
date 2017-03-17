@@ -68,10 +68,6 @@ public class RefundResponse implements BaseProperties {
         return refundRequest;
     }
 
-    public void checkIssuer(PayeeAuthority payeeAuthority) throws IOException {
-        ProviderAuthority.compareCertificates(signatureDecoder, payeeAuthority.signatureDecoder);
-    }
-
     public static JSONObjectWriter encode(RefundRequest refundRequest,
                                           String referenceId,
                                           String optionalLogData,
@@ -85,5 +81,4 @@ public class RefundResponse implements BaseProperties {
                                                       TransactionResponse.SOFTWARE_VERSION))
             .setSignature(signer);
     }
-
 }

@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class UrlHolder {
     String callerAddress;
+    boolean nonCached;
     
     public UrlHolder(HttpServletRequest request) {
         callerAddress = " [Origin=" + request.getRemoteAddr() + ", Context=" + request.getContextPath() + "] ";
@@ -32,6 +33,16 @@ public class UrlHolder {
 
     public String getUrl() {
         return url;
+    }
+
+    public void setNonCachedMode(boolean nonCached) {
+        this.nonCached = nonCached;
+    }
+
+    public boolean nonCachedMode() {
+        boolean temp = nonCached;
+        nonCached = false;
+        return temp;
     }
 
     public void setUrl(String url) {

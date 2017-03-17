@@ -103,7 +103,9 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                 debugData.refundResponse = refundResponseData;
             }
             RefundResponse refundResponse = new RefundResponse(refundResponseData);
-            refundResponse.checkIssuer(payeeAuthority);
+            refundResponse.getSignatureDecoder().verify(
+               authorizationRequest.getPayerAccountType().isCardPayment() ? 
+                       MerchantService.acquirerRoot : MerchantService.paymentRoot);
 
             HTML.refundResultPage(response,
                                   debug,

@@ -23,12 +23,13 @@ import java.math.BigDecimal;
 import java.security.GeneralSecurityException;
 
 import java.text.SimpleDateFormat;
-
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -70,20 +71,41 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         NonDirectPayments nonDirectPayment = paymentRequest.getNonDirectPayment();
         boolean cardPayment = authorizationRequest.getPayerAccountType().isCardPayment();
         
-        // Verify that the authorization request is signed by a payment partner
-        PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
+        // Get the providers. Note that caching could play tricks on you!
+        PayeeAuthority payeeAuthority;
+        ProviderAuthority providerAuthority;
+        boolean nonCached = false;
+        while (true) {
+            // Lookup of Payee
+            urlHolder.setNonCachedMode(nonCached);
+            payeeAuthority = getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
+    
+            // Lookup of Payee's Provider
+            urlHolder.setNonCachedMode(nonCached);
+            providerAuthority = getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
+            
+            // Now verify that they are issued by the same entity
+            if (Arrays.equals(payeeAuthority.getSignatureDecoder().getCertificatePath(),
+                              providerAuthority.getSignatureDecoder().getCertificatePath())) {
+                break;
+            }
+            if (nonCached) {
+                throw new IOException("\"" + JSONSignatureDecoder.CERTIFICATE_PATH_JSON + "\" mismatch");
+            }
+            nonCached = !nonCached;  // Edge case?  Yes, but it could happen
+        }
+
+        // Verify that the authorization request is signed by a genuine payment partner
         payeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
+
+        // Verify Payee signature keys.  They may be one generation back as well
         payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), authorizationRequest.getSignatureDecoder());
         payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), paymentRequest.getSignatureDecoder());
 
-        // Lookup of payee's provider
-        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
-        providerAuthority.compareIssuers(payeeAuthority);  // Sanity check
-
-        // Decrypt and validate the encrypted user authorization
+        // Decrypt and validate the encrypted Payer authorization
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
-        // Verify that the there is a matching user account
+        // Verify that the there is a matching Payer account
         String accountId = authorizationData.getAccount().getId();
         String accountType = authorizationData.getAccount().getType();
         UserAccountEntry account = BankService.userAccountDb.get(accountId);

@@ -121,6 +121,11 @@ public class AuthorityObjectManager extends Thread {
         return payeeAuthorityBlobs.get(id);
     }
 
+    public synchronized void updateProviderSigner(ServerX509Signer providerSigner) throws IOException {
+        this.providerSigner = providerSigner;
+        update();
+    }
+
     @Override
     public void run() {
         while (true) {
