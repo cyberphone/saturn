@@ -281,7 +281,8 @@ class DebugPrintout implements BaseProperties {
             "payment credential) before it is returned to the <b>Merchant</b>:</p>");
 
         fancyBox(debugData.walletResponse);
-        descriptionStdMargin("Note that " +
+        descriptionStdMargin("For details on the encryption scheme, see <a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/jef.html\">[ENCRYPTION]</a>." +
+             " Note that " +
              keyWord(PROVIDER_AUTHORITY_URL_JSON) + " and " +
              keyWord(ACCOUNT_TYPE_JSON) + " are sent in clear as well (otherwise the <b>Merchant</b>" +
              " would not know what to do with the received data)."); 
@@ -293,12 +294,7 @@ class DebugPrintout implements BaseProperties {
             " object of the <b>User&nbsp;Bank</b> claimed to be the user's account holder for the selected card:</p>");
 
         fancyBox(debugData.providerAuthority);
-        descriptionStdMargin(keyWord(Messages.PROVIDER_AUTHORITY) + 
-            " is an object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
-            "has the following tasks:<ul>" +
-            "<li style=\"padding:0pt\">Provide credentials of an entity allowing relying parties verifying such before interacting with the entity.</li>" +
-            "<li>Through a signature attest the authenticity of core parameters including <i>service end points</i>, <i>encryption keys</i>, " +
-            "<i>supported payment methods</i>, <i>extensions</i>, and <i>algorithms</i>.</li></ul>");
+        providerAuthDescription();
 
         standardMode();
 
@@ -370,6 +366,15 @@ class DebugPrintout implements BaseProperties {
         description("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }
     
+    void providerAuthDescription() {
+        descriptionStdMargin(keyWord(Messages.PROVIDER_AUTHORITY) + 
+                " is an object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
+                "has the following tasks:<ul>" +
+                "<li style=\"padding:0pt\">Enabling other parties discovering data about an entity <i>before</i> interacting with the entity.</li>" +
+                "<li>Through a signature attesting the authenticity of core parameters including <i>service end points</i>, <i>encryption keys</i>, " +
+                "<i>supported payment methods</i>, <i>extensions</i>, and <i>algorithms</i>.</li></ul>");
+    }
+
     void standardMode() throws Exception {
         description(point + 
                     "<p>After receiving the " + keyWord(Messages.PROVIDER_AUTHORITY) +
@@ -394,6 +399,12 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.PAYEE_AUTHORITY) + " object:</p>");
 
         fancyBox(debugData.payeeAuthority);
+        descriptionStdMargin(keyWord(Messages.PAYEE_AUTHORITY) + 
+                " is an object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
+                "has the following tasks:<ul>" +
+                "<li style=\"padding:0pt\">Enabling other parties discovering data about an entity <i>before</i> interacting with the entity.</li>" +
+                "<li>Through an associated <i>provider's</i> signature attesting the authenticity of core parameters including <i>identity</i> and <i>signature keys</i>" +
+                ".</li></ul>");
 
         description(point.sub() + 
                 "<p>After receiving the " + keyWord(Messages.PAYEE_AUTHORITY) +
@@ -402,6 +413,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.PROVIDER_AUTHORITY) + " object:</p>");
 
         fancyBox(debugData.payeeProviderAuthority);
+        providerAuthDescription();
         description(point.sub() +
                 "<p>Now the <b>User&nbsp;Bank</b> (equipped with the " +
                 keyWord(Messages.PROVIDER_AUTHORITY) +
