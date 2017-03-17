@@ -20,11 +20,17 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
+import java.util.Arrays;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
+import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.PayeeAuthority;
+import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
@@ -41,16 +47,31 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         // Decode and finalize the cardpay request which in hybrid mode actually is account-2-account
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, false);
+ 
+        // Verify that it was actually we who created the original response
+        AuthorizationResponse authorizationResponse = transactionRequest.getAuthorizationResponse();
+        if (!Arrays.equals(BankService.bankCertificatePath,
+                           authorizationResponse.getSignatureDecoder().getCertificatePath())) {
+            throw new IOException("\"" + JSONSignatureDecoder.CERTIFICATE_PATH_JSON + "\" mismatch");
+        }
+
+        // Although we have already verified the Payee (merchant) during the authorization phase
+        // we should do it for this round as well...
+        AuthorizationRequest authorizationRequest = authorizationResponse.getAuthorizationRequest();
+        PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
+        PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
+        payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), 
+                                                       transactionRequest.getSignatureDecoder());
         
-        // Get account data.  Note: this may also be derived from a transaction DB
-        AuthorizationRequest authorizationRequest = transactionRequest.getAuthorizationResponse().getAuthorizationRequest();
-        AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
+        // Get payer account data.  Note: this may also be derived from a transaction DB
+        AuthorizationData authorizationData = 
+            authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         boolean testMode = transactionRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Charging for AccountID=" + authorizationData.getAccount().getId() + 
                     ", Amount=" + transactionRequest.getAmount().toString() +
-                    " " + transactionRequest.getPaymentRequest().getCurrency().toString());
+                    " " + paymentRequest.getCurrency().toString());
         String optionalLogData = null;
         TransactionResponse.ERROR transactionError = null;
         if (!testMode) {

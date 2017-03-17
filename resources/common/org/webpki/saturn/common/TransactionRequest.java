@@ -129,7 +129,7 @@ public class TransactionRequest implements BaseProperties {
                                         authorizationResponse.authorizationRequest.payerAccountType);
     }
 
-    public void verifyUserBank(JSONX509Verifier paymentRoot) throws IOException {
+    public void verifyPayerBank(JSONX509Verifier paymentRoot) throws IOException {
         authorizationResponse.signatureDecoder.verify(paymentRoot);
     }
 }

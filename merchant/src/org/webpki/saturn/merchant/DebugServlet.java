@@ -511,7 +511,7 @@ class DebugPrintout implements BaseProperties {
                 " in a " +
                 keyWord(Messages.REFUND_REQUEST) +
                 " object and sending the completed and <i>signed</i> result to " +
-                "the merchant's <i>payment provider</i>:</p>");
+                "the <i>merchant's</i> payment provider:</p>");
         fancyBox(debugData.refundRequest);
         descriptionStdMargin("Also see <a href=\"" + encryptedAccount + "\">Encrypted Account Data</a>. " +
             "Note that " +

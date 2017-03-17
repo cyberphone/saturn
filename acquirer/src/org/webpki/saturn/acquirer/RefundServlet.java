@@ -42,7 +42,7 @@ public class RefundServlet extends ProcessingBaseServlet {
 
         // Decode refund request which embeds the authorization response
         RefundRequest refundRequest = new RefundRequest(providerRequest, true);
-        refundRequest.verifyUserBank(AcquirerService.paymentRoot);
+        refundRequest.verifyPayerBank(AcquirerService.paymentRoot);
         
         // Verify that the payee (merchant) is one of our customers
         Payee payee = refundRequest.getPayee();

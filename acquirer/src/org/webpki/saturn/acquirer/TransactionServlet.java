@@ -43,8 +43,8 @@ public class TransactionServlet extends ProcessingBaseServlet {
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, true);
         PaymentRequest paymentRequest = transactionRequest.getPaymentRequest();
 
-        // Verify that the user's bank is known
-        transactionRequest.verifyUserBank(AcquirerService.paymentRoot);
+        // Verify that the payer's (user) bank is known
+        transactionRequest.verifyPayerBank(AcquirerService.paymentRoot);
 
         // Verify that the payee (merchant) is one of our customers
         Payee payee = transactionRequest.getPayee();
