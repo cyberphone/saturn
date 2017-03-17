@@ -92,7 +92,9 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                                      refundUrl,
                                      resultData.amount,
                                      MerchantService.getReferenceId(),
-                                     MerchantService.paymentNetworks.get(authorizationRequest.getPublicKey()).signer);
+                                     MerchantService.paymentNetworks.get(authorizationRequest
+                                                                             .getSignatureDecoder()
+                                                                                 .getPublicKey()).signer);
         
             JSONObjectReader refundResponseData = ProcessingBaseServlet.postData(urlHolder, refundRequestData);
             if (debug) {

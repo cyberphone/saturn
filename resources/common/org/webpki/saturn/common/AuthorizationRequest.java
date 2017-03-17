@@ -19,7 +19,6 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import java.security.GeneralSecurityException;
-import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
 import java.util.Vector;
@@ -30,6 +29,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
+import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.json.encryption.DecryptionKeyHolder;
 
@@ -52,8 +52,7 @@ public class AuthorizationRequest implements BaseProperties {
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
-        publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
-        comparePublicKeys (publicKey, paymentRequest);
+        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
         rd.checkForUnread();
     }
 
@@ -74,9 +73,9 @@ public class AuthorizationRequest implements BaseProperties {
         return payerAccountType;
     }
 
-    PublicKey publicKey;
-    public PublicKey getPublicKey() {
-        return publicKey;
+    JSONSignatureDecoder signatureDecoder;
+    public JSONSignatureDecoder getSignatureDecoder() {
+        return signatureDecoder;
     }
 
     AccountDescriptor payeeAccount;
@@ -138,12 +137,6 @@ public class AuthorizationRequest implements BaseProperties {
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, PaymentRequest.SOFTWARE_VERSION))
             .setSignature(signer);
-    }
-
-    public static void comparePublicKeys(PublicKey publicKey, PaymentRequest paymentRequest) throws IOException {
-        if (!publicKey.equals(paymentRequest.getPublicKey())) {
-            throw new IOException("Outer and inner public keys differ");
-        }
     }
 
     public AuthorizationData getDecryptedAuthorizationData(Vector<DecryptionKeyHolder> decryptionKeys)

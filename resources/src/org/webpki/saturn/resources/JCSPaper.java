@@ -53,7 +53,6 @@ import org.webpki.saturn.common.ServerX509Signer;
 
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
-import org.webpki.util.ISODateTime;
 
 public class JCSPaper implements BaseProperties {
     
@@ -183,7 +182,7 @@ public class JCSPaper implements BaseProperties {
         writer.setString(JSONDecoderCache.CONTEXT_JSON, CONTEXT);
         writer.setString(JSONDecoderCache.QUALIFIER_JSON, AUTHORIZATION);
         writer.setObject(PAYMENT_REQUEST_JSON, paymentRequest);
-        writer.setString(TRANSACTION_ID_JSON, "#1250000005");
+        writer.setString("transactionId", "#1250000005");
         writer.setString(TIME_STAMP_JSON, "2016-02-02T10:07:42Z");
         JSONObjectWriter joseAuthorization = new JSONObjectWriter(JSONParser.parse(writer.toString()));
         joseAuthorization.setupForRewrite(PAYMENT_REQUEST_JSON);

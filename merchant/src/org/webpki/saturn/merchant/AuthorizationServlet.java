@@ -17,11 +17,15 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.net.URL;
+
 import java.security.GeneralSecurityException;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -29,6 +33,7 @@ import javax.servlet.http.HttpSession;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+
 import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -138,7 +143,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         paymentRequest,
                                         accountDescriptor,
                                         MerchantService.getReferenceId(),
-                                        MerchantService.paymentNetworks.get(paymentRequest.getPublicKey()).signer);
+                                        MerchantService.paymentNetworks.get(paymentRequest
+                                                                                .getSignatureDecoder()
+                                                                                    .getPublicKey())
+                                                                                        .signer);
 
         // Call Payer bank
         urlHolder.setUrl(providerAuthority.getServiceUrl());
@@ -231,7 +239,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                       MerchantService.getReferenceId(),
                                       MerchantService.paymentNetworks.get(transactionOperation.authorizationResponse
                                                                               .getAuthorizationRequest()
-                                                                                  .getPublicKey()).signer);
+                                                                                  .getSignatureDecoder()
+                                                                                      .getPublicKey()).signer);
         // Acquirer or Hybrid call
         urlHolder.setUrl(transactionOperation.urlToCall);
         JSONObjectReader response = postData(urlHolder, transactionRequest);

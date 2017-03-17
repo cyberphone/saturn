@@ -85,7 +85,7 @@ public class AuthorizationResponse implements BaseProperties {
 
     public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
                                           String accountReference,
-                                          ProviderAuthority providerAuthority,
+                                          ProviderAuthority.EncryptionParameter encryptionParameter,
                                           AccountDescriptor accountDescriptor,
                                           CardSpecificData cardSpecificData,
                                           String referenceId,
@@ -98,9 +98,9 @@ public class AuthorizationResponse implements BaseProperties {
                        JSONObjectWriter
                            .createEncryptionObject(ProtectedAccountData.encode(accountDescriptor, cardSpecificData)
                                                        .serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                                   providerAuthority.getDataEncryptionAlgorithm(),
-                                                   providerAuthority.getEncryptionKey(),
-                                                   providerAuthority.getKeyEncryptionAlgorithm()))
+                                                   encryptionParameter.getDataEncryptionAlgorithm(),
+                                                   encryptionParameter.getEncryptionKey(),
+                                                   encryptionParameter.getKeyEncryptionAlgorithm()))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)

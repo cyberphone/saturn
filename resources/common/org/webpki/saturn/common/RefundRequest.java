@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import java.security.GeneralSecurityException;
-import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
 import java.util.Vector;
@@ -31,6 +30,7 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
+import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.json.encryption.DecryptionKeyHolder;
@@ -47,10 +47,7 @@ public class RefundRequest implements BaseProperties {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
-        publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
-        AuthorizationRequest.comparePublicKeys(publicKey,
-                                               authorizationResponse
-                                                   .authorizationRequest.paymentRequest);
+        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
         if (cardNetwork != null &&
             authorizationResponse.authorizationRequest.payerAccountType.isCardPayment() ^ cardNetwork) {
             throw new IOException("Incompatible payment method: " + 
@@ -95,9 +92,9 @@ public class RefundRequest implements BaseProperties {
         return authorizationResponse.authorizationRequest.paymentRequest;
     }
 
-    PublicKey publicKey;
-    public PublicKey getPublicKey() {
-        return publicKey;
+    JSONSignatureDecoder signatureDecoder;
+    public JSONSignatureDecoder getSignatureDecoder() {
+        return signatureDecoder;
     }
 
     AuthorizationResponse authorizationResponse;

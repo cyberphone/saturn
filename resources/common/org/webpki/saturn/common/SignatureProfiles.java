@@ -16,7 +16,9 @@
  */
 package org.webpki.saturn.common;
 
-public class Version {
-    public final static String PROTOCOL = "0.54";
-    public final static String DATE     = "2017-03-16";
+// Holds Saturn pre-defined signatures profiles
+
+public interface SignatureProfiles {
+    
+    String P256_ES256  = "http://webpki.org/saturn/v3/signatures#P-256.ES256";
 }

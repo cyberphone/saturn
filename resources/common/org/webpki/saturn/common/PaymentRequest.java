@@ -20,8 +20,6 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
-import java.security.PublicKey;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -29,6 +27,7 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONAsymKeySigner;
+import org.webpki.json.JSONSignatureDecoder;
 
 public class PaymentRequest implements BaseProperties {
     
@@ -68,7 +67,7 @@ public class PaymentRequest implements BaseProperties {
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         software = new Software(rd);
-        publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
+        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
         rd.checkForUnread();
     }
 
@@ -112,9 +111,9 @@ public class PaymentRequest implements BaseProperties {
         return software;
     }
 
-    PublicKey publicKey;
-    public PublicKey getPublicKey() {
-        return publicKey;
+    JSONSignatureDecoder signatureDecoder;
+    public JSONSignatureDecoder getSignatureDecoder() {
+        return signatureDecoder;
     }
 
     JSONObjectReader root;

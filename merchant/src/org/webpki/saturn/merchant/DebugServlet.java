@@ -416,25 +416,39 @@ class DebugPrintout implements BaseProperties {
                 keyWord(SERVICE_URL_JSON) + " of the <b>User&nbsp;Bank</b>" +
                 ".</li>" +
                 "<li>Verifying that the <b>Merchant</b> is vouched for by a provider belonging to one for the <b>User&nbsp;Bank</b> " +
-                "known trust network through " +
+                "known trust network through the " +
                 keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) +
-                " in " +
+                " in the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
-                ".</li>" +
+                " object.</li>" +
                 "<li>Verifying that the " +
-                keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) + " in " +
+                keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) + " in the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
                 " and " +
                 keyWord(Messages.PROVIDER_AUTHORITY) +
-                " are identical.</li>" +
+                " objects are identical.</li>" +
                 "<li>Verifying that the " +
-                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in " +
-                keyWord(Messages.PAYEE_AUTHORITY) +
-                ", " +
-                keyWord(Messages.AUTHORIZATION_REQUEST) +
+                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) +
                 " and " +
+                keyWord(JSONSignatureDecoder.ALGORITHM_JSON) +
+                " in the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST) +
+                " matches one of the " +
+                keyWord(SIGNATURE_PARAMETERS_JSON) +
+                " objects in the " +
+                keyWord(Messages.PAYEE_AUTHORITY) +
+                " object.</li>" +
+                "<li>Verifying that the " +
+                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) +
+                " and " +
+                keyWord(JSONSignatureDecoder.ALGORITHM_JSON) +
+                " in the " +
                 keyWord(PAYMENT_REQUEST_JSON) +
-                " are identical.</li>" +
+                " matches one of the " +
+                keyWord(SIGNATURE_PARAMETERS_JSON) +
+                " objects in the " +
+                keyWord(Messages.PAYEE_AUTHORITY) +
+                " object.</li>" +
                 "<li>Verifying that decrypting " +
                 keyWord(ENCRYPTED_AUTHORIZATION_JSON) +
                 " returns a valid user authorization object including " +

@@ -20,13 +20,14 @@ import java.io.IOException;
 
 import java.security.PublicKey;
 
-import java.security.interfaces.RSAPublicKey;
-
 import java.util.Arrays;
 import java.util.GregorianCalendar;
+import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
 
+import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
@@ -36,6 +37,33 @@ import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 public class ProviderAuthority implements BaseProperties {
+    
+    public static class EncryptionParameter {
+        
+        DataEncryptionAlgorithms dataEncryptionAlgorithm;
+        KeyEncryptionAlgorithms keyEncryptionAlgorithm;
+        PublicKey encryptionKey;
+
+        public EncryptionParameter(DataEncryptionAlgorithms dataEncryptionAlgorithm,
+                                   KeyEncryptionAlgorithms keyEncryptionAlgorithm,
+                                   PublicKey encryptionKey) {
+            this.dataEncryptionAlgorithm = dataEncryptionAlgorithm;
+            this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
+            this.encryptionKey = encryptionKey;
+        }
+
+        public PublicKey getEncryptionKey() {
+            return encryptionKey;
+        }
+
+        public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
+            return dataEncryptionAlgorithm;
+        }
+
+        public KeyEncryptionAlgorithms getKeyEncryptionAlgorithm() {
+            return keyEncryptionAlgorithm;
+        }
+    }
 
     public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
 
@@ -43,7 +71,8 @@ public class ProviderAuthority implements BaseProperties {
                                           String serviceUrl,
                                           JSONObjectReader optionalExtensions,
                                           String[] optionalProviderAccountTypes,
-                                          PublicKey encryptionKey,
+                                          String[] signatureProfiles,
+                                          EncryptionParameter[] encryptionParameters,
                                           GregorianCalendar expires,
                                           ServerX509Signer signer) throws IOException {
         return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
@@ -53,11 +82,19 @@ public class ProviderAuthority implements BaseProperties {
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
             .setDynamic((wr) -> optionalProviderAccountTypes == null ?
                     wr : wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes))
-            .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
-                .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, (encryptionKey instanceof RSAPublicKey ?
-                     KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
-                .setPublicKey(encryptionKey, AlgorithmPreferences.JOSE))
+            .setStringArray(SIGNATURE_PROFILES_JSON, signatureProfiles)
+            .setDynamic((wr) -> {
+                JSONArrayWriter jsonArray = wr.setArray(ENCRYPTION_PARAMETERS_JSON);
+                for (EncryptionParameter encryptionParameter : encryptionParameters) {
+                    jsonArray.setObject()
+                        .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON,
+                                   encryptionParameter.dataEncryptionAlgorithm.toString())
+                        .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
+                                   encryptionParameter.keyEncryptionAlgorithm.toString())
+                    .setPublicKey(encryptionParameter.encryptionKey, AlgorithmPreferences.JOSE);
+                }
+                return wr;
+            })
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
             .setSignature(signer);
@@ -83,12 +120,21 @@ public class ProviderAuthority implements BaseProperties {
             rd.scanAway(EXTENSIONS_JSON);
         }
         optionalProviderAccountTypes = rd.getStringArrayConditional(PROVIDER_ACCOUNT_TYPES_JSON);
-        JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        dataEncryptionAlgorithm = DataEncryptionAlgorithms
-            .getAlgorithmFromString(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
-        keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-            .getAlgorithmFromString(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
-        encryptionKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
+        signatureProfiles = rd.getStringArray(SIGNATURE_PROFILES_JSON);
+        Vector<EncryptionParameter> parameterArray = new Vector<EncryptionParameter>();
+        JSONArrayReader jsonParameterArray = rd.getArray(ENCRYPTION_PARAMETERS_JSON);
+        do {
+            JSONObjectReader encryptionParameter = jsonParameterArray.getObject();
+            parameterArray.add(
+                new EncryptionParameter(DataEncryptionAlgorithms
+                                            .getAlgorithmFromString(encryptionParameter
+                                                 .getString(DATA_ENCRYPTION_ALGORITHM_JSON)),
+                                        KeyEncryptionAlgorithms
+                                            .getAlgorithmFromString(encryptionParameter
+                                                 .getString(KEY_ENCRYPTION_ALGORITHM_JSON)),
+                                        encryptionParameter.getPublicKey()));
+        } while (jsonParameterArray.hasMore());
+        encryptionParameters = parameterArray.toArray(new EncryptionParameter[0]);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -116,6 +162,11 @@ public class ProviderAuthority implements BaseProperties {
         return optionalExtensions;
     }
 
+    String[] signatureProfiles;
+    public String[] getSignatureProfiles() {
+        return signatureProfiles;
+    }
+
     String[] optionalProviderAccountTypes;
     public String[] getProviderAccountTypes(boolean required) throws IOException {
         if (required && optionalProviderAccountTypes == null) {
@@ -124,19 +175,9 @@ public class ProviderAuthority implements BaseProperties {
         return optionalProviderAccountTypes;
     }
 
-    DataEncryptionAlgorithms dataEncryptionAlgorithm;
-    public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
-        return dataEncryptionAlgorithm;
-    }
-
-    KeyEncryptionAlgorithms keyEncryptionAlgorithm;
-    public KeyEncryptionAlgorithms getKeyEncryptionAlgorithm() {
-        return keyEncryptionAlgorithm;
-    }
-
-    PublicKey encryptionKey;
-    public PublicKey getEncryptionKey() throws IOException {
-        return encryptionKey;
+    EncryptionParameter[] encryptionParameters;
+    public EncryptionParameter[] getEncryptionParameters() {
+        return encryptionParameters;
     }
 
     GregorianCalendar expires;

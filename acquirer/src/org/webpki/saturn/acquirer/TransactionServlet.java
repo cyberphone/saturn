@@ -17,12 +17,11 @@
 package org.webpki.saturn.acquirer;
 
 import java.io.IOException;
-
 import java.security.GeneralSecurityException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-
+import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
@@ -42,19 +41,19 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
         // Decode and finalize the cardpay request
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, true);
+        PaymentRequest paymentRequest = transactionRequest.getPaymentRequest();
 
         // Verify that the user's bank is known
         transactionRequest.verifyUserBank(AcquirerService.paymentRoot);
 
         // Verify that the payee (merchant) is one of our customers
         Payee payee = transactionRequest.getPayee();
-        PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
-        if (merchantProperties == null) {
+        PayeeCoreProperties payeeCoreProperties = AcquirerService.merchantAccountDb.get(payee.getId());
+        if (payeeCoreProperties == null) {
             throw new IOException("Unknown merchant Id: " + payee.getId());
         }
-        if (!merchantProperties.getPublicKey().equals(transactionRequest.getPublicKey())) {
-            throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
-        }
+        payeeCoreProperties.verify(payee, transactionRequest.getSignatureDecoder());
+        payeeCoreProperties.verify(payee, paymentRequest.getSignatureDecoder());
 
         // Get card data
         ProtectedAccountData protectedAccountData = transactionRequest.getProtectedAccountData(AcquirerService.decryptionKeys);
@@ -65,7 +64,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Acquiring for AccountID=" + protectedAccountData.getAccount().getId() + 
                     ", Amount=" + transactionRequest.getAmount().toString() +
-                    " " + transactionRequest.getPaymentRequest().getCurrency().toString());
+                    " " + paymentRequest.getCurrency().toString());
         
         String optionalLogData = null;
         TransactionResponse.ERROR transactionError = null;

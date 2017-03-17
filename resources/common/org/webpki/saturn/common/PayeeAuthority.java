@@ -18,8 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.security.PublicKey;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -30,17 +28,15 @@ import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
 
 public class PayeeAuthority implements BaseProperties {
-
+    
     public static JSONObjectWriter encode(String authorityUrl,
                                           String providerAuthorityUrl,
-                                          Payee payee,
-                                          PublicKey payeePublicKey,
+                                          PayeeCoreProperties payeeCoreProperties,
                                           GregorianCalendar expires,
                                           ServerX509Signer attestSigner) throws IOException {
-        return payee.writeObject(Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
+        return payeeCoreProperties.writeObject(Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
                                      .setString(AUTHORITY_URL_JSON, authorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
-            .setPublicKey(payeePublicKey, AlgorithmPreferences.JOSE)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
             .setSignature(attestSigner);
@@ -54,8 +50,7 @@ public class PayeeAuthority implements BaseProperties {
                                   " expected=" + expectedAuthorityUrl);
         }
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
-        payee = new Payee(rd);
-        payeePublicKey = rd.getPublicKey(AlgorithmPreferences.JOSE);
+        payeeCoreProperties = new PayeeCoreProperties(rd);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -73,14 +68,9 @@ public class PayeeAuthority implements BaseProperties {
         return providerAuthorityUrl;
     }
 
-    Payee payee;
-    public Payee getPayee() {
-        return payee;
-    }
-
-    PublicKey payeePublicKey;
-    public PublicKey getPayeePublicKey() {
-        return payeePublicKey;
+    PayeeCoreProperties payeeCoreProperties;
+    public PayeeCoreProperties getPayeeCoreProperties() {
+        return payeeCoreProperties;
     }
 
     GregorianCalendar expires;

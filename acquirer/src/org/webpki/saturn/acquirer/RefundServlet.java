@@ -46,13 +46,11 @@ public class RefundServlet extends ProcessingBaseServlet {
         
         // Verify that the payee (merchant) is one of our customers
         Payee payee = refundRequest.getPayee();
-        PayeeCoreProperties merchantProperties = AcquirerService.merchantAccountDb.get(payee.getId());
-        if (merchantProperties == null) {
+        PayeeCoreProperties payeeCoreProperties = AcquirerService.merchantAccountDb.get(payee.getId());
+        if (payeeCoreProperties == null) {
             throw new IOException("Unknown merchant Id: " + payee.getId());
         }
-        if (!merchantProperties.getPublicKey().equals(refundRequest.getPublicKey())) {
-            throw new IOException("Non-matching public key for merchant Id: " + payee.getId());
-        }
+        payeeCoreProperties.verify(payee, refundRequest.getSignatureDecoder());
 
         // Get payer account data.
         AccountDescriptor accountDescriptor = refundRequest.getProtectedAccountData(AcquirerService.decryptionKeys).getAccount();

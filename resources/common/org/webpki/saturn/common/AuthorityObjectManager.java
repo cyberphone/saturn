@@ -18,8 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.security.PublicKey;
-
 import java.util.LinkedHashMap;
 
 import java.util.logging.Logger;
@@ -37,7 +35,8 @@ public class AuthorityObjectManager extends Thread {
     String serviceUrl;
     JSONObjectReader optionalExtensions;
     String[] optionalProviderAccountTypes;
-    PublicKey optionalEncryptionKey;
+    String[] signatureProfiles;
+    ProviderAuthority.EncryptionParameter[] encryptionParameters;
     
     LinkedHashMap<String,PayeeCoreProperties> payees;
     String payeeBaseAuthorityUrl;
@@ -56,7 +55,8 @@ public class AuthorityObjectManager extends Thread {
                                                              serviceUrl,
                                                              optionalExtensions,
                                                              optionalProviderAccountTypes,
-                                                             optionalEncryptionKey,
+                                                             signatureProfiles,
+                                                             encryptionParameters,
                                                              Expires.inSeconds(expiryTimeInSeconds),
                                                              providerSigner).serializeToBytes(JSONOutputFormats.PRETTY_PRINT);
         }
@@ -70,8 +70,7 @@ public class AuthorityObjectManager extends Thread {
                 payeeAuthorityBlobs.put(id, 
                                         PayeeAuthority.encode(payeeBaseAuthorityUrl + id,
                                                               providerAuthorityUrl,
-                                                              new Payee(payeeCoreProperties.getCommonName(), id),
-                                                              payeeCoreProperties.getPublicKey(),
+                                                              payeeCoreProperties,
                                                               Expires.inSeconds(expiryTimeInSeconds),
                                                               providerSigner).serializeToBytes(JSONOutputFormats.PRETTY_PRINT));
             }
@@ -86,7 +85,8 @@ public class AuthorityObjectManager extends Thread {
                                   String serviceUrl,
                                   JSONObjectReader optionalExtensions,
                                   String[] optionalProviderAccountTypes,
-                                  PublicKey optionalEncryptionKey,
+                                  String[] signatureProfiles,
+                                  ProviderAuthority.EncryptionParameter[] encryptionParameters,
                                     
                                   LinkedHashMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
                                   String payeeBaseAuthorityUrl,
@@ -99,7 +99,8 @@ public class AuthorityObjectManager extends Thread {
         this.serviceUrl = serviceUrl;
         this.optionalExtensions = optionalExtensions;
         this.optionalProviderAccountTypes = optionalProviderAccountTypes;
-        this.optionalEncryptionKey = optionalEncryptionKey;
+        this.signatureProfiles = signatureProfiles;
+        this.encryptionParameters = encryptionParameters;
 
         this.payees = payees;
         this.payeeBaseAuthorityUrl = payeeBaseAuthorityUrl;

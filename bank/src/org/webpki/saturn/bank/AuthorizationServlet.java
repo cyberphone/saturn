@@ -72,8 +72,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         // Verify that the authorization request is signed by a payment partner
         PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
-        AuthorizationRequest.comparePublicKeys(payeeAuthority.getPayeePublicKey(), paymentRequest);
         payeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
+        payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), authorizationRequest.getSignatureDecoder());
+        payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), paymentRequest.getSignatureDecoder());
 
         // Lookup of payee's provider
         ProviderAuthority providerAuthority = getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
@@ -185,7 +186,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // We did it!
         return AuthorizationResponse.encode(authorizationRequest,
                                             accountReference.toString(),
-                                            providerAuthority,
+                                            providerAuthority.getEncryptionParameters()[0],
                                             accountDescriptor,
                                             cardSpecificData,
                                             getReferenceId(),

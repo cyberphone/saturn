@@ -49,6 +49,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.DecryptionKeyHolder;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
@@ -58,7 +59,9 @@ import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
+import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
+import org.webpki.saturn.common.SignatureProfiles;
 import org.webpki.saturn.common.UserAccountEntry;
 
 import org.webpki.webutil.InitPropertyReader;
@@ -210,7 +213,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
-                merchantAccountDb.put(account.getId(), account);
+                merchantAccountDb.put(account.getPayee().getId(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -233,7 +236,12 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            serviceUrl = bankHost + "/service",
                                            optionalProviderExtensions,
                                            new String[]{"https://swift.com", "https://ultragiro.se"},
-                                           decryptionKeys.get(0).getPublicKey(),
+                                           new String[]{SignatureProfiles.P256_ES256},
+                                           new ProviderAuthority.EncryptionParameter[]{
+                    new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                            decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
+                        KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
+                                                              decryptionKeys.get(0).getPublicKey())},
 
                                            merchantAccountDb,
                                            bankHost + "/payees/",

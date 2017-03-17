@@ -47,6 +47,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.DecryptionKeyHolder;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
@@ -56,7 +57,9 @@ import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
+import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
+import org.webpki.saturn.common.SignatureProfiles;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -171,7 +174,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
-                merchantAccountDb.put(account.getId(), account);
+                merchantAccountDb.put(account.getPayee().getId(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -192,8 +195,13 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                            aquirerHost + "/service",
                                            optionalProviderExtensions,
                                            null,
-                                           decryptionKeys.get(0).getPublicKey(),
-    
+                                           new String[]{SignatureProfiles.P256_ES256},
+                                           new ProviderAuthority.EncryptionParameter[]{
+                    new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                            decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
+                        KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
+                                                              decryptionKeys.get(0).getPublicKey())},
+     
                                            merchantAccountDb, 
                                            aquirerHost + "/payees/",
     
