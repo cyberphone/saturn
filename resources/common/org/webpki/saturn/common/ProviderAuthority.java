@@ -20,7 +20,6 @@ import java.io.IOException;
 
 import java.security.PublicKey;
 
-import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
@@ -71,7 +70,7 @@ public class ProviderAuthority implements BaseProperties {
                                           String serviceUrl,
                                           JSONObjectReader optionalExtensions,
                                           String[] optionalProviderAccountTypes,
-                                          String[] signatureProfiles,
+                                          SignatureProfiles[] signatureProfiles,
                                           EncryptionParameter[] encryptionParameters,
                                           GregorianCalendar expires,
                                           ServerX509Signer signer) throws IOException {
@@ -82,7 +81,13 @@ public class ProviderAuthority implements BaseProperties {
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
             .setDynamic((wr) -> optionalProviderAccountTypes == null ?
                     wr : wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes))
-            .setStringArray(SIGNATURE_PROFILES_JSON, signatureProfiles)
+            .setDynamic((wr) -> {
+                JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PROFILES_JSON);
+                for (SignatureProfiles signatureProfile : signatureProfiles) {
+                    jsonArray.setString(signatureProfile.getId());
+                }
+                return wr;
+            })
             .setDynamic((wr) -> {
                 JSONArrayWriter jsonArray = wr.setArray(ENCRYPTION_PARAMETERS_JSON);
                 for (EncryptionParameter encryptionParameter : encryptionParameters) {
@@ -120,21 +125,50 @@ public class ProviderAuthority implements BaseProperties {
             rd.scanAway(EXTENSIONS_JSON);
         }
         optionalProviderAccountTypes = rd.getStringArrayConditional(PROVIDER_ACCOUNT_TYPES_JSON);
-        signatureProfiles = rd.getStringArray(SIGNATURE_PROFILES_JSON);
+
+        // Signature profiles tell other parties what kind of signatures that are accepted
+        // Additional signature profiles can be introduced without breaking existing applications
+        Vector<SignatureProfiles> profileArray = new Vector<SignatureProfiles>();
+        JSONArrayReader jsonProfileArray = rd.getArray(SIGNATURE_PROFILES_JSON);
+        do {
+            SignatureProfiles signatureProfile = SignatureProfiles.getProfileFromString(jsonProfileArray.getString());
+            if (signatureProfile != null) {
+                profileArray.add(signatureProfile);
+            }
+        } while (jsonProfileArray.hasMore());
+        if (profileArray.isEmpty()) {
+            throw new IOException("No \"" + SIGNATURE_PROFILES_JSON + "\" were recognized");
+        }
+        signatureProfiles = profileArray.toArray(new SignatureProfiles[0]);
+
+        // Encryption parameters tell other parties what kind of encryption keys you have
+        // Additional algorithms can be introduced without breaking existing applications
         Vector<EncryptionParameter> parameterArray = new Vector<EncryptionParameter>();
         JSONArrayReader jsonParameterArray = rd.getArray(ENCRYPTION_PARAMETERS_JSON);
         do {
             JSONObjectReader encryptionParameter = jsonParameterArray.getObject();
-            parameterArray.add(
-                new EncryptionParameter(DataEncryptionAlgorithms
-                                            .getAlgorithmFromString(encryptionParameter
-                                                 .getString(DATA_ENCRYPTION_ALGORITHM_JSON)),
-                                        KeyEncryptionAlgorithms
-                                            .getAlgorithmFromString(encryptionParameter
-                                                 .getString(KEY_ENCRYPTION_ALGORITHM_JSON)),
-                                        encryptionParameter.getPublicKey()));
+            String algorithm = encryptionParameter.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
+            for (DataEncryptionAlgorithms dataEncryptionAlgorithm : DataEncryptionAlgorithms.values()) {
+                if (dataEncryptionAlgorithm.toString().equals(algorithm)) {
+                    algorithm = encryptionParameter.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
+                    for (KeyEncryptionAlgorithms keyEncryptionAlgorithm : KeyEncryptionAlgorithms.values()) {
+                        if (keyEncryptionAlgorithm.toString().equals(algorithm)) {
+                            parameterArray.add(
+                                    new EncryptionParameter(dataEncryptionAlgorithm,
+                                                            keyEncryptionAlgorithm,
+                                                            encryptionParameter.getPublicKey()));
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
         } while (jsonParameterArray.hasMore());
+        if (parameterArray.isEmpty()) {
+            throw new IOException("No \"" + ENCRYPTION_PARAMETERS_JSON + "\" were recognized");
+        }
         encryptionParameters = parameterArray.toArray(new EncryptionParameter[0]);
+
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
@@ -162,8 +196,8 @@ public class ProviderAuthority implements BaseProperties {
         return optionalExtensions;
     }
 
-    String[] signatureProfiles;
-    public String[] getSignatureProfiles() {
+    SignatureProfiles[] signatureProfiles;
+    public SignatureProfiles[] getSignatureProfiles() {
         return signatureProfiles;
     }
 

@@ -195,7 +195,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                            aquirerHost + "/service",
                                            optionalProviderExtensions,
                                            null,
-                                           new String[]{SignatureProfiles.P256_ES256},
+                                           new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                                            new ProviderAuthority.EncryptionParameter[]{
                     new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                             decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?

@@ -18,7 +18,27 @@ package org.webpki.saturn.common;
 
 // Holds Saturn pre-defined signatures profiles
 
-public interface SignatureProfiles {
+public enum SignatureProfiles {
     
-    String P256_ES256  = "http://webpki.org/saturn/v3/signatures#P-256.ES256";
+    P256_ES256 ("http://webpki.org/saturn/v3/signatures#P-256.ES256");
+    
+    String id;
+    
+    SignatureProfiles(String id) {
+        this.id = id;
+    }
+    
+    public String getId() {
+        return id;
+    }
+
+    public static SignatureProfiles getProfileFromString(String id) {
+        for (SignatureProfiles signatureProfile : SignatureProfiles.values()) {
+            if (signatureProfile.id.equals(id)) {
+                return signatureProfile;
+            }
+        }
+        // All signature profiles DO NOT need to be known by everybody
+        return null;
+    }
 }

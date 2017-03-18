@@ -20,19 +20,19 @@
 // Saturn "PayeeAuthority" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
-const Keys = require('webpki.org').Keys;
-const Jef = require('webpki.org').Jef;
-const Jcs = require('webpki.org').Jcs;
+const Keys     = require('webpki.org').Keys;
+const Jef      = require('webpki.org').Jef;
+const Jcs      = require('webpki.org').Jcs;
 
 const BaseProperties = require('./BaseProperties');
-const Messages = require('./Messages');
+const Messages       = require('./Messages');
 
 function PayeeAuthority() {
 }
 
 PayeeAuthority.encode = function(authorityUrl,
                                  providerAuthorityUrl,
-                                 payeeInformation,
+                                 payeeCoreProperties,
                                  now,
                                  expiresInSeconds,
                                  signer) {
@@ -41,9 +41,17 @@ PayeeAuthority.encode = function(authorityUrl,
   return Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
-    .setString(BaseProperties.COMMON_NAME_JSON, payeeInformation[BaseProperties.COMMON_NAME_JSON])
-    .setString(BaseProperties.ID_JSON, payeeInformation[BaseProperties.ID_JSON])
-    .setPublicKey(payeeInformation[Jcs.PUBLIC_KEY_JSON])
+    .setString(BaseProperties.COMMON_NAME_JSON, payeeCoreProperties[BaseProperties.COMMON_NAME_JSON])
+    .setString(BaseProperties.ID_JSON, payeeCoreProperties[BaseProperties.ID_JSON])
+    .setDynamic((wr) => {
+        var array = wr.setArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
+        payeeCoreProperties.signatureParameters.forEach((entry) => {
+          array.setObject()
+                 .setString(Jcs.ALGORITHM_JSON, entry[Jcs.ALGORITHM_JSON])
+                 .setPublicKey(entry[Jcs.PUBLIC_KEY_JSON]);
+        });
+        return wr;
+      })
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
     .setSignature(signer);

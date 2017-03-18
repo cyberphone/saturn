@@ -19,7 +19,7 @@
 
 // Saturn "TransactionRequest" object
 
-const JsonUtil = require('webpki.org').JsonUtil;
+const JsonUtil  = require('webpki.org').JsonUtil;
 const ByteArray = require('webpki.org').ByteArray;
 
 const BaseProperties        = require('./BaseProperties');

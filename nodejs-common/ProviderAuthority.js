@@ -41,12 +41,15 @@ ProviderAuthority.encode = function(authorityUrl,
     .setString(BaseProperties.HTTP_VERSION_JSON, "HTTP/1.1")
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
-    .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JsonUtil.ObjectWriter()
-      .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Jef.JOSE_A128CBC_HS256_ALG_ID)
-      .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
+    .setArray(BaseProperties.SIGNATURE_PROFILES_JSON, 
+              new JsonUtil.ArrayWriter().setString('http://webpki.org/saturn/v3/signatures#P-256.ES256'))
+    .setArray(BaseProperties.ENCRYPTION_PARAMETERS_JSON, 
+              new JsonUtil.ArrayWriter().setObject(new JsonUtil.ObjectWriter()
+        .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Jef.JOSE_A128CBC_HS256_ALG_ID)
+        .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
                          publicKey.jcs.type == 'RSA' ?
                         Jef.JOSE_RSA_OAEP_256_ALG_ID : Jef.JOSE_ECDH_ES_ALG_ID)
-      .setPublicKey(publicKey))
+        .setPublicKey(publicKey)))
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
     .setSignature(signer);

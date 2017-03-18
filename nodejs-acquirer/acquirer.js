@@ -37,6 +37,7 @@ const Logging   = require('webpki.org').Logging;
 const ServerCertificateSigner = require('../nodejs-common/ServerCertificateSigner');
 const BaseProperties          = require('../nodejs-common/BaseProperties');
 const PayeeAuthority          = require('../nodejs-common/PayeeAuthority');
+const PayeeCoreProperties     = require('../nodejs-common/PayeeCoreProperties');
 const ProviderAuthority       = require('../nodejs-common/ProviderAuthority');
 const TransactionRequest      = require('../nodejs-common/TransactionRequest');
 const TransactionResponse     = require('../nodejs-common/TransactionResponse');
@@ -98,14 +99,13 @@ encryptionKeys.push(Keys.createPrivateKeyFromPem(readFile(Config.ownKeys.rsaEncr
 /////////////////////////////////
 
 const payeeDb = new Map();
-JSON.parse(readFile(Config.payeeDb).toString('utf8')).forEach((entry) => {
-  var payeeInformation = {};
-  payeeInformation[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
-  payeeInformation[Jcs.PUBLIC_KEY_JSON] = Keys.encodePublicKey(entry[Jcs.PUBLIC_KEY_JSON]);
-  payeeInformation[BaseProperties.COMMON_NAME_JSON] = entry[BaseProperties.PAYEE_JSON][BaseProperties.COMMON_NAME_JSON];
-  payeeInformation[BaseProperties.ID_JSON] = entry[BaseProperties.PAYEE_JSON][BaseProperties.ID_JSON];
-  payeeDb.set(payeeInformation[BaseProperties.ID_JSON], payeeInformation);
-});
+var payees = new JsonUtil.ArrayReader(JSON.parse(readFile(Config.payeeDb).toString('utf8')));
+do {
+  var payeeCoreProperties = new PayeeCoreProperties(payees.getObject());
+  payeeCoreProperties[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
+  payeeDb.set(payeeCoreProperties[BaseProperties.ID_JSON], payeeCoreProperties);
+  logger.info('Added payee: ' + payeeCoreProperties[BaseProperties.ID_JSON]);
+} while (payees.hasMore());
 
 var providerAuthority;
 function updateProviderAuthority() {
@@ -136,8 +136,9 @@ const jsonPostProcessors = {
         payeeDbEntry[BaseProperties.COMMON_NAME_JSON] != payee[BaseProperties.COMMON_NAME_JSON]) {
       throw new TypeError('Unknown merchant ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
     }
-    if (!cardPaymentRequest.getPublicKey().equals(payeeDbEntry[Jcs.PUBLIC_KEY_JSON])) {
-      throw new TypeError('Public key doesn\'t merchant ID=' + payee.getId());
+    if (!cardPaymentRequest.getPublicKey().equals(
+         payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jcs.PUBLIC_KEY_JSON])) {
+      throw new TypeError('Public key doesn\'t match merchant ID=' + payee.getId());
     }
     
     // Verify the the embedded response was created by a known bank (network)

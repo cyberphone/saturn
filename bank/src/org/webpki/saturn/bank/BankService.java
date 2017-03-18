@@ -236,7 +236,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            serviceUrl = bankHost + "/service",
                                            optionalProviderExtensions,
                                            new String[]{"https://swift.com", "https://ultragiro.se"},
-                                           new String[]{SignatureProfiles.P256_ES256},
+                                           new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                                            new ProviderAuthority.EncryptionParameter[]{
                     new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                             decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?

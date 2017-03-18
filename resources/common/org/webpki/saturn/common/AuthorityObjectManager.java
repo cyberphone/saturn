@@ -35,7 +35,7 @@ public class AuthorityObjectManager extends Thread {
     String serviceUrl;
     JSONObjectReader optionalExtensions;
     String[] optionalProviderAccountTypes;
-    String[] signatureProfiles;
+    SignatureProfiles[] signatureProfiles;
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
     
     LinkedHashMap<String,PayeeCoreProperties> payees;
@@ -85,7 +85,7 @@ public class AuthorityObjectManager extends Thread {
                                   String serviceUrl,
                                   JSONObjectReader optionalExtensions,
                                   String[] optionalProviderAccountTypes,
-                                  String[] signatureProfiles,
+                                  SignatureProfiles[] signatureProfiles,
                                   ProviderAuthority.EncryptionParameter[] encryptionParameters,
                                     
                                   LinkedHashMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed

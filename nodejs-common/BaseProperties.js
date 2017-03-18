@@ -82,6 +82,8 @@ const BaseProperties = {
     REQUEST_HASH_JSON                : 'requestHash',
     DOMAIN_NAME_JSON                 : 'domainName',
     SIGNATURE_ALGORITHM_JSON         : 'signatureAlgorithm',
+    SIGNATURE_PARAMETERS_JSON        : 'signatureParameters',
+    SIGNATURE_PROFILES_JSON          : 'signatureProfiles',          // For "ProviderAuthority".  Accepts these
     KEY_ENCRYPTION_ALGORITHM_JSON    : 'keyEncryptionAlgorithm',     // For "ProviderAuthority" encryption key
     DATA_ENCRYPTION_ALGORITHM_JSON   : 'dataEncryptionAlgorithm',    //    -"-
     ENCRYPTION_PARAMETERS_JSON       : 'encryptionParameters',       //    -"-
