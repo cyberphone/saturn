@@ -96,7 +96,7 @@ public class ProviderAuthority implements BaseProperties {
                                    encryptionParameter.dataEncryptionAlgorithm.toString())
                         .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
                                    encryptionParameter.keyEncryptionAlgorithm.toString())
-                    .setPublicKey(encryptionParameter.encryptionKey, AlgorithmPreferences.JOSE);
+                        .setPublicKey(encryptionParameter.encryptionKey, AlgorithmPreferences.JOSE);
                 }
                 return wr;
             })
