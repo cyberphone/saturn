@@ -286,7 +286,7 @@ class DebugPrintout implements BaseProperties {
              keyWord(PROVIDER_AUTHORITY_URL_JSON) + " and " +
              keyWord(ACCOUNT_TYPE_JSON) + " are sent in clear as well (otherwise the <b>Merchant</b>" +
              " would not know what to do with the received data). " +
-             "To further limit privacy issues, the issuer specific encryption public key is preferably shared by many (&gt; 100000) users."); 
+             "To maintain privacy, the issuer specific encryption public key is preferably shared by many (&gt; 100000) users."); 
 
         description(point.sub() +
             "<p>After receiving the <b>Wallet</b> response, the <b>Merchant</b> uses the supplied " +
