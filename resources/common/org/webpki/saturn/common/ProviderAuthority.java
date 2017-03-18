@@ -171,8 +171,8 @@ public class ProviderAuthority implements BaseProperties {
                 encryptionParameter.scanAway(KEY_ENCRYPTION_ALGORITHM_JSON);
                 encryptionParameter.scanAway(JSONSignatureDecoder.PUBLIC_KEY_JSON);
             }
-          } while (jsonParameterArray.hasMore());
-       if (parameterArray.isEmpty()) {
+        } while (jsonParameterArray.hasMore());
+        if (parameterArray.isEmpty()) {
             throw new IOException("No \"" + ENCRYPTION_PARAMETERS_JSON + "\" were recognized");
         }
         encryptionParameters = parameterArray.toArray(new EncryptionParameter[0]);

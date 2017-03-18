@@ -51,6 +51,10 @@
   		<param name="file" value="PaymentRequest"/>
     </antcall>
   	<antcall target="_final">
+  		<param name="var" value="signatureProfiles"/>
+  		<param name="file" value="ProviderAuthority"/>
+    </antcall>
+  	<antcall target="_final">
   		<param name="var" value="encryptionParameters"/>
   		<param name="file" value="ProviderAuthority"/>
     </antcall>
