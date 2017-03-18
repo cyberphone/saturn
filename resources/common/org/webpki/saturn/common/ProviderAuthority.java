@@ -148,6 +148,7 @@ public class ProviderAuthority implements BaseProperties {
         do {
             JSONObjectReader encryptionParameter = jsonParameterArray.getObject();
             String algorithm = encryptionParameter.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
+            boolean notRecognized = true;
             for (DataEncryptionAlgorithms dataEncryptionAlgorithm : DataEncryptionAlgorithms.values()) {
                 if (dataEncryptionAlgorithm.toString().equals(algorithm)) {
                     algorithm = encryptionParameter.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
@@ -157,7 +158,7 @@ public class ProviderAuthority implements BaseProperties {
                                     new EncryptionParameter(dataEncryptionAlgorithm,
                                                             keyEncryptionAlgorithm,
                                                             encryptionParameter.getPublicKey()));
-                            algorithm = null;
+                            notRecognized = false;
                             break;
                         }
                     }
@@ -166,7 +167,7 @@ public class ProviderAuthority implements BaseProperties {
             }
             // The parsing is setup to flag unread elements so we must perform a
             // dummy read when we find a parameter object we don't fully understand
-            if (algorithm != null) {
+            if (notRecognized) {
                 encryptionParameter.scanAway(DATA_ENCRYPTION_ALGORITHM_JSON);
                 encryptionParameter.scanAway(KEY_ENCRYPTION_ALGORITHM_JSON);
                 encryptionParameter.scanAway(JSONSignatureDecoder.PUBLIC_KEY_JSON);
