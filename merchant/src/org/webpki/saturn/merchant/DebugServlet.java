@@ -285,7 +285,8 @@ class DebugPrintout implements BaseProperties {
              " Note that " +
              keyWord(PROVIDER_AUTHORITY_URL_JSON) + " and " +
              keyWord(ACCOUNT_TYPE_JSON) + " are sent in clear as well (otherwise the <b>Merchant</b>" +
-             " would not know what to do with the received data)."); 
+             " would not know what to do with the received data). " +
+             "To further limit privacy issues, the issuer specific encryption public key is preferably shared by many (&gt; 100000) users."); 
 
         description(point.sub() +
             "<p>After receiving the <b>Wallet</b> response, the <b>Merchant</b> uses the supplied " +
@@ -360,7 +361,7 @@ class DebugPrintout implements BaseProperties {
         " list:");
         fancyBoxNoClean(MerchantService.userChallAuthzSample);
         descriptionStdMargin("<p>This object is returned to the <b>Merchant</b> in a " +
-        keyWord(Messages.PAYER_AUTHORIZATION) + " message, effectively returning to <a href=\"#3\">step&nbsp;3</a>.</p><p>This process may be repeated " +
+        keyWord(Messages.PAYER_AUTHORIZATION) + " message, effectively resuming operation at <a href=\"#3\">step&nbsp;3</a>.</p><p>This process may be repeated " +
         "until <b>User&nbsp;Bank</b> is satisfied or blocks further attempts.</p>");
 
         description("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
