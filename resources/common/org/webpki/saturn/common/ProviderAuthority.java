@@ -157,14 +157,22 @@ public class ProviderAuthority implements BaseProperties {
                                     new EncryptionParameter(dataEncryptionAlgorithm,
                                                             keyEncryptionAlgorithm,
                                                             encryptionParameter.getPublicKey()));
+                            algorithm = null;
                             break;
                         }
                     }
                     break;
                 }
             }
-        } while (jsonParameterArray.hasMore());
-        if (parameterArray.isEmpty()) {
+            // The parsing is setup to flag unread elements so we must perform a
+            // dummy read when we find a parameter object we don't fully understand
+            if (algorithm != null) {
+                encryptionParameter.scanAway(DATA_ENCRYPTION_ALGORITHM_JSON);
+                encryptionParameter.scanAway(KEY_ENCRYPTION_ALGORITHM_JSON);
+                encryptionParameter.scanAway(JSONSignatureDecoder.PUBLIC_KEY_JSON);
+            }
+          } while (jsonParameterArray.hasMore());
+       if (parameterArray.isEmpty()) {
             throw new IOException("No \"" + ENCRYPTION_PARAMETERS_JSON + "\" were recognized");
         }
         encryptionParameters = parameterArray.toArray(new EncryptionParameter[0]);
