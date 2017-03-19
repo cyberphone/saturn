@@ -20,30 +20,26 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.AuthorityBaseServlet;
 
 //This servlet publishes Payee (Merchant) "PayeeAuthority" objects.
 
-public class PayeeAuthorityServlet extends HttpServlet {
+public class PayeeAuthorityServlet extends AuthorityBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String id = request.getPathInfo();
-        if (id != null) {
-            byte[] authorityBlob = AcquirerService.authorityObjectManager.getPayeeAuthorityBlob(id.substring(1));
-            if (authorityBlob != null) {
-                response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
-                response.setHeader("Pragma", "No-Cache");
-                response.setDateHeader("EXPIRES", 0);
-                response.getOutputStream().write(authorityBlob);
-                return;
-            }
-        }
-        response.sendError(HttpServletResponse.SC_NOT_FOUND);
+        processAuthorityRequest(request, 
+                                response,
+                                id == null ? null : AcquirerService.authorityObjectManager.getPayeeAuthorityBlob(id.substring(1)));
+    }
+
+    @Override
+    protected boolean isProvider() {
+        return false;
     }
 }

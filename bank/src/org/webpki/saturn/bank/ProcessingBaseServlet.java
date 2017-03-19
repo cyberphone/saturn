@@ -122,7 +122,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader("Content-Type", JSON_CONTENT_TYPE);
+        wrap.setHeader(HTTP_CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE);
+        wrap.setHeader(HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
         wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
         return fetchJSONData(wrap, urlHolder);
@@ -134,6 +135,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
+        wrap.setHeader(HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
         wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
         return fetchJSONData(wrap, urlHolder);

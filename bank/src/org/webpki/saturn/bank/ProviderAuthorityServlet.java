@@ -20,22 +20,25 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.AuthorityBaseServlet;
 
 //This servlet publishes the Payment Provider (Bank) "ProviderAuthority" object.
 
-public class ProviderAuthorityServlet extends HttpServlet {
+public class ProviderAuthorityServlet extends AuthorityBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
-        response.setHeader("Pragma", "No-Cache");
-        response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(BankService.authorityObjectManager.getProviderAuthorityBlob());
+        processAuthorityRequest(request, 
+                                response,
+                                BankService.authorityObjectManager.getProviderAuthorityBlob());
+    }
+
+    @Override
+    protected boolean isProvider() {
+        return true;
     }
 }

@@ -18,28 +18,27 @@ package org.webpki.saturn.acquirer;
 
 import java.io.IOException;
 
-import java.util.logging.Logger;
-
 import javax.servlet.ServletException;
 
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.AuthorityBaseServlet;
 
 //This servlet publishes the Acquirer (Card-Processor) "ProviderAuthority" object.
 
-public class ProviderAuthorityServlet extends HttpServlet {
+public class ProviderAuthorityServlet extends AuthorityBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
-    static Logger logger = Logger.getLogger(ProviderAuthorityServlet.class.getCanonicalName());
-    
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType(BaseProperties.JSON_CONTENT_TYPE);
-        response.setHeader("Pragma", "No-Cache");
-        response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(AcquirerService.authorityObjectManager.getProviderAuthorityBlob());
+        processAuthorityRequest(request, 
+                                response,
+                                AcquirerService.authorityObjectManager.getProviderAuthorityBlob());
+    }
+
+    @Override
+    protected boolean isProvider() {
+        return true;
     }
 }
