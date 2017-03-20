@@ -97,8 +97,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             list(rd, AUTHORITY_URL_JSON, "The address of this object") +
                             list(rd, SERVICE_URL_JSON, "Primary service end point") +
                             list(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
-                            list(rd, PROVIDER_ACCOUNT_TYPES_JSON, "Supported accont types", true) +
-                            list(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algoritms <i>recognized</i> by the provider") +
+                            list(rd, PROVIDER_ACCOUNT_TYPES_JSON, "Supported account types", true) +
+                            list(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algorithms <i>recognized</i> by the provider") +
                             list(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider")
                                : 
                             list(rd, AUTHORITY_URL_JSON, "The address of this object") +
