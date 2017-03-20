@@ -73,6 +73,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             "<i>live object</i> is normally requested by service providers for looking up partner core data. In this case " +
                             "the requester seems to be a browser which is why a &quot;pretty-printed&quot; HTML page is returned instead of raw JSON.")
                     .append(isProvider() ? "" : "</td></tr><tr><td style=\"padding-bottom:8pt\">" +
+                            "This particular (payee) object was issued by the provider specified by the " +
                             keyWord(PROVIDER_AUTHORITY_URL_JSON) +
                             " property: <a href=\"" +
                             rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "\" target=\"_blank\">" + 
