@@ -42,10 +42,16 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     }
     
     String list(JSONObjectReader rd, String property, String description) throws IOException {
-        rd.scanAway(property);
-        return "<li>" + keyWord(property) + ": " + description + "</li>";
+        return list(rd, property, description, false);
     }
     
+    String list(JSONObjectReader rd, String property, String description, boolean optional) throws IOException {
+        if (!optional || rd.hasProperty(property)) {
+            rd.scanAway(property);
+        }
+        return "<li>" + keyWord(property) + ": " + (optional ? "<i>Optional</i>. " : "") + description + "</li>";
+    }
+
     public void processAuthorityRequest(HttpServletRequest request, HttpServletResponse response, byte[] authorityData) throws IOException, ServletException {
         if (authorityData == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -90,8 +96,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             list(rd, HTTP_VERSION_JSON, "Preferred HTTP version (&#x2265; HTTP/1.1)") +
                             list(rd, AUTHORITY_URL_JSON, "The address of this object") +
                             list(rd, SERVICE_URL_JSON, "Primary service end point") +
-                            (rd.hasProperty(EXTENSIONS_JSON) ?
-                            list(rd, EXTENSIONS_JSON, "Supported extension objects") : "") +
+                            list(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
+                            list(rd, PROVIDER_ACCOUNT_TYPES_JSON, "Supported accont types", true) +
                             list(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algoritms <i>recognized</i> by the provider") +
                             list(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider")
                                : 
