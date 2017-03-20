@@ -19,11 +19,11 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
@@ -54,6 +54,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
             if (accept != null && accept.contains(HTML_CONTENT_TYPE)) {
                 // Presumably called by a browser
                 JSONObjectReader rd = JSONParser.parse(authorityData);
+                rd.getString(JSONDecoderCache.CONTEXT_JSON);
+                rd.getString(JSONDecoderCache.QUALIFIER_JSON);
                 response.setContentType(HTML_CONTENT_TYPE + "; charset=utf-8");
                 authorityData = new StringBuffer("<!DOCTYPE html>" +
                             "<html><head><meta charset=\"UTF-8\"><link rel=\"icon\" href=\"")
@@ -103,6 +105,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(list(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
                     .append(list(rd, JSONSignatureDecoder.SIGNATURE_JSON, "X.509 provider attestation signature"))
                     .append("</ul></td></tr></body></html>").toString().getBytes("UTF-8");
+                // Just to check that we didn't forgot anything...
+                rd.checkForUnread();
             } else {
                 // Normal call from a service
                 response.setContentType(JSON_CONTENT_TYPE);
