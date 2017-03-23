@@ -110,7 +110,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(list(rd, TIME_STAMP_JSON, "Object creation time"))
                     .append(list(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
                     .append(list(rd, JSONSignatureDecoder.SIGNATURE_JSON, "X.509 provider attestation signature"))
-                    .append("</ul></td></tr></body></html>").toString().getBytes("UTF-8");
+                    .append("</ul></td></tr></table></body></html>").toString().getBytes("UTF-8");
                 // Just to check that we didn't forgot anything...
                 rd.checkForUnread();
             } else {
