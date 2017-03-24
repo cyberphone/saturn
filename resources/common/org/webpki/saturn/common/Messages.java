@@ -82,22 +82,14 @@ public enum Messages {
           .setString(JSONDecoderCache.QUALIFIER_JSON, message.toString());
     }
 
-    public static Messages parseBaseMessage(Messages expectedMessage,
-                                            JSONObjectReader requestObject) throws IOException {
-        return parseBaseMessage(new Messages[]{expectedMessage}, requestObject);
-    }
-
-    public static Messages parseBaseMessage(Messages[] expectedMessages,
-                                            JSONObjectReader requestObject) throws IOException {
+    public static void parseBaseMessage(Messages expectedMessage,
+                                        JSONObjectReader requestObject) throws IOException {
         if (!requestObject.getString(JSONDecoderCache.CONTEXT_JSON).equals(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI)) {
             throw new IOException("Unknown context: " + requestObject.getString(JSONDecoderCache.CONTEXT_JSON));
         }
         String qualifier = requestObject.getString(JSONDecoderCache.QUALIFIER_JSON);
-        for (Messages message : expectedMessages) {
-            if (qualifier.equals(message.toString())) {
-                return message;
-            }
+        if (!qualifier.equals(expectedMessage.toString())) {
+            throw new IOException("Unexpected qualifier: " + qualifier);
         }
-        throw new IOException("Unexpected qualifier: " + qualifier);
     }
 }
