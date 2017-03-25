@@ -140,7 +140,11 @@ const jsonPostProcessors = {
          payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jcs.PUBLIC_KEY_JSON])) {
       throw new TypeError('Public key doesn\'t match merchant ID=' + payee.getId());
     }
-    
+    if (!cardPaymentRequest.getAuthorizationPublicKey().equals(
+        payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jcs.PUBLIC_KEY_JSON])) {
+      throw new TypeError('Public key doesn\'t match merchant ID=' + payee.getId());
+    }
+
     // Verify the the embedded response was created by a known bank (network)
     cardPaymentRequest.verifyPayerProvider(paymentRoot);
 

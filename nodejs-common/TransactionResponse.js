@@ -31,56 +31,15 @@ const SOFTWARE_VERSION = "1.00";
 function TransactionResponse() {
 }
 
-/*
-    public TransactionResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.CARD_PAYMENT_RESPONSE, root = rd);
-        cardPaymentRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON));
-        referenceId = rd.getString(REFERENCE_ID_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON);
-        software = new Software(rd);
-        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
-        signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
-        rd.checkForUnread();
-    }
-
-    JSONObjectReader root;
-
-    Software software;
-
-    GregorianCalendar dateTime;
-
-    String referenceId;
-    public String getReferenceId() {
-        return referenceId;
-    }
-
-    String accountReference;
-    public String getAccountReference() {
-        return accountReference;
-    }
-
-    JSONSignatureDecoder signatureDecoder;
-    public JSONSignatureDecoder getSignatureDecoder() {
-        return signatureDecoder;
-    }
-
-
-    TransactionRequest cardPaymentRequest;
-    public TransactionRequest getCardPaymentRequest() {
-        return cardPaymentRequest;
-    }
-
-*/
-
-TransactionResponse.encode = function(cardPaymentRequest,
+TransactionResponse.encode = function(transactionRequest,
                                       referenceId,
                                       optionalLogData,
                                       signer) {
   return Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
-    .setObject(BaseProperties.EMBEDDED_JSON, cardPaymentRequest.root)
+    .setObject(Messages.getLowerCamelCase(Messages.TRANSACTION_REQUEST), transactionRequest.root)
     .setString(BaseProperties.REFERENCE_ID_JSON, referenceId)
     .setDynamic((wr) => {
-        return optionalLogData == null ? wr :wr.setString(BaseProperties.LOG_DATA_JSON, optionalLogData)
+        return optionalLogData == null ? wr : wr.setString(BaseProperties.LOG_DATA_JSON, optionalLogData)
       })
     .setDateTime(BaseProperties.TIME_STAMP_JSON, new Date())
     .setObject(BaseProperties.SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))

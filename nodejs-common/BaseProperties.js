@@ -21,8 +21,6 @@
 
 const BaseProperties = {
 
-    EMBEDDED_JSON                    : '@embedded',
-
     // For the Web2Native Bridge wallet 
     WINDOW_JSON                      : 'window',
     HEIGHT_JSON                      : 'height',

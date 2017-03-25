@@ -31,7 +31,7 @@ const ProtectedAccountData  = require('./ProtectedAccountData');
 
 function TransactionRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, rd);
-  this.authorizationResponse = new AuthorizationResponse(rd.getObject(BaseProperties.EMBEDDED_JSON));
+  this.authorizationResponse = new AuthorizationResponse(Messages.getEmbeddedMessage(Messages.AUTHORIZATION_RESPONSE, rd));
   this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
   this.actualAmount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON,
                                        this.authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
@@ -39,8 +39,6 @@ function TransactionRequest(rd) {
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
   this.publicKey = rd.getSignature().getPublicKey();
-  AuthorizationRequest.comparePublicKeys(this.publicKey,
-                                         this.authorizationResponse.authorizationRequest.paymentRequest);
   if (!this.authorizationResponse.authorizationRequest.payerAccountType.isCardPayment()) {
     throw new TypeError('Payment method is not card: ' + 
         this.authorizationResponse.authorizationRequest.payerAccountType.getTypeUri());
@@ -72,6 +70,10 @@ TransactionRequest.prototype.getPublicKey = function() {
   return this.publicKey;
 };
 
+TransactionRequest.prototype.getAuthorizationPublicKey = function() {
+  return this.authorizationResponse.authorizationRequest.publicKey;
+};
+
 TransactionRequest.prototype.getAuthorizationResponse = function() {
   return this.authorizationResponse;
 };
@@ -90,30 +92,5 @@ TransactionRequest.prototype.getProtectedAccountData = function(decryptionKeys) 
                                           .getDecryptedData(decryptionKeys)),
                                   this.authorizationResponse.authorizationRequest.payerAccountType);
 };
-
-/*
-    public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
-                                          String referenceId,
-                                          ServerAsymKeySigner signer) throws IOException {
-        return Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
-            .setObject(EMBEDDED_JSON, authorizationResponse.root)
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(AuthorizationRequest.SOFTWARE_NAME, 
-                                                      AuthorizationRequest.SOFTWARE_VERSION))
-            .setSignature(signer);
-    }
-
-    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys, boolean cardAccount)
-    throws IOException, GeneralSecurityException {
-        return new ProtectedAccountData(JSONParser.parse(authorizationResponse
-                                                             .encryptedAccountData
-                                                                 .getDecryptedData(decryptionKeys)), cardAccount);
-    }
-
-    public void verifyUserBank(JSONX509Verifier paymentRoot) throws IOException {
-        authorizationResponse.signatureDecoder.verify(paymentRoot);
-    }
-*/
 
 module.exports = TransactionRequest;

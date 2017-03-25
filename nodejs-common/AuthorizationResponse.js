@@ -31,7 +31,7 @@ const SOFTWARE_VERSION = "1.00";
 
 function AuthorizationResponse(rd) {
   this.root = Messages.parseBaseMessage(Messages.AUTHORIZATION_RESPONSE, rd);
-  this.authorizationRequest = new AuthorizationRequest(rd.getObject(BaseProperties.EMBEDDED_JSON));
+  this.authorizationRequest = new AuthorizationRequest(Messages.getEmbeddedMessage(Messages.AUTHORIZATION_REQUEST, rd));
   this.accountReference = rd.getString(BaseProperties.ACCOUNT_REFERENCE_JSON);
   this.encryptedAccountData = rd.getObject(BaseProperties.ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
@@ -58,29 +58,5 @@ AuthorizationResponse.prototype.getSignatureDecoder = function() {
 AuthorizationResponse.prototype.getAuthorizationRequest = function() {
   return this.authorizationRequest;
 }
-/*
-    public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
-                                          String accountReference,
-                                          ProviderAuthority providerAuthority,
-                                          AccountDescriptor accountDescriptor,
-                                          CardSpecificData cardSpecificData,
-                                          String referenceId,
-                                          ServerX509Signer signer) throws IOException, GeneralSecurityException {
-        return Messages.createBaseMessage(Messages.AUTHORIZATION_RESPONSE)
-            .setObject(EMBEDDED_JSON, authorizationRequest.root)
-            .setString(ACCOUNT_REFERENCE_JSON, accountReference)
-            .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
-                       JSONObjectWriter
-                           .createEncryptionObject(ProtectedAccountData.encode(accountDescriptor, cardSpecificData)
-                                                       .serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                                   providerAuthority.getDataEncryptionAlgorithm(),
-                                                   providerAuthority.getEncryptionKey(),
-                                                   providerAuthority.getKeyEncryptionAlgorithm()))
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new Date(), true)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
-            .setSignature(signer);
-    }
-*/
 
 module.exports = AuthorizationResponse;

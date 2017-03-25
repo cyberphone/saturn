@@ -52,6 +52,14 @@ const Messages = {
         throw new TypeError('Unexpected qualifier: ' + jsonReader.getString(Messages.QUALIFIER_JSON));
       }
       return jsonReader;
+    },
+    
+    getLowerCamelCase : function(message) {
+      return message.substring(0, 1).toLowerCase() + message.substring(1);
+    },
+    
+    getEmbeddedMessage : function(message, jsonReader) {
+      return jsonReader.getObject(Messages.getLowerCamelCase(message));
     }
 
 };
