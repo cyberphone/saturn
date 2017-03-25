@@ -92,7 +92,7 @@ public class AuthorizationResponse implements BaseProperties {
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException, GeneralSecurityException {
         return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
-            .setObject(Messages.AUTHORIZATION_REQUEST.getlowerCamelCase(), authorizationRequest.root)
+            .setObject(Messages.AUTHORIZATION_REQUEST.lowerCamelCase(), authorizationRequest.root)
             .setString(ACCOUNT_REFERENCE_JSON, accountReference)
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
                        JSONObjectWriter

@@ -93,13 +93,13 @@ public enum Messages {
         return requestObject;
     }
 
-    public String getlowerCamelCase() {
+    public String lowerCamelCase() {
         char[] lowerCamelCasedMessage = qualifier.toCharArray();
         lowerCamelCasedMessage[0] = Character.toLowerCase(lowerCamelCasedMessage[0]);
         return String.valueOf(lowerCamelCasedMessage);
     }
 
     public JSONObjectReader getEmbeddedMessage(JSONObjectReader reader) throws IOException {
-        return reader.getObject(getlowerCamelCase());
+        return reader.getObject(lowerCamelCase());
     }
 }

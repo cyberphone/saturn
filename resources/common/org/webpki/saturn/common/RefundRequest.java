@@ -108,7 +108,7 @@ public class RefundRequest implements BaseProperties {
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.REFUND_REQUEST.createBaseMessage()
-            .setObject(Messages.AUTHORIZATION_RESPONSE.getlowerCamelCase(), authorizationResponse.root)
+            .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setBigDecimal(AMOUNT_JSON,
                            amount,
