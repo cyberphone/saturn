@@ -24,7 +24,7 @@ import org.webpki.json.JSONObjectWriter;
 public class WalletAlertMessage implements BaseProperties {
     
     public WalletAlertMessage(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.PAYMENT_CLIENT_ALERT, root = rd);
+        root = Messages.PAYMENT_CLIENT_ALERT.parseBaseMessage(rd);
         text = rd.getString(TEXT_JSON);
         rd.checkForUnread();
     }
@@ -40,7 +40,7 @@ public class WalletAlertMessage implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(String text) throws IOException {
-        return Messages.createBaseMessage(Messages.PAYMENT_CLIENT_ALERT)
+        return Messages.PAYMENT_CLIENT_ALERT.createBaseMessage()
             .setString(TEXT_JSON, text);
     }
 }

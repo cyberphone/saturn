@@ -37,8 +37,8 @@ public class AuthorizationResponse implements BaseProperties {
     public static final String SOFTWARE_VERSION = "1.00";
 
     public AuthorizationResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.AUTHORIZATION_RESPONSE, root = rd);
-        authorizationRequest = new AuthorizationRequest(rd.getObject(EMBEDDED_JSON));
+        root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
+        authorizationRequest = new AuthorizationRequest(Messages.AUTHORIZATION_REQUEST.getEmbeddedMessage(rd));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         encryptedAccountData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
         referenceId = rd.getString(REFERENCE_ID_JSON);
@@ -91,8 +91,8 @@ public class AuthorizationResponse implements BaseProperties {
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException, GeneralSecurityException {
-        return Messages.createBaseMessage(Messages.AUTHORIZATION_RESPONSE)
-            .setObject(EMBEDDED_JSON, authorizationRequest.root)
+        return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
+            .setObject(Messages.AUTHORIZATION_REQUEST.getlowerCamelCase(), authorizationRequest.root)
             .setString(ACCOUNT_REFERENCE_JSON, accountReference)
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
                        JSONObjectWriter

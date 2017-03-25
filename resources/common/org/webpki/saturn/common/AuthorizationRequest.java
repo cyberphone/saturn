@@ -38,7 +38,7 @@ import org.webpki.util.ArrayUtil;
 public class AuthorizationRequest implements BaseProperties {
     
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, root = rd);
+        root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
@@ -123,7 +123,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           AccountDescriptor payeeAccount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
-        return Messages.createBaseMessage(Messages.AUTHORIZATION_REQUEST)
+        return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setString(AUTHORITY_URL_JSON, authorityUrl)

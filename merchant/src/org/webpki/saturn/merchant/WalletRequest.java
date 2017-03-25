@@ -53,7 +53,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
         }
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
-        requestObject = Messages.createBaseMessage(Messages.PAYMENT_CLIENT_REQUEST);
+        requestObject = Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage();
         JSONArrayWriter paymentNetworksArray = requestObject.setArray(PAYMENT_NETWORKS_JSON);
         GregorianCalendar timeStamp = new GregorianCalendar();
         GregorianCalendar expires = Expires.inMinutes(30);

@@ -38,8 +38,8 @@ import org.webpki.json.encryption.DecryptionKeyHolder;
 public class RefundRequest implements BaseProperties {
     
     public RefundRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
-        Messages.parseBaseMessage(Messages.REFUND_REQUEST, root = rd);
-        authorizationResponse = new AuthorizationResponse(rd.getObject(EMBEDDED_JSON));
+        root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
+        authorizationResponse = new AuthorizationResponse(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         amount = rd.getBigDecimal(AMOUNT_JSON,
                                         authorizationResponse
@@ -107,8 +107,8 @@ public class RefundRequest implements BaseProperties {
                                           BigDecimal amount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
-        return Messages.createBaseMessage(Messages.REFUND_REQUEST)
-            .setObject(EMBEDDED_JSON, authorizationResponse.root)
+        return Messages.REFUND_REQUEST.createBaseMessage()
+            .setObject(Messages.AUTHORIZATION_RESPONSE.getlowerCamelCase(), authorizationResponse.root)
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setBigDecimal(AMOUNT_JSON,
                            amount,

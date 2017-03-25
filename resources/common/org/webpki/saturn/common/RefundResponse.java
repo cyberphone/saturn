@@ -30,8 +30,8 @@ import org.webpki.json.JSONSignatureTypes;
 public class RefundResponse implements BaseProperties {
     
     public RefundResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.REFUND_RESPONSE, root = rd);
-        refundRequest = new RefundRequest(rd.getObject(EMBEDDED_JSON), null);
+        root = Messages.REFUND_RESPONSE.parseBaseMessage(rd);
+        refundRequest = new RefundRequest(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
@@ -72,8 +72,8 @@ public class RefundResponse implements BaseProperties {
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(Messages.REFUND_RESPONSE)
-            .setObject(EMBEDDED_JSON, refundRequest.root)
+        return Messages.REFUND_RESPONSE.createBaseMessage()
+            .setObject(Messages.REFUND_REQUEST.getlowerCamelCase(), refundRequest.root)
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)

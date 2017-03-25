@@ -253,7 +253,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 /////////////////////////////////////////////////////////////////////////////////////////
                 // Normal return                                                                       //
                 /////////////////////////////////////////////////////////////////////////////////////////
-                returnJsonData(response, Messages.createBaseMessage(Messages.PAYMENT_CLIENT_SUCCESS));
+                returnJsonData(response, Messages.PAYMENT_CLIENT_SUCCESS.createBaseMessage());
             }
 
         } catch (Exception e) {

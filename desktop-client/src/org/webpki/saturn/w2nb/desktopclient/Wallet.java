@@ -76,6 +76,7 @@ import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.AsymKeySignerInterface;
 
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
@@ -891,7 +892,7 @@ public class Wallet {
             try {
                 JSONObjectReader invokeMessage = stdin.readJSONObject();
                 logger.info("Received from browser:\n" + invokeMessage);
-                Messages.parseBaseMessage(Messages.PAYMENT_CLIENT_REQUEST, invokeMessage);
+                Messages.PAYMENT_CLIENT_REQUEST.parseBaseMessage(invokeMessage);
                 final JSONArrayReader paymentNetworks = invokeMessage.getArray(BaseProperties.PAYMENT_NETWORKS_JSON);
                 timer.cancel();
                 if (running) {
@@ -973,9 +974,12 @@ public class Wallet {
                     JSONObjectReader optionalMessage = stdin.readJSONObject();
                     try {
                         logger.info("Received from browser:\n" + optionalMessage);
-                        Messages message = Messages.parseBaseMessage(new Messages[]{Messages.PROVIDER_USER_RESPONSE,
-                                                                                    Messages.PAYMENT_CLIENT_ALERT},
-                                                                     optionalMessage);
+                        Messages message =
+                            optionalMessage
+                                .getString(JSONDecoderCache.QUALIFIER_JSON)
+                                    .equals(Messages.PROVIDER_USER_RESPONSE.toString()) ?
+                                                        Messages.PROVIDER_USER_RESPONSE : Messages.PAYMENT_CLIENT_ALERT;
+                        message.parseBaseMessage(optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
                             EncryptedMessage encryptedMessage = new ProviderUserResponse(optionalMessage)
@@ -1224,7 +1228,7 @@ public class Wallet {
         // lacks the 'px' part; you have to add it in the Web application.
         try {
             dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
-            JSONObjectWriter readyMessage = Messages.createBaseMessage(Messages.PAYMENT_CLIENT_IS_READY);
+            JSONObjectWriter readyMessage = Messages.PAYMENT_CLIENT_IS_READY.createBaseMessage();
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)
                     .setDouble(BaseProperties.WIDTH_JSON, extWidth)

@@ -34,7 +34,7 @@ public class PayeeAuthority implements BaseProperties {
                                           PayeeCoreProperties payeeCoreProperties,
                                           GregorianCalendar expires,
                                           ServerX509Signer attestSigner) throws IOException {
-        return payeeCoreProperties.writeObject(Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
+        return payeeCoreProperties.writeObject(Messages.PAYEE_AUTHORITY.createBaseMessage()
                                      .setString(AUTHORITY_URL_JSON, authorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
@@ -43,7 +43,7 @@ public class PayeeAuthority implements BaseProperties {
     }
 
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
-        Messages.parseBaseMessage(Messages.PAYEE_AUTHORITY, root = rd);
+        root = Messages.PAYEE_AUTHORITY.parseBaseMessage(rd);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         if (!authorityUrl.equals(expectedAuthorityUrl)) {
             throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +

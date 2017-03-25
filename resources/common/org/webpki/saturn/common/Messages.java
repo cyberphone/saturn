@@ -76,20 +76,30 @@ public enum Messages {
         return cardPayment;
     }
 
-    public static JSONObjectWriter createBaseMessage(Messages message) throws IOException {
+    public JSONObjectWriter createBaseMessage() throws IOException {
         return new JSONObjectWriter()
           .setString(JSONDecoderCache.CONTEXT_JSON, BaseProperties.SATURN_WEB_PAY_CONTEXT_URI)  
-          .setString(JSONDecoderCache.QUALIFIER_JSON, message.toString());
+          .setString(JSONDecoderCache.QUALIFIER_JSON, qualifier);
     }
 
-    public static void parseBaseMessage(Messages expectedMessage,
-                                        JSONObjectReader requestObject) throws IOException {
+    public JSONObjectReader parseBaseMessage(JSONObjectReader requestObject) throws IOException {
         if (!requestObject.getString(JSONDecoderCache.CONTEXT_JSON).equals(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI)) {
             throw new IOException("Unknown context: " + requestObject.getString(JSONDecoderCache.CONTEXT_JSON));
         }
         String qualifier = requestObject.getString(JSONDecoderCache.QUALIFIER_JSON);
-        if (!qualifier.equals(expectedMessage.toString())) {
+        if (!qualifier.equals(this.qualifier)) {
             throw new IOException("Unexpected qualifier: " + qualifier);
         }
+        return requestObject;
+    }
+
+    public String getlowerCamelCase() {
+        char[] lowerCamelCasedMessage = qualifier.toCharArray();
+        lowerCamelCasedMessage[0] = Character.toLowerCase(lowerCamelCasedMessage[0]);
+        return String.valueOf(lowerCamelCasedMessage);
+    }
+
+    public JSONObjectReader getEmbeddedMessage(JSONObjectReader reader) throws IOException {
+        return reader.getObject(getlowerCamelCase());
     }
 }

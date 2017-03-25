@@ -35,8 +35,8 @@ public class TransactionResponse implements BaseProperties {
     public static enum ERROR {OUT_OF_FUNDS, DELETED_AUTHORIZATION}
 
     public TransactionResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.TRANSACTION_RESPONSE, root = rd);
-        transactionRequest = new TransactionRequest(rd.getObject(EMBEDDED_JSON), null);
+        root = Messages.TRANSACTION_RESPONSE.parseBaseMessage(rd);
+        transactionRequest = new TransactionRequest(Messages.TRANSACTION_REQUEST.getEmbeddedMessage(rd), null);
         if (rd.hasProperty(TRANSACTION_ERROR_JSON)) {
             transactionError = ERROR.valueOf(rd.getString(TRANSACTION_ERROR_JSON));
         }
@@ -86,8 +86,8 @@ public class TransactionResponse implements BaseProperties {
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
-            .setObject(EMBEDDED_JSON, transactionRequest.root)
+        return Messages.TRANSACTION_RESPONSE.createBaseMessage()
+            .setObject(Messages.TRANSACTION_REQUEST.getlowerCamelCase(), transactionRequest.root)
             .setDynamic((wr) -> transactionError == null ? wr : wr.setString(TRANSACTION_ERROR_JSON, transactionError.toString()))
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)

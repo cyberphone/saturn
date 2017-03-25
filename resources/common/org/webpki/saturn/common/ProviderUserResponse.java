@@ -34,7 +34,7 @@ import org.webpki.json.encryption.DataEncryptionAlgorithms;
 public class ProviderUserResponse implements BaseProperties {
  
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
-        Messages.parseBaseMessage(Messages.PROVIDER_USER_RESPONSE, rd);
+        Messages.PROVIDER_USER_RESPONSE.parseBaseMessage(rd);
         encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON).getEncryptionObject().require(false);
         rd.checkForUnread();
     }
@@ -65,7 +65,7 @@ public class ProviderUserResponse implements BaseProperties {
             }
         }
         wr.setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true);
-        return Messages.createBaseMessage(Messages.PROVIDER_USER_RESPONSE)
+        return Messages.PROVIDER_USER_RESPONSE.createBaseMessage()
             .setObject(ENCRYPTED_MESSAGE_JSON,
                        JSONObjectWriter.createEncryptionObject(wr.serializeToBytes(JSONOutputFormats.NORMALIZED),
                                                                dataEncryptionAlgorithm,

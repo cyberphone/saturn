@@ -39,8 +39,8 @@ import org.webpki.json.encryption.DecryptionKeyHolder;
 public class TransactionRequest implements BaseProperties {
     
     public TransactionRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
-        Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, root = rd);
-        authorizationResponse = new AuthorizationResponse(rd.getObject(EMBEDDED_JSON));
+        root = Messages.TRANSACTION_REQUEST.parseBaseMessage(rd);
+        authorizationResponse = new AuthorizationResponse(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         actualAmount = rd.getBigDecimal(AMOUNT_JSON,
                                         authorizationResponse
@@ -108,8 +108,8 @@ public class TransactionRequest implements BaseProperties {
                                           BigDecimal actualAmount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
-        return Messages.createBaseMessage(Messages.TRANSACTION_REQUEST)
-            .setObject(EMBEDDED_JSON, authorizationResponse.root)
+        return Messages.TRANSACTION_REQUEST.createBaseMessage()
+            .setObject(Messages.AUTHORIZATION_RESPONSE.getlowerCamelCase(), authorizationResponse.root)
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setBigDecimal(AMOUNT_JSON,
                            actualAmount,

@@ -74,7 +74,7 @@ public class ProviderAuthority implements BaseProperties {
                                           EncryptionParameter[] encryptionParameters,
                                           GregorianCalendar expires,
                                           ServerX509Signer signer) throws IOException {
-        return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
+        return Messages.PROVIDER_AUTHORITY.createBaseMessage()
             .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(SERVICE_URL_JSON, serviceUrl)
@@ -106,7 +106,7 @@ public class ProviderAuthority implements BaseProperties {
     }
 
     public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
-        Messages.parseBaseMessage(Messages.PROVIDER_AUTHORITY, root = rd);
+        root = Messages.PROVIDER_AUTHORITY.parseBaseMessage(rd);
         httpVersion = rd.getString(HTTP_VERSION_JSON);
         if (!httpVersion.equals(HTTP_VERSION_SUPPORT)) {
             throw new IOException("\"" + HTTP_VERSION_JSON + "\" is currently limited to " + HTTP_VERSION_SUPPORT);

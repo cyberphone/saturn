@@ -18,8 +18,6 @@ package org.webpki.saturn.common;
 
 public interface BaseProperties {
 
-    String EMBEDDED_JSON                    = "@embedded";
-
     // For the Web2Native Bridge wallet 
     String WINDOW_JSON                      = "window";
     String HEIGHT_JSON                      = "height";
