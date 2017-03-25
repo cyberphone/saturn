@@ -62,6 +62,7 @@ public interface BaseProperties {
     String REFERENCE_ID_JSON                = "referenceId";
     String PAYEE_JSON                       = "payee";                      // Payee object
     String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
+    String ADDITIONAL_PAYEE_DATA_JSON       = "additionalPayeeData";        // Optional object in an AuthorizationRequest
     String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider
     String PROVIDER_ACCOUNT_TYPES_JSON      = "providerAccountTypes";       // List of Account2Account types "understood" by provider

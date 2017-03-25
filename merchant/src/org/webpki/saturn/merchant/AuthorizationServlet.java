@@ -131,7 +131,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
-
+        // Nothing yet...
+        JSONObjectReader additionalPayeeData = null;
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
             AuthorizationRequest.encode(MerchantService.testMode,
@@ -142,6 +143,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         request.getRemoteAddr(),
                                         paymentRequest,
                                         accountDescriptor,
+                                        additionalPayeeData,
                                         MerchantService.getReferenceId(),
                                         MerchantService.paymentNetworks.get(paymentRequest
                                                                                 .getSignatureDecoder()

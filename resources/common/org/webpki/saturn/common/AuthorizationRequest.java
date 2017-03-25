@@ -46,7 +46,11 @@ public class AuthorizationRequest implements BaseProperties {
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         if (rd.hasProperty(PAYEE_ACCOUNT_JSON)) {
-            payeeAccount = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
+            optionalPayeeAccount = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
+        }
+        if (rd.hasProperty(ADDITIONAL_PAYEE_DATA_JSON)) {
+            additionalPayeeData = rd.getObject(ADDITIONAL_PAYEE_DATA_JSON);
+            rd.scanAway(ADDITIONAL_PAYEE_DATA_JSON);
         }
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
@@ -78,9 +82,14 @@ public class AuthorizationRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    AccountDescriptor payeeAccount;
+    AccountDescriptor optionalPayeeAccount;
     public AccountDescriptor getAccountDescriptor() {
-        return payeeAccount;
+        return optionalPayeeAccount;
+    }
+
+    JSONObjectReader additionalPayeeData;
+    public JSONObjectReader getAdditionalPayeeData() {
+        return additionalPayeeData;
     }
 
     GregorianCalendar timeStamp;
@@ -120,7 +129,8 @@ public class AuthorizationRequest implements BaseProperties {
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          AccountDescriptor payeeAccount,
+                                          AccountDescriptor optionalPayeeAccount,
+                                          JSONObjectReader additionalPayeeData,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
@@ -130,8 +140,10 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setDynamic((wr) -> payeeAccount == null ? wr 
-                      : wr.setObject(PAYEE_ACCOUNT_JSON, payeeAccount.writeObject()))
+            .setDynamic((wr) -> optionalPayeeAccount == null ? wr 
+                      : wr.setObject(PAYEE_ACCOUNT_JSON, optionalPayeeAccount.writeObject()))
+            .setDynamic((wr) -> additionalPayeeData == null ? wr 
+                      : wr.setObject(ADDITIONAL_PAYEE_DATA_JSON, additionalPayeeData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)

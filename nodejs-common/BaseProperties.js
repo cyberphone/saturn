@@ -65,6 +65,7 @@ const BaseProperties = {
     REFERENCE_ID_JSON                : 'referenceId',
     PAYEE_JSON                       : 'payee',                      // Payee object
     TEST_MODE_JSON                   : 'testMode',                   // Test mode = no real money involved
+    ADDITIONAL_PAYEE_DATA_JSON       : 'additionalPayeeData',        // Optional object in an AuthorizationRequest
     ENCRYPTED_AUTHORIZATION_JSON     : 'encryptedAuthorization',     // Payer authorization data
     PROVIDER_AUTHORITY_URL_JSON      : 'providerAuthorityUrl',       // URL to payment provider
     PROVIDER_ACCOUNT_TYPES_JSON      : 'providerAccountTypes',       // List of Account2Account types "understood" by provider
