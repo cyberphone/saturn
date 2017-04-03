@@ -17,7 +17,6 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.net.URL;
 
 import java.security.GeneralSecurityException;
@@ -31,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -131,11 +131,16 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return fetchJSONData(wrap, urlHolder);
     }
 
-    static void returnJsonData(HttpServletResponse response, JSONObjectWriter data) throws IOException {
+    static void returnJsonData(HttpServletResponse response, JSONObjectWriter returnData) throws IOException {
         response.setContentType(JSON_CONTENT_TYPE);
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(data.serializeToBytes(JSONOutputFormats.NORMALIZED));
+        byte[] data = returnData.serializeToBytes(JSONOutputFormats.NORMALIZED);
+        // Chunked data seems unnecessary here
+        response.setContentLength(data.length);
+        ServletOutputStream serverOutputStream = response.getOutputStream();
+        serverOutputStream.write(data);
+        serverOutputStream.flush();
     }
 
     static ProviderAuthority getProviderAuthority(UrlHolder urlHolder) throws IOException {

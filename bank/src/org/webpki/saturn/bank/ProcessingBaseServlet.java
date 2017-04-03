@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -232,7 +233,12 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             response.setContentType(JSON_CONTENT_TYPE);
             response.setHeader("Pragma", "No-Cache");
             response.setDateHeader("EXPIRES", 0);
-            response.getOutputStream().write(providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED));
+            byte[] data = providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED);
+            // Chunked data seems unnecessary here
+            response.setContentLength(data.length);
+            ServletOutputStream serverOutputStream = response.getOutputStream();
+            serverOutputStream.write(data);
+            serverOutputStream.flush();
             
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////

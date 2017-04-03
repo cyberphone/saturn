@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,7 +98,11 @@ public class HTML implements MerchantProperties {
         response.setContentType("text/html; charset=utf-8");
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(html.getBytes("UTF-8"));
+        byte[] data = html.getBytes("UTF-8");
+        response.setContentLength(data.length);
+        ServletOutputStream servletOutputStream = response.getOutputStream();
+        servletOutputStream.write(data);
+        servletOutputStream.flush();
     }
 
     static void homePage(HttpServletResponse response,

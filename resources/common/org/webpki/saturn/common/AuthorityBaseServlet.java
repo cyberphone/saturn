@@ -19,6 +19,7 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -119,7 +120,11 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
             }
             response.setHeader("Pragma", "No-Cache");
             response.setDateHeader("EXPIRES", 0);
-            response.getOutputStream().write(authorityData);
+            // Chunked data seems unnecessary here
+            response.setContentLength(authorityData.length);
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+            servletOutputStream.write(authorityData);
+            servletOutputStream.flush();
         }
     }
 }
