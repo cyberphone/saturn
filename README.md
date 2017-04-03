@@ -3,3 +3,5 @@
 ##A (potentially) Universal Payment Authorization System
 
 https://cyberphone.github.io/doc/saturn
+
+##Testing Saturn locally using Tomcat 8
