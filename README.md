@@ -6,6 +6,8 @@ https://cyberphone.github.io/doc/saturn
 
 ## Testing Saturn locally using Tomcat 8
 
+Prerequisites: JDK 8 and ANT
+
 Define an environment variable <code>CATALINA_HOME</code> = <code>TOMCAT-INSTALL-DIRECTORY</code>
 
 In <code>TOMCAT-INSTALL-DIRECTORY/conf/server.xml</code> define:
@@ -26,3 +28,9 @@ $ ant -f SATURN-INSTALL-DIRECTORY/merchant/build.xml tomcat
 $ ant -f SATURN-INSTALL-DIRECTORY/acquirer/build.xml tomcat
 $ ant -f SATURN-INSTALL-DIRECTORY/bank/build.xml both
 ```
+Update the <code>cacerts</code> file used by the JDK installation:
+
+```
+$ keytool -importcert -keystore JDK-INSTALL-DIRECTORY/jre/lib/security/cacerts -storepass changeit -file SATURN-INSTALL-DIRECTORY/tls-certificates/root/tlsroot.cer -alias webpkitestroot
+```
+Now Tomcat can be started.  There should be no errors in the log.
