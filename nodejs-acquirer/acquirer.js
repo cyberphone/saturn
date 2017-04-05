@@ -57,7 +57,7 @@ function readFile(path) {
 
 const homePage = readFile(__dirname + '/index.html');
 
-const AO_EXPIRY_TIME = 120;  // Authority object expiry time in seconds
+const AO_EXPIRY_TIME = 3600;  // Authority object expiry time in seconds
 
 var referenceId = 194006;
 function getReferenceId() {
@@ -186,7 +186,7 @@ const jsonGetProcessors = {
       // Valid merchant id?
       var payeeInformation = payeeDb.get(getArgument);
       if (payeeInformation === undefined) {
-        throw new TypeError('No such merchant: ' + getArgument);
+        return null;
       }
 
       // If the payee authority object has less than half of its life left, renew it
@@ -231,18 +231,20 @@ function successLog(returnOrReceived, request, jsonReaderOrWriter) {
   }
 }
 
+function writeData(response, data, contentType) {
+  response.writeHead(200, {'Content-Type'  : contentType,
+                           'Server'        : 'Node.js',
+                           'Connection'    : 'close',
+                           'Pragma'        : 'No-Cache',
+                           'Expires'       : 'Thu, 01 Jan 1970 00:00:00 GMT',
+                           'Content-Length': data.length});
+  response.write(data);
+  response.end();
+}
+
 function returnJsonData(request, response, jsonWriter) {
-  if (jsonWriter) {
-    var output = jsonWriter.getNormalizedData();
-    response.writeHead(200, {'Content-Type'  : BaseProperties.JSON_CONTENT_TYPE,
-                             'Connection'    : 'close',
-                             'Content-Length': output.length});
-    response.write(new Buffer(output));
-    response.end();
-    successLog('Returned data', request, jsonWriter);
-  } else {
-    noSuchFileResponse(response, request);
-  }
+  writeData(response, new Buffer(jsonWriter.getNormalizedData()), BaseProperties.JSON_CONTENT_TYPE);
+  successLog('Returned data', request, jsonWriter);
 }
 
 function noSuchFileResponse(response, request) {
@@ -253,6 +255,10 @@ function noSuchFileResponse(response, request) {
     response.write(message);
     response.end();
  }
+
+function writeHtml(response, htmlData) {
+  writeData(response, htmlData, 'text/html; charset=utf-8');
+}
 
 Https.createServer(options, (request, response) => {
   var pathname = Url.parse(request.url).pathname;
@@ -274,15 +280,23 @@ Https.createServer(options, (request, response) => {
     }
     if (getPath in jsonGetProcessors) {
       try {
-        returnJsonData(request, response, jsonGetProcessors[getPath](getArgument));
+        var jsonWriter = jsonGetProcessors[getPath](getArgument);
+        if (jsonWriter) {
+          var accept = request.headers['accept'];
+          if (!accept || accept == BaseProperties.JSON_CONTENT_TYPE) {
+            returnJsonData(request, response, jsonWriter);
+          } else {
+            writeHtml(response, '<html><body><pre>' + jsonWriter.toString() + '</pre></body></html>');
+          }
+        } else {
+          noSuchFileResponse(response, request);
+        }
       } catch (e) {
         logger.error(e.stack)
         serverError(response, e.message);
       }
     } else if (pathname == '') {
-      response.writeHead(200, {'Content-Type': 'text/html'});
-      response.write(homePage);
-      response.end();
+      writeHtml(response, homePage);
     } else {
       noSuchFileResponse(response, request);
     }

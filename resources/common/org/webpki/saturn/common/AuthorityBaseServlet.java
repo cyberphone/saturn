@@ -69,12 +69,12 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(isProvider() ? "" : "../")
                     .append("saturn.png\" sizes=\"192x192\">"+
                             "<title>Saturn Authority Object</title><style type=\"text/css\">" +
-                            " body {font-size:8pt;color:#000000;font-family:Verdana,'Bitstream Vera Sans'," +
+                            " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana,'Bitstream Vera Sans'," +
                              "'DejaVu Sans',Arial,'Liberation Sans';background-color:white} " +
                              " code {font-size:9pt} " +
                              " a {color:blue;text-decoration:none} " +
                              " li {padding-bottom:3pt} " +
-                            "</style></head><body><table style=\"margin-left:auto;margin-right:auto;width:800pt\"><tr><td style=\"text-align:center;font-size:10pt;font-weight:bold;padding:15pt\">")
+                            "</style></head><body><table style=\"margin-left:auto;margin-right:auto\"><tr><td style=\"text-align:center;font-size:10pt;font-weight:bold;padding:15pt\">")
                     .append(isProvider() ? Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
                     .append("</td></tr>" +
                             "<tr><td style=\"padding-bottom:8pt\">" +
