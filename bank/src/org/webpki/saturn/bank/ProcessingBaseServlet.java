@@ -34,7 +34,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -55,6 +54,7 @@ import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
+import org.webpki.saturn.common.AuthorityBaseServlet;
 
 import org.webpki.webutil.ServletUtil;
 
@@ -85,7 +85,6 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
 
     static Map<String,ProviderAuthority> providerAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
-
 
     static String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
@@ -230,15 +229,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            response.setContentType(JSON_CONTENT_TYPE);
-            response.setHeader("Pragma", "No-Cache");
-            response.setDateHeader("EXPIRES", 0);
-            byte[] data = providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED);
-            // Chunked data seems unnecessary here
-            response.setContentLength(data.length);
-            ServletOutputStream serverOutputStream = response.getOutputStream();
-            serverOutputStream.write(data);
-            serverOutputStream.flush();
+            AuthorityBaseServlet.writeData(response,
+                                           providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                           JSON_CONTENT_TYPE);
             
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////

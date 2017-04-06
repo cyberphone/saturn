@@ -18,7 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.LinkedHashMap;
+import java.util.TreeMap;
+import java.util.SortedMap;
 
 import java.util.logging.Logger;
 
@@ -29,7 +30,7 @@ public class AuthorityObjectManager extends Thread {
 
     private static final Logger logger = Logger.getLogger(AuthorityObjectManager.class.getCanonicalName());
 
-    LinkedHashMap<String,byte[]> payeeAuthorityBlobs = new LinkedHashMap<String,byte[]>();
+    TreeMap<String,byte[]> payeeAuthorityBlobs = new TreeMap<String,byte[]>();
 
     String providerAuthorityUrl;
     String serviceUrl;
@@ -38,7 +39,7 @@ public class AuthorityObjectManager extends Thread {
     SignatureProfiles[] signatureProfiles;
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
     
-    LinkedHashMap<String,PayeeCoreProperties> payees;
+    SortedMap<String,PayeeCoreProperties> payees;
     String payeeBaseAuthorityUrl;
 
     int expiryTimeInSeconds;
@@ -88,7 +89,7 @@ public class AuthorityObjectManager extends Thread {
                                   SignatureProfiles[] signatureProfiles,
                                   ProviderAuthority.EncryptionParameter[] encryptionParameters,
                                     
-                                  LinkedHashMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
+                                  SortedMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
                                   String payeeBaseAuthorityUrl,
 
                                   int expiryTimeInSeconds,

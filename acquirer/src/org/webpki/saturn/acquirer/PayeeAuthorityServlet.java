@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
 
-//This servlet publishes Payee (Merchant) "PayeeAuthority" objects.
+// This servlet publishes Payee (Merchant) "PayeeAuthority" objects.
 
 public class PayeeAuthorityServlet extends AuthorityBaseServlet {
 

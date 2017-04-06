@@ -69,6 +69,11 @@
     </listener>
 
     <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.acquirer.HomeServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>ProviderAuthorityServlet</servlet-name>
         <servlet-class>org.webpki.saturn.acquirer.ProviderAuthorityServlet</servlet-class>
     </servlet>
@@ -82,6 +87,11 @@
         <servlet-name>TransactionServlet</servlet-name>
         <servlet-class>org.webpki.saturn.acquirer.TransactionServlet</servlet-class>
     </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HomeServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>ProviderAuthorityServlet</servlet-name>

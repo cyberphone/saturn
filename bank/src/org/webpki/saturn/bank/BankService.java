@@ -26,9 +26,11 @@ import java.security.cert.X509Certificate;
 
 import java.security.interfaces.RSAPublicKey;
 
-import java.util.LinkedHashMap;
+import java.util.TreeMap;
+import java.util.SortedMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.GregorianCalendar;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -99,9 +101,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
     
-    static LinkedHashMap<String,UserAccountEntry> userAccountDb = new LinkedHashMap<String,UserAccountEntry>();
+    static SortedMap<String,UserAccountEntry> userAccountDb = new TreeMap<String,UserAccountEntry>();
     
-    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb = new LinkedHashMap<String,PayeeCoreProperties>();
+    static SortedMap<String,PayeeCoreProperties> merchantAccountDb = new TreeMap<String,PayeeCoreProperties>();
     
     static String bankCommonName;
 
@@ -124,6 +126,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static int referenceId;
     
     static AuthorityObjectManager authorityObjectManager;
+    
+    static GregorianCalendar started;
+    
+    static long transactionCount;
     
     static boolean logging;
 
@@ -259,6 +265,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                            KnownExtensions.REFUND_REQUEST,
                            RefundServlet.class,
                            "Refund Servlet");
+
+            started = new GregorianCalendar();
 
             logger.info("Saturn \"" + bankCommonName + "\" server initiated");
         } catch (Exception e) {

@@ -38,19 +38,52 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     
     protected abstract boolean isProvider();
     
+    public static final String BORDER = "border-width:1px;border-style:solid;border-color:#a9a9a9";
+    public static final String BOX_SHADDOW = "box-shadow:3pt 3pt 3pt #D0D0D0";
+    public static final String TOP_ELEMENT = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\">";
+    public static final String REST_ELEMENT = 
+        "<style type=\"text/css\">" +
+        " .header {text-align:center;font-size:10pt;font-weight:bold;padding:15pt}" +
+        " td {padding-bottom:8pt}" +
+        " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
+        " .tftable td {background-color:#FFFFE0;padding:3pt 4pt;" + BORDER + "}" +
+        " .tftable th {padding:4pt 3pt;background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
+        "text-align:center;" + BORDER +"}" +
+        " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
+        "'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans';background-color:white}" + 
+        " code {font-size:9pt}" +
+        " a {color:blue;text-decoration:none}" +
+        "</style></head>";
+    public static final String SATURN_LINK = "<a href=\"https://cyberphone.github.io/doc/saturn/\" target=\"_blank\">Saturn</a>";
+
+    public static void writeData(HttpServletResponse response, byte[] data, String contentType) throws IOException {
+        response.setContentType(contentType);
+        response.setHeader("Pragma", "No-Cache");
+        response.setDateHeader("EXPIRES", 0);
+        // Chunked data seems unnecessary here
+        response.setContentLength(data.length);
+        ServletOutputStream serverOutputStream = response.getOutputStream();
+        serverOutputStream.write(data);
+        serverOutputStream.flush();
+    }
+    
+    public static void writeHtml(HttpServletResponse response, StringBuffer html) throws IOException {
+        writeData(response, html.toString().getBytes("utf-8"), "text/html; charset=\"utf-8\"");
+    }
+
     String keyWord(String constant) {
         return "<code>&quot;" + constant + "&quot;</code>";
     }
     
-    String list(JSONObjectReader rd, String property, String description) throws IOException {
-        return list(rd, property, description, false);
+    String tableRow(JSONObjectReader rd, String property, String description) throws IOException {
+        return tableRow(rd, property, description, false);
     }
     
-    String list(JSONObjectReader rd, String property, String description, boolean optional) throws IOException {
+    String tableRow(JSONObjectReader rd, String property, String description, boolean optional) throws IOException {
         if (!optional || rd.hasProperty(property)) {
             rd.scanAway(property);
         }
-        return "<li>" + keyWord(property) + ": " + (optional ? "<i>Optional</i>. " : "") + description + "</li>";
+        return "<tr><td><code>" + property + "</code></td><td>" + (optional ? "<i>Optional</i>. " : "") + description + "</td></tr>";
     }
 
     public void processAuthorityRequest(HttpServletRequest request, HttpServletResponse response, byte[] authorityData) throws IOException, ServletException {
@@ -64,22 +97,18 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 rd.getString(JSONDecoderCache.CONTEXT_JSON);
                 rd.getString(JSONDecoderCache.QUALIFIER_JSON);
                 response.setContentType(HTML_CONTENT_TYPE + "; charset=utf-8");
-                authorityData = new StringBuffer("<!DOCTYPE html>" +
-                            "<html><head><meta charset=\"UTF-8\"><link rel=\"icon\" href=\"")
+                StringBuffer html = new StringBuffer(TOP_ELEMENT +
+                            "<link rel=\"icon\" href=\"")
                     .append(isProvider() ? "" : "../")
                     .append("saturn.png\" sizes=\"192x192\">"+
-                            "<title>Saturn Authority Object</title><style type=\"text/css\">" +
-                            " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana,'Bitstream Vera Sans'," +
-                             "'DejaVu Sans',Arial,'Liberation Sans';background-color:white} " +
-                             " code {font-size:9pt} " +
-                             " a {color:blue;text-decoration:none} " +
-                             " li {padding-bottom:3pt} " +
-                            "</style></head><body><table style=\"margin-left:auto;margin-right:auto\"><tr><td style=\"text-align:center;font-size:10pt;font-weight:bold;padding:15pt\">")
+                            "<title>Saturn Authority Object</title>" +
+                            REST_ELEMENT +
+                            "<body><table style=\"margin-left:auto;margin-right:auto\"><tr><td class=\"header\">")
                     .append(isProvider() ? Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
                     .append("</td></tr>" +
-                            "<tr><td style=\"padding-bottom:8pt\">" +
-                            "This <a href=\"https://cyberphone.github.io/doc/saturn/\" target=\"_blank\">Saturn</a> " +
-                            "<i>live object</i> is normally requested by service providers for looking up partner core data. In this case " +
+                            "<tr><td>This " +
+                            SATURN_LINK +
+                            " <i>live object</i> is normally requested by service providers for looking up partner core data. In this case " +
                             "the requester seems to be a browser which is why a &quot;pretty-printed&quot; HTML page is returned instead of raw JSON.")
                     .append(isProvider() ? "" : "</td></tr><tr><td style=\"padding-bottom:8pt\">" +
                             "This particular (payee) object was issued by the provider specified by the " +
@@ -89,42 +118,37 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             rd.getString(PROVIDER_AUTHORITY_URL_JSON) + 
                             "</a>.")
                     .append("</td></tr>" +
-                            "<tr><td><div style=\"word-break:break-all;background:#F8F8F8;" +
-                            "border-width:1px;border-style:solid;border-color:grey;padding:10pt;box-shadow:3pt 3pt 3pt #D0D0D0\">")
+                            "<tr><td><div style=\"word-break:break-all;background-color:#F8F8F8;padding:10pt;" +
+                            BORDER + ";" + BOX_SHADDOW + "\">")
                     .append(rd.serializeToString(JSONOutputFormats.PRETTY_HTML))
-                    .append("</div></td></tr><tr><td style=\"padding-top:10pt\">Properties:<ul>")
+                    .append("</div></td></tr><tr><td style=\"padding:4pt 0pt 4pt 0pt\">Short reference:</td></tr>" +
+                            "<tr><td><table class=\"tftable\"><tr><th>Property</th><th>Description</th></tr>")
                     .append(isProvider() ?
-                            list(rd, HTTP_VERSION_JSON, "Preferred HTTP version (&#x2265; HTTP/1.1)") +
-                            list(rd, AUTHORITY_URL_JSON, "The address of this object") +
-                            list(rd, SERVICE_URL_JSON, "Primary service end point") +
-                            list(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
-                            list(rd, PROVIDER_ACCOUNT_TYPES_JSON, "Supported account types", true) +
-                            list(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algorithms <i>recognized</i> by the provider") +
-                            list(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider")
+                            tableRow(rd, HTTP_VERSION_JSON, "Preferred HTTP version (&#x2265; HTTP/1.1)") +
+                            tableRow(rd, AUTHORITY_URL_JSON, "The address of this object") +
+                            tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
+                            tableRow(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
+                            tableRow(rd, PROVIDER_ACCOUNT_TYPES_JSON, "Supported account types", true) +
+                            tableRow(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algorithms <i>recognized</i> by the provider") +
+                            tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider")
                                : 
-                            list(rd, AUTHORITY_URL_JSON, "The address of this object") +
-                            list(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of the issuing provider's authority object") +
-                            list(rd, COMMON_NAME_JSON, "Payee common name") +
-                            list(rd, ID_JSON, "Local payee id used by the payee provider") +
-                            list(rd, SIGNATURE_PARAMETERS_JSON, "Holds one or more payee signature keys and associated algorithms")
+                            tableRow(rd, AUTHORITY_URL_JSON, "The address of this object") +
+                            tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of the issuing provider'html authority object") +
+                            tableRow(rd, COMMON_NAME_JSON, "Payee common name") +
+                            tableRow(rd, ID_JSON, "Local payee id used by the payee provider") +
+                            tableRow(rd, SIGNATURE_PARAMETERS_JSON, "Holds one or more payee signature keys and associated algorithms")
                             )
-                    .append(list(rd, TIME_STAMP_JSON, "Object creation time"))
-                    .append(list(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
-                    .append(list(rd, JSONSignatureDecoder.SIGNATURE_JSON, "X.509 provider attestation signature"))
-                    .append("</ul></td></tr></table></body></html>").toString().getBytes("UTF-8");
+                    .append(tableRow(rd, TIME_STAMP_JSON, "Object creation time"))
+                    .append(tableRow(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
+                    .append(tableRow(rd, JSONSignatureDecoder.SIGNATURE_JSON, "X.509 provider attestation signature"))
+                    .append("</table></td></tr></table></body></html>");
                 // Just to check that we didn't forgot anything...
                 rd.checkForUnread();
+                writeHtml(response, html);
             } else {
                 // Normal call from a service
-                response.setContentType(JSON_CONTENT_TYPE);
+                writeData(response, authorityData, JSON_CONTENT_TYPE);
             }
-            response.setHeader("Pragma", "No-Cache");
-            response.setDateHeader("EXPIRES", 0);
-            // Chunked data seems unnecessary here
-            response.setContentLength(authorityData.length);
-            ServletOutputStream servletOutputStream = response.getOutputStream();
-            servletOutputStream.write(authorityData);
-            servletOutputStream.flush();
         }
     }
 }

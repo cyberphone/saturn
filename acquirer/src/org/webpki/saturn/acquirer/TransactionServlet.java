@@ -76,10 +76,12 @@ public class TransactionServlet extends ProcessingBaseServlet {
         }
 
         // It appears that we succeeded
+        AcquirerService.transactionCount++;
         return TransactionResponse.encode(transactionRequest,
                                           transactionError,
                                           getReferenceId(),
                                           optionalLogData,
                                           AcquirerService.acquirerKey);
-    }
+        
+     }
 }

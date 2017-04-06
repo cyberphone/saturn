@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
 
-//This servlet publishes the Acquirer (Card-Processor) "ProviderAuthority" object.
+// This servlet publishes the Acquirer (Card-Processor) "ProviderAuthority" object.
 
 public class ProviderAuthorityServlet extends AuthorityBaseServlet {
 

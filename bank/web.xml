@@ -99,6 +99,11 @@
     </listener>
 
     <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.HomeServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>AuthorizationServlet</servlet-name>
         <servlet-class>org.webpki.saturn.bank.AuthorizationServlet</servlet-class>
     </servlet>
@@ -112,6 +117,11 @@
         <servlet-name>PayeeAuthorityServlet</servlet-name>
         <servlet-class>org.webpki.saturn.bank.PayeeAuthorityServlet</servlet-class>
     </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HomeServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>AuthorizationServlet</servlet-name>

@@ -24,8 +24,10 @@ import java.security.KeyStore;
 
 import java.security.interfaces.RSAPublicKey;
 
-import java.util.LinkedHashMap;
+import java.util.GregorianCalendar;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.SortedMap;
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -88,7 +90,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
 
-    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb = new LinkedHashMap<String,PayeeCoreProperties>();
+    static SortedMap<String,PayeeCoreProperties> merchantAccountDb = new TreeMap<String,PayeeCoreProperties>();
 
     static JSONX509Verifier paymentRoot;
 
@@ -97,6 +99,10 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static String authorityUrl;
     
     static String payeeId;
+    
+    static long transactionCount;
+    
+    static GregorianCalendar started;
     
     static JSONObjectReader optionalProviderExtensions;
     
@@ -214,6 +220,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                            KnownExtensions.REFUND_REQUEST,
                            RefundServlet.class,
                            "Refund Servlet");
+            
+            started = new GregorianCalendar();
 
             logger.info("Saturn Acquirer-server initiated");
         } catch (Exception e) {

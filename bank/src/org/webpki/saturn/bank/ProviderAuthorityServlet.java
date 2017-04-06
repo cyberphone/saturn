@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
 
-//This servlet publishes the Payment Provider (Bank) "ProviderAuthority" object.
+// This servlet publishes the Payment Provider (Bank) "ProviderAuthority" object.
 
 public class ProviderAuthorityServlet extends AuthorityBaseServlet {
 

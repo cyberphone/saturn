@@ -206,6 +206,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         
         // We did it!
+        BankService.transactionCount++;
         return AuthorizationResponse.encode(authorizationRequest,
                                             accountReference.toString(),
                                             providerAuthority.getEncryptionParameters()[0],

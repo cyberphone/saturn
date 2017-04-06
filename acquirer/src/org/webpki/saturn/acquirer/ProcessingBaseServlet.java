@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +37,7 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.AuthorityBaseServlet;
 
 import org.webpki.webutil.ServletUtil;
 
@@ -83,15 +83,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            response.setContentType(JSON_CONTENT_TYPE);
-            response.setHeader("Pragma", "No-Cache");
-            response.setDateHeader("EXPIRES", 0);
-            byte[] data = providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED);
-            // Chunked data seems unnecessary here
-            response.setContentLength(data.length);
-            ServletOutputStream serverOutputStream = response.getOutputStream();
-            serverOutputStream.write(data);
-            serverOutputStream.flush();
+            AuthorityBaseServlet.writeData(response, 
+                                           providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                           JSON_CONTENT_TYPE);
 
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////
