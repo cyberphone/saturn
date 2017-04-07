@@ -105,10 +105,10 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static ServerX509Signer acquirerKey;
     
-    static String authorityUrl;
+    static String providerAuthorityUrl;
     
-    static String payeeId;
-    
+    static String payeeAuthorityBaseUrl;
+
     static long transactionCount;
     
     static GregorianCalendar started;
@@ -118,6 +118,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static AuthorityObjectManager authorityObjectManager;
     
     static boolean logging;
+
     
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -206,7 +207,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             }
 
             authorityObjectManager =
-                new AuthorityObjectManager(authorityUrl = aquirerHost + "/authority",
+                new AuthorityObjectManager(providerAuthorityUrl = aquirerHost + "/authority",
                                            aquirerHost + "/service",
                                            optionalProviderExtensions,
                                            null,
@@ -218,7 +219,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                               decryptionKeys.get(0).getPublicKey())},
      
                                            merchantAccountDb, 
-                                           aquirerHost + "/payees/",
+                                           payeeAuthorityBaseUrl = aquirerHost + "/payees/",
     
                                            PROVIDER_EXPIRATION_TIME,
                                            acquirerKey,

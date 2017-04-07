@@ -128,8 +128,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static Integer serverPortMapping;
     
-    static String authorityUrl;
+    static String providerAuthorityUrl;
     
+    static String payeeAuthorityBaseUrl;
+
     static String serviceUrl;
 
     static int referenceId;
@@ -249,7 +251,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             }
 
             authorityObjectManager = 
-                new AuthorityObjectManager(authorityUrl = bankHost + "/authority",
+                new AuthorityObjectManager(providerAuthorityUrl = bankHost + "/authority",
                                            serviceUrl = bankHost + "/service",
                                            optionalProviderExtensions,
                                            new String[]{"https://swift.com", "https://ultragiro.se"},
@@ -261,7 +263,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                                               decryptionKeys.get(0).getPublicKey())},
 
                                            merchantAccountDb,
-                                           bankHost + "/payees/",
+                                           payeeAuthorityBaseUrl = bankHost + "/payees/",
 
                                            PROVIDER_EXPIRATION_TIME,
                                            bankKey,

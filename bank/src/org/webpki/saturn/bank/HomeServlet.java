@@ -29,8 +29,6 @@ import org.webpki.saturn.common.AuthorityBaseServlet;
 
 import org.webpki.util.ISODateTime;
 
-import org.webpki.webutil.ServletUtil;
-
 // This servlet publishes a miniscule "home page".
 
 public class HomeServlet extends HttpServlet {
@@ -38,7 +36,7 @@ public class HomeServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String authorityUrl = ServletUtil.getContextURL(request) + "/authority";
+        String authorityUrl = BankService.providerAuthorityUrl;
         StringBuffer s = new StringBuffer(
            AuthorityBaseServlet.TOP_ELEMENT +
            "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\"><title>Saturn Bank</title>" +
@@ -71,7 +69,7 @@ public class HomeServlet extends HttpServlet {
                 "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : BankService.merchantAccountDb.values()) {
                 String id = payeeCoreProperties.getPayee().getId();
-                authorityUrl = ServletUtil.getContextURL(request) + "/payees/" + id;
+                authorityUrl = BankService.payeeAuthorityBaseUrl + id;
                 s.append("<tr><td style=\"text-align:right\">")
                  .append(id)
                  .append("</td><td>")
