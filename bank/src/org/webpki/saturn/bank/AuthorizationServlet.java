@@ -127,6 +127,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         if (diff > (MAX_CLIENT_CLOCK_SKEW + MAX_CLIENT_AUTH_AGE) || diff < -MAX_CLIENT_CLOCK_SKEW) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
             sdf.setTimeZone(authorizationData.getTimeStamp().getTimeZone());
+            BankService.rejectedTransactions++;
             return createProviderUserResponse("Either your request is older than " + 
                                                 (MAX_CLIENT_AUTH_AGE / 60000) +
                                                 " minutes, or your device clock is incorrect.<p>Timestamp=" +
@@ -148,6 +149,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         BigDecimal amount = paymentRequest.getAmount();
         // Sorry but you don't appear to have a million bucks :-)
         if (amount.compareTo(DEMO_ACCOUNT_LIMIT) >= 0) {
+            BankService.rejectedTransactions++;
             return createProviderUserResponse("Your request for " + 
                                                 amountInHtml(paymentRequest, amount) +
                                                 " appears to be slightly out of your current capabilities...",
@@ -159,6 +161,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         if (amount.compareTo(DEMO_RBA_LIMIT) >= 0 &&
             (authorizationData.getOptionalUserResponseItems() == null ||
              !authorizationData.getOptionalUserResponseItems()[0].getText().equals("garbo"))) {
+            BankService.rejectedTransactions++;
             return createProviderUserResponse("Transaction requests exceeding " +
                                                 amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
                                                 " require additional user authentication to " +
@@ -206,7 +209,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         
         // We did it!
-        BankService.transactionCount++;
+        BankService.successfulTtransactions++;
         return AuthorizationResponse.encode(authorizationRequest,
                                             accountReference.toString(),
                                             providerAuthority.getEncryptionParameters()[0],

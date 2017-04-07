@@ -51,8 +51,11 @@ public class HomeServlet extends HttpServlet {
            "<tr><td>Started: ")
          .append(ISODateTime.formatDateTime(BankService.started, false))
          .append("</td></tr>" +
-           "<tr><td>Transactions: ")
-         .append(BankService.transactionCount)
+           "<tr><td>Successful transactions: ")
+         .append(BankService.successfulTtransactions)
+         .append("</td></tr>" +
+           "<tr><td>Rejected transactions: ")
+         .append(BankService.rejectedTransactions)
          .append("</td></tr>" +
            "<tr><td>Authority object: " +
            "<a href=\"")
@@ -69,7 +72,7 @@ public class HomeServlet extends HttpServlet {
             for (PayeeCoreProperties payeeCoreProperties : BankService.merchantAccountDb.values()) {
                 String id = payeeCoreProperties.getPayee().getId();
                 authorityUrl = ServletUtil.getContextURL(request) + "/payees/" + id;
-                s.append("<tr><td>")
+                s.append("<tr><td style=\"text-align:right\">")
                  .append(id)
                  .append("</td><td>")
                  .append(payeeCoreProperties.getPayee().getCommonName())

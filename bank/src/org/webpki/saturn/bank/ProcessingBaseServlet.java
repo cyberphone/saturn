@@ -240,6 +240,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
             /////////////////////////////////////////////////////////////////////////////////////////
+            BankService.rejectedTransactions++;
             String message = (urlHolder == null ? "" : "From" + urlHolder.getCallerAddress() +
                               (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl()) + "\n") + e.getMessage();
             logger.log(Level.SEVERE, message, e);

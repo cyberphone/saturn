@@ -69,7 +69,7 @@ public class HomeServlet extends HttpServlet {
             for (PayeeCoreProperties payeeCoreProperties : AcquirerService.merchantAccountDb.values()) {
                 String id = payeeCoreProperties.getPayee().getId();
                 authorityUrl = ServletUtil.getContextURL(request) + "/payees/" + id;
-                s.append("<tr><td>")
+                s.append("<tr><td style=\"text-align:right\">")
                  .append(id)
                  .append("</td><td>")
                  .append(payeeCoreProperties.getPayee().getCommonName())

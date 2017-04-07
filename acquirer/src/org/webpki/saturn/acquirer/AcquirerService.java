@@ -28,6 +28,7 @@ import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.SortedMap;
+import java.util.Comparator;
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -90,7 +91,15 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
 
-    static SortedMap<String,PayeeCoreProperties> merchantAccountDb = new TreeMap<String,PayeeCoreProperties>();
+    static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
+        new TreeMap<String,PayeeCoreProperties>(new Comparator<String>() {
+            @Override
+            public int compare(String arg0, String arg1) {
+                if (arg0.length() > arg1.length()) {
+                    return 1;
+                }
+                return arg0.compareTo(arg1);
+            }});
 
     static JSONX509Verifier paymentRoot;
 

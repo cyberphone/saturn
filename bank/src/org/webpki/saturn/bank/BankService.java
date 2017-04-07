@@ -30,6 +30,7 @@ import java.util.TreeMap;
 import java.util.SortedMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 
 import java.util.logging.Level;
@@ -103,7 +104,15 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static SortedMap<String,UserAccountEntry> userAccountDb = new TreeMap<String,UserAccountEntry>();
     
-    static SortedMap<String,PayeeCoreProperties> merchantAccountDb = new TreeMap<String,PayeeCoreProperties>();
+    static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
+        new TreeMap<String,PayeeCoreProperties>(new Comparator<String>() {
+            @Override
+            public int compare(String arg0, String arg1) {
+                if (arg0.length() > arg1.length()) {
+                    return 1;
+                }
+                return arg0.compareTo(arg1);
+            }});
     
     static String bankCommonName;
 
@@ -129,8 +138,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static GregorianCalendar started;
     
-    static long transactionCount;
+    static long successfulTtransactions;
     
+    static long rejectedTransactions;
+
     static boolean logging;
 
     InputStream getResource(String name) throws IOException {
