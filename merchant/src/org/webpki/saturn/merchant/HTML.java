@@ -367,6 +367,7 @@ public class HTML implements MerchantProperties {
     }
 
     static void w2nbWalletPay(HttpServletResponse response,
+                              boolean firefox,
                               SavedShoppingCart savedShoppingCart, 
                               boolean tapConnectMode,
                               boolean debugMode,
@@ -405,8 +406,12 @@ public class HTML implements MerchantProperties {
                     "}\n\n" +
 
                     "function activateWallet() {\n" +
-                    "  var initMode = true;\n" +
-                    "  if (!navigator.")
+                    "  var initMode = true;\n");
+        if (firefox) {
+            temp_string.append("  setTimeout(function() {\n");
+        }
+                    
+        temp_string.append("  if (!navigator.")
              .append(connectMethod)
              .append(") {\n" +
                     "    setFail('\"navigator.")
@@ -504,8 +509,11 @@ public class HTML implements MerchantProperties {
        temp_string.append(
                     "  }, function(err) {\n" +
                     "    console.debug(err);\n" +
-                    "  });\n" +
-                    "}\n\n");
+                    "  });\n");
+       if (firefox) {
+           temp_string.append("}, 10);\n");
+       }
+       temp_string.append("}\n\n");
 
        if (!tapConnectMode) {
            temp_string.append(ExtensionPositioning.SET_EXTENSION_POSITION_FUNCTION_TEXT + "\n");

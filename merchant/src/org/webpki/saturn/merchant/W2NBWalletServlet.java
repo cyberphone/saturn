@@ -40,8 +40,10 @@ public class W2NBWalletServlet extends HttpServlet implements MerchantProperties
             ErrorServlet.sessionTimeout(response);
             return;
         }
+        String userAgent = request.getHeader("User-Agent");
         WalletRequest walletRequest = new WalletRequest(session, null);
         HTML.w2nbWalletPay(response,
+                           userAgent.contains("Mozilla/") && userAgent.contains(" Firefox/"),
                            walletRequest.savedShoppingCart,
                            HomeServlet.getOption(session, TAP_CONNECT_MODE_SESSION_ATTR),
                            walletRequest.debugMode,
