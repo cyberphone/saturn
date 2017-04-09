@@ -58,7 +58,7 @@ public class AuthorityObjectManager extends Thread {
                                                              optionalProviderAccountTypes,
                                                              signatureProfiles,
                                                              encryptionParameters,
-                                                             Expires.inSeconds(expiryTimeInSeconds),
+                                                             TimeUtil.inSeconds(expiryTimeInSeconds),
                                                              providerSigner).serializeToBytes(JSONOutputFormats.NORMALIZED);
         }
         if (logging) {
@@ -72,7 +72,7 @@ public class AuthorityObjectManager extends Thread {
                                         PayeeAuthority.encode(payeeBaseAuthorityUrl + id,
                                                               providerAuthorityUrl,
                                                               payeeCoreProperties,
-                                                              Expires.inSeconds(expiryTimeInSeconds),
+                                                              TimeUtil.inSeconds(expiryTimeInSeconds),
                                                               providerSigner).serializeToBytes(JSONOutputFormats.NORMALIZED));
             }
             if (logging) {

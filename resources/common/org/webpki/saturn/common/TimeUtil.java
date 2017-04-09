@@ -18,9 +18,9 @@ package org.webpki.saturn.common;
 
 import java.util.GregorianCalendar;
 
-public class Expires {
+public class TimeUtil {
 
-    private Expires() {}
+    private TimeUtil() {}
     
     private static GregorianCalendar upwardTime(long upfactor, int argument, long divisor) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
