@@ -18,8 +18,6 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
-import java.security.GeneralSecurityException;
-
 import java.util.Arrays;
 
 import org.webpki.json.JSONObjectReader;

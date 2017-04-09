@@ -17,10 +17,10 @@
 package org.webpki.saturn.acquirer;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.UrlHolder;
