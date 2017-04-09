@@ -48,7 +48,8 @@ public class HomeServlet extends HttpServlet {
            AuthorityBaseServlet.SATURN_LINK +
            " &quot;acquirer&quot; server.</td></tr>" +
            "<tr><td>Started: ")
-         .append(ISODateTime.formatDateTime(AcquirerService.started, false))
+         .append(ISODateTime.formatDateTime(AcquirerService.started, false)
+                .replace('T', ' ').replace('Z', ' '))
          .append("</td></tr>" +
            "<tr><td>Transactions: ")
          .append(AcquirerService.transactionCount)

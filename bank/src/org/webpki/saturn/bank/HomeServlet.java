@@ -48,7 +48,8 @@ public class HomeServlet extends HttpServlet {
            AuthorityBaseServlet.SATURN_LINK +
            " &quot;bank&quot; server.</td></tr>" +
            "<tr><td>Started: ")
-         .append(ISODateTime.formatDateTime(BankService.started, false))
+         .append(ISODateTime.formatDateTime(BankService.started, false)
+                 .replace('T', ' ').replace('Z', ' '))
          .append("</td></tr>" +
            "<tr><td>Successful transactions: ")
          .append(BankService.successfulTtransactions)
