@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.NonDirectPayments;
 
 public class AndroidPluginServlet extends HttpServlet implements MerchantProperties {
@@ -138,12 +139,12 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                                        :
                     MerchantService.merchantBaseUrl + "/result";
             String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
-            ProcessingBaseServlet.returnJsonData(response, 
-                                                 new WalletRequest(session,
-                                                                   nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
-                                                                   MerchantService.merchantBaseUrl,
-                                                                   cancelUrl,
-                                                                   successUrl).requestObject);
+            HttpSupport.writeJsonData(response, 
+                                      new WalletRequest(session,
+                                                        nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
+                                                        MerchantService.merchantBaseUrl,
+                                                        cancelUrl,
+                                                        successUrl).requestObject);
         } else {
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {

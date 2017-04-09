@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.webutil.ServletUtil;
@@ -52,6 +54,10 @@ public class HttpSupport {
     
     public static void writeHtml(HttpServletResponse response, StringBuffer html) throws IOException {
         writeData(response, html.toString().getBytes("utf-8"), HTML_CONTENT_TYPE + "; charset=\"utf-8\"");
+    }
+
+    public static void writeJsonData(HttpServletResponse response, JSONObjectWriter json) throws IOException {
+        writeData(response, json.serializeToBytes(JSONOutputFormats.NORMALIZED), BaseProperties.JSON_CONTENT_TYPE);
     }
 
     public static JSONObjectReader readJsonData(HttpServletRequest request) throws IOException {

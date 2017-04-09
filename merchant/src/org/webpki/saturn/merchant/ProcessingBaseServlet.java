@@ -17,20 +17,15 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-import java.net.URL;
 
 import java.security.GeneralSecurityException;
 
-import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,13 +37,10 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
-import org.webpki.net.HTTPSWrapper;
-
 import org.webpki.webutil.ServletUtil;
 
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.Messages;
@@ -67,113 +59,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
-    static Map<String,ProviderAuthority> providerAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
-
-    static Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
-
-    static final int TIMEOUT_FOR_REQUEST = 5000;
-
     static JSONObjectReader makeReader(JSONObjectWriter writer) throws IOException {
         return JSONParser.parse(writer.serializeToString(JSONOutputFormats.NORMALIZED));
-    }
-
-    static String portFilter(String url) throws IOException {
-        // Our JBoss installation has some port mapping issues...
-        if (MerchantService.serverPortMapping == null) {
-            return url;
-        }
-        URL url2 = new URL(url);
-        return new URL(url2.getProtocol(),
-                       url2.getHost(),
-                       MerchantService.serverPortMapping,
-                       url2.getFile()).toExternalForm(); 
-    }
-    
-    static JSONObjectReader fetchJSONData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
-        if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
-            throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
-                                  (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
-        }
-        // We expect JSON, yes
-        if (!wrap.getRawContentType().equals(JSON_CONTENT_TYPE)) {
-            throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + wrap.getRawContentType());
-        }
-        JSONObjectReader result = JSONParser.parse(wrap.getData());
-        if (MerchantService.logging) {
-            logger.info("Call to " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
-                        "returned:\n" + result);
-        }
-        return result;
-    }
-
-    static JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
-        if (MerchantService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
-                        "with data:\n" + request);
-        }
-        HTTPSWrapper wrap = new HTTPSWrapper();
-        wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HttpSupport.HTTP_CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE);
-        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
-        wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
-        return fetchJSONData(wrap, urlHolder);
-    }
-
-    static JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
-        if (MerchantService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress());
-        }
-        HTTPSWrapper wrap = new HTTPSWrapper();
-        wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
-        wrap.setRequireSuccess(false);
-        wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
-        return fetchJSONData(wrap, urlHolder);
-    }
-
-    static void returnJsonData(HttpServletResponse response, JSONObjectWriter returnData) throws IOException {
-        response.setContentType(JSON_CONTENT_TYPE);
-        response.setHeader("Pragma", "No-Cache");
-        response.setDateHeader("EXPIRES", 0);
-        byte[] data = returnData.serializeToBytes(JSONOutputFormats.NORMALIZED);
-        // Chunked data seems unnecessary here
-        response.setContentLength(data.length);
-        ServletOutputStream serverOutputStream = response.getOutputStream();
-        serverOutputStream.write(data);
-        serverOutputStream.flush();
-    }
-
-    static ProviderAuthority getProviderAuthority(UrlHolder urlHolder) throws IOException {
-        ProviderAuthority providerAuthority = providerAuthorityObjects.get(urlHolder.getUrl());
-        if (providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
-            providerAuthority = new ProviderAuthority(getData(urlHolder), urlHolder.getUrl());
-            providerAuthorityObjects.put(urlHolder.getUrl(), providerAuthority);
-            if (MerchantService.logging) {
-                logger.info("Updated cache " + urlHolder.getUrl());
-            }
-        } else {
-            if (MerchantService.logging) {
-                logger.info("Fetched from cache " + urlHolder.getUrl());
-            }
-        }
-        return providerAuthority;
-    }
-
-    static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder) throws IOException {
-        PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(urlHolder.getUrl());
-        if (payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
-            payeeAuthority = new PayeeAuthority(getData(urlHolder), urlHolder.getUrl());
-            payeeAuthorityObjects.put(urlHolder.getUrl(), payeeAuthority);
-            if (MerchantService.logging) {
-                logger.info("Updated cache " + urlHolder.getUrl());
-            }
-        } else {
-            if (MerchantService.logging) {
-                logger.info("Fetched from cache " + urlHolder.getUrl());
-            }
-        }
-        return payeeAuthority;
     }
     
     static String getHybridModeUrl(ProviderAuthority providerAuthority) throws IOException {
@@ -200,7 +87,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         try {
             HttpSession session = request.getSession(false);
             if (session == null) {
-                returnJsonData(response, WalletAlertMessage.encode("The session appears to have timed out."));
+                HttpSupport.writeJsonData(response, WalletAlertMessage.encode("The session appears to have timed out."));
                 return;
             }
             
@@ -259,7 +146,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 /////////////////////////////////////////////////////////////////////////////////////////
                 // Normal return                                                                       //
                 /////////////////////////////////////////////////////////////////////////////////////////
-                returnJsonData(response, Messages.PAYMENT_CLIENT_SUCCESS.createBaseMessage());
+                HttpSupport.writeJsonData(response, Messages.PAYMENT_CLIENT_SUCCESS.createBaseMessage());
             }
 
         } catch (Exception e) {
@@ -267,7 +154,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             logger.log(Level.SEVERE, message, e);
             JSONObjectWriter userError = WalletAlertMessage.encode("An unexpected error occurred.<br>" +
                                                                    "Please try again or contact support.");
-            returnJsonData(response, userError);
+            HttpSupport.writeJsonData(response, userError);
         }
     }
 

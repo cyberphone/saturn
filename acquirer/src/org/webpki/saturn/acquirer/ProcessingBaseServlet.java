@@ -30,7 +30,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
@@ -83,9 +82,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            HttpSupport.writeData(response, 
-                                  providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                  JSON_CONTENT_TYPE);
+            HttpSupport.writeJsonData(response, providerResponse);
 
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////

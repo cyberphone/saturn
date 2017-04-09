@@ -21,14 +21,7 @@ import java.io.PrintWriter;
 
 import java.math.BigDecimal;
 
-import java.net.URL;
-
 import java.security.GeneralSecurityException;
-
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,16 +34,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
-
-import org.webpki.net.HTTPSWrapper;
 
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.UserChallengeItem;
-import org.webpki.saturn.common.PayeeAuthority;
-import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderUserResponse;
@@ -66,8 +53,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
-    static final int TIMEOUT_FOR_REQUEST           = 5000;
-    static final long MAX_CLIENT_CLOCK_SKEW        = 5 * 60 * 1000;
+     static final long MAX_CLIENT_CLOCK_SKEW        = 5 * 60 * 1000;
     static final long MAX_CLIENT_AUTH_AGE          = 20 * 60 * 1000;
     
     // Just a few demo values
@@ -78,110 +64,10 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     static final String RBA_PARM_MOTHER             = "mother";
     
-     // Authority object caches
-    
-    static Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
-
-    static Map<String,ProviderAuthority> providerAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
-
-    static String portFilter(String url) throws IOException {
-        // Our JBoss installation has some port mapping issues...
-        if (BankService.serverPortMapping == null) {
-            return url;
-        }
-        URL url2 = new URL(url);
-        return new URL(url2.getProtocol(),
-                       url2.getHost(),
-                       BankService.serverPortMapping,
-                       url2.getFile()).toExternalForm(); 
-    }
-
-    static JSONObjectReader fetchJSONData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
-        if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
-            throw new IOException("HTTP error " + wrap.getResponseCode() + " " + wrap.getResponseMessage() + ": " +
-                                  (wrap.getData() == null ? "No other information available" : wrap.getDataUTF8()));
-        }
-        // We expect JSON, yes
-        if (!wrap.getRawContentType().equals(JSON_CONTENT_TYPE)) {
-            throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + wrap.getRawContentType());
-        }
-        JSONObjectReader result = JSONParser.parse(wrap.getData());
-        if (BankService.logging) {
-            logger.info("Call to " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
-                        "returned:\n" + result);
-        }
-        return result;
-    }
-
-    static JSONObjectReader postData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
-        if (BankService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
-                        "with data:\n" + request);
-        }
-        HTTPSWrapper wrap = new HTTPSWrapper();
-        wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HttpSupport.HTTP_CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE);
-        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
-        wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
-        return fetchJSONData(wrap, urlHolder);
-    }
-
-    static JSONObjectReader getData(UrlHolder urlHolder) throws IOException {
-        if (BankService.logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress());
-        }
-        HTTPSWrapper wrap = new HTTPSWrapper();
-        wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
-        wrap.setRequireSuccess(false);
-        wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
-        return fetchJSONData(wrap, urlHolder);
-    }
-
-    
     static String getReferenceId() {
         return "#" + (BankService.referenceId++);
     }
     
-    static ProviderAuthority getProviderAuthority(UrlHolder urlHolder, String url) throws IOException {
-        urlHolder.setUrl(url);
-        ProviderAuthority providerAuthority = providerAuthorityObjects.get(url);
-        if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
-                providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
-            providerAuthority = new ProviderAuthority(getData(urlHolder), url);
-            providerAuthorityObjects.put(url, providerAuthority);
-            if (BankService.logging) {
-                logger.info("Updated cache " + url);
-            }
-        } else {
-            if (BankService.logging) {
-                logger.info("Fetched from cache " + url);
-            }
-        }
-        urlHolder.setUrl(null);
-        return providerAuthority;
-    }
-
-    static PayeeAuthority getPayeeAuthority(UrlHolder urlHolder, String url) throws IOException {
-        urlHolder.setUrl(url);
-        PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(url);
-        if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
-                payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
-            payeeAuthority = new PayeeAuthority(getData(urlHolder), url);
-            payeeAuthorityObjects.put(url, payeeAuthority);
-            if (BankService.logging) {
-                logger.info("Updated cache " + url);
-            }
-        } else {
-            if (BankService.logging) {
-                logger.info("Fetched from cache " + url);
-            }
-        }
-        urlHolder.setUrl(null);
-        return payeeAuthority;
-    }
- 
     static String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
         return "<span style=\"font-weight:bold;white-space:nowrap\">" + 
                paymentRequest.getCurrency().amountToDisplayString(amount, true) +
@@ -198,7 +84,6 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                                            authorizationData.getDataEncryptionKey(),
                                            authorizationData.getDataEncryptionAlgorithm());
     }
-
 
     abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception;
 
@@ -230,9 +115,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            HttpSupport.writeData(response,
-                                  providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                  JSON_CONTENT_TYPE);
+            HttpSupport.writeJsonData(response, providerResponse);
             
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////

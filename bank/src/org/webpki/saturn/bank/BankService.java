@@ -66,6 +66,7 @@ import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.SignatureProfiles;
 import org.webpki.saturn.common.UserAccountEntry;
+import org.webpki.saturn.common.ExternalCalls;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -145,6 +146,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static long rejectedTransactions;
 
     static boolean logging;
+    
+    static ExternalCalls externalCalls;
 
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -278,6 +281,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                            KnownExtensions.REFUND_REQUEST,
                            RefundServlet.class,
                            "Refund Servlet");
+            
+            externalCalls = new ExternalCalls(logging, logger, serverPortMapping);
 
             started = new GregorianCalendar();
 

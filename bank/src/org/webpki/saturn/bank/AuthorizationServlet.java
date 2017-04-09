@@ -75,11 +75,15 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         while (true) {
             // Lookup of Payee
             urlHolder.setNonCachedMode(nonCached);
-            payeeAuthority = getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
+            payeeAuthority = 
+                BankService.externalCalls.getPayeeAuthority(urlHolder,
+                                                            authorizationRequest.getAuthorityUrl());
     
             // Lookup of Payee's Provider
             urlHolder.setNonCachedMode(nonCached);
-            providerAuthority = getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
+            providerAuthority =
+                BankService.externalCalls.getProviderAuthority(urlHolder,
+                                                               payeeAuthority.getProviderAuthorityUrl());
             
             // Now verify that they are issued by the same entity
             if (Arrays.equals(payeeAuthority.getSignatureDecoder().getCertificatePath(),

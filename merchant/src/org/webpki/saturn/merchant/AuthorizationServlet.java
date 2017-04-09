@@ -38,6 +38,7 @@ import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
@@ -85,9 +86,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Lookup of Payer's bank
-        urlHolder.setUrl(providerAuthorityUrl);
-        ProviderAuthority providerAuthority = getProviderAuthority(urlHolder);
-        urlHolder.setUrl(null);
+        ProviderAuthority providerAuthority = 
+            MerchantService.externalCalls.getProviderAuthority(urlHolder, providerAuthorityUrl);
 
         if (debug) {
             debugData.providerAuthority = providerAuthority.getRoot();
@@ -100,7 +100,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 !cardPayment && getHybridModeUrl(providerAuthority) == null) {
             JSONObjectWriter notImplemented = WalletAlertMessage.encode(
                     "This card type doesn't support gas station payments yet...<p>Please select another card.");
-            returnJsonData(response, notImplemented);
+            HttpSupport.writeJsonData(response, notImplemented);
             return false;
            
         }
@@ -109,10 +109,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         TransactionOperation transactionOperation = new TransactionOperation();
         if (cardPayment) {
             // Lookup of acquirer authority
-            urlHolder.setUrl(MerchantService.payeeAcquirerAuthorityUrl);
-            urlHolder.setUrl(getPayeeAuthority(urlHolder).getProviderAuthorityUrl());
-            ProviderAuthority acquirerAuthority = getProviderAuthority(urlHolder);
-            urlHolder.setUrl(null);
+            PayeeAuthority payeeAuthority =
+                MerchantService.externalCalls.getPayeeAuthority(urlHolder, MerchantService.payeeAcquirerAuthorityUrl);
+            ProviderAuthority acquirerAuthority =
+                MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
             transactionOperation.urlToCall = acquirerAuthority.getServiceUrl();
             transactionOperation.verifier = MerchantService.acquirerRoot;
             if (debugData != null) {
@@ -152,17 +152,16 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Call Payer bank
         urlHolder.setUrl(providerAuthority.getServiceUrl());
-        JSONObjectReader resultMessage = postData(urlHolder, authorizationRequest);
+        JSONObjectReader resultMessage = MerchantService.externalCalls.postJsonData(urlHolder, authorizationRequest);
         urlHolder.setUrl(null);
 
         if (debug) {
             debugData.authorizationRequest = makeReader(authorizationRequest);
-            urlHolder.setUrl(payeeAuthorityUrl);
-            PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder);
+            PayeeAuthority payeeAuthority =
+                MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
             debugData.payeeAuthority = payeeAuthority.getRoot();
-            urlHolder.setUrl(payeeAuthority.getProviderAuthorityUrl());
-            debugData.payeeProviderAuthority = getProviderAuthority(urlHolder).getRoot();
-            urlHolder.setUrl(null);
+            debugData.payeeProviderAuthority =
+                MerchantService.externalCalls.getProviderAuthority(urlHolder,payeeAuthority.getProviderAuthorityUrl()).getRoot();
             debugData.authorizationResponse = resultMessage;
         }
 
@@ -172,7 +171,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             }
             // Parse for syntax only
             new ProviderUserResponse(resultMessage);
-            returnJsonData(response, new JSONObjectWriter(resultMessage));
+            HttpSupport.writeJsonData(response, new JSONObjectWriter(resultMessage));
             return false;
         }
     
@@ -245,7 +244,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                                       .getPublicKey()).signer);
         // Acquirer or Hybrid call
         urlHolder.setUrl(transactionOperation.urlToCall);
-        JSONObjectReader response = postData(urlHolder, transactionRequest);
+        JSONObjectReader response = MerchantService.externalCalls.postJsonData(urlHolder, transactionRequest);
 
         if (debugData != null) {
             debugData.transactionRequest = makeReader(transactionRequest);

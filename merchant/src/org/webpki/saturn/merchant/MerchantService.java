@@ -57,6 +57,7 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.ServerAsymKeySigner;
+import org.webpki.saturn.common.ExternalCalls;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -157,6 +158,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static Boolean testMode;
 
     static boolean logging;
+    
+    static ExternalCalls externalCalls;
     
     private static boolean slowOperation;
 
@@ -303,6 +306,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             logging = getPropertyBoolean(LOGGING);
 
             slowOperation = getPropertyBoolean(SLOW_OPERATION);
+            
+            externalCalls = new ExternalCalls(logging, logger, serverPortMapping);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check

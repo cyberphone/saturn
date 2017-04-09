@@ -57,7 +57,9 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         // we should do it for this round as well...
         AuthorizationRequest authorizationRequest = authorizationResponse.getAuthorizationRequest();
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
-        PayeeAuthority payeeAuthority = getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
+        PayeeAuthority payeeAuthority =
+            BankService.externalCalls.getPayeeAuthority(urlHolder,
+                                                        authorizationRequest.getAuthorityUrl());
         payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), 
                                                        transactionRequest.getSignatureDecoder());
         

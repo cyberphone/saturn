@@ -74,10 +74,10 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                         ", Account=" + resultData.accountReference + 
                         ", Type=" + resultData.accountType.getTypeUri());
 
-            urlHolder.setUrl(authorizationRequest.getAuthorityUrl());
-            PayeeAuthority payeeAuthority = ProcessingBaseServlet.getPayeeAuthority(urlHolder);
-            urlHolder.setUrl(payeeAuthority.getProviderAuthorityUrl());
-            ProviderAuthority providerAuthority = ProcessingBaseServlet.getProviderAuthority(urlHolder);
+            PayeeAuthority payeeAuthority = 
+                MerchantService.externalCalls.getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
+             ProviderAuthority providerAuthority =
+                MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
 
             String refundUrl = providerAuthority.getExtensions() == null ? null :
                 providerAuthority.getExtensions().getStringConditional(KnownExtensions.REFUND_REQUEST);
@@ -96,12 +96,15 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                                                                              .getSignatureDecoder()
                                                                                  .getPublicKey()).signer);
         
-            JSONObjectReader refundResponseData = ProcessingBaseServlet.postData(urlHolder, refundRequestData);
+            JSONObjectReader refundResponseData =
+                MerchantService.externalCalls.postJsonData(urlHolder, refundRequestData);
+
             if (debug) {
                 DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
                 debugData.refundRequest = new JSONObjectReader(refundRequestData);
                 debugData.refundResponse = refundResponseData;
             }
+
             RefundResponse refundResponse = new RefundResponse(refundResponseData);
             refundResponse.getSignatureDecoder().verify(
                authorizationRequest.getPayerAccountType().isCardPayment() ? 
