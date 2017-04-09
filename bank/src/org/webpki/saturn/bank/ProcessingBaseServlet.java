@@ -216,7 +216,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             HttpSupport.checkRequest(request);
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // Passed, then we parse it                                                      //
+            // Passed, then we parse it                                                            //
             /////////////////////////////////////////////////////////////////////////////////////////
             JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
             if (BankService.logging) {
@@ -224,7 +224,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // We rationalize here by using a single end-point for all requests                    //
+            // Each method has its own servlet in this setup but that is just an option            //
             /////////////////////////////////////////////////////////////////////////////////////////
             JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest); 
             if (BankService.logging) {
