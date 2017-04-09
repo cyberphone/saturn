@@ -180,10 +180,13 @@ public class ProviderAuthority implements BaseProperties {
 
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
+        expiresInMillis = expires.getTimeInMillis();
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
+
+    long expiresInMillis;
 
     String httpVersion;
     public String getHttpVersion() {

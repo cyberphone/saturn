@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import java.text.SimpleDateFormat;
+
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Locale;
 
 import org.webpki.json.JSONObjectReader;
@@ -124,7 +124,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // We don't accept requests that are old or ahead of time
-        long diff = new Date().getTime() - authorizationData.getTimeStamp().getTimeInMillis();
+        long diff = System.currentTimeMillis() - authorizationData.getTimeStamp().getTimeInMillis();
         if (diff > (MAX_CLIENT_CLOCK_SKEW + MAX_CLIENT_AUTH_AGE) || diff < -MAX_CLIENT_CLOCK_SKEW) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
             sdf.setTimeZone(authorizationData.getTimeStamp().getTimeZone());

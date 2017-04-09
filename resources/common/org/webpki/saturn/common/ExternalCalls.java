@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URL;
 
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -100,9 +99,7 @@ public class ExternalCalls {
         wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, BaseProperties.JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
         wrap.makePostRequest(portFilter(url), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
-        JSONObjectReader json = fetchJsonReturnData(wrap, urlHolder);
-        urlHolder.setUrl(null);
-        return json;
+        return fetchJsonReturnData(wrap, urlHolder);
     }
 
     JSONObjectReader getJsonData(UrlHolder urlHolder) throws IOException {
@@ -121,7 +118,7 @@ public class ExternalCalls {
         urlHolder.setUrl(url);
         ProviderAuthority providerAuthority = providerAuthorityObjects.get(url);
         if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
-                providerAuthority == null || providerAuthority.getExpires().before(new GregorianCalendar())) {
+                providerAuthority == null || providerAuthority.expiresInMillis < System.currentTimeMillis()) {
             providerAuthority = new ProviderAuthority(getJsonData(urlHolder), url);
             providerAuthorityObjects.put(url, providerAuthority);
             if (logging) {
@@ -140,7 +137,7 @@ public class ExternalCalls {
         urlHolder.setUrl(url);
         PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(url);
         if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
-                payeeAuthority == null || payeeAuthority.getExpires().before(new GregorianCalendar())) {
+                payeeAuthority == null || payeeAuthority.expiresInMillis < System.currentTimeMillis()) {
             payeeAuthority = new PayeeAuthority(getJsonData(urlHolder), url);
             payeeAuthorityObjects.put(url, payeeAuthority);
             if (logging) {

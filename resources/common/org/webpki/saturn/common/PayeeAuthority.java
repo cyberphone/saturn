@@ -53,10 +53,13 @@ public class PayeeAuthority implements BaseProperties {
         payeeCoreProperties = new PayeeCoreProperties(rd);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
+        expiresInMillis = expires.getTimeInMillis();
         signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
+
+    long expiresInMillis;
 
     String authorityUrl;
     public String getAuthorityUrl() {
