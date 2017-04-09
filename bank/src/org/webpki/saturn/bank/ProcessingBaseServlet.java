@@ -57,7 +57,7 @@ import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
-// This is the core Payment Provider (Bank) processing servlet //
+// This is the core Payment Provider (Bank) processing servlet          //
 //////////////////////////////////////////////////////////////////////////
 
 public abstract class ProcessingBaseServlet extends HttpServlet implements BaseProperties {
