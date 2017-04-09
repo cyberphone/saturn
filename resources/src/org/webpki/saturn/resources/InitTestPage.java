@@ -161,7 +161,7 @@ public class InitTestPage implements BaseProperties {
               "var normalRequest = ");
 
         // The payment request is wrapped in an unsigned wallet invocation message
-        write(Messages.createBaseMessage(Messages.PAYMENT_CLIENT_REQUEST)
+        write(Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage()
             .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
                 .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON,
                                 new String[]{"https://nosuchcard.com",
