@@ -37,7 +37,7 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.AuthorityBaseServlet;
+import org.webpki.saturn.common.HttpSupport;
 
 import org.webpki.webutil.ServletUtil;
 
@@ -65,10 +65,14 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         try {
             urlHolder = new UrlHolder(request);
 
-            String contentType = request.getContentType();
-            if (!contentType.equals(JSON_CONTENT_TYPE)) {
-                throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
-            }
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Must be tagged as JSON content                                                      //
+            /////////////////////////////////////////////////////////////////////////////////////////
+            HttpSupport.checkRequest(request);
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Passed, then we parse it                                                      //
+            /////////////////////////////////////////////////////////////////////////////////////////
             JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
             if (AcquirerService.logging) {
                 logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
@@ -83,9 +87,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            AuthorityBaseServlet.writeData(response, 
-                                           providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                           JSON_CONTENT_TYPE);
+            HttpSupport.writeData(response, 
+                                  providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                  JSON_CONTENT_TYPE);
 
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////

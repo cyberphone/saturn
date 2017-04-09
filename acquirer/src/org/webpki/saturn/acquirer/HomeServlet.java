@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.AuthorityBaseServlet;
+import org.webpki.saturn.common.HttpSupport;
 
 import org.webpki.util.ISODateTime;
 
@@ -37,7 +38,7 @@ public class HomeServlet extends HttpServlet {
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String authorityUrl = AcquirerService.providerAuthorityUrl;
-        StringBuffer s = new StringBuffer(
+        StringBuffer html = new StringBuffer(
            AuthorityBaseServlet.TOP_ELEMENT +
            "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\"><title>Saturn Acquirer</title>" +
            AuthorityBaseServlet.REST_ELEMENT +
@@ -60,14 +61,14 @@ public class HomeServlet extends HttpServlet {
          .append("</a>")
          .append("</td></tr><tr><td style=\"padding-bottom:4pt\">Registered merchants:");
         if (AcquirerService.merchantAccountDb.isEmpty()) {
-            s.append(" <i>None</i></td></tr>");
+            html.append(" <i>None</i></td></tr>");
         } else {
-            s.append("</td></tr>" +
+            html.append("</td></tr>" +
                 "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : AcquirerService.merchantAccountDb.values()) {
                 String id = payeeCoreProperties.getPayee().getId();
                 authorityUrl = AcquirerService.payeeAuthorityBaseUrl + id;
-                s.append("<tr><td style=\"text-align:right\">")
+                html.append("<tr><td style=\"text-align:right\">")
                  .append(id)
                  .append("</td><td>")
                  .append(payeeCoreProperties.getPayee().getCommonName())
@@ -77,10 +78,10 @@ public class HomeServlet extends HttpServlet {
                  .append(authorityUrl)
                  .append("</a></td></tr>");
             }
-            s.append("</table></td></tr>");
+            html.append("</table></td></tr>");
         }
-        s.append("</table></body></html>");
-        AuthorityBaseServlet.writeHtml(response, s);
+        html.append("</table></body></html>");
+        HttpSupport.writeHtml(response, html);
     }
 
 }

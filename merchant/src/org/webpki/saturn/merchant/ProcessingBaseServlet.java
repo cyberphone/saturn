@@ -50,6 +50,7 @@ import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.UrlHolder;
+import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
@@ -112,8 +113,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HTTP_CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE);
-        wrap.setHeader(HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
+        wrap.setHeader(HttpSupport.HTTP_CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE);
+        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
         wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
         return fetchJSONData(wrap, urlHolder);
@@ -125,7 +126,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
+        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
         wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
         return fetchJSONData(wrap, urlHolder);

@@ -47,6 +47,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.net.HTTPSWrapper;
 
 import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
@@ -54,7 +55,6 @@ import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
-import org.webpki.saturn.common.AuthorityBaseServlet;
 
 import org.webpki.webutil.ServletUtil;
 
@@ -122,8 +122,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HTTP_CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE);
-        wrap.setHeader(HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
+        wrap.setHeader(HttpSupport.HTTP_CONTENT_TYPE_HEADER, JSON_CONTENT_TYPE);
+        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
         wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
         return fetchJSONData(wrap, urlHolder);
@@ -135,7 +135,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         }
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
-        wrap.setHeader(HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
+        wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
         wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
         return fetchJSONData(wrap, urlHolder);
@@ -209,10 +209,15 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         UrlHolder urlHolder = null;
         try {
             urlHolder = new UrlHolder(request);
-            String contentType = request.getContentType();
-            if (!contentType.equals(JSON_CONTENT_TYPE)) {
-                throw new IOException("Content-Type must be \"" + JSON_CONTENT_TYPE + "\" , found: " + contentType);
-            }
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Must be tagged as JSON content                                                      //
+            /////////////////////////////////////////////////////////////////////////////////////////
+            HttpSupport.checkRequest(request);
+
+            /////////////////////////////////////////////////////////////////////////////////////////
+            // Passed, then we parse it                                                      //
+            /////////////////////////////////////////////////////////////////////////////////////////
             JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
             if (BankService.logging) {
                 logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
@@ -229,9 +234,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Normal return                                                                       //
             /////////////////////////////////////////////////////////////////////////////////////////
-            AuthorityBaseServlet.writeData(response,
-                                           providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                           JSON_CONTENT_TYPE);
+            HttpSupport.writeData(response,
+                                  providerResponse.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                  JSON_CONTENT_TYPE);
             
         } catch (Exception e) {
             /////////////////////////////////////////////////////////////////////////////////////////

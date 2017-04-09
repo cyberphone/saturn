@@ -91,8 +91,4 @@ public interface BaseProperties {
     String SATURN_WEB_PAY_CONTEXT_URI       = "http://webpki.org/saturn/v3";
 
     String JSON_CONTENT_TYPE                = "application/json";
-    String HTML_CONTENT_TYPE                = "text/html";
-
-    String HTTP_ACCEPT_HEADER               = "Accept";
-    String HTTP_CONTENT_TYPE_HEADER         = "Content-Type";
 }

@@ -19,7 +19,7 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,21 +56,6 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         "</style></head>";
     public static final String SATURN_LINK = "<a href=\"https://cyberphone.github.io/doc/saturn/\" target=\"_blank\">Saturn</a>";
 
-    public static void writeData(HttpServletResponse response, byte[] data, String contentType) throws IOException {
-        response.setContentType(contentType);
-        response.setHeader("Pragma", "No-Cache");
-        response.setDateHeader("EXPIRES", 0);
-        // Chunked data seems unnecessary here
-        response.setContentLength(data.length);
-        ServletOutputStream serverOutputStream = response.getOutputStream();
-        serverOutputStream.write(data);
-        serverOutputStream.flush();
-    }
-    
-    public static void writeHtml(HttpServletResponse response, StringBuffer html) throws IOException {
-        writeData(response, html.toString().getBytes("utf-8"), "text/html; charset=\"utf-8\"");
-    }
-
     String keyWord(String constant) {
         return "<code>&quot;" + constant + "&quot;</code>";
     }
@@ -90,13 +75,13 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         if (authorityData == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            String accept = request.getHeader(HTTP_ACCEPT_HEADER);
-            if (accept != null && accept.contains(HTML_CONTENT_TYPE)) {
+            String accept = request.getHeader(HttpSupport.HTTP_ACCEPT_HEADER);
+            if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
                 // Presumably called by a browser
                 JSONObjectReader rd = JSONParser.parse(authorityData);
                 rd.getString(JSONDecoderCache.CONTEXT_JSON);
                 rd.getString(JSONDecoderCache.QUALIFIER_JSON);
-                response.setContentType(HTML_CONTENT_TYPE + "; charset=utf-8");
+                response.setContentType(HttpSupport.HTML_CONTENT_TYPE + "; charset=utf-8");
                 StringBuffer html = new StringBuffer(TOP_ELEMENT +
                             "<link rel=\"icon\" href=\"")
                     .append(isProvider() ? "" : "../")
@@ -144,10 +129,10 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append("</table></td></tr></table></body></html>");
                 // Just to check that we didn't forgot anything...
                 rd.checkForUnread();
-                writeHtml(response, html);
+                HttpSupport.writeHtml(response, html);
             } else {
                 // Normal call from a service
-                writeData(response, authorityData, JSON_CONTENT_TYPE);
+                HttpSupport.writeData(response, authorityData, JSON_CONTENT_TYPE);
             }
         }
     }
