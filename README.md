@@ -39,4 +39,4 @@ Now Tomcat can be started.  There should be no errors in the log.
 
 A browser can be used to invoke the "mechant" application at: http://localhost:8080/webpay-merchant
 
-Using HTTPS requires installation of <code>SATURN-INSTALL-DIRECTORY/tls-certificates/root/tlsroot.cer</code> in the browser.  Then you would browser to the address: https://localhost:8442/webpay-merchant
+Using HTTPS requires installation of <code>SATURN-INSTALL-DIRECTORY/tls-certificates/root/tlsroot.cer</code> in the browser.  Then you would browse to the address: https://localhost:8442/webpay-merchant
