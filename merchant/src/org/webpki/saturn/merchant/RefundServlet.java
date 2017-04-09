@@ -86,7 +86,6 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                 return;
             }
             
-            urlHolder.setUrl(refundUrl);
             JSONObjectWriter refundRequestData = 
                 RefundRequest.encode(resultData.optionalRefund,
                                      refundUrl,
@@ -97,7 +96,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                                                                                  .getPublicKey()).signer);
         
             JSONObjectReader refundResponseData =
-                MerchantService.externalCalls.postJsonData(urlHolder, refundRequestData);
+                MerchantService.externalCalls.postJsonData(urlHolder, refundUrl, refundRequestData);
 
             if (debug) {
                 DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);

@@ -88,18 +88,21 @@ public class ExternalCalls {
         return result;
     }
 
-    public JSONObjectReader postJsonData(UrlHolder urlHolder, JSONObjectWriter request) throws IOException {
+    public JSONObjectReader postJsonData(UrlHolder urlHolder, String url, JSONObjectWriter request) throws IOException {
         if (logging) {
-            logger.info("About to call " + urlHolder.getUrl() + urlHolder.getCallerAddress() +
+            logger.info("About to call " + url + urlHolder.getCallerAddress() +
                         "with data:\n" + request);
         }
+        urlHolder.setUrl(url);
         HTTPSWrapper wrap = new HTTPSWrapper();
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setHeader(HttpSupport.HTTP_CONTENT_TYPE_HEADER, BaseProperties.JSON_CONTENT_TYPE);
         wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, BaseProperties.JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(urlHolder.getUrl()), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
-        return fetchJsonReturnData(wrap, urlHolder);
+        wrap.makePostRequest(portFilter(url), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
+        JSONObjectReader json = fetchJsonReturnData(wrap, urlHolder);
+        urlHolder.setUrl(null);
+        return json;
     }
 
     JSONObjectReader getJsonData(UrlHolder urlHolder) throws IOException {

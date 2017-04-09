@@ -151,9 +151,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                                         .signer);
 
         // Call Payer bank
-        urlHolder.setUrl(providerAuthority.getServiceUrl());
-        JSONObjectReader resultMessage = MerchantService.externalCalls.postJsonData(urlHolder, authorizationRequest);
-        urlHolder.setUrl(null);
+        JSONObjectReader resultMessage =
+            MerchantService.externalCalls.postJsonData(urlHolder, providerAuthority.getServiceUrl(), authorizationRequest);
 
         if (debug) {
             debugData.authorizationRequest = makeReader(authorizationRequest);
@@ -243,8 +242,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                                   .getSignatureDecoder()
                                                                                       .getPublicKey()).signer);
         // Acquirer or Hybrid call
-        urlHolder.setUrl(transactionOperation.urlToCall);
-        JSONObjectReader response = MerchantService.externalCalls.postJsonData(urlHolder, transactionRequest);
+        JSONObjectReader response =
+            MerchantService.externalCalls.postJsonData(urlHolder, transactionOperation.urlToCall, transactionRequest);
 
         if (debugData != null) {
             debugData.transactionRequest = makeReader(transactionRequest);

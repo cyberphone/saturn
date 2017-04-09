@@ -45,7 +45,7 @@ public class UrlHolder {
         return temp;
     }
 
-    public void setUrl(String url) {
+    void setUrl(String url) {
         this.url = url;
     }
     
