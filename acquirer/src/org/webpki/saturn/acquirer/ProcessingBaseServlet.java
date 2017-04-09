@@ -33,13 +33,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
-
-import org.webpki.webutil.ServletUtil;
 
 ////////////////////////////////////////////////////////////////////////////
 // This is the core Acquirer (Card-Processor) payment transaction servlet //
@@ -66,15 +63,14 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             urlHolder = new UrlHolder(request);
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // Must be tagged as JSON content                                                      //
+            // Must be tagged as JSON content and parse as well                                    //
             /////////////////////////////////////////////////////////////////////////////////////////
-            HttpSupport.checkRequest(request);
+            JSONObjectReader providerRequest = HttpSupport.readJsonData(request);
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // Passed, then we parse it                                                            //
+            // First control passed...                                                             //
             /////////////////////////////////////////////////////////////////////////////////////////
-            JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
-            if (AcquirerService.logging) {
+             if (AcquirerService.logging) {
                 logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
             }
             

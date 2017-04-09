@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="common.lib/webpki.org-libext-1.00.jar"/>
 	<classpathentry kind="lib" path="common.lib/proxy-support.jar"/>
 	<classpathentry kind="lib" path="ref.lib/servlet-api.jar"/>
+	<classpathentry kind="lib" path="common.lib/webpki.org-webutil-1.00.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

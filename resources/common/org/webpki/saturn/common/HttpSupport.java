@@ -19,8 +19,14 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONParser;
+
+import org.webpki.webutil.ServletUtil;
 
 public class HttpSupport {
 
@@ -48,7 +54,7 @@ public class HttpSupport {
         writeData(response, html.toString().getBytes("utf-8"), HTML_CONTENT_TYPE + "; charset=\"utf-8\"");
     }
 
-    public static void checkRequest(HttpServletRequest request) throws IOException {
+    public static JSONObjectReader readJsonData(HttpServletRequest request) throws IOException {
         String contentType = request.getContentType();
         if (!contentType.equals(BaseProperties.JSON_CONTENT_TYPE)) {
             throw new IOException("Content-Type must be \"" + 
@@ -59,5 +65,6 @@ public class HttpSupport {
             throw new IOException("Accept must be \"" + 
                     BaseProperties.JSON_CONTENT_TYPE + "\" , found: " + accept);
         }
+        return JSONParser.parse(ServletUtil.getData(request));
     }
 }

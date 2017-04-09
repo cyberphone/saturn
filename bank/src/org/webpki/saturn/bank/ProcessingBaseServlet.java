@@ -56,8 +56,6 @@ import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 
-import org.webpki.webutil.ServletUtil;
-
 //////////////////////////////////////////////////////////////////////////
 // This is the core Payment Provider (Bank) processing servlet //
 //////////////////////////////////////////////////////////////////////////
@@ -211,14 +209,13 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             urlHolder = new UrlHolder(request);
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // Must be tagged as JSON content                                                      //
+            // Must be tagged as JSON content and parse as well                                    //
             /////////////////////////////////////////////////////////////////////////////////////////
-            HttpSupport.checkRequest(request);
+            JSONObjectReader providerRequest = HttpSupport.readJsonData(request);
 
             /////////////////////////////////////////////////////////////////////////////////////////
-            // Passed, then we parse it                                                            //
+            // First control passed...                                                             //
             /////////////////////////////////////////////////////////////////////////////////////////
-            JSONObjectReader providerRequest = JSONParser.parse(ServletUtil.getData(request));
             if (BankService.logging) {
                 logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
             }
