@@ -38,7 +38,7 @@ public class RefundServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
-    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
+    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
 
         // Decode refund request which embeds the authorization response
         RefundRequest refundRequest = new RefundRequest(providerRequest, false);

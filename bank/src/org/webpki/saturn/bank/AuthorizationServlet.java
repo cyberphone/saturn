@@ -55,8 +55,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     private static final long serialVersionUID = 1L;
     
     @Override
-    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest)
-    throws IOException, GeneralSecurityException {
+    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
 
         // Decode authorization request message
         AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);

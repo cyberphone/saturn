@@ -43,7 +43,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
-    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
+    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
 
         // Decode and finalize the cardpay request which in hybrid mode actually is account-2-account
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, false);

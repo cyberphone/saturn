@@ -37,7 +37,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
-    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws IOException, GeneralSecurityException {
+    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
 
         // Decode and finalize the cardpay request
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, true);

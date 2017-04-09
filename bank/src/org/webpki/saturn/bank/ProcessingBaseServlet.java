@@ -200,8 +200,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     }
 
 
-    abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) 
-    throws IOException, GeneralSecurityException;
+    abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest)throws Exception;
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = null;
