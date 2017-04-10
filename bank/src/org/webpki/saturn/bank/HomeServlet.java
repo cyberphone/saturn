@@ -27,8 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.AuthorityBaseServlet;
 import org.webpki.saturn.common.HttpSupport;
-
-import org.webpki.util.ISODateTime;
+import org.webpki.saturn.common.TimeUtil;
 
 // This servlet publishes a miniscule "home page".
 
@@ -48,8 +47,7 @@ public class HomeServlet extends HttpServlet {
            AuthorityBaseServlet.SATURN_LINK +
            " &quot;bank&quot; server.</td></tr>" +
            "<tr><td>Started: ")
-         .append(ISODateTime.formatDateTime(BankService.started, false)
-                 .replace('T', ' ').replace('Z', ' '))
+         .append(TimeUtil.displayUtcTime(BankService.started))
          .append("</td></tr>" +
            "<tr><td>Successful transactions: ")
          .append(BankService.successfulTtransactions)

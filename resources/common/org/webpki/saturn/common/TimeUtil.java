@@ -16,7 +16,10 @@
  */
 package org.webpki.saturn.common;
 
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class TimeUtil {
 
@@ -43,5 +46,11 @@ public class TimeUtil {
 
     public static GregorianCalendar inDays(int days) {
         return upwardTime(82800000l, days, 86400000l);
+    }
+
+    public static String displayUtcTime(GregorianCalendar dateTime) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return sdf.format(dateTime.getTime());
     }
 }
