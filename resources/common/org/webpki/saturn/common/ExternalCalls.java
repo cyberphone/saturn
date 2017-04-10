@@ -54,9 +54,12 @@ public class ExternalCalls {
     static final int TIMEOUT_FOR_REQUEST           = 5000;
     
     // Authority object caches
-    Map<String,PayeeAuthority> payeeAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
 
-    Map<String,ProviderAuthority> providerAuthorityObjects = Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
+    Map<String,PayeeAuthority> payeeAuthorityObjects =
+            Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
+
+    Map<String,ProviderAuthority> providerAuthorityObjects = 
+            Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
 
     String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...
@@ -77,7 +80,8 @@ public class ExternalCalls {
         }
         // We expect JSON, yes
         if (!wrap.getRawContentType().equals(BaseProperties.JSON_CONTENT_TYPE)) {
-            throw new IOException("Content-Type must be \"" + BaseProperties.JSON_CONTENT_TYPE + "\" , found: " + wrap.getRawContentType());
+            throw new IOException("Content-Type must be \"" + BaseProperties.JSON_CONTENT_TYPE + 
+                                  "\" , found: " + wrap.getRawContentType());
         }
         JSONObjectReader result = JSONParser.parse(wrap.getData());
         if (logging) {

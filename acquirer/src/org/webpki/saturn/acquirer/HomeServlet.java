@@ -82,5 +82,4 @@ public class HomeServlet extends HttpServlet {
         html.append("</table></body></html>");
         HttpSupport.writeHtml(response, html);
     }
-
 }

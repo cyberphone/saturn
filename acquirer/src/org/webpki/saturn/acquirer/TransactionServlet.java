@@ -83,5 +83,5 @@ public class TransactionServlet extends ProcessingBaseServlet {
                                           optionalLogData,
                                           AcquirerService.acquirerKey);
         
-     }
+    }
 }
