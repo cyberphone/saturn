@@ -45,7 +45,7 @@ import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.util.ISODateTime;
 
 /////////////////////////////////////////////////////////////////////////////////
-// This is the Saturn basic mode Payment Provider (Bank) authorization servlet //
+// This is the Saturn core Payment Provider (Bank) authorization servlet       //
 /////////////////////////////////////////////////////////////////////////////////
 
 public class AuthorizationServlet extends ProcessingBaseServlet {
@@ -96,7 +96,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             nonCached = !nonCached;  // Edge case?  Yes, but it could happen
         }
 
-        // Verify that the authorization request is signed by a genuine payment partner
+        // Verify that the authority objects were signed by a genuine payment partner
         payeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
 
         // Verify Payee signature keys.  They may be one generation back as well
