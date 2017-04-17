@@ -308,7 +308,7 @@
     </javac>
     <copy todir="${temp.dir}">
        <fileset dir="${src.dir}">
-          <include name="**/*.json"/>
+          <include name="**/*.jwk"/>
        </fileset>
     </copy>
     <java fork="yes"

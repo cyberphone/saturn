@@ -173,8 +173,8 @@ public class JCSPaper implements BaseProperties {
                 new JSONObjectWriter()
                     .setString(JOSE_ALG, AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE))
                     .setObject(JOSE_JWK, new JSONObjectWriter()
-                        .setString(JOSE_KTY, joseHeader.getString(JSONSignatureDecoder.TYPE_JSON))
-                        .setString(JOSE_CRV, joseHeader.getString(JSONSignatureDecoder.CURVE_JSON))
+                        .setString(JOSE_KTY, joseHeader.getString(JSONSignatureDecoder.KTY_JSON))
+                        .setString(JOSE_CRV, joseHeader.getString(JSONSignatureDecoder.CRV_JSON))
                         .setString(JSONSignatureDecoder.X_JSON, joseHeader.getString(JSONSignatureDecoder.X_JSON))
                         .setString(JSONSignatureDecoder.Y_JSON, joseHeader.getString(JSONSignatureDecoder.Y_JSON))),
                  paymentRequestKey);
@@ -227,7 +227,7 @@ public class JCSPaper implements BaseProperties {
         write("<span style=\"color:orange\">var</span>&nbsp;<span style=\"color:purple\">" +
               PAYMENT_REQUEST_JSON + "</span>&nbsp;=&nbsp;" + jsPaymentRequest.replaceAll("<br>}", "<br>};"));
         write("</div>" +
-              "V0.8, A.Rundgren, 2017-01-21" +
+              "V0.9, A.Rundgren, 2017-04-17" +
               "</body></html>");
         fos.close();
     }
@@ -266,8 +266,8 @@ public class JCSPaper implements BaseProperties {
             JSONObjectReader jwk = protectedHeader.getObject(JOSE_JWK);
             JSONObjectWriter josePK = new JSONObjectWriter()
                 .setObject(JSONSignatureDecoder.PUBLIC_KEY_JSON, new JSONObjectWriter()
-                    .setString(JSONSignatureDecoder.TYPE_JSON, jwk.getString(JOSE_KTY))
-                    .setString(JSONSignatureDecoder.CURVE_JSON, jwk.getString(JOSE_CRV))
+                    .setString(JSONSignatureDecoder.KTY_JSON, jwk.getString(JOSE_KTY))
+                    .setString(JSONSignatureDecoder.CRV_JSON, jwk.getString(JOSE_CRV))
                     .setString(JSONSignatureDecoder.X_JSON, jwk.getString(JSONSignatureDecoder.X_JSON))
                     .setString(JSONSignatureDecoder.Y_JSON, jwk.getString(JSONSignatureDecoder.Y_JSON)));
             publicKey = JSONParser.parse(josePK.toString()).getPublicKey();

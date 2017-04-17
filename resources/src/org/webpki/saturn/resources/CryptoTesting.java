@@ -57,7 +57,7 @@ public class CryptoTesting {
 
    
     static KeyPair getKeyPair(String name) throws IOException {
-        return JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(CryptoTesting.class.getResourceAsStream(name))).getKeyPairFromJwk();
+        return JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(CryptoTesting.class.getResourceAsStream(name))).getKeyPair();
     }
 
     static byte[] createPKCS8PrivateKey(byte[]publicKey, byte[]privateKey) throws IOException {
@@ -85,9 +85,9 @@ public class CryptoTesting {
             System.exit(3);
         }
         CustomCryptoProvider.forcedLoad(true);
-        KeyPair bob = getKeyPair("bobkey.json");
-        KeyPair alice = getKeyPair("alicekey.json");
-        KeyPair rsa = getKeyPair("rsakey.json");
+        KeyPair bob = getKeyPair("bobkey.jwk");
+        KeyPair alice = getKeyPair("alicekey.jwk");
+        KeyPair rsa = getKeyPair("rsakey.jwk");
         byte[] symkey = HashAlgorithms.SHA256.digest(Base64URL.decode(ECDH_RESULT_WITH_KDF));
         js.append("// JEF test data\n\n" +
                   "const ECDH_RESULT_WITH_KDF    = '" + ECDH_RESULT_WITH_KDF + "';\n" +
