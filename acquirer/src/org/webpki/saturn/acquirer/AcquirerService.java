@@ -130,7 +130,9 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         decryptionKeys.add(new DecryptionKeyHolder(keyStoreEnumerator.getPublicKey(),
                                                    keyStoreEnumerator.getPrivateKey(),
                                                    keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey ?
-                                                            KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID));
+                                                            KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : 
+                                                            KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID,
+                                                   keyStoreEnumerator.getKeyId()));
     }
 
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {

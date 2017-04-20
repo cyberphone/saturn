@@ -63,6 +63,7 @@ public class PayerAuthorization implements BaseProperties {
                           .createEncryptionObject(unencryptedAuthorizationData.serializeToBytes(JSONOutputFormats.NORMALIZED),
                                                   dataEncryptionAlgorithm,
                                                   keyEncryptionKey,
+                                                  null,
                                                   keyEncryptionAlgorithm));
     }
 }

@@ -100,6 +100,7 @@ public class AuthorizationResponse implements BaseProperties {
                                                        .serializeToBytes(JSONOutputFormats.NORMALIZED),
                                                    encryptionParameter.getDataEncryptionAlgorithm(),
                                                    encryptionParameter.getEncryptionKey(),
+                                                   null,
                                                    encryptionParameter.getKeyEncryptionAlgorithm()))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))

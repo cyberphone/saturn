@@ -35,16 +35,17 @@ public class KeyStoreEnumerator {
 
     Vector<X509Certificate> certificatePath = new Vector<X509Certificate>();
     PrivateKey privateKey = null;
+    String keyId;
     
     public KeyStoreEnumerator(InputStream is, String password) throws IOException {
         try {
             KeyStore ks = KeyStoreReader.loadKeyStore(is, password);
             Enumeration<String> aliases = ks.aliases();
             while (aliases.hasMoreElements()) {
-                String alias = aliases.nextElement();
-                if (ks.isKeyEntry(alias)) {
-                    privateKey = (PrivateKey) ks.getKey(alias, password.toCharArray());
-                    for (Certificate cert : ks.getCertificateChain(alias)) {
+                keyId = aliases.nextElement();
+                if (ks.isKeyEntry(keyId)) {
+                    privateKey = (PrivateKey) ks.getKey(keyId, password.toCharArray());
+                    for (Certificate cert : ks.getCertificateChain(keyId)) {
                         certificatePath.add((X509Certificate) cert);
                     }
                     break;
@@ -68,5 +69,9 @@ public class KeyStoreEnumerator {
 
     public PrivateKey getPrivateKey() {
         return privateKey;
+    }
+
+    public String getKeyId() {
+        return keyId;
     }
 }
