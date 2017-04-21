@@ -47,6 +47,7 @@ ProviderAuthority.encode = function(authorityUrl,
               new JsonUtil.ArrayWriter().setObject(new JsonUtil.ObjectWriter()
         .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Jef.JOSE_A128CBC_HS256_ALG_ID)
         .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
+                          publicKey.jwk.kty == 'RSA' ?
                         Jef.JOSE_RSA_OAEP_256_ALG_ID : Jef.JOSE_ECDH_ES_ALG_ID)
         .setPublicKey(publicKey)))
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
