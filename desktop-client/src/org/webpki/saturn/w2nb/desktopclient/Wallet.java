@@ -1018,20 +1018,8 @@ public class Wallet {
                     JSONObjectReader encryptionParameters = cardProperties.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
                     card.keyEncryptionAlgorithm = KeyEncryptionAlgorithms
                              .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
-                    if (!EncryptionCore.permittedKeyEncryptionAlgorithm(card.keyEncryptionAlgorithm)) {
-                        logger.warning("Account " + cardAccount.getId() + " contained an unknown \"" +
-                                       BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON + "\": " +
-                                       card.keyEncryptionAlgorithm);
-                        break;
-                    }
                     card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
                              .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
-                    if (!EncryptionCore.permittedDataEncryptionAlgorithm(card.dataEncryptionAlgorithm)) {
-                        logger.warning("Account " + cardAccount.getId() + " contained an unknown \"" +
-                                       BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON + "\": " +
-                                       card.dataEncryptionAlgorithm);
-                        break;
-                    }
                     card.keyEncryptionKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
 
                     // We found a useful card!
