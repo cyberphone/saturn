@@ -80,11 +80,11 @@ import org.webpki.util.ArrayUtil;
 public class InitWallet {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 10) {
+        if (args.length != 11) {
             System.out.println("\nUsage: " +
                                InitWallet.class.getCanonicalName() +
                                "sksFile userDb clientCertFile certFilePassword pin accountType/@ accountId" +
-                               " authorityUrl keyEncryptionKey imageFile");
+                               " authorityUrl keyEncryptionKey imageFile dataEncrytionAlgorithm");
             System.exit(-3);
         }
         CustomCryptoProvider.forcedLoad(true);
@@ -166,7 +166,7 @@ public class InitWallet {
                  .setPublicKey(importedKey.getCertificatePath()[0].getPublicKey());
             PublicKey publicKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
             ow.setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
-                  .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID.toString())
+                  .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, args[10])
                   .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
                         (publicKey instanceof RSAPublicKey ?
                              KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID 

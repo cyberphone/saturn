@@ -242,6 +242,7 @@
         <arg value="${bank.host}/${bankpath}/authority"/>
         <arg value="${sks.encryption}.cer"/>
         <arg value="${card.path}"/>
+        <arg value="${dea}"/>
     </java>
   </target>
 
@@ -266,6 +267,7 @@
        <param name="card.image" value="supercard.png"/>
        <param name="bankpath" value="${payerbankpath}"/>
        <param name="sks.encryption" value="${payerbankpath}-enc-key-ec"/>
+       <param name="dea" value="A128CBC-HS256"/>
     </antcall>
     <antcall target="_import">
        <param name="sks.certificate" value="${clientkey_bankdir}"/>
@@ -275,6 +277,7 @@
        <param name="card.image" value="bankdirect.png"/>
        <param name="bankpath" value="${payerbankpath}"/>
        <param name="sks.encryption" value="${payerbankpath}-enc-key-ec"/>
+       <param name="dea" value="A128GCM"/>
      </antcall>
      <antcall target="_import">
        <param name="bankpath" value="${payerbankpath}"/>
@@ -290,6 +293,7 @@
        <param name="card.image" value="unusualcard.png"/>
        <param name="bankpath" value="${payeebankpath}"/>
        <param name="sks.encryption" value="${payeebankpath}-enc-key-ec"/>
+       <param name="dea" value="A128CBC-HS256"/>
      </antcall>
   </target>
   

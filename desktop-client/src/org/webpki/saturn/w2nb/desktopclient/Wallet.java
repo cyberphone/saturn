@@ -983,7 +983,7 @@ public class Wallet {
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
                             EncryptedMessage encryptedMessage = new ProviderUserResponse(optionalMessage)
-                                .getEncryptedMessage(dataEncryptionKey, DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
+                                .getEncryptedMessage(dataEncryptionKey, selectedCard.dataEncryptionAlgorithm);
                             logger.info("Decrypted private message:\n" + encryptedMessage.getRoot());
                             showProviderDialog(encryptedMessage);
                         } else {
@@ -1045,12 +1045,13 @@ public class Wallet {
                 try {
                     // User authorizations are always signed by a key that only needs to be
                     // understood by the issuing Payment Provider (bank).
+                    dataEncryptionKey = EncryptionCore.generateRandom(selectedCard.dataEncryptionAlgorithm.getKeyLength());
                     JSONObjectWriter authorizationData = AuthorizationData.encode(
                         selectedCard.paymentRequest,
                         domainName,
                         selectedCard.accountDescriptor,
                         dataEncryptionKey,
-                        DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                        selectedCard.dataEncryptionAlgorithm,
                         challengeResults,
                         selectedCard.signatureAlgorithm,
                         new AsymKeySignerInterface () {
@@ -1215,7 +1216,6 @@ public class Wallet {
         // it more look like a Web application.  Note that this measurement
         // lacks the 'px' part; you have to add it in the Web application.
         try {
-            dataEncryptionKey = EncryptionCore.generateDataEncryptionKey(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID);
             JSONObjectWriter readyMessage = Messages.PAYMENT_CLIENT_IS_READY.createBaseMessage();
             if (extWidth != 0) {
                 readyMessage.setObject(BaseProperties.WINDOW_JSON)

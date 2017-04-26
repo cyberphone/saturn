@@ -115,6 +115,33 @@ public class CryptoTesting {
                                                       JEF_EC_KEY_ID,
                                                       KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
         js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
+        .append(";\n\n" +
+               "const JEF_ECDH_OBJECT_3 = ");
+        encryptedData =
+            JSONObjectWriter.createEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
+                                                    DataEncryptionAlgorithms.JOSE_A128GCM_ALG_ID,
+                                                    alice.getPublic(),
+                                                    JEF_EC_KEY_ID,
+                                                    KeyEncryptionAlgorithms.JOSE_ECDH_ES_A128KW_ALG_ID);
+        js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
+        .append(";\n\n" +
+               "const JEF_ECDH_OBJECT_4 = ");
+        encryptedData =
+            JSONObjectWriter.createEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
+                                                    DataEncryptionAlgorithms.JOSE_A256CBC_HS512_ALG_ID,
+                                                    alice.getPublic(),
+                                                    JEF_EC_KEY_ID,
+                                                    KeyEncryptionAlgorithms.JOSE_ECDH_ES_A256KW_ALG_ID);
+        js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
+        .append(";\n\n" +
+               "const JEF_ECDH_OBJECT_5 = ");
+        encryptedData =
+            JSONObjectWriter.createEncryptionObject(JEF_TEST_STRING.getBytes("UTF-8"),
+                                                    DataEncryptionAlgorithms.JOSE_A192CBC_HS384_ALG_ID,
+                                                    alice.getPublic(),
+                                                    JEF_EC_KEY_ID,
+                                                    KeyEncryptionAlgorithms.JOSE_ECDH_ES_A192KW_ALG_ID);
+        js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
           .append(";\n\n" +
                   "const JEF_RSA_OBJECT_2 = ");
         encryptedData =
