@@ -80,6 +80,7 @@ import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
+import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
@@ -176,6 +177,7 @@ public class Wallet {
         ImageIcon cardIcon;
         AsymSignatureAlgorithms signatureAlgorithm;
         String authorityUrl;
+        String optionalKeyId;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey keyEncryptionKey;
@@ -1016,6 +1018,7 @@ public class Wallet {
                                     cardProperties.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON),
                                     paymentRequest);
                     JSONObjectReader encryptionParameters = cardProperties.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
+                    card.optionalKeyId = encryptionParameters.getStringConditional(JSONSignatureDecoder.KEY_ID_JSON);
                     card.keyEncryptionAlgorithm = KeyEncryptionAlgorithms
                              .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
                     card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
@@ -1078,6 +1081,7 @@ public class Wallet {
                                                               selectedCard.accountDescriptor.getType(),
                                                               selectedCard.dataEncryptionAlgorithm,
                                                               selectedCard.keyEncryptionKey,
+                                                              selectedCard.optionalKeyId,
                                                               selectedCard.keyEncryptionAlgorithm);
                     logger.info("About to send to the browser:\n" + resultMessage);
                     return true;

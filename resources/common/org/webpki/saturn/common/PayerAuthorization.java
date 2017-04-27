@@ -54,6 +54,7 @@ public class PayerAuthorization implements BaseProperties {
                                           String accountType,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           PublicKey keyEncryptionKey,
+                                          String optionalKeyId,
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm) throws IOException, GeneralSecurityException {
         return Messages.PAYER_AUTHORIZATION.createBaseMessage()
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
@@ -63,7 +64,7 @@ public class PayerAuthorization implements BaseProperties {
                           .createEncryptionObject(unencryptedAuthorizationData.serializeToBytes(JSONOutputFormats.NORMALIZED),
                                                   dataEncryptionAlgorithm,
                                                   keyEncryptionKey,
-                                                  null,
+                                                  optionalKeyId,
                                                   keyEncryptionAlgorithm));
     }
 }
