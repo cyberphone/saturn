@@ -28,6 +28,8 @@ import java.security.PublicKey;
 
 import java.security.cert.X509Certificate;
 
+import java.security.interfaces.RSAPublicKey;
+
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -41,6 +43,9 @@ import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 
 import org.webpki.json.JSONDecoderCache;
+
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.CredentialDiscoveryResponseDecoder;
 import org.webpki.keygen2.InvocationResponseDecoder;
@@ -105,6 +110,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         String authorityUrl;
         MIMETypedObject cardImage;
         PublicKey encryptionKey;
+        DataEncryptionAlgorithms dataEncryptionAlgorithm;
+        KeyEncryptionAlgorithms keyEncryptionAlgorithm;
     }
 
     static Vector<PaymentCredential> paymentCredentials = new Vector<PaymentCredential>();
@@ -208,6 +215,13 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 paymentCredential.encryptionKey =
                     CertificateUtil.getCertificateFromBlob(
                         ArrayUtil.getByteArrayFromInputStream(getResource(arguments[4]))).getPublicKey();
+                paymentCredential.keyEncryptionAlgorithm = 
+                        paymentCredential.encryptionKey instanceof RSAPublicKey ?
+                        KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID 
+                                                                                : 
+                        KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID;
+                paymentCredential.dataEncryptionAlgorithm = 
+                        DataEncryptionAlgorithms.getAlgorithmFromId(arguments[7]);
             }
 
 

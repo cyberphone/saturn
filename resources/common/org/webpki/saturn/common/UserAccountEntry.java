@@ -20,7 +20,14 @@ import java.io.IOException;
 
 import java.security.PublicKey;
 
+import org.webpki.crypto.AlgorithmPreferences;
+import org.webpki.crypto.AsymSignatureAlgorithms;
+
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONSignatureDecoder;
+
+import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 public class UserAccountEntry implements BaseProperties {
     PublicKey publicKey;
@@ -28,10 +35,11 @@ public class UserAccountEntry implements BaseProperties {
     String id;
     boolean cardFormatAccountId;
     String providerAuthorityUrl;
-    String signatureAlgorithm;
+    AsymSignatureAlgorithms signatureAlgorithm;
+    String optionalKeyId;
     PublicKey encryptionKey;
-    String dataEncryptionAlgorithm;
-    String keyEncryptionAlgorithm;
+    DataEncryptionAlgorithms dataEncryptionAlgorithm;
+    KeyEncryptionAlgorithms keyEncryptionAlgorithm;
     
     RiskBasedAuthentication riskBasedAuthentication = new RiskBasedAuthentication();
 
@@ -39,13 +47,19 @@ public class UserAccountEntry implements BaseProperties {
         type = rd.getObject(ACCOUNT_JSON).getString(TYPE_JSON);
         id = rd.getObject(ACCOUNT_JSON).getString(ID_JSON);
         cardFormatAccountId = rd.getBoolean(CARD_FORMAT_ACCOUNT_ID_JSON);
-        signatureAlgorithm = rd.getString(SIGNATURE_ALGORITHM_JSON);
+        signatureAlgorithm = AsymSignatureAlgorithms
+            .getAlgorithmFromId(rd.getString(SIGNATURE_ALGORITHM_JSON), AlgorithmPreferences.JOSE);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         publicKey = rd.getPublicKey();
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
+        if (encryptionParameters.hasProperty(JSONSignatureDecoder.KEY_ID_JSON)) {
+            optionalKeyId = encryptionParameters.getString(JSONSignatureDecoder.KEY_ID_JSON);
+        }
         encryptionKey = encryptionParameters.getPublicKey();
-        dataEncryptionAlgorithm = encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
-        keyEncryptionAlgorithm = encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
+        dataEncryptionAlgorithm = DataEncryptionAlgorithms
+            .getAlgorithmFromId(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
+        keyEncryptionAlgorithm = KeyEncryptionAlgorithms
+            .getAlgorithmFromId(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
         rd.checkForUnread();
     }
 
@@ -55,6 +69,10 @@ public class UserAccountEntry implements BaseProperties {
 
     public PublicKey getPublicKey() {
         return publicKey;
+    }
+
+    public String getKeyId() {
+        return optionalKeyId;
     }
 
     public String getType() {

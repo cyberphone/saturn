@@ -56,7 +56,7 @@ public class PayeeCoreProperties implements BaseProperties {
             parameterArray.add(
                 new SignatureParameter(
                     AsymSignatureAlgorithms
-                        .getAlgorithmFromID(signatureParameter.getString(JSONSignatureDecoder.ALGORITHM_JSON),
+                        .getAlgorithmFromId(signatureParameter.getString(JSONSignatureDecoder.ALGORITHM_JSON),
                                             AlgorithmPreferences.JOSE),
                     signatureParameter.getPublicKey()));
         } while (jsonParameterArray.hasMore());

@@ -109,7 +109,7 @@ public class AuthorizationData implements BaseProperties {
         account = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
-            .getAlgorithmFromString(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
+            .getAlgorithmFromId(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
         if (rd.hasProperty(USER_RESPONSE_ITEMS_JSON)) {
             LinkedHashMap<String,UserResponseItem> results = new LinkedHashMap<String,UserResponseItem>();

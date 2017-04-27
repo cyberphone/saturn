@@ -1010,16 +1010,16 @@ public class Wallet {
                                     getImageIcon(sks.getExtension(keyHandle, 
                                                  KeyGen2URIs.LOGOTYPES.CARD).getExtensionData(SecureKeyStore.SUB_TYPE_LOGOTYPE),
                                                  false),
-                                    AsymSignatureAlgorithms.getAlgorithmFromID(
+                                    AsymSignatureAlgorithms.getAlgorithmFromId(
                                             cardProperties.getString(BaseProperties.SIGNATURE_ALGORITHM_JSON),
                                             AlgorithmPreferences.JOSE),
                                     cardProperties.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON),
                                     paymentRequest);
                     JSONObjectReader encryptionParameters = cardProperties.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
                     card.keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-                             .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
+                             .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
                     card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
-                             .getAlgorithmFromString(encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
+                             .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
                     card.keyEncryptionKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
 
                     // We found a useful card!

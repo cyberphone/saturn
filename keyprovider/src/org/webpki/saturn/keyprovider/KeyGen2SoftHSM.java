@@ -79,7 +79,7 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
     public ECPublicKey generateEphemeralKey (KeyAlgorithms ephemeralKeyAlgorithm) throws IOException {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance ("EC", "BC");
-            ECGenParameterSpec eccgen = new ECGenParameterSpec (ephemeralKeyAlgorithm.getJCEName ());
+            ECGenParameterSpec eccgen = new ECGenParameterSpec (ephemeralKeyAlgorithm.getJceName ());
             generator.initialize (eccgen, new SecureRandom ());
             KeyPair kp = generator.generateKeyPair();
             serverEcPrivateKey = (ECPrivateKey) kp.getPrivate ();
@@ -103,7 +103,7 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
             byte[] Z = keyAgreement.generateSecret ();
       
             // The custom KDF
-            Mac mac = Mac.getInstance (MACAlgorithms.HMAC_SHA256.getJCEName ());
+            Mac mac = Mac.getInstance (MACAlgorithms.HMAC_SHA256.getJceName ());
             mac.init (new SecretKeySpec (Z, "RAW"));
             sessionKey = mac.doFinal (kdfData);
 
@@ -126,7 +126,7 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
     @Override
     public byte[] mac (byte[] data, byte[] keyModifier) throws IOException {
         try {
-            Mac mac = Mac.getInstance (MACAlgorithms.HMAC_SHA256.getJCEName ());
+            Mac mac = Mac.getInstance (MACAlgorithms.HMAC_SHA256.getJceName ());
             mac.init (new SecretKeySpec (ArrayUtil.add (sessionKey, keyModifier), "RAW"));
             return mac.doFinal (data);
         } catch (GeneralSecurityException e) {

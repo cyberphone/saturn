@@ -27,7 +27,6 @@ import java.security.PublicKey;
 
 import java.security.cert.X509Certificate;
 
-import java.util.Date;
 import java.util.Vector;
 
 import org.webpki.crypto.AlgorithmPreferences;
