@@ -172,7 +172,7 @@ public class InitWallet {
                              KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID 
                                                            : 
                              KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
-                  .setPublicKey(publicKey, AlgorithmPreferences.JOSE);
+                  .setPublicKey(publicKey);
             surrogateKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                                       SecureKeyStore.SUB_TYPE_EXTENSION,
                                       "",

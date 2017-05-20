@@ -1023,7 +1023,7 @@ public class Wallet {
                              .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
                     card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
                              .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
-                    card.keyEncryptionKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
+                    card.keyEncryptionKey = encryptionParameters.getPublicKey();
 
                     // We found a useful card!
                     cardCollection.put(keyHandle, card);
@@ -1065,7 +1065,7 @@ public class Wallet {
                             @Override
                             public byte[] signData(byte[] data, AsymSignatureAlgorithms algorithm) throws IOException {
                                 return sks.signHashedData(keyHandle,
-                                                          algorithm.getAlgorithmId (AlgorithmPreferences.SKS),
+                                                          algorithm.getAlgorithmId(AlgorithmPreferences.SKS),
                                                           null,
                                                           new String(pinText.getPassword()).getBytes("UTF-8"),
                                                           algorithm.getDigestAlgorithm().digest(data));

@@ -23,7 +23,6 @@ import java.util.LinkedHashMap;
 
 import java.security.PublicKey;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.AsymKeySignerInterface;
 
@@ -86,8 +85,7 @@ public class AuthorizationData implements BaseProperties {
                       optionalUserResponseItems,
                       new GregorianCalendar(),
                       new JSONAsymKeySigner(signer)
-                          .setSignatureAlgorithm(signatureAlgorithm)
-                          .setAlgorithmPreferences(AlgorithmPreferences.JOSE));
+                          .setSignatureAlgorithm(signatureAlgorithm));
     }
 
     public static String formatCardNumber(String accountId) {
@@ -124,7 +122,7 @@ public class AuthorizationData implements BaseProperties {
         }
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
-        publicKey = rd.getSignature(AlgorithmPreferences.JOSE).getPublicKey();
+        publicKey = rd.getSignature(new JSONSignatureDecoder.Options()).getPublicKey();
         rd.checkForUnread();
     }
 

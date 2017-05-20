@@ -20,8 +20,6 @@ import java.io.IOException;
 
 import java.util.GregorianCalendar;
 
-import org.webpki.crypto.AlgorithmPreferences;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
@@ -36,7 +34,7 @@ public class RefundResponse implements BaseProperties {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
+        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }

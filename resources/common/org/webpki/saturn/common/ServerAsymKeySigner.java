@@ -23,7 +23,6 @@ import java.security.PublicKey;
 
 import java.security.interfaces.RSAPublicKey;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.SignatureWrapper;
 import org.webpki.crypto.AsymKeySignerInterface;
@@ -51,6 +50,5 @@ public class ServerAsymKeySigner extends JSONAsymKeySigner {
         });
         setSignatureAlgorithm(key.getPublicKey() instanceof RSAPublicKey ?
                   AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256);
-        setAlgorithmPreferences(AlgorithmPreferences.JOSE);
-    }
+     }
 }

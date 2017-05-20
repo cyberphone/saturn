@@ -23,8 +23,6 @@ import java.security.PublicKey;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
-import org.webpki.crypto.AlgorithmPreferences;
-
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
@@ -96,7 +94,7 @@ public class ProviderAuthority implements BaseProperties {
                                    encryptionParameter.dataEncryptionAlgorithm.toString())
                         .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
                                    encryptionParameter.keyEncryptionAlgorithm.toString())
-                        .setPublicKey(encryptionParameter.encryptionKey, AlgorithmPreferences.JOSE);
+                        .setPublicKey(encryptionParameter.encryptionKey);
                 }
                 return wr;
             })
@@ -181,7 +179,7 @@ public class ProviderAuthority implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         expiresInMillis = expires.getTimeInMillis();
-        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
+        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }

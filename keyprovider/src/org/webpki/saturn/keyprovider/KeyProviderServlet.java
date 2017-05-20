@@ -152,7 +152,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                            paymentCredential.dataEncryptionAlgorithm.toString())
                     .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
                            paymentCredential.keyEncryptionAlgorithm.toString())
-                    .setPublicKey(paymentCredential.encryptionKey, AlgorithmPreferences.JOSE))
+                    .setPublicKey(paymentCredential.encryptionKey))
                              .serializeToBytes(JSONOutputFormats.NORMALIZED));
 
            key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, paymentCredential.cardImage);

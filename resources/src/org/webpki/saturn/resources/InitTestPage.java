@@ -31,7 +31,6 @@ import java.security.PublicKey;
 
 import java.security.interfaces.RSAPublicKey;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CustomCryptoProvider;
@@ -78,7 +77,6 @@ public class InitTestPage implements BaseProperties {
             });
             setSignatureAlgorithm(key.getPublicKey() instanceof RSAPublicKey ?
                       AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256);
-            setAlgorithmPreferences(AlgorithmPreferences.JOSE);
         }
     }
 
