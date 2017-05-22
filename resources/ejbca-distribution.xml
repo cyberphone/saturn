@@ -12,13 +12,13 @@
   <target name="_nolambda">
   	<replaceregexp
   		match="(\(\(wr\)\ \-&gt;\ \{)(.*?)(}\))"
-  		replace="(&#10;new JSONObjectWriter.JSONSetDynamic() {&#10;public JSONObjectWriter set(JSONObjectWriter wr) throws IOException&#10;  {&#10;\2&#10;  }&#10;})"
+  		replace="(&#10;new JSONObjectWriter.Dynamic() {&#10;public JSONObjectWriter set(JSONObjectWriter wr) throws IOException&#10;  {&#10;\2&#10;  }&#10;})"
   		flags="sg">
   	    <fileset dir="${subdir}" includes="**/*.java"/>
   	</replaceregexp>
   	<replaceregexp
   		match="(\(\(wr\)\ \-&gt; )([a-zA-Z]*)(.*?\)?\))(;?\)\n?)"
-  		replace="(&#10;new JSONObjectWriter.JSONSetDynamic() {&#10;public JSONObjectWriter set(JSONObjectWriter wr) throws IOException&#10;  {&#10;    return \2\3;&#10;  }&#10;})&#10;"
+  		replace="(&#10;new JSONObjectWriter.Dynamic() {&#10;public JSONObjectWriter set(JSONObjectWriter wr) throws IOException&#10;  {&#10;    return \2\3;&#10;  }&#10;})&#10;"
   		flags="sg">
   	    <fileset dir="${subdir}" includes="**/*.java"/>
   	</replaceregexp>
