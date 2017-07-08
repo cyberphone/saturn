@@ -226,7 +226,13 @@ public class JCSPaper implements BaseProperties {
         write("<span style=\"color:orange\">var</span>&nbsp;<span style=\"color:purple\">" +
               PAYMENT_REQUEST_JSON + "</span>&nbsp;=&nbsp;" + jsPaymentRequest.replaceAll("<br>}", "<br>};"));
         write("</div>" +
-              "V0.9, A.Rundgren, 2017-04-17" +
+              "<div id=\"yasmin\" class=\"header\" style=\"margin-top:20pt\">HTTP Usage<br></div>" +
+              "<div class=\"text\" style=\"margin-bottom:15pt\">"+
+                   "Although just an example, " + YASMIN() +
+                   " represents a workable way for using" +
+                    " JCS signatures in Web applications." +
+              "</div>" +
+              "V0.91, A.Rundgren, 2017-07-08" +
               "</body></html>");
         fos.close();
     }
@@ -253,6 +259,10 @@ public class JCSPaper implements BaseProperties {
 
     static String JEF() {
         return link("JEF", "https://cyberphone.github.io/doc/security/jef.html");
+    }
+
+    static String YASMIN() {
+        return link("YASMIN", "https://cyberphone.github.io/doc/web/yasmin.html");
     }
 
     static void checkJws(JSONObjectReader jws) throws Exception {
