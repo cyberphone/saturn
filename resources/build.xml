@@ -456,6 +456,12 @@
     </antcall>
   </target>
 
+  <target name="_hosterkey">
+	<antcall target="_createcert">
+	   <param name="cmd" value="-out/keyalias 20170101:hoster.com:ec -selfsigned -entity/ee -subject &quot;CN=Hoster Signature Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${hostersignaturekey}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+	</antcall>
+  </target>
+
   <target name="srcclean">
     <fixcrlf srcdir="../"
        tab="remove"
@@ -473,6 +479,7 @@
     <antcall target="_clientkeys"/>
     <antcall target="_bankencryption"/>
     <antcall target="_kg2kmkey"/>
+    <antcall target="_hosterkey"/>
   </target>
   
 </project>

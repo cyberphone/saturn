@@ -64,6 +64,7 @@ import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
+import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.SignatureProfiles;
 import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.ExternalCalls;
@@ -265,13 +266,13 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                             decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
                         KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
                                                               decryptionKeys.get(0).getPublicKey())},
+                                           bankKey,
 
                                            merchantAccountDb,
                                            payeeAuthorityBaseUrl = bankHost + "/payees/",
+                                           new ServerAsymKeySigner(bankcreds),
 
                                            PROVIDER_EXPIRATION_TIME,
-                                           bankKey,
-
                                            logging);
 
             dynamicServlet(sce,

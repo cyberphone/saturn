@@ -428,18 +428,22 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.AUTHORIZATION_REQUEST) + " matches the " +
                 keyWord(SERVICE_URL_JSON) + " of the <b>User&nbsp;Bank</b>" +
                 ".</li>" +
+                "<li>Verifying that the " +
+                keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) + " in the " +
+                keyWord(JSONSignatureDecoder.SIGNATURE_JSON) +
+                " object of the " +
+                keyWord(Messages.PAYEE_AUTHORITY) +
+                " object and the public key of the first (=signature) certificate in the " +
+                keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) +
+                " of the " +
+                keyWord(Messages.PROVIDER_AUTHORITY) +
+                " object are identical.</li>" +
                 "<li>Verifying that the <b>Merchant</b> is vouched for by a provider belonging to one for the <b>User&nbsp;Bank</b> " +
                 "known trust network through the " +
                 keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) +
                 " in the " +
-                keyWord(Messages.PAYEE_AUTHORITY) +
-                " object.</li>" +
-                "<li>Verifying that the " +
-                keyWord(JSONSignatureDecoder.CERTIFICATE_PATH_JSON) + " in the " +
-                keyWord(Messages.PAYEE_AUTHORITY) +
-                " and " +
                 keyWord(Messages.PROVIDER_AUTHORITY) +
-                " objects are identical.</li>" +
+                " object.</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONSignatureDecoder.PUBLIC_KEY_JSON) +
                 " and " +

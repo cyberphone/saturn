@@ -86,18 +86,18 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                payeeAuthority.getProviderAuthorityUrl());
             
             // Now verify that they are issued by the same entity
-            if (Arrays.equals(payeeAuthority.getSignatureDecoder().getCertificatePath(),
-                              providerAuthority.getSignatureDecoder().getCertificatePath())) {
+            if (payeeAuthority.getAttestationKey().equals(
+                    providerAuthority.getSignatureDecoder().getCertificatePath()[0].getPublicKey())) {
                 break;
             }
             if (nonCached) {
-                throw new IOException("\"" + JSONSignatureDecoder.CERTIFICATE_PATH_JSON + "\" mismatch");
+                throw new IOException("Payee attestation key mismatch");
             }
             nonCached = !nonCached;  // Edge case?  Yes, but it could happen
         }
 
         // Verify that the authority objects were signed by a genuine payment partner
-        payeeAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
+        providerAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
 
         // Verify Payee signature keys.  They may be one generation back as well
         payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), authorizationRequest.getSignatureDecoder());

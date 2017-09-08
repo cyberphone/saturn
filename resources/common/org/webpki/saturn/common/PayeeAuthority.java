@@ -18,12 +18,13 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.PublicKey;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
-import org.webpki.json.JSONSignatureTypes;
 
 public class PayeeAuthority implements BaseProperties {
     
@@ -31,7 +32,7 @@ public class PayeeAuthority implements BaseProperties {
                                           String providerAuthorityUrl,
                                           PayeeCoreProperties payeeCoreProperties,
                                           GregorianCalendar expires,
-                                          ServerX509Signer attestSigner) throws IOException {
+                                          ServerAsymKeySigner attestSigner) throws IOException {
         return payeeCoreProperties.writeObject(Messages.PAYEE_AUTHORITY.createBaseMessage()
                                      .setString(AUTHORITY_URL_JSON, authorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
@@ -52,8 +53,7 @@ public class PayeeAuthority implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         expiresInMillis = expires.getTimeInMillis();
-        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
-        signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
+        attestationKey = rd.getSignature(new JSONSignatureDecoder.Options()).getPublicKey();
         rd.checkForUnread();
     }
 
@@ -84,9 +84,9 @@ public class PayeeAuthority implements BaseProperties {
         return timeStamp;
     }
 
-    JSONSignatureDecoder signatureDecoder;
-    public JSONSignatureDecoder getSignatureDecoder() {
-        return signatureDecoder;
+    PublicKey attestationKey;
+    public PublicKey getAttestationKey() {
+        return attestationKey;
     }
 
     JSONObjectReader root;

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
+    version="2.4">
+
+    <context-param>
+        <description>Key Password</description>
+        <param-name>key_password</param-name>
+        <param-value>@key-password@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Hoster Attestation Key</description>
+        <param-name>hoster_key</param-name>
+        <param-value>@hoster-key@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Merchant Accounts</description>
+        <param-name>merchant_account_db</param-name>
+        <param-value>@merchant-account-db@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Loading of Bouncycastle (EJBCA or Tomcat)</description>
+        <param-name>bouncycastle_first</param-name>
+        <param-value>@bouncycastle-first@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Logging</description>
+        <param-name>logging</param-name>
+        <param-value>@logging@</param-value>
+    </context-param>
+    
+    <listener>
+        <listener-class>org.webpki.saturn.hoster.HosterService</listener-class>
+    </listener>
+
+    <servlet>
+        <servlet-name>HomeServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.hoster.HomeServlet</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>PayeeAuthorityServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.hoster.PayeeAuthorityServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>HomeServlet</servlet-name>
+        <url-pattern>/home</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>PayeeAuthorityServlet</servlet-name>
+        <url-pattern>/payees/*</url-pattern>
+    </servlet-mapping>
+
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>The app</web-resource-name>
+        <url-pattern>/*</url-pattern>
+      </web-resource-collection>
+      <user-data-constraint>
+        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+    </security-constraint>
+
+</web-app>

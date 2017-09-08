@@ -62,6 +62,7 @@ import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
+import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.SignatureProfiles;
 
 import org.webpki.webutil.InitPropertyReader;
@@ -180,10 +181,11 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             logging = getPropertyBoolean(LOGGING);
 
              
-            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));;
+            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
-            acquirerKey = new ServerX509Signer(new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
-                                                                      getPropertyString(KEYSTORE_PASSWORD)));
+            KeyStoreEnumerator acquirercreds = new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
+                                                                      getPropertyString(KEYSTORE_PASSWORD));
+            acquirerKey = new ServerX509Signer(acquirercreds);
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
@@ -219,13 +221,13 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                             decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
                         KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
                                                               decryptionKeys.get(0).getPublicKey())},
-     
+                                           acquirerKey,
+
                                            merchantAccountDb, 
                                            payeeAuthorityBaseUrl = aquirerHost + "/payees/",
-    
+                                           new ServerAsymKeySigner(acquirercreds),
+
                                            PROVIDER_EXPIRATION_TIME,
-                                           acquirerKey,
-    
                                            logging);
 
             dynamicServlet(sce,

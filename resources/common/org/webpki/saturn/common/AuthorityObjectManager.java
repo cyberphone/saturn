@@ -46,56 +46,64 @@ public class AuthorityObjectManager extends Thread {
     long renewCycle;
     byte[] providerAuthorityBlob;
     ServerX509Signer providerSigner;
+    ServerAsymKeySigner attestationSigner;
 
     boolean logging;
 
     
     void update() throws IOException {
-        synchronized(this) {
-            providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,
-                                                             serviceUrl,
-                                                             optionalExtensions,
-                                                             optionalProviderAccountTypes,
-                                                             signatureProfiles,
-                                                             encryptionParameters,
-                                                             TimeUtil.inSeconds(expiryTimeInSeconds),
-                                                             providerSigner).serializeToBytes(JSONOutputFormats.NORMALIZED);
-        }
-        if (logging) {
-            logger.info("Updated \"" + Messages.PROVIDER_AUTHORITY.toString() + "\"");
-        }
-
-        for (String id : payees.keySet()) {
-            PayeeCoreProperties payeeCoreProperties = payees.get(id);
+        if (providerSigner != null) {
             synchronized(this) {
-                payeeAuthorityBlobs.put(id, 
-                                        PayeeAuthority.encode(payeeBaseAuthorityUrl + id,
-                                                              providerAuthorityUrl,
-                                                              payeeCoreProperties,
-                                                              TimeUtil.inSeconds(expiryTimeInSeconds),
-                                                              providerSigner).serializeToBytes(JSONOutputFormats.NORMALIZED));
+                providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,
+                                                                 serviceUrl,
+                                                                 optionalExtensions,
+                                                                 optionalProviderAccountTypes,
+                                                                 signatureProfiles,
+                                                                 encryptionParameters,
+                                                                 TimeUtil.inSeconds(expiryTimeInSeconds),
+                                                                 providerSigner).serializeToBytes(JSONOutputFormats.NORMALIZED);
             }
             if (logging) {
-                logger.info("Updated \"" + Messages.PAYEE_AUTHORITY.toString() + "\" with id:" + id);
+                logger.info("Updated \"" + Messages.PROVIDER_AUTHORITY.toString() + "\"");
+            }
+        }
+
+        if (attestationSigner != null) {
+            for (String id : payees.keySet()) {
+                PayeeCoreProperties payeeCoreProperties = payees.get(id);
+                synchronized(this) {
+                    payeeAuthorityBlobs.put(id, 
+                                            PayeeAuthority.encode(payeeBaseAuthorityUrl + id,
+                                                                  providerAuthorityUrl,
+                                                                  payeeCoreProperties,
+                                                                  TimeUtil.inSeconds(expiryTimeInSeconds),
+                                                                  attestationSigner).serializeToBytes(JSONOutputFormats.NORMALIZED));
+                }
+                if (logging) {
+                    logger.info("Updated \"" + Messages.PAYEE_AUTHORITY.toString() + "\" with id:" + id);
+                }
             }
         }
 
     }
 
-    public AuthorityObjectManager(String providerAuthorityUrl,
+    public AuthorityObjectManager(String providerAuthorityUrl /* Both */,
+
+                                  // ProviderAuthority (may be null)
                                   String serviceUrl,
                                   JSONObjectReader optionalExtensions,
                                   String[] optionalProviderAccountTypes,
                                   SignatureProfiles[] signatureProfiles,
                                   ProviderAuthority.EncryptionParameter[] encryptionParameters,
+                                  ServerX509Signer providerSigner,
                                     
+                                  // PayeeAuthority (may be null)
                                   SortedMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
                                   String payeeBaseAuthorityUrl,
+                                  ServerAsymKeySigner attestationSigner,
 
-                                  int expiryTimeInSeconds,
-                                  ServerX509Signer providerSigner,
-                                  
-                                  boolean logging) throws IOException {
+                                  int expiryTimeInSeconds /* Both */,
+                                  boolean logging /* Both */) throws IOException {
         this.providerAuthorityUrl = providerAuthorityUrl;
         this.serviceUrl = serviceUrl;
         this.optionalExtensions = optionalExtensions;
@@ -109,6 +117,7 @@ public class AuthorityObjectManager extends Thread {
         this.expiryTimeInSeconds = expiryTimeInSeconds;
         this.renewCycle = expiryTimeInSeconds * 500;
         this.providerSigner = providerSigner;
+        this.attestationSigner = attestationSigner;
         this.logging = logging;
         update();
         start();
