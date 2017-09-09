@@ -56,9 +56,9 @@ public class HostingService extends InitPropertyReader implements ServletContext
     
     static final String KEYSTORE_PASSWORD     = "key_password";
 
-    static final String HOSTER_KEY            = "hoster_key";
+    static final String HOSTING_KEY           = "hosting_key";
 
-    static final String HOSTER_HOST           = "hoster_host";
+    static final String HOSTING_HOST          = "hosting_host";
 
     static final String PROVIDER_HOST         = "provider_host";
 
@@ -80,8 +80,6 @@ public class HostingService extends InitPropertyReader implements ServletContext
                 return arg0.compareTo(arg1);
             }});
 
-    static ServerAsymKeySigner hosterKey;
-    
     static String providerAuthorityUrl;
     
     static String payeeAuthorityBaseUrl;
@@ -125,33 +123,30 @@ public class HostingService extends InitPropertyReader implements ServletContext
              
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
-            KeyStoreEnumerator acquirercreds = new KeyStoreEnumerator(getResource(HOSTER_KEY),
-                                                                      getPropertyString(KEYSTORE_PASSWORD));
-            hosterKey = new ServerAsymKeySigner(acquirercreds);
-
             JSONArrayReader accounts = JSONParser.parse(
                     ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
-                merchantAccountDb.put(account.getPayee().getId(), account);
+                merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
             }
 
-            String aquirerHost = getPropertyString(PROVIDER_HOST);
-
             authorityObjectManager =
-                new AuthorityObjectManager(providerAuthorityUrl = aquirerHost + "/authority",
+                new AuthorityObjectManager(providerAuthorityUrl = getPropertyString(PROVIDER_HOST) + "/authority",
+                                           getPropertyString(HOSTING_HOST),
                                            null,
                                            null,
                                            null,
                                            null,
                                            null,
                                            null,
-     
+                                           null,
+
                                            merchantAccountDb, 
-                                           payeeAuthorityBaseUrl = aquirerHost + "/payees/",
-                                           hosterKey,
-    
+                                           payeeAuthorityBaseUrl = getPropertyString(HOSTING_HOST) + "/payees/",
+                                           new ServerAsymKeySigner(new KeyStoreEnumerator(getResource(HOSTING_KEY),
+                                                                                          getPropertyString(KEYSTORE_PASSWORD))),
+
                                            PROVIDER_EXPIRATION_TIME,
                                            logging);
 

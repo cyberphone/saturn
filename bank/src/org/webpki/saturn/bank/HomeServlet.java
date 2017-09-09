@@ -68,12 +68,12 @@ public class HomeServlet extends HttpServlet {
             html.append("</td></tr>" +
                 "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : BankService.merchantAccountDb.values()) {
-                String id = payeeCoreProperties.getPayee().getId();
+                String id = payeeCoreProperties.getDecoratedPayee().getId();
                 authorityUrl = BankService.payeeAuthorityBaseUrl + id;
                 html.append("<tr><td style=\"text-align:right\">")
                  .append(id)
                  .append("</td><td>")
-                 .append(payeeCoreProperties.getPayee().getCommonName())
+                 .append(payeeCoreProperties.getDecoratedPayee().getCommonName())
                  .append("</td><td><a href=\"")
                  .append(authorityUrl)
                  .append("\" target=\"_blank\">")

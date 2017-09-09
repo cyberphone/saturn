@@ -66,6 +66,8 @@ public interface BaseProperties {
     String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider
     String PROVIDER_ACCOUNT_TYPES_JSON      = "providerAccountTypes";       // List of Account2Account types "understood" by provider
+    String HOSTING_PROVIDER_JSON            = "hostingProvider";            // Optional object in ProviderAuthority
+    String HOME_PAGE_JSON                   = "homePage";                   // URL to the public Web of the entity
     String ACCEPTED_ACCOUNT_TYPES_JSON      = "acceptedAccountTypes";       // List of ACCOUNT_TYPE_JSON
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_JSON                     = "account";                    // Payer Account2Account or Card

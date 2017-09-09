@@ -59,6 +59,7 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.AuthorityObjectManager;
+import org.webpki.saturn.common.HostingProvider;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
@@ -83,7 +84,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String DECRYPTION_KEY1       = "bank_decryptionkey1";
     static final String DECRYPTION_KEY2       = "bank_decryptionkey2";
     static final String REFERENCE_ID_START    = "bank_reference_id_start";
-    
+
+    static final String HOSTING_PROVIDER_KEY  = "hosting_provider_key";
+
     static final String PAYMENT_ROOT          = "payment_root";
 
     static final String ACQUIRER_ROOT         = "acquirer_root";
@@ -219,6 +222,15 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                                                   getPropertyString(KEYSTORE_PASSWORD));
             bankCertificatePath = bankcreds.getCertificatePath();
             bankKey = new ServerX509Signer(bankcreds);
+            
+            HostingProvider hostingProvider = null;
+            String hostingProviderKeyName = getPropertyString(HOSTING_PROVIDER_KEY);
+            if (!hostingProviderKeyName.isEmpty()) {
+                hostingProvider = 
+                    new HostingProvider("https://hosting.com",
+                                        new KeyStoreEnumerator(getResource(HOSTING_PROVIDER_KEY),
+                                                               getPropertyString(KEYSTORE_PASSWORD)).getPublicKey());
+            }
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
@@ -232,12 +244,14 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 userAccountDb.put(account.getId(), account);
             }
 
-            accounts = JSONParser.parse(
-                                   ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
-                                       ).getJSONArrayReader();
-            while (accounts.hasMore()) {
-                PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
-                merchantAccountDb.put(account.getPayee().getId(), account);
+            if (hostingProvider == null) {
+                accounts = JSONParser.parse(
+                                       ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
+                                           ).getJSONArrayReader();
+                while (accounts.hasMore()) {
+                    PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
+                    merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
+                }
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -250,13 +264,14 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             String extensions =
                 new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
 
-            if (extensions.length() > 0) {
+            if (!extensions.isEmpty()) {
                 extensions = extensions.replace("${host}", bankHost);
                 optionalProviderExtensions = JSONParser.parse(extensions);
             }
 
             authorityObjectManager = 
                 new AuthorityObjectManager(providerAuthorityUrl = bankHost + "/authority",
+                                           bankHost,
                                            serviceUrl = bankHost + "/service",
                                            optionalProviderExtensions,
                                            new String[]{"https://swift.com", "https://ultragiro.se"},
@@ -266,11 +281,12 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                             decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
                         KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
                                                               decryptionKeys.get(0).getPublicKey())},
+                                           hostingProvider,
                                            bankKey,
 
                                            merchantAccountDb,
                                            payeeAuthorityBaseUrl = bankHost + "/payees/",
-                                           new ServerAsymKeySigner(bankcreds),
+                                           hostingProvider == null ? new ServerAsymKeySigner(bankcreds) : null,
 
                                            PROVIDER_EXPIRATION_TIME,
                                            logging);

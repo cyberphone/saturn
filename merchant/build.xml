@@ -40,7 +40,7 @@
   <property name="security.constraints" refid="security.constraints.xml"/>
   
   <target name="help">
-    <echo message="tomcat [-Dunusual.card=0] [-Dcurrency=XYZ] [-Dslow.operation=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+    <echo message="tomcat [-Dunusual.card=0] [-Dcurrency=XYZ] [-Dslow.operation=0] [-Dhostingoption=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -59,6 +59,9 @@
     <property name="var.slow.operation" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442"/>
     <property name="payee_provider.host" value="https://localhost:8442"/>
+    <condition property="payee_provider.path" value="${hostingpath}" else="${payeebankpath}">
+      <isset property="hostingoption"/>
+    </condition>
     <property name="merchant.host" value="http://localhost:8080"/>
     <property name="security.actual" value=""/>
     <property name="server.port.map" value=""/>
@@ -97,7 +100,7 @@
       <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
       <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
       <replacefilter token="@payee-acquirer-authority-url@" value="${acquirer.host}/${acquirerpath}/payees/${merchantid}"/>
-      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payeebankpath}/payees/${merchantid}"/>
+      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payee_provider.path}/payees/${merchantid}"/>
       <replacefilter token="@merchant-base-url@" value="${merchant.host}/${appcorename}"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>

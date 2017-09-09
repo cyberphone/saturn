@@ -111,13 +111,17 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(isProvider() ?
                             tableRow(rd, HTTP_VERSION_JSON, "Preferred HTTP version (&#x2265; HTTP/1.1)") +
                             tableRow(rd, AUTHORITY_URL_JSON, "The address of this object") +
+                            tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
                             tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
                             tableRow(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
                             tableRow(rd, PROVIDER_ACCOUNT_TYPES_JSON, "Supported account types", true) +
                             tableRow(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algorithms <i>recognized</i> by the provider") +
-                            tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider")
+                            tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider") +
+                            (rd.hasProperty(HOSTING_PROVIDER_JSON) ? 
+                                tableRow(rd, HOSTING_PROVIDER_JSON, "Holds core data of a payee hosting provider") : "")
                                : 
                             tableRow(rd, AUTHORITY_URL_JSON, "The address of this object") +
+                            tableRow(rd, HOME_PAGE_JSON, "Payee public home page") +
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of the issuing provider's authority object") +
                             tableRow(rd, COMMON_NAME_JSON, "Payee common name") +
                             tableRow(rd, ID_JSON, "Local payee id used by the payee provider") +

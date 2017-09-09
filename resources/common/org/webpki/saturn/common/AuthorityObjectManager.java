@@ -33,12 +33,14 @@ public class AuthorityObjectManager extends Thread {
     TreeMap<String,byte[]> payeeAuthorityBlobs = new TreeMap<String,byte[]>();
 
     String providerAuthorityUrl;
+    String providerHomePage;
     String serviceUrl;
     JSONObjectReader optionalExtensions;
     String[] optionalProviderAccountTypes;
     SignatureProfiles[] signatureProfiles;
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
-    
+    HostingProvider optionalHostingProvider; 
+
     SortedMap<String,PayeeCoreProperties> payees;
     String payeeBaseAuthorityUrl;
 
@@ -55,11 +57,13 @@ public class AuthorityObjectManager extends Thread {
         if (providerSigner != null) {
             synchronized(this) {
                 providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,
+                                                                 providerHomePage,
                                                                  serviceUrl,
                                                                  optionalExtensions,
                                                                  optionalProviderAccountTypes,
                                                                  signatureProfiles,
                                                                  encryptionParameters,
+                                                                 optionalHostingProvider, 
                                                                  TimeUtil.inSeconds(expiryTimeInSeconds),
                                                                  providerSigner).serializeToBytes(JSONOutputFormats.NORMALIZED);
             }
@@ -90,11 +94,13 @@ public class AuthorityObjectManager extends Thread {
     public AuthorityObjectManager(String providerAuthorityUrl /* Both */,
 
                                   // ProviderAuthority (may be null)
+                                  String providerHomePage,
                                   String serviceUrl,
                                   JSONObjectReader optionalExtensions,
                                   String[] optionalProviderAccountTypes,
                                   SignatureProfiles[] signatureProfiles,
                                   ProviderAuthority.EncryptionParameter[] encryptionParameters,
+                                  HostingProvider optionalHostingProvider, 
                                   ServerX509Signer providerSigner,
                                     
                                   // PayeeAuthority (may be null)
@@ -105,11 +111,13 @@ public class AuthorityObjectManager extends Thread {
                                   int expiryTimeInSeconds /* Both */,
                                   boolean logging /* Both */) throws IOException {
         this.providerAuthorityUrl = providerAuthorityUrl;
+        this.providerHomePage = providerHomePage;
         this.serviceUrl = serviceUrl;
         this.optionalExtensions = optionalExtensions;
         this.optionalProviderAccountTypes = optionalProviderAccountTypes;
         this.signatureProfiles = signatureProfiles;
         this.encryptionParameters = encryptionParameters;
+        this.optionalHostingProvider = optionalHostingProvider; 
 
         this.payees = payees;
         this.payeeBaseAuthorityUrl = payeeBaseAuthorityUrl;

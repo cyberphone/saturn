@@ -11,7 +11,7 @@
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-      <echo message="both tomcat [-Dpayeebank=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+      <echo message="both tomcat [-Dpayeebank=0] [-Dhostingoption=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -41,6 +41,12 @@
     <condition property="common.name" value="Big Bank" else="My Bank">
       <equals arg1="${payeebankpath}" arg2="${appcorename}"/>
     </condition>
+    <condition property="hosting.provider.key" value="${hostingattestationkey}.p12" else="">
+      <and>
+        <equals arg1="${payeebankpath}" arg2="${appcorename}"/>
+        <isset property="hostingoption"/>
+      </and>
+    </condition>
     <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
@@ -60,6 +66,7 @@
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${keypassword}"/>
       <replacefilter token="@bank-name@" value="${common.name}"/>
+      <replacefilter token="@hosting-provider-key@" value="${hosting.provider.key}"/>
       <replacefilter token="@provider-extensions@" value="${extensions.file}"/>
       <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
@@ -92,6 +99,7 @@
          <include name="${cert.key}"/>
          <include name="${paymentroot}.cer"/>
          <include name="${acquirerroot}.cer"/>
+         <include name="${hosting.provider.key}"/>
       </zipfileset>
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
          <include name="${users.db}"/>

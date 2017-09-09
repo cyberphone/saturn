@@ -11,9 +11,21 @@
     </context-param>
 
     <context-param>
-        <description>Hoster Attestation Key</description>
-        <param-name>hoster_key</param-name>
-        <param-value>@hoster-key@</param-value>
+        <description>Hosting Attestation Key</description>
+        <param-name>hosting_key</param-name>
+        <param-value>@hosting-key@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Hosting Host</description>
+        <param-name>hosting_host</param-name>
+        <param-value>@hosting-host@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Provider Host</description>
+        <param-name>provider_host</param-name>
+        <param-value>@provider-host@</param-value>
     </context-param>
 
     <context-param>
@@ -35,17 +47,17 @@
     </context-param>
     
     <listener>
-        <listener-class>org.webpki.saturn.hoster.HosterService</listener-class>
+        <listener-class>org.webpki.saturn.hosting.HostingService</listener-class>
     </listener>
 
     <servlet>
         <servlet-name>HomeServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.hoster.HomeServlet</servlet-class>
+        <servlet-class>org.webpki.saturn.hosting.HomeServlet</servlet-class>
     </servlet>
 
     <servlet>
         <servlet-name>PayeeAuthorityServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.hoster.PayeeAuthorityServlet</servlet-class>
+        <servlet-class>org.webpki.saturn.hosting.PayeeAuthorityServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

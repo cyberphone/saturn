@@ -194,7 +194,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
-                merchantAccountDb.put(account.getPayee().getId(), account);
+                merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -212,6 +212,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
             authorityObjectManager =
                 new AuthorityObjectManager(providerAuthorityUrl = aquirerHost + "/authority",
+                                           aquirerHost,
                                            aquirerHost + "/service",
                                            optionalProviderExtensions,
                                            null,
@@ -221,6 +222,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                             decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
                         KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
                                                               decryptionKeys.get(0).getPublicKey())},
+                                           null,
                                            acquirerKey,
 
                                            merchantAccountDb, 

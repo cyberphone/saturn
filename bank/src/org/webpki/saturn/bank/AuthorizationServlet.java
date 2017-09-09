@@ -22,12 +22,10 @@ import java.math.BigDecimal;
 
 import java.text.SimpleDateFormat;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -77,23 +75,32 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             urlHolder.setNonCachedMode(nonCached);
             payeeAuthority = 
                 BankService.externalCalls.getPayeeAuthority(urlHolder,
-                                                            authorizationRequest.getAuthorityUrl());
-    
+                                                           authorizationRequest.getAuthorityUrl());
+
             // Lookup of Payee's Provider
             urlHolder.setNonCachedMode(nonCached);
             providerAuthority =
                 BankService.externalCalls.getProviderAuthority(urlHolder,
                                                                payeeAuthority.getProviderAuthorityUrl());
-            
+
             // Now verify that they are issued by the same entity
             if (payeeAuthority.getAttestationKey().equals(
-                    providerAuthority.getSignatureDecoder().getCertificatePath()[0].getPublicKey())) {
+                    providerAuthority.getHostingProvider() == null ?
+                // Direct attestation of Payee
+                providerAuthority.getSignatureDecoder().getCertificatePath()[0].getPublicKey()
+                                                                   :
+                // Indirect attestation of Payee through a designated Hosting provider
+                providerAuthority.getHostingProvider().getPublicKey())) {
                 break;
             }
+
+            // No match, should we give up?
             if (nonCached) {
                 throw new IOException("Payee attestation key mismatch");
             }
-            nonCached = !nonCached;  // Edge case?  Yes, but it could happen
+            
+            // Edge case?  Yes, but it could happen
+            nonCached = !nonCached;
         }
 
         // Verify that the authority objects were signed by a genuine payment partner

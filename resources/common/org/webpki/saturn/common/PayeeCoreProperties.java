@@ -34,7 +34,7 @@ import org.webpki.json.JSONSignatureDecoder;
 public class PayeeCoreProperties implements BaseProperties {
 
     SignatureParameter[] signatureParameters;
-    Payee payee;
+    DecoratedPayee decoratedPayee;
 
     public static class SignatureParameter {
         
@@ -48,7 +48,7 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
-        payee = new Payee(rd);
+        decoratedPayee = new DecoratedPayee(rd);
         Vector<SignatureParameter> parameterArray = new Vector<SignatureParameter>();
         JSONArrayReader jsonParameterArray = rd.getArray(SIGNATURE_PARAMETERS_JSON);
         do {
@@ -63,13 +63,13 @@ public class PayeeCoreProperties implements BaseProperties {
         signatureParameters = parameterArray.toArray(new SignatureParameter[0]);
     }
 
-    public PayeeCoreProperties(Payee payee, SignatureParameter[] signatureParameters) {
-        this.payee = payee;
+    public PayeeCoreProperties(DecoratedPayee decoratedPayee, SignatureParameter[] signatureParameters) {
+        this.decoratedPayee = decoratedPayee;
         this.signatureParameters = signatureParameters;
     }
 
-    public Payee getPayee() {
-        return payee;
+    public DecoratedPayee getDecoratedPayee() {
+        return decoratedPayee;
     }
 
     public SignatureParameter[] getSignatureParameters() {
@@ -77,7 +77,7 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        JSONArrayWriter jsonArray = payee.writeObject(wr).setArray(SIGNATURE_PARAMETERS_JSON);
+        JSONArrayWriter jsonArray = decoratedPayee.writeObject(wr).setArray(SIGNATURE_PARAMETERS_JSON);
         for (SignatureParameter signatureParameter : signatureParameters) {
             jsonArray.setObject().setString(JSONSignatureDecoder.ALGORITHM_JSON,
                                             signatureParameter
@@ -89,8 +89,8 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public void verify(Payee payee, JSONSignatureDecoder signatureDecoder) throws IOException {
-        if (!this.payee.id.equals(payee.id)) {
-            throw new IOException("Payee ID mismatch " + this.payee.id + " " + payee.id);
+        if (!this.decoratedPayee.id.equals(payee.id)) {
+            throw new IOException("Payee ID mismatch " + this.decoratedPayee.id + " " + payee.id);
         }
         boolean publicKeyMismatch = true;
         for (SignatureParameter signatureParameter : signatureParameters) {

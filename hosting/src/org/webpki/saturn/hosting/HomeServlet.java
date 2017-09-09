@@ -45,7 +45,7 @@ public class HomeServlet extends HttpServlet {
            "<tr><td class=\"header\">Saturn Hosting Service</td></tr>" +
            "<tr><td>This is a " +
            AuthorityBaseServlet.SATURN_LINK +
-           " &quot;hoster&quot; server.</td></tr>" +
+           " &quot;hosting&quot; server.</td></tr>" +
            "<tr><td>Started: ")
          .append(TimeUtil.displayUtcTime(HostingService.started))
          .append("</td></tr>" +
@@ -62,12 +62,12 @@ public class HomeServlet extends HttpServlet {
             html.append("</td></tr>" +
                 "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : HostingService.merchantAccountDb.values()) {
-                String id = payeeCoreProperties.getPayee().getId();
+                String id = payeeCoreProperties.getDecoratedPayee().getId();
                 authorityUrl = HostingService.payeeAuthorityBaseUrl + id;
                 html.append("<tr><td style=\"text-align:right\">")
                  .append(id)
                  .append("</td><td>")
-                 .append(payeeCoreProperties.getPayee().getCommonName())
+                 .append(payeeCoreProperties.getDecoratedPayee().getCommonName())
                  .append("</td><td><a href=\"")
                  .append(authorityUrl)
                  .append("\" target=\"_blank\">")

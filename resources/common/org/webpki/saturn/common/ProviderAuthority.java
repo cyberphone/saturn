@@ -65,16 +65,19 @@ public class ProviderAuthority implements BaseProperties {
     public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
 
     public static JSONObjectWriter encode(String authorityUrl,
+                                          String homePage,
                                           String serviceUrl,
                                           JSONObjectReader optionalExtensions,
                                           String[] optionalProviderAccountTypes,
                                           SignatureProfiles[] signatureProfiles,
                                           EncryptionParameter[] encryptionParameters,
+                                          HostingProvider optionalHostingProvider,
                                           GregorianCalendar expires,
                                           ServerX509Signer signer) throws IOException {
         return Messages.PROVIDER_AUTHORITY.createBaseMessage()
             .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
+            .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
             .setDynamic((wr) -> optionalProviderAccountTypes == null ?
@@ -98,6 +101,7 @@ public class ProviderAuthority implements BaseProperties {
                 }
                 return wr;
             })
+            .setDynamic((wr) -> optionalHostingProvider == null ? wr : optionalHostingProvider.writeObject(wr))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
             .setSignature(signer);
@@ -114,6 +118,7 @@ public class ProviderAuthority implements BaseProperties {
             throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
                                   " expected=" + expectedAuthorityUrl);
         }
+        homePage = rd.getString(HOME_PAGE_JSON);
         serviceUrl = rd.getString(SERVICE_URL_JSON);
         if (rd.hasProperty(EXTENSIONS_JSON)) {
             optionalExtensions = rd.getObject(EXTENSIONS_JSON);
@@ -176,6 +181,13 @@ public class ProviderAuthority implements BaseProperties {
         }
         encryptionParameters = parameterArray.toArray(new EncryptionParameter[0]);
 
+        // If the following object is defined it means that the bank/provider
+        // have outsourced the administration of Merchants to a hosting
+        // facility which it voucher for here
+        if (rd.hasProperty(HOSTING_PROVIDER_JSON)) {
+            optionalHostingProvider = new HostingProvider(rd);
+        }
+
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         expires = rd.getDateTime(EXPIRES_JSON);
         expiresInMillis = expires.getTimeInMillis();
@@ -194,6 +206,11 @@ public class ProviderAuthority implements BaseProperties {
     String authorityUrl;
     public String getAuthorityUrl() {
         return authorityUrl;
+    }
+
+    String homePage;
+    public String getHomePage() {
+        return homePage;
     }
 
     String serviceUrl;
@@ -222,6 +239,11 @@ public class ProviderAuthority implements BaseProperties {
     EncryptionParameter[] encryptionParameters;
     public EncryptionParameter[] getEncryptionParameters() {
         return encryptionParameters;
+    }
+
+    HostingProvider optionalHostingProvider;
+    public HostingProvider getHostingProvider() {
+        return optionalHostingProvider;
     }
 
     GregorianCalendar expires;
