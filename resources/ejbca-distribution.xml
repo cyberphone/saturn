@@ -70,6 +70,10 @@
   		<param name="var" value="optionalProviderAccountTypes"/>
   		<param name="file" value="ProviderAuthority"/>
     </antcall>
+  	<antcall target="_final">
+  		<param name="var" value="optionalHostingProvider"/>
+  		<param name="file" value="ProviderAuthority"/>
+    </antcall>
    	<replaceregexp
   		match="(CardSpecificData cardSpecificData\))"
   		replace="final \1"

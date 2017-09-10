@@ -75,7 +75,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             urlHolder.setNonCachedMode(nonCached);
             payeeAuthority = 
                 BankService.externalCalls.getPayeeAuthority(urlHolder,
-                                                           authorizationRequest.getAuthorityUrl());
+                                                            authorizationRequest.getAuthorityUrl());
 
             // Lookup of Payee's Provider
             urlHolder.setNonCachedMode(nonCached);

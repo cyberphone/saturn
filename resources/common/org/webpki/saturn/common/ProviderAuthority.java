@@ -182,8 +182,8 @@ public class ProviderAuthority implements BaseProperties {
         encryptionParameters = parameterArray.toArray(new EncryptionParameter[0]);
 
         // If the following object is defined it means that the bank/provider
-        // have outsourced the administration of Merchants to a hosting
-        // facility which it voucher for here
+        // have outsourced the administration of Merchants to a Hosting
+        // facility which it vouches for here
         if (rd.hasProperty(HOSTING_PROVIDER_JSON)) {
             optionalHostingProvider = new HostingProvider(rd);
         }
