@@ -41,6 +41,7 @@ PayeeAuthority.encode = function(authorityUrl,
   return Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
+    .setString(BaseProperties.HOME_PAGE_JSON, payeeCoreProperties[BaseProperties.HOME_PAGE_JSON])
     .setString(BaseProperties.COMMON_NAME_JSON, payeeCoreProperties[BaseProperties.COMMON_NAME_JSON])
     .setString(BaseProperties.ID_JSON, payeeCoreProperties[BaseProperties.ID_JSON])
     .setDynamic((wr) => {

@@ -26,6 +26,7 @@ const Jcs       = require('webpki.org').Jcs;
 const BaseProperties        = require('./BaseProperties');
 
 function PayeeCoreProperties(rd) {
+  this.homePage = rd.getString(BaseProperties.HOME_PAGE_JSON);
   this.commonName = rd.getString(BaseProperties.COMMON_NAME_JSON);
   this.id = rd.getString(BaseProperties.ID_JSON);
   this.signatureParameters = [];

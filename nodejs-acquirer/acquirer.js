@@ -35,6 +35,7 @@ const Logging   = require('webpki.org').Logging;
 
 // Saturn common library imports
 const ServerCertificateSigner = require('../nodejs-common/ServerCertificateSigner');
+const ServerAsymKeySigner     = require('../nodejs-common/ServerAsymKeySigner');
 const BaseProperties          = require('../nodejs-common/BaseProperties');
 const PayeeAuthority          = require('../nodejs-common/PayeeAuthority');
 const PayeeCoreProperties     = require('../nodejs-common/PayeeCoreProperties');
@@ -88,6 +89,8 @@ const serverCertificateSigner =
   new ServerCertificateSigner(Keys.createPrivateKeyFromPem(keyData),
                               Keys.createCertificatesFromPem(keyData));
 
+const serverAsymKeySigner = new ServerAsymKeySigner(Keys.createPrivateKeyFromPem(keyData));
+
 const paymentRoot = Keys.createCertificatesFromPem(readFile(Config.trustAnchors));
 
 const encryptionKeys = [];
@@ -110,6 +113,7 @@ do {
 var providerAuthority;
 function updateProviderAuthority() {
   providerAuthority = ProviderAuthority.encode(Config.host + '/authority',
+                                               Config.host,
                                                Config.host + '/authorize',
                                                encryptionKeys[0].getPublicKey(),
                                                AO_EXPIRY_TIME,
@@ -198,7 +202,7 @@ const jsonGetProcessors = {
                                                                 payeeInformation,
                                                                 now,
                                                                 AO_EXPIRY_TIME,
-                                                                serverCertificateSigner);
+                                                                serverAsymKeySigner);
       }
       return payeeInformation.payeeAuthority;
     }

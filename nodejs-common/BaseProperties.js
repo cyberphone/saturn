@@ -31,6 +31,7 @@ const BaseProperties = {
     ANDROID_SUCCESS_URL_JSON         : 'androidSuccessUrl',
     ANDROID_TRANSACTION_URL_JSON     : 'androidTransactionUrl',
 
+    HOME_PAGE_JSON                   : 'homePage',                   // Home page of entity
     COMMON_NAME_JSON                 : 'commonName',                 // Common name of providers to be used in UIs
     NAME_JSON                        : 'name',
 

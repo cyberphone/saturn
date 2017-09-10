@@ -71,7 +71,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                         HttpServletResponse response,
                         boolean debug, 
                         DebugData debugData, 
-                       UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+                        UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Slightly different flows for card- and bank-to-bank authorizations
         boolean cardPayment = payerAuthorization.getAccountType().isCardPayment();
         

@@ -30,6 +30,7 @@ function ProviderAuthority() {
 }
 
 ProviderAuthority.encode = function(authorityUrl,
+                                    homePage,
                                     serviceUrl,
                                     publicKey,
                                     expiresInSeconds,
@@ -40,6 +41,7 @@ ProviderAuthority.encode = function(authorityUrl,
   return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
     .setString(BaseProperties.HTTP_VERSION_JSON, "HTTP/1.1")
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
+    .setString(BaseProperties.HOME_PAGE_JSON, homePage)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
     .setArray(BaseProperties.SIGNATURE_PROFILES_JSON, 
               new JsonUtil.ArrayWriter().setString('http://webpki.org/saturn/v3/signatures#P-256.ES256'))
