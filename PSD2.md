@@ -16,8 +16,8 @@ established *four corner* model, obviating the need for PISPs altogether.
 
 ### Trust Establishment
 Since PSD2 APIs provide access to potentially sensitive data in arbitrary banks, a PSD2
-service provider must authenticate itself as being a certified entity.  This typically
-introduces a need for specific CAs (Certification Authorities) as well as centralized registries
+service provider must authenticate itself to banks in a trustworthy manner.  This typically
+demands specific CAs (Certification Authorities) as well as centralized registries
 holding data about PSD2 service providers.  A potential problem is that the cost for certification may
 be high and may also prove to be somewhat less easy to get acceptance for on a European or global level.
 
