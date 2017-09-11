@@ -18,20 +18,20 @@ the need for PISPs altogether.
 Since PSD2 APIs provide access to potentially sensitive data in arbitrary banks, a PSD2
 service provider must authenticate itself as being a certified entity.  This typically
 introduces a need for specific CAs (Certification Authorities) as well as centralized registries
-holding data about the PSD2 service providers.  A potential problem is that the cost for certification may
-be high and may also prove to be somewhat less easy to get acceptance for on a European level.
+holding data about PSD2 service providers.  A potential problem is that the cost for certification may
+be high and may also prove to be somewhat less easy to get acceptance for on a European or global level.
 
-Saturn, on the other hand do not require third party certification since *there is no third party to certify*.
-It does though mandate a payment-network-wide CA (Certification Authority) providing
+Saturn, on the other hand, do not depend on third party certification since *there is no third party to certify*.
+It does though *mandate* a payment-network-wide CA (Certification Authority) providing
 participating banks with "member" certificates.  Equipped with such a certificate,
 a bank can with limited efforts enroll any number of payees (Merchants), alternatively
-rely on a *built-in*, highly scalable otsourced hosting option.
+rely on a *built-in*, highly scalable outsourced hosting option.
 
 ### User Interface
 Since PSD2 APIs operate at the same trust level as banks, they (*quite logically*) build on
 *reusing* the banks' existing (and *arbitrary complex*),
 on-line banking authentication solutions and user interfaces.
-This introduces a *dependency* which card-based payment solutions do not have.
+However, this introduces a *dependency* which card-based payment solutions do not have.
 If you brought the current PSD2 API concept to the POS (Point of Sale) terminal,
 users would most likely have to *manually select* which *bank-specific* "wallet" to use.
 
