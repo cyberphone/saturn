@@ -43,3 +43,7 @@ a single "wallet" for all parties, *exactly like Apple and Google already have*.
 In addition to the things stated above as well as to the lack of a *Europe-wide* PSD2 API standard,
 there is bunch of other differing parameters summarized in the following table:
 https://cyberphone.github.io/doc/saturn/saturn--wallet-using-credit-transfer.pdf
+
+For readers with strong interests in technology, a peek in 
+https://cyberphone.github.io/doc/saturn/saturn-authorization.pdf
+may be of some use.
