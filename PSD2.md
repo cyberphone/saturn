@@ -1,4 +1,4 @@
-## Saturn features compared to PSD2 APIs
+## Saturn versus PSD2 APIs
 
 Note: The currently published PSD2 APIs are certainly not identical but seem anyway sharing a common "conceptual" model.
 
