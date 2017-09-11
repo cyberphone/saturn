@@ -22,7 +22,7 @@ holding data about PSD2 service providers.  A potential problem is that the cost
 be high and may also prove to be somewhat less easy to get acceptance for on a European or global level.
 
 Saturn, on the other hand, does not depend on third party certification since *there is no third party to certify*.
-It does though *mandate* a payment-network-wide CA (Certification Authority) providing
+It does though *mandate* a payment-network-wide CA providing
 participating banks with "member" certificates.  Equipped with such a certificate,
 a bank can with limited efforts enroll any number of payees (Merchants), alternatively
 rely on a *built-in*, highly scalable outsourced hosting option.
