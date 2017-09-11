@@ -28,7 +28,7 @@ a bank can with limited efforts enroll any number of payees (Merchants), alterna
 rely on a *built-in*, highly scalable outsourced hosting option.
 
 ### User Interfaces
-Since PSD2 APIs operate at the same trust level as banks, they (*quite logically*) build on
+Due to the fact that PSD2 APIs operate at the same trust level as banks, they (*quite logically*) build on
 *reusing* the banks' existing (and *arbitrary complex*),
 on-line banking authentication solutions and user interfaces.
 However, this introduces a *dependency* which card-based payment solutions never had.
