@@ -35,7 +35,7 @@ However, this introduces a *dependency* which card-based payment solutions do no
 If you brought the current PSD2 API concept to the POS (Point of Sale) terminal,
 users would most likely have to *manually select* which *bank-specific* "wallet" to use.
 
-Saturn, by only dealing with payments, reuses the well-known card paradigm (although the
+Saturn, by only dealing with payments, adopted the well-known card paradigm (although the
 underlying technology is quite different), making it *technically* feasible having
 a single "wallet" for all parties, *exactly like Apple and Google already have*.
 
