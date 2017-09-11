@@ -1,6 +1,6 @@
 ## Saturn versus PSD2 APIs
 
-Note: The currently published PSD2 APIs are certainly not identical but seem anyway sharing a common "conceptual" model.
+Note: Although the currently published PSD2 APIs certainly are not identical, they seem anyway sharing a common "conceptual" model.
 
 ### Purpose of PSD2
 The purpose of PSD2 is enabling third parties creating new *financial services* through
