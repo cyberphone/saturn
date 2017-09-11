@@ -11,8 +11,8 @@ necessarily have a contract with each bank they interact with, creates a require
 
 ### Saturn - Payments Only
 Saturn, which has a more limited scope, *exposing no account information to payees*, is therefore
-able exploiting a considerably simpler scheme based on the established *four corner* model, obviating
-the need for PISPs altogether.
+able exploiting a considerably simpler scheme based on a slightly enhanced variant of the firmly
+established *four corner* model, obviating the need for PISPs altogether.
 
 ### Trust Establishment
 Since PSD2 APIs provide access to potentially sensitive data in arbitrary banks, a PSD2
@@ -27,7 +27,7 @@ participating banks with "member" certificates.  Equipped with such a certificat
 a bank can with limited efforts enroll any number of payees (Merchants), alternatively
 rely on a *built-in*, highly scalable outsourced hosting option.
 
-### User Interface
+### User Interfaces
 Since PSD2 APIs operate at the same trust level as banks, they (*quite logically*) build on
 *reusing* the banks' existing (and *arbitrary complex*),
 on-line banking authentication solutions and user interfaces.
@@ -46,4 +46,4 @@ https://cyberphone.github.io/doc/saturn/saturn--wallet-using-credit-transfer.pdf
 
 For readers with strong interests in technology, a peek in 
 https://cyberphone.github.io/doc/saturn/saturn-authorization.pdf
-may be of some use.
+may also be of some use.
