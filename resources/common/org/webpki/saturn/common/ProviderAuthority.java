@@ -68,7 +68,7 @@ public class ProviderAuthority implements BaseProperties {
                                           String homePage,
                                           String serviceUrl,
                                           JSONObjectReader optionalExtensions,
-                                          String[] optionalProviderAccountTypes,
+                                          String[] providerPaymentMethods,
                                           SignatureProfiles[] signatureProfiles,
                                           EncryptionParameter[] encryptionParameters,
                                           HostingProvider optionalHostingProvider,
@@ -80,8 +80,7 @@ public class ProviderAuthority implements BaseProperties {
             .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
-            .setDynamic((wr) -> optionalProviderAccountTypes == null ?
-                    wr : wr.setStringArray(PROVIDER_ACCOUNT_TYPES_JSON, optionalProviderAccountTypes))
+            .setStringArray(PROVIDER_PAYMENT_METHODS_JSON, providerPaymentMethods)
             .setDynamic((wr) -> {
                 JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PROFILES_JSON);
                 for (SignatureProfiles signatureProfile : signatureProfiles) {
@@ -127,7 +126,7 @@ public class ProviderAuthority implements BaseProperties {
             }
             rd.scanAway(EXTENSIONS_JSON);
         }
-        optionalProviderAccountTypes = rd.getStringArrayConditional(PROVIDER_ACCOUNT_TYPES_JSON);
+        providerPaymentMethods = rd.getStringArray(PROVIDER_PAYMENT_METHODS_JSON);
 
         // Signature profiles tell other parties what kind of signatures that are accepted
         // Additional signature profiles can be introduced without breaking existing applications
@@ -228,12 +227,9 @@ public class ProviderAuthority implements BaseProperties {
         return signatureProfiles;
     }
 
-    String[] optionalProviderAccountTypes;
-    public String[] getProviderAccountTypes(boolean required) throws IOException {
-        if (required && optionalProviderAccountTypes == null) {
-            throw new IOException("Expected \"" + PROVIDER_ACCOUNT_TYPES_JSON + "\" missing in: " + authorityUrl);
-        }
-        return optionalProviderAccountTypes;
+    String[] providerPaymentMethods;
+    public String[] getProviderPaymentMethods() {
+        return providerPaymentMethods;
     }
 
     EncryptionParameter[] encryptionParameters;

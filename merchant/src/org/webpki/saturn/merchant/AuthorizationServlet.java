@@ -30,15 +30,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.payments.cepa.CEPAAregEncoder;
+
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.HttpSupport;
+import org.webpki.saturn.common.PaymentMethodEncoder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
@@ -50,6 +52,8 @@ import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
 
+import com.supercard.SupercardAregEncoder;
+
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
 //////////////////////////////////////////////////////////////////////////
@@ -58,9 +62,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String MERCHANT_ACCOUNT_TYPE = "https://swift.com";
+    private static final String MERCHANT_PAYMENT_METHOD = "https://sepa.payments.org";
 
-    private static final String MERCHANT_ACCOUNT_ID = "IBAN:FR7630004003200001019471656";
+    private static final String MERCHANT_ACCOUNT_ID = "FR7630004003200001019471656";
     
     @Override
     boolean processCall(JSONObjectReader walletResponse,
@@ -105,7 +109,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
            
         }
  
-        AccountDescriptor accountDescriptor = null;
+        PaymentMethodEncoder paymentMethodEncoder = null;
         TransactionOperation transactionOperation = new TransactionOperation();
         if (cardPayment) {
             // Lookup of acquirer authority
@@ -118,21 +122,20 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             if (debugData != null) {
                 debugData.acquirerAuthority = acquirerAuthority.getRoot();
             }
+            paymentMethodEncoder = new SupercardAregEncoder();
         } else {
-            for (String accountType : providerAuthority.getProviderAccountTypes(true)) {
-                if (accountType.equals(MERCHANT_ACCOUNT_TYPE)) {
-                    accountDescriptor = new AccountDescriptor(accountType, MERCHANT_ACCOUNT_ID);
+            for (String paymentMethod : providerAuthority.getProviderPaymentMethods()) {
+                if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
+                    paymentMethodEncoder = new CEPAAregEncoder(MERCHANT_ACCOUNT_ID);
                     break;
                 }
             }
-            if (accountDescriptor == null) {
-                throw new IOException("No matching account type: " + providerAuthority.getProviderAccountTypes(true));
+            if (paymentMethodEncoder == null) {
+                throw new IOException("No matching account type: " + providerAuthority.getProviderPaymentMethods());
             }
         }
 
         String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
-        // Nothing yet...
-        JSONObjectReader additionalPayeeData = null;
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
             AuthorizationRequest.encode(MerchantService.testMode,
@@ -142,8 +145,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                         request.getRemoteAddr(),
                                         paymentRequest,
-                                        accountDescriptor,
-                                        additionalPayeeData,
+                                        paymentMethodEncoder,
                                         MerchantService.getReferenceId(),
                                         MerchantService.paymentNetworks.get(paymentRequest
                                                                                 .getSignatureDecoder()

@@ -58,7 +58,7 @@
     <javac debug="${debug}"
            source="${javaversion}"
            target="${javaversion}"
-           srcdir="${src.dir}:${compile.common.src.dir}"
+           srcdir="${src.dir}:${compile.common.src.dir}:${compile.methods.src.dir}"
            destdir="${temp.dir}"
            classpath="${compile.classpath}"
            includeAntRuntime="false"/>
@@ -143,6 +143,8 @@
 
        <param name="compile.common.src.dir" value="${common.src.dir}"/>
        
+       <param name="compile.methods.src.dir" value="${methods.src.dir}"/>
+        
        <param name="compile.classpath" refid="tomcat.compile.classpath"/>
        
        <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
@@ -181,6 +183,8 @@
 
        <param name="compile.common.src.dir" value="common.src"/>
        
+       <param name="compile.methods.src.dir" value="methods.src"/>
+        
        <param name="compile.classpath" refid="ejbca.compile.classpath"/>
        
        <param name="zip.common.lib.dir" value="empty.lib"/>
@@ -239,6 +243,7 @@
         <exclude name="dist/**"/>
       </zipfileset>
       <zipfileset dir="${common.src.dir}" prefix="${banksourcepath}/common.src"/>
+      <zipfileset dir="${methods.src.dir}" prefix="${banksourcepath}/methods.src"/>
       <zipfileset dir="${key.dir}" prefix="${banksourcepath}/keys"/>
       <zipfileset dir="${credentials.dir}" prefix="${banksourcepath}/credentials">
         <include name="*.json"/>

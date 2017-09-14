@@ -14,9 +14,30 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package org.payments.cepa;
 
-public class Version {
-    public final static String PROTOCOL = "0.57";
-    public final static String DATE     = "2017-09-09";
+import java.io.IOException;
+
+import org.webpki.json.JSONDecoder;
+import org.webpki.json.JSONObjectReader;
+
+public final class CEPAAregDecoder extends JSONDecoder {
+
+    private static final long serialVersionUID = 1L;
+
+    String payeeIban;
+
+    @Override
+    protected void readJSONData(JSONObjectReader rd) throws IOException {
+        payeeIban = rd.getString(CEPAAregEncoder.PAYEE_IBAN_JSON);
+    }
+
+    public String getPayeeIban() {
+        return payeeIban;
+    }
+
+    @Override
+    public String getContext() {
+        return CEPAAregEncoder.AREQ_CONTEXT;
+    }
 }

@@ -27,14 +27,6 @@
   		<param name="file" value="AuthorizationRequest"/>
     </antcall>
   	<antcall target="_final">
-  		<param name="var" value="optionalPayeeAccount"/>
-  		<param name="file" value="AuthorizationRequest"/>
-    </antcall>
-  	<antcall target="_final">
-  		<param name="var" value="additionalPayeeData"/>
-  		<param name="file" value="AuthorizationRequest"/>
-    </antcall>
-  	<antcall target="_final">
   		<param name="var" value="optionalLogData"/>
   		<param name="file" value="AuthorizationResponse"/>
     </antcall>
@@ -64,10 +56,6 @@
     </antcall>
   	<antcall target="_final">
   		<param name="var" value="optionalExtensions"/>
-  		<param name="file" value="ProviderAuthority"/>
-    </antcall>
-  	<antcall target="_final">
-  		<param name="var" value="optionalProviderAccountTypes"/>
   		<param name="file" value="ProviderAuthority"/>
     </antcall>
   	<antcall target="_final">

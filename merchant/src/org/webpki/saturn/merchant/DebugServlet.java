@@ -156,7 +156,6 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
-        updateUrls(jsonTree, rewriter, ACQUIRER_AUTHORITY_URL_JSON);
         updateSpecific(jsonTree, rewriter, DOMAIN_NAME_JSON, "demomerchant.com");
         updateSpecific(jsonTree, rewriter, CLIENT_IP_ADDRESS_JSON, "220.13.198.144");
     }
@@ -386,12 +385,8 @@ class DebugPrintout implements BaseProperties {
                     keyWord(PAYMENT_REQUEST_JSON) + "), to the <b>User&nbsp;Bank</b>:</p>");
         
         fancyBox(debugData.authorizationRequest);
-        if (!debugData.acquirerMode) {
-            descriptionStdMargin("Note the use of " + keyWord(PAYEE_ACCOUNT_JSON) + 
-                    " which holds an object that is compatible with the " + 
-                    keyWord(PROVIDER_ACCOUNT_TYPES_JSON) + " of the (by the <b>Merchant</b>) retrieved " + 
-                    keyWord(Messages.PROVIDER_AUTHORITY) + " object.");
-        }
+            descriptionStdMargin("Note the use of " + keyWord(PAYMENT_METHOD_SPECIFIC_JSON) + 
+                    " which holds data needed for the actual payment method.");
         
         description(point.sub() + 
                 "<p>After receiving the " + keyWord(Messages.AUTHORIZATION_REQUEST) +
@@ -643,9 +638,9 @@ class DebugPrintout implements BaseProperties {
                 "<p>After validating the " +
                 keyWord(message) +
                 " and checking that the <b>User</b> actually has funds matching the request," +
-                " the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by " +
-                keyWord(PAYEE_ACCOUNT_JSON) +
-                " using a with both parties compatible payment scheme.</p>" +
+                " the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by the " +
+                keyWord(PAYMENT_METHOD_SPECIFIC_JSON) +
+                " object.</p>" +
                 "<p>Note that the actual payment process may be fully <i>asynchronous</i> where the " +
                 "authorization is only used for <i>initiation</i>.</p> ");
     }

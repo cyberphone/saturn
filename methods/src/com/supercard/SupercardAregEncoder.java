@@ -14,9 +14,28 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package com.supercard;
 
-public class Version {
-    public final static String PROTOCOL = "0.57";
-    public final static String DATE     = "2017-09-09";
+import java.io.IOException;
+
+import org.webpki.json.JSONObjectWriter;
+
+import org.webpki.saturn.common.PaymentMethodEncoder;
+
+public final class SupercardAregEncoder extends PaymentMethodEncoder {
+
+    static final String AREQ_CONTEXT    = "https://supercard.com/saturn/v3#areq";
+
+    public SupercardAregEncoder() {
+    }
+
+    @Override
+    protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
+        return wr;
+    }
+
+    @Override
+    public String getContext() {
+        return AREQ_CONTEXT;
+    }
 }

@@ -14,9 +14,23 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package com.supercard;
 
-public class Version {
-    public final static String PROTOCOL = "0.57";
-    public final static String DATE     = "2017-09-09";
+import java.io.IOException;
+
+import org.webpki.json.JSONDecoder;
+import org.webpki.json.JSONObjectReader;
+
+public final class SupercardAregDecoder extends JSONDecoder {
+
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    protected void readJSONData(JSONObjectReader rd) throws IOException {
+    }
+
+    @Override
+    public String getContext() {
+        return SupercardAregEncoder.AREQ_CONTEXT;
+    }
 }

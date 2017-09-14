@@ -48,6 +48,7 @@ import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
@@ -148,6 +149,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static long successfulTtransactions;
     
     static long rejectedTransactions;
+    
+    static JSONDecoderCache knownPaymentMethods = new JSONDecoderCache();
 
     static boolean logging;
     
@@ -211,6 +214,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             logging = getPropertyBoolean(LOGGING);
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
+            
+            knownPaymentMethods.addToCache(com.supercard.SupercardAregDecoder.class);
+            knownPaymentMethods.addToCache(org.payments.cepa.CEPAAregDecoder.class);
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
@@ -274,7 +280,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            bankHost,
                                            serviceUrl = bankHost + "/service",
                                            optionalProviderExtensions,
-                                           new String[]{"https://swift.com", "https://ultragiro.se"},
+                                           new String[]{"https://sepa.payments.org", "https://ultragiro.se"},
                                            new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                                            new ProviderAuthority.EncryptionParameter[]{
                     new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,

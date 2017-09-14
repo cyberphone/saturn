@@ -23,6 +23,8 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
+import org.webpki.json.JSONDecoder;
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
@@ -43,13 +45,7 @@ public class AuthorizationRequest implements BaseProperties {
         payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
-        if (rd.hasProperty(PAYEE_ACCOUNT_JSON)) {
-            optionalPayeeAccount = new AccountDescriptor(rd.getObject(PAYEE_ACCOUNT_JSON));
-        }
-        if (rd.hasProperty(ADDITIONAL_PAYEE_DATA_JSON)) {
-            additionalPayeeData = rd.getObject(ADDITIONAL_PAYEE_DATA_JSON);
-            rd.scanAway(ADDITIONAL_PAYEE_DATA_JSON);
-        }
+        rd.scanAway(PAYMENT_METHOD_SPECIFIC_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
@@ -80,14 +76,8 @@ public class AuthorizationRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    AccountDescriptor optionalPayeeAccount;
-    public AccountDescriptor getAccountDescriptor() {
-        return optionalPayeeAccount;
-    }
-
-    JSONObjectReader additionalPayeeData;
-    public JSONObjectReader getAdditionalPayeeData() {
-        return additionalPayeeData;
+    public JSONDecoder getPaymentMethodSpecific(JSONDecoderCache knownPaymentMethods) throws IOException {
+        return knownPaymentMethods.parse(root.clone().getObject(PAYMENT_METHOD_SPECIFIC_JSON));
     }
 
     GregorianCalendar timeStamp;
@@ -127,8 +117,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          AccountDescriptor optionalPayeeAccount,
-                                          JSONObjectReader additionalPayeeData,
+                                          PaymentMethodEncoder paymentMethodEncoder,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
@@ -138,10 +127,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setDynamic((wr) -> optionalPayeeAccount == null ? wr 
-                      : wr.setObject(PAYEE_ACCOUNT_JSON, optionalPayeeAccount.writeObject()))
-            .setDynamic((wr) -> additionalPayeeData == null ? wr 
-                      : wr.setObject(ADDITIONAL_PAYEE_DATA_JSON, additionalPayeeData))
+            .setObject(PAYMENT_METHOD_SPECIFIC_JSON, paymentMethodEncoder.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)

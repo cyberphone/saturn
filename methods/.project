@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>bank</name>
+	<name>methods</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -19,11 +19,6 @@
 			<name>common</name>
 			<type>2</type>
 			<locationURI>copy_PARENT/resources/common</locationURI>
-		</link>
-		<link>
-			<name>methods</name>
-			<type>2</type>
-			<locationURI>copy_PARENT/methods/src</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>

@@ -114,7 +114,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
                             tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
                             tableRow(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
-                            tableRow(rd, PROVIDER_ACCOUNT_TYPES_JSON, "Supported account types", true) +
+                            tableRow(rd, PROVIDER_PAYMENT_METHODS_JSON, "Supported payment methods") +
                             tableRow(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algorithms <i>recognized</i> by the provider") +
                             tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider") +
                             (rd.hasProperty(HOSTING_PROVIDER_JSON) ? 

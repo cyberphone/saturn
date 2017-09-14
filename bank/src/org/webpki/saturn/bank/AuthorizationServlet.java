@@ -24,8 +24,10 @@ import java.text.SimpleDateFormat;
 
 import java.util.Locale;
 
+import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
 
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -55,6 +57,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Decode authorization request message
         AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);
+        // Verify that we understand the payment method
+        JSONDecoder paymentMethod = authorizationRequest.getPaymentMethodSpecific(BankService.knownPaymentMethods);
 
         // Check that we actually were the intended party
         if (!BankService.serviceUrl.equals(authorizationRequest.getRecepientUrl())) {
@@ -65,6 +69,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
         NonDirectPayments nonDirectPayment = paymentRequest.getNonDirectPayment();
         boolean cardPayment = authorizationRequest.getPayerAccountType().isCardPayment();
+        if (cardPayment ^ paymentMethod instanceof com.supercard.SupercardAregDecoder) {
+            throw new IOException("Incompatible \"" + PAYMENT_METHOD_SPECIFIC_JSON + "\" data");
+        }
         
         // Get the providers. Note that caching could play tricks on you!
         PayeeAuthority payeeAuthority;
@@ -204,7 +211,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 "Authorized Amount=" + amount.toString() + 
                 ", AccountID=" + accountId + 
                 ", AccountType=" + accountType + 
-                ", Client IP=" + clientIpAddress);
+                ", Client IP=" + clientIpAddress +
+                ", Method=" + paymentMethod.getWriter().serializeToString(JSONOutputFormats.NORMALIZED));
 
         String optionalLogData = null;
         if (!testMode) {
