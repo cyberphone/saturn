@@ -6,14 +6,14 @@ Note: Although the currently published PSD2 APIs certainly are not identical, th
 
 This document focuses on PSD2 for *payments* which in PSD2 is accomplished through PISPs (Payment Initiation Service Providers).
 
-### Certification and Authentication
-Since PSD2 APIs provide access to sensitive data in arbitrary banks
+### Certification and Authentication Requirements
+Since PSD2 APIs provide access to *sensitive data* in arbitrary banks
 without necessarily having a contract, creates a requirement for *certification*.
 This also implies specific CAs (Certification Authorities) as well as centralized registries
 holding data about PSD2 service providers.  A potential problem is that the cost for certification may
 be high and may also prove to be somewhat less easy to get acceptance for on a European or global level.
 
-### User Interfaces
+### User Interface Issues
 Due to the fact that PSD2 APIs operate at the same trust level as banks,
 they (*quite logically*) build on *reusing* the banks' existing (and *arbitrary complex*),
 on-line banking authentication solutions and user interfaces.
@@ -23,13 +23,13 @@ users would most likely have to *manually select* which *bank-specific* "wallet"
 
 ### Not yet Standardized
 The lack of a standardized PSD2 API complicates roll-out considerably but may be less of a
-problem for finanical services than for payments.
+problem for financial services than for payments.
 
 ## Saturn - Optimized for Payments
 To cope with these issues a light-weight tightly-scoped system, coined "Saturn" was developed which
-- Does not depend on third party certification since *there is no third party to certify*
-- Does not expose *any* private information to external parties
-- Builds on a slightly enhanced variant of the firmly
+- does not depend on third party certification since *there is no third party to certify*
+- does not expose *any* private information to external parties
+- builds on a slightly enhanced variant of the firmly
 established *four corner* model, obviating the need for PISPs altogether
 
 Saturn, by only dealing with payments, adopts the well-known card paradigm (although the
