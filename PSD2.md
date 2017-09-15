@@ -27,16 +27,16 @@ problem for financial services than for payments.
 
 ## Saturn - Optimized for Payments
 To cope with these issues a light-weight tightly-scoped system, coined "Saturn" was developed which:
-- does not depend on third party certification since *there is no third party to certify*
-- does not expose *any* private information to external parties
-- builds on a slightly enhanced variant of the firmly
-established *four corner* model, obviating the need for PISPs altogether
+- Does not depend on third party certification since *there is no third party to certify*.
+- Does not expose *any* private information to external parties.
+- Builds on a slightly enhanced variant of the firmly
+established "four corner" model, *obviating the need for PISPs altogether*.
 
 Saturn, by only dealing with payments, adopts the well-known card paradigm (although the
 underlying technology is quite different), making it *technically* feasible having
 a single "wallet" for all parties, *exactly like Apple and Google already have*.
 
-In addition to the things stated above, there is bunch of other
+In addition to the things stated above, Saturn addresses a bunch of other
 parameters summarized in the following table:
 https://cyberphone.github.io/doc/saturn/saturn--wallet-using-credit-transfer.pdf
 
