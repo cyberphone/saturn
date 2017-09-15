@@ -18,6 +18,7 @@ Due to the fact that PSD2 APIs operate at the same trust level as banks,
 they (*quite logically*) build on *reusing* the banks' existing (and *arbitrary complex*),
 on-line banking authentication solutions and user interfaces.
 However, this introduces a *dependency* which card-based payment solutions never had.
+
 If you brought the current PSD2 API concept to the POS (Point of Sale) terminal,
 users would most likely have to *manually select* which *bank-specific* "wallet" to use.
 
