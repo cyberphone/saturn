@@ -4,7 +4,7 @@ open APIs to customers' bank accounts.
 
 Note: Although the currently published PSD2 APIs certainly are not identical, they seem anyway sharing a common "conceptual" model.
 
-This document focuses on PSD2 for *payments* which in PSD2 is accomplished through PISPs (Payment Initiation Service Providers).
+This document focuses on PSD2 for *payments* which in PSD2 are facilitated through PISPs (Payment Initiation Service Providers).
 
 ### Certification and Authentication Requirements
 Since PSD2 APIs provide access to *sensitive data* in arbitrary banks
@@ -26,7 +26,7 @@ The lack of a standardized PSD2 API complicates roll-out considerably but may be
 problem for financial services than for payments.
 
 ## Saturn - Optimized for Payments
-To cope with these issues a light-weight tightly-scoped system, coined "Saturn" was developed which
+To cope with these issues a light-weight tightly-scoped system, coined "Saturn" was developed which:
 - does not depend on third party certification since *there is no third party to certify*
 - does not expose *any* private information to external parties
 - builds on a slightly enhanced variant of the firmly
