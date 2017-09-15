@@ -8,7 +8,7 @@ This document focuses on PSD2 for *payments* which in PSD2 are facilitated throu
 
 ### Certification and Authentication Requirements
 Since PSD2 APIs provide access to *sensitive data* in arbitrary banks
-without necessarily having a contract, creates a requirement for *certification*.
+without necessarily having a contract, there is a *certification requirement*.
 This also implies specific CAs (Certification Authorities) as well as centralized registries
 holding data about PSD2 service providers.  A potential problem is that the cost for certification may
 be high and may also prove to be somewhat less easy to get acceptance for on a European or global level.
