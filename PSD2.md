@@ -30,14 +30,14 @@ To cope with these issues a light-weight tightly-scoped system, coined "Saturn" 
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
 - Does not expose *any* private information to external parties.
-- Finally unleashes the true power of *decentralization*.
+- Finally unleashes the true power of *decentralization*!
 
 Saturn, by only dealing with payments, adopts the well-known card paradigm (although the
 underlying technology is quite different), making it *technically* feasible having
 a single "wallet" for all parties, *exactly like Apple and Google already have*.
 
-In addition to the things stated above, Saturn addresses a bunch of other
-parameters summarized in the following table:
+In addition to the things stated above, Saturn addresses several other
+parameters as well, summarized in the following table:
 https://cyberphone.github.io/doc/saturn/saturn--wallet-using-credit-transfer.pdf
 
 For readers with strong interests in technology, a peek in 
