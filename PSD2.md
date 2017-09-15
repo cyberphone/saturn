@@ -27,10 +27,10 @@ problem for financial services than for payments.
 
 ## Saturn - Optimized for Payments
 To cope with these issues a light-weight tightly-scoped system, coined "Saturn" was developed which:
-- Does not depend on third party certification since *there is no third party to certify*.
-- Does not expose *any* private information to external parties.
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
+- Does not expose *any* private information to external parties.
+- Finally unleashes the true power of *decentralization*.
 
 Saturn, by only dealing with payments, adopts the well-known card paradigm (although the
 underlying technology is quite different), making it *technically* feasible having
