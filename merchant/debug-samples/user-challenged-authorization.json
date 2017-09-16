@@ -1,22 +1,22 @@
 {
   "requestHash": {
     "algorithm": "S256",
-    "value": "Bh7IX3QmhvZ7BW7PqzOMKy51ODN_fIa7XKBf4oJrjlk"
+    "value": "kfV1zzbzFX_U3jTuXmMivIHQR7yt9DIwrc9jhuKIx30"
   },
   "domainName": "localhost",
   "account": {
-    "type": "https://supercard.com",
-    "id": "6875056745552109"
+    "type": "https://bankdirect.net",
+    "id": "8645-7800239403"
   },
   "encryptionParameters": {
     "algorithm": "A128CBC-HS256",
-    "key": "Pd2IoYEEmw9kZTemffuqP9kNrKCCNpJPr-GNe3qrT4c"
+    "key": "eMbZhrtqOZnraV9soyE2dxQDvQ2k27TUoqdWpVNP90Y"
   },
   "userResponseItems": [{
     "id": "mother",
     "text": "garbo"
   }],
-  "timeStamp": "2017-04-16T17:52:24+02:00",
+  "timeStamp": "2017-09-16T07:07:27+02:00",
   "software": {
     "name": "WebPKI.org - Wallet",
     "version": "1.00"
@@ -26,9 +26,9 @@
     "publicKey": {
       "kty": "EC",
       "crv": "P-256",
-      "x": "MNGpxRCX3nbLR2IsLIVUpNDkbGJs4FaSCPW0odyIXMY",
-      "y": "8gsEOvO5Y5HL-s092cmKp1MQXWUmytp4jBEvnw67weM"
+      "x": "rQ4WXMB6_wQKHSiY_mbJ4QkGpfWLssF7hvIiiFpDEx8",
+      "y": "Fh2rl0LGTtvaomOuhuRNo9Drz9o0--WXV2ITvdVQFRY"
     },
-    "value": "ZmUNUNpGxCimsXDxh8P-9E0lVOE_OptC_3dbnaZP-35C2bDLi4ZjYGo4BfLMII1WiYNkHFBIg7KXa9C7fKz7mg"
+    "value": "oVbDkymm5sAc-kjfR_k3SfByMcVRtBowI1hsr3Tf5lTIiasODjdnuJlet5hHy8s7930u9yNC8NO2F_g-JA4oAw"
   }
 }

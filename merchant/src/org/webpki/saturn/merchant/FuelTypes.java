@@ -39,6 +39,6 @@ public enum FuelTypes implements Serializable {
     }
     
     String displayPrice() throws IOException {
-        return Currencies.USD.amountToDisplayString(new BigDecimal(pricePerLitreX100).divide(new BigDecimal(100)), false);
+        return Currencies.EUR.amountToDisplayString(new BigDecimal(pricePerLitreX100).divide(new BigDecimal(100)), false);
     }
 }

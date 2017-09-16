@@ -326,7 +326,7 @@ public class HTML implements MerchantProperties {
             "var shoppingCart = [];\n");
 
         HTML.output(response, HTML.getHTML(temp_string.toString(),
-            "onload=\"closeFundFlash()\"><div id=\"fundlimit\" style=\"position:absolute;left:15pt;bottom:15pt;z-index:3;font-size:8pt\">Your funds at the bank are limited to $1M...</div>" +
+            "onload=\"closeFundFlash()\"><div id=\"fundlimit\" style=\"position:absolute;left:15pt;bottom:15pt;z-index:3;font-size:8pt\">Your funds at the bank are limited to 1MEUR...</div>" +
             "<div id=\"emptybasket\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:"
             + FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">Nothing ordered yet...</div",
             page_data.toString()));
@@ -697,7 +697,7 @@ public class HTML implements MerchantProperties {
                      "<td align=\"center\" style=\"box-shadow:5pt 5pt 5pt #c0c0c0;background:linear-gradient(135deg, #516287 0%,#5697e2 71%,#5697e2 71%,#516287 100%);border-radius:4pt\">" +
                      "<div style=\"padding:3pt;font-size:12pt;color:white\">Pump O'Matic</div>")
              .append(pumpDisplay(3, 1, "Volume", "Litres", "pvol"))
-             .append(pumpDisplay(3, 2, "To Pay", "$", "ppri"))
+             .append(pumpDisplay(3, 2, "To Pay", "&#8364;", "ppri"))
              .append("</td></tr></table></td></tr>");
         }
         return s.append("<tr><td id=\"phase\" style=\"padding-bottom:10pt;text-align:center;" +
@@ -866,7 +866,7 @@ public class HTML implements MerchantProperties {
             gasStation("1. Select Fuel Type", false) +
             "<tr id=\"authtext\" style=\"display:none\"><td style=\"width:40em;padding-bottom:15pt\">Since the quantity of fuel is usually not known in an advance, " +
             "automated fueling stations require <i>pre-authorization</i> of a fixed maximum amount of money (" +
-            Currencies.USD.amountToDisplayString(new BigDecimal(GasStationServlet.STANDARD_RESERVATION_AMOUNT_X_100 / 100), true) +
+            Currencies.EUR.amountToDisplayString(new BigDecimal(GasStationServlet.STANDARD_RESERVATION_AMOUNT_X_100 / 100), true) +
             " in the demo), while only the actual amount " +
             "needed is eventually withdrawn from the client's account. This should be reflected in the Wallet's " +
             "authorization display as well.</td></tr>" +
