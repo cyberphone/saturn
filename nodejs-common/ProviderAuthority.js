@@ -43,6 +43,8 @@ ProviderAuthority.encode = function(authorityUrl,
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.HOME_PAGE_JSON, homePage)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
+    .setArray(BaseProperties.PROVIDER_PAYMENT_METHODS_JSON, 
+              new JsonUtil.ArrayWriter().setString('https://supercard.com'))
     .setArray(BaseProperties.SIGNATURE_PROFILES_JSON, 
               new JsonUtil.ArrayWriter().setString('http://webpki.org/saturn/v3/signatures#P-256.ES256'))
     .setArray(BaseProperties.ENCRYPTION_PARAMETERS_JSON, 

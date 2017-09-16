@@ -39,13 +39,8 @@ function AuthorizationRequest(rd) {
   this.payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(BaseProperties.ACCOUNT_TYPE_JSON));
   this.paymentRequest = new PaymentRequest(rd.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
   this.encryptedAuthorizationData = rd.getObject(BaseProperties.ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject();
-  if (rd.hasProperty(BaseProperties.PAYEE_ACCOUNT_JSON)) {
-    this.payeeAccount = new AccountDescriptor(rd.getObject(BaseProperties.PAYEE_ACCOUNT_JSON));
-  }
-  if (rd.hasProperty(BaseProperties.ADDITIONAL_PAYEE_DATA_JSON)) {
-    this.additionalPayeeData = rd.getObject(BaseProperties.ADDITIONAL_PAYEE_DATA_JSON);
-    rd.scanItem(BaseProperties.ADDITIONAL_PAYEE_DATA_JSON);
-  }
+  this.paymentMethodSpecific = rd.getObject(BaseProperties.PAYMENT_METHOD_SPECIFIC_JSON);
+  rd.scanItem(BaseProperties.PAYMENT_METHOD_SPECIFIC_JSON);
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.clientIpAddress = rd.getString(BaseProperties.CLIENT_IP_ADDRESS_JSON);
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);

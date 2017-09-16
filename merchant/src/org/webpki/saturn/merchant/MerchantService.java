@@ -51,6 +51,7 @@ import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 
 import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PayerAccountTypes;
 import org.webpki.saturn.common.Currencies;
@@ -100,8 +101,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String USER_AUTHZ_SAMPLE            = "user-authorization.json";
 
     static final String USER_CHALL_AUTHZ_SAMPLE      = "user-challenged-authorization.json";
-
-    static final String ENCRYPTED_MESSAGE_SAMPLE     = "encrypted-message.json";
 
     static final String PROV_USER_RESPONSE_SAMPLE    = "provider-user-response.json";
 
@@ -291,9 +290,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));
 
-            encryptedMessageSample = new EncryptedMessage(readJSONFile(ENCRYPTED_MESSAGE_SAMPLE));
-
             new ProviderUserResponse(providerUserResponseSample = readJSONFile(PROV_USER_RESPONSE_SAMPLE));
+            
+            encryptedMessageSample = new EncryptedMessage(JSONParser.parse(
+                providerUserResponseSample.getObject(BaseProperties.ENCRYPTED_MESSAGE_JSON)
+                    .getEncryptionObject()
+                        .getDecryptedData(
+                    userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
+                        .getBinary(BaseProperties.KEY_JSON))));
 
             walletSupercardAuthz = getImageDataURI(SUPERCARD_AUTHZ_SAMPLE);
 

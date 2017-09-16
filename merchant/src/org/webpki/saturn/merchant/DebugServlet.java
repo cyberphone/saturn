@@ -544,8 +544,8 @@ class DebugPrintout implements BaseProperties {
     private void authorizationResponse() throws IOException, GeneralSecurityException {
         JSONObjectWriter sampleAccountData = ProtectedAccountData.encode(
             new AccountDescriptor(debugData.acquirerMode ?
-                    PayerAccountTypes.SUPER_CARD.getTypeUri() : "https://swift.com",
-                                  debugData.acquirerMode ? "6875056745552109" : "IBAN:FR1420041010050500013M02606"),
+                    PayerAccountTypes.SUPER_CARD.getTypeUri() : "https://sepa.payments.org",
+                                  debugData.acquirerMode ? "6875056745552109" : "FR1420041010050500013M02606"),
             debugData.acquirerMode ?
                 new CardSpecificData("Luke Skywalker", 
                                      ISODateTime.parseDateTime("2022-03-14T00:00:00Z"),

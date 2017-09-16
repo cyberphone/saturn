@@ -66,7 +66,7 @@
     <property name="security.actual" value=""/>
     <property name="server.port.map" value=""/>
     <property name="unusualcard" value="false"/>
-    <property name="currency" value="USD"/>
+    <property name="currency" value="EUR"/>
     <property name="bouncycastle.first" value="true"/>
     <property name="other.key" value=""/>
     <fixcrlf srcdir="${src.dir}"

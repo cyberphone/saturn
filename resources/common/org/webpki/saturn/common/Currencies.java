@@ -18,13 +18,18 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 import java.io.Serializable;
+
 import java.math.BigDecimal;
+
 import java.util.regex.Pattern;
 
 public enum Currencies implements Serializable {
 
     USD ("$\u200a",       true,  2), 
-    EUR ("\u2009\u20ac",  false, 2),
+/*
+    EUR ("\u2009\u20ac",  false, 2),  // French notation
+*/
+    EUR ("\u20ac\u200a",  true,  2),  // English notation
     GBP ("\u00a3\u200a",  true,  2);
 
     public String symbol;

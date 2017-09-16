@@ -49,8 +49,6 @@ const BaseProperties = {
     PAYMENT_NETWORKS_JSON            : 'paymentNetworks',
     PAYMENT_REQUEST_JSON             : 'paymentRequest',
     HTTP_VERSION_JSON                : 'httpVersion',                // For per partner being able to use HTTP/2 and further
-    ACQUIRER_AUTHORITY_URL_JSON      : 'acquirerAuthorityUrl',       // For CreditCard payments
-    PAYEE_ACCOUNT_JSON               : 'payeeAccount',               // Selected payee Account2Account
     EXPIRES_JSON                     : 'expires',                    // Object expiration time
     RECEPIENT_URL_JSON               : 'recepientUrl',               // Where we are sending (target address)
     AUTHORITY_URL_JSON               : 'authorityUrl',               // Double use self in *Authority objects and initiator
@@ -59,14 +57,14 @@ const BaseProperties = {
     CURRENCY_JSON                    : 'currency',
     NON_DIRECT_PAYMENT_JSON          : 'nonDirectPayment',           // Deposit, automated gas station, booking
     TIME_STAMP_JSON                  : 'timeStamp',
-    TRANSACTION_ID_JSON              : 'transactionId',
+    PROVIDER_PAYMENT_METHODS_JSON    : 'providerPaymentMethods',     // List of provider-supported payment methods
+    PAYMENT_METHOD_SPECIFIC_JSON     : 'paymentMethodSpecific',      // Holding a payment method specific object
     CLIENT_IP_ADDRESS_JSON           : 'clientIpAddress',            // Security data for the payment provider
     CLIENT_GEO_LOCATION_JSON         : 'clientGeoLocation',          // Optional security data that client devices may supply
     LOG_DATA_JSON                    : 'logData',                    // Insertion of external log data
     REFERENCE_ID_JSON                : 'referenceId',
     PAYEE_JSON                       : 'payee',                      // Payee object
     TEST_MODE_JSON                   : 'testMode',                   // Test mode = no real money involved
-    ADDITIONAL_PAYEE_DATA_JSON       : 'additionalPayeeData',        // Optional object in an AuthorizationRequest
     ENCRYPTED_AUTHORIZATION_JSON     : 'encryptedAuthorization',     // Payer authorization data
     PROVIDER_AUTHORITY_URL_JSON      : 'providerAuthorityUrl',       // URL to payment provider
     PROVIDER_ACCOUNT_TYPES_JSON      : 'providerAccountTypes',       // List of Account2Account types "understood" by provider
