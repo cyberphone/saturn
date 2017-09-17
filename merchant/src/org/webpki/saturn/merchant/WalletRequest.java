@@ -61,7 +61,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         LinkedHashMap<String,JSONObjectWriter> requests = new LinkedHashMap<String,JSONObjectWriter>();
 
         // Create a signed payment request for each payment network
-         for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
+        for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
             JSONObjectWriter paymentRequest =
                 PaymentRequest.encode(new Payee(MerchantService.merchantCommonName, paymentNetwork.merchantId),
                                       new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
