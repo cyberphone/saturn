@@ -912,7 +912,7 @@ public class Wallet {
                                     if (comparePaymentRequest == null) {
                                         comparePaymentRequest = paymentRequest;
                                     } else {
-                                        paymentRequest.consistencyCheck(paymentRequest);
+                                        comparePaymentRequest.consistencyCheck(paymentRequest);
                                     }
                                     // Primary information to the user...
                                     amountString = paymentRequest.getCurrency()
