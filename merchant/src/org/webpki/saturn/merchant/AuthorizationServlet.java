@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.payments.cepa.CEPAAregEncoder;
+import org.payments.sepa.SEPAAreqEncoder;
 
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
@@ -126,7 +126,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         } else {
             for (String paymentMethod : providerAuthority.getProviderPaymentMethods()) {
                 if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
-                    paymentMethodEncoder = new CEPAAregEncoder(MERCHANT_ACCOUNT_ID);
+                    paymentMethodEncoder = new SEPAAreqEncoder(MERCHANT_ACCOUNT_ID);
                     break;
                 }
             }

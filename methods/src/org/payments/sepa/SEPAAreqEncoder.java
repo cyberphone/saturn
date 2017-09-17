@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.payments.cepa;
+package org.payments.sepa;
 
 import java.io.IOException;
 
@@ -22,7 +22,7 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.PaymentMethodEncoder;
 
-public final class CEPAAregEncoder extends PaymentMethodEncoder {
+public final class SEPAAreqEncoder extends PaymentMethodEncoder {
 
     static final String AREQ_CONTEXT    = "https://sepa.payments.org/saturn/v3#areq";
 
@@ -30,7 +30,7 @@ public final class CEPAAregEncoder extends PaymentMethodEncoder {
 
     String payeeIban;
 
-    public CEPAAregEncoder(String payeeIban) {
+    public SEPAAreqEncoder(String payeeIban) {
         this.payeeIban = payeeIban;
     }
 

@@ -14,14 +14,14 @@
  *  limitations under the License.
  *
  */
-package org.payments.cepa;
+package org.payments.sepa;
 
 import java.io.IOException;
 
 import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONObjectReader;
 
-public final class CEPAAregDecoder extends JSONDecoder {
+public final class SEPAAreqDecoder extends JSONDecoder {
 
     private static final long serialVersionUID = 1L;
 
@@ -29,7 +29,7 @@ public final class CEPAAregDecoder extends JSONDecoder {
 
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        payeeIban = rd.getString(CEPAAregEncoder.PAYEE_IBAN_JSON);
+        payeeIban = rd.getString(SEPAAreqEncoder.PAYEE_IBAN_JSON);
     }
 
     public String getPayeeIban() {
@@ -38,6 +38,6 @@ public final class CEPAAregDecoder extends JSONDecoder {
 
     @Override
     public String getContext() {
-        return CEPAAregEncoder.AREQ_CONTEXT;
+        return SEPAAreqEncoder.AREQ_CONTEXT;
     }
 }
