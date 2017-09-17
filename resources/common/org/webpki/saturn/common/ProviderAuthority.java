@@ -100,7 +100,8 @@ public class ProviderAuthority implements BaseProperties {
                 }
                 return wr;
             })
-            .setDynamic((wr) -> optionalHostingProvider == null ? wr : optionalHostingProvider.writeObject(wr))
+            .setDynamic((wr) -> optionalHostingProvider == null ? 
+                wr : wr.setObject(HOSTING_PROVIDER_JSON, optionalHostingProvider.writeObject()))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
             .setSignature(signer);
@@ -184,7 +185,7 @@ public class ProviderAuthority implements BaseProperties {
         // have outsourced the administration of Merchants to a Hosting
         // facility which it vouches for here
         if (rd.hasProperty(HOSTING_PROVIDER_JSON)) {
-            optionalHostingProvider = new HostingProvider(rd);
+            optionalHostingProvider = new HostingProvider(rd.getObject(HOSTING_PROVIDER_JSON));
         }
 
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
