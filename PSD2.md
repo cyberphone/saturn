@@ -26,7 +26,7 @@ users would most likely have to *manually select* which *bank-specific* "wallet"
 The lack of a standardized PSD2 API complicates roll-out considerably but may be less of a
 problem for financial services than for payments.
 
-## Saturn - Optimized for Payments
+# Saturn - Optimized for Payments
 To cope with these issues a light-weight tightly-scoped system, coined "Saturn" was developed which:
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
