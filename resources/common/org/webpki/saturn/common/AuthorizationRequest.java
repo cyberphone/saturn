@@ -23,7 +23,6 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
-import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -76,8 +75,14 @@ public class AuthorizationRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    public JSONDecoder getPaymentMethodSpecific(JSONDecoderCache knownPaymentMethods) throws IOException {
-        return knownPaymentMethods.parse(root.clone().getObject(PAYMENT_METHOD_SPECIFIC_JSON));
+    public PaymentMethodDecoder getPaymentMethodSpecific(JSONDecoderCache knownPaymentMethods) throws IOException {
+        PaymentMethodDecoder paymentMethod =
+            (PaymentMethodDecoder) knownPaymentMethods.parse(root.clone().getObject(PAYMENT_METHOD_SPECIFIC_JSON));
+        if (!paymentMethod.match(payerAccountType)) {
+            throw new IOException("\"" + PAYMENT_METHOD_SPECIFIC_JSON + 
+                                  "\" data incompatible with \"" + ACCOUNT_TYPE_JSON + "\"");
+        }
+        return paymentMethod;
     }
 
     GregorianCalendar timeStamp;

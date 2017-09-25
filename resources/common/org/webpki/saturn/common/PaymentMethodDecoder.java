@@ -14,30 +14,16 @@
  *  limitations under the License.
  *
  */
-package com.supercard;
+package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONDecoder;
 
-import org.webpki.saturn.common.PayerAccountTypes;
-import org.webpki.saturn.common.PaymentMethodDecoder;
-
-public final class SupercardAregDecoder extends PaymentMethodDecoder {
+public abstract class PaymentMethodDecoder extends JSONDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    @Override
-    protected void readJSONData(JSONObjectReader rd) throws IOException {
-    }
+    public abstract boolean match(PayerAccountTypes payerAccountType) throws IOException;
 
-    @Override
-    public String getContext() {
-        return SupercardAregEncoder.AREQ_CONTEXT;
-    }
-
-    @Override
-    public boolean match(PayerAccountTypes payerAccountType) throws IOException {
-        return PayerAccountTypes.SUPER_CARD == payerAccountType;
-    }
 }

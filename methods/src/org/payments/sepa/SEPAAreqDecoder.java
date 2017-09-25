@@ -18,10 +18,12 @@ package org.payments.sepa;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONObjectReader;
 
-public final class SEPAAreqDecoder extends JSONDecoder {
+import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethodDecoder;
+
+public final class SEPAAreqDecoder extends PaymentMethodDecoder {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,5 +41,10 @@ public final class SEPAAreqDecoder extends JSONDecoder {
     @Override
     public String getContext() {
         return SEPAAreqEncoder.AREQ_CONTEXT;
+    }
+
+    @Override
+    public boolean match(PayerAccountTypes payerAccountType) throws IOException {
+        return PayerAccountTypes.BANK_DIRECT == payerAccountType;
     }
 }
