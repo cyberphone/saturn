@@ -32,7 +32,7 @@ To cope with these issues a light-weight tightly-scoped system, coined "Saturn" 
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
 - Does not expose *any* private information to external parties.
-- Finally unleashes the true power of *decentralization*!
+- Finally unleashes the true power of the *decentralized* banking network!
 
 Saturn, by only dealing with payments, adopts the well-known card paradigm (although the
 underlying technology is quite different), making it *technically* feasible having
