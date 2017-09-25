@@ -5,7 +5,7 @@ open APIs to customers' bank accounts.
 Although the currently published PSD2 APIs certainly are not identical, they seem anyway sharing a common "conceptual" model.
 
 This document focuses on PSD2 for *Payments* which in PSD2 are facilitated through PISPs (Payment Initiation Service Providers).
-It is in this context worth noting that current consumer payment are using specialized "rails" like EMV rather than through *Banking* interfaces.
+It is in this context worth noting that consumer payment are currently performed through dedicated payment "rails" like EMV, *which do not rely on direct access to accounts by third parties*.
 
 ### Certification and Authentication Requirements
 Since PSD2 APIs provide access to *sensitive data* in arbitrary banks
