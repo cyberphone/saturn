@@ -46,7 +46,7 @@ For readers with strong interests in technology, a peek in
 https://cyberphone.github.io/doc/saturn/saturn-authorization.pdf
 may also be of some use.
 
-### So PISP APIs are Useless?
-Not at all; they are highly useful for "Banking" like:
-- Moving money between accounts in different banks.
+### So PISP APIs are Useless for Payments?
+Not at all; they are highly useful for payments as a part of "Banking" like:
+- Account management (moving money between accounts in different banks).
 - Bill payments. 
