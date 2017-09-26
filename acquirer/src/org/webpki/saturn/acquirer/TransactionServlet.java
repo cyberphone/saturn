@@ -20,9 +20,10 @@ import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
 
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.ProtectedAccountData;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
@@ -55,14 +56,10 @@ public class TransactionServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(payee, transactionRequest.getSignatureDecoder());
         payeeCoreProperties.verify(payee, paymentRequest.getSignatureDecoder());
 
-        // Get card data
-        ProtectedAccountData protectedAccountData = transactionRequest.getProtectedAccountData(AcquirerService.decryptionKeys);
-        if (AcquirerService.logging) {
-            logger.info("Payer account data: " + protectedAccountData);
-        }
+        AccountDataDecoder accountData = getAccountData(transactionRequest.getAuthorizationResponse());
         boolean testMode = transactionRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
-                    "Acquiring for AccountID=" + protectedAccountData.getAccount().getId() + 
+                    "Acquiring for Account=" + accountData.logLine() + 
                     ", Amount=" + transactionRequest.getAmount().toString() +
                     " " + paymentRequest.getCurrency().toString());
         

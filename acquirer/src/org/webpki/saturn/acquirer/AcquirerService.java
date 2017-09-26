@@ -49,6 +49,7 @@ import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
+import org.webpki.json.JSONDecoderCache;
 
 import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.DecryptionKeyHolder;
@@ -118,6 +119,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     
     static AuthorityObjectManager authorityObjectManager;
     
+    static JSONDecoderCache knownAccountTypes = new JSONDecoderCache();
+    
     static boolean logging;
 
     
@@ -180,8 +183,9 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         try {
             logging = getPropertyBoolean(LOGGING);
 
-             
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
+            
+            knownAccountTypes.addToCache(com.supercard.SupercardAresDecoder.class);
 
             KeyStoreEnumerator acquirercreds = new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD));

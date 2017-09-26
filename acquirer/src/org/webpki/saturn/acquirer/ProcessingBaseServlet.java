@@ -19,6 +19,8 @@ package org.webpki.saturn.acquirer;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import java.security.GeneralSecurityException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,6 +33,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.AccountDataDecoder;
+import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
@@ -49,6 +53,12 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     static String getReferenceId() {
         return "#" + (referenceId++);
+    }
+
+    static AccountDataDecoder getAccountData(AuthorizationResponse authorizationResponse)
+    throws IOException, GeneralSecurityException {
+        return authorizationResponse.getProtectedAccountData(AcquirerService.knownAccountTypes,
+                                                             AcquirerService.decryptionKeys);
     }
 
     abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception;

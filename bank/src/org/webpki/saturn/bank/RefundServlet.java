@@ -21,7 +21,7 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AccountDescriptor;
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.UrlHolder;
@@ -51,12 +51,13 @@ public class RefundServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(payee, refundRequest.getSignatureDecoder());
 
         // Get payer account data.
-        AccountDescriptor accountDescriptor = refundRequest.getProtectedAccountData(BankService.decryptionKeys).getAccount();
+        AccountDataDecoder accountData = 
+            refundRequest.getAuthorizationResponse().getProtectedAccountData(BankService.knownAccountTypes,
+                                                                             BankService.decryptionKeys);
 
         boolean testMode = refundRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
-                    "Refunding for AccountID=" + accountDescriptor.getId() +
-                    " Type=" + accountDescriptor.getType() +
+                    "Refunding for Account=" + accountData.logLine() +
                     ", Amount=" + refundRequest.getAmount().toString() +
                     " " + refundRequest.getPaymentRequest().getCurrency().toString());
         String optionalLogData = null;

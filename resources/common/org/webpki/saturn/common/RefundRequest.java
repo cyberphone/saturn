@@ -20,18 +20,12 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
-import java.util.Vector;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Verifier;
-
-import org.webpki.json.encryption.DecryptionKeyHolder;
 
 public class RefundRequest implements BaseProperties {
     
@@ -116,14 +110,6 @@ public class RefundRequest implements BaseProperties {
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 
                                                       PaymentRequest.SOFTWARE_VERSION))
             .setSignature(signer);
-    }
-
-    public ProtectedAccountData getProtectedAccountData(Vector<DecryptionKeyHolder> decryptionKeys)
-    throws IOException, GeneralSecurityException {
-        return new ProtectedAccountData(JSONParser.parse(authorizationResponse
-                                                             .encryptedAccountData
-                                                                 .getDecryptedData(decryptionKeys)),
-                                        authorizationResponse.authorizationRequest.payerAccountType);
     }
 
     public void verifyPayerBank(JSONX509Verifier paymentRoot) throws IOException {

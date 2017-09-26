@@ -20,9 +20,8 @@ import java.io.IOException;
 
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 
-public abstract class EncryptedAccountDataEncoder {
+public abstract class AccountDataEncoder {
 
     protected abstract JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException;
     
@@ -32,7 +31,7 @@ public abstract class EncryptedAccountDataEncoder {
         return null;  // Optional
     }
     
-    public byte[] writeObject() throws IOException {
+    public JSONObjectWriter writeObject() throws IOException {
         return new JSONObjectWriter()
             .setString(JSONDecoderCache.CONTEXT_JSON, getContext())
             .setDynamic((wr) -> {
@@ -40,6 +39,6 @@ public abstract class EncryptedAccountDataEncoder {
                     wr.setString(JSONDecoderCache.QUALIFIER_JSON, getQualifier());
                 }
                 return writeObject(wr);
-            }).serializeToBytes(JSONOutputFormats.NORMALIZED);
+            });
     }
 }

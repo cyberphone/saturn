@@ -14,36 +14,27 @@
  *  limitations under the License.
  *
  */
-package com.supercard;
+package org.payments.sepa;
 
 import java.io.IOException;
 
-import java.util.GregorianCalendar;
-
 import org.webpki.json.JSONObjectReader;
 
-import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.AccountDataDecoder;
 
-public final class SupercardAresDecoder extends AccountDataDecoder {
+public final class SEPAAresDecoder extends AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    String cardNumber;                   // PAN
-    String cardHolder;                   // Name
-    GregorianCalendar expirationDate;    // Card expiration date
-    String securityCode;                 // CCV or similar
+    String payerIban;
 
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        cardNumber = rd.getString(SupercardAresEncoder.CARD_NUMBER_JSON);
-        cardHolder = rd.getString(SupercardAresEncoder.CARD_HOLDER_JSON);
-        expirationDate = rd.getDateTime(BaseProperties.EXPIRES_JSON);
-        securityCode = rd.getString(SupercardAresEncoder.SECURITY_CODE_JSON);
+        payerIban = rd.getString(SEPAAresEncoder.PAYER_IBAN_JSON);
     }
 
     @Override
     public String getContext() {
-        return SupercardAresEncoder.ARES_CONTEXT;
+        return SEPAAresEncoder.ARES_CONTEXT;
     }
 }

@@ -48,10 +48,6 @@ import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.Version;
-import org.webpki.saturn.common.ProtectedAccountData;
-import org.webpki.saturn.common.PayerAccountTypes;
-import org.webpki.saturn.common.AccountDescriptor;
-import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.KnownExtensions;
 
 class DebugPrintout implements BaseProperties {
@@ -542,14 +538,14 @@ class DebugPrintout implements BaseProperties {
     }
 
     private void authorizationResponse() throws IOException, GeneralSecurityException {
-        JSONObjectWriter sampleAccountData = ProtectedAccountData.encode(
-            new AccountDescriptor(debugData.acquirerMode ?
-                    PayerAccountTypes.SUPER_CARD.getTypeUri() : "https://sepa.payments.org",
-                                  debugData.acquirerMode ? "6875056745552109" : "FR1420041010050500013M02606"),
+        JSONObjectWriter sampleAccountData = (
             debugData.acquirerMode ?
-                new CardSpecificData("Luke Skywalker", 
-                                     ISODateTime.parseDateTime("2022-03-14T00:00:00Z"),
-                                     "953") : null);
+                new com.supercard.SupercardAresEncoder("6875056745552109",
+                                                       "Luke Skywalker", 
+                                                       ISODateTime.parseDateTime("2022-03-14T00:00:00Z"),
+                                                       "953")
+                                   :
+                new org.payments.sepa.SEPAAresEncoder("FR1420041010050500013M02606")).writeObject();
         description(point.sub() +
                 "<p>After a <i>successful</i> preceding step, the <b>User&nbsp;Bank</b> embeds the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +

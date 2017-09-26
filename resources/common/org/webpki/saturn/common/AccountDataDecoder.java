@@ -16,10 +16,16 @@
  */
 package org.webpki.saturn.common;
 
-import org.webpki.json.JSONDecoder;
+import java.io.IOException;
 
-public abstract class EncryptedAccountDataDecoder extends JSONDecoder {
+import org.webpki.json.JSONDecoder;
+import org.webpki.json.JSONOutputFormats;
+
+public abstract class AccountDataDecoder extends JSONDecoder {
 
     private static final long serialVersionUID = 1L;
 
+    public String logLine() throws IOException {
+        return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
+    }
 }

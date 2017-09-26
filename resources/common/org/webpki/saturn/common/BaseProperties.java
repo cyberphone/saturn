@@ -69,10 +69,9 @@ public interface BaseProperties {
     String ACCEPTED_ACCOUNT_TYPES_JSON      = "acceptedAccountTypes";       // List of ACCOUNT_TYPE_JSON
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_JSON                     = "account";                    // Payer Account2Account or Card
+    String ACCOUNT_ID_JSON                  = "accountId";                  // Account identifier or PAN
     String ACCOUNT_REFERENCE_JSON           = "accountReference";           // Account/Card number for payee (like ************5678)
     String ACCOUNT_TYPE_JSON                = "accountType";                // Account/Card type in the form of a URI
-    String ACCOUNT_HOLDER_JSON              = "accountHolder";              // Card holder
-    String ACCOUNT_SECURITY_CODE_JSON       = "accountSecurityCode";        // CCV
     String CARD_FORMAT_ACCOUNT_ID_JSON      = "cardFormatAccountId";        // Display formatting like cards or not
     String ENCRYPTED_ACCOUNT_DATA_JSON      = "encryptedAccountData";       // Account data that (only) an acquirer needs
     String REQUEST_HASH_JSON                = "requestHash";

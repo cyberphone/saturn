@@ -18,20 +18,42 @@ package com.supercard;
 
 import java.io.IOException;
 
+import java.util.GregorianCalendar;
+
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.EncryptedAccountDataEncoder;
+import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.AccountDataEncoder;
 
-public final class SupercardAresEncoder extends EncryptedAccountDataEncoder {
+public final class SupercardAresEncoder extends AccountDataEncoder {
 
-    static final String ARES_CONTEXT    = "https://supercard.com/saturn/v3#ares";
+    static final String ARES_CONTEXT       = "https://supercard.com/saturn/v3#ares";
 
-    public SupercardAresEncoder() {
+    static final String CARD_NUMBER_JSON   = "cardNumber";    // PAN
+    static final String CARD_HOLDER_JSON   = "cardHolder";    // Name
+    static final String SECURITY_CODE_JSON = "securityCode";  // CCV
+
+    String cardNumber;                   // PAN
+    String cardHolder;                   // Name
+    GregorianCalendar expirationDate;    // Card expiration date
+    String securityCode;                 // CCV or similar
+
+    public SupercardAresEncoder(String cardNumber,
+                                String cardHolder,
+                                GregorianCalendar expirationDate,
+                                String securityCode) {
+        this.cardNumber = cardNumber;
+        this.cardHolder = cardHolder;
+        this.expirationDate = expirationDate;
+        this.securityCode = securityCode;
     }
 
     @Override
     protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        return wr;
+        return wr.setString(CARD_NUMBER_JSON, cardNumber)
+                 .setString(CARD_HOLDER_JSON, cardHolder)
+                 .setDateTime(BaseProperties.EXPIRES_JSON, expirationDate, true)
+                 .setString(SECURITY_CODE_JSON, securityCode);
     }
 
     @Override

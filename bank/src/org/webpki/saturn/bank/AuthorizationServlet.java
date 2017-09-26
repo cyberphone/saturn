@@ -28,6 +28,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
+import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.PaymentMethodDecoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -35,9 +36,7 @@ import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.AuthorizationData;
-import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.PaymentRequest;
-import org.webpki.saturn.common.CardSpecificData;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.NonDirectPayments;
@@ -191,12 +190,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Pure sample data...
         // Separate credit-card and account2account payments
-        AccountDescriptor accountDescriptor = cardPayment ?
-            authorizationData.getAccount() : new AccountDescriptor("https://sepa.payments.org", "FR1420041010050500013M02606");
-        CardSpecificData cardSpecificData = cardPayment ? 
-            new CardSpecificData("Luke Skywalker",
-                                 ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),
-                                 "943") : null;
+        AccountDataEncoder accountData = cardPayment ?
+            new com.supercard.SupercardAresEncoder(authorizationData.getAccount().getId(), 
+                                                   "Luke Skywalker",
+                                                   ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),
+                                                   "943")
+                                                     :
+            new org.payments.sepa.SEPAAresEncoder("FR1420041010050500013M02606");
 
         // Reference to Merchant
         StringBuffer accountReference = new StringBuffer();
@@ -227,8 +227,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return AuthorizationResponse.encode(authorizationRequest,
                                             accountReference.toString(),
                                             providerAuthority.getEncryptionParameters()[0],
-                                            accountDescriptor,
-                                            cardSpecificData,
+                                            accountData,
                                             getReferenceId(),
                                             optionalLogData,
                                             BankService.bankKey);

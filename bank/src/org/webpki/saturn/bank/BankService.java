@@ -152,6 +152,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static JSONDecoderCache knownPaymentMethods = new JSONDecoderCache();
 
+    static JSONDecoderCache knownAccountTypes = new JSONDecoderCache();
+
     static boolean logging;
     
     static ExternalCalls externalCalls;
@@ -214,9 +216,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             logging = getPropertyBoolean(LOGGING);
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
-            
+
             knownPaymentMethods.addToCache(com.supercard.SupercardAreqDecoder.class);
             knownPaymentMethods.addToCache(org.payments.sepa.SEPAAreqDecoder.class);
+
+            knownAccountTypes.addToCache(org.payments.sepa.SEPAAresDecoder.class);
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
