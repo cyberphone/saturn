@@ -20,8 +20,11 @@ import java.io.IOException;
 
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.EncryptedAccountDataEncoder;
 
+public final class SupercardAresEncoder extends EncryptedAccountDataEncoder {
 
+    static final String ARES_CONTEXT    = "https://supercard.com/saturn/v3#ares";
 
     public SupercardAresEncoder() {
     }
@@ -33,5 +36,6 @@ import org.webpki.json.JSONObjectWriter;
 
     @Override
     public String getContext() {
+        return ARES_CONTEXT;
     }
 }
