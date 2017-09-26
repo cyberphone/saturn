@@ -20,10 +20,9 @@ import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
 
-import org.webpki.saturn.common.PayerAccountTypes;
-import org.webpki.saturn.common.PaymentMethodDecoder;
+import org.webpki.saturn.common.EncryptedAccountDataDecoder;
 
-public final class SupercardAregDecoder extends PaymentMethodDecoder {
+public final class SupercardAresDecoder extends EncryptedAccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,11 +32,6 @@ public final class SupercardAregDecoder extends PaymentMethodDecoder {
 
     @Override
     public String getContext() {
-        return SupercardAregEncoder.AREQ_CONTEXT;
-    }
-
-    @Override
-    public boolean match(PayerAccountTypes payerAccountType) throws IOException {
-        return PayerAccountTypes.SUPER_CARD == payerAccountType;
+        return SupercardAresEncoder.ARES_CONTEXT;
     }
 }

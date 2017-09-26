@@ -52,7 +52,7 @@ import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
 
-import com.supercard.SupercardAregEncoder;
+import com.supercard.SupercardAreqEncoder;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -122,7 +122,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             if (debugData != null) {
                 debugData.acquirerAuthority = acquirerAuthority.getRoot();
             }
-            paymentMethodEncoder = new SupercardAregEncoder();
+            paymentMethodEncoder = new SupercardAreqEncoder();
         } else {
             for (String paymentMethod : providerAuthority.getProviderPaymentMethods()) {
                 if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {

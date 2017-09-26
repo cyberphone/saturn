@@ -18,24 +18,26 @@ package com.supercard;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONObjectReader;
 
-import org.webpki.saturn.common.PaymentMethodEncoder;
+import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethodDecoder;
 
-public final class SupercardAregEncoder extends PaymentMethodEncoder {
+public final class SupercardAreqDecoder extends PaymentMethodDecoder {
 
-    static final String AREQ_CONTEXT    = "https://supercard.com/saturn/v3#areq";
-
-    public SupercardAregEncoder() {
-    }
+    private static final long serialVersionUID = 1L;
 
     @Override
-    protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        return wr;
+    protected void readJSONData(JSONObjectReader rd) throws IOException {
     }
 
     @Override
     public String getContext() {
-        return AREQ_CONTEXT;
+        return SupercardAreqEncoder.AREQ_CONTEXT;
+    }
+
+    @Override
+    public boolean match(PayerAccountTypes payerAccountType) throws IOException {
+        return PayerAccountTypes.SUPER_CARD == payerAccountType;
     }
 }
