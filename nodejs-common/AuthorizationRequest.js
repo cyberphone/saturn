@@ -27,6 +27,7 @@ const Software       = require('./Software');
 const PaymentRequest = require('./PaymentRequest');
     
 const EXPECTED_CONTEXT = 'https://supercard.com/saturn/v3#pms';
+
 const EXPECTED_METHOD  = 'https://supercard.com';
 
 function AuthorizationRequest(rd) {
@@ -35,14 +36,11 @@ function AuthorizationRequest(rd) {
   this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
   this.authorityUrl = rd.getString(BaseProperties.AUTHORITY_URL_JSON);
   var paymentMethod = rd.getString(BaseProperties.PAYMENT_METHOD_JSON);
-  if (paymentMethod != 'https://supercard.com') {
+  if (paymentMethod != EXPECTED_METHOD) {
     throw new TypeError('Unrecognized payment method: ' + paymentMethod);
   }
   this.paymentRequest = new PaymentRequest(rd.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
   this.encryptedAuthorizationData = rd.getObject(BaseProperties.ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject();
-  if (paymentMethod != EXPECTED_METHOD) {
-    throw new TypeError('Unrecognized payment method: ' + paymentMethod);
-  }
   var paymentMethodSpecific = rd.getObject(BaseProperties.PAYMENT_METHOD_SPECIFIC_JSON);
   if (paymentMethodSpecific.getString(Messages.CONTEXT_JSON) != EXPECTED_CONTEXT) {
     throw new TypeError('Unrecognized payment method specfic data: ' + paymentMethodSpecific.toString());

@@ -26,9 +26,6 @@ const Messages             = require('./Messages');
 const Software             = require('./Software');
 const AuthorizationRequest = require('./AuthorizationRequest');
     
-const SOFTWARE_NAME    = "WebPKI.org - Bank";
-const SOFTWARE_VERSION = "1.00";
-
 function AuthorizationResponse(rd) {
   this.root = Messages.parseBaseMessage(Messages.AUTHORIZATION_RESPONSE, rd);
   this.authorizationRequest = new AuthorizationRequest(Messages.getEmbeddedMessage(Messages.AUTHORIZATION_REQUEST, rd));
