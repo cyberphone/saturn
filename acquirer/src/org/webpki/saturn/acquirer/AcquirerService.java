@@ -185,7 +185,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
             
-            knownAccountTypes.addToCache(com.supercard.SupercardAresDecoder.class);
+            knownAccountTypes.addToCache(com.supercard.SupercardAccountDataDecoder.class);
 
             KeyStoreEnumerator acquirercreds = new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD));

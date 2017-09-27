@@ -21,9 +21,9 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 
 import org.webpki.saturn.common.PayerAccountTypes;
-import org.webpki.saturn.common.PaymentMethodDecoder;
+import org.webpki.saturn.common.AuthorizationRequest;
 
-public final class SupercardAreqDecoder extends PaymentMethodDecoder {
+public final class SupercardPaymentMethodDecoder extends AuthorizationRequest.PaymentMethodDecoder {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,7 +33,7 @@ public final class SupercardAreqDecoder extends PaymentMethodDecoder {
 
     @Override
     public String getContext() {
-        return SupercardAreqEncoder.AREQ_CONTEXT;
+        return SupercardPaymentMethodEncoder.PAYMENT_METHOD;
     }
 
     @Override

@@ -20,27 +20,27 @@ import java.io.IOException;
 
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AccountDataEncoder;
+import org.webpki.saturn.common.AuthorizationResponse;
 
-public final class SEPAAresEncoder extends AccountDataEncoder {
+public final class SEPAAccountDataEncoder extends AuthorizationResponse.AccountDataEncoder {
 
-    static final String ARES_CONTEXT       = "https://sepa.payments.org/saturn/v3#ares";
+    static final String ACCOUNT_DATA    = "https://sepa.payments.org/saturn/v3#ad";
 
-    static final String PAYER_IBAN_JSON    = "payerIban";    // Payer IBAN
+    static final String PAYER_IBAN_JSON = "payerIban";    // Payer IBAN
 
     String payerIban;
 
-    public SEPAAresEncoder(String payerIban) {
+    public SEPAAccountDataEncoder(String payerIban) {
         this.payerIban = payerIban;
     }
 
     @Override
     protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        return wr.setString(payerIban, payerIban);
+        return wr.setString(PAYER_IBAN_JSON, payerIban);
     }
 
     @Override
     public String getContext() {
-        return ARES_CONTEXT;
+        return ACCOUNT_DATA;
     }
 }

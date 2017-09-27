@@ -14,28 +14,33 @@
  *  limitations under the License.
  *
  */
-package com.supercard;
+package org.payments.sepa;
 
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.PaymentMethodEncoder;
+import org.webpki.saturn.common.AuthorizationRequest;
 
-public final class SupercardAreqEncoder extends PaymentMethodEncoder {
+public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.PaymentMethodEncoder {
 
-    static final String AREQ_CONTEXT    = "https://supercard.com/saturn/v3#areq";
+    static final String PAYMENT_METHOD  = "https://sepa.payments.org/saturn/v3#pms";
 
-    public SupercardAreqEncoder() {
+    static final String PAYEE_IBAN_JSON = "payeeIban";
+
+    String payeeIban;
+
+    public SEPAPaymentMethodEncoder(String payeeIban) {
+        this.payeeIban = payeeIban;
     }
 
     @Override
     protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        return wr;
+        return wr.setString(PAYEE_IBAN_JSON, payeeIban);
     }
 
     @Override
     public String getContext() {
-        return AREQ_CONTEXT;
+        return PAYMENT_METHOD;
     }
 }

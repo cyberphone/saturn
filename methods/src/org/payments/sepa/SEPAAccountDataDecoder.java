@@ -14,16 +14,30 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package org.payments.sepa;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONDecoder;
+import org.webpki.json.JSONObjectReader;
 
-public abstract class PaymentMethodDecoder extends JSONDecoder {
+import org.webpki.saturn.common.AuthorizationResponse;
+
+public final class SEPAAccountDataDecoder extends AuthorizationResponse.AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    public abstract boolean match(PayerAccountTypes payerAccountType) throws IOException;
+    String payerIban;
+    public String geyPayerIban() {
+        return payerIban;
+    }
 
+    @Override
+    protected void readJSONData(JSONObjectReader rd) throws IOException {
+        payerIban = rd.getString(SEPAAccountDataEncoder.PAYER_IBAN_JSON);
+    }
+
+    @Override
+    public String getContext() {
+        return SEPAAccountDataEncoder.ACCOUNT_DATA;
+    }
 }

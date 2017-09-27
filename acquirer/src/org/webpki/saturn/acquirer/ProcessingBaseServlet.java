@@ -33,7 +33,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
@@ -55,7 +54,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return "#" + (referenceId++);
     }
 
-    static AccountDataDecoder getAccountData(AuthorizationResponse authorizationResponse)
+    static AuthorizationResponse.AccountDataDecoder getAccountData(AuthorizationResponse authorizationResponse)
     throws IOException, GeneralSecurityException {
         return authorizationResponse.getProtectedAccountData(AcquirerService.knownAccountTypes,
                                                              AcquirerService.decryptionKeys);

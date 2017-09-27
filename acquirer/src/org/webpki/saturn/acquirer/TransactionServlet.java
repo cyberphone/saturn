@@ -20,9 +20,8 @@ import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.saturn.common.AccountDataDecoder;
+import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
@@ -56,7 +55,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(payee, transactionRequest.getSignatureDecoder());
         payeeCoreProperties.verify(payee, paymentRequest.getSignatureDecoder());
 
-        AccountDataDecoder accountData = getAccountData(transactionRequest.getAuthorizationResponse());
+        AuthorizationResponse.AccountDataDecoder accountData = getAccountData(transactionRequest.getAuthorizationResponse());
         boolean testMode = transactionRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Acquiring for Account=" + accountData.logLine() + 

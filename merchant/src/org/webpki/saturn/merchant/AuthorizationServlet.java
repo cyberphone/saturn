@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.payments.sepa.SEPAAreqEncoder;
+import org.payments.sepa.SEPAPaymentMethodEncoder;
 
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
@@ -40,7 +40,6 @@ import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.PaymentMethodEncoder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
@@ -52,7 +51,7 @@ import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
 
-import com.supercard.SupercardAreqEncoder;
+import com.supercard.SupercardPaymentMethodEncoder;
 
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
@@ -109,7 +108,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
            
         }
  
-        PaymentMethodEncoder paymentMethodEncoder = null;
+        AuthorizationRequest.PaymentMethodEncoder paymentMethodEncoder = null;
         TransactionOperation transactionOperation = new TransactionOperation();
         if (cardPayment) {
             // Lookup of acquirer authority
@@ -122,11 +121,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             if (debugData != null) {
                 debugData.acquirerAuthority = acquirerAuthority.getRoot();
             }
-            paymentMethodEncoder = new SupercardAreqEncoder();
+            paymentMethodEncoder = new SupercardPaymentMethodEncoder();
         } else {
             for (String paymentMethod : providerAuthority.getProviderPaymentMethods()) {
                 if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
-                    paymentMethodEncoder = new SEPAAreqEncoder(MERCHANT_ACCOUNT_ID);
+                    paymentMethodEncoder = new SEPAPaymentMethodEncoder(MERCHANT_ACCOUNT_ID);
                     break;
                 }
             }

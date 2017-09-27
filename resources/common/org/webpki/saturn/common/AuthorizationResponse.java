@@ -17,24 +17,58 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
+
 import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
+import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
+
 import org.webpki.json.encryption.DecryptionKeyHolder;
 
 public class AuthorizationResponse implements BaseProperties {
     
     public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
     public static final String SOFTWARE_VERSION = "1.00";
+
+    public static abstract class AccountDataDecoder extends JSONDecoder {
+
+        private static final long serialVersionUID = 1L;
+
+        public String logLine() throws IOException {
+            return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
+        }
+    }
+
+    public static abstract class AccountDataEncoder {
+
+        protected abstract JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException;
+        
+        public abstract String getContext();
+        
+        public String getQualifier() {
+            return null;  // Optional
+        }
+        
+        public JSONObjectWriter writeObject() throws IOException {
+            return new JSONObjectWriter()
+                .setString(JSONDecoderCache.CONTEXT_JSON, getContext())
+                .setDynamic((wr) -> {
+                    if (getQualifier() != null) {
+                        wr.setString(JSONDecoderCache.QUALIFIER_JSON, getQualifier());
+                    }
+                    return writeObject(wr);
+                });
+        }
+    }
 
     public AuthorizationResponse(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
@@ -113,6 +147,4 @@ public class AuthorizationResponse implements BaseProperties {
     throws IOException, GeneralSecurityException {
          return (AccountDataDecoder) knownAccountTypes.parse(encryptedAccountData.getDecryptedData(decryptionKeys));
     }
-
-
 }

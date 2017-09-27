@@ -21,7 +21,7 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AccountDataDecoder;
+import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.UrlHolder;
@@ -50,7 +50,7 @@ public class RefundServlet extends ProcessingBaseServlet {
         }
         payeeCoreProperties.verify(payee, refundRequest.getSignatureDecoder());
 
-        AccountDataDecoder accountData = getAccountData(refundRequest.getAuthorizationResponse());
+        AuthorizationResponse.AccountDataDecoder accountData = getAccountData(refundRequest.getAuthorizationResponse());
 
         boolean testMode = refundRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +

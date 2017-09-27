@@ -21,9 +21,9 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 
 import org.webpki.saturn.common.PayerAccountTypes;
-import org.webpki.saturn.common.PaymentMethodDecoder;
+import org.webpki.saturn.common.AuthorizationRequest;
 
-public final class SEPAAreqDecoder extends PaymentMethodDecoder {
+public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.PaymentMethodDecoder {
 
     private static final long serialVersionUID = 1L;
 
@@ -31,7 +31,7 @@ public final class SEPAAreqDecoder extends PaymentMethodDecoder {
 
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        payeeIban = rd.getString(SEPAAreqEncoder.PAYEE_IBAN_JSON);
+        payeeIban = rd.getString(SEPAPaymentMethodEncoder.PAYEE_IBAN_JSON);
     }
 
     public String getPayeeIban() {
@@ -40,7 +40,7 @@ public final class SEPAAreqDecoder extends PaymentMethodDecoder {
 
     @Override
     public String getContext() {
-        return SEPAAreqEncoder.AREQ_CONTEXT;
+        return SEPAPaymentMethodEncoder.PAYMENT_METHOD;
     }
 
     @Override

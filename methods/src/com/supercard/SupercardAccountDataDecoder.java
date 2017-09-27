@@ -23,27 +23,42 @@ import java.util.GregorianCalendar;
 import org.webpki.json.JSONObjectReader;
 
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.AccountDataDecoder;
+import org.webpki.saturn.common.AuthorizationResponse;
 
-public final class SupercardAresDecoder extends AccountDataDecoder {
+public final class SupercardAccountDataDecoder extends AuthorizationResponse.AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
     String cardNumber;                   // PAN
+    public String getCardNumber() {
+        return cardNumber;
+    }
+
     String cardHolder;                   // Name
+    public String getCardHolder() {
+        return cardHolder;
+    }
+
     GregorianCalendar expirationDate;    // Card expiration date
+    public GregorianCalendar getExpirationDate() {
+        return expirationDate;
+    }
+
     String securityCode;                 // CCV or similar
+    public String getSecurityCode() {
+        return securityCode;
+    }
 
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        cardNumber = rd.getString(SupercardAresEncoder.CARD_NUMBER_JSON);
-        cardHolder = rd.getString(SupercardAresEncoder.CARD_HOLDER_JSON);
+        cardNumber = rd.getString(SupercardAccountDataEncoder.CARD_NUMBER_JSON);
+        cardHolder = rd.getString(SupercardAccountDataEncoder.CARD_HOLDER_JSON);
         expirationDate = rd.getDateTime(BaseProperties.EXPIRES_JSON);
-        securityCode = rd.getString(SupercardAresEncoder.SECURITY_CODE_JSON);
+        securityCode = rd.getString(SupercardAccountDataEncoder.SECURITY_CODE_JSON);
     }
 
     @Override
     public String getContext() {
-        return SupercardAresEncoder.ARES_CONTEXT;
+        return SupercardAccountDataEncoder.ACCOUNT_DATA;
     }
 }

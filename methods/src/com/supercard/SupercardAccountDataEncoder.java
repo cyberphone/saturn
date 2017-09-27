@@ -23,11 +23,11 @@ import java.util.GregorianCalendar;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.AccountDataEncoder;
+import org.webpki.saturn.common.AuthorizationResponse;
 
-public final class SupercardAresEncoder extends AccountDataEncoder {
+public final class SupercardAccountDataEncoder extends AuthorizationResponse.AccountDataEncoder {
 
-    static final String ARES_CONTEXT       = "https://supercard.com/saturn/v3#ares";
+    static final String ACCOUNT_DATA       = "https://supercard.com/saturn/v3#ad";
 
     static final String CARD_NUMBER_JSON   = "cardNumber";    // PAN
     static final String CARD_HOLDER_JSON   = "cardHolder";    // Name
@@ -38,10 +38,10 @@ public final class SupercardAresEncoder extends AccountDataEncoder {
     GregorianCalendar expirationDate;    // Card expiration date
     String securityCode;                 // CCV or similar
 
-    public SupercardAresEncoder(String cardNumber,
-                                String cardHolder,
-                                GregorianCalendar expirationDate,
-                                String securityCode) {
+    public SupercardAccountDataEncoder(String cardNumber,
+                                       String cardHolder,
+                                       GregorianCalendar expirationDate,
+                                       String securityCode) {
         this.cardNumber = cardNumber;
         this.cardHolder = cardHolder;
         this.expirationDate = expirationDate;
@@ -58,6 +58,6 @@ public final class SupercardAresEncoder extends AccountDataEncoder {
 
     @Override
     public String getContext() {
-        return ARES_CONTEXT;
+        return ACCOUNT_DATA;
     }
 }

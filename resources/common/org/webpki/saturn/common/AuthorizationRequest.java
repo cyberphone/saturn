@@ -23,10 +23,12 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
+import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
+import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 
@@ -36,6 +38,39 @@ import org.webpki.util.ArrayUtil;
 
 public class AuthorizationRequest implements BaseProperties {
     
+    public static abstract class PaymentMethodDecoder extends JSONDecoder {
+
+        private static final long serialVersionUID = 1L;
+
+        public abstract boolean match(PayerAccountTypes payerAccountType) throws IOException;
+
+        public String logLine() throws IOException {
+            return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
+        }
+    }
+
+    public static abstract class PaymentMethodEncoder {
+
+        protected abstract JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException;
+        
+        public abstract String getContext();
+        
+        public String getQualifier() {
+            return null;  // Optional
+        }
+        
+        public JSONObjectWriter writeObject() throws IOException {
+            return new JSONObjectWriter()
+                .setString(JSONDecoderCache.CONTEXT_JSON, getContext())
+                .setDynamic((wr) -> {
+                    if (getQualifier() != null) {
+                        wr.setString(JSONDecoderCache.QUALIFIER_JSON, getQualifier());
+                    }
+                    return writeObject(wr);
+                });
+        }
+    }
+
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
@@ -52,7 +87,6 @@ public class AuthorizationRequest implements BaseProperties {
         signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
         rd.checkForUnread();
     }
-
 
     Software software;
 

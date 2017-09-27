@@ -26,10 +26,7 @@ import java.util.Locale;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.saturn.common.AccountDataEncoder;
-import org.webpki.saturn.common.PaymentMethodDecoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
@@ -63,7 +60,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Verify that we understand the payment method
-        PaymentMethodDecoder paymentMethod = authorizationRequest.getPaymentMethodSpecific(BankService.knownPaymentMethods);
+        AuthorizationRequest.PaymentMethodDecoder paymentMethod =
+            authorizationRequest.getPaymentMethodSpecific(BankService.knownPaymentMethods);
 
         // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
@@ -190,13 +188,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Pure sample data...
         // Separate credit-card and account2account payments
-        AccountDataEncoder accountData = cardPayment ?
-            new com.supercard.SupercardAresEncoder(authorizationData.getAccount().getId(), 
+        AuthorizationResponse.AccountDataEncoder accountData = cardPayment ?
+            new com.supercard.SupercardAccountDataEncoder(authorizationData.getAccount().getId(), 
                                                    "Luke Skywalker",
                                                    ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),
                                                    "943")
                                                      :
-            new org.payments.sepa.SEPAAresEncoder("FR1420041010050500013M02606");
+            new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606");
 
         // Reference to Merchant
         StringBuffer accountReference = new StringBuffer();
@@ -210,7 +208,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 ", AccountID=" + accountId + 
                 ", AccountType=" + accountType + 
                 ", Client IP=" + clientIpAddress +
-                ", Method=" + paymentMethod.getWriter().serializeToString(JSONOutputFormats.NORMALIZED));
+                ", Method Specific=" + paymentMethod.logLine());
 
         String optionalLogData = null;
         if (!testMode) {

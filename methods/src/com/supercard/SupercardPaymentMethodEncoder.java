@@ -14,18 +14,28 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package com.supercard;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONDecoder;
-import org.webpki.json.JSONOutputFormats;
+import org.webpki.json.JSONObjectWriter;
 
-public abstract class AccountDataDecoder extends JSONDecoder {
+import org.webpki.saturn.common.AuthorizationRequest;
 
-    private static final long serialVersionUID = 1L;
+public final class SupercardPaymentMethodEncoder extends AuthorizationRequest.PaymentMethodEncoder {
 
-    public String logLine() throws IOException {
-        return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
+    static final String PAYMENT_METHOD    = "https://supercard.com/saturn/v3#pms";
+
+    public SupercardPaymentMethodEncoder() {
+    }
+
+    @Override
+    protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
+        return wr;
+    }
+
+    @Override
+    public String getContext() {
+        return PAYMENT_METHOD;
     }
 }

@@ -217,10 +217,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
-            knownPaymentMethods.addToCache(com.supercard.SupercardAreqDecoder.class);
-            knownPaymentMethods.addToCache(org.payments.sepa.SEPAAreqDecoder.class);
+            knownPaymentMethods.addToCache(com.supercard.SupercardPaymentMethodDecoder.class);
+            knownPaymentMethods.addToCache(org.payments.sepa.SEPAPaymentMethodDecoder.class);
 
-            knownAccountTypes.addToCache(org.payments.sepa.SEPAAresDecoder.class);
+            knownAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
                 serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
