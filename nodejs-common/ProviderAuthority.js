@@ -20,11 +20,14 @@
 // Saturn "ProviderAuthority" object
 
 const JsonUtil = require('webpki.org').JsonUtil;
-const Keys = require('webpki.org').Keys;
-const Jef = require('webpki.org').Jef;
+const Keys     = require('webpki.org').Keys;
+const Jef      = require('webpki.org').Jef;
 
 const BaseProperties = require('./BaseProperties');
-const Messages = require('./Messages');
+const Messages       = require('./Messages');
+
+const PAYMENT_METHOD    = 'https://supercard.com';  // Only one...
+const SIGNATURE_PROFILE = 'http://webpki.org/saturn/v3/signatures#P-256.ES256'; // Only one
 
 function ProviderAuthority() {
 }
@@ -44,9 +47,9 @@ ProviderAuthority.encode = function(authorityUrl,
     .setString(BaseProperties.HOME_PAGE_JSON, homePage)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
     .setArray(BaseProperties.PAYMENT_METHODS_JSON, 
-              new JsonUtil.ArrayWriter().setString('https://supercard.com'))
+              new JsonUtil.ArrayWriter().setString(PAYMENT_METHOD))
     .setArray(BaseProperties.SIGNATURE_PROFILES_JSON, 
-              new JsonUtil.ArrayWriter().setString('http://webpki.org/saturn/v3/signatures#P-256.ES256'))
+              new JsonUtil.ArrayWriter().setString(SIGNATURE_PROFILE))
     .setArray(BaseProperties.ENCRYPTION_PARAMETERS_JSON, 
               new JsonUtil.ArrayWriter().setObject(new JsonUtil.ObjectWriter()
         .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Jef.JOSE_A128CBC_HS256_ALG_ID)
@@ -58,71 +61,5 @@ ProviderAuthority.encode = function(authorityUrl,
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
     .setSignature(signer);
 };
-
-/*
-    public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
-        root = Messages.parseBaseMessage(Messages.AUTHORITY, rd);
-        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-        if (!authorityUrl.equals(expectedAuthorityUrl)) {
-            throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
-                                  " expected=" + expectedAuthorityUrl);
-        }
-        serviceUrl = rd.getString(TRANSACTION_URL_JSON);
-        JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        dataEncryptionAlgorithm = encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
-        keyEncryptionAlgorithm = encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
-        publicKey = encryptionParameters.getPublicKey(AlgorithmPreferences.JOSE);
-        timeStamp = rd.getDateTime(TIME_STAMP_JSON);
-        expires = rd.getDateTime(EXPIRES_JSON);
-        signatureDecoder = rd.getSignature(AlgorithmPreferences.JOSE);
-        signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
-        rd.checkForUnread();
-    }
-    
-    String authorityUrl;
-    public String getAuthorityUrl() {
-        return authorityUrl;
-    }
-
-    String serviceUrl;
-    public String getTransactionUrl() {
-        return serviceUrl;
-    }
-
-    String dataEncryptionAlgorithm;
-    public String getDataEncryptionAlgorithm() {
-        return dataEncryptionAlgorithm;
-    }
-
-    String keyEncryptionAlgorithm;
-    public String getKeyEncryptionAlgorithm() {
-        return keyEncryptionAlgorithm;
-    }
-
-    PublicKey publicKey;
-    public PublicKey getPublicKey() {
-        return publicKey;
-    }
-
-    GregorianCalendar expires;
-    public GregorianCalendar getExpires() {
-        return expires;
-    }
-
-    GregorianCalendar timeStamp;
-     public GregorianCalendar getTimeStamp() {
-        return timeStamp;
-    }
-
-    JSONSignatureDecoder signatureDecoder;
-    public JSONSignatureDecoder getSignatureDecoder() {
-        return signatureDecoder;
-    }
-
-    JSONObjectReader root;
-    public JSONObjectReader getRoot() {
-        return root;
-    }
-*/
 
 module.exports = ProviderAuthority;

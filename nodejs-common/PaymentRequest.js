@@ -75,30 +75,8 @@ PaymentRequest.prototype.getPublicKey = function() {
   return this.publicKey;
 };
   
-PaymentRequest.SOFTWARE_NAME    = 'WebPKI.org - Merchant';
-PaymentRequest.SOFTWARE_VERSION = '1.00';
-  
 PaymentRequest.prototype.getRequestHash = function() {
   return RequestHash.getRequestHash(root);
 };
-
-PaymentRequest.encode = function(payee,
-                                 amount,
-                                 currency,
-                                 referenceId,
-                                 expires,
-                                 signer) {
-  return new JsonUtil.ObjectWriter()
-    .setObject(BaseProperties.PAYEE_JSON, payee.writeObject())
-    .setBigDecimal(BaseProperties.AMOUNT_JSON, amount, currency.getDecimals())
-    .setString(BaseProperties.CURRENCY_JSON, currency.toString())
-    .setString(BaseProperties.REFERENCE_ID_JSON, referenceId)
-    .setDateTime(BaseProperties.TIME_STAMP_JSON, new Date())
-    .setDateTime(BaseProperties.EXPIRES_JSON, expires)
-    .setObject(BaseProperties.SOFTWARE_JSON,
-               Software.encode(PaymentRequest.SOFTWARE_NAME, PaymentRequest.SOFTWARE_VERSION))
-    .setSignature(signer);
-};
-
 
 module.exports = PaymentRequest;
