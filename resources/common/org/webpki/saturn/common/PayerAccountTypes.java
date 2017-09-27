@@ -25,13 +25,13 @@ public enum PayerAccountTypes implements Serializable {
     BANK_DIRECT  (false, "https://bankdirect.net",  "Bank Direct"),
     UNUSUAL_CARD (false, "https://unusualcard.com", "UnusualCard");
 
-    boolean cardPayment;  // True => card processor model, false = > 3 or 4 corner distributed model
-    String typeUri;       // A brand & method URI
-    String commonName;    // What it is usually called
+    boolean cardPayment;      // True => card processor model, false = > 3 or 4 corner distributed model
+    String paymentMethodUri;  // Method URI
+    String commonName;        // What it is usually called
     
-    PayerAccountTypes (boolean cardPayment, String typeUri, String commonName) {
+    PayerAccountTypes (boolean cardPayment, String paymentMethodUri, String commonName) {
         this.cardPayment = cardPayment;
-        this.typeUri = typeUri;
+        this.paymentMethodUri = paymentMethodUri;
         this.commonName = commonName;
     }
 
@@ -39,20 +39,20 @@ public enum PayerAccountTypes implements Serializable {
         return cardPayment;
     }
 
-    public String getTypeUri() {
-        return typeUri;
+    public String getPaymentMethodUri() {
+        return paymentMethodUri;
     }
 
     public String getCommonName() {
         return commonName;
     }
 
-    public static PayerAccountTypes fromTypeUri(String typeUri) throws IOException {
+    public static PayerAccountTypes fromTypeUri(String paymentMethodUri) throws IOException {
         for (PayerAccountTypes accountType : PayerAccountTypes.values()) {
-            if (accountType.typeUri.equals(typeUri)) {
+            if (accountType.paymentMethodUri.equals(paymentMethodUri)) {
                 return accountType;
             }
         }
-        throw new IOException("No such account type: " + typeUri);
+        throw new IOException("No such payment method: " + paymentMethodUri);
     }
 }

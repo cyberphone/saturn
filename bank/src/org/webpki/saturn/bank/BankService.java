@@ -251,7 +251,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                                        ).getJSONArrayReader();
             while (accounts.hasMore()) {
                 UserAccountEntry account = new UserAccountEntry(accounts.getObject());
-                userAccountDb.put(account.getId(), account);
+                userAccountDb.put(account.getAccountId(), account);
             }
 
             if (hostingProvider == null) {

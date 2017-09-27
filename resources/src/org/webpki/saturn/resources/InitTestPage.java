@@ -161,27 +161,27 @@ public class InitTestPage implements BaseProperties {
         // The payment request is wrapped in an unsigned wallet invocation message
         write(Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage()
             .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
-                .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON,
+                .setStringArray(PAYMENT_METHODS_JSON,
                                 new String[]{"https://nosuchcard.com",
-                                              PayerAccountTypes.SUPER_CARD.getTypeUri(),
-                                              PayerAccountTypes.BANK_DIRECT.getTypeUri()})
+                                              PayerAccountTypes.SUPER_CARD.getPaymentMethodUri(),
+                                              PayerAccountTypes.BANK_DIRECT.getPaymentMethodUri()})
                 .setObject(PAYMENT_REQUEST_JSON, standardRequest))));
 
         // The normal request is cloned and modified for testing error handling
         write(";\n\n" +
               "// All our cards/accounts should match during the discovery phase...\n" +
               "var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-              "scrollMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + ACCEPTED_ACCOUNT_TYPES_JSON + " = [\"https://nosuchcard.com\"");
+              "scrollMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"");
         for (PayerAccountTypes accountType : PayerAccountTypes.values()) {
             write(", \"");
-            write(accountType.getTypeUri());
+            write(accountType.getPaymentMethodUri());
             write("\"");
         }
 
         write("];\n\n" +
                 "// No card/account should match during the discovery phase...\n" +
                 "var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-                "nonMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + ACCEPTED_ACCOUNT_TYPES_JSON + " = [\"https://nosuchcard.com\"];\n\n");
+                "nonMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"];\n\n");
 
         write("// Note the modified \"" + PAYEE_JSON + "\" property...\n" +
               "var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +

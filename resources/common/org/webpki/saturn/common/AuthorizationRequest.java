@@ -79,7 +79,8 @@ public class AuthorizationRequest implements BaseProperties {
         payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
-        rd.scanAway(PAYMENT_METHOD_SPECIFIC_JSON);
+        paymentSpecific = rd.getObject(PAYMENT_METHOD_SPECIFIC_JSON);
+        rd.scanAway(PAYMENT_METHOD_SPECIFIC_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
@@ -93,6 +94,8 @@ public class AuthorizationRequest implements BaseProperties {
     JSONDecryptionDecoder encryptedAuthorizationData;
 
     JSONObjectReader root;
+    
+    JSONObjectReader paymentSpecific;
 
     boolean testMode;
     public boolean getTestMode() {
@@ -111,7 +114,7 @@ public class AuthorizationRequest implements BaseProperties {
 
     public PaymentMethodDecoder getPaymentMethodSpecific(JSONDecoderCache knownPaymentMethods) throws IOException {
         PaymentMethodDecoder paymentMethod =
-            (PaymentMethodDecoder) knownPaymentMethods.parse(root.clone().getObject(PAYMENT_METHOD_SPECIFIC_JSON));
+            (PaymentMethodDecoder) knownPaymentMethods.parse(paymentSpecific.clone()); // Clone => Fresh read
         if (!paymentMethod.match(payerAccountType)) {
             throw new IOException("\"" + PAYMENT_METHOD_SPECIFIC_JSON + 
                                   "\" data incompatible with \"" + ACCOUNT_TYPE_JSON + "\"");
@@ -163,7 +166,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
-            .setString(ACCOUNT_TYPE_JSON, payerAccountType.getTypeUri())
+            .setString(ACCOUNT_TYPE_JSON, payerAccountType.getPaymentMethodUri())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
             .setObject(PAYMENT_METHOD_SPECIFIC_JSON, paymentMethodEncoder.writeObject())
@@ -181,8 +184,8 @@ public class AuthorizationRequest implements BaseProperties {
         if (!ArrayUtil.compare(authorizationData.requestHash, paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }
-        if (!authorizationData.account.typeUri.equals(payerAccountType.typeUri)) {
-            throw new IOException("Non-matching account \"" + TYPE_JSON + "\" value");
+        if (!authorizationData.paymentMethod.equals(payerAccountType.paymentMethodUri)) {
+            throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
         return authorizationData;
     }

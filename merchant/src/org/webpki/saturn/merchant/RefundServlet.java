@@ -72,7 +72,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
             logger.info("Trying to refund Amount=" + resultData.amount.toString() +
                           " " + resultData.currency.toString() + 
                         ", Account=" + resultData.accountReference + 
-                        ", Type=" + resultData.accountType.getTypeUri());
+                        ", Method=" + resultData.accountType.getPaymentMethodUri());
 
             PayeeAuthority payeeAuthority = 
                 MerchantService.externalCalls.getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());

@@ -50,7 +50,6 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
-import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PayerAccountTypes;
@@ -153,9 +152,8 @@ public class InitWallet {
                 accountId = accountId.substring(1);
             }
             ow = new JSONObjectWriter()
-                 .setObject(BaseProperties.ACCOUNT_JSON, 
-                            new AccountDescriptor(accountType.getTypeUri(),
-                                                  accountId).writeObject())
+                 .setString(BaseProperties.PAYMENT_METHOD_JSON, accountType.getPaymentMethodUri())
+                 .setString(BaseProperties.ACCOUNT_ID_JSON, accountId)
                  .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON, cardFormatted)
                  .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, args[7])
                  .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,

@@ -116,16 +116,16 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         // Verify that the there is a matching Payer account
-        String accountId = authorizationData.getAccount().getId();
-        String accountType = authorizationData.getAccount().getType();
+        String accountId = authorizationData.getAccountId();
+        String authorizedPaymentMethod = authorizationData.getPaymentMethod();
         UserAccountEntry account = BankService.userAccountDb.get(accountId);
         if (account == null) {
             logger.severe("No such account ID: " + accountId);
             throw new IOException("No such user account ID");
         }
-        if (!account.getType().equals(accountType)) {
-            logger.severe("Wrong account type: " + accountType + " for account ID: " + accountId);
-            throw new IOException("Wrong user account type");
+        if (!authorizedPaymentMethod.equals(account.getPaymentMethod())) {
+            logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
+            throw new IOException("Wrong payment method");
         }
         if (!account.getPublicKey().equals(authorizationData.getPublicKey())) {
             logger.severe("Wrong public key for account ID: " + accountId);
@@ -189,10 +189,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Pure sample data...
         // Separate credit-card and account2account payments
         AuthorizationResponse.AccountDataEncoder accountData = cardPayment ?
-            new com.supercard.SupercardAccountDataEncoder(authorizationData.getAccount().getId(), 
-                                                   "Luke Skywalker",
-                                                   ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),
-                                                   "943")
+            new com.supercard.SupercardAccountDataEncoder(authorizationData.getAccountId(), 
+                                                          "Luke Skywalker",
+                                                          ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),
+                                                          "943")
                                                      :
             new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606");
 
@@ -205,8 +205,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         boolean testMode = authorizationRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ": "") +
                 "Authorized Amount=" + amount.toString() + 
-                ", AccountID=" + accountId + 
-                ", AccountType=" + accountType + 
+                ", Account ID=" + accountId + 
+                ", Payment Method=" + paymentMethod + 
                 ", Client IP=" + clientIpAddress +
                 ", Method Specific=" + paymentMethod.logLine());
 

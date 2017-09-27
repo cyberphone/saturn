@@ -98,7 +98,6 @@ import org.webpki.sks.test.SKSReferenceImplementation;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
@@ -172,7 +171,8 @@ public class Wallet {
     static final String DUMMY_ACCOUNT_ID       = "12341234123412341234";
 
     static class Account {
-        AccountDescriptor accountDescriptor;
+        String paymentMethod;
+        String accountId;
         boolean cardFormatAccountId;
         ImageIcon cardIcon;
         AsymSignatureAlgorithms signatureAlgorithm;
@@ -183,13 +183,15 @@ public class Wallet {
         PublicKey keyEncryptionKey;
         PaymentRequest paymentRequest;
         
-        Account(AccountDescriptor accountDescriptor,
+        Account(String paymentMethod,
+                String accountId,
                 boolean cardFormatAccountId,
                 ImageIcon cardIcon,
                 AsymSignatureAlgorithms signatureAlgorithm,
                 String authorityUrl,
                 PaymentRequest paymentRequest) {
-            this.accountDescriptor = accountDescriptor;
+            this.paymentMethod = paymentMethod;
+            this.accountId = accountId;
             this.cardFormatAccountId = cardFormatAccountId;
             this.cardIcon = cardIcon;
             this.signatureAlgorithm = signatureAlgorithm;
@@ -374,9 +376,9 @@ public class Wallet {
 
         String formatAccountId(Account card) {
             return card.cardFormatAccountId ?
-                AuthorizationData.formatCardNumber(card.accountDescriptor.getId()) 
+                AuthorizationData.formatCardNumber(card.accountId) 
                                             :
-                card.accountDescriptor.getId();
+                card.accountId;
         }
 
         String processExternalHtml(String simpleHtml) {
@@ -456,7 +458,7 @@ public class Wallet {
             } else {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<Integer,Account>();
                 for (int i = 0; i < 2; i++) {
-                    cards.put(i, new Account(new AccountDescriptor("n/a", DUMMY_ACCOUNT_ID),
+                    cards.put(i, new Account("n/a", DUMMY_ACCOUNT_ID,
                                              true, dummyCardIcon, null, null, null));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
@@ -666,8 +668,8 @@ public class Wallet {
 
         void showAuthorizationView(int keyHandle) {
             selectedCard = cardCollection.get(keyHandle);
-            logger.info("Selected Account: Key=" + keyHandle +
-                        ", Number=" + selectedCard.accountDescriptor.getId() +
+            logger.info("Selected Card: Key=" + keyHandle +
+                        ", AccountId=" + selectedCard.accountId +
                         ", URL=" + selectedCard.authorityUrl +
                         ", KeyEncryptionKey=" + selectedCard.keyEncryptionKey);
             this.keyHandle = keyHandle;
@@ -907,7 +909,7 @@ public class Wallet {
                                 PaymentRequest comparePaymentRequest = null;
                                 do {
                                     JSONObjectReader paymentNetwork = paymentNetworks.getObject();
-                                    String[] accountTypes = paymentNetwork.getStringArray(BaseProperties.ACCEPTED_ACCOUNT_TYPES_JSON);
+                                    String[] paymentMethods = paymentNetwork.getStringArray(BaseProperties.PAYMENT_METHODS_JSON);
                                     PaymentRequest paymentRequest = new PaymentRequest(paymentNetwork.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
                                     if (comparePaymentRequest == null) {
                                         comparePaymentRequest = paymentRequest;
@@ -941,7 +943,7 @@ public class Wallet {
                                         collectPotentialCard(ek.getKeyHandle(),
                                                              JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
                                                              paymentRequest,
-                                                             accountTypes);
+                                                             paymentMethods);
                                     }
                                 } while (paymentNetworks.hasMore());
                             } catch (Exception e) {
@@ -1002,12 +1004,13 @@ public class Wallet {
 
         void collectPotentialCard(int keyHandle,
                                   JSONObjectReader cardProperties,
-                                  PaymentRequest paymentRequest, String[] accountTypes) throws IOException {
-            AccountDescriptor cardAccount = new AccountDescriptor(cardProperties.getObject(BaseProperties.ACCOUNT_JSON));
-            for (String accountType : accountTypes) {
-                if (cardAccount.getType().equals(accountType)) {
+                                  PaymentRequest paymentRequest, String[] paymentMethods) throws IOException {
+            String paymentMethod = cardProperties.getString(BaseProperties.PAYMENT_METHOD_JSON);
+            for (String acceptedPaymentMethod : paymentMethods) {
+                if (acceptedPaymentMethod.equals(paymentMethod)) {
                     Account card =
-                        new Account(cardAccount,
+                        new Account(paymentMethod,
+                                    cardProperties.getString(BaseProperties.ACCOUNT_ID_JSON),
                                     cardProperties.getBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON),
                                     getImageIcon(sks.getExtension(keyHandle, 
                                                  KeyGen2URIs.LOGOTYPES.CARD).getExtensionData(SecureKeyStore.SUB_TYPE_LOGOTYPE),
@@ -1052,7 +1055,8 @@ public class Wallet {
                     JSONObjectWriter authorizationData = AuthorizationData.encode(
                         selectedCard.paymentRequest,
                         domainName,
-                        selectedCard.accountDescriptor,
+                        selectedCard.paymentMethod,
+                        selectedCard.accountId,
                         dataEncryptionKey,
                         selectedCard.dataEncryptionAlgorithm,
                         challengeResults,
@@ -1078,7 +1082,7 @@ public class Wallet {
                     // and process user authorizations.
                     resultMessage = PayerAuthorization.encode(authorizationData,
                                                               selectedCard.authorityUrl,
-                                                              selectedCard.accountDescriptor.getType(),
+                                                              selectedCard.paymentMethod,
                                                               selectedCard.dataEncryptionAlgorithm,
                                                               selectedCard.keyEncryptionKey,
                                                               selectedCard.optionalKeyId,

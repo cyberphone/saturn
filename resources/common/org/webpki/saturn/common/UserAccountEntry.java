@@ -31,8 +31,8 @@ import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 public class UserAccountEntry implements BaseProperties {
     PublicKey publicKey;
-    String type;
-    String id;
+    String paymentMethod;
+    String accountId;
     boolean cardFormatAccountId;
     String providerAuthorityUrl;
     AsymSignatureAlgorithms signatureAlgorithm;
@@ -44,8 +44,8 @@ public class UserAccountEntry implements BaseProperties {
     RiskBasedAuthentication riskBasedAuthentication = new RiskBasedAuthentication();
 
     public UserAccountEntry(JSONObjectReader rd) throws IOException {
-        type = rd.getObject(ACCOUNT_JSON).getString(TYPE_JSON);
-        id = rd.getObject(ACCOUNT_JSON).getString(ID_JSON);
+        paymentMethod = rd.getString(PAYMENT_METHOD_JSON);
+        accountId = rd.getString(ACCOUNT_ID_JSON);
         cardFormatAccountId = rd.getBoolean(CARD_FORMAT_ACCOUNT_ID_JSON);
         signatureAlgorithm = AsymSignatureAlgorithms
             .getAlgorithmFromId(rd.getString(SIGNATURE_ALGORITHM_JSON), AlgorithmPreferences.JOSE);
@@ -63,8 +63,8 @@ public class UserAccountEntry implements BaseProperties {
         rd.checkForUnread();
     }
 
-    public String getId() {
-         return id;
+    public String getAccountId() {
+         return accountId;
     }
 
     public PublicKey getPublicKey() {
@@ -75,8 +75,8 @@ public class UserAccountEntry implements BaseProperties {
         return optionalKeyId;
     }
 
-    public String getType() {
-        return type;
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 
     public RiskBasedAuthentication getRiskBasedAuthentication() {

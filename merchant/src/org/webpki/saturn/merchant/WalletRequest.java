@@ -78,7 +78,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                 }
             }
             paymentNetworksArray.setObject()
-                .setStringArray(ACCEPTED_ACCOUNT_TYPES_JSON, paymentNetwork.acceptedAccountTypes)
+                .setStringArray(PAYMENT_METHODS_JSON, paymentNetwork.acceptedAccountTypes)
                 .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         }
         

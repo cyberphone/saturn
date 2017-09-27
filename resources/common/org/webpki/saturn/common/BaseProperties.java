@@ -62,13 +62,12 @@ public interface BaseProperties {
     String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
     String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Encrypted Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider authority object
-    String PROVIDER_PAYMENT_METHODS_JSON    = "providerPaymentMethods";     // List of provider-supported payment methods
     String HOSTING_PROVIDER_JSON            = "hostingProvider";            // Optional object in ProviderAuthority
     String HOME_PAGE_JSON                   = "homePage";                   // URL to the public Web of the entity
     String PAYMENT_METHOD_SPECIFIC_JSON     = "paymentMethodSpecific";      // Holding a payment method specific object
-    String ACCEPTED_ACCOUNT_TYPES_JSON      = "acceptedAccountTypes";       // List of ACCOUNT_TYPE_JSON
+    String PAYMENT_METHODS_JSON             = "paymentMethods";             // List of accepted payment methods (URIs)
+    String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URI)
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
-    String ACCOUNT_JSON                     = "account";                    // Payer Account2Account or Card
     String ACCOUNT_ID_JSON                  = "accountId";                  // Account identifier or PAN
     String ACCOUNT_REFERENCE_JSON           = "accountReference";           // Account/Card number for payee (like ************5678)
     String ACCOUNT_TYPE_JSON                = "accountType";                // Account/Card type in the form of a URI

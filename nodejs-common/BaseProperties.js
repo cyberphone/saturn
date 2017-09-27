@@ -72,7 +72,6 @@ const BaseProperties = {
     EXTENSIONS_JSON                  : 'extensions',                 // Optional provider authority data
     ACCOUNT_JSON                     : 'account',                    // Payer Account2Account or Card
     ACCOUNT_REFERENCE_JSON           : 'accountReference',           // Account/Card number for payee (like ************5678)
-    ACCOUNT_TYPE_JSON                : 'accountType',                // Account/Card type in the form of a URI
     ACCOUNT_HOLDER_JSON              : 'accountHolder',              // Card holder
     ACCOUNT_SECURITY_CODE_JSON       : 'accountSecurityCode',        // CCV
     CARD_FORMAT_ACCOUNT_ID_JSON      : 'cardFormatAccountId',        // Display formatting like cards or not

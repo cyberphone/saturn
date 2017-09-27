@@ -59,7 +59,6 @@ import org.webpki.sks.Grouping;
 import org.webpki.sks.AppUsage;
 import org.webpki.sks.PassphraseFormat;
 
-import org.webpki.saturn.common.AccountDescriptor;
 import org.webpki.saturn.common.BaseProperties;
 
 import org.webpki.webutil.ServletUtil;
@@ -138,13 +137,10 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
             key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                              new JSONObjectWriter()
-                .setObject(BaseProperties.ACCOUNT_JSON, 
-                           new AccountDescriptor(paymentCredential.accountType,
-                                                 paymentCredential.accountId).writeObject())
-                .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON,
-                            paymentCredential.cardFormatted)
-                .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON,
-                            paymentCredential.authorityUrl)
+                .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentCredential.paymentMethod)
+                .setString(BaseProperties.ACCOUNT_ID_JSON, paymentCredential.accountId)
+                .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON, paymentCredential.cardFormatted)
+                .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, paymentCredential.authorityUrl)
                 .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
                            signAlg.getAlgorithmId(AlgorithmPreferences.JOSE))
                 .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()

@@ -123,14 +123,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             }
             paymentMethodEncoder = new SupercardPaymentMethodEncoder();
         } else {
-            for (String paymentMethod : providerAuthority.getProviderPaymentMethods()) {
+            for (String paymentMethod : providerAuthority.getPaymentMethods()) {
                 if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
                     paymentMethodEncoder = new SEPAPaymentMethodEncoder(MERCHANT_ACCOUNT_ID);
                     break;
                 }
             }
             if (paymentMethodEncoder == null) {
-                throw new IOException("No matching account type: " + providerAuthority.getProviderPaymentMethods());
+                throw new IOException("No matching account type: " + providerAuthority.getPaymentMethods());
             }
         }
 

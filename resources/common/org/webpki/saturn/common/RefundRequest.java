@@ -43,7 +43,7 @@ public class RefundRequest implements BaseProperties {
         if (cardNetwork != null &&
             authorizationResponse.authorizationRequest.payerAccountType.isCardPayment() ^ cardNetwork) {
             throw new IOException("Incompatible payment method: " + 
-                authorizationResponse.authorizationRequest.payerAccountType.getTypeUri());
+                authorizationResponse.authorizationRequest.payerAccountType.getPaymentMethodUri());
         }
         rd.checkForUnread();
     }

@@ -103,7 +103,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static class PaymentCredential {
         KeyStoreEnumerator signatureKey;
-        String accountType;
+        String paymentMethod;
         String accountId;
         boolean cardFormatted;
         byte[] optionalServerPin;
@@ -194,7 +194,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 paymentCredential.signatureKey =
                     new KeyStoreEnumerator(getResource(arguments[0]),
                                            getPropertyString(KEYSTORE_PASSWORD));
-                paymentCredential.accountType = PayerAccountTypes.valueOf(arguments[1]).getTypeUri();
+                paymentCredential.paymentMethod = PayerAccountTypes.valueOf(arguments[1]).getPaymentMethodUri();
                 boolean cardFormatted = true;
                 if (arguments[2].charAt(0) == '!') {
                     cardFormatted = false;

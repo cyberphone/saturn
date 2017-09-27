@@ -42,7 +42,8 @@ public class AuthorizationData implements BaseProperties {
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
-                                          AccountDescriptor account,
+                                          String paymentMethod,
+                                          String accountId,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
@@ -53,7 +54,8 @@ public class AuthorizationData implements BaseProperties {
                 .setString(JSONSignatureDecoder.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
                 .setBinary(JSONSignatureDecoder.VALUE_JSON, paymentRequest.getRequestHash()))
             .setString(DOMAIN_NAME_JSON, domainName)
-            .setObject(ACCOUNT_JSON, account.writeObject())
+            .setString(PAYMENT_METHOD_JSON, paymentMethod)
+            .setString(ACCOUNT_ID_JSON, accountId)
             .setObject(ENCRYPTION_PARAMETERS_JSON, 
                        new JSONObjectWriter()
                 .setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
@@ -71,7 +73,8 @@ public class AuthorizationData implements BaseProperties {
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
-                                          AccountDescriptor account,
+                                          String paymentMethod,
+                                          String accountId,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
@@ -79,7 +82,8 @@ public class AuthorizationData implements BaseProperties {
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
                       domainName,
-                      account,
+                      paymentMethod,
+                      accountId,
                       dataEncryptionKey,
                       dataEncryptionAlgorithm,
                       optionalUserResponseItems,
@@ -104,7 +108,8 @@ public class AuthorizationData implements BaseProperties {
     public AuthorizationData(JSONObjectReader rd) throws IOException {
         requestHash = RequestHash.parse(rd);
         domainName = rd.getString(DOMAIN_NAME_JSON);
-        account = new AccountDescriptor(rd.getObject(ACCOUNT_JSON));
+        paymentMethod = rd.getString(PAYMENT_METHOD_JSON);
+        accountId = rd.getString(ACCOUNT_ID_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
             .getAlgorithmFromId(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
@@ -151,9 +156,14 @@ public class AuthorizationData implements BaseProperties {
         return domainName;
     }
 
-    AccountDescriptor account;
-    public AccountDescriptor getAccount() {
-        return account;
+    String paymentMethod;
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    String accountId;
+    public String getAccountId() {
+        return accountId;
     }
 
     GregorianCalendar timeStamp;

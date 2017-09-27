@@ -69,7 +69,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         boolean testMode = transactionRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
-                    "Charging for AccountID=" + authorizationData.getAccount().getId() + 
+                    "Charging for Account ID=" + authorizationData.getAccountId() + 
                     ", Amount=" + transactionRequest.getAmount().toString() +
                     " " + paymentRequest.getCurrency().toString());
         String optionalLogData = null;
