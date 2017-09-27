@@ -153,13 +153,13 @@ const jsonPostProcessors = {
     cardPaymentRequest.verifyPayerProvider(paymentRoot);
 
     // This is the account we are processing
-    var accountData = cardPaymentRequest.getProtectedAccountData(encryptionKeys);
+    var cardData = cardPaymentRequest.getProtectedCardData(encryptionKeys);
     var currency = cardPaymentRequest.getPaymentRequest().getCurrency();
     var amountString = cardPaymentRequest.getAmount().toFixed(currency.getDecimals());
     var testMode = cardPaymentRequest.getTestMode();
     logger.info((testMode ? 'TEST ONLY: ' : '') + 
-                  'Amount=' + amountString + ' ' + currency.getSymbol() + ', Account ID=' + accountData.getAccount().getId() + 
-                  ', Holder=' + accountData.getCardSpecificData().getAccountHolder());
+                  'Amount=' + amountString + ' ' + currency.getSymbol() + ', Card Number=' + cardData.getCardNumber() + 
+                  ', Holder=' + cardData.getCardHolder());
     if (!testMode) {
     
       /////////////////////////////////////////////////////////////

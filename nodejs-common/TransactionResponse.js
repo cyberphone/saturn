@@ -25,7 +25,7 @@ const BaseProperties = require('./BaseProperties');
 const Messages       = require('./Messages');
 const Software       = require('./Software');
     
-const SOFTWARE_NAME    = "WebPKI.org - Acquirer";
+const SOFTWARE_NAME    = "WebPKI.org - Acquirer(js)";
 const SOFTWARE_VERSION = "1.00";
 
 function TransactionResponse() {

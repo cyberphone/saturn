@@ -27,7 +27,7 @@ const Messages              = require('./Messages');
 const Software              = require('./Software');
 const AuthorizationResponse = require('./AuthorizationResponse');
 const AuthorizationRequest  = require('./AuthorizationRequest');
-const ProtectedAccountData  = require('./ProtectedAccountData');
+const CardData              = require('./CardData');
 
 function TransactionRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, rd);
@@ -39,10 +39,6 @@ function TransactionRequest(rd) {
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
   this.publicKey = rd.getSignature().getPublicKey();
-  if (!this.authorizationResponse.authorizationRequest.payerAccountType.isCardPayment()) {
-    throw new TypeError('Payment method is not card: ' + 
-        this.authorizationResponse.authorizationRequest.payerAccountType.getTypeUri());
-  }
   rd.checkForUnread();
 }
 
@@ -86,11 +82,10 @@ TransactionRequest.prototype.verifyPayerProvider = function(paymentRoot) {
   this.authorizationResponse.signatureDecoder.verifyTrust(paymentRoot);
 };
 
-TransactionRequest.prototype.getProtectedAccountData = function(decryptionKeys) {
-  return new ProtectedAccountData(JsonUtil.ObjectReader.parse(
+TransactionRequest.prototype.getProtectedCardData = function(decryptionKeys) {
+  return new CardData(JsonUtil.ObjectReader.parse(
                                       this.authorizationResponse.encryptedAccountData
-                                          .getDecryptedData(decryptionKeys)),
-                                  this.authorizationResponse.authorizationRequest.payerAccountType);
+                                          .getDecryptedData(decryptionKeys)));
 };
 
 module.exports = TransactionRequest;

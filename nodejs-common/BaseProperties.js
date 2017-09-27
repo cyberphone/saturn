@@ -57,7 +57,8 @@ const BaseProperties = {
     CURRENCY_JSON                    : 'currency',
     NON_DIRECT_PAYMENT_JSON          : 'nonDirectPayment',           // Deposit, automated gas station, booking
     TIME_STAMP_JSON                  : 'timeStamp',
-    PROVIDER_PAYMENT_METHODS_JSON    : 'providerPaymentMethods',     // List of provider-supported payment methods
+    PAYMENT_METHOD_JSON              : 'paymentMethod',              // Payment method (URI)
+    PAYMENT_METHODS_JSON             : 'paymentMethods',             // List of supported payment methods (URIs)
     PAYMENT_METHOD_SPECIFIC_JSON     : 'paymentMethodSpecific',      // Holding a payment method specific object
     CLIENT_IP_ADDRESS_JSON           : 'clientIpAddress',            // Security data for the payment provider
     CLIENT_GEO_LOCATION_JSON         : 'clientGeoLocation',          // Optional security data that client devices may supply
@@ -67,13 +68,9 @@ const BaseProperties = {
     TEST_MODE_JSON                   : 'testMode',                   // Test mode = no real money involved
     ENCRYPTED_AUTHORIZATION_JSON     : 'encryptedAuthorization',     // Payer authorization data
     PROVIDER_AUTHORITY_URL_JSON      : 'providerAuthorityUrl',       // URL to payment provider
-    PROVIDER_ACCOUNT_TYPES_JSON      : 'providerAccountTypes',       // List of Account2Account types "understood" by provider
-    ACCEPTED_ACCOUNT_TYPES_JSON      : 'acceptedAccountTypes',       // List of ACCOUNT_TYPE_JSON
     EXTENSIONS_JSON                  : 'extensions',                 // Optional provider authority data
-    ACCOUNT_JSON                     : 'account',                    // Payer Account2Account or Card
+    ACCOUNT_ID_JSON                  : 'accountId',                  // Actual identifier
     ACCOUNT_REFERENCE_JSON           : 'accountReference',           // Account/Card number for payee (like ************5678)
-    ACCOUNT_HOLDER_JSON              : 'accountHolder',              // Card holder
-    ACCOUNT_SECURITY_CODE_JSON       : 'accountSecurityCode',        // CCV
     CARD_FORMAT_ACCOUNT_ID_JSON      : 'cardFormatAccountId',        // Display formatting like cards or not
     ENCRYPTED_ACCOUNT_DATA_JSON      : 'encryptedAccountData',       // Account data that (only) an acquirer needs
     REQUEST_HASH_JSON                : 'requestHash',

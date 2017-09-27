@@ -21,26 +21,32 @@
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
-const BaseProperties    = require('./BaseProperties');
-const Messages          = require('./Messages');
-const Software          = require('./Software');
-const PaymentRequest    = require('./PaymentRequest');
-const PayerAccountTypes = require('./PayerAccountTypes');
-const AccountDescriptor = require('./AccountDescriptor');
+const BaseProperties = require('./BaseProperties');
+const Messages       = require('./Messages');
+const Software       = require('./Software');
+const PaymentRequest = require('./PaymentRequest');
     
-const SOFTWARE_NAME    = "WebPKI.org - Payee";
-const SOFTWARE_VERSION = "1.00";
+const EXPECTED_CONTEXT = 'https://supercard.com/saturn/v3#pms';
+const EXPECTED_METHOD  = 'https://supercard.com';
 
 function AuthorizationRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, rd);
   this.testMode = rd.getBooleanConditional(BaseProperties.TEST_MODE_JSON);
   this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
   this.authorityUrl = rd.getString(BaseProperties.AUTHORITY_URL_JSON);
-  this.payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(BaseProperties.ACCOUNT_TYPE_JSON));
+  var paymentMethod = rd.getString(BaseProperties.PAYMENT_METHOD_JSON);
+  if (paymentMethod != 'https://supercard.com') {
+    throw new TypeError('Unrecognized payment method: ' + paymentMethod);
+  }
   this.paymentRequest = new PaymentRequest(rd.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
   this.encryptedAuthorizationData = rd.getObject(BaseProperties.ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject();
-  this.paymentMethodSpecific = rd.getObject(BaseProperties.PAYMENT_METHOD_SPECIFIC_JSON);
-  rd.scanItem(BaseProperties.PAYMENT_METHOD_SPECIFIC_JSON);
+  if (paymentMethod != EXPECTED_METHOD) {
+    throw new TypeError('Unrecognized payment method: ' + paymentMethod);
+  }
+  var paymentMethodSpecific = rd.getObject(BaseProperties.PAYMENT_METHOD_SPECIFIC_JSON);
+  if (paymentMethodSpecific.getString(Messages.CONTEXT_JSON) != EXPECTED_CONTEXT) {
+    throw new TypeError('Unrecognized payment method specfic data: ' + paymentMethodSpecific.toString());
+  }
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.clientIpAddress = rd.getString(BaseProperties.CLIENT_IP_ADDRESS_JSON);
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
