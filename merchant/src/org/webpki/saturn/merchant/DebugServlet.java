@@ -81,7 +81,10 @@ class DebugPrintout implements BaseProperties {
         String original = originalBuffer.toString();
         int i = original.indexOf(pattern);
         if (i < 0) return false;
-        originalBuffer.delete(0, i + pattern.length() - 1);
+        if (pattern.endsWith("/")) {
+            i--;
+        }
+        originalBuffer.delete(0, i + pattern.length());
         originalBuffer.insert(0, rewritten);
         return true;
     }
@@ -91,6 +94,8 @@ class DebugPrintout implements BaseProperties {
             StringBuffer value = new StringBuffer(jsonTree.getString(target));
             if (rewrittenUrl(value, "/webpay-payerbank/", "https://payments.mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank/", "https://payments.bigbank.com") ||
+                rewrittenUrl(value, "/webpay-payerbank", "https://mybank.com") ||
+                rewrittenUrl(value, "/webpay-payeebank", "https://bigbank.com") ||
                 rewrittenUrl(value, "/webpay-acquirer/", "https://https://cardprocessor.com")) {
                 rewriter.setupForRewrite(target);
                 rewriter.setString(target, value.toString());
@@ -148,6 +153,7 @@ class DebugPrintout implements BaseProperties {
             }
         }
         updateUrls(jsonTree, rewriter, KnownExtensions.HYBRID_PAYMENT);
+        updateUrls(jsonTree, rewriter, HOME_PAGE_JSON);
         updateUrls(jsonTree, rewriter, RECEPIENT_URL_JSON);
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
@@ -279,7 +285,7 @@ class DebugPrintout implements BaseProperties {
         descriptionStdMargin("For details on the encryption scheme, see <a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/jef.html\">[ENCRYPTION]</a>." +
              " Note that " +
              keyWord(PROVIDER_AUTHORITY_URL_JSON) + " and " +
-             keyWord(ACCOUNT_TYPE_JSON) + " are sent in clear as well (otherwise the <b>Merchant</b>" +
+             keyWord(PAYMENT_METHOD_JSON) + " are sent in clear as well (otherwise the <b>Merchant</b>" +
              " would not know what to do with the received data). " +
              "To maintain privacy, the issuer specific encryption public key is preferably shared by many (&gt; 100000) users."); 
 
@@ -469,10 +475,9 @@ class DebugPrintout implements BaseProperties {
                 keyWord(PAYMENT_REQUEST_JSON) +
                 " object.</li>" +
                 "<li>Verifying that the " +
-                keyWord(ACCOUNT_TYPE_JSON) + " in the " +
-                keyWord(Messages.AUTHORIZATION_REQUEST) + " and the " +
-                keyWord(TYPE_JSON) +
-                " in the user authorization object are identical.</li>" +
+                keyWord(PAYMENT_METHOD_JSON) + " in the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST) +
+                " and in the user authorization object are identical.</li>" +
                 "<li>Verifying that the " +
                 keyWord(TIME_STAMP_JSON) +
                 " in the user authorization object is within limits like " +

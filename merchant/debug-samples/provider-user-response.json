@@ -2,10 +2,11 @@
   "@context": "http://webpki.org/saturn/v3",
   "@qualifier": "ProviderUserResponse",
   "encryptedMessage": {
-    "algorithm": "A128CBC-HS256",
-    "iv": "AYRgHvkkcuQDbHB0s2n3pg",
-    "tag": "VqEdrZIib_XzRF0LX7yI0g",
-    "cipherText": "mNxgq4E0OH2a6Qb_DDUjVEtfpdDeKb5twe8W9HH3Mk8VwKlasb5SDk4iwFqm2ytdqAfFzKTTAR7h0Yyb4fsYLFoij2ox871Z_lKwsu5UJg2Mi2z30ck8WALXGA2a70sj3EhFoVchMDCL2ieBcZup9mTLw07DNPIw_DpeDLBaiDI-JPdkLlm_npM9Of_2JD_InW93_6nT3Q68Un5Ocvd1zHh2T8s42sjkHAuNQPty_eljtE_0hkjG8zxkQ_3KGV7gXKB_ghnrUKzx0Hu4qpYpse_zwHvcqeQVzso91Ud3vKHOMFMNHgp0CEdLcuBSt0vwegv0hZNnGYPkTdhVr9A2VDm_Ee3GEM6sUPARL6pux51ixxDzYd8tKcbDZRpO0mYsYoVMeo65ngNJ0gRrECgEIrTGboU0KJZPIigAsPPKY5TSawAcjNo8hbjlahowpCHznM2NgPjRlVTYcxut_mMn1gl6jx3g0tRXK9zOavD8pnOICScJUGn3lyrLhCRYAtKa"
+    "algorithm": "A128GCM",
+    "iv": "70It1cvexXMb4Gpa",
+    "tag": "dtHRYudA3Z0CXssRGDpVlw",
+    "cipherText": "7F7uSDYrJgJSf7jDP2bRnui_XmHcscNFrQTY3GI8MpiO8U-oJzKOSZRUImPfWhVeH_HqzFLP224vwz5-zDPFDkX_Udxiv-R9WLGmfmAyIqUIwXyMVmDnNLrqCystOyG8H_NIuJ4AzDY8Z0yUBjN2rTE_tZVVcmlHyHypkfz-XRhAsbIiLigSSLTtG8b6hQU124NY3pW0F9UBSEpOrOq1XULqH7dTEBLy-1I7oVGcyJN9i-436PGfcOlMoTQcWVSyp19rcIB4m-czCj6LUfAfogOVx0q_CRlNmoD0vpxFnDRzBZy0QZPY8bL8FlrW-izU1tJP5L7FCTITppZQPzxqeRVauFmyuA-0em-cv2LUtSWHfMk2Dxs49IzOs1LkAJ_8bLHmvm69SUqw3tCls_67je5KzIlch8coGXfycmwtN32VhT7mMtlQERfGhCO4IbJPFzdXkhHBtMAkj-AEe06xdSCCHnUU-6mPVoOGqhlVg7d7uBiadSwV-OM4YKC_"
   }
 }
+
 

@@ -76,7 +76,7 @@ public class AuthorizationRequest implements BaseProperties {
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-        payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
+        payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         paymentSpecific = rd.getObject(PAYMENT_METHOD_SPECIFIC_JSON);
@@ -117,7 +117,7 @@ public class AuthorizationRequest implements BaseProperties {
             (PaymentMethodDecoder) knownPaymentMethods.parse(paymentSpecific.clone()); // Clone => Fresh read
         if (!paymentMethod.match(payerAccountType)) {
             throw new IOException("\"" + PAYMENT_METHOD_SPECIFIC_JSON + 
-                                  "\" data incompatible with \"" + ACCOUNT_TYPE_JSON + "\"");
+                                  "\" data incompatible with \"" + PAYMENT_METHOD_JSON + "\"");
         }
         return paymentMethod;
     }
@@ -166,7 +166,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
-            .setString(ACCOUNT_TYPE_JSON, payerAccountType.getPaymentMethodUri())
+            .setString(PAYMENT_METHOD_JSON, payerAccountType.getPaymentMethodUri())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
             .setObject(PAYMENT_METHOD_SPECIFIC_JSON, paymentMethodEncoder.writeObject())

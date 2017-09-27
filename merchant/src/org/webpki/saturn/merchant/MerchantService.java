@@ -285,7 +285,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             payeeAcquirerAuthorityUrl = getPropertyString(PAYEE_ACQUIRER_AUTHORITY_URL);
 
             merchantBaseUrl = getURL(getPropertyString(MERCHANT_BASE_URL));
-/*
+
             new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
 
             new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));
@@ -298,7 +298,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                         .getDecryptedData(
                     userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
                         .getBinary(BaseProperties.KEY_JSON))));
-*/
+
             walletSupercardAuthz = getImageDataURI(SUPERCARD_AUTHZ_SAMPLE);
 
             walletBankdirectAuthz = getImageDataURI(BANKDIRECT_AUTHZ_SAMPLE);

@@ -35,7 +35,7 @@ public class PayerAuthorization implements BaseProperties {
         // Only syntax checking for intermediaries
         rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
-        accountType = PayerAccountTypes.fromTypeUri(rd.getString(ACCOUNT_TYPE_JSON));
+        accountType = PayerAccountTypes.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
         rd.checkForUnread();
     }
     
@@ -58,7 +58,7 @@ public class PayerAuthorization implements BaseProperties {
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm) throws IOException, GeneralSecurityException {
         return Messages.PAYER_AUTHORIZATION.createBaseMessage()
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
-            .setString(ACCOUNT_TYPE_JSON, accountType)
+            .setString(PAYMENT_METHOD_JSON, accountType)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, 
                        JSONObjectWriter
                           .createEncryptionObject(unencryptedAuthorizationData.serializeToBytes(JSONOutputFormats.NORMALIZED),
