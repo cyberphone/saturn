@@ -25,7 +25,7 @@ var normalRequest = {
   "@context": "http://webpki.org/saturn/v3",
   "@qualifier": "PaymentClientRequest",
   paymentNetworks: [{
-    acceptedAccountTypes: ["https://nosuchcard.com","https://supercard.com","https://bankdirect.net"],
+    paymentMethods: ["https://nosuchcard.com","https://supercard.com","https://bankdirect.net"],
     paymentRequest: {
       payee: {
         commonName: "Demo Merchant",
@@ -56,11 +56,11 @@ var normalRequest = {
 
 // All our cards/accounts should match during the discovery phase...
 var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-scrollMatchingRequest.paymentNetworks[0].acceptedAccountTypes = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
+scrollMatchingRequest.paymentNetworks[0].paymentMethods = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
 
 // No card/account should match during the discovery phase...
 var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-nonMatchingRequest.paymentNetworks[0].acceptedAccountTypes = ["https://nosuchcard.com"];
+nonMatchingRequest.paymentNetworks[0].paymentMethods = ["https://nosuchcard.com"];
 
 // Note the modified "payee" property...
 var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
