@@ -94,9 +94,10 @@ class DebugPrintout implements BaseProperties {
             StringBuffer value = new StringBuffer(jsonTree.getString(target));
             if (rewrittenUrl(value, "/webpay-payerbank/", "https://payments.mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank/", "https://payments.bigbank.com") ||
+                rewrittenUrl(value, "/webpay-acquirer/", "https://secure.cardprocessor.com") ||
                 rewrittenUrl(value, "/webpay-payerbank", "https://mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank", "https://bigbank.com") ||
-                rewrittenUrl(value, "/webpay-acquirer/", "https://https://cardprocessor.com")) {
+                rewrittenUrl(value, "/webpay-acquirer", "https://cardprocessor.com")) {
                 rewriter.setupForRewrite(target);
                 rewriter.setString(target, value.toString());
             }
@@ -250,7 +251,7 @@ class DebugPrintout implements BaseProperties {
 
          description(point +
             "<p>When the ready signal has been received the <b>Merchant</b> Web-page sends a " +
-            "list of accepted account types (aka payment instruments) and associated <i>signed</i> " + 
+            "list of accepted payment methods and associated <i>signed</i> " + 
             "<a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/jcs.html\">[SIGNATURE]</a> " +
             keyWord(PAYMENT_REQUEST_JSON) + " objects to the <b>Wallet</b>:</p>");
 
