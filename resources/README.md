@@ -1,2 +1,2 @@
-###Web Payment Application
-This project contains miscellaneous resources.
+### Saturn Payment Authorization System
+This project contains miscellaneous resources as well as a library of common objects.
