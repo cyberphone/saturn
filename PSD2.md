@@ -32,7 +32,7 @@ There are already many and *quite successful* "pre-PSD2" mobile payment systems 
 Unfortunately, *none of these efforts seem to have enjoyed much success outside of their
 original national setting*. This may prove to be difficult changing, because these schemes
 (for *scalability* and *interoperability* reasons), usually depend on specific third-party
-wallet services, which would create *friction* in an international scenario.
+wallet services, causing *friction* if applied to an international market.
 It would effectively be similar to launching a new VISA network.
 
 # Saturn - Optimized for Payments
