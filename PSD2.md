@@ -29,7 +29,7 @@ problem for financial services than for payments.
 
 ### Business Issues
 There are already many and *quite successful* "pre-PSD2" mobile payment systems on the market.
-Theese have so far *without exeptions* been stuck to their original home market.
+These have so far *without exceptions* been stuck to their original home market.
 A major reason why this may not change either is because they depend on third-party
 wallet services, creating considerable friction in the market.
 
