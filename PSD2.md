@@ -14,7 +14,7 @@ This also implies specific CAs (Certification Authorities) as well as centralize
 holding data about PSD2 service providers.  A potential problem is that the cost for certification may
 be high and may also prove to be somewhat less easy to get acceptance for on a European or global level.
 
-### User Interface Issues
+### Quirky User Interfaces
 Due to the fact that PSD2 APIs operate at the same trust level as banks,
 they (*quite logically*) build on *reusing* the banks' existing (and *arbitrary complex*),
 on-line banking authentication solutions and user interfaces.
@@ -23,13 +23,13 @@ However, this introduces a *dependency* which card-based payment solutions never
 If you brought the current PSD2 API concept to the POS (Point of Sale) terminal,
 users would most likely have to *manually select* which *bank-specific* "wallet" to use.
 
-### Not yet Standardized
+### Standardization Hurdles
 The lack of a standardized PSD2 API complicates roll-out considerably but may be less of a
 problem for financial services than for payments.
 
 ### Business Issues
 There are already many and *quite successful* "pre-PSD2" mobile payment systems on the market.
-These have so far *without exceptions* been stuck to their original home market.
+These have so far *without exceptions* been stuck at their original national border.
 A major reason why this may not change either is because they depend on third-party
 wallet services, creating considerable friction in the market.
 
