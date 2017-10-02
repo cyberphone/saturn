@@ -30,8 +30,10 @@ problem for financial services than for payments.
 ### Business Issues
 There are already many and *quite successful* "pre-PSD2" mobile payment systems on the market.
 Unfortunately, *none of these efforts seem to have enjoyed much success outside of their
-original national setting*. A major reason why this may not change either is because they depend on third-party
-wallet services, creating considerable *friction* in the market.
+original national setting*. This may prove to be difficult changing, because these schemes
+(for *scalability* and *interoperability* reasons), usually depend on specific third-party
+wallet services, which would create *friction* in an international scenario.
+It would be similar to creating a new VISA network.
 
 # Saturn - Optimized for Payments
 To cope with these issues a light-weight tightly-scoped system, coined "[Saturn](https://cyberphone.github.io/doc/saturn/)" was developed which:
