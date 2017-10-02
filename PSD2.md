@@ -2,7 +2,7 @@
 The purpose of PSD2 is enabling third parties creating new *Financial Services* through
 open APIs to customers' bank accounts.
 
-Although the currently published PSD2 APIs certainly are not identical, they seem anyway sharing a common "conceptual" model.
+Although the currently published PSD2 APIs certainly are not identical, they at least share a common "conceptual" model.
 
 This document focuses on PSD2 for *Payments* which in PSD2 are facilitated through PISPs (Payment Initiation Service Providers).
 It is in this context worth noting that consumer payment are currently performed through dedicated payment "rails" like EMV, *which do not rely on direct access to accounts by external parties*.
@@ -29,7 +29,7 @@ problem for financial services than for payments.
 
 ### Business Issues
 There are already many and *quite successful* "pre-PSD2" mobile payment systems on the market.
-Unfortunately *none of these efforts seem to have enjoyed much success outside of their
+Unfortunately, *none of these efforts seem to have enjoyed much success outside of their
 original national setting*. A major reason why this may not change either is because they depend on third-party
 wallet services, creating considerable *friction* in the market.
 
