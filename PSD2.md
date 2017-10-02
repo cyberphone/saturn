@@ -33,7 +33,7 @@ Unfortunately, *none of these efforts seem to have enjoyed much success outside 
 original national setting*. This may prove to be difficult changing, because these schemes
 (for *scalability* and *interoperability* reasons), usually depend on specific third-party
 wallet services, which would create *friction* in an international scenario.
-It would be similar to creating a new VISA network.
+It would effectively be similar to launching a new VISA network.
 
 # Saturn - Optimized for Payments
 To cope with these issues a light-weight tightly-scoped system, coined "[Saturn](https://cyberphone.github.io/doc/saturn/)" was developed which:
