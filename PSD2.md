@@ -30,7 +30,7 @@ problem for financial services than for payments.
 ### Business Issues
 There are already many and *quite successful* "pre-PSD2" mobile payment systems on the market.
 Unfortunately, *none of these efforts seem to have enjoyed much success outside of their
-original national setting*. This may prove to be difficult changing, because these schemes
+original national setting*. This may prove to be difficult to change, because these schemes
 (for *scalability* and *interoperability* reasons), usually depend on specific third-party
 wallet services, causing "friction" if applied to an international market.
 It would effectively be similar to launching a new VISA network.
