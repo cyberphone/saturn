@@ -39,7 +39,8 @@ It would effectively be similar to launching a new VISA network.
 To cope with these issues a light-weight tightly-scoped system, coined "[Saturn](https://cyberphone.github.io/doc/saturn/)" was developed which:
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
-- Does not expose *any* private information to external parties.
+- Maintains a security level surpassing EMV.
+- Uses the same API for *all* payment scenarios, be it on-line or at the Gas station.
 - Finally unleashes the true power of the *decentralized* banking network!
 
 Saturn, by only dealing with payments, adopts the well-known card paradigm (although the
