@@ -193,10 +193,24 @@
   <target name="svg-webpki">
     <antcall target="_svg">
        <param name="svgfile" value="svg-gen/webpki.svg"/>
-       <param name="svgclass" value="org.webpki.saturn.resources.svg.diagrams.WebPKI"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.WebPKI"/>
     </antcall>
   </target>
   
+  <target name="svg-p2pbanks">
+    <antcall target="_svg">
+       <param name="svgfile" value="svg-gen/p2pbanks.svg"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.P2PBanks"/>
+    </antcall>
+  </target>
+
+  <target name="svg-bank">
+    <antcall target="_svg">
+       <param name="svgfile" value="svg-gen/bank.svg"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.Bank"/>
+    </antcall>
+  </target>
+
   <target name="svg-play">
     <fail unless="playclass" message="-&#10;
 ***************************************************************&#10;

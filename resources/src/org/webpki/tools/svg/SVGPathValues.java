@@ -113,10 +113,10 @@ public class SVGPathValues extends SVGValue {
         StringBuffer result = new StringBuffer();
         char last = 0;
         for (SubCommand subCommand : commands) {
-            if (result.length() > 0) {
-                result.append(' ');
-            }
             if (last != subCommand.command) {
+                if (result.length() > 0) {
+                    result.append(' ');
+                }
                 result.append(last = subCommand.command);
             }
             for (Coordinate coordinate : subCommand.coordinates) {

@@ -68,7 +68,7 @@ public class SVGPath extends SVGObject {
     @Override
     double getMaxX() {
         if (x.getDouble() + path.minX < 0) {
-            throw new RuntimeException("SVGPath X negative!");
+//            throw new RuntimeException("SVGPath X negative!");
         }
         x = new SVGAddOffset(x, SVGDocument.marginX);
         return x.getDouble() + path.maxX;
@@ -77,7 +77,7 @@ public class SVGPath extends SVGObject {
     @Override
     double getMaxY() {
         if (y.getDouble() + path.minY < 0) {
-            throw new RuntimeException("SVGPath Y negative!");
+  //          throw new RuntimeException("SVGPath Y negative!");
         }
         y = new SVGAddOffset(y, SVGDocument.marginY);
         return y.getDouble() + path.maxY;
@@ -90,6 +90,11 @@ public class SVGPath extends SVGObject {
 
     public SVGPath setRoundLineCap() {
         _setRoundLineCap();
+        return this;
+    }
+
+    public SVGPath setFillOpacity(double opacity) {
+        _setFillOpacity(opacity);
         return this;
     }
 }
