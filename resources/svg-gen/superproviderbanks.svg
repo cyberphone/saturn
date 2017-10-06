@@ -1,0 +1,193 @@
+<svg width="614" height="584" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="super" spreadMethod="pad" cx="0.5" cy="0.5" r="1">
+<stop stop-color="#ffe100" offset="0"/>
+<stop stop-color="#ff005d" stop-opacity="0.99609" offset="1"/>
+</radialGradient>
+<linearGradient y2="0.6" x2="1" y1="0.6" x1="0" id="bankPillar">
+<stop stop-opacity="0.98438" stop-color="#707070" offset="0"/>
+<stop offset="0.37323" stop-opacity="0.97656" stop-color="#e8e8e8"/>
+<stop stop-opacity="0.99219" stop-color="#f4f4f2" offset="0.65448"/>
+<stop stop-color="#707070" stop-opacity="0.98438" offset="0.99823"/>
+</linearGradient>
+<filter width="200%" height="200%" x="-50%" y="-50%" id="bankShaddow">
+<feGaussianBlur stdDeviation="2"/>
+</filter>
+</defs>
+<g>
+<line x1="555" y1="290" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="521.5" y1="415" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="430" y1="506.5" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="305" y1="540" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="180" y1="506.5" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="88.49" y1="415" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="55" y1="290" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="88.49" y1="165" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="179.99" y1="73.49" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="304.99" y1="40" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="429.99" y1="73.49" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<line x1="521.5" y1="164.99" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
+<path fill="#a0a0a0" d="M 513,273 L 558.5,258 604,273 604,284.5 596.5,284.5 596.5,316 604,316 604,322 609,322 609,329 508,329 508,322 513,322 513,316 520.5,316 520.5,284.5 513,284.5" filter="url(#bankShaddow)"/>
+<rect x="517" y="281" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 520.5,273.5 L 542.5,273.5 542.5,284.5 530.5,284.5 530.5,316 520.5,316" filter="url(#bankShaddow)"/>
+<rect x="517" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 542.5,273.5 L 564.5,273.5 564.5,284.5 552.5,284.5 552.5,316 542.5,316" filter="url(#bankShaddow)"/>
+<rect x="539" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 564.5,273.5 L 586.5,273.5 586.5,284.5 574.5,284.5 574.5,316 564.5,316" filter="url(#bankShaddow)"/>
+<rect x="561" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="583" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 510,270 L 555,255 600,270" stroke-linecap="round"/>
+<rect x="510" y="270.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="505" y="319" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="510" y="313" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 479.5,398 L 525,383 570.5,398 570.5,409.5 563,409.5 563,441 570.5,441 570.5,447 575.5,447 575.5,454 474.5,454 474.5,447 479.5,447 479.5,441 487,441 487,409.5 479.5,409.5" filter="url(#bankShaddow)"/>
+<rect x="483.5" y="406" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 487,398.5 L 509,398.5 509,409.5 497,409.5 497,441 487,441" filter="url(#bankShaddow)"/>
+<rect x="483.5" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 509,398.5 L 531,398.5 531,409.5 519,409.5 519,441 509,441" filter="url(#bankShaddow)"/>
+<rect x="505.5" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 531,398.5 L 553,398.5 553,409.5 541,409.5 541,441 531,441" filter="url(#bankShaddow)"/>
+<rect x="527.5" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="549.5" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 476.5,395 L 521.5,380 566.5,395" stroke-linecap="round"/>
+<rect x="476.5" y="395.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="471.5" y="444" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="476.5" y="438" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 388,489.5 L 433.5,474.5 479,489.5 479,501 471.5,501 471.5,532.5 479,532.5 479,538.5 484,538.5 484,545.5 383,545.5 383,538.5 388,538.5 388,532.5 395.5,532.5 395.5,501 388,501" filter="url(#bankShaddow)"/>
+<rect x="392" y="497.5" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 395.5,490 L 417.5,490 417.5,501 405.5,501 405.5,532.5 395.5,532.5" filter="url(#bankShaddow)"/>
+<rect x="392" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 417.5,490 L 439.5,490 439.5,501 427.5,501 427.5,532.5 417.5,532.5" filter="url(#bankShaddow)"/>
+<rect x="414" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 439.5,490 L 461.5,490 461.5,501 449.5,501 449.5,532.5 439.5,532.5" filter="url(#bankShaddow)"/>
+<rect x="436" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="458" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 385,486.5 L 430,471.5 475,486.5" stroke-linecap="round"/>
+<rect x="385" y="487" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="380" y="535.5" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="385" y="529.5" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 263,523 L 308.5,508 354,523 354,534.5 346.5,534.5 346.5,566 354,566 354,572 359,572 359,579 258,579 258,572 263,572 263,566 270.5,566 270.5,534.5 263,534.5" filter="url(#bankShaddow)"/>
+<rect x="267" y="531" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 270.5,523.5 L 292.5,523.5 292.5,534.5 280.5,534.5 280.5,566 270.5,566" filter="url(#bankShaddow)"/>
+<rect x="267" y="531" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 292.5,523.5 L 314.5,523.5 314.5,534.5 302.5,534.5 302.5,566 292.5,566" filter="url(#bankShaddow)"/>
+<rect x="289" y="531" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 314.5,523.5 L 336.5,523.5 336.5,534.5 324.5,534.5 324.5,566 314.5,566" filter="url(#bankShaddow)"/>
+<rect x="311" y="531" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="333" y="531" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 260,520 L 305,505 350,520" stroke-linecap="round"/>
+<rect x="260" y="520.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="255" y="569" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="260" y="563" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 138,489.5 L 183.5,474.5 229,489.5 229,501 221.5,501 221.5,532.5 229,532.5 229,538.5 234,538.5 234,545.5 133,545.5 133,538.5 138,538.5 138,532.5 145.5,532.5 145.5,501 138,501" filter="url(#bankShaddow)"/>
+<rect x="142" y="497.5" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 145.5,490 L 167.5,490 167.5,501 155.5,501 155.5,532.5 145.5,532.5" filter="url(#bankShaddow)"/>
+<rect x="142" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 167.5,490 L 189.5,490 189.5,501 177.5,501 177.5,532.5 167.5,532.5" filter="url(#bankShaddow)"/>
+<rect x="164" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 189.5,490 L 211.5,490 211.5,501 199.5,501 199.5,532.5 189.5,532.5" filter="url(#bankShaddow)"/>
+<rect x="186" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="208" y="497.5" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 135,486.5 L 180,471.5 225,486.5" stroke-linecap="round"/>
+<rect x="135" y="487" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="130" y="535.5" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="135" y="529.5" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 46.49,398 L 91.99,383 137.49,398 137.49,409.5 129.99,409.5 129.99,441 137.49,441 137.49,447 142.49,447 142.49,454 41.49,454 41.49,447 46.49,447 46.49,441 53.99,441 53.99,409.5 46.49,409.5" filter="url(#bankShaddow)"/>
+<rect x="50.49" y="406" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 53.99,398.5 L 75.99,398.5 75.99,409.5 63.99,409.5 63.99,441 53.99,441" filter="url(#bankShaddow)"/>
+<rect x="50.49" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 75.99,398.5 L 97.99,398.5 97.99,409.5 85.99,409.5 85.99,441 75.99,441" filter="url(#bankShaddow)"/>
+<rect x="72.49" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 97.99,398.5 L 119.99,398.5 119.99,409.5 107.99,409.5 107.99,441 97.99,441" filter="url(#bankShaddow)"/>
+<rect x="94.49" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="116.49" y="406" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 43.49,395 L 88.49,380 133.49,395" stroke-linecap="round"/>
+<rect x="43.49" y="395.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="38.49" y="444" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="43.49" y="438" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 13,273 L 58.5,258 104,273 104,284.5 96.5,284.5 96.5,316 104,316 104,322 109,322 109,329 8,329 8,322 13,322 13,316 20.5,316 20.5,284.5 13,284.5" filter="url(#bankShaddow)"/>
+<rect x="17" y="281" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 20.5,273.5 L 42.5,273.5 42.5,284.5 30.5,284.5 30.5,316 20.5,316" filter="url(#bankShaddow)"/>
+<rect x="17" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 42.5,273.5 L 64.5,273.5 64.5,284.5 52.5,284.5 52.5,316 42.5,316" filter="url(#bankShaddow)"/>
+<rect x="39" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 64.5,273.5 L 86.5,273.5 86.5,284.5 74.5,284.5 74.5,316 64.5,316" filter="url(#bankShaddow)"/>
+<rect x="61" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="83" y="281" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 10,270 L 55,255 100,270" stroke-linecap="round"/>
+<rect x="10" y="270.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="5" y="319" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="10" y="313" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 46.49,148 L 91.99,133 137.49,148 137.49,159.5 129.99,159.5 129.99,191 137.49,191 137.49,197 142.49,197 142.49,204 41.49,204 41.49,197 46.49,197 46.49,191 53.99,191 53.99,159.5 46.49,159.5" filter="url(#bankShaddow)"/>
+<rect x="50.49" y="156" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 53.99,148.5 L 75.99,148.5 75.99,159.5 63.99,159.5 63.99,191 53.99,191" filter="url(#bankShaddow)"/>
+<rect x="50.49" y="156" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 75.99,148.5 L 97.99,148.5 97.99,159.5 85.99,159.5 85.99,191 75.99,191" filter="url(#bankShaddow)"/>
+<rect x="72.49" y="156" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 97.99,148.5 L 119.99,148.5 119.99,159.5 107.99,159.5 107.99,191 97.99,191" filter="url(#bankShaddow)"/>
+<rect x="94.49" y="156" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="116.49" y="156" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 43.49,145 L 88.49,130 133.49,145" stroke-linecap="round"/>
+<rect x="43.49" y="145.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="38.49" y="194" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="43.49" y="188" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 137.99,56.49 L 183.49,41.49 228.99,56.49 228.99,67.99 221.49,67.99 221.49,99.49 228.99,99.49 228.99,105.49 233.99,105.49 233.99,112.49 132.99,112.49 132.99,105.49 137.99,105.49 137.99,99.49 145.49,99.49 145.49,67.99 137.99,67.99" filter="url(#bankShaddow)"/>
+<rect x="141.99" y="64.49" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 145.49,56.99 L 167.49,56.99 167.49,67.99 155.49,67.99 155.49,99.49 145.49,99.49" filter="url(#bankShaddow)"/>
+<rect x="141.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 167.49,56.99 L 189.49,56.99 189.49,67.99 177.49,67.99 177.49,99.49 167.49,99.49" filter="url(#bankShaddow)"/>
+<rect x="163.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 189.49,56.99 L 211.49,56.99 211.49,67.99 199.49,67.99 199.49,99.49 189.49,99.49" filter="url(#bankShaddow)"/>
+<rect x="185.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="207.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 134.99,53.49 L 179.99,38.49 224.99,53.49" stroke-linecap="round"/>
+<rect x="134.99" y="53.99" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="129.99" y="102.49" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="134.99" y="96.49" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 262.99,23 L 308.49,8 353.99,23 353.99,34.5 346.49,34.5 346.49,66 353.99,66 353.99,72 358.99,72 358.99,79 257.99,79 257.99,72 262.99,72 262.99,66 270.49,66 270.49,34.5 262.99,34.5" filter="url(#bankShaddow)"/>
+<rect x="266.99" y="31" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 270.49,23.5 L 292.49,23.5 292.49,34.5 280.49,34.5 280.49,66 270.49,66" filter="url(#bankShaddow)"/>
+<rect x="266.99" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 292.49,23.5 L 314.49,23.5 314.49,34.5 302.49,34.5 302.49,66 292.49,66" filter="url(#bankShaddow)"/>
+<rect x="288.99" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 314.49,23.5 L 336.49,23.5 336.49,34.5 324.49,34.5 324.49,66 314.49,66" filter="url(#bankShaddow)"/>
+<rect x="310.99" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="332.99" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 259.99,20 L 304.99,5 349.99,20" stroke-linecap="round"/>
+<rect x="259.99" y="20.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="254.99" y="69" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="259.99" y="63" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 387.99,56.49 L 433.49,41.49 478.99,56.49 478.99,67.99 471.49,67.99 471.49,99.49 478.99,99.49 478.99,105.49 483.99,105.49 483.99,112.49 382.99,112.49 382.99,105.49 387.99,105.49 387.99,99.49 395.49,99.49 395.49,67.99 387.99,67.99" filter="url(#bankShaddow)"/>
+<rect x="391.99" y="64.49" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 395.49,56.99 L 417.49,56.99 417.49,67.99 405.49,67.99 405.49,99.49 395.49,99.49" filter="url(#bankShaddow)"/>
+<rect x="391.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 417.49,56.99 L 439.49,56.99 439.49,67.99 427.49,67.99 427.49,99.49 417.49,99.49" filter="url(#bankShaddow)"/>
+<rect x="413.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 439.49,56.99 L 461.49,56.99 461.49,67.99 449.49,67.99 449.49,99.49 439.49,99.49" filter="url(#bankShaddow)"/>
+<rect x="435.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="457.99" y="64.49" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 384.99,53.49 L 429.99,38.49 474.99,53.49" stroke-linecap="round"/>
+<rect x="384.99" y="53.99" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="379.99" y="102.49" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="384.99" y="96.49" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<path fill="#a0a0a0" d="M 479.5,147.99 L 525,132.99 570.5,147.99 570.5,159.49 563,159.49 563,190.99 570.5,190.99 570.5,196.99 575.5,196.99 575.5,203.99 474.5,203.99 474.5,196.99 479.5,196.99 479.5,190.99 487,190.99 487,159.49 479.5,159.49" filter="url(#bankShaddow)"/>
+<rect x="483.5" y="155.99" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 487,148.49 L 509,148.49 509,159.49 497,159.49 497,190.99 487,190.99" filter="url(#bankShaddow)"/>
+<rect x="483.5" y="155.99" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 509,148.49 L 531,148.49 531,159.49 519,159.49 519,190.99 509,190.99" filter="url(#bankShaddow)"/>
+<rect x="505.5" y="155.99" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 531,148.49 L 553,148.49 553,159.49 541,159.49 541,190.99 531,190.99" filter="url(#bankShaddow)"/>
+<rect x="527.5" y="155.99" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="549.5" y="155.99" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#404040" stroke-width="1" fill="#e0e0e0" d="M 476.5,144.99 L 521.5,129.99 566.5,144.99" stroke-linecap="round"/>
+<rect x="476.5" y="145.49" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="471.5" y="193.99" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<rect x="476.5" y="187.99" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
+<circle cx="309.75" cy="294.75" r="100.5" fill="#a0a0a0" filter="url(#bankShaddow)"/>
+<circle cx="305" cy="290" r="100" stroke="#404040" stroke-width="1" fill="url(#super)"/>
+<text x="309" y="274" font-family="Sans-serif" font-size="34" text-anchor="middle">
+<tspan>Super</tspan>
+<tspan x="309" dy="1.2em">Provider</tspan>
+</text>
+</g>
+</svg>

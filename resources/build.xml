@@ -204,6 +204,13 @@
     </antcall>
   </target>
 
+  <target name="svg-superproviderbanks">
+    <antcall target="_svg">
+       <param name="svgfile" value="svg-gen/superproviderbanks.svg"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.SuperProviderBanks"/>
+    </antcall>
+  </target>
+
   <target name="svg-bank">
     <antcall target="_svg">
        <param name="svgfile" value="svg-gen/bank.svg"/>

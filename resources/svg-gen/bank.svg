@@ -1,0 +1,28 @@
+<svg width="114" height="84" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient y2="0.6" x2="1" y1="0.6" x1="0" id="bankPillar">
+<stop stop-opacity="0.98438" stop-color="#707070" offset="0"/>
+<stop offset="0.37323" stop-opacity="0.97656" stop-color="#e8e8e8"/>
+<stop stop-opacity="0.99219" stop-color="#f4f4f2" offset="0.65448"/>
+<stop stop-color="#707070" stop-opacity="0.98438" offset="0.99823"/>
+</linearGradient>
+<filter width="200%" height="200%" x="-50%" y="-50%" id="bankShaddow">
+<feGaussianBlur stdDeviation="2"/>
+</filter>
+</defs>
+<g>
+<path fill="#a0a0a0" d="M 13,23 L 58.5,8 104,23 104,34.5 96.5,34.5 96.5,66 104,66 104,72 109,72 109,79 8,79 8,72 13,72 13,66 20.5,66 20.5,34.5 13,34.5" filter="url(#bankShaddow)"/>
+<rect x="17" y="31" width="76" height="31.5" fill="#ffffff"/>
+<path fill="#a0a0a0" d="M 20.5,23.5 L 42.5,23.5 42.5,34.5 30.5,34.5 30.5,66 20.5,66" filter="url(#bankShaddow)"/>
+<rect x="17" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 42.5,23.5 L 64.5,23.5 64.5,34.5 52.5,34.5 52.5,66 42.5,66" filter="url(#bankShaddow)"/>
+<rect x="39" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path fill="#a0a0a0" d="M 64.5,23.5 L 86.5,23.5 86.5,34.5 74.5,34.5 74.5,66 64.5,66" filter="url(#bankShaddow)"/>
+<rect x="61" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<rect x="83" y="31" width="10" height="31.5" fill="url(#bankPillar)"/>
+<path stroke="#a0a0a0" stroke-width="1" fill="#e0e0e0" d="M 10,20 L 55,5 100,20" stroke-linecap="round"/>
+<rect x="10" y="20.5" width="90" height="10" stroke="#a0a0a0" stroke-width="1" fill="#f2f2f2"/>
+<rect x="5" y="69" width="100" height="6" stroke="#a0a0a0" stroke-width="1" fill="#f2f2f2"/>
+<rect x="10" y="63" width="90" height="6" stroke="#a0a0a0" stroke-width="1" fill="#f2f2f2"/>
+</g>
+</svg>

@@ -18,13 +18,7 @@ package org.webpki.saturn.svg.diagrams;
 
 import org.webpki.tools.svg.SVGDocument;
 import org.webpki.tools.svg.SVGDoubleValue;
-import org.webpki.tools.svg.SVGEmbeddedText;
 import org.webpki.tools.svg.SVGLine;
-import org.webpki.tools.svg.SVGPath;
-import org.webpki.tools.svg.SVGRect;
-import org.webpki.tools.svg.SVGShaderTemplate;
-import org.webpki.tools.svg.SVGText;
-import org.webpki.tools.svg.SVGValue;
 
 public class P2PBanks extends SVGDocument {
     public P2PBanks() {
@@ -37,14 +31,6 @@ public class P2PBanks extends SVGDocument {
     public String getFilters() {
         return 
         "<defs>\n" +
-        "  <linearGradient id=\"supercardGradient\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n" +
-        "  <stop stop-color=\"#ffb115\" offset=\"0\"/>\n" +
-        "  <stop stop-color=\"#ffff00\" offset=\"0.5\"/>\n" +
-        "  <stop stop-color=\"#ffb115\" stop-opacity=\"0.99219\" offset=\"1\"/>\n" +
-        "  </linearGradient>\n" +
-        "  <filter width=\"200%\" height=\"200%\" x=\"-50%\" y=\"-50%\" id=\"messageBlur\">\n" +
-        "  <feGaussianBlur stdDeviation=\"2\"/>\n" +
-        "  </filter>\n" + 
         Bank.BANK_PILLAR +
         "</defs>\n";
 
@@ -57,14 +43,7 @@ public class P2PBanks extends SVGDocument {
     double getBankY(int q) {
         return Math.sin(q * increment) * Bank.BANK_WIDTH * 2.5 + 2.5 * Bank.BANK_WIDTH + Bank.BANK_HEIGHT / 2;
     }
-/*
-SVGValue x1,
-                   SVGValue y1,
-                   SVGValue x2,
-                   SVGValue y2,
-                   Double strokeWidth,
-                   String strokeColor
-                    */
+
     @Override
     public void generate() {
         for (int q = 0; q < 12; q++) {
@@ -78,7 +57,11 @@ SVGValue x1,
             }
         }
         for (int q = 0; q < 12; q++) {
-            new Bank.SubBank(getBankX(q), getBankY(q), 1, true).setStrokeWeight(1).setStrokeColor("#404040").generate(this);
+            new Bank.SubBank(getBankX(q), getBankY(q), 1, true)
+                .setStrokeWeight(1)
+                .setStrokeColor("#404040")
+                .setShaddow(true)
+                .generate(this);
         }
     }
 }
