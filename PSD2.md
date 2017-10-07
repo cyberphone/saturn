@@ -1,3 +1,5 @@
+![Saturn is great](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
+
 # Purpose of PSD2
 The purpose of PSD2 is enabling third parties creating new *Financial Services* through
 open APIs to customers' bank accounts.
