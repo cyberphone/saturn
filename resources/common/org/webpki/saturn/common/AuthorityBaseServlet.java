@@ -40,7 +40,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     
     public static final String BORDER = "border-width:1px;border-style:solid;border-color:#a9a9a9";
     public static final String BOX_SHADDOW = "box-shadow:3pt 3pt 3pt #D0D0D0";
-    public static final String TOP_ELEMENT = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\">";
+    public static final String TOP_ELEMENT = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\">" +
+                                             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
     public static final String REST_ELEMENT = 
         "<style type=\"text/css\">" +
         " .header {text-align:center;font-size:10pt;font-weight:bold;padding:15pt}" +

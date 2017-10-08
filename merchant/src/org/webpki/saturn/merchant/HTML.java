@@ -51,7 +51,7 @@ public class HTML implements MerchantProperties {
     static final String HTML_INIT = 
         "<!DOCTYPE html>"+
         "<html><head><meta charset=\"UTF-8\"><link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\">"+
-        "<meta name=\"viewport\" content=\"initial-scale=1.0\"/>" +
+        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>" +
         "<title>Saturn Payment Demo</title>"+
         "<style type=\"text/css\">html {overflow:auto}\n"+
         ".point {text-align:center;font-family:courier;font-weight:bold;font-size:10pt;border-radius:3pt;border-width:1px;border-style:solid;border-color:#B0B0B0;display:inline-block;padding:1.5pt 3pt 1pt 3pt}\n" +

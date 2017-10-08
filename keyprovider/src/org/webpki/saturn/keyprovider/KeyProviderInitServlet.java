@@ -52,7 +52,7 @@ public class KeyProviderInitServlet extends HttpServlet {
 
     static final String HTML_INIT = 
             "<!DOCTYPE HTML>"+
-            "<html><head><meta name=\"viewport\" content=\"initial-scale=1.0\"/>" +
+            "<html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>" +
             "<title>Payment Credential Enrollment</title>"+
             "<style type=\"text/css\">html {overflow:auto} html, body {margin:0px;padding:0px;height:100%} "+
             "body {font-size:8pt;color:#000000;font-family:verdana,arial;background-color:white} "+

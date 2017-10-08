@@ -290,7 +290,10 @@ Https.createServer(options, (request, response) => {
           if (!accept || accept == BaseProperties.JSON_CONTENT_TYPE) {
             returnJsonData(request, response, jsonWriter);
           } else {
-            writeHtml(response, '<html><body><pre>' + jsonWriter.toString() + '</pre></body></html>');
+            writeHtml(response, '<!DOCTYPE html><html><head><title>Acquirer Server (nodejs)</title>' +
+                                '<meta http-equiv=Content-Type content="text/html; charset=utf-8">' +
+                                '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+                                '</head><body><pre>' + jsonWriter.toString() + '</pre></body></html>');
           }
         } else {
           noSuchFileResponse(response, request);
