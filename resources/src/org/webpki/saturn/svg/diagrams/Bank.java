@@ -36,7 +36,7 @@ public class Bank extends SVGDocument {
     
     static final int PILLAR_WIDTH_3 = 13;
     
-    static final int PILLAR_WIDTH_4 = 10;
+    static final int PILLAR_WIDTH_4 = 11;
 
     static final int STAIRS_HEIGHT = 6;
     
@@ -52,18 +52,18 @@ public class Bank extends SVGDocument {
     
     static final String ROOF_COLOR = "#e0e0e0";
 
-    static final String STROKE_COLOR = "#a0a0a0";
+    static final String STROKE_COLOR = "#404040";
     
     static final String SHADDOW_COLOR = "#a0a0a0";
     
     static final String SHADDOW_FILTER = "url(#bankShaddow)";
 
     static final String BANK_PILLAR = 
-            "<linearGradient y2=\"0.6\" x2=\"1\" y1=\"0.6\" x1=\"0\" id=\"bankPillar\">\n" +
-            "<stop stop-opacity=\"0.98438\" stop-color=\"#707070\" offset=\"0\"/>\n" +
-            "<stop offset=\"0.37323\" stop-opacity=\"0.97656\" stop-color=\"#e8e8e8\"/>\n" +
-            "<stop stop-opacity=\"0.99219\" stop-color=\"#f4f4f2\" offset=\"0.65448\"/>\n" +
-            "<stop stop-color=\"#707070\" stop-opacity=\"0.98438\" offset=\"0.99823\"/>\n" +
+            "<linearGradient y2=\"0.5\" x2=\"1\" y1=\"0.5\" x1=\"0\" id=\"bankPillar\">\n" +
+            "<stop stop-color=\"#606060\" offset=\"0\"/>\n" +
+            "<stop stop-color=\"#ffffff\" offset=\"0.4\"/>\n" +
+            "<stop stop-color=\"#ffffff\" offset=\"0.6\"/>\n" +
+            "<stop stop-color=\"#606060\" offset=\"1\"/>\n" +
             "</linearGradient>\n" +
             "<filter width=\"200%\" height=\"200%\" x=\"-50%\" y=\"-50%\" id=\"bankShaddow\">\n" +
             "<feGaussianBlur stdDeviation=\"2\"/>\n" +

@@ -58,8 +58,6 @@ public class P2PBanks extends SVGDocument {
         }
         for (int q = 0; q < 12; q++) {
             new Bank.SubBank(getBankX(q), getBankY(q), 1, true)
-                .setStrokeWeight(1)
-                .setStrokeColor("#404040")
                 .setShaddow(true)
                 .generate(this);
         }

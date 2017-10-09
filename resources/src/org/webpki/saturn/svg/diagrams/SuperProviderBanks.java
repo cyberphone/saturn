@@ -41,7 +41,7 @@ public class SuperProviderBanks extends SVGDocument {
         "<defs>\n" +
         "<radialGradient id=\"super\" spreadMethod=\"pad\" cx=\"0.5\" cy=\"0.5\" r=\"1\">\n" +
         "<stop stop-color=\"#ffe100\" offset=\"0\"/>\n" +
-        "<stop stop-color=\"#ff005d\" stop-opacity=\"0.99609\" offset=\"1\"/>\n" +
+        "<stop stop-color=\"#ff005d\" offset=\"1\"/>\n" +
         "</radialGradient>\n" +
         Bank.BANK_PILLAR +
         "</defs>\n";
@@ -68,8 +68,6 @@ public class SuperProviderBanks extends SVGDocument {
         }
         for (int q = 0; q < 12; q++) {
             new Bank.SubBank(getBankX(q), getBankY(q), 1, true)
-                .setStrokeWeight(1)
-                .setStrokeColor("#404040")
                 .setShaddow(true)
                 .generate(this);
         }
@@ -78,7 +76,7 @@ public class SuperProviderBanks extends SVGDocument {
                                         SVGAnchor.ALIGNMENT.MIDDLE_CENTER),
                           new SVGDoubleValue(Bank.BANK_WIDTH * 2),
                           1.0,
-                          "#404040",
+                          Bank.STROKE_COLOR,
                           "url(#super)").setShader(new SVGShaderTemplate(Bank.SHADDOW_FILTER,
                                                                          "#a0a0a0",
                                                                          Bank.X_SHADDOW * 1.5,
