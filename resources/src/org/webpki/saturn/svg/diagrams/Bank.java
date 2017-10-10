@@ -64,7 +64,9 @@ public class Bank extends SVGDocument {
             "<stop stop-color=\"#ffffff\" offset=\"0.4\"/>\n" +
             "<stop stop-color=\"#ffffff\" offset=\"0.6\"/>\n" +
             "<stop stop-color=\"#606060\" offset=\"1\"/>\n" +
-            "</linearGradient>\n" +
+            "</linearGradient>\n";
+    
+    static final String BANK_DEFS = BANK_PILLAR +
             "<filter width=\"200%\" height=\"200%\" x=\"-50%\" y=\"-50%\" id=\"bankShaddow\">\n" +
             "<feGaussianBlur stdDeviation=\"2\"/>\n" +
             "</filter>\n";
@@ -77,7 +79,7 @@ public class Bank extends SVGDocument {
     public String getFilters() {
         return 
         "<defs>\n" +
-         Bank.BANK_PILLAR +
+         Bank.BANK_DEFS +
         "</defs>\n";
 
     }

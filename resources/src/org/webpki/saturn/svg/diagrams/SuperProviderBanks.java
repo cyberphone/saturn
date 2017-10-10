@@ -43,7 +43,7 @@ public class SuperProviderBanks extends SVGDocument {
         "<stop stop-color=\"#ffe100\" offset=\"0\"/>\n" +
         "<stop stop-color=\"#ff005d\" offset=\"1\"/>\n" +
         "</radialGradient>\n" +
-        Bank.BANK_PILLAR +
+        Bank.BANK_DEFS +
         "</defs>\n";
 
     }

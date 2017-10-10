@@ -31,7 +31,7 @@ public class P2PBanks extends SVGDocument {
     public String getFilters() {
         return 
         "<defs>\n" +
-        Bank.BANK_PILLAR +
+        Bank.BANK_DEFS +
         "</defs>\n";
 
     }
