@@ -58,35 +58,50 @@ public class Bank extends SVGDocument {
     
     static final String SHADDOW_FILTER = "url(#bankShaddow)";
 
-    static final String BANK_PILLAR = 
-            "<linearGradient y2=\"0.5\" x2=\"1\" y1=\"0.5\" x1=\"0\" id=\"bankPillar\">\n" +
+    static String getBankPillarDefs() { 
+        return size < 0.5 ?
+            "<linearGradient x2=\"1\" x1=\"0\" id=\"bankPillar\">\n" +
+            "<stop stop-color=\"#707070\" offset=\"0\"/>\n" +
+            "<stop stop-color=\"#ffffff\" offset=\"0.5\"/>\n" +
+            "<stop stop-color=\"#707070\" offset=\"1\"/>\n" +
+            "</linearGradient>\n"
+                :
+            "<linearGradient x2=\"1\" x1=\"0\" id=\"bankPillar\">\n" +
             "<stop stop-color=\"#606060\" offset=\"0\"/>\n" +
             "<stop stop-color=\"#ffffff\" offset=\"0.4\"/>\n" +
             "<stop stop-color=\"#ffffff\" offset=\"0.6\"/>\n" +
             "<stop stop-color=\"#606060\" offset=\"1\"/>\n" +
             "</linearGradient>\n";
+    }
     
-    static final String BANK_DEFS = BANK_PILLAR +
+    static String getBankDefs() {
+        return
+            getBankPillarDefs() +
             "<filter width=\"200%\" height=\"200%\" x=\"-50%\" y=\"-50%\" id=\"bankShaddow\">\n" +
-            "<feGaussianBlur stdDeviation=\"2\"/>\n" +
+            "<feGaussianBlur stdDeviation=\"" +
+            (2 * size) +
+            "\"/>\n" +
             "</filter>\n";
+    }
     
     static final double X_SHADDOW = 3.5;
     
     static final double Y_SHADDOW = 3.5;
+    
+    static double size;
 
     @Override
     public String getFilters() {
         return 
         "<defs>\n" +
-         Bank.BANK_DEFS +
+         getBankDefs() +
         "</defs>\n";
 
     }
 
     public static class SubBank extends SVGSubDocument {
     
-        double x, y, size;
+        double x, y;
         boolean fourPillars;
         double strokeWeight;
         String strokeColor = STROKE_COLOR;
@@ -103,7 +118,7 @@ public class Bank extends SVGDocument {
         public SubBank(double x, double y, double size, boolean fourPillars) {
             this.x = x;
             this.y = y;
-            this.size = size;
+            Bank.size = size;
             this.fourPillars = fourPillars;
             this.strokeWeight = STROKE_WIDTH * size;
         }
@@ -143,8 +158,8 @@ public class Bank extends SVGDocument {
                 .lineToAbsolute(-roofLR + OUTER_PILLAR_GAP * size, roofLow + TOP_BAR_HEIGHT * size + strokeWeight)
                 .lineToAbsolute(-roofLR - strokeWeight / 2, roofLow + TOP_BAR_HEIGHT * size + strokeWeight);
             add(new SVGPath(
-                    new SVGDoubleValue(x + X_SHADDOW),
-                    new SVGDoubleValue(y + Y_SHADDOW),
+                    new SVGDoubleValue(x + X_SHADDOW * size),
+                    new SVGDoubleValue(y + Y_SHADDOW * size),
                     background,
                     null,
                     null,
@@ -154,11 +169,11 @@ public class Bank extends SVGDocument {
         @Override
         public void generate() {
             numberOfPillars = fourPillars ? 4 : 3;
-            pillarWidth = fourPillars ? PILLAR_WIDTH_4 : PILLAR_WIDTH_3;
+            pillarWidth = (fourPillars ? PILLAR_WIDTH_4 : PILLAR_WIDTH_3) * size;
             roofLR = (ROOF_WIDTH * size) / 2;
             roofLow = (ROOF_HEIGHT - BANK_HEIGHT / 2) * size;
             pillarX = x - roofLR + OUTER_PILLAR_GAP * size;
-            pillarXincrement = (roofLR + roofLR - (OUTER_PILLAR_GAP * 2 + pillarWidth) * size) / (numberOfPillars - 1);
+            pillarXincrement = (roofLR + roofLR - OUTER_PILLAR_GAP * 2 * size - pillarWidth) / (numberOfPillars - 1);
             pillarHeight = (BANK_HEIGHT - STAIRS_HEIGHT * 2 - ROOF_HEIGHT - TOP_BAR_HEIGHT) * size - strokeWeight * 1.5;
             inset = ((BANK_WIDTH - ROOF_WIDTH) / 2) * size;
             if (shaddow) {
@@ -168,7 +183,7 @@ public class Bank extends SVGDocument {
                     new SVGDoubleValue(pillarX),
                     new SVGDoubleValue(y + roofLow + strokeWeight + TOP_BAR_HEIGHT * size),
                     new SVGDoubleValue(roofLR + roofLR - OUTER_PILLAR_GAP * 2 * size),
-                    new SVGDoubleValue(pillarHeight * size),
+                    new SVGDoubleValue(pillarHeight),
                     null,
                     null,
                     "#ffffff"));
@@ -179,12 +194,12 @@ public class Bank extends SVGDocument {
                         .moveAbsolute(shaddowX, roofLow)
                         .lineToAbsolute(shaddowX + pillarXincrement, roofLow)
                         .lineToAbsolute(shaddowX + pillarXincrement, roofLow + TOP_BAR_HEIGHT * size + strokeWeight)
-                        .lineToAbsolute(shaddowX + pillarWidth * size, roofLow + TOP_BAR_HEIGHT * size + strokeWeight)
-                        .lineToAbsolute(shaddowX + pillarWidth * size, roofLow + TOP_BAR_HEIGHT * size + strokeWeight + pillarHeight * size)
-                        .lineToAbsolute(shaddowX, roofLow + TOP_BAR_HEIGHT * size + strokeWeight + pillarHeight * size);
+                        .lineToAbsolute(shaddowX + pillarWidth, roofLow + TOP_BAR_HEIGHT * size + strokeWeight)
+                        .lineToAbsolute(shaddowX + pillarWidth, roofLow + TOP_BAR_HEIGHT * size + strokeWeight + pillarHeight)
+                        .lineToAbsolute(shaddowX, roofLow + TOP_BAR_HEIGHT * size + strokeWeight + pillarHeight);
                     add(new SVGPath(
-                            new SVGDoubleValue(x + X_SHADDOW),
-                            new SVGDoubleValue(y + Y_SHADDOW),
+                            new SVGDoubleValue(x + X_SHADDOW * size),
+                            new SVGDoubleValue(y + Y_SHADDOW * size),
                             background,
                             null,
                             null,
@@ -194,8 +209,8 @@ public class Bank extends SVGDocument {
                 add(new SVGRect(
                         new SVGDoubleValue(pillarX),
                         new SVGDoubleValue(y + roofLow + strokeWeight + TOP_BAR_HEIGHT * size),
-                        new SVGDoubleValue(pillarWidth * size),
-                        new SVGDoubleValue(pillarHeight * size),
+                        new SVGDoubleValue(pillarWidth),
+                        new SVGDoubleValue(pillarHeight),
                         null,
                         null,
                         "url(#bankPillar)"));

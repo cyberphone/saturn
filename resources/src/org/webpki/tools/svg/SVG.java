@@ -98,12 +98,12 @@ public class SVG {
             if (args.length == 3) {
                 filters = new String(ArrayUtil.readFile(args[2]), "UTF-8");
             }
-            filters += doc.getFilters();
             doc.generate();
+            filters += doc.getFilters();
             for (SVGObject svgObject : SVGDocument.svgObjects) {
                 writeSVGObject(svgObject);
             }
-            svgText.append("</g>\n</svg>");
+            svgText.append("</svg>");
             StringBuffer total = new StringBuffer("<svg ");
             if (doc.useViewBox()) {
                 total.append("viewBox=\"0 0 ")
@@ -120,7 +120,6 @@ public class SVG {
                  .append(SVGDocument.linksUsed ? " xmlns:xlink=\"http://www.w3.org/1999/xlink\"" : "")
                  .append(">\n")
                  .append(filters)
-                 .append("<g>\n")
                  .append(svgText);
             ArrayUtil.writeFile(args[0], total.toString().getBytes("UTF-8"));
         } catch (Exception e) {

@@ -168,6 +168,13 @@
        <param name="svgclass" value="org.webpki.saturn.svg.diagrams.SuperCard"/>
     </antcall>
   </target>
+
+  <target name="svg-bankdirect-square">
+    <antcall target="_svg">
+       <param name="svgfile" value="svg-gen/bankdirect-square.svg"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.BankDirectSquare"/>
+    </antcall>
+  </target>
   
   <target name="svg-saturnlogo">
     <antcall target="_svg">
