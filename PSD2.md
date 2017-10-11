@@ -35,9 +35,8 @@ original national setting*. This may prove to be difficult to change, because th
 wallet services, causing "friction" if applied to an international market.
 It would effectively be similar to launching a new VISA network.
 
-![Two visions](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
-
 # Saturn - Optimized for Payments
+![Upgraded vision](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
 To cope with these issues a light-weight tightly-scoped system, coined "[Saturn](https://cyberphone.github.io/doc/saturn/)" was developed which:
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
