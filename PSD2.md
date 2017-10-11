@@ -37,6 +37,7 @@ It would effectively be similar to launching a new VISA network.
 
 # Saturn - Optimized for Payments
 ![Upgraded vision](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
+
 To cope with these issues a light-weight tightly-scoped system, coined "[Saturn](https://cyberphone.github.io/doc/saturn/)" was developed which:
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
