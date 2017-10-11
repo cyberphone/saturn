@@ -1,5 +1,3 @@
-![Saturn is great](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
-
 # Purpose of PSD2
 The purpose of PSD2 is enabling third parties creating new *Financial Services* through
 open APIs to customers' bank accounts.
@@ -38,6 +36,8 @@ wallet services, causing "friction" if applied to an international market.
 It would effectively be similar to launching a new VISA network.
 
 # Saturn - Optimized for Payments
+![Upgraded vision](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
+
 To cope with these issues a light-weight tightly-scoped system, coined "[Saturn](https://cyberphone.github.io/doc/saturn/)" was developed which:
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
