@@ -4,17 +4,16 @@
 <stop stop-color="#ffe100" offset="0"/>
 <stop stop-color="#ff005d" offset="1"/>
 </radialGradient>
-<linearGradient y2="0.5" x2="1" y1="0.5" x1="0" id="bankPillar">
+<linearGradient x2="1" x1="0" id="bankPillar">
 <stop stop-color="#606060" offset="0"/>
 <stop stop-color="#ffffff" offset="0.4"/>
 <stop stop-color="#ffffff" offset="0.6"/>
 <stop stop-color="#606060" offset="1"/>
 </linearGradient>
 <filter width="200%" height="200%" x="-50%" y="-50%" id="bankShaddow">
-<feGaussianBlur stdDeviation="2"/>
+<feGaussianBlur stdDeviation="2.0"/>
 </filter>
 </defs>
-<g>
 <line x1="555" y1="290" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
 <line x1="521.5" y1="415" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
 <line x1="430" y1="506.5" x2="305" y2="290" stroke-width="1" stroke="#0000ff"/>
@@ -189,5 +188,4 @@
 <tspan>Super</tspan>
 <tspan x="309" dy="1.2em">Provider</tspan>
 </text>
-</g>
 </svg>

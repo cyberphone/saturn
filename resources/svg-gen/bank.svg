@@ -1,16 +1,15 @@
 <svg width="114" height="84" xmlns="http://www.w3.org/2000/svg">
 <defs>
-<linearGradient y2="0.5" x2="1" y1="0.5" x1="0" id="bankPillar">
+<linearGradient x2="1" x1="0" id="bankPillar">
 <stop stop-color="#606060" offset="0"/>
 <stop stop-color="#ffffff" offset="0.4"/>
 <stop stop-color="#ffffff" offset="0.6"/>
 <stop stop-color="#606060" offset="1"/>
 </linearGradient>
 <filter width="200%" height="200%" x="-50%" y="-50%" id="bankShaddow">
-<feGaussianBlur stdDeviation="2"/>
+<feGaussianBlur stdDeviation="2.0"/>
 </filter>
 </defs>
-<g>
 <path fill="#a0a0a0" d="M 13,23 L 58.5,8 104,23 104,34.5 96.5,34.5 96.5,66 104,66 104,72 109,72 109,79 8,79 8,72 13,72 13,66 20.5,66 20.5,34.5 13,34.5" filter="url(#bankShaddow)"/>
 <rect x="17" y="31" width="76" height="31.5" fill="#ffffff"/>
 <path fill="#a0a0a0" d="M 20.5,23.5 L 42.16,23.5 42.16,34.5 31.5,34.5 31.5,66 20.5,66" filter="url(#bankShaddow)"/>
@@ -24,5 +23,4 @@
 <rect x="10" y="20.5" width="90" height="10" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
 <rect x="5" y="69" width="100" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
 <rect x="10" y="63" width="90" height="6" stroke="#404040" stroke-width="1" fill="#f2f2f2"/>
-</g>
 </svg>

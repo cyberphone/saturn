@@ -32,18 +32,15 @@ public class BankDirectSquare extends SVGDocument {
     final static double WIDTH  = 300;
     final static double HEIGHT = 180;
     
-    final static String CORE_COLOR = "#6d8838";
-    final static String S_COLOR    = "#9e0a11";
-    
-    final static double WHITE_SQUARE_WIDTH  = 130;
-    final static double WHITE_SQUARE_HEIGHT = 90;
-    final static double WHITE_SQUARE_PAD    = 22;
+    final static double WHITE_SQUARE_WIDTH  = 138;
+    final static double WHITE_SQUARE_HEIGHT = 98;
+    final static double WHITE_SQUARE_PAD    = 14;
     
     final static double RED_ELLIPSE_PAD     = 9;
 
-    final static double BANK_PAD            = 5;
+    final static double BANK_PAD            = 7;
     
-    final static double BANK_SIZE           = 0.32;
+    final static double BANK_SIZE           = 0.34;
 
     @Override
     public String getFilters() {
@@ -106,7 +103,7 @@ public class BankDirectSquare extends SVGDocument {
 
         add(new SVGText(
                 new SVGDoubleValue(WHITE_SQUARE_WIDTH / 2 + WHITE_SQUARE_PAD),
-                new SVGDoubleValue(WHITE_SQUARE_HEIGHT / 2  + WHITE_SQUARE_PAD - 5),
+                new SVGDoubleValue(WHITE_SQUARE_HEIGHT / 2  + WHITE_SQUARE_PAD - 4),
                 "Sans-serif",
                 18,
                 SVGText.TEXT_ANCHOR.MIDDLE,
