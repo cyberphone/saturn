@@ -53,7 +53,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
-     static final long MAX_CLIENT_CLOCK_SKEW        = 5 * 60 * 1000;
+    static final long MAX_CLIENT_CLOCK_SKEW        = 5 * 60 * 1000;
     static final long MAX_CLIENT_AUTH_AGE          = 20 * 60 * 1000;
     
     // Just a few demo values
