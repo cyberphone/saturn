@@ -128,8 +128,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static String payeeProviderAuthorityUrl;
 
-    static Integer serverPortMapping;
-    
     static String merchantBaseUrl;  // For QR and Android only
     
     static Currencies currency;
@@ -251,10 +249,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         try {
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
-            if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
-                serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
-            }
-
             // Should be common for all payment networks...
             merchantCommonName = getPropertyString(MERCHANT_CN);
 
@@ -311,7 +305,10 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             slowOperation = getPropertyBoolean(SLOW_OPERATION);
             
-            externalCalls = new ExternalCalls(logging, logger, serverPortMapping);
+            externalCalls = new ExternalCalls(logging, 
+                                              logger,
+                                              getPropertyString(SERVER_PORT_MAP).length () > 0 ?
+                                                               getPropertyInt(SERVER_PORT_MAP) : null);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check

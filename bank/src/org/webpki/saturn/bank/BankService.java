@@ -132,8 +132,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static JSONObjectReader optionalProviderExtensions;
     
-    static Integer serverPortMapping;
-    
     static String providerAuthorityUrl;
     
     static String payeeAuthorityBaseUrl;
@@ -222,10 +220,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             knownAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
 
-            if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
-                serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
-            }
-
             bankCommonName = getPropertyString(BANK_NAME);
 
             KeyStoreEnumerator bankcreds = new KeyStoreEnumerator(getResource(BANK_EECERT),
@@ -310,7 +304,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                            RefundServlet.class,
                            "Refund Servlet");
             
-            externalCalls = new ExternalCalls(logging, logger, serverPortMapping);
+            externalCalls = new ExternalCalls(logging,
+                                              logger,
+                                              getPropertyString(SERVER_PORT_MAP).length () > 0 ?
+                                                               getPropertyInt(SERVER_PORT_MAP) : null);
 
             started = new GregorianCalendar();
 
