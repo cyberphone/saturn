@@ -130,6 +130,7 @@ public class BankDirectSquare extends SVGDocument {
         if (y > BANK_PAD) y_offset = - y_offset;
         new Bank.SubBank(WHITE_SQUARE_PAD + x + x_offset, WHITE_SQUARE_PAD + y + y_offset, BANK_SIZE, true)
             .setShaddow(false)
+            .setStrokeWeight(0.5)
             .generate(this);
     }
  }
