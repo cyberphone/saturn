@@ -111,6 +111,10 @@
         match="(&lt;url-pattern&gt;/service&lt;.*?&lt;\/servlet-mapping&gt;)"
         replace="\1&#10;&#10;    &lt;servlet-mapping&gt;&#10;        &lt;servlet-name&gt;RefundServlet&lt;/servlet-name&gt;&#10;        &lt;url-pattern&gt;/refund&lt;/url-pattern&gt;&#10;    &lt;/servlet-mapping&gt;"
         flags="s"/>
+  	<replaceregexp file="${dd}/webpay-keyprovider/build.xml"
+        match="A128GCM"
+        replace="A128CBC-HS256"
+        flags="s"/>
     <antcall target="_nolambda"><param name="subdir" value="${dd}/webpay-acquirer/common.src"/></antcall>
     <antcall target="_nolambda"><param name="subdir" value="${dd}/webpay-bank/common.src"/></antcall>
     <antcall target="_nolambda"><param name="subdir" value="${dd}/webpay-merchant/common.src"/></antcall>
