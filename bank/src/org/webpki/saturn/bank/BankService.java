@@ -144,7 +144,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static GregorianCalendar started;
     
-    static long successfulTtransactions;
+    static long successfulTransactions;
     
     static long rejectedTransactions;
     

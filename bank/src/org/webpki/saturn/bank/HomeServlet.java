@@ -50,7 +50,7 @@ public class HomeServlet extends HttpServlet {
          .append(TimeUtil.displayUtcTime(BankService.started))
          .append("</td></tr>" +
            "<tr><td>Successful transactions: ")
-         .append(BankService.successfulTtransactions)
+         .append(BankService.successfulTransactions)
          .append("</td></tr>" +
            "<tr><td>Rejected transactions: ")
          .append(BankService.rejectedTransactions)
