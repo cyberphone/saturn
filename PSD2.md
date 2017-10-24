@@ -15,7 +15,7 @@ holding data about PSD2 service providers.  A potential problem is that the cost
 be high and may also prove to be somewhat less easy to get acceptance for on a European or global level.
 
 ### Quirky User Interfaces
-Due to the fact that PSD2 APIs operate at the same trust level as banks,
+Due to the fact that PSD2 APIs operate at the same trust level as on-line banking,
 they (*quite logically*) build on *reusing* the banks' existing (and *arbitrary complex*),
 on-line banking authentication solutions and user interfaces.
 However, this introduces a *dependency* which card-based payment solutions never had.
