@@ -35,6 +35,9 @@ original national setting*. This may prove to be difficult to change, because th
 wallet services, causing "friction" if applied to an international market.
 It would effectively be similar to launching a new VISA network.
 
+To accomplish something comparable to VISA et. al., you would most likely have to
+create a *PISP aggregation service*.
+
 # Saturn - Optimized for Payments
 ![Upgraded vision](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
 
