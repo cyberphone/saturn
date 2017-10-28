@@ -3,12 +3,13 @@ The purpose of PSD2 is enabling third parties creating new *Financial Services* 
 open APIs to customers' bank accounts.  Such systems already exist but currently rely of questionable methods
 typically requiring consumers giving their login credentials to third parties, which in turn through
 "screen-scraping", effectively *impersonate* their clients to their on-line banks.  One of the objectives
-with PSD2 is offering dedicated APIs for third party access which do not jeopardize customers' security and privacy.  
+with PSD2 is offering *dedicated APIs for third party access* which do not jeopardize customers' security and privacy.  
 
 Although recently published PSD2 APIs certainly are not identical, they at least share a common "conceptual" model.
 
 This document focuses on PSD2 for *Payments* which in PSD2 are facilitated through PISPs (Payment Initiation Service Providers).
-It is in this context worth noting that consumer payment are currently performed through dedicated payment "rails" like EMV, *which do not rely on direct access to accounts by external parties*.
+
+It is in this context worth noting that consumer payment are currently performed through specific payment "rails" like EMV, *which do not rely on direct access to accounts by external parties*.
 
 ### Certification and Authentication Requirements
 Since PSD2 APIs provide access to *sensitive data* in arbitrary banks
