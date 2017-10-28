@@ -1,6 +1,9 @@
 # Purpose of PSD2
 The purpose of PSD2 is enabling third parties creating new *Financial Services* through
-open APIs to customers' bank accounts.
+open APIs to customers' bank accounts.  Such systems already exist but currently rely of questionable methods
+typically requiring consumers giving their login credentials to third parties, which in turn through
+"screen-scraping", effectively *impersonate* their clients to their on-line banks.  One of the objectives
+with PSD2 is offering dedicated APIs for third party access which do not jeopardize customers' security and privacy.  
 
 Although recently published PSD2 APIs certainly are not identical, they at least share a common "conceptual" model.
 
