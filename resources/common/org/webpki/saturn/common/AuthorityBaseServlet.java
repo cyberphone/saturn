@@ -39,8 +39,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     protected abstract boolean isProvider();
     
     public static final String BORDER = "border-width:1px;border-style:solid;border-color:#a9a9a9";
-    public static final String BOX_SHADDOW = "box-shadow:3pt 3pt 3pt #D0D0D0";
-    public static final String TOP_ELEMENT = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\">" +
+    public static final String BOX_SHADDOW = "box-shadow:3pt 3pt 3pt #d0d0d0";
+    public static final String TOP_ELEMENT = "<!DOCTYPE html><html><head><meta charset=\"utf-8\">" +
                                              "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
     public static final String REST_ELEMENT = 
         "<style type=\"text/css\">" +
@@ -53,6 +53,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
         "'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans';background-color:white}" + 
         " code {font-size:9pt}" +
+        " @media (max-width:800px) {code {font-size:8pt;}}" +
         " a {color:blue;text-decoration:none}" +
         "</style></head>";
     public static final String SATURN_LINK = "<a href=\"https://cyberphone.github.io/doc/saturn/\" target=\"_blank\">Saturn</a>";

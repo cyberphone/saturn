@@ -61,9 +61,7 @@ class DebugPrintout implements BaseProperties {
 
     String encryptedAccount;
 
-    static final String STATIC_BOX = "font-size:8pt;word-break:break-all;width:800pt;background:#F8F8F8;";
-    static final String COMMON_BOX = "border-width:1px;border-style:solid;border-color:grey;padding:10pt;box-shadow:3pt 3pt 3pt #D0D0D0";
-    
+  
     static final String REFUND_TRANSACTION = "Refund&nbsp;Transaction";
     static final String PROV_USER_RESPONSE = "Provider&nbsp;User&nbsp;Response";
     static final String UNENCRYPTED_AUTHZ  = "Unencrypted&nbsp;User&nbsp;Authorization";
@@ -168,9 +166,9 @@ class DebugPrintout implements BaseProperties {
             reader = reader.clone();
             cleanData(reader);
         }
-        s.append("<div style=\"" + STATIC_BOX + COMMON_BOX + "\">" +
-              reader.serializeToString(JSONOutputFormats.PRETTY_HTML) +
-              "</div>");
+        s.append("<div class=\"jsonbox\">" +
+                 reader.serializeToString(JSONOutputFormats.PRETTY_HTML) +
+                 "</div>");
     }
 
     void fancyBoxNoClean(JSONObjectReader reader) throws IOException, GeneralSecurityException {
@@ -185,11 +183,11 @@ class DebugPrintout implements BaseProperties {
     }
 
     void description(String string) {
-        s.append("<div style=\"word-wrap:break-word;width:800pt;margin-bottom:10pt;margin-top:20pt\">" + string + "</div>");
+        s.append("<div class=\"dbgdesc\">" + string + "</div>");
     }
 
     void descriptionStdMargin(String string) {
-        s.append("<div style=\"word-wrap:break-word;width:800pt;margin-bottom:10pt;margin-top:10pt\">" + string + "</div>");
+        s.append("<div class=\"dbgdesc\" style=\"margin-top:10pt\">" + string + "</div>");
     }
 
     class Point {
@@ -212,7 +210,7 @@ class DebugPrintout implements BaseProperties {
     }
 
     String keyWord(String keyWord) {
-        return "<code style=\"font-size:10pt\">&quot;" + keyWord + "&quot;</code>";
+        return "<code>&quot;" + keyWord + "&quot;</code>";
     }
     
     String keyWord(Messages message) {

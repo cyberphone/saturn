@@ -48,29 +48,16 @@ public class HTML implements MerchantProperties {
     
     static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" title=\"For showing context\" style=\"width:30pt;position:absolute;right:10pt;top:10pt\"";
     
-    static final String HTML_INIT = 
-        "<!DOCTYPE html>"+
-        "<html><head><meta charset=\"UTF-8\"><link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\">"+
-        "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
-        "<title>Saturn Payment Demo</title>"+
-        "<style type=\"text/css\">html {overflow:auto}\n"+
-        ".point {text-align:center;font-family:courier;font-weight:bold;font-size:10pt;border-radius:3pt;border-width:1px;border-style:solid;border-color:#B0B0B0;display:inline-block;padding:1.5pt 3pt 1pt 3pt}\n" +
-        ".tftable {border-collapse:collapse;box-shadow:3pt 3pt 3pt #D0D0D0}\n" +
-        ".tftable th {font-size:10pt;background:" +
-          "linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
-          "border-width:1px;padding:4pt 10pt 4pt 10pt;border-style:solid;border-color:#a9a9a9;" +
-          "text-align:center;font-family:" + FONT_ARIAL + "}\n" +
-        ".tftable td {background-color:#FFFFE0;font-size:11pt;border-width:1px;padding:4pt 8pt 4pt 8pt;border-style:solid;border-color:#a9a9a9;font-family:" + FONT_ARIAL + ";white-space:nowrap}\n" +
-        "body {font-size:10pt;color:#000000;font-family:" + FONT_VERDANA + ";background-color:white}\n" +
-        "a {font-weight:bold;font-size:8pt;color:blue;font-family:" + FONT_ARIAL + ";text-decoration:none}\n" +
-        "td {font-size:8pt;font-family:" + FONT_VERDANA + "}\n" +
-        "li {padding-top:5pt}\n" +
-        ".quantity {text-align:right;font-weight:normal;font-size:10pt;font-family:" + FONT_ARIAL + "}\n" +
-        ".stdbtn {font-weight:normal;font-size:10pt;font-family:" + FONT_ARIAL + "}\n" +
-        ".updnbtn {vertical-align:middle;text-align:center;font-weight:normal;font-size:8px;font-family:" + FONT_VERDANA + ";margin:0px;border-spacing:0px;padding:2px 3px 2px 3px}\n";
-    
     static String getHTML(String javascript, String bodyscript, String box) {
-        StringBuffer s = new StringBuffer(HTML_INIT + "html, body {margin:0px;padding:0px;height:100%}</style>");
+        StringBuffer s = new StringBuffer(
+            "<!DOCTYPE html>"+
+            "<html><head>" +
+            "<meta charset=\"utf-8\">" +
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" +
+            "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\">"+
+            "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">" +
+            "<title>Saturn Payment Demo</title>");
+
         if (javascript != null) {
             s.append("<script type=\"text/javascript\">").append(javascript).append("</script>");
         }
@@ -110,7 +97,7 @@ public class HTML implements MerchantProperties {
                          boolean refundMode) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(null, null,
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-                "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
+                "<table class=\"tighttable\" style=\"max-width:600px;\" cellpadding=\"4\">" +
                    "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Saturn - Web Payment Demo<br>&nbsp;</td></tr>" +
                    "<tr><td style=\"text-align:left\">This application is a demo of version 3 of the Saturn <i>payment authorization</i> scheme.&nbsp; " +
                    "Saturn depends on a native &quot;Wallet&quot; utilizing the Web2Native Bridge concept" +
@@ -182,7 +169,7 @@ public class HTML implements MerchantProperties {
         StringBuffer s = new StringBuffer(
             "<tr style=\"text-align:center\"><td><img src=\"images/")
         .append(product_entry.imageUrl)
-        .append("\"></td><td>")
+        .append("\" class=\"product\"></td><td>")
         .append(product_entry.name)
         .append("</td><td style=\"text-align:right\">")
         .append(price(product_entry.priceX100))
@@ -197,7 +184,7 @@ public class HTML implements MerchantProperties {
         .append(")\"></td>" +
             "</tr>" +
             "<tr>" +
-            "<td style=\"border-width:0px;padding:0px;margin:0px\"><input size=\"6\" type=\"text\" name=\"p")
+            "<td style=\"border-width:0px;padding:0px;margin:0px\"><input max=\"6\" size=\"4\" type=\"text\" name=\"p")
         .append(index)
         .append("\" value=\"")
         .append(quantity)
@@ -558,8 +545,8 @@ public class HTML implements MerchantProperties {
                       "\">Order Status" : ";color:red\">Failed = " + resultData.transactionError.toString())
             .append("<br>&nbsp;</td></tr>")
             .append(resultData.transactionError == null ?
-                    "<tr><td style=\"text-align:center;padding-bottom:15pt;font-size:10pt\">" +
-                    "Dear customer, your order has been successfully processed!</td></tr>" : "")
+                    "<tr><td style=\"text-align:center\">" +
+                    "Dear customer, your order has been successfully processed!<br>&nbsp;</td></tr>" : "")
             .append(receiptCore(resultData, debugMode && resultData.optionalRefund == null))
             .append(optionalRefund(resultData))
             .append("</table></td></tr></table></td></tr>");
@@ -893,7 +880,7 @@ public class HTML implements MerchantProperties {
     static void androidPage(HttpServletResponse response) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(null, null,
             "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-            "<table style=\"max-width:600px;\" cellpadding=\"4\">" +
+            "<table class=\"tighttable\" style=\"max-width:600px;\" cellpadding=\"4\">" +
             "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
              "<tr><td style=\"text-align:left\">Note: The Android Wallet is currently a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
             "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
