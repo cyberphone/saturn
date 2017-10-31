@@ -71,7 +71,7 @@ html, body {
   margin:0px;padding:0px;height:100%;
 }
 
-@media (max-width:800px) {
+@media (max-width:768px) {
   body {
     font-size:8pt
   }
