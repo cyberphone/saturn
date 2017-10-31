@@ -73,7 +73,7 @@ html, body {
 
 @media (max-width:768px) {
   body {
-    font-size:8pt
+    font-size:8pt;
   }
 
   .tftable th {
