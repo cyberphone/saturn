@@ -100,21 +100,22 @@ public class HTML implements MerchantProperties {
                 "<table class=\"tighttable\" style=\"max-width:600px;\" cellpadding=\"4\">" +
                    "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Saturn - Web Payment Demo<br>&nbsp;</td></tr>" +
                    "<tr><td style=\"text-align:left\">This application is a demo of version 3 of the Saturn <i>payment authorization</i> scheme.&nbsp; " +
-                   "Saturn depends on a native &quot;Wallet&quot; utilizing the Web2Native Bridge concept" +
+                   "Saturn depends on a <i>native</i> &quot;Wallet&quot; application" +
                    ".&nbsp; Primary Saturn features include:<ul>" +
                    "<li style=\"padding-top:0pt\">Fully <i>decentralized</i> operation (no dependency on central registries like in 3D Secure)</li>" +
-                   "<li><i>Digitally signed</i> messages enable a protocol-level security comparable to a PIN-code terminal and chip-card in a physical shop</li>" +
-                   "<li>Encryption (like in SET) hides sensitive customer data from merchants, eliminating the need for third-party &quot;tokenization&quot; services</li>" +
+                   "<li><i>Digitally signed</i> messages enable a protocol-level security comparable to a payment terminal and EMV card in a physical shop</li>" +
+                   "<li>Encryption hides customer data from merchants, eliminating " +
+                   "the need for third-party &quot;tokenization&quot; services as well as supporting GDPR</li>" +
                    "<li>Private messaging through the payment backend makes it easy applying RBA (Risk Based Authentication) for high-value or &quot;suspicious&quot; transactions</li>" +
-                   "<li>Equally applicable for legacy card payment networks as for bank-2-bank schemes including SEPA</li>" +
+                   "<li>Equally applicable for legacy card payment networks as for bank-2-bank schemes including SEPA SCT</li>" +
                    "<li>In addition to supporting Web payments, Saturn is <i>also intended to be usable in traditional payment scenarios " +
                    "including with POS terminals and gas pumps using an NFC/BLE connection to the Wallet</i></li>" +
                    "<li>JSON based messaging</li>" +
                    "<li>Consumers only deal with payment instruments visualized as cards (like they did <i>before</i> the Web)</li>" +
                    "</ul>" +
-                   "Note that the Wallet is <i>pre-configured</i> with payment credentials requiring no signup etc.&nbsp;&nbsp;" +
-                   "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">Install Wallet</a>.&nbsp; " +
-                   "There is also an <a href=\"android\">Android version</a> of the Wallet.</td></tr>" +
+                   "For testing you need either the <a href=\"android\">Android</a> or the " +
+                   "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">desktop</a>" +
+                   " version of the Wallet software.</td></tr>" +
                    "<tr><td align=\"center\"><table cellspacing=\"0\">" +
                    "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "shop" + 
                    "\">Go To Merchant</a></td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
@@ -133,7 +134,6 @@ public class HTML implements MerchantProperties {
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/\">Saturn Home</a>&nbsp;&nbsp;</td><td>Presentation Etc.</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Source Code</a></td><td>For Nerds...</td></tr>" +
-                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge\">Web2Native Bridge</a>&nbsp;&nbsp;&nbsp;</td><td>API and &quot;Executive Level&quot; Description</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://mobilepki.org/jcs\">JCS</a></td><td>JSON Cleartext Signature</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/jef.html\">JEF</a></td><td>JSON Encryption Format</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/web/yasmin.html\">YASMIN</a></td><td>JSON Message Scheme</td></tr>" +
@@ -882,12 +882,12 @@ public class HTML implements MerchantProperties {
             "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
             "<table class=\"tighttable\" style=\"max-width:600px;\" cellpadding=\"4\">" +
             "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
-             "<tr><td style=\"text-align:left\">Note: The Android Wallet is currently a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
+             "<tr><td style=\"text-align:left\">Note: The Android Wallet is a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
             "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
               "https://play.google.com/store/apps/details?id=org.webpki.mobile.android</a></td></tr>" +
             "<tr><td>Enroll payment <i>test credentials</i> by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +
               "https://mobilepki.org/webpay-keyprovider</td></tr>" +
-            "<tr><td>Unlike the Windows, Linux, and OS/X-based Wallet, the Android version also supports remote operation using QR codes.  This mode is " +
+            "<tr><td>Unlike the desktop (Windows, Linux, and OS/X-based) Wallet, the Android version also supports remote operation using QR codes.  This mode is " +
               "indicated by the following image in the Merchant Web application:</td></tr>" +
             "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" +
             "</table></td></tr>"));       
