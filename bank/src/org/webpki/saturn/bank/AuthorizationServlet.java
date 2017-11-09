@@ -60,7 +60,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Verify that we understand the payment method
-        AuthorizationRequest.PaymentMethodDecoder paymentMethod =
+        AuthorizationRequest.PaymentMethodDecoder paymentMethodSpecific =
             authorizationRequest.getPaymentMethodSpecific(BankService.knownPaymentMethods);
 
         // Fetch the payment request object
@@ -206,9 +206,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         logger.info((testMode ? "TEST ONLY: ": "") +
                 "Authorized Amount=" + amount.toString() + 
                 ", Account ID=" + accountId + 
-                ", Payment Method=" + paymentMethod + 
+                ", Payment Method=" + authorizedPaymentMethod + 
                 ", Client IP=" + clientIpAddress +
-                ", Method Specific=" + paymentMethod.logLine());
+                ", Method Specific=" + paymentMethodSpecific.logLine());
 
         String optionalLogData = null;
         if (!testMode) {

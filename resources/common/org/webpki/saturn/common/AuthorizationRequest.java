@@ -79,7 +79,7 @@ public class AuthorizationRequest implements BaseProperties {
         payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
-        paymentSpecific = rd.getObject(PAYMENT_METHOD_SPECIFIC_JSON);
+        undecodedPaymentMethodSpecific = rd.getObject(PAYMENT_METHOD_SPECIFIC_JSON);
         rd.scanAway(PAYMENT_METHOD_SPECIFIC_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
@@ -95,7 +95,7 @@ public class AuthorizationRequest implements BaseProperties {
 
     JSONObjectReader root;
     
-    JSONObjectReader paymentSpecific;
+    JSONObjectReader undecodedPaymentMethodSpecific;
 
     boolean testMode;
     public boolean getTestMode() {
@@ -113,13 +113,13 @@ public class AuthorizationRequest implements BaseProperties {
     }
 
     public PaymentMethodDecoder getPaymentMethodSpecific(JSONDecoderCache knownPaymentMethods) throws IOException {
-        PaymentMethodDecoder paymentMethod =
-            (PaymentMethodDecoder) knownPaymentMethods.parse(paymentSpecific.clone()); // Clone => Fresh read
-        if (!paymentMethod.match(payerAccountType)) {
+        PaymentMethodDecoder paymentMethodSpecific =
+            (PaymentMethodDecoder) knownPaymentMethods.parse(undecodedPaymentMethodSpecific.clone()); // Clone => Fresh read
+        if (!paymentMethodSpecific.match(payerAccountType)) {
             throw new IOException("\"" + PAYMENT_METHOD_SPECIFIC_JSON + 
                                   "\" data incompatible with \"" + PAYMENT_METHOD_JSON + "\"");
         }
-        return paymentMethod;
+        return paymentMethodSpecific;
     }
 
     GregorianCalendar timeStamp;
@@ -159,7 +159,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          PaymentMethodEncoder paymentMethodEncoder,
+                                          PaymentMethodEncoder paymentMethodSpecific,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
@@ -169,7 +169,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(PAYMENT_METHOD_JSON, payerAccountType.getPaymentMethodUri())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setObject(PAYMENT_METHOD_SPECIFIC_JSON, paymentMethodEncoder.writeObject())
+            .setObject(PAYMENT_METHOD_SPECIFIC_JSON, paymentMethodSpecific.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
