@@ -517,15 +517,15 @@ public class HTML implements MerchantProperties {
 
     static StringBuffer receiptCore(ResultData resultData, boolean debugMode) throws IOException {
         StringBuffer s = new StringBuffer("<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
-            .append(resultData.accountType.isCardPayment() ? "Card" : "Account")
+            .append(resultData.paymentMethod.isCardPayment() ? "Card" : "Account")
             .append(" Type</th><th>")
-            .append(resultData.accountType.isCardPayment() ? "Card Reference" : "Account Number")   
+            .append(resultData.paymentMethod.isCardPayment() ? "Card Reference" : "Account Number")   
             .append("</th></tr><tr><td style=\"text-align:center\">")  
             .append(resultData.referenceId)
             .append("</td><td style=\"text-align:center\">")
             .append(resultData.currency.amountToDisplayString(resultData.amount, false))
             .append("</td><td style=\"text-align:center\">")
-            .append(resultData.accountType.getCommonName())
+            .append(resultData.paymentMethod.getCommonName())
             .append("</td><td style=\"text-align:center\">")
             .append(resultData.accountReference)
             .append("</td></tr></table></td></tr>");

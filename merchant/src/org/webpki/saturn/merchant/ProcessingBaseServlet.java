@@ -121,9 +121,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
             @SuppressWarnings("unchecked")
             JSONObjectWriter rawPaymentRequest = ((LinkedHashMap<String,JSONObjectWriter>) session.getAttribute(WALLET_REQUEST_SESSION_ATTR))
-                .get(payerAuthorization.getAccountType().getPaymentMethodUri());
+                .get(payerAuthorization.getPaymentMethod().getPaymentMethodUri());
             if (rawPaymentRequest == null) {
-                throw new IOException("Missing: " + payerAuthorization.getAccountType().getPaymentMethodUri());
+                throw new IOException("Missing: " + payerAuthorization.getPaymentMethod().getPaymentMethodUri());
             }
             PaymentRequest paymentRequest =
                 new PaymentRequest(JSONParser.parse(rawPaymentRequest.serializeToString(JSONOutputFormats.NORMALIZED)));

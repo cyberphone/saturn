@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.Currencies;
-import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.TransactionResponse.ERROR;
 
 public class ResultData implements Serializable {
@@ -37,7 +37,7 @@ public class ResultData implements Serializable {
 
     public String accountReference;
 
-    public PayerAccountTypes accountType;
+    public PaymentMethods paymentMethod;
 
     public ERROR transactionError;
     

@@ -241,10 +241,8 @@ class DebugPrintout implements BaseProperties {
             "</i></p>");
         description(point +
             "<p>The user performs &quot;Checkout&quot; (after <i>optionally</i> selecting payment method), " +
-            "causing the <b>Merchant</b> server returning a " +
-            "<b>Wallet</b> invocation Web-page featuring a call to the " +
-            keyWord("navigator.nativeConnect()") + 
-            " <a target=\"_blank\" href=\"https://github.com/cyberphone/web2native-bridge#api\">[CONNECT]</a> browser API. " +
+            "causing the <b>Merchant</b> server returning a currently <i>platform dependent</i> " +
+            "<b>Wallet</b> invocation Web-page. " +
             "Then the invoking Web-page waits for a ready signal from the <b>Wallet</b>.</p>");
 
          description(point +

@@ -41,9 +41,9 @@ public class TransactionRequest implements BaseProperties {
         software = new Software(rd);
         signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
         if (cardNetwork != null &&
-            authorizationResponse.authorizationRequest.payerAccountType.isCardPayment() ^ cardNetwork) {
+            authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ cardNetwork) {
             throw new IOException("Incompatible payment method: " + 
-                authorizationResponse.authorizationRequest.payerAccountType.getPaymentMethodUri());
+                authorizationResponse.authorizationRequest.paymentMethod.getPaymentMethodUri());
         }
         rd.checkForUnread();
     }

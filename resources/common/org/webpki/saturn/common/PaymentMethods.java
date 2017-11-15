@@ -19,7 +19,7 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 import java.io.Serializable;
 
-public enum PayerAccountTypes implements Serializable {
+public enum PaymentMethods implements Serializable {
 
     SUPER_CARD   (true,  "https://supercard.com",   "SuperCard"), 
     BANK_DIRECT  (false, "https://bankdirect.net",  "Bank Direct"),
@@ -29,7 +29,7 @@ public enum PayerAccountTypes implements Serializable {
     String paymentMethodUri;  // Method URI
     String commonName;        // What it is usually called
     
-    PayerAccountTypes (boolean cardPayment, String paymentMethodUri, String commonName) {
+    PaymentMethods (boolean cardPayment, String paymentMethodUri, String commonName) {
         this.cardPayment = cardPayment;
         this.paymentMethodUri = paymentMethodUri;
         this.commonName = commonName;
@@ -47,8 +47,8 @@ public enum PayerAccountTypes implements Serializable {
         return commonName;
     }
 
-    public static PayerAccountTypes fromTypeUri(String paymentMethodUri) throws IOException {
-        for (PayerAccountTypes accountType : PayerAccountTypes.values()) {
+    public static PaymentMethods fromTypeUri(String paymentMethodUri) throws IOException {
+        for (PaymentMethods accountType : PaymentMethods.values()) {
             if (accountType.paymentMethodUri.equals(paymentMethodUri)) {
                 return accountType;
             }

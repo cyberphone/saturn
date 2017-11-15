@@ -53,7 +53,7 @@ import org.webpki.util.Base64;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.EncryptedMessage;
-import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ProviderUserResponse;
@@ -259,8 +259,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             // The standard payment network supported by the Saturn demo
             Vector<String> acceptedAccountTypes = new Vector<String>();
-            for (PayerAccountTypes card : PayerAccountTypes.values()) {
-                if (card != PayerAccountTypes.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
+            for (PaymentMethods card : PaymentMethods.values()) {
+                if (card != PaymentMethods.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
                     acceptedAccountTypes.add(card.getPaymentMethodUri());
                 }
             }

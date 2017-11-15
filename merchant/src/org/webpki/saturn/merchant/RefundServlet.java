@@ -72,7 +72,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
             logger.info("Trying to refund Amount=" + resultData.amount.toString() +
                           " " + resultData.currency.toString() + 
                         ", Account=" + resultData.accountReference + 
-                        ", Method=" + resultData.accountType.getPaymentMethodUri());
+                        ", Method=" + resultData.paymentMethod.getPaymentMethodUri());
 
             PayeeAuthority payeeAuthority = 
                 MerchantService.externalCalls.getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
@@ -106,7 +106,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
 
             RefundResponse refundResponse = new RefundResponse(refundResponseData);
             refundResponse.getSignatureDecoder().verify(
-               authorizationRequest.getPayerAccountType().isCardPayment() ? 
+               authorizationRequest.getPaymentMethod().isCardPayment() ? 
                        MerchantService.acquirerRoot : MerchantService.paymentRoot);
 
             HTML.refundResultPage(response,

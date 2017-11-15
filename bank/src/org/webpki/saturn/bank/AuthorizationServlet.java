@@ -66,7 +66,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
         NonDirectPayments nonDirectPayment = paymentRequest.getNonDirectPayment();
-        boolean cardPayment = authorizationRequest.getPayerAccountType().isCardPayment();
+        boolean cardPayment = authorizationRequest.getPaymentMethod().isCardPayment();
         
         // Get the providers. Note that caching could play tricks on you!
         PayeeAuthority payeeAuthority;

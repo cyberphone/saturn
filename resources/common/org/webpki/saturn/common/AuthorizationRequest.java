@@ -42,7 +42,7 @@ public class AuthorizationRequest implements BaseProperties {
 
         private static final long serialVersionUID = 1L;
 
-        public abstract boolean match(PayerAccountTypes payerAccountType) throws IOException;
+        public abstract boolean match(PaymentMethods payerAccountType) throws IOException;
 
         public String logLine() throws IOException {
             return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
@@ -76,7 +76,7 @@ public class AuthorizationRequest implements BaseProperties {
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-        payerAccountType = PayerAccountTypes.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
+        paymentMethod = PaymentMethods.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
         undecodedPaymentMethodSpecific = rd.getObject(PAYMENT_METHOD_SPECIFIC_JSON);
@@ -102,9 +102,9 @@ public class AuthorizationRequest implements BaseProperties {
         return testMode;
     }
 
-    PayerAccountTypes payerAccountType;
-    public PayerAccountTypes getPayerAccountType() {
-        return payerAccountType;
+    PaymentMethods paymentMethod;
+    public PaymentMethods getPaymentMethod() {
+        return paymentMethod;
     }
 
     JSONSignatureDecoder signatureDecoder;
@@ -115,7 +115,7 @@ public class AuthorizationRequest implements BaseProperties {
     public PaymentMethodDecoder getPaymentMethodSpecific(JSONDecoderCache knownPaymentMethods) throws IOException {
         PaymentMethodDecoder paymentMethodSpecific =
             (PaymentMethodDecoder) knownPaymentMethods.parse(undecodedPaymentMethodSpecific.clone()); // Clone => Fresh read
-        if (!paymentMethodSpecific.match(payerAccountType)) {
+        if (!paymentMethodSpecific.match(paymentMethod)) {
             throw new IOException("\"" + PAYMENT_METHOD_SPECIFIC_JSON + 
                                   "\" data incompatible with \"" + PAYMENT_METHOD_JSON + "\"");
         }
@@ -155,7 +155,7 @@ public class AuthorizationRequest implements BaseProperties {
     public static JSONObjectWriter encode(Boolean testMode,
                                           String recepientUrl,
                                           String authorityUrl,
-                                          PayerAccountTypes payerAccountType,
+                                          PaymentMethods paymentMethod,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
@@ -166,7 +166,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
-            .setString(PAYMENT_METHOD_JSON, payerAccountType.getPaymentMethodUri())
+            .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUri())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
             .setObject(PAYMENT_METHOD_SPECIFIC_JSON, paymentMethodSpecific.writeObject())
@@ -184,7 +184,7 @@ public class AuthorizationRequest implements BaseProperties {
         if (!ArrayUtil.compare(authorizationData.requestHash, paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }
-        if (!authorizationData.paymentMethod.equals(payerAccountType.paymentMethodUri)) {
+        if (!authorizationData.paymentMethod.equals(paymentMethod.paymentMethodUri)) {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
         return authorizationData;

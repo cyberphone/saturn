@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
 
-import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.AuthorizationRequest;
 
 public final class SupercardPaymentMethodDecoder extends AuthorizationRequest.PaymentMethodDecoder {
@@ -37,7 +37,7 @@ public final class SupercardPaymentMethodDecoder extends AuthorizationRequest.Pa
     }
 
     @Override
-    public boolean match(PayerAccountTypes payerAccountType) throws IOException {
-        return PayerAccountTypes.SUPER_CARD == payerAccountType;
+    public boolean match(PaymentMethods payerAccountType) throws IOException {
+        return PaymentMethods.SUPER_CARD == payerAccountType;
     }
 }

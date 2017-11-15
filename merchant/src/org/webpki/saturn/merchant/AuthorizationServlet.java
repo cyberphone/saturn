@@ -76,7 +76,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                         DebugData debugData, 
                         UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Slightly different flows for card- and bank-to-bank authorizations
-        boolean cardPayment = payerAuthorization.getAccountType().isCardPayment();
+        boolean cardPayment = payerAuthorization.getPaymentMethod().isCardPayment();
         
         // ugly fix to cope with local installation
         String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
@@ -110,10 +110,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
  
         AuthorizationRequest.PaymentMethodEncoder paymentMethodEncoder = null;
         TransactionOperation transactionOperation = new TransactionOperation();
+        String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
+        
+        // Lookup of self (since it is provided by an external party)
+        PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
         if (cardPayment) {
             // Lookup of acquirer authority
-            PayeeAuthority payeeAuthority =
-                MerchantService.externalCalls.getPayeeAuthority(urlHolder, MerchantService.payeeAcquirerAuthorityUrl);
             ProviderAuthority acquirerAuthority =
                 MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
             transactionOperation.urlToCall = acquirerAuthority.getServiceUrl();
@@ -134,13 +136,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             }
         }
 
-        String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
             AuthorizationRequest.encode(MerchantService.testMode,
                                         providerAuthority.getServiceUrl(),
                                         payeeAuthorityUrl,
-                                        payerAuthorization.getAccountType(),
+                                        payerAuthorization.getPaymentMethod(),
                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                         request.getRemoteAddr(),
                                         paymentRequest,
@@ -157,8 +158,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         if (debug) {
             debugData.authorizationRequest = makeReader(authorizationRequest);
-            PayeeAuthority payeeAuthority =
-                MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
             debugData.payeeAuthority = payeeAuthority.getRoot();
             debugData.payeeProviderAuthority =
                 MerchantService.externalCalls.getProviderAuthority(urlHolder,payeeAuthority.getProviderAuthorityUrl()).getRoot();
@@ -187,7 +186,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         resultData.amount = paymentRequest.getAmount();  // Gas Station will upgrade amount
         resultData.referenceId = paymentRequest.getReferenceId();
         resultData.currency = paymentRequest.getCurrency();
-        resultData.accountType = authorizationResponse.getAuthorizationRequest().getPayerAccountType();
+        resultData.paymentMethod = authorizationResponse.getAuthorizationRequest().getPaymentMethod();
         String accountReference = authorizationResponse.getAccountReference();
         if (cardPayment) {
             accountReference = AuthorizationData.formatCardNumber(accountReference);

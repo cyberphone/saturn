@@ -20,7 +20,7 @@ import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
 
-import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.AuthorizationRequest;
 
 public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.PaymentMethodDecoder {
@@ -44,7 +44,7 @@ public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.Payment
     }
 
     @Override
-    public boolean match(PayerAccountTypes payerAccountType) throws IOException {
-        return PayerAccountTypes.BANK_DIRECT == payerAccountType;
+    public boolean match(PaymentMethods payerAccountType) throws IOException {
+        return PaymentMethods.BANK_DIRECT == payerAccountType;
     }
 }
