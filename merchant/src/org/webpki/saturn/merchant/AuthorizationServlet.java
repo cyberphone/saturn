@@ -51,8 +51,6 @@ import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
 
-import com.supercard.SupercardPaymentMethodEncoder;
-
 //////////////////////////////////////////////////////////////////////////
 // This servlet does all Merchant backend payment transaction work      //
 //////////////////////////////////////////////////////////////////////////
@@ -77,6 +75,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                         UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Slightly different flows for card- and bank-to-bank authorizations
         boolean cardPayment = payerAuthorization.getPaymentMethod().isCardPayment();
+        String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
+        
+        // Lookup of self (since it is provided by an external party)
+        PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
+
+        // Strictly put not entirely necessary (YET...)
+        ProviderAuthority ownProviderAuthority = 
+            MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
         
         // ugly fix to cope with local installation
         String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
@@ -110,20 +116,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
  
         AuthorizationRequest.PaymentMethodEncoder paymentMethodEncoder = null;
         TransactionOperation transactionOperation = new TransactionOperation();
-        String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
-        
-        // Lookup of self (since it is provided by an external party)
-        PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
         if (cardPayment) {
-            // Lookup of acquirer authority
-            ProviderAuthority acquirerAuthority =
-                MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
-            transactionOperation.urlToCall = acquirerAuthority.getServiceUrl();
+            transactionOperation.urlToCall = ownProviderAuthority.getServiceUrl();
             transactionOperation.verifier = MerchantService.acquirerRoot;
             if (debugData != null) {
-                debugData.acquirerAuthority = acquirerAuthority.getRoot();
+                debugData.acquirerAuthority = ownProviderAuthority.getRoot();
             }
-            paymentMethodEncoder = new SupercardPaymentMethodEncoder();
+            paymentMethodEncoder = MerchantService.superCardPaymentEncoder;
         } else {
             for (String paymentMethod : providerAuthority.getPaymentMethods()) {
                 if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
@@ -153,20 +152,20 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                                         .signer);
 
         // Call Payer bank
-        JSONObjectReader resultMessage =
-            MerchantService.externalCalls.postJsonData(urlHolder, providerAuthority.getServiceUrl(), authorizationRequest);
+        JSONObjectReader resultMessage = MerchantService.externalCalls.postJsonData(urlHolder,
+                                                                                    providerAuthority.getServiceUrl(),
+                                                                                    authorizationRequest);
 
         if (debug) {
             debugData.authorizationRequest = makeReader(authorizationRequest);
             debugData.payeeAuthority = payeeAuthority.getRoot();
-            debugData.payeeProviderAuthority =
-                MerchantService.externalCalls.getProviderAuthority(urlHolder,payeeAuthority.getProviderAuthorityUrl()).getRoot();
+            debugData.payeeProviderAuthority = ownProviderAuthority.getRoot();
             debugData.authorizationResponse = resultMessage;
         }
 
         if (resultMessage.getString(JSONDecoderCache.QUALIFIER_JSON).equals(Messages.PROVIDER_USER_RESPONSE.toString())) {
             if (debug) {
-                debugData.softReserveOrBasicError = true;
+                debugData.softAuthorizationError = true;
             }
             // Parse for syntax only
             new ProviderUserResponse(resultMessage);

@@ -32,7 +32,7 @@ public class DebugData implements Serializable {
 
     public boolean basicCredit;
     
-    public boolean softReserveOrBasicError;
+    public boolean softAuthorizationError;
     
     public JSONObjectReader payeeAuthority;
     

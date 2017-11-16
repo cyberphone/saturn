@@ -93,4 +93,9 @@ public class PayeeAuthority implements BaseProperties {
     public JSONObjectReader getRoot() {
         return root;
     }
+
+    boolean cached;  // Set by ExternalCalls
+    public boolean isCached() {
+        return cached;
+    }
 }

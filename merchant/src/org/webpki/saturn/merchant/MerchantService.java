@@ -51,6 +51,7 @@ import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 
 import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PaymentMethods;
@@ -61,6 +62,8 @@ import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
 
 import org.webpki.webutil.InitPropertyReader;
+
+import com.supercard.SupercardPaymentMethodEncoder;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
 
@@ -151,6 +154,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String walletBankdirectAuthz;
     
     static PaymentNetwork primaryMerchant;
+    
+    static AuthorizationRequest.PaymentMethodEncoder superCardPaymentEncoder = new SupercardPaymentMethodEncoder();
     
     static Boolean testMode;
 

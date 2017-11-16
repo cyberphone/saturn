@@ -129,6 +129,7 @@ public class ExternalCalls {
                 logger.info("Updated cache " + url);
             }
         } else {
+            providerAuthority.cached = true;
             if (logging) {
                 logger.info("Fetched from cache " + url);
             }
@@ -148,6 +149,7 @@ public class ExternalCalls {
                 logger.info("Updated cache " + url);
             }
         } else {
+            payeeAuthority.cached = true;
             if (logging) {
                 logger.info("Fetched from cache " + url);
             }

@@ -655,7 +655,7 @@ class DebugPrintout implements BaseProperties {
     }
 
     boolean providerUserResponse(JSONObjectReader response) throws IOException, GeneralSecurityException {
-        if (debugData.softReserveOrBasicError) {
+        if (debugData.softAuthorizationError) {
             description(point + 
                 "<p>The <b>User&nbsp;Bank</b> found some kind of account problem:</p>");
             fancyBox(response);
@@ -663,7 +663,7 @@ class DebugPrintout implements BaseProperties {
                 PROV_USER_RESPONSE + "</a> for more information.</p>" +
                 "<p>Although the Saturn protocol may continue after this point the debug mode won't currently show that...</p>");
         }
-        return debugData.softReserveOrBasicError;
+        return debugData.softAuthorizationError;
     }
 
     public String toString() {

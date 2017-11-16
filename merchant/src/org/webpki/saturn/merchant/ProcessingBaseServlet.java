@@ -108,7 +108,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             boolean debug = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             if (debug) {
                 debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
-                if (debugData.softReserveOrBasicError) {
+                if (debugData.softAuthorizationError) {
                     debug = false;
                     debugData = null;
                 } else {
