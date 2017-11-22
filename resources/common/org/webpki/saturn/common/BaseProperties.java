@@ -76,8 +76,7 @@ public interface BaseProperties {
     String DOMAIN_NAME_JSON                 = "domainName";
     String ACCOUNT_VERIFIER_JSON            = "accountVerifier";            // Option for "PayeeAuthority"
     String HASHED_PAYEE_ACCOUNTS_JSON       = "hashedPayeeAccounts";        //    -"-
-    String ACCOUNT_JSON                     = "account";                    // For usage in methods together with the option above
-    String NONCE_JSON                       = "nonce";                      //    -"-
+    String NONCE_JSON                       = "nonce";                      // For usage in methods together with the option above
     String SIGNATURE_ALGORITHM_JSON         = "signatureAlgorithm";
     String SIGNATURE_PROFILES_JSON          = "signatureProfiles";          // For "ProviderAuthority".  Accepts these
     String KEY_ENCRYPTION_ALGORITHM_JSON    = "keyEncryptionAlgorithm";     // For "ProviderAuthority" encryption key

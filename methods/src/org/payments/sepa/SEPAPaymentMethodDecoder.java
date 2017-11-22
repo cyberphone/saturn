@@ -19,7 +19,6 @@ package org.payments.sepa;
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONOutputFormats;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentMethods;
@@ -33,16 +32,10 @@ public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.Payment
     
     byte[] nonce;
     
-    JSONObjectReader account;
-
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        if (rd.hasProperty(BaseProperties.ACCOUNT_JSON)) {
-            account = rd.getObject(BaseProperties.ACCOUNT_JSON);
-            nonce = account.getBinary(BaseProperties.NONCE_JSON);
-            rd = account;
-        }
         payeeIban = rd.getString(SEPAPaymentMethodEncoder.PAYEE_IBAN_JSON);
+        nonce = rd.getBinaryConditional(BaseProperties.NONCE_JSON);
     }
 
     public String getPayeeIban() {
@@ -50,8 +43,8 @@ public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.Payment
     }
 
     @Override
-    protected JSONObjectReader getAccountObject() {
-        return account;
+    protected JSONObjectReader getAccountObject() throws IOException {
+        return nonce == null ? null : new JSONObjectReader(getWriter());
     }
 
     @Override

@@ -44,12 +44,10 @@ public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.Payment
 
     @Override
     protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        if (nonce == null) {
-            return wr.setString(PAYEE_IBAN_JSON, payeeIban);
+        wr.setString(PAYEE_IBAN_JSON, payeeIban);
+        if (nonce != null) {
+            wr.setBinary(BaseProperties.NONCE_JSON, nonce);
         }
-        wr.setObject(BaseProperties.ACCOUNT_JSON)
-            .setString(PAYEE_IBAN_JSON, payeeIban)
-            .setBinary(BaseProperties.NONCE_JSON, nonce);
         return wr;
     }
 
