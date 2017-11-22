@@ -21,6 +21,7 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.AuthorizationRequest;
+import org.webpki.saturn.common.BaseProperties;
 
 public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.PaymentMethodEncoder {
 
@@ -29,6 +30,13 @@ public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.Payment
     static final String PAYEE_IBAN_JSON = "payeeIban";
 
     String payeeIban;
+    
+    byte[] nonce;
+
+    public SEPAPaymentMethodEncoder(SEPAPaymentMethodDecoder sepaPaymentMethodDecoder) {
+        nonce = sepaPaymentMethodDecoder.nonce;
+        payeeIban = sepaPaymentMethodDecoder.payeeIban;
+    }
 
     public SEPAPaymentMethodEncoder(String payeeIban) {
         this.payeeIban = payeeIban;
@@ -36,7 +44,13 @@ public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.Payment
 
     @Override
     protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        return wr.setString(PAYEE_IBAN_JSON, payeeIban);
+        if (nonce == null) {
+            return wr.setString(PAYEE_IBAN_JSON, payeeIban);
+        }
+        wr.setObject(BaseProperties.ACCOUNT_JSON)
+            .setString(PAYEE_IBAN_JSON, payeeIban)
+            .setBinary(BaseProperties.NONCE_JSON, nonce);
+        return wr;
     }
 
     @Override
