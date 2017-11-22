@@ -47,7 +47,7 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.Payee;
-import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequest;
 
 import org.webpki.util.ISODateTime;
@@ -163,8 +163,8 @@ public class InitTestPage implements BaseProperties {
             .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
                 .setStringArray(PAYMENT_METHODS_JSON,
                                 new String[]{"https://nosuchcard.com",
-                                              PayerAccountTypes.SUPER_CARD.getPaymentMethodUri(),
-                                              PayerAccountTypes.BANK_DIRECT.getPaymentMethodUri()})
+                                    PaymentMethods.SUPER_CARD.getPaymentMethodUri(),
+                                    PaymentMethods.BANK_DIRECT.getPaymentMethodUri()})
                 .setObject(PAYMENT_REQUEST_JSON, standardRequest))));
 
         // The normal request is cloned and modified for testing error handling
@@ -172,9 +172,9 @@ public class InitTestPage implements BaseProperties {
               "// All our cards/accounts should match during the discovery phase...\n" +
               "var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
               "scrollMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"");
-        for (PayerAccountTypes accountType : PayerAccountTypes.values()) {
+        for (PaymentMethods paymentMethod : PaymentMethods.values()) {
             write(", \"");
-            write(accountType.getPaymentMethodUri());
+            write(paymentMethod.getPaymentMethodUri());
             write("\"");
         }
 

@@ -26,6 +26,7 @@
   </target>
 
   <target name="_build">
+  	<property name="payee.account.validation" value="true"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="logging" value="false"/>
     <property name="bank.host" value="https://localhost:8442/"/>
@@ -77,6 +78,7 @@
       <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
+      <replacefilter token="@merchant-account-validation@" value="${payee.account.validation}"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>

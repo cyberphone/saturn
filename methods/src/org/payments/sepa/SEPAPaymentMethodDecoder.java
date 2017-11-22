@@ -19,7 +19,9 @@ package org.payments.sepa;
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONOutputFormats;
 
+import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.AuthorizationRequest;
 
@@ -28,14 +30,28 @@ public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.Payment
     private static final long serialVersionUID = 1L;
 
     String payeeIban;
+    
+    byte[] nonce;
+    
+    JSONObjectReader account;
 
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
+        if (rd.hasProperty(BaseProperties.ACCOUNT_JSON)) {
+            account = rd.getObject(BaseProperties.ACCOUNT_JSON);
+            nonce = account.getBinary(BaseProperties.NONCE_JSON);
+            rd = account;
+        }
         payeeIban = rd.getString(SEPAPaymentMethodEncoder.PAYEE_IBAN_JSON);
     }
 
     public String getPayeeIban() {
         return payeeIban;
+    }
+
+    @Override
+    protected JSONObjectReader getAccountObject() {
+        return account;
     }
 
     @Override

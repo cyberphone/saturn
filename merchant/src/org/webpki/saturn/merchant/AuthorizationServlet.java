@@ -30,8 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.payments.sepa.SEPAPaymentMethodEncoder;
-
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -61,8 +59,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
     private static final String MERCHANT_PAYMENT_METHOD = "https://sepa.payments.org";
 
-    private static final String MERCHANT_ACCOUNT_ID = "FR7630004003200001019471656";
-    
     @Override
     boolean processCall(JSONObjectReader walletResponse,
                         PaymentRequest paymentRequest, 
@@ -126,7 +122,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         } else {
             for (String paymentMethod : providerAuthority.getPaymentMethods()) {
                 if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
-                    paymentMethodEncoder = new SEPAPaymentMethodEncoder(MERCHANT_ACCOUNT_ID);
+                    paymentMethodEncoder = payeeAuthority.getPayeeCoreProperties().getAccountHashes() == null ?
+                            MerchantService.sepaPlainAccount : MerchantService.sepaVerifiableAccount;
                     break;
                 }
             }

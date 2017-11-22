@@ -126,6 +126,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of the issuing provider's authority object") +
                             tableRow(rd, COMMON_NAME_JSON, "Payee common name") +
                             tableRow(rd, ID_JSON, "Local payee id used by the payee provider") +
+                            tableRow(rd, ACCOUNT_VERIFIER_JSON, "For verifying claimed payee account", true) +
                             tableRow(rd, SIGNATURE_PARAMETERS_JSON, "Holds one or more payee signature keys and associated algorithms")
                             )
                     .append(tableRow(rd, TIME_STAMP_JSON, "Object creation time"))

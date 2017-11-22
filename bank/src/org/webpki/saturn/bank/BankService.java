@@ -97,6 +97,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String USER_ACCOUNT_DB       = "user_account_db";
     
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
+    
+    static final String ACCOUNT_VALIDATION    = "merchant_account_validation";
 
     static final String SERVER_PORT_MAP       = "server_port_map";
     
@@ -248,12 +250,15 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 userAccountDb.put(account.getAccountId(), account);
             }
 
+            boolean accountValidation = getPropertyBoolean(ACCOUNT_VALIDATION);
             if (hostingProvider == null) {
                 accounts = JSONParser.parse(
                                        ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
                                            ).getJSONArrayReader();
                 while (accounts.hasMore()) {
-                    PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
+                    PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
+                                                                           knownPaymentMethods,
+                                                                           accountValidation);
                     merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
                 }
             }

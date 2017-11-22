@@ -23,6 +23,8 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
+import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
@@ -46,6 +48,16 @@ public class AuthorizationRequest implements BaseProperties {
 
         public String logLine() throws IOException {
             return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
+        }
+
+        public byte[] getAccountHash() throws IOException {
+            JSONObjectReader account = getAccountObject();
+            return account == null ? null :
+                HashAlgorithms.SHA256.digest(account.serializeToBytes(JSONOutputFormats.NORMALIZED));
+        }
+
+        protected JSONObjectReader getAccountObject() {
+            return null;
         }
     }
 

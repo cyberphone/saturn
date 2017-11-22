@@ -46,6 +46,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
+import org.webpki.json.JSONDecoderCache;
 
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
@@ -64,6 +65,9 @@ import org.webpki.saturn.common.ExternalCalls;
 import org.webpki.webutil.InitPropertyReader;
 
 import com.supercard.SupercardPaymentMethodEncoder;
+
+import org.payments.sepa.SEPAPaymentMethodEncoder;
+import org.payments.sepa.SEPAPaymentMethodDecoder;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
 
@@ -100,7 +104,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String SLOW_OPERATION               = "slow_operation";
 
     static final String W2NB_WALLET                  = "w2nb_wallet";
-    
+
+    static final String SEPA_ACCOUNT                 = "sepa-account.json";
+
     static final String USER_AUTHZ_SAMPLE            = "user-authorization.json";
 
     static final String USER_CHALL_AUTHZ_SAMPLE      = "user-challenged-authorization.json";
@@ -156,7 +162,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static PaymentNetwork primaryMerchant;
     
     static AuthorizationRequest.PaymentMethodEncoder superCardPaymentEncoder = new SupercardPaymentMethodEncoder();
-    
+
+    static AuthorizationRequest.PaymentMethodEncoder sepaVerifiableAccount;
+
+    static AuthorizationRequest.PaymentMethodEncoder sepaPlainAccount;
+
     static Boolean testMode;
 
     static boolean logging;
@@ -270,6 +280,13 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                 }
             }
             primaryMerchant = addPaymentNetwork(MERCHANT_KEY, MERCHANT_ID, acceptedAccountTypes.toArray(new String[0]));
+
+            JSONDecoderCache sepaAccount = new JSONDecoderCache();
+            sepaAccount.addToCache(SEPAPaymentMethodDecoder.class);
+            SEPAPaymentMethodDecoder sepaAccountDecoder = 
+                    (SEPAPaymentMethodDecoder)sepaAccount.parse(readJSONFile(SEPA_ACCOUNT));
+            sepaVerifiableAccount = new SEPAPaymentMethodEncoder(sepaAccountDecoder);
+            sepaPlainAccount = new SEPAPaymentMethodEncoder(sepaAccountDecoder.getPayeeIban());
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 

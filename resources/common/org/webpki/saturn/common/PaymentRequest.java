@@ -124,8 +124,7 @@ public class PaymentRequest implements BaseProperties {
         if (paymentRequest.currency != currency ||
             !paymentRequest.amount.equals(amount) ||
             paymentRequest.nonDirectPayment != nonDirectPayment ||
-            !paymentRequest.referenceId.equals(referenceId) ||
-            !paymentRequest.payee.commonName.equals(payee.commonName)) {
+            !paymentRequest.referenceId.equals(referenceId)) {
             throw new IOException("Inconsistent \"" + PAYMENT_REQUEST_JSON + "\" objects");
         }
     }

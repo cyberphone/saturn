@@ -140,6 +140,7 @@
          <include name="${payment.var.root}.cer"/>
          <include name="${acquirerroot}.cer"/>
       </zipfileset>
+      <zipfileset file="sepa-account.json" prefix="${class_war_path}"/>
       <zipfileset dir="debug-samples" prefix="${class_war_path}"/>
       <fileset dir="web"/>
     </war>

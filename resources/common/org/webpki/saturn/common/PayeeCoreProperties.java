@@ -27,12 +27,16 @@ import org.webpki.crypto.AsymSignatureAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
 public class PayeeCoreProperties implements BaseProperties {
+    
+    static final String PAYEE_ACCOUNTS_JSON = "payeeAccounts";  // Only for "init" not part of Saturn vocabularly
 
+    Vector<byte[]> optionalAccountHashes;
     SignatureParameter[] signatureParameters;
     DecoratedPayee decoratedPayee;
 
@@ -49,6 +53,17 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
         decoratedPayee = new DecoratedPayee(rd);
+        if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
+            optionalAccountHashes = new Vector<byte[]>();
+            JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
+            if (!accountVerifier.getString(JSONSignatureDecoder.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
+                throw new IOException("Unexpected hash algorithm");
+            }
+            JSONArrayReader accountHashes = accountVerifier.getArray(HASHED_PAYEE_ACCOUNTS_JSON);
+            do {
+                optionalAccountHashes.add(accountHashes.getBinary());
+            } while (accountHashes.hasMore());
+        }
         Vector<SignatureParameter> parameterArray = new Vector<SignatureParameter>();
         JSONArrayReader jsonParameterArray = rd.getArray(SIGNATURE_PARAMETERS_JSON);
         do {
@@ -63,9 +78,22 @@ public class PayeeCoreProperties implements BaseProperties {
         signatureParameters = parameterArray.toArray(new SignatureParameter[0]);
     }
 
-    public PayeeCoreProperties(DecoratedPayee decoratedPayee, SignatureParameter[] signatureParameters) {
-        this.decoratedPayee = decoratedPayee;
-        this.signatureParameters = signatureParameters;
+    public static PayeeCoreProperties init(JSONObjectReader rd, 
+                                           JSONDecoderCache knownPaymentMethods,
+                                           boolean addVerifier) throws IOException {
+        JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
+        Vector<byte[]> optionalAccountHashes = new Vector<byte[]>();
+        do {
+            AuthorizationRequest.PaymentMethodDecoder paymentMethodDecoder =
+                    (AuthorizationRequest.PaymentMethodDecoder)knownPaymentMethods.parse(payeeAccounts.getObject());
+            byte[] accountHash = paymentMethodDecoder.getAccountHash();
+            if (accountHash != null && addVerifier) {
+                optionalAccountHashes.add(accountHash);
+            }
+        } while (payeeAccounts.hasMore());
+        PayeeCoreProperties payeeCoreProperties = new PayeeCoreProperties(rd);
+        payeeCoreProperties.optionalAccountHashes = optionalAccountHashes.isEmpty() ? null : optionalAccountHashes;
+        return payeeCoreProperties;
     }
 
     public DecoratedPayee getDecoratedPayee() {
@@ -76,8 +104,18 @@ public class PayeeCoreProperties implements BaseProperties {
         return signatureParameters;
     }
 
+    public Vector<byte[]> getAccountHashes() {
+        return optionalAccountHashes;
+    }
+
     public JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        JSONArrayWriter jsonArray = decoratedPayee.writeObject(wr).setArray(SIGNATURE_PARAMETERS_JSON);
+        decoratedPayee.writeObject(wr);
+        if (optionalAccountHashes != null) {
+            wr.setObject(ACCOUNT_VERIFIER_JSON)
+                  .setString(JSONSignatureDecoder.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
+                  .setBinaryArray(HASHED_PAYEE_ACCOUNTS_JSON, optionalAccountHashes);
+        }
+        JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PARAMETERS_JSON);
         for (SignatureParameter signatureParameter : signatureParameters) {
             jsonArray.setObject().setString(JSONSignatureDecoder.ALGORITHM_JSON,
                                             signatureParameter

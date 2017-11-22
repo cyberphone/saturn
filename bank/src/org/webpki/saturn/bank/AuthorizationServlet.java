@@ -27,6 +27,7 @@ import java.util.Locale;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
@@ -37,7 +38,9 @@ import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.NonDirectPayments;
+import org.webpki.saturn.common.Messages;
 
+import org.webpki.util.ArrayUtil;
 import org.webpki.util.ISODateTime;
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -109,8 +112,33 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         providerAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
 
         // Verify Payee signature keys.  They may be one generation back as well
-        payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), authorizationRequest.getSignatureDecoder());
-        payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), paymentRequest.getSignatureDecoder());
+        PayeeCoreProperties payeeCoreProperties = payeeAuthority.getPayeeCoreProperties();
+        payeeCoreProperties.verify(paymentRequest.getPayee(), authorizationRequest.getSignatureDecoder());
+        payeeCoreProperties.verify(paymentRequest.getPayee(), paymentRequest.getSignatureDecoder());
+
+        // Optionally verify the claimed Payee account
+        byte[] accountHash = paymentMethodSpecific.getAccountHash();
+        if (payeeCoreProperties.getAccountHashes() == null) {
+            if (accountHash != null) {
+                throw new IOException("Missing \"" + ACCOUNT_VERIFIER_JSON + 
+                                      "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
+            }
+        } else {
+            if (accountHash == null) {
+                throw new IOException("Missing verifiable payee account");
+            }
+            boolean notFound = true;
+            for (byte[] hash : payeeCoreProperties.getAccountHashes()) {
+                if (ArrayUtil.compare(accountHash, hash)) {
+                    notFound = false;
+                    break;
+                }
+            }
+            if (notFound) {
+                throw new IOException("Payee account does not match \"" + ACCOUNT_VERIFIER_JSON + 
+                                      "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
+            }
+        }
 
         // Decrypt and validate the encrypted Payer authorization
         AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);

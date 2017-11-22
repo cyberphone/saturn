@@ -1,0 +1,7 @@
+{
+  "@context": "https://sepa.payments.org/saturn/v3#pms",
+  "account": {
+    "payeeIban": "FR7630004003200001019471656",
+    "nonce": "nZFwxLP0TvFXD2xPKzRTIGevgLjpiMw2BP86hszj5x4"
+  }
+}

@@ -319,49 +319,49 @@ class DebugPrintout implements BaseProperties {
             keyWord(Messages.AUTHORIZATION_RESPONSE) + " message, but the following:");
         fancyBoxNoClean(MerchantService.providerUserResponseSample);
         descriptionStdMargin("Note that the <b>Merchant</b> is supposed to transfer the " +
-        keyWord(Messages.PROVIDER_USER_RESPONSE) +
-        " to the already open <b>Wallet</b> and be prepared for receiving a renewed " +
-        keyWord(Messages.PAYER_AUTHORIZATION) +
-        " in order to maintain an unmodified " +
-        keyWord(PAYMENT_REQUEST_JSON) +
-        " needed for RBA synchronization.");
-        description("The message featured in the " +
-        keyWord(ENCRYPTED_MESSAGE_JSON) +
-        " object is then decrypted using the " +
-        keyWord(ENCRYPTION_PARAMETERS_JSON) +
-        " the <b>Wallet</b> included in the <i>preceding</i> " +
-        "user authentication object:");
+            keyWord(Messages.PROVIDER_USER_RESPONSE) +
+            " to the already open <b>Wallet</b> and be prepared for receiving a renewed " +
+            keyWord(Messages.PAYER_AUTHORIZATION) +
+            " in order to maintain an unmodified " +
+            keyWord(PAYMENT_REQUEST_JSON) +
+            " needed for RBA synchronization.");
+            description("The message featured in the " +
+            keyWord(ENCRYPTED_MESSAGE_JSON) +
+            " object is then decrypted using the " +
+            keyWord(ENCRYPTION_PARAMETERS_JSON) +
+            " the <b>Wallet</b> included in the <i>preceding</i> " +
+            "user authentication object:");
         fancyBoxNoClean(MerchantService.encryptedMessageSample.getRoot());
         descriptionStdMargin("<p>Note that if there are no " +
-        keyWord(USER_CHALLENGE_ITEMS_JSON) +
-        " elements, there is only a text message to the user like &quot;Out of funds&quot; " +
-        "and the payment process terminates.</p><p>" +
-        "However, in the case above there is a " +
-        keyWord(USER_CHALLENGE_ITEMS_JSON) +
-        " list which must be handled by a specific RBA dialog:</p>");
+            keyWord(USER_CHALLENGE_ITEMS_JSON) +
+            " elements, there is only a text message to the user like &quot;Out of funds&quot; " +
+            "and the payment process terminates.</p><p>" +
+            "However, in the case above there is a " +
+            keyWord(USER_CHALLENGE_ITEMS_JSON) +
+            " list which must be handled by a specific RBA dialog:</p>");
         descriptionStdMargin("<div style=\"margin-left:auto;margin-right:auto;width:30em;background-color:#f0f0f0;border-width:1px;" +
-        "border-style:solid;border-color:black;box-shadow:3pt 3pt 3pt #D0D0D0;\">" +
-        "<style scoped>" +
-        " .button {border-radius:3pt;background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);width:6em;text-align:center;border-width:1px;border-style:solid;border-color:#a9a9a9;padding:2pt}" +
-        "</style>" +
-        "<div style=\"background-color:green;color:white;font-size:larger;text-align:center;padding:5pt\">Requester: " +
-        MerchantService.encryptedMessageSample.getRequester() +        
-        "</div><div style=\"margin:10pt 10pt 0pt 10pt\">" +
-        MerchantService.encryptedMessageSample.getText() +
-        "</div><div style=\"margin:5pt 10pt 0pt 10pt;width:" + 
-        MerchantService.encryptedMessageSample.getOptionalUserChallengeItems()[0].getOptionalLength() +
-        "em;background-color:white;border-width:1px;padding:1pt 0pt 2pt 4pt;border-style:solid;border-color:#a9a9a9;margin-top:3pt\">"+
-        "\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf</div>" +
-        "<table style=\"margin-left:auto;margin-right:auto;margin-top:12pt;margin-bottom:12pt\"><tr><td><div class=\"button\">Cancel</div></td><td style=\"width:4em\"></td><td><div class=\"button\">Submit!</div></tr></table>" +
-        "</div>");
+            "border-style:solid;border-color:black;box-shadow:3pt 3pt 3pt #D0D0D0;\">" +
+            "<style scoped>" +
+            " .button {border-radius:3pt;background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);width:6em;text-align:center;border-width:1px;border-style:solid;border-color:#a9a9a9;padding:2pt}" +
+            "</style>" +
+            "<div style=\"background-color:green;color:white;font-size:larger;text-align:center;padding:5pt\">Requester: " +
+            MerchantService.encryptedMessageSample.getRequester() +        
+            "</div><div style=\"margin:10pt 10pt 0pt 10pt\">" +
+            MerchantService.encryptedMessageSample.getText() +
+            "</div><div style=\"margin:5pt 10pt 0pt 10pt;width:" + 
+            MerchantService.encryptedMessageSample.getOptionalUserChallengeItems()[0].getOptionalLength() +
+            "em;background-color:white;border-width:1px;padding:1pt 0pt 2pt 4pt;border-style:solid;border-color:#a9a9a9;margin-top:3pt\">"+
+            "\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf</div>" +
+            "<table style=\"margin-left:auto;margin-right:auto;margin-top:12pt;margin-bottom:12pt\"><tr><td><div class=\"button\">Cancel</div></td><td style=\"width:4em\"></td><td><div class=\"button\">Submit!</div></tr></table>" +
+            "</div>");
         description("When the user have issued the requested data the <b>Wallet</b> creates a new user authentication object which " +
-        "now also contains a matching " +
-        keyWord(USER_RESPONSE_ITEMS_JSON) +
-        " list:");
+            "now also contains a matching " +
+            keyWord(USER_RESPONSE_ITEMS_JSON) +
+            " list:");
         fancyBoxNoClean(MerchantService.userChallAuthzSample);
         descriptionStdMargin("<p>This object is returned to the <b>Merchant</b> in a " +
-        keyWord(Messages.PAYER_AUTHORIZATION) + " message, effectively resuming operation at <a href=\"#3\">step&nbsp;3</a>.</p><p>This process may be repeated " +
-        "until <b>User&nbsp;Bank</b> is satisfied or blocks further attempts.</p>");
+            keyWord(Messages.PAYER_AUTHORIZATION) + " message, effectively resuming operation at <a href=\"#3\">step&nbsp;3</a>.</p><p>This process may be repeated " +
+            "until <b>User&nbsp;Bank</b> is satisfied or blocks further attempts.</p>");
 
         description("Protocol version: <i>" + Version.PROTOCOL + "</i><br>Date: <i>" + Version.DATE + "</i>");
     }
@@ -475,6 +475,12 @@ class DebugPrintout implements BaseProperties {
                 keyWord(PAYMENT_METHOD_JSON) + " in the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +
                 " and in the user authorization object are identical.</li>" +
+                "<li>Verifying that the <i>optional</i> " +
+                keyWord(ACCOUNT_VERIFIER_JSON) + " in the " +
+                keyWord(Messages.PAYEE_AUTHORITY) +
+                " matches the account provided in the " +
+                keyWord(PAYMENT_METHOD_SPECIFIC_JSON) +
+                " object.</li>" +
                 "<li>Verifying that the " +
                 keyWord(TIME_STAMP_JSON) +
                 " in the user authorization object is within limits like " +

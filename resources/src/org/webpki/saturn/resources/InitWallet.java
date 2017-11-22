@@ -45,14 +45,13 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
-import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethods;
 
 import org.webpki.sks.AppUsage;
 import org.webpki.sks.BiometricProtection;
@@ -144,7 +143,7 @@ public class InitWallet {
         surrogateKey.setPrivateKey(importedKey.getPrivateKey());
         JSONObjectWriter ow = null;
         if (!args[5].equals("@")) {
-            PayerAccountTypes accountType = PayerAccountTypes.valueOf(args[5]);
+            PaymentMethods paymentMethod = PaymentMethods.valueOf(args[5]);
             String accountId = args[6];
             boolean cardFormatted = true;
             if (accountId.startsWith("!")) {
@@ -152,7 +151,7 @@ public class InitWallet {
                 accountId = accountId.substring(1);
             }
             ow = new JSONObjectWriter()
-                 .setString(BaseProperties.PAYMENT_METHOD_JSON, accountType.getPaymentMethodUri())
+                 .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUri())
                  .setString(BaseProperties.ACCOUNT_ID_JSON, accountId)
                  .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON, cardFormatted)
                  .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, args[7])
