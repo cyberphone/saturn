@@ -49,7 +49,7 @@ public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.Payment
 
     @Override
     public String getContext() {
-        return SEPAPaymentMethodEncoder.PAYMENT_METHOD;
+        return SEPAPaymentMethodEncoder.CONTEXT;
     }
 
     @Override

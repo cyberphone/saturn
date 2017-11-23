@@ -38,6 +38,6 @@ public final class SEPAAccountDataDecoder extends AuthorizationResponse.AccountD
 
     @Override
     public String getContext() {
-        return SEPAAccountDataEncoder.ACCOUNT_DATA;
+        return SEPAAccountDataEncoder.CONTEXT;
     }
 }

@@ -25,7 +25,7 @@ import org.webpki.saturn.common.BaseProperties;
 
 public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.PaymentMethodEncoder {
 
-    static final String PAYMENT_METHOD  = "https://sepa.payments.org/saturn/v3#pms";
+    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#pms";
 
     static final String PAYEE_IBAN_JSON = "payeeIban";
 
@@ -34,8 +34,8 @@ public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.Payment
     byte[] nonce;
 
     public SEPAPaymentMethodEncoder(SEPAPaymentMethodDecoder sepaPaymentMethodDecoder) {
+        this(sepaPaymentMethodDecoder.payeeIban);
         nonce = sepaPaymentMethodDecoder.nonce;
-        payeeIban = sepaPaymentMethodDecoder.payeeIban;
     }
 
     public SEPAPaymentMethodEncoder(String payeeIban) {
@@ -53,6 +53,6 @@ public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.Payment
 
     @Override
     public String getContext() {
-        return PAYMENT_METHOD;
+        return CONTEXT;
     }
 }

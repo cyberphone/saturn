@@ -24,7 +24,7 @@ import org.webpki.saturn.common.AuthorizationResponse;
 
 public final class SEPAAccountDataEncoder extends AuthorizationResponse.AccountDataEncoder {
 
-    static final String ACCOUNT_DATA    = "https://sepa.payments.org/saturn/v3#ad";
+    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#ad";
 
     static final String PAYER_IBAN_JSON = "payerIban";    // Payer IBAN
 
@@ -41,6 +41,6 @@ public final class SEPAAccountDataEncoder extends AuthorizationResponse.AccountD
 
     @Override
     public String getContext() {
-        return ACCOUNT_DATA;
+        return CONTEXT;
     }
 }
