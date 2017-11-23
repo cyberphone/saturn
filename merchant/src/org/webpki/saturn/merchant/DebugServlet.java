@@ -368,7 +368,7 @@ class DebugPrintout implements BaseProperties {
     
     void providerAuthDescription() {
         descriptionStdMargin(keyWord(Messages.PROVIDER_AUTHORITY) + 
-                " is an object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
+                " is an object that normally would be <i>cached</i> until it has expired.&nbsp;&nbsp;It " +
                 "has the following tasks:<ul>" +
                 "<li style=\"padding:0pt\">Enabling other parties discovering data about an entity <i>before</i> interacting with the entity.</li>" +
                 "<li>Through a signature attesting the authenticity of core parameters including <i>service end points</i>, <i>encryption keys</i>, " +
@@ -396,7 +396,7 @@ class DebugPrintout implements BaseProperties {
 
         fancyBox(debugData.payeeAuthority);
         descriptionStdMargin(keyWord(Messages.PAYEE_AUTHORITY) + 
-                " is an object that typically would be <i>cached</i>.&nbsp;&nbsp;It " +
+                " is an object that normally would be <i>cached</i> until it has expired.&nbsp;&nbsp;It " +
                 "has the following tasks:<ul>" +
                 "<li style=\"padding:0pt\">Enabling other parties discovering data about an entity <i>before</i> interacting with the entity.</li>" +
                 "<li>Through an associated <i>provider's</i> signature attesting the authenticity of core parameters including <i>identity</i> and <i>signature keys</i>" +
