@@ -82,7 +82,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         // ugly fix to cope with local installation
         String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
-        if (MerchantService.payeeProviderAuthorityUrl.contains("localhost")) {
+        if (MerchantService.localInstallation) {
             URL url = new URL(MerchantService.payeeProviderAuthorityUrl);
             providerAuthorityUrl = new URL(url.getProtocol(),
                                            url.getHost(), 

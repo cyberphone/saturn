@@ -55,6 +55,7 @@
   </target>
 
   <target name="_build">
+    <property name="local.installation" value="true"/>
     <property name="logging" value="false"/>
     <property name="var.slow.operation" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442"/>
@@ -96,6 +97,7 @@
            classpath="${compile.classpath}"
            includeAntRuntime="false"/>
     <replace file="${temp.dir}/web.xml">
+      <replacefilter token="@local-installation@" value="${local.installation}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${keypassword}"/>
       <replacefilter token="@merchant-key@" value="${merchantkey}.p12"/>

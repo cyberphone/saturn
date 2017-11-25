@@ -96,7 +96,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String SERVER_PORT_MAP              = "server_port_map";
     
     static final String MERCHANT_BASE_URL            = "merchant_base_url";
-    
+
+    static final String LOCAL_INSTALLATION           = "local_installation";
+
     static final String CURRENCY                     = "currency";
 
     static final String ADD_UNUSUAL_CARD             = "add_unusual_card";
@@ -178,6 +180,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     private static int referenceId = 1000000;
 
     static String[] grantedVersions;
+
+    static boolean localInstallation;
 
     static String getReferenceId() {
         return "#" + (referenceId++);
@@ -263,6 +267,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         initProperties (sce);
         try {
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
+
+            localInstallation = getPropertyBoolean(LOCAL_INSTALLATION);
 
             // Should be common for all payment networks...
             merchantCommonName = getPropertyString(MERCHANT_CN);
