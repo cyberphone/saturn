@@ -81,7 +81,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static final String BANK_NAME             = "bank_name";
     static final String BANK_EECERT           = "bank_eecert";
-    static final String BANK_HOST             = "bank_host";
+    static final String BANK_BASE_URL         = "bank_base_url";
     static final String DECRYPTION_KEY1       = "bank_decryptionkey1";
     static final String DECRYPTION_KEY2       = "bank_decryptionkey2";
     static final String REFERENCE_ID_START    = "bank_reference_id_start";
@@ -268,20 +268,20 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             referenceId = getPropertyInt(REFERENCE_ID_START);
             
-            String bankHost = getPropertyString(BANK_HOST);
+            String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
             String extensions =
                 new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
 
             if (!extensions.isEmpty()) {
-                extensions = extensions.replace("${host}", bankHost);
+                extensions = extensions.replace("${host}", bankBaseUrl);
                 optionalProviderExtensions = JSONParser.parse(extensions);
             }
 
             authorityObjectManager = 
-                new AuthorityObjectManager(providerAuthorityUrl = bankHost + "/authority",
-                                           bankHost,
-                                           serviceUrl = bankHost + "/service",
+                new AuthorityObjectManager(providerAuthorityUrl = bankBaseUrl + "/authority",
+                                           bankBaseUrl,
+                                           serviceUrl = bankBaseUrl + "/service",
                                            optionalProviderExtensions,
                                            new String[]{"https://sepa.payments.org", "https://ultragiro.se"},
                                            new SignatureProfiles[]{SignatureProfiles.P256_ES256},
@@ -294,7 +294,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            bankKey,
 
                                            merchantAccountDb,
-                                           payeeAuthorityBaseUrl = bankHost + "/payees/",
+                                           payeeAuthorityBaseUrl = bankBaseUrl + "/payees/",
                                            hostingProvider == null ? new ServerAsymKeySigner(bankcreds) : null,
 
                                            PROVIDER_EXPIRATION_TIME,

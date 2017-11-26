@@ -58,9 +58,9 @@ public class HostingService extends InitPropertyReader implements ServletContext
 
     static final String HOSTING_KEY           = "hosting_key";
 
-    static final String HOSTING_HOST          = "hosting_host";
+    static final String HOSTING_BASE_URL       = "hosting_base_url";
 
-    static final String PROVIDER_HOST         = "provider_host";
+    static final String PROVIDER_BASE_URL      = "provider_base_url";
 
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
 
@@ -132,8 +132,8 @@ public class HostingService extends InitPropertyReader implements ServletContext
             }
 
             authorityObjectManager =
-                new AuthorityObjectManager(providerAuthorityUrl = getPropertyString(PROVIDER_HOST) + "/authority",
-                                           getPropertyString(HOSTING_HOST),
+                new AuthorityObjectManager(providerAuthorityUrl = getPropertyString(PROVIDER_BASE_URL) + "/authority",
+                                           getPropertyString(HOSTING_BASE_URL),
                                            null,
                                            null,
                                            null,
@@ -143,7 +143,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
                                            null,
 
                                            merchantAccountDb, 
-                                           payeeAuthorityBaseUrl = getPropertyString(HOSTING_HOST) + "/payees/",
+                                           payeeAuthorityBaseUrl = getPropertyString(HOSTING_BASE_URL) + "/payees/",
                                            new ServerAsymKeySigner(new KeyStoreEnumerator(getResource(HOSTING_KEY),
                                                                                           getPropertyString(KEYSTORE_PASSWORD))),
 

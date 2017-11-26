@@ -56,6 +56,11 @@
 
   <target name="_build">
     <property name="local.installation" value="true"/>
+
+  	<property name="zip.extra.lib.dir" value="${common.lib.dir}"/>
+    <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
+    <property name="zip.lib.dir" value="lib"/>
+    
     <property name="logging" value="false"/>
     <property name="var.slow.operation" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442"/>
@@ -185,12 +190,6 @@
         
        <param name="compile.classpath" refid="tomcat.compile.classpath"/>
        
-       <param name="zip.extra.lib.dir" value="${common.lib.dir}"/>
-       
-       <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
-       
-       <param name="zip.lib.dir" value="lib"/>
-       
        <param name="zip.key.dir" value="${key.dir}"/>
        
        <param name="payment.var.root" value="${payment_root}"/>
@@ -211,6 +210,11 @@
              <include name="*.jar"/>
          </fileset>
      </copy>
+
+  	 <property name="zip.extra.lib.dir" value="extra.lib"/>
+     <property name="zip.common.lib.dir" value="empty.lib"/>
+     <property name="zip.lib.dir" value="empty.lib"/>
+   
      <property name="bouncycastle.first" value="false"/>
      <property name="acquirer.host" value="https://mobilepki.org"/>
      <property name="payee_provider.host" value="https://mobilepki.org"/>
@@ -238,12 +242,6 @@
        <param name="compile.methods.src.dir" value="methods.src"/>
         
        <param name="compile.classpath" refid="ejbca.compile.classpath"/>
-       
-       <param name="zip.extra.lib.dir" value="extra.lib"/>
-       
-       <param name="zip.common.lib.dir" value="empty.lib"/>
-       
-       <param name="zip.lib.dir" value="empty.lib"/>
        
        <param name="zip.key.dir" value="keys"/>
 

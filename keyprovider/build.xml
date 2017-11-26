@@ -7,6 +7,8 @@
   
   <property name="appcorename" value="webpay-keyprovider"/>
   <property name="application" value="${appcorename}.war"/>
+
+  <property name="gcm.crypto" value="A128GCM"/>
   
   <property name="debug" value="on"/>
   <property environment="env"/>
@@ -56,10 +58,12 @@
   </target>
 
   <target name="_build">
+    <property name="keyprov.host" value="http://localhost:8080"/>
+    <property name="keyprov.path" value="webpay-keyprovider"/>
+    <property name="bank.host" value="https://localhost:8442"/>
+    <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
     <property name="plugin.ejbca.ant.custom.logon.version-check" value=""/>
     <property name="security.actual" value=""/>
-    <property name="keyprov.host" value="http://localhost:8080/webpay-keyprovider"/>
-    <property name="bank.host" value="https://localhost:8442"/>
     <property name="server.port.map" value=""/>
     <property name="errormedia" value="false"/>
     <property name="bouncycastle.first" value="true"/>
@@ -82,14 +86,14 @@
       <replacefilter token="@saturn-logotype@" value="${saturn-logotype.file}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${keypassword}"/>
-      <replacefilter token="@keyprov-host@" value="${keyprov.host}"/>
+      <replacefilter token="@keyprov-base-url@" value="${keyprov.host}/${keyprov.path}"/>
       <replacefilter token="@bank-host@" value="${bank.host}"/>
       <replacefilter token="@android-webpki-versions@" value="${android.webpki.versions}"/>
       <replacefilter token="@security@" value="${security.actual}"/>
       <replacefilter token="@paycred1@"
         value="${clientkey_super}.p12,SUPER_CARD,${account_id_super},supercard.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath},@,A128CBC-HS256"/>
       <replacefilter token="@paycred2@"
-        value="${clientkey_bankdir}.p12,BANK_DIRECT,!${account_id_bankdir},bankdirect.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath},@,A128GCM"/>
+        value="${clientkey_bankdir}.p12,BANK_DIRECT,!${account_id_bankdir},bankdirect.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath},@,${gcm.crypto}"/>
       <replacefilter token="@paycred3@"
         value="${clientkey_unusual}.p12,UNUSUAL_CARD,${account_id_unusual},unusualcard.svg,${payeebankpath}-enc-key-ec.cer,${payeebankpath},Money-77,A128CBC-HS256"/>
       <replacefilter token="@keyprov-kmk@" value="${kg2kmkey_ec}.p12"/>
@@ -146,8 +150,6 @@
        
        <param name="compile.classpath" refid="tomcat.compile.classpath"/>
        
-       <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
-       
        <param name="zip.key.dir" value="${key.dir}"/>
 
        <param name="zip.logotype.dir" value="${logotype.dir}"/>
@@ -160,11 +162,13 @@
   <!-- mobilepki using EJBCA plugin mode -->
   <target name="mobilepki-ejbca">
      <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Key Provider Plugin"/>
+
+  	 <property name="zip.common.lib.dir" value="empty.lib"/>
      <property name="bouncycastle.first" value="false"/>
      <property file="common.properties"/>
      <property file="users.properties"/>
      <property name="security.actual" value="${security.internal}"/>
-     <property name="keyprov.host" value="https://mobilepki.org/webpay-keyprovider"/>
+     <property name="keyprov.host" value="https://mobilepki.org"/>
      <property name="bank.host" value="https://mobilepki.org"/>
      <property name="server.port.map" value="8442"/>
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
@@ -182,8 +186,6 @@
        
        <param name="compile.classpath" refid="ejbca.compile.classpath"/>
        
-       <param name="zip.common.lib.dir" value="empty.lib"/>
-       
        <param name="zip.key.dir" value="keys"/>
        
        <param name="zip.logotype.dir" value="logotype"/>
@@ -198,7 +200,7 @@
   
   <target name="localhost-ejbca">
      <echo message="Web2Native Bridge &quot;localhost&quot; Key Provider Plugin"/>
-     <property name="keyprov.host" value="http://localhost:8080/webpay-keyprovider"/>
+     <property name="keyprov.host" value="http://localhost:8080"/>
      <property name="bank.host" value="https://localhost:8442"/>
      <property name="server.port.map" value=""/>
      <property name="security.actual" value=""/>

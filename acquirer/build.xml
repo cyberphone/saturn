@@ -42,9 +42,11 @@
   </target>
 
   <target name="_build">
+    <property name="acquirer.host" value="https://localhost:8442"/>
+    <property name="acquirer.path" value="webpay-acquirer"/>
+    <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="logging" value="false"/>
-    <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
     <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="${src.dir}"
@@ -73,7 +75,7 @@
       <replacefilter token="@acquirer-eecert@" value="${acquirersignaturekey}.p12"/>
       <replacefilter token="@acquirer-decryptionkey1@" value="${acquirerencryptionkey_ec}.p12"/>
       <replacefilter token="@acquirer-decryptionkey2@" value="${acquirerencryptionkey_rsa}.p12"/>
-      <replacefilter token="@acquirer-host@" value="${acquirer.host}"/>
+      <replacefilter token="@acquirer-base-url@" value="${acquirer.host}/${acquirer.path}"/>
       <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
@@ -132,8 +134,6 @@
 
        <param name="compile.classpath" refid="tomcat.compile.classpath"/>
        
-       <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
-       
        <param name="zip.key.dir" value="${key.dir}"/>
        
        <param name="payment.var.root" value="${payment_root}"/>
@@ -146,11 +146,13 @@
   <!-- mobilepki using EJBCA plugin mode -->
   <target name="mobilepki-ejbca">
      <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Acquirer Plugin"/>
-      <condition property="logging" value="true" else="false">
+
+  	 <property name="zip.common.lib.dir" value="empty.lib"/>
+     <condition property="logging" value="true" else="false">
         <isset property="plugin.ejbca.ant.custom.logging"/>
      </condition>
      <property name="bouncycastle.first" value="false"/>
-     <property name="acquirer.host" value="https://mobilepki.org/webpay-acquirer"/>
+     <property name="acquirer.host" value="https://mobilepki.org"/>
      <property file="common.properties"/>
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
      <property name="dist.dir" value="${ejbca.gen.path}"/>
@@ -169,8 +171,6 @@
          
        <param name="compile.classpath" refid="ejbca.compile.classpath"/>
        
-       <param name="zip.common.lib.dir" value="empty.lib"/>
-       
        <param name="zip.key.dir" value="keys"/>
 
        <param name="payment.var.root" value="${paymentroot}"/>
@@ -186,7 +186,7 @@
   
   <target name="localhost-ejbca">
      <echo message="Web2Native Bridge &quot;localhost&quot; Acquirer Plugin"/>
-     <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
+     <property name="acquirer.host" value="https://localhost:8442"/>
      <antcall target="mobilepki-ejbca"/>
   </target>
   

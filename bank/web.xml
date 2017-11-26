@@ -23,9 +23,9 @@
     </context-param>
 
     <context-param>
-        <description>Bank Host</description>
-        <param-name>bank_host</param-name>
-        <param-value>@bank-host@</param-value>
+        <description>Bank Base URL</description>
+        <param-name>bank_base_url</param-name>
+        <param-value>@bank-base-url@</param-value>
     </context-param>
 
     <context-param>

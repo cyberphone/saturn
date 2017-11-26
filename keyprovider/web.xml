@@ -35,9 +35,9 @@
     </context-param>
 
     <context-param>
-        <description>Key Provider Host</description>
-        <param-name>keyprov_host</param-name>
-        <param-value>@keyprov-host@</param-value>
+        <description>Key Provider Base URL</description>
+        <param-name>keyprov_base_url</param-name>
+        <param-value>@keyprov-base-url@</param-value>
     </context-param>
 
     <context-param>

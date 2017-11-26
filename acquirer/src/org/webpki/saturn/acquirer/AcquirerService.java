@@ -75,7 +75,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static final String KEYSTORE_PASSWORD     = "key_password";
 
     static final String ACQUIRER_EECERT       = "acquirer_eecert";
-    static final String ACQUIRER_HOST         = "acquirer_host";
+    static final String ACQUIRER_BASE_URL     = "acquirer_base_url";
     static final String DECRYPTION_KEY1       = "acquirer_decryptionkey1";  // PUBLISHED
     static final String DECRYPTION_KEY2       = "acquirer_decryptionkey2";
 
@@ -204,20 +204,20 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             addDecryptionKey(DECRYPTION_KEY1);
             addDecryptionKey(DECRYPTION_KEY2);
             
-            String aquirerHost = getPropertyString(ACQUIRER_HOST);
+            String acquirerBaseUrl = getPropertyString(ACQUIRER_BASE_URL);
 
             String extensions =
                     new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
 
             if (extensions.length() > 0) {
-                extensions = extensions.replace("${host}", aquirerHost);
+                extensions = extensions.replace("${host}", acquirerBaseUrl);
                 optionalProviderExtensions = JSONParser.parse(extensions);
             }
 
             authorityObjectManager =
-                new AuthorityObjectManager(providerAuthorityUrl = aquirerHost + "/authority",
-                                           aquirerHost,
-                                           aquirerHost + "/service",
+                new AuthorityObjectManager(providerAuthorityUrl = acquirerBaseUrl + "/authority",
+                                           acquirerBaseUrl,
+                                           acquirerBaseUrl + "/service",
                                            optionalProviderExtensions,
                                            new String[]{"https://supercard.com"},
                                            new SignatureProfiles[]{SignatureProfiles.P256_ES256},
@@ -230,7 +230,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                            acquirerKey,
 
                                            merchantAccountDb, 
-                                           payeeAuthorityBaseUrl = aquirerHost + "/payees/",
+                                           payeeAuthorityBaseUrl = acquirerBaseUrl + "/payees/",
                                            new ServerAsymKeySigner(acquirercreds),
 
                                            PROVIDER_EXPIRATION_TIME,

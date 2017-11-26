@@ -43,8 +43,10 @@
 
   <target name="_build">
     <property name="logging" value="false"/>
-    <property name="hosting.host" value="https://localhost:8442/webpay-hosting"/>
-    <property name="provider.host" value="https://localhost:8442/webpay-payeebank"/>
+    <property name="hosting.path" value="webpay-hosting"/>
+    <property name="hosting.provider.path" value="webpay-payeebank"/>
+    <property name="hosting.host" value="https://localhost:8442"/>
+    <property name="hosting.provider.host" value="https://localhost:8442"/>
     <property name="merchants.db" value="merchants.${payeebankpath}.json"/>
     <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="${src.dir}"
@@ -70,8 +72,8 @@
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@key-password@" value="${keypassword}"/>
       <replacefilter token="@hosting-key@" value="${hostingattestationkey}.p12"/>
-      <replacefilter token="@hosting-host@" value="${hosting.host}"/>
-      <replacefilter token="@provider-host@" value="${provider.host}"/>
+      <replacefilter token="@hosting-base-url@" value="${hosting.host}/${hosting.path}"/>
+      <replacefilter token="@provider-base-url@" value="${hosting.provider.host}/${hosting.provider.path}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
       <replacefilter token="@logging@" value="${logging}"/>
@@ -137,7 +139,6 @@
         <isset property="plugin.ejbca.ant.custom.logging"/>
      </condition>
      <property name="bouncycastle.first" value="false"/>
-     <property name="acquirer.host" value="https://mobilepki.org/webpay-acquirer"/>
      <property file="common.properties"/>
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
      <property name="dist.dir" value="${ejbca.gen.path}"/>
@@ -171,7 +172,6 @@
   
   <target name="localhost-ejbca">
      <echo message="Web2Native Bridge &quot;localhost&quot; Acquirer Plugin"/>
-     <property name="acquirer.host" value="https://localhost:8442/webpay-acquirer"/>
      <antcall target="mobilepki-ejbca"/>
   </target>
   

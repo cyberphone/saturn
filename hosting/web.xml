@@ -17,15 +17,15 @@
     </context-param>
 
     <context-param>
-        <description>Hosting Host</description>
-        <param-name>hosting_host</param-name>
-        <param-value>@hosting-host@</param-value>
+        <description>Hosting Base URL</description>
+        <param-name>hosting_base_url</param-name>
+        <param-value>@hosting-base-url@</param-value>
     </context-param>
 
     <context-param>
-        <description>Provider Host</description>
-        <param-name>provider_host</param-name>
-        <param-value>@provider-host@</param-value>
+        <description>Provider Base URL</description>
+        <param-name>provider_base_url</param-name>
+        <param-value>@provider-base-url@</param-value>
     </context-param>
 
     <context-param>

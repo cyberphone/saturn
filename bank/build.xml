@@ -26,10 +26,12 @@
   </target>
 
   <target name="_build">
+    <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
+    <property name="bank.host" value="https://localhost:8442"/>
+    <property name="bank.path" value="${appcorename}"/>
   	<property name="payee.account.validation" value="true"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="logging" value="false"/>
-    <property name="bank.host" value="https://localhost:8442/"/>
     <property name="server.port.map" value=""/>
     <property name="users.db" value="users.${appcorename}.json"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
@@ -75,7 +77,7 @@
       <replacefilter token="@bank-reference-id-start@" value="${reference.id.start}"/>
       <replacefilter token="@payment-root@" value="${paymentroot}.cer"/>
       <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
-      <replacefilter token="@bank-host@" value="${bank.host}${appcorename}"/>
+      <replacefilter token="@bank-base-url@" value="${bank.host}/${bank.path}"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@merchant-account-validation@" value="${payee.account.validation}"/>
@@ -149,8 +151,6 @@
         
        <param name="compile.classpath" refid="tomcat.compile.classpath"/>
        
-       <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
-       
        <param name="zip.key.dir" value="${key.dir}"/>
 
        <param name="zip.credentials.dir" value="${credentials.dir}"/>
@@ -161,6 +161,8 @@
   <!-- mobilepki using EJBCA plugin mode -->
   <target name="mobilepki-ejbca">
      <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Bank Plugin"/>
+
+  	 <property name="zip.common.lib.dir" value="empty.lib"/>
      <property file="common.properties"/>
      <condition property="appcorename" value="${payeebankpath}" else="${payerbankpath}">
         <isset property="plugin.ejbca.ant.custom.payee"/>
@@ -169,7 +171,7 @@
         <isset property="plugin.ejbca.ant.custom.logging"/>
      </condition>
      <property name="bouncycastle.first" value="false"/>
-     <property name="bank.host" value="https://mobilepki.org/"/>
+     <property name="bank.host" value="https://mobilepki.org"/>
      <property name="server.port.map" value="8442"/>
      <property file="common.properties"/>
      <property name="temp.dir" value="${ejbca.tmp.path}"/>
@@ -188,8 +190,6 @@
        <param name="compile.methods.src.dir" value="methods.src"/>
         
        <param name="compile.classpath" refid="ejbca.compile.classpath"/>
-       
-       <param name="zip.common.lib.dir" value="empty.lib"/>
        
        <param name="zip.key.dir" value="keys"/>
 
@@ -214,7 +214,7 @@
   
   <target name="localhost-ejbca">
      <echo message="Web2Native Bridge &quot;localhost&quot; Bank Plugin"/>
-     <property name="bank.host" value="https://localhost:8442/"/>
+     <property name="bank.host" value="https://localhost:8442"/>
      <property name="server.port.map" value=""/>
      <antcall target="mobilepki-ejbca"/>
   </target>

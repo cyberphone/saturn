@@ -59,7 +59,7 @@ import org.webpki.util.ArrayUtil;
 import org.webpki.util.MIMETypedObject;
 
 import org.webpki.saturn.common.KeyStoreEnumerator;
-import org.webpki.saturn.common.PayerAccountTypes;
+import org.webpki.saturn.common.PaymentMethods;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -77,7 +77,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String BANK_HOST             = "bank_host";
     
-    static final String KEYPROV_HOST          = "keyprov_host";
+    static final String KEYPROV_BASE_URL      = "keyprov_base_url";
 
     static final String KEYPROV_KMK           = "keyprov_kmk";
     
@@ -194,7 +194,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 paymentCredential.signatureKey =
                     new KeyStoreEnumerator(getResource(arguments[0]),
                                            getPropertyString(KEYSTORE_PASSWORD));
-                paymentCredential.paymentMethod = PayerAccountTypes.valueOf(arguments[1]).getPaymentMethodUri();
+                paymentCredential.paymentMethod = PaymentMethods.valueOf(arguments[1]).getPaymentMethodUri();
                 boolean cardFormatted = true;
                 if (arguments[2].charAt(0) == '!') {
                     cardFormatted = false;
@@ -238,7 +238,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Get KeyGen2 protocol entry
             ////////////////////////////////////////////////////////////////////////////////////////////
-            keygen2EnrollmentUrl = getURL(getPropertyString(KEYPROV_HOST)) + "/getkeys";
+            keygen2EnrollmentUrl = getURL(getPropertyString(KEYPROV_BASE_URL)) + "/getkeys";
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // WebPKI.org logotype

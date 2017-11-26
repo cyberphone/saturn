@@ -35,9 +35,9 @@
     </context-param>
  
     <context-param>
-        <description>Acquirer Host</description>
-        <param-name>acquirer_host</param-name>
-        <param-value>@acquirer-host@</param-value>
+        <description>Acquirer Base URL</description>
+        <param-name>acquirer_base_url</param-name>
+        <param-value>@acquirer-base-url@</param-value>
     </context-param>
     
     <context-param>
