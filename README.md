@@ -4,7 +4,7 @@
 
 https://cyberphone.github.io/doc/saturn
 
-## Testing Saturn locally using Tomcat 8
+## Testing Saturn locally using Tomcat 8.5
 
 Prerequisites: JDK 8 and ANT
 
@@ -15,13 +15,14 @@ Define an environment variable <code>CATALINA_HOME</code> = <code>TOMCAT-INSTALL
 In <code>TOMCAT-INSTALL-DIRECTORY/conf/server.xml</code> define:
 ```xml
 
-    <Connector port="8442" address="0.0.0.0" protocol="org.apache.coyote.http11.Http11Protocol"
-         maxThreads="150" SSLEnabled="true" scheme="https" secure="true"
-         clientAuth="false" sslProtocol="TLS" 
-         keystoreFile="SATURN-INSTALL-DIRECTORY/tls-certificates/server/localhost.p12"
-         keystorePass="foo123"
-         keystoreType="PKCS12"
-         URIEncoding="UTF-8"/>    
+    <Connector port="8442" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               maxThreads="150" SSLEnabled="true">
+        <SSLHostConfig>
+            <Certificate certificateKeystoreFile="SATURN-INSTALL-DIRECTORY\tls-certificates\server\localhost.p12"
+                         certificateKeystoreType="pkcs12"
+                         certificateKeystorePassword="foo123"/>
+        </SSLHostConfig>
+    </Connector>
 ```
 Perform the following ANT commands:
 
