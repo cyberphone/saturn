@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
@@ -28,6 +28,8 @@ import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.json.encryption.DataEncryptionAlgorithms;
 import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+
+import org.webpki.saturn.common.BaseProperties;
 
 public class UserAccountEntry implements BaseProperties {
     PublicKey publicKey;

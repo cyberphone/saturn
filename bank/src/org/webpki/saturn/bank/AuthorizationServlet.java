@@ -36,7 +36,6 @@ import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.Messages;
 

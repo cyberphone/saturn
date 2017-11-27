@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.common;
+package org.webpki.saturn.bank;
 
 import java.math.BigDecimal;
 

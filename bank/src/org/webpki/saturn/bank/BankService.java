@@ -68,7 +68,6 @@ import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.SignatureProfiles;
-import org.webpki.saturn.common.UserAccountEntry;
 import org.webpki.saturn.common.ExternalCalls;
 
 import org.webpki.webutil.InitPropertyReader;
