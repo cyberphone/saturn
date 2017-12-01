@@ -113,8 +113,10 @@ public class HTML implements MerchantProperties {
                    "<li>JSON based messaging</li>" +
                    "<li>Consumers only deal with payment instruments visualized as cards (like they did <i>before</i> the Web)</li>" +
                    "</ul>" +
-                   "For testing you need either the <a href=\"android\">Android</a> or the " +
-                   "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">desktop</a>" +
+                   "For testing you need " +
+                   (MerchantService.desktopWallet ? "either the <a href=\"android\">Android</a> or the " +
+                   "<a href=\"https://github.com/cyberphone/web2native-bridge#installation\">desktop</a>" :
+                   " the <a href=\"android\">Android</a>") +
                    " version of the Wallet software.</td></tr>" +
                    "<tr><td align=\"center\"><table cellspacing=\"0\">" +
                    "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "shop" + 
@@ -627,10 +629,18 @@ public class HTML implements MerchantProperties {
                                boolean android) throws IOException, ServletException {
         StringBuffer s = currentOrder(savedShoppingCart)
             .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
-                    "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:"
-                + FONT_ARIAL + "\">Select Payment Method</td></tr>" +
-                    "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"document.forms.shoot.submit()\"></td></tr>" +
-                    "<tr><td style=\"padding-top:10pt\"><img title=\"Saturn QR\" style=\"cursor:pointer\" src=\"images/paywith-saturnqr.png\" onclick=\"document.location.href='qrdisplay'\"></td></tr>" +
+                    "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:" +
+                    FONT_ARIAL + "\">Select Payment Method</td></tr>" +
+                    (MerchantService.desktopWallet || android ?
+                      "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"document.forms.shoot.submit()\"></td></tr>" 
+                                                                :
+                      "") +
+                    (MerchantService.desktopWallet || !android ?
+                      "<tr><td style=\"padding-top:10pt\"><img title=\"Saturn QR\" style=\"cursor:pointer\" src=\"images/paywith-saturn" +
+                            (MerchantService.desktopWallet ? "qr" : "") +
+                      ".png\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
+                                                               :
+                      "") +
                     "<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod()\"></td></tr>" +
                     "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod()\"></td></tr>" +
                     "<tr><td style=\"text-align:center;padding:15pt\"><input class=\"stdbtn\" type=\"button\" value=\"Return to shop..\" title=\"Changed your mind?\" onclick=\"document.forms.restore.submit()\"></td></tr>" +
@@ -882,7 +892,7 @@ public class HTML implements MerchantProperties {
             "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
             "<table class=\"tighttable\" style=\"max-width:600px;\" cellpadding=\"4\">" +
             "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
-             "<tr><td style=\"text-align:left\">Note: The Android Wallet is a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
+            "<tr><td style=\"text-align:left\">Note: The Android Wallet is a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
             "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
               "https://play.google.com/store/apps/details?id=org.webpki.mobile.android</a></td></tr>" +
             "<tr><td>Enroll payment <i>test credentials</i> by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +

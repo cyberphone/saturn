@@ -113,6 +113,12 @@
     </context-param>
 
     <context-param>
+        <description>Support Desktop Wallet</description>
+        <param-name>desktop_wallet</param-name>
+        <param-value>@desktop-wallet@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Slow operation flag</description>
         <param-name>slow_operation</param-name>
         <param-value>@slow-operation@</param-value>

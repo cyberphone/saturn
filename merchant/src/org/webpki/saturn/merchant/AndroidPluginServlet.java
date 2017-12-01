@@ -50,12 +50,13 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     }
 
     void doPlugin (String httpSessionId, boolean qrMode, HttpServletResponse response) throws IOException, ServletException {
-        String url = "webpkiproxy://saturn?cookie=JSESSIONID%3D" + httpSessionId +
-               "&url=" + URLEncoder.encode(getPluginUrl() + (qrMode ? "?" + QR_RETRIEVE + "=true" : "") +
-                     (MerchantService.grantedVersions == null ?
-                         ""
-                         :
-                     (qrMode ? "&" : "?") + ANDROID_WEBPKI_VERSION_TAG + "=" + ANDROID_WEBPKI_VERSION_MACRO), "UTF-8");
+        String url = "intent://saturn?cookie=JSESSIONID%3D" + httpSessionId +
+                       ("&url=" + URLEncoder.encode(getPluginUrl() + (qrMode ? "?" + QR_RETRIEVE + "=true" : "") +
+                             (MerchantService.grantedVersions == null ?
+                                 ""
+                                 :
+                             (qrMode ? "&" : "?") + ANDROID_WEBPKI_VERSION_TAG + "=" + ANDROID_WEBPKI_VERSION_MACRO), "UTF-8")) +
+                     "#Intent;scheme=webpkiproxy;package=org.webpki.mobile.android;end";
         HTML.androidPluginActivate(response, url);
     }
 
@@ -149,6 +150,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {
                 logger.severe("QR session not found");
+                response.sendRedirect(MerchantService.merchantBaseUrl);
             } else {
                 Synchronizer synchronizer = QRSessions.getSynchronizer(id);
                 if (synchronizer != null) {

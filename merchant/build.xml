@@ -56,6 +56,7 @@
 
   <target name="_build">
     <property name="local.installation" value="true"/>
+    <property name="desktop.wallet" value="true"/>
 
   	<property name="zip.extra.lib.dir" value="${common.lib.dir}"/>
     <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
@@ -103,6 +104,7 @@
            includeAntRuntime="false"/>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@local-installation@" value="${local.installation}"/>
+      <replacefilter token="@desktop-wallet@" value="${desktop.wallet}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${keypassword}"/>
       <replacefilter token="@merchant-key@" value="${merchantkey}.p12"/>

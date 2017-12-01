@@ -119,6 +119,7 @@ Create a file "/home/anders/build-saturn.xml" with the following content:
 	</copy>
 
 	<ant antfile="saturn-master/merchant/build.xml" target="tomcat" useNativeBasedir="true">
+        <property name="desktop.wallet" value="false"/>
 	</ant>
 
 	<ant antfile="saturn-master/bank/build.xml" target="tomcat" useNativeBasedir="true">
