@@ -767,8 +767,7 @@ public class HTML implements MerchantProperties {
     
     static String bodyStartQR(String optional) {
         return "onload=\"startComet()\">" + optional + 
-               GAS_PUMP_LOGO +
-               "><div id=\"qridflasher\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
+               "<div id=\"qridflasher\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
                FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">" +
                "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div";       
     }
@@ -809,7 +808,7 @@ public class HTML implements MerchantProperties {
         for (FuelTypes fuelType : fuelTypes) {
             s.append("<tr id=\"")
              .append(fuelType.toString())
-             .append(".\"><td style=\"height:6pt\"></td></tr><tr title=\"Selected fuel type\" id=\"")
+             .append(".\"><td colspan=\"2\" style=\"height:6pt\"></td></tr><tr title=\"Selected fuel type\" id=\"")
              .append(fuelType.toString())
              .append("\" style=\"box-shadow:3pt 3pt 3pt #D0D0D0;text-align:center;background:")
              .append(fuelType.background);
@@ -859,7 +858,8 @@ public class HTML implements MerchantProperties {
             "}\n").toString(),
             bodyStartQR("<form name=\"fillgas\" method=\"POST\" action=\"gasstation\">" +
                         "<input name=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" " +
-                        "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\"></form>"),
+                        "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\"></form>" +
+                        GAS_PUMP_LOGO + ">"),
             gasStation("1. Select Fuel Type", false) +
             "<tr id=\"authtext\" style=\"display:none\"><td style=\"width:40em;padding-bottom:15pt\">Since the quantity of fuel is usually not known in an advance, " +
             "automated fueling stations require <i>pre-authorization</i> of a fixed maximum amount of money (" +
