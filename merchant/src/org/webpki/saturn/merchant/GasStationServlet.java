@@ -51,6 +51,10 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
         if (!HomeServlet.browserIsSupported(request, response)) {
             return;
         }
+        if (HomeServlet.isAndroid(request)) {
+            HTML.notification(response, "This application is supposed to be invoked from a <i>desktop</i> browser");
+            return;
+        }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
         savedShoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;

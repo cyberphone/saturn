@@ -624,6 +624,17 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null,s.toString()));
     }
 
+    static void notification(HttpServletResponse response, String notification)
+            throws IOException, ServletException {
+        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
+            "<table>" +
+            "<tr><td style=\"font-size:10pt;font-family:" + FONT_ARIAL +
+            "\">")
+        .append(notification)
+        .append("</td></tr></table></td></tr>");
+        HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null,s.toString()));
+    }
+
     static void userChoosePage(HttpServletResponse response,
                                SavedShoppingCart savedShoppingCart,
                                boolean android) throws IOException, ServletException {

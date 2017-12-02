@@ -46,6 +46,10 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
         }
         return true;
     }
+    
+    static boolean isAndroid(HttpServletRequest request) {
+        return request.getHeader("User-Agent").contains("Android");
+    }
 
     boolean checkBoxGet(HttpSession session, String name) {
         boolean argument = false;

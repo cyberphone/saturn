@@ -49,7 +49,6 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        boolean android = request.getHeader("User-Agent").contains("Android");
         JSONArrayReader ar = JSONParser.parse(request.getParameter(SHOPPING_CART_FORM_ATTR)).getJSONArrayReader();
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
         long total = 0;
@@ -71,7 +70,7 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
         savedShoppingCart.roundedPaymentAmount = ((savedShoppingCart.tax + total + 24) / 25) * 25;
         session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
 
-        HTML.userChoosePage(response, savedShoppingCart, android);
+        HTML.userChoosePage(response, savedShoppingCart, HomeServlet.isAndroid(request));
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
