@@ -29,6 +29,10 @@ function PayeeCoreProperties(rd) {
   this.homePage = rd.getString(BaseProperties.HOME_PAGE_JSON);
   this.commonName = rd.getString(BaseProperties.COMMON_NAME_JSON);
   this.id = rd.getString(BaseProperties.ID_JSON);
+  var payeeAccounts = rd.getArray(BaseProperties.PAYEE_ACCOUNTS_JSON);
+  do {
+    payeeAccounts.scanItem();
+  } while (payeeAccounts.hasMore());
   this.signatureParameters = [];
   var paramArray = rd.getArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
   do {

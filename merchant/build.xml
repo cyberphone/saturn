@@ -65,6 +65,7 @@
     <property name="logging" value="false"/>
     <property name="var.slow.operation" value="false"/>
     <property name="acquirer.host" value="https://localhost:8442"/>
+    <property name="acquirerpath.S" value="${acquirerpath}/"/>
     <property name="payee_provider.host" value="https://localhost:8442"/>
     <condition property="payee_provider.path" value="${hostingpath}" else="${payeebankpath}">
       <isset property="hostingoption"/>
@@ -114,7 +115,7 @@
       <replacefilter token="@othernetwork-id@" value="${othernetworkid}"/>
       <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
       <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
-      <replacefilter token="@payee-acquirer-authority-url@" value="${acquirer.host}/${acquirerpath}/payees/${merchantid}"/>
+      <replacefilter token="@payee-acquirer-authority-url@" value="${acquirer.host}/${acquirerpath.S}payees/${merchantid}"/>
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payee_provider.path}/payees/${merchantid}"/>
       <replacefilter token="@merchant-base-url@" value="${merchant.host}/${appcorename}"/>
       <replacefilter token="@currency@" value="${currency}"/>

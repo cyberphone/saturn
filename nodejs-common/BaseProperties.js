@@ -60,6 +60,7 @@ const BaseProperties = {
     PAYMENT_METHOD_JSON              : 'paymentMethod',              // Payment method (URI)
     PAYMENT_METHODS_JSON             : 'paymentMethods',             // List of supported payment methods (URIs)
     PAYMENT_METHOD_SPECIFIC_JSON     : 'paymentMethodSpecific',      // Holding a payment method specific object
+    PAYEE_ACCOUNTS_JSON              : 'payeeAccounts',              // Merchant DB element not used by the aquirer
     CLIENT_IP_ADDRESS_JSON           : 'clientIpAddress',            // Security data for the payment provider
     CLIENT_GEO_LOCATION_JSON         : 'clientGeoLocation',          // Optional security data that client devices may supply
     LOG_DATA_JSON                    : 'logData',                    // Insertion of external log data
