@@ -18,7 +18,7 @@ In <code>TOMCAT-INSTALL-DIRECTORY/conf/server.xml</code> define:
     <Connector port="8442" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true">
         <SSLHostConfig>
-            <Certificate certificateKeystoreFile="SATURN-INSTALL-DIRECTORY\tls-certificates\server\localhost.p12"
+            <Certificate certificateKeystoreFile="SATURN-INSTALL-DIRECTORY/tls-certificates/server/localhost.p12"
                          certificateKeystoreType="pkcs12"
                          certificateKeystorePassword="foo123"/>
         </SSLHostConfig>
