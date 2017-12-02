@@ -29,6 +29,7 @@ Perform the following ANT commands:
 ```
 $ ant -f SATURN-INSTALL-DIRECTORY/merchant/build.xml tomcat
 $ ant -f SATURN-INSTALL-DIRECTORY/acquirer/build.xml tomcat
+$ ant -f SATURN-INSTALL-DIRECTORY/keyprovider/build.xml tomcat
 $ ant -f SATURN-INSTALL-DIRECTORY/bank/build.xml both
 ```
 Update the <code>cacerts</code> file used by the JDK installation:
