@@ -584,7 +584,7 @@ public class HTML implements MerchantProperties {
                 .append("<tr><td style=\"height:15pt\"></td></tr>")
                 .append(receiptCore(resultData, debugMode && resultData.optionalRefund == null))
                 .append(optionalRefund(resultData))
-                .append("</table></td></tr></table></td></tr>");
+                .append("</table></td></tr>");
             HTML.output(response, 
                         HTML.getHTML(STICK_TO_HOME_URL + updatePumpDisplay(fuelType),
                                      "onload=\"updatePumpDisplay(" + decilitres + ")\">" +
@@ -728,7 +728,7 @@ public class HTML implements MerchantProperties {
             "  var displayArg = turnOn ? 'table-row' : 'none';\n" +
             "  document.getElementById('qr1').style.display = displayArg;\n" +
             "  document.getElementById('qr2').style.display = displayArg;\n" +
-            "  document.getElementById('waiting').style.paddingTop = turnOn ? '0pt' : '15pt';\n" +
+            "  document.getElementById('waiting').style.display = turnOn ? 'none' : 'table-row';\n" +
             "}\n" +
             "function flashQRInfo() {\n" +
             "  document.getElementById('qridflasher').style.top = ((window.innerHeight - document.getElementById('qridflasher').offsetHeight) / 2) + 'px';\n" +
@@ -755,6 +755,7 @@ public class HTML implements MerchantProperties {
             "    switch (resultData) {\n" +
             "      case '" + QRSessions.QR_PROGRESS + "':\n")
         .append(progressAction)
+        .append("      document.getElementById('authhelp').style.display = 'table-row';\n")
         .append(
             "        setQRDisplay(false);\n" +
             "      case '" + QRSessions.QR_CONTINUE + "':\n" +
@@ -796,9 +797,11 @@ public class HTML implements MerchantProperties {
              .append(display)
              .append(" id=\"qr2\"><td align=\"center\"><img title=\"Do NOT put the cursor here because then the QR reader won't work\" src=\"data:image/png;base64,")
              .append(new Base64(false).getBase64StringFromBinary(qrImage))
-             .append("\"></td></tr><tr><td id=\"waiting\" style=\"padding-top:")
-             .append(qrInitOn ? 0 : 15)
-             .append("pt\" align=\"center\"><img title=\"Something is running...\" src=\"images/waiting.gif\"></td></tr></table></td></tr>");     
+             .append("\"></td></tr>"+
+                     "<tr id=\"authhelp\" style=\"display:none\"><td style=\"padding-top:15pt;text-align:center\">"+
+                     "Waiting for you to <i>authorize</i> the transaction in the mobile device...</td></tr>" +    
+                     "<tr id=\"waiting\" style=\"display:none\"><td style=\"padding-top:10pt;text-align:center\">"+
+                     "<img title=\"Something is running...\" src=\"images/waiting.gif\"></td></tr></table></td></tr>");     
     }
 
     static void printQRCode4Shop(HttpServletResponse response,
@@ -807,7 +810,10 @@ public class HTML implements MerchantProperties {
                                  HttpServletRequest request,
                                  String id) throws IOException, ServletException {
         HTML.output(response, HTML.getHTML(
-            cometJavaScriptSupport(id, request, "document.forms.restore.submit()", "", "document.location.href = 'result'"),
+            cometJavaScriptSupport(id, request, 
+                                   "document.forms.restore.submit()",
+                                   "",
+                                   "document.location.href = 'result'"),
             bodyStartQR("<form name=\"restore\" method=\"POST\" action=\"shop\"></form>"),
             currentOrder(savedShoppingCart).toString() +
             bodyEndQR(qrImage, true)));
@@ -860,7 +866,7 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(
             cometJavaScriptSupport(id, request, 
                                   "document.location.href='home'",
-                                  "      document.getElementById('phase').innerHTML = '3. Waiting For User Authorization...';\n" +
+                                  "      document.getElementById('phase').innerHTML = '3. User Authorization';\n" +
                                   "      document.getElementById('authtext').style.display = 'table-row';\n",
                                   "document.forms.fillgas.submit()") +
             s.append(
@@ -872,7 +878,8 @@ public class HTML implements MerchantProperties {
                         "id=\"" + GasStationServlet.FUEL_TYPE_FIELD + "\" type=\"hidden\"></form>" +
                         GAS_PUMP_LOGO + ">"),
             gasStation("1. Select Fuel Type", false) +
-            "<tr id=\"authtext\" style=\"display:none\"><td style=\"width:40em;padding-bottom:15pt\">Since the quantity of fuel is usually not known in an advance, " +
+            "<tr id=\"authtext\" style=\"display:none\">" +
+            "<td style=\"width:40em;padding-bottom:15pt\">Since the quantity of fuel is usually not known in an advance, " +
             "automated fueling stations require <i>pre-authorization</i> of a fixed maximum amount of money (" +
             Currencies.EUR.amountToDisplayString(new BigDecimal(GasStationServlet.STANDARD_RESERVATION_AMOUNT_X_100 / 100), true) +
             " in the demo), while only the actual amount " +
@@ -890,7 +897,8 @@ public class HTML implements MerchantProperties {
         response.getOutputStream().write(
             HTML.getHTML(null,
                          "onload=\"document.location.href='" + url + "'\"" ,
-                         "<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><b>Please wait while the Wallet plugin starts...</b></td></tr>").getBytes("UTF-8"));
+                         "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
+                         "<b>Please wait while the Wallet plugin starts...</b></td></tr>").getBytes("UTF-8"));
     }
 
     static void autoPost(HttpServletResponse response, String url) throws IOException, ServletException {
@@ -902,13 +910,17 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(null, null,
             "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
             "<table class=\"tighttable\" style=\"max-width:600px;\" cellpadding=\"4\">" +
-            "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
-            "<tr><td style=\"text-align:left\">Note: The Android Wallet is a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
+            "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + 
+            FONT_ARIAL + "\">Android Wallet<br>&nbsp;</td></tr>" +
+            "<tr><td style=\"text-align:left\">" +
+              "Note: The Android Wallet is a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
             "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
               "https://play.google.com/store/apps/details?id=org.webpki.mobile.android</a></td></tr>" +
-            "<tr><td>Enroll payment <i>test credentials</i> by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +
+            "<tr><td>Enroll payment <i>test credentials</i> " +
+              "by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +
               "https://mobilepki.org/webpay-keyprovider</td></tr>" +
-            "<tr><td>Unlike the desktop (Windows, Linux, and OS/X-based) Wallet, the Android version also supports remote operation using QR codes.  This mode is " +
+            "<tr><td>Unlike the desktop (Windows, Linux, and OS/X-based) Wallet, " +
+              "the Android version also supports remote operation using QR codes.  This mode is " +
               "indicated by the following image in the Merchant Web application:</td></tr>" +
             "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" +
             "</table></td></tr>"));       
@@ -921,6 +933,7 @@ public class HTML implements MerchantProperties {
             "var decilitres = 0;\n" +
             "var timer = null;\n" +
             "function finishPumping() {\n" +
+            "  document.getElementById('waiting').style.display = 'table-row';\n" +
             "  clearInterval(timer);\n" +
             "  document.getElementById('pumpbtn').innerHTML = 'Please wait while we are finalizing the payment...';\n" +
             "  setTimeout(function() {\n" +
@@ -931,14 +944,17 @@ public class HTML implements MerchantProperties {
             "  if (timer) {\n"+
             "    finishPumping();\n" +
             "  } else {\n" +
-            "    document.getElementById('waiting').style.display = 'table-row';\n" +
-            "    document.getElementById('cmd').value = '\u00a0\u00a0\u00a0Click here to \"simulate\" that you have finished pumping...\u00a0\u00a0\u00a0';\n" +
             "    timer = setInterval(function () {\n" +
             "      updatePumpDisplay(++decilitres);\n" +
             "      if (decilitres == " + maxVolume + ") {\n" +
             "        finishPumping();\n" +
             "      }\n" +
             "    }, 100);\n" +
+            "    document.getElementById('waiting').style.display = 'table-row';\n" +
+            "    setTimeout(function() {\n" +
+            "      document.getElementById('cmd').innerHTML = 'Click here to <i style=\"color:red\">stop</i> pumping...';\n" +
+            "      document.getElementById('waiting').style.display = 'none';\n" +
+            "    }, 1000);\n" +
             "  }\n" +
             "}\n" +
             "function doneFilling() {\n" +
@@ -954,8 +970,16 @@ public class HTML implements MerchantProperties {
             "</form",
             gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
-            "<tr><td style=\"padding-top:20pt;font-size:11pt;font-family:" + FONT_ARIAL + "\" align=\"center\" id=\"pumpbtn\"><input id=\"cmd\" type=\"button\" style=\"min-width:12em;font-size:11pt;padding:4pt\" value=\"Start pumping!\" onclick=\"execute()\"></td></tr>" +
-            "<tr id=\"waiting\" style=\"display:none\"><td style=\"padding-top:20pt\" align=\"center\"><img title=\"Something is running...\" src=\"images/waiting.gif\"></td></tr>" +
+            "<tr><td style=\"padding-top:20pt;font-size:11pt;font-family:" + 
+            FONT_ARIAL + "\" id=\"pumpbtn\">" +
+            "<div title=\"Since we don't have a real pump we &quot;simulate&quot; one\" id=\"cmd\" " +
+            "style=\"text-align:center;cursor:pointer;font-size:11pt;" +
+            "background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
+            "border-width:1px;border-style:solid;border-color:#a9a9a9;" +
+            "padding:5pt 10pt;box-shadow:3pt 3pt 3pt #D0D0D0;border-radius:5pt\" onclick=\"execute()\">" +
+            "Click here to <i style=\"color:green\">start</i> pumping!</div></td></tr>" +
+            "<tr id=\"waiting\" style=\"display:none\"><td style=\"padding-top:10pt\" align=\"center\">" +
+            "<img title=\"Something is running...\" src=\"images/waiting.gif\"></td></tr>" +
             "</table></td></tr>"));
     }
 
