@@ -933,10 +933,11 @@ public class HTML implements MerchantProperties {
             "<tr><td>Enroll payment <i>test credentials</i> " +
               "by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +
               "https://mobilepki.org/webpay-keyprovider</td></tr>" +
-            "<tr><td>Unlike the desktop (Windows, Linux, and OS/X-based) Wallet, " +
+            (MerchantService.desktopWallet ?
+              "<tr><td>Unlike the desktop (Windows, Linux, and OS/X-based) Wallet, " +
               "the Android version also supports remote operation using QR codes.  This mode is " +
               "indicated by the following image in the Merchant Web application:</td></tr>" +
-            "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" +
+              "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" : "") +
             "</table></td></tr>"));       
     }
 
