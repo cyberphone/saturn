@@ -120,7 +120,7 @@ public class HTML implements MerchantProperties {
                    " version of the Wallet software.</td></tr>" +
                    "<tr><td align=\"center\"><table cellspacing=\"0\">" +
                    "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "shop" + 
-                   "\">Go To Merchant</a></td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
+                   "\">Go To Merchant</a>&nbsp;&nbsp;</td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
                    "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "gasstation" + 
                    "\">Gas Station</a></td><td style=\"text-align:left;padding-bottom:5pt\">Another Payment Scenario</td></tr>" +
                    "<form name=\"options\" method=\"POST\">" +
@@ -134,7 +134,7 @@ public class HTML implements MerchantProperties {
                    "></td><td>Refund Option</td></tr>" +
                    "</form>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
-                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/\">Saturn Home</a>&nbsp;&nbsp;</td><td>Presentation Etc.</td></tr>" +
+                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/\">Saturn Home</a></td><td>Presentation Etc.</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://github.com/cyberphone/saturn\">Source Code</a></td><td>For Nerds...</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://mobilepki.org/jcs\">JCS</a></td><td>JSON Cleartext Signature</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/jef.html\">JEF</a></td><td>JSON Encryption Format</td></tr>" +
@@ -294,10 +294,12 @@ public class HTML implements MerchantProperties {
         }
         page_data.append(
             "</table></tr></td><tr><td style=\"padding-top:10pt\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\"><tr><th>Total</th><td style=\"text-align:right\" id=\"total\">")
-            .append(price(savedShoppingCart.total))
-            .append("</td></tr>" +
+        .append(price(savedShoppingCart.total))
+        .append("</td></tr>" +
             "</table></td></tr>" +
-            "<tr><td style=\"text-align:center;padding-top:10pt\" id=\"pay\"><input class=\"stdbtn\" type=\"button\" value=\"Checkout..\" title=\"Paying time has come...\" onclick=\"userPay()\"></td></tr>" +
+            "<tr><td style=\"text-align:center;padding-top:10pt\" id=\"pay\">")
+        .append(fancyButton("Checkout..", "Paying time has come...", "userPay()"))
+        .append("</td></tr>" +
             "</table>" +
             "<form name=\"shoot\" method=\"POST\" action=\"choose\">" +
             "<input type=\"hidden\" name=\"" + W2NBWalletServlet.SHOPPING_CART_FORM_ATTR + "\" id=\"" + W2NBWalletServlet.SHOPPING_CART_FORM_ATTR + "\">" +
@@ -598,7 +600,8 @@ public class HTML implements MerchantProperties {
     static String optionalRefund(ResultData resultData) {
         return resultData.optionalRefund == null ? "" :
             "<tr><td style=\"text-align:center;padding-top:20pt\">" +
-            "<input type=\"button\" style=\"font-size:11pt;padding:4pt\" value=\"Please refund this transaction...\" onclick=\"location.href='refund'\"></td></tr>";
+            fancyButton("Please refund this transaction...", "Payback time has come...", "location.href='refund'") +
+            "</td></tr>";
     }
 
     static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
@@ -634,6 +637,16 @@ public class HTML implements MerchantProperties {
         .append("</td></tr></table></td></tr>");
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null,s.toString()));
     }
+    
+    static StringBuffer fancyButton(String value, String title, String onclick) {
+        return new StringBuffer("<div class=\"stdbtn\" id=\"cmd\" title=\"")
+            .append(title)
+            .append("\" onclick=\"")
+            .append(onclick)
+            .append("\">")
+            .append(value)
+            .append("</div>");
+     }
 
     static void userChoosePage(HttpServletResponse response,
                                SavedShoppingCart savedShoppingCart,
@@ -641,21 +654,22 @@ public class HTML implements MerchantProperties {
         StringBuffer s = currentOrder(savedShoppingCart)
             .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
                     "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:" +
-                    FONT_ARIAL + "\">Select Payment Method</td></tr>" +
-                    (MerchantService.desktopWallet || android ?
+                    FONT_ARIAL + "\">Select Payment Method</td></tr>")
+            .append(MerchantService.desktopWallet || android ?
                       "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"document.forms.shoot.submit()\"></td></tr>" 
                                                                 :
-                      "") +
-                    (MerchantService.desktopWallet || !android ?
+                      "")
+            .append(MerchantService.desktopWallet || !android ?
                       "<tr><td style=\"padding-top:10pt\"><img title=\"Saturn QR\" style=\"cursor:pointer\" src=\"images/paywith-saturn" +
                             (MerchantService.desktopWallet ? "qr" : "") +
                       ".png\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
                                                                :
-                      "") +
-                    "<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod()\"></td></tr>" +
+                      "")
+            .append("<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod()\"></td></tr>" +
                     "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod()\"></td></tr>" +
-                    "<tr><td style=\"text-align:center;padding:15pt\"><input class=\"stdbtn\" type=\"button\" value=\"Return to shop..\" title=\"Changed your mind?\" onclick=\"document.forms.restore.submit()\"></td></tr>" +
-                    "</table></td></tr></table></td></tr>");
+                    "<tr><td style=\"text-align:center;padding:15pt\">")
+            .append(fancyButton("Return to shop..", "Changed your mind?", "document.forms.restore.submit()"))
+            .append("</td></tr></table></td></tr></table></td></tr>");
 
         HTML.output(response, HTML.getHTML(
                 STICK_TO_HOME_URL +
@@ -970,14 +984,11 @@ public class HTML implements MerchantProperties {
             "</form",
             gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
-            "<tr><td style=\"padding-top:20pt;font-size:11pt;font-family:" + 
-            FONT_ARIAL + "\" id=\"pumpbtn\">" +
-            "<div title=\"Since we don't have a real pump we &quot;simulate&quot; one\" id=\"cmd\" " +
-            "style=\"text-align:center;cursor:pointer;font-size:11pt;" +
-            "background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
-            "border-width:1px;border-style:solid;border-color:#a9a9a9;" +
-            "padding:5pt 10pt;box-shadow:3pt 3pt 3pt #D0D0D0;border-radius:5pt\" onclick=\"execute()\">" +
-            "Click here to <i style=\"color:green\">start</i> pumping!</div></td></tr>" +
+            "<tr><td style=\"padding-top:20pt;text-align:center\" id=\"pumpbtn\">" +
+            fancyButton("Click here to <i style=\"color:green\">start</i> pumping!",
+                        "Since we don't have a real pump we &quot;simulate&quot; one",
+                        "execute()") +
+            "</td></tr>" +
             "<tr id=\"waiting\" style=\"display:none\"><td style=\"padding-top:10pt\" align=\"center\">" +
             "<img title=\"Something is running...\" src=\"images/waiting.gif\"></td></tr>" +
             "</table></td></tr>"));

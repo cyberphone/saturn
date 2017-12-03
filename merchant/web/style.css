@@ -58,7 +58,17 @@ code {
 }
 
 .stdbtn {
-  font-weight:normal;font-size:10pt;font-family:Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans';
+  font-size:11pt;
+  font-family:Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans';
+  display:inline-block;
+  cursor:pointer;
+  background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);
+  border-width:1px;
+  border-style:solid;
+  border-color:#a9a9a9;
+  border-radius:5pt;
+  padding:3pt 10pt;
+  box-shadow:3pt 3pt 3pt #D0D0D0;
 }
 
 .updnbtn {
@@ -74,6 +84,11 @@ html, body {
 @media (max-width:768px) {
   body {
     font-size:8pt;
+  }
+  
+  .stdbtn {
+    font-size:9pt;
+    padding:2pt 6pt;
   }
 
   .tftable th {
