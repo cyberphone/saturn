@@ -280,4 +280,8 @@
         <url-pattern>/gasstation</url-pattern>
     </servlet-mapping>
 @security-constraints@
+    <session-config>
+      <session-timeout>60</session-timeout>
+    </session-config>
+
 </web-app>
