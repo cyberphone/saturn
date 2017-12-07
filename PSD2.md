@@ -43,7 +43,6 @@ To accomplish something comparable to VISA et. al., you would most likely have t
 create a *PISP aggregation service*.
 
 # Saturn - Optimized for Payments
--![An illustration](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
 
 To cope with these issues a light-weight tightly-scoped system, coined "[Saturn](https://cyberphone.github.io/doc/saturn/)" was developed which:
 - Builds on a slightly enhanced variant of the firmly
