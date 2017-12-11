@@ -130,7 +130,8 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                   }
             }
             if (!found) {
-                ErrorServlet.systemFail(response, "Wrong version of WebPKI, you need to update");
+                ErrorServlet.systemFail(response, "Wrong version of the WebPKI app, you need to update");
+                return;
             }
             String cancelUrl = getPluginUrl() + "?" + ANDROID_CANCEL + "=";
             if (qrMode) {

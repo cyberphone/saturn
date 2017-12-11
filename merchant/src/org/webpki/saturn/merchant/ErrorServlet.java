@@ -43,7 +43,7 @@ public class ErrorServlet extends HttpServlet {
 
     private static void fail(HttpServletResponse response, String message, boolean system) throws IOException {
         logger.info(message);
-        response.sendRedirect("error?" + ERROR + "=" + URLEncoder.encode(message, "UTF-8") +
+        response.sendRedirect(MerchantService.merchantBaseUrl + "/error?" + ERROR + "=" + URLEncoder.encode(message, "UTF-8") +
                               (system ? "&" + SYSTEM + "=true" : ""));
     }
 

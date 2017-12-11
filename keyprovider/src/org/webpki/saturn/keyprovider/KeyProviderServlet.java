@@ -202,7 +202,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                       }
                 }
                 if (!found) {
-                    returnKeyGen2Error(response, "Wrong version of WebPKI, you need to update");
+                    returnKeyGen2Error(response, "Wrong version of the WebPKI app, you need to update");
                     return;
                 }
                 InvocationRequestEncoder invocationRequest =
