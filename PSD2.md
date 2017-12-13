@@ -54,10 +54,10 @@ To cope with these issues a light-weight tightly-scoped system, coined "[Saturn]
 - Builds on a slightly enhanced variant of the firmly
 established "four corner" model, *obviating the need for PISPs altogether*.
 - Maintains a security level surpassing EMV.
-- Uses the same API for *all* payment scenarios, be it on-line or at the Gas station.
+- Uses the same API for *all* consumer payment scenarios, be it on-line or at the Gas station.
 - Finally unleashes the true power of the *decentralized* banking network!
 
-Saturn, by only dealing with payments, adopts the well-known card paradigm (although the
+Saturn, by only dealing with consumer payments, adopts the well-known card paradigm (although the
 underlying technology is quite different), making it *technically* feasible having
 a single "wallet" for all parties, *exactly like Apple and Google already have*.
 
