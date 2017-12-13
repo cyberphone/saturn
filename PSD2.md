@@ -42,6 +42,11 @@ It would effectively be similar to launching a new VISA network.
 To accomplish something comparable to VISA et. al., you would most likely have to
 create a *PISP aggregation service*.
 
+### So PISP APIs are Useless for Payments?
+Not at all; they are highly useful for payments as a part of "Banking" like:
+- Account management (moving money between accounts in different banks).
+- Bill payments. 
+
 # Saturn - Optimized for Payments
 -![Upgraded vision](https://cyberphone.github.io/doc/saturn/supervsdistrib.svg)
 
@@ -63,8 +68,3 @@ https://cyberphone.github.io/doc/saturn/saturn--wallet-using-credit-transfer.pdf
 For readers with strong interests in technology, a peek in 
 https://cyberphone.github.io/doc/saturn/saturn-authorization.pdf
 may also be of some use.
-
-### So PISP APIs are Useless for Payments?
-Not at all; they are highly useful for payments as a part of "Banking" like:
-- Account management (moving money between accounts in different banks).
-- Bill payments. 
