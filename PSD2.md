@@ -9,7 +9,7 @@ Although recently published PSD2 APIs certainly are not identical, they at least
 
 This document focuses on PSD2 for *Payments* which in PSD2 are facilitated through PISPs (Payment Initiation Service Providers).
 
-<table><tr><td>It is in this context worth noting that most consumer payment are currently performed through specific payment "rails" like EMV, <i>which do not rely on direct access to accounts by external parties</i>.</td></tr></table>
+<table><tr><td>It is in this context worth noting that most consumer payment are currently performed through specific payment "rails" like EMV, <i>which do not rely on access to account information by external parties</i>.</td></tr></table>
 
 ### Certification and Authentication Requirements
 Since PSD2 APIs provide access to *sensitive data* in arbitrary banks
