@@ -55,7 +55,7 @@ public class CryptoTesting {
     static final String JEF_RSA_KEY_ID  = "20170101:mybank:rsa";
     static final String JEF_EC_KEY_ID   = "20170101:mybank:ec";
 
-    static StringBuffer js = new StringBuffer();
+    static StringBuilder js = new StringBuilder();
 
    
     static KeyPair getKeyPair(String name) throws IOException {

@@ -52,7 +52,7 @@ import org.webpki.saturn.common.KnownExtensions;
 
 class DebugPrintout implements BaseProperties {
     
-    StringBuffer s = new StringBuffer( );
+    StringBuilder s = new StringBuilder( );
 
     Point point = new Point();
 
@@ -75,7 +75,7 @@ class DebugPrintout implements BaseProperties {
         return b64;
     }
     
-    boolean rewrittenUrl(StringBuffer originalBuffer, String pattern, String rewritten) {
+    boolean rewrittenUrl(StringBuilder originalBuffer, String pattern, String rewritten) {
         String original = originalBuffer.toString();
         int i = original.indexOf(pattern);
         if (i < 0) return false;
@@ -89,7 +89,7 @@ class DebugPrintout implements BaseProperties {
     
     void updateUrls(JSONObjectReader jsonTree, JSONObjectWriter rewriter, String target) throws IOException {
         if (jsonTree.hasProperty(target)) {
-            StringBuffer value = new StringBuffer(jsonTree.getString(target));
+            StringBuilder value = new StringBuilder(jsonTree.getString(target));
             if (rewrittenUrl(value, "/webpay-payerbank/", "https://payments.mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank/", "https://payments.bigbank.com") ||
                 rewrittenUrl(value, "/webpay-acquirer/", "https://secure.cardprocessor.com") ||

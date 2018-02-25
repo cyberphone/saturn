@@ -309,7 +309,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
         }
     }
 
-    boolean foundData(HttpServletRequest request, StringBuffer result, String tag) {
+    boolean foundData(HttpServletRequest request, StringBuilder result, String tag) {
         String value = request.getParameter(tag);
         if (value == null) {
             return false;
@@ -328,8 +328,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                            true);
             return;
         }
-        StringBuffer html = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
-        StringBuffer result = new StringBuffer();
+        StringBuilder html = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
+        StringBuilder result = new StringBuilder();
         if (foundData(request, result, KeyProviderInitServlet.ERROR_TAG)) {
             html.append("<table><tr><td><b>Failure Report:</b></td></tr><tr><td><pre><font color=\"red\">")
                 .append(result)

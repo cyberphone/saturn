@@ -56,7 +56,7 @@ public enum Currencies implements Serializable {
         }
         String amountString = amount.setScale(decimals).toPlainString();
         int dp = amountString.indexOf('.');
-        StringBuffer amountString2 = new StringBuffer();
+        StringBuilder amountString2 = new StringBuilder();
         for (int i = 0; i < dp; i++) {
             amountString2.append(amountString.charAt(i));
             if (i < dp - 1 && (dp - i - 1) % 3 == 0) {

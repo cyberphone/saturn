@@ -20,7 +20,7 @@ import org.webpki.util.ArrayUtil;
 
 public class SVG {
     
-    static StringBuffer svgText = new StringBuffer();
+    static StringBuilder svgText = new StringBuilder();
     
     static SVGDocument doc;
     
@@ -104,7 +104,7 @@ public class SVG {
                 writeSVGObject(svgObject);
             }
             svgText.append("</svg>");
-            StringBuffer total = new StringBuffer("<svg ");
+            StringBuilder total = new StringBuilder("<svg ");
             if (doc.useViewBox()) {
                 total.append("viewBox=\"0 0 ")
                      .append((long)(doc.currentMaxX + SVGDocument.marginX))

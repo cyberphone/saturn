@@ -69,7 +69,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "</style>";
 
     static String getHTML(String javascript, String bodyscript, String box) {
-        StringBuffer s = new StringBuffer(HTML_INIT);
+        StringBuilder s = new StringBuilder(HTML_INIT);
         if (javascript != null) {
             s.append("<script type=\"text/javascript\">").append(javascript)
                     .append("</script>");

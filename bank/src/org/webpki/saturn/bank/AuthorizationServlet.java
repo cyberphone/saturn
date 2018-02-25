@@ -224,7 +224,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606");
 
         // Reference to Merchant
-        StringBuffer accountReference = new StringBuffer();
+        StringBuilder accountReference = new StringBuilder();
         int q = accountId.length() - 4;
         for (char c : accountId.toCharArray()) {
             accountReference.append((--q < 0) ? c : '*');

@@ -110,7 +110,7 @@ public class SVGPathValues extends SVGValue {
     
     @Override
     public String getStringRepresentation() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         char last = 0;
         for (SubCommand subCommand : commands) {
             if (last != subCommand.command) {

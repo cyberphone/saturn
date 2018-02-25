@@ -260,7 +260,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             }
             String merchantUrl = new URL(hostUrl.getProtocol(), merchantHost, hostUrl.getPort(), "/webpay-merchant").toExternalForm(); 
             logger.info(merchantUrl);
-            successImageAndMessage = new StringBuffer("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
+            successImageAndMessage = new StringBuilder("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
                 .append(getResourceAsString(SATURN_LOGO))
                 .append("</div><b>Enrollment Succeeded!</b><p><a href=\"")
                 .append(merchantUrl)

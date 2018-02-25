@@ -27,7 +27,7 @@ public class SVGPolygon extends SVGObject {
         @Override
         public String getStringRepresentation() {
             int i = 0;
-            StringBuffer result = new StringBuffer();
+            StringBuilder result = new StringBuilder();
             while (i < coordinates.length) {
                 if (i > 0) {
                     result.append(' ');

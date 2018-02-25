@@ -93,7 +93,7 @@ public class AuthorizationData implements BaseProperties {
     }
 
     public static String formatCardNumber(String accountId) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         int q = 0;
         for (char c : accountId.toCharArray()) {
             if (q != 0 && q % 4 == 0) {

@@ -84,7 +84,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 rd.getString(JSONDecoderCache.CONTEXT_JSON);
                 rd.getString(JSONDecoderCache.QUALIFIER_JSON);
                 response.setContentType(HttpSupport.HTML_CONTENT_TYPE + "; charset=utf-8");
-                StringBuffer html = new StringBuffer(TOP_ELEMENT +
+                StringBuilder html = new StringBuilder(TOP_ELEMENT +
                             "<link rel=\"icon\" href=\"")
                     .append(isProvider() ? "" : "../")
                     .append("saturn.png\" sizes=\"192x192\">"+

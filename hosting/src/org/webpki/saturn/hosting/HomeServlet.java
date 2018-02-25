@@ -37,7 +37,7 @@ public class HomeServlet extends HttpServlet {
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String authorityUrl = HostingService.providerAuthorityUrl;
-        StringBuffer html = new StringBuffer(
+        StringBuilder html = new StringBuilder(
            AuthorityBaseServlet.TOP_ELEMENT +
            "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\"><title>Saturn Hosting Service</title>" +
            AuthorityBaseServlet.REST_ELEMENT +

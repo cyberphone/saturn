@@ -52,7 +52,7 @@ public class HttpSupport {
         serverOutputStream.flush();
     }
     
-    public static void writeHtml(HttpServletResponse response, StringBuffer html) throws IOException {
+    public static void writeHtml(HttpServletResponse response, StringBuilder html) throws IOException {
         writeData(response, html.toString().getBytes("utf-8"), HTML_CONTENT_TYPE + "; charset=\"utf-8\"");
     }
 

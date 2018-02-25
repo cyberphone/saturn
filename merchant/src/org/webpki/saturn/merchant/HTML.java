@@ -49,7 +49,7 @@ public class HTML implements MerchantProperties {
     static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" title=\"For showing context\" style=\"width:30pt;position:absolute;right:10pt;top:10pt\"";
     
     static String getHTML(String javascript, String bodyscript, String box) {
-        StringBuffer s = new StringBuffer(
+        StringBuilder s = new StringBuilder(
             "<!DOCTYPE html>"+
             "<html><head>" +
             "<meta charset=\"utf-8\">" +
@@ -147,7 +147,7 @@ public class HTML implements MerchantProperties {
     }
 
     static String javaScript(String string) {
-        StringBuffer s = new StringBuffer();
+        StringBuilder s = new StringBuilder();
         for (char c : string.toCharArray()) {
             if (c == '\n') {
                 s.append("\\n");
@@ -162,13 +162,13 @@ public class HTML implements MerchantProperties {
         return s.toString();
     }
 
-    private static StringBuffer productEntry(StringBuffer temp_string,
+    private static StringBuilder productEntry(StringBuilder temp_string,
                                              ProductEntry product_entry,
                                              String sku,
                                              SavedShoppingCart savedShoppingCart,
                                              int index) throws IOException {
         int quantity = savedShoppingCart.items.containsKey(sku) ? savedShoppingCart.items.get(sku): 0;
-        StringBuffer s = new StringBuffer(
+        StringBuilder s = new StringBuilder(
             "<tr style=\"text-align:center\"><td><img src=\"images/")
         .append(product_entry.imageUrl)
         .append("\" class=\"product\"></td><td>")
@@ -216,7 +216,7 @@ public class HTML implements MerchantProperties {
     
     static void merchantPage(HttpServletResponse response,
                              SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
-        StringBuffer temp_string = new StringBuffer(
+        StringBuilder temp_string = new StringBuilder(
             "\nfunction closeFundFlash() {\n" +
             "    setTimeout(function() {\n" +
             "        document.getElementById('fundlimit').style.visibility = 'hidden';\n" +
@@ -280,7 +280,7 @@ public class HTML implements MerchantProperties {
             "    updateInput(index, control);\n" +
             "}\n");
 
-        StringBuffer page_data = new StringBuffer(
+        StringBuilder page_data = new StringBuilder(
             "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
             "<table>" +
             "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">" +
@@ -323,8 +323,8 @@ public class HTML implements MerchantProperties {
             page_data.toString()));
     }
 
-    static StringBuffer currentOrder(SavedShoppingCart savedShoppingCart) throws IOException {
-        StringBuffer s = new StringBuffer(
+    static StringBuilder currentOrder(SavedShoppingCart savedShoppingCart) throws IOException {
+        StringBuilder s = new StringBuilder(
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table>" +
                 "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
@@ -364,7 +364,7 @@ public class HTML implements MerchantProperties {
                               boolean debugMode,
                               String walletRequest) throws IOException, ServletException {
         String connectMethod = tapConnectMode ? "tapConnect" : "nativeConnect";
-        StringBuffer s = currentOrder(savedShoppingCart);
+        StringBuilder s = currentOrder(savedShoppingCart);
       
         if (tapConnectMode) {
             s.append("<tr><td align=\"center\"><img id=\"state\" title=\"Please tap your mobile wallet!\" " +
@@ -376,7 +376,7 @@ public class HTML implements MerchantProperties {
                  "<form name=\"restore\" method=\"POST\" action=\"shop\">" +
                  "</form></td></tr>");
         
-        StringBuffer temp_string = new StringBuffer("\n\n\"use strict\";\n\nvar invocationData = ")
+        StringBuilder temp_string = new StringBuilder("\n\n\"use strict\";\n\nvar invocationData = ")
             .append(walletRequest)
             .append(";\n\n" +
 
@@ -519,8 +519,8 @@ public class HTML implements MerchantProperties {
                               s.toString()));
     }
 
-    static StringBuffer receiptCore(ResultData resultData, boolean debugMode) throws IOException {
-        StringBuffer s = new StringBuffer("<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
+    static StringBuilder receiptCore(ResultData resultData, boolean debugMode) throws IOException {
+        StringBuilder s = new StringBuilder("<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
             .append(resultData.paymentMethod.isCardPayment() ? "Card" : "Account")
             .append(" Type</th><th>")
             .append(resultData.paymentMethod.isCardPayment() ? "Card Reference" : "Account Number")   
@@ -542,7 +542,7 @@ public class HTML implements MerchantProperties {
     static void shopResultPage(HttpServletResponse response,
                                boolean debugMode,
                                ResultData resultData) throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
+        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
             .append("<table>" +
                     "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL)
             .append(resultData.transactionError == null ?
@@ -580,7 +580,7 @@ public class HTML implements MerchantProperties {
                                      boolean debugMode,
                                      ResultData resultData) throws IOException, ServletException {
         if (resultData.transactionError == null) {
-            StringBuffer s = new StringBuffer()
+            StringBuilder s = new StringBuilder()
                 .append(gasStation("Thank You - Welcome Back!", true))
                 .append(selectionButtons(new FuelTypes[]{fuelType}))
                 .append("<tr><td style=\"height:15pt\"></td></tr>")
@@ -605,7 +605,7 @@ public class HTML implements MerchantProperties {
     }
 
     static void debugPage(HttpServletResponse response, String string, boolean clean) throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
+        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
                   "<table>" +
                   "<tr><td style=\"padding-top:50pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL +
                   "\">Payment Session Debug Information&nbsp;<br></td></tr><tr><td style=\"text-align:left\">")
@@ -616,7 +616,7 @@ public class HTML implements MerchantProperties {
 
     static void errorPage(HttpServletResponse response, String error, boolean system)
                                  throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
+        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
                  "<table>" +
                  "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL +
                  "\">")
@@ -629,7 +629,7 @@ public class HTML implements MerchantProperties {
 
     static void notification(HttpServletResponse response, String notification)
             throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
+        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" + 
             "<table>" +
             "<tr><td style=\"font-size:10pt;font-family:" + FONT_ARIAL +
             "\">")
@@ -638,8 +638,8 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null,s.toString()));
     }
     
-    static StringBuffer fancyButton(String value, String title, String onclick) {
-        return new StringBuffer("<div class=\"stdbtn\" id=\"cmd\" title=\"")
+    static StringBuilder fancyButton(String value, String title, String onclick) {
+        return new StringBuilder("<div class=\"stdbtn\" id=\"cmd\" title=\"")
             .append(title)
             .append("\" onclick=\"")
             .append(onclick)
@@ -651,7 +651,7 @@ public class HTML implements MerchantProperties {
     static void userChoosePage(HttpServletResponse response,
                                SavedShoppingCart savedShoppingCart,
                                boolean android) throws IOException, ServletException {
-        StringBuffer s = currentOrder(savedShoppingCart)
+        StringBuilder s = currentOrder(savedShoppingCart)
             .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
                     "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:" +
                     FONT_ARIAL + "\">Select Payment Method</td></tr>")
@@ -689,15 +689,15 @@ public class HTML implements MerchantProperties {
                 s.toString()));
     }
     
-    static StringBuffer pumpDigit(int digit, String prefix) {
-        return new StringBuffer("<td><div style=\"background-color:white;padding:0pt 3pt 1pt 3pt;font-size:14pt;border-radius:2pt\" id=\"")
+    static StringBuilder pumpDigit(int digit, String prefix) {
+        return new StringBuilder("<td><div style=\"background-color:white;padding:0pt 3pt 1pt 3pt;font-size:14pt;border-radius:2pt\" id=\"")
             .append(prefix)
             .append(digit)
             .append("\">0</div></td>");
     }
     
-    static StringBuffer pumpDisplay(int digits, int decimals, String leader, String trailer, String prefix) {
-        StringBuffer s = new StringBuffer("<table cellspacing=\"5\"><tr><td style=\"color:white\">")
+    static StringBuilder pumpDisplay(int digits, int decimals, String leader, String trailer, String prefix) {
+        StringBuilder s = new StringBuilder("<table cellspacing=\"5\"><tr><td style=\"color:white\">")
             .append(leader)
             .append("</td>");
         while (digits-- > 0) {
@@ -713,7 +713,7 @@ public class HTML implements MerchantProperties {
     }
     
     static String gasStation(String header, boolean visiblePumpDisplay) {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>");
+        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>");
         if (visiblePumpDisplay) {
             s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table title=\"This is [sort of] a pump display\"><tr>"+
                      "<td align=\"center\" style=\"box-shadow:5pt 5pt 5pt #c0c0c0;background:linear-gradient(135deg, #516287 0%,#5697e2 71%,#5697e2 71%,#516287 100%);border-radius:4pt\">" +
@@ -735,7 +735,7 @@ public class HTML implements MerchantProperties {
                                          String returnAction,
                                          String progressAction,
                                          String successAction) {
-        return new StringBuffer(
+        return new StringBuilder(
             "\"use strict\";\n" +
             STICK_TO_HOME_URL +
             "function setQRDisplay(turnOn) {" +
@@ -798,9 +798,9 @@ public class HTML implements MerchantProperties {
                "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div";       
     }
     
-    static StringBuffer bodyEndQR(byte[] qrImage, boolean qrInitOn) {
+    static StringBuilder bodyEndQR(byte[] qrImage, boolean qrInitOn) {
         String display = qrInitOn ? "" : " style=\"display:none\"";
-        return new StringBuffer()
+        return new StringBuilder()
             .append(
                 "<tr")
             .append(display)
@@ -834,7 +834,7 @@ public class HTML implements MerchantProperties {
     }
     
     static String selectionButtons(FuelTypes[] fuelTypes) throws IOException {
-        StringBuffer s = new StringBuffer("<tr><td><table cellpadding=\"0\" cellspacing=\"0\" align=\"center\">" +
+        StringBuilder s = new StringBuilder("<tr><td><table cellpadding=\"0\" cellspacing=\"0\" align=\"center\">" +
                                           "<tr style=\"text-align:center\"><td>Fuel Type</td><td>Price/Litre</td></tr>");
         for (FuelTypes fuelType : fuelTypes) {
             s.append("<tr id=\"")
@@ -861,7 +861,7 @@ public class HTML implements MerchantProperties {
                                        byte[] qrImage,
                                        HttpServletRequest request,
                                        String id) throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("function selectFuel(fuelType, element) {\n");
+        StringBuilder s = new StringBuilder("function selectFuel(fuelType, element) {\n");
         for (FuelTypes fuelType : FuelTypes.values()) {
             s.append("  if (fuelType == '")
              .append(fuelType.toString())
@@ -996,7 +996,7 @@ public class HTML implements MerchantProperties {
     }
 
     static void refundResultPage(HttpServletResponse response, boolean debugMode, ResultData resultData) throws IOException, ServletException {
-        StringBuffer s = new StringBuffer("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
+        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
             .append("<table>" +
                 "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL +
                 "\">Refund Result<br>&nbsp;</td></tr>" +
