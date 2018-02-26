@@ -88,8 +88,7 @@ public class AuthorizationData implements BaseProperties {
                       dataEncryptionAlgorithm,
                       optionalUserResponseItems,
                       new GregorianCalendar(),
-                      new JSONAsymKeySigner(signer)
-                          .setSignatureAlgorithm(signatureAlgorithm));
+                      new JSONAsymKeySigner(signer).setSignatureAlgorithm(signatureAlgorithm));
     }
 
     public static String formatCardNumber(String accountId) {
@@ -115,15 +114,13 @@ public class AuthorizationData implements BaseProperties {
             .getAlgorithmFromId(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
         if (rd.hasProperty(USER_RESPONSE_ITEMS_JSON)) {
-            LinkedHashMap<String,UserResponseItem> results = new LinkedHashMap<String,UserResponseItem>();
             JSONArrayReader ar = rd.getArray(USER_RESPONSE_ITEMS_JSON);
              do {
                  UserResponseItem challengeResult = new UserResponseItem(ar.getObject());
-                if (results.put(challengeResult.getId(), challengeResult) != null) {
+                if (optionalUserResponseItems.put(challengeResult.getId(), challengeResult) != null) {
                     throw new IOException("Duplicate: " + challengeResult.getId());
                 }
             } while (ar.hasMore());
-            optionalUserResponseItems = results.values().toArray(new UserResponseItem[0]);
         }
         timeStamp = rd.getDateTime(TIME_STAMP_JSON);
         software = new Software(rd);
@@ -141,8 +138,8 @@ public class AuthorizationData implements BaseProperties {
         return dataEncryptionKey;
     }
 
-    UserResponseItem[] optionalUserResponseItems;
-    public UserResponseItem[] getOptionalUserResponseItems() {
+    LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = new LinkedHashMap<String,UserResponseItem>();
+    public LinkedHashMap<String,UserResponseItem> getUserResponseItems() {
         return optionalUserResponseItems;
     }
 

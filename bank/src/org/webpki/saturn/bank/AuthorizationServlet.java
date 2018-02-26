@@ -38,6 +38,7 @@ import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.Messages;
+import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.ISODateTime;
@@ -195,16 +196,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // RBA v0.001...
+        UserResponseItem userResponseItem;
         if (amount.compareTo(DEMO_RBA_LIMIT) >= 0 &&
-            (authorizationData.getOptionalUserResponseItems() == null ||
-             !authorizationData.getOptionalUserResponseItems()[0].getText().equals("garbo"))) {
+            (((userResponseItem = authorizationData.getUserResponseItems().get(RBA_PARM_MOTHER)) == null) ||
+            (!userResponseItem.getText().equals(MOTHER_NAME)))) {
             BankService.rejectedTransactions++;
             return createProviderUserResponse("Transaction requests exceeding " +
                                                 amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
                                                 " require additional user authentication to " +
                                                 "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
                                                 "<p>Since <i>this is a demo</i>, " +
-                                                "answer <span style=\"color:red\">garbo</span>&nbsp; :-)</p>",
+                                                "answer <span style=\"color:red\">" + MOTHER_NAME + "</span>&nbsp; :-)</p>",
                                               new UserChallengeItem[]{new UserChallengeItem(RBA_PARM_MOTHER,
                                                     amount.compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
                                                          UserChallengeItem.TYPE.ALPHANUMERIC : UserChallengeItem.TYPE.ALPHANUMERIC_SECRET,
