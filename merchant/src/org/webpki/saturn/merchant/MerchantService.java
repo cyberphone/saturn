@@ -95,8 +95,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String SERVER_PORT_MAP              = "server_port_map";
     
-    static final String MERCHANT_BASE_URL            = "merchant_base_url";
-
     static final String LOCAL_INSTALLATION           = "local_installation";
 
     static final String DESKTOP_WALLET               = "desktop_wallet";
@@ -141,7 +139,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static String payeeProviderAuthorityUrl;
 
-    static String merchantBaseUrl;  // For QR and Android only
+    static String merchantBaseUrl;  // For QR and Android only, set in HomeServlet
     
     static Currencies currency;
 
@@ -311,8 +309,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
             payeeAcquirerAuthorityUrl = getPropertyString(PAYEE_ACQUIRER_AUTHORITY_URL);
-
-            merchantBaseUrl = getURL(getPropertyString(MERCHANT_BASE_URL));
 
             new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
 

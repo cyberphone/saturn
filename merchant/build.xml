@@ -70,7 +70,6 @@
     <condition property="payee_provider.path" value="${hostingpath}" else="${payeebankpath}">
       <isset property="hostingoption"/>
     </condition>
-    <property name="merchant.host" value="http://localhost:8080"/>
     <property name="security.actual" value=""/>
     <property name="server.port.map" value=""/>
     <property name="unusualcard" value="false"/>
@@ -117,7 +116,6 @@
       <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
       <replacefilter token="@payee-acquirer-authority-url@" value="${acquirer.host}/${acquirerpath.S}payees/${merchantid}"/>
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payee_provider.path}/payees/${merchantid}"/>
-      <replacefilter token="@merchant-base-url@" value="${merchant.host}/${appcorename}"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>
       <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
