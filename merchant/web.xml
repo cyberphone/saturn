@@ -273,9 +273,19 @@
         <servlet-name>GasStationServlet</servlet-name>
         <url-pattern>/gasstation</url-pattern>
     </servlet-mapping>
-@security-constraints@
+
     <session-config>
       <session-timeout>60</session-timeout>
     </session-config>
 
-</web-app>
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>The app</web-resource-name>
+          <url-pattern>/*</url-pattern>
+       </web-resource-collection>
+       <user-data-constraint>
+         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+    </security-constraint>
+
+ </web-app>

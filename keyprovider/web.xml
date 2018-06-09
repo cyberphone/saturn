@@ -76,6 +76,12 @@
         <param-value>@bouncycastle-first@</param-value>
     </context-param>
 
+    <context-param>
+        <description>TLS certificate</description>
+        <param-name>server_tls_certificate</param-name>
+        <param-value>@server-tls-certificate@</param-value>
+    </context-param>
+
     <listener>
         <listener-class>org.webpki.saturn.keyprovider.KeyProviderService</listener-class>
     </listener>
@@ -99,5 +105,15 @@
         <servlet-name>KeyProviderInitServlet</servlet-name>
         <url-pattern>/init</url-pattern>
     </servlet-mapping>
-@security@
+
+    <security-constraint>
+      <web-resource-collection>
+        <web-resource-name>The app</web-resource-name>
+        <url-pattern>/*</url-pattern>
+      </web-resource-collection>
+      <user-data-constraint>
+        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
+      </user-data-constraint>
+    </security-constraint>
+    
 </web-app>

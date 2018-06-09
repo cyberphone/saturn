@@ -24,21 +24,6 @@
   </resources>
   <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
 
-  <resources id="security.constraints.xml">
-  <string><![CDATA[
-   <security-constraint>
-      <web-resource-collection>
-        <web-resource-name>The app</web-resource-name>
-          <url-pattern>/*</url-pattern>
-       </web-resource-collection>
-       <user-data-constraint>
-         <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-      </user-data-constraint>
-    </security-constraint>
-    ]]></string>
-  </resources>
-  <property name="security.constraints" refid="security.constraints.xml"/>
-  
   <target name="help">
     <echo message="tomcat [-Dunusual.card=0] [-Dcurrency=XYZ] [-Dslow.operation=0] [-Dhostingoption=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
@@ -70,7 +55,6 @@
     <condition property="payee_provider.path" value="${hostingpath}" else="${payeebankpath}">
       <isset property="hostingoption"/>
     </condition>
-    <property name="security.actual" value=""/>
     <property name="server.port.map" value=""/>
     <property name="unusualcard" value="false"/>
     <property name="currency" value="EUR"/>
@@ -123,7 +107,6 @@
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
       <replacefilter token="@android-webpki-versions@" value="${android.webpki.versions}"/>
       <replacefilter token="@logging@" value="${logging}"/>
-      <replacefilter token="@security-constraints@" value="${security.actual}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
@@ -220,7 +203,6 @@
      <property name="acquirer.host" value="https://mobilepki.org"/>
      <property name="payee_provider.host" value="https://mobilepki.org"/>
      <property name="merchant.host" value="https://test.webpki.org"/>
-     <property name="security.actual" value="${security.constraints}"/>
      <property name="server.port.map" value="8442"/>
      <property file="common.properties"/>
      <property file="merchants.properties"/>
@@ -259,7 +241,6 @@
      <property name="acquirer.host" value="https://localhost:8442"/>
      <property name="payee_provider.host" value="https://localhost:8442"/>
      <property name="merchant.host" value="http://localhost:8080"/>
-     <property name="security.actual" value=""/>
      <property name="server.port.map" value=""/>
      <antcall target="mobilepki-ejbca"/>
   </target>

@@ -53,8 +53,6 @@ import org.webpki.keygen2.KeyCreationResponseDecoder;
 import org.webpki.keygen2.ProvisioningFinalizationResponseDecoder;
 import org.webpki.keygen2.ProvisioningInitializationResponseDecoder;
 
-import org.webpki.net.HTTPSWrapper;
-
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.MIMETypedObject;
 
@@ -83,6 +81,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static final String SERVER_PORT_MAP       = "server_port_map";
     
+    static final String TLS_CERTIFICATE       = "server_tls_certificate";
+
     static final String[] CREDENTIALS         = {"paycred1", "paycred2", "paycred3"};
     
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
@@ -267,33 +267,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 .append("\">Continue to merchant site</a></p>").toString();
 
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // Get TLS server certificate (if necessary)
+            // Get TLS server certificate
             ////////////////////////////////////////////////////////////////////////////////////////////
-            if (keygen2EnrollmentUrl.startsWith("https")) {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            HTTPSWrapper wrapper = new HTTPSWrapper();
-                            String url = keygen2EnrollmentUrl;
-                            wrapper.setRequireSuccess(false);
-                            if (serverPortMapping != null) {
-                                URL url2 = new URL(url);
-                                url = new URL(url2.getProtocol(),
-                                              url2.getHost(),
-                                              serverPortMapping,
-                                              url2.getFile()).toExternalForm();
-                            }
-                            wrapper.makeGetRequest(url);
-                            tlsCertificate = wrapper.getServerCertificate();
-                            logger.info("TLS cert: " + tlsCertificate.getSubjectX500Principal().getName());
-                        } catch (Exception e) {
-                            logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
-                        }
-                    }
-                }.start();
-            }
-            
+            tlsCertificate = CertificateUtil
+                    .getCertificateFromBlob(ArrayUtil
+                            .getByteArrayFromInputStream(getResource(getPropertyString(TLS_CERTIFICATE))));
+
             logger.info("Saturn KeyProvider-server initiated");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);

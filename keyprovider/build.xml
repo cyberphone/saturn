@@ -4,6 +4,8 @@
   <property name="src.dir" value="src"/>
   <property name="packimage_dir" value="packaged-images"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/keyprovider"/>
+  <property name="tls_cert_path" location="c:\apache-tomcat-8.5.23\conf\localhost-and-192.168.1.79.cer"/>
+  <basename property="tls_cert_file" file="${tls_cert_path}"/>
   
   <property name="appcorename" value="webpay-keyprovider"/>
   <property name="application" value="${appcorename}.war"/>
@@ -27,21 +29,6 @@
   </resources>
   <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
 
-    <resources id="security.external">
-<string><![CDATA[
-    <security-constraint>
-      <web-resource-collection>
-        <web-resource-name>The app</web-resource-name>
-        <url-pattern>/*</url-pattern>
-      </web-resource-collection>
-      <user-data-constraint>
-        <transport-guarantee>CONFIDENTIAL</transport-guarantee>
-      </user-data-constraint>
-    </security-constraint>
-]]></string>
-    </resources> 
-  <property name="security.internal" refid="security.external"/> 
-    
   <target name="help">
       <echo message="tomcat [-Derr.merchant.root=0] [-Derr.media=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
   </target>
@@ -63,7 +50,6 @@
     <property name="bank.host" value="https://localhost:8442"/>
     <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
     <property name="plugin.ejbca.ant.custom.logon.version-check" value=""/>
-    <property name="security.actual" value=""/>
     <property name="server.port.map" value=""/>
     <property name="errormedia" value="false"/>
     <property name="bouncycastle.first" value="true"/>
@@ -89,7 +75,6 @@
       <replacefilter token="@keyprov-base-url@" value="${keyprov.host}/${keyprov.path}"/>
       <replacefilter token="@bank-host@" value="${bank.host}"/>
       <replacefilter token="@android-webpki-versions@" value="${android.webpki.versions}"/>
-      <replacefilter token="@security@" value="${security.actual}"/>
       <replacefilter token="@paycred1@"
         value="${clientkey_super}.p12,SUPER_CARD,${account_id_super},supercard.svg,${payerbankpath}-enc-key-ec.cer,${payerbankpath},@,A128CBC-HS256"/>
       <replacefilter token="@paycred2@"
@@ -98,6 +83,7 @@
         value="${clientkey_unusual}.p12,UNUSUAL_CARD,${account_id_unusual},unusualcard.svg,${payeebankpath}-enc-key-ec.cer,${payeebankpath},Money-77,A128CBC-HS256"/>
       <replacefilter token="@keyprov-kmk@" value="${kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
+      <replacefilter token="@server-tls-certificate@" value="${tls_cert_file}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
@@ -123,6 +109,7 @@
       </zipfileset>
       <zipfileset dir="card-images" prefix="${class_war_path}"/>
       <zipfileset dir="${zip.logotype.dir}" prefix="${class_war_path}"/>
+      <zipfileset file="${tls_cert_path}" prefix="${class_war_path}"/>
       <fileset dir="web"/>
     </war>
   </target>
@@ -167,7 +154,6 @@
      <property name="bouncycastle.first" value="false"/>
      <property file="common.properties"/>
      <property file="users.properties"/>
-     <property name="security.actual" value="${security.internal}"/>
      <property name="keyprov.host" value="https://mobilepki.org"/>
      <property name="bank.host" value="https://mobilepki.org"/>
      <property name="server.port.map" value="8442"/>
@@ -203,7 +189,6 @@
      <property name="keyprov.host" value="http://localhost:8080"/>
      <property name="bank.host" value="https://localhost:8442"/>
      <property name="server.port.map" value=""/>
-     <property name="security.actual" value=""/>
      <antcall target="mobilepki-ejbca"/>
   </target>
   
