@@ -82,7 +82,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Server errors are returned as HTTP redirects taking the client out of its KeyGen2 mode
         ////////////////////////////////////////////////////////////////////////////////////////////
-        response.sendRedirect(KeyProviderService.keygen2EnrollmentUrl + 
+        response.sendRedirect(KeyProviderInitServlet.keygen2EnrollmentUrl + 
                               "?" +
                               KeyProviderInitServlet.ERROR_TAG +
                               "=" +
@@ -156,7 +156,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     
         keygen2JSONBody(response, 
                         new KeyCreationRequestEncoder(keygen2State,
-                                                      KeyProviderService.keygen2EnrollmentUrl));
+                                                      KeyProviderInitServlet.keygen2EnrollmentUrl));
       }
 
     String certificateData(X509Certificate certificate) {
@@ -175,7 +175,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         String versionMacro,
                         boolean init)
          throws IOException, ServletException {
-        String keygen2EnrollmentUrl = KeyProviderService.keygen2EnrollmentUrl;
+        String keygen2EnrollmentUrl = KeyProviderInitServlet.keygen2EnrollmentUrl;
         HttpSession session = request.getSession(false);
         try {
             ////////////////////////////////////////////////////////////////////////////////////////////
@@ -345,7 +345,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 html.append("<b>You need to restart the session</b>");
             } else {
                 session.invalidate();
-                html.append(KeyProviderService.successImageAndMessage);
+                html.append(KeyProviderInitServlet.successImageAndMessage);
             }
         }
         KeyProviderInitServlet.output(response, 

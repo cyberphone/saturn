@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import java.util.logging.Logger;
 
+import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
@@ -34,11 +35,13 @@ import org.webpki.keygen2.ServerState;
 
 import org.webpki.util.Base64URL;
 
+import org.webpki.webutil.ServletUtil;
+
 public class KeyProviderInitServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    static Logger log = Logger.getLogger(KeyProviderInitServlet.class.getCanonicalName());
+    static Logger logger = Logger.getLogger(KeyProviderInitServlet.class.getCanonicalName());
 
     static final String ANDROID_WEBPKI_VERSION_TAG     = "VER";
     static final String ANDROID_WEBPKI_VERSION_MACRO   = "$VER$";  // KeyGen2 Android PoC
@@ -95,6 +98,34 @@ public class KeyProviderInitServlet extends HttpServlet {
         response.getOutputStream().write(html.getBytes("UTF-8"));
     }
     
+    static String keygen2EnrollmentUrl;
+    
+    static String successImageAndMessage;
+    
+    synchronized void initGlobals(String baseUrl) throws IOException {
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Get KeyGen2 protocol entry
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        keygen2EnrollmentUrl = baseUrl + "/getkeys";
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // Show a sign that the user succeeded getting Saturn credentials
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        URL hostUrl = new URL(keygen2EnrollmentUrl);
+        String merchantHost = hostUrl.getHost();
+        if (merchantHost.equals("mobilepki.org")) {
+            merchantHost = "test.webpki.org";
+        }
+        String merchantUrl = new URL(hostUrl.getProtocol(), merchantHost, hostUrl.getPort(), "/webpay-merchant").toExternalForm(); 
+        logger.info(merchantUrl);
+        successImageAndMessage = new StringBuilder("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
+            .append(KeyProviderService.saturnLogotype)
+            .append("</div><b>Enrollment Succeeded!</b><p><a href=\"")
+            .append(merchantUrl)
+            .append("\">Continue to merchant site</a></p>").toString();
+    }
+    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (!request.getHeader("User-Agent").contains("Android")) {
@@ -104,6 +135,9 @@ public class KeyProviderInitServlet extends HttpServlet {
                             "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                             "This proof-of-concept system only supports Android</td></tr>"));
             return;
+        }
+        if (keygen2EnrollmentUrl == null) {
+            initGlobals(ServletUtil.getContextURL(request));
         }
         HttpSession session = request.getSession(true);
         session.setAttribute(KEYGEN2_SESSION_ATTR,
@@ -119,7 +153,7 @@ public class KeyProviderInitServlet extends HttpServlet {
         ////////////////////////////////////////////////////////////////////////////////////////////
         String extra = "cookie=JSESSIONID%3D" +
                      session.getId() +
-                     "&url=" + URLEncoder.encode(KeyProviderService.keygen2EnrollmentUrl + "?" +
+                     "&url=" + URLEncoder.encode(keygen2EnrollmentUrl + "?" +
                      INIT_TAG + "=" + Base64URL.generateURLFriendlyRandom(8) +
                      (KeyProviderService.grantedVersions == null ? "" : "&" + ANDROID_WEBPKI_VERSION_TAG + "=" + ANDROID_WEBPKI_VERSION_MACRO), "UTF-8");
         output(response, 

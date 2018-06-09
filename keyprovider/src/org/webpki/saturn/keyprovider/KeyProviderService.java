@@ -19,18 +19,12 @@ package org.webpki.saturn.keyprovider;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.URL;
-
 import java.security.PublicKey;
 
 import java.security.cert.X509Certificate;
 
 import java.security.interfaces.RSAPublicKey;
 
-import java.util.Enumeration;
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -75,8 +69,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String BANK_HOST             = "bank_host";
     
-    static final String KEYPROV_BASE_URL      = "keyprov_base_url";
-
     static final String KEYPROV_KMK           = "keyprov_kmk";
     
     static final String SERVER_PORT_MAP       = "server_port_map";
@@ -88,10 +80,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
     static KeyStoreEnumerator keyManagemenentKey;
-    
-    static String keygen2EnrollmentUrl;
-    
-    static String successImageAndMessage;
     
     static Integer serverPortMapping;
 
@@ -116,7 +104,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static Vector<PaymentCredential> paymentCredentials = new Vector<PaymentCredential>();
 
-    public static String webpkiLogotype;
+    static String webpkiLogotype;
+
+    static String saturnLogotype;
 
     InputStream getResource(String name) throws IOException {
         InputStream is = this.getClass().getResourceAsStream(name);
@@ -127,38 +117,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     }
 
     String getResourceAsString(String propertyName) throws IOException {
-        return new String(ArrayUtil.getByteArrayFromInputStream(getResource(getPropertyString(propertyName))), "UTF-8");
-        
-    }
-
-    String getURL (String inUrl) throws IOException {
-        URL url = new URL(inUrl);
-        if (!url.getHost().equals("localhost")) {
-            return inUrl;
-        }
-        String autoHost = null;
-        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-        int foundAddresses = 0;
-        while (networkInterfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = networkInterfaces.nextElement();
-            if (networkInterface.isUp() && !networkInterface.isVirtual() && !networkInterface.isLoopback() &&
-                networkInterface.getDisplayName().indexOf("VMware") < 0) {  // Well.... 
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (inetAddress instanceof Inet4Address) {
-                        foundAddresses++;
-                        autoHost = inetAddress.getHostAddress();
-                    }
-                }
-            }
-        }
-        if (foundAddresses != 1) throw new IOException("Couldn't determine network interface");
-        logger.info("Host automagically set to: " + autoHost);
-        return new URL(url.getProtocol(),
-                       autoHost,
-                       url.getPort(),
-                       url.getFile()).toExternalForm();
+        return new String(ArrayUtil.getByteArrayFromInputStream(getResource(getPropertyString(propertyName))),
+                          "UTF-8");
     }
 
     @Override
@@ -236,14 +196,15 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // Get KeyGen2 protocol entry
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            keygen2EnrollmentUrl = getURL(getPropertyString(KEYPROV_BASE_URL)) + "/getkeys";
-
-            ////////////////////////////////////////////////////////////////////////////////////////////
             // WebPKI.org logotype
             ////////////////////////////////////////////////////////////////////////////////////////////
             webpkiLogotype = getResourceAsString(WEBPKI_LOGO);
+
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Saturn logotype
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            saturnLogotype = getResourceAsString(SATURN_LOGO);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check
@@ -251,29 +212,13 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             grantedVersions = getPropertyStringList(VERSION_CHECK);
  
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // Show a sign that the user succeeded getting Saturn credentials
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            URL hostUrl = new URL(keygen2EnrollmentUrl);
-            String merchantHost = hostUrl.getHost();
-            if (merchantHost.equals("mobilepki.org")) {
-                merchantHost = "test.webpki.org";
-            }
-            String merchantUrl = new URL(hostUrl.getProtocol(), merchantHost, hostUrl.getPort(), "/webpay-merchant").toExternalForm(); 
-            logger.info(merchantUrl);
-            successImageAndMessage = new StringBuilder("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
-                .append(getResourceAsString(SATURN_LOGO))
-                .append("</div><b>Enrollment Succeeded!</b><p><a href=\"")
-                .append(merchantUrl)
-                .append("\">Continue to merchant site</a></p>").toString();
-
-            ////////////////////////////////////////////////////////////////////////////////////////////
             // Get TLS server certificate
             ////////////////////////////////////////////////////////////////////////////////////////////
             tlsCertificate = CertificateUtil
                     .getCertificateFromBlob(ArrayUtil
                             .getByteArrayFromInputStream(getResource(getPropertyString(TLS_CERTIFICATE))));
 
-            logger.info("Saturn KeyProvider-server initiated");
+            logger.info("Saturn KeyProvider-server initiated: " + tlsCertificate.getSubjectX500Principal().getName());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }
