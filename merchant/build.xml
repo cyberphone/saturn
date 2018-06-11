@@ -202,7 +202,6 @@
      <property name="bouncycastle.first" value="false"/>
      <property name="acquirer.host" value="https://mobilepki.org"/>
      <property name="payee_provider.host" value="https://mobilepki.org"/>
-     <property name="merchant.host" value="https://test.webpki.org"/>
      <property name="server.port.map" value="8442"/>
      <property file="common.properties"/>
      <property file="merchants.properties"/>
@@ -240,7 +239,6 @@
      <echo message="Web2Native Bridge &quot;localhost&quot; Merchant Plugin"/>
      <property name="acquirer.host" value="https://localhost:8442"/>
      <property name="payee_provider.host" value="https://localhost:8442"/>
-     <property name="merchant.host" value="http://localhost:8080"/>
      <property name="server.port.map" value=""/>
      <antcall target="mobilepki-ejbca"/>
   </target>

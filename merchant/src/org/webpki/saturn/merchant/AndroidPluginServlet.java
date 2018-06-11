@@ -46,7 +46,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     static final String QR_RETRIEVE                   = "qrir";
     
     String getPluginUrl() {
-        return MerchantService.merchantBaseUrl + "/androidplugin";
+        return HomeServlet.merchantBaseUrl + "/androidplugin";
     }
 
     void doPlugin (String httpSessionId, boolean qrMode, HttpServletResponse response) throws IOException, ServletException {
@@ -91,7 +91,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                 }
                 // When user clicks "Cancel" in App mode we must return to
                 // the shop using a POST operation
-                HTML.autoPost(response, MerchantService.merchantBaseUrl + "/shop");
+                HTML.autoPost(response, HomeServlet.merchantBaseUrl + "/shop");
             } else {
                 // When user clicks "Cancel" in QR mode we must cancel the operation
                 // at the merchant side and return a suitable page to the QR client
@@ -139,19 +139,19 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             }
             String successUrl = qrMode ? QR_SUCCESS_URL
                                        :
-                    MerchantService.merchantBaseUrl + "/result";
+                   HomeServlet.merchantBaseUrl + "/result";
             String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
             HttpSupport.writeJsonData(response, 
                                       new WalletRequest(session,
                                                         nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
-                                                        MerchantService.merchantBaseUrl,
+                                                            HomeServlet.merchantBaseUrl,
                                                         cancelUrl,
                                                         successUrl).requestObject);
         } else {
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {
                 logger.severe("QR session not found");
-                response.sendRedirect(MerchantService.merchantBaseUrl);
+                response.sendRedirect(HomeServlet.merchantBaseUrl);
             } else {
                 Synchronizer synchronizer = QRSessions.getSynchronizer(id);
                 if (synchronizer != null) {

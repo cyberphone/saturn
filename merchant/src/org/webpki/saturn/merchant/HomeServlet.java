@@ -19,7 +19,6 @@ package org.webpki.saturn.merchant;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +29,8 @@ import org.webpki.webutil.ServletUtil;
 public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
+    
+    static String merchantBaseUrl;  // For QR and Android only
     
     boolean isTapConnect() {
         return false;
@@ -68,7 +69,7 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        MerchantService.merchantBaseUrl = ServletUtil.getContextURL(request);
+        merchantBaseUrl = ServletUtil.getContextURL(request);
         HttpSession session = request.getSession(false);
         if (session != null && session.getAttribute(WALLET_REQUEST_SESSION_ATTR) != null) {
             session.invalidate();

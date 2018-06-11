@@ -139,8 +139,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static String payeeProviderAuthorityUrl;
 
-    static String merchantBaseUrl;  // For QR and Android only, set in HomeServlet
-    
     static Currencies currency;
 
     // Web2Native Bridge constants
