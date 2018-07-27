@@ -69,13 +69,15 @@ public class SVGText extends SVGObject {
                    SVGValue y,
                    String fontFamily,
                    double fontSize,
-                   TEXT_ANCHOR textAnchor,
+                   TEXT_ANCHOR optionalTextAnchor,
                    String text) {
         addDouble(SVGAttributes.X, x);
         addDouble(SVGAttributes.Y, y);
         addString(SVGAttributes.FONT_FAMILY, new SVGStringValue(fontFamily));
         addDouble(SVGAttributes.FONT_SIZE, new SVGDoubleValue(fontSize));
-        addString(SVGAttributes.TEXT_ANCHOR, new SVGStringValue(textAnchor.toString().toLowerCase()));
+        if (optionalTextAnchor != null) {
+            addString(SVGAttributes.TEXT_ANCHOR, new SVGStringValue(optionalTextAnchor.toString().toLowerCase()));
+        }
         if (text.indexOf('\n') > 0) {
             boolean next = false;
             while (text.length() > 0) {

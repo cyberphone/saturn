@@ -99,12 +99,15 @@
 
   <target name="_svg">
     <property name="svgfilters" value=""/>
-    <delete dir="${temp.dir}"/>
+    <condition property="additional.src.dir" value=":${additional.src}" else="">
+      <isset property="additional.src"/>
+    </condition>
+  	<delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
            source="${javaversion}"
            target="${javaversion}"
-           srcdir="${src.dir}:${common.src.dir}"
+           srcdir="${src.dir}:${common.src.dir}${additional.src.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">

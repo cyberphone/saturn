@@ -22,17 +22,17 @@ import org.webpki.tools.svg.SVGEmbeddedText;
 import org.webpki.tools.svg.SVGPath;
 import org.webpki.tools.svg.SVGRect;
 import org.webpki.tools.svg.SVGText;
+import org.webpki.tools.svg.SVGText.FONT_WEIGHTS;
 
-public class SuperCardSquare extends SVGDocument {
+public class SuperCardSquare extends SVGDocument implements StandardCardData {
     public SuperCardSquare() {
         super(0, 0);
     }
 
-    final static double WIDTH  = 300;
-    final static double HEIGHT = 180;
-    
     final static String CORE_COLOR = "#6d8838";
     final static String S_COLOR    = "#9e0a11";
+    
+    final static double NAME_Y_COORDINATE = STANDARD_HEIGHT * 0.76;
     
     @Override
     public String getFilters() {
@@ -41,7 +41,7 @@ public class SuperCardSquare extends SVGDocument {
         "  <linearGradient id=\"supercardGradient\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\">\n" +
         "  <stop stop-color=\"#ffb115\" offset=\"0\"/>\n" +
         "  <stop stop-color=\"#ffff00\" offset=\"0.5\"/>\n" +
-        "  <stop stop-color=\"#ffb115\" stop-opacity=\"0.99219\" offset=\"1\"/>\n" +
+        "  <stop stop-color=\"#ffb115\" offset=\"1\"/>\n" +
         "  </linearGradient>\n" +
         "</defs>\n";
 
@@ -49,30 +49,38 @@ public class SuperCardSquare extends SVGDocument {
     @Override
     public void generate() {
         add(new SVGRect(new SVGDoubleValue(0), new SVGDoubleValue(0),
-            new SVGDoubleValue(WIDTH), new SVGDoubleValue(HEIGHT),
+            new SVGDoubleValue(STANDARD_WIDTH), new SVGDoubleValue(STANDARD_HEIGHT),
         null,
         null,
         "url(#supercardGradient)"));
         
-        add(new SVGText(new SVGDoubleValue(WIDTH/2),
-                        new SVGDoubleValue(HEIGHT * 0.8),
+        add(new SVGText(new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                        new SVGDoubleValue(NAME_Y_COORDINATE),
                         "Sans-serif",
-                        26,
-                        SVGText.TEXT_ANCHOR.MIDDLE,
-                        "Luke Skywalker"));
+                        STANDARD_NAME_FONT_SIZE,
+                        null,
+                        STANDARD_NAME));
+
+        add(new SVGText(new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                        new SVGDoubleValue(NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
+                        "monospace",
+                        STANDARD_ACCOUNT_FONT_SIZE,
+                        null,
+                        STANDARD_ACCOUNT).setFontWeight(FONT_WEIGHTS.BOLD));
+
         SVGEmbeddedText et = new SVGEmbeddedText(org.webpki.saturn.svg.diagrams.SupercardGlyphs.class);
 
         String superCardString = "SuperCard";
 
-        double x = WIDTH / 12;
+        double x = STANDARD_WIDTH / 12;
         
         String color = S_COLOR;
         
-        double transformation = HEIGHT / 5;
-        double y = HEIGHT / 2.5;
-        double gutter = WIDTH / 16;
+        double transformation = STANDARD_HEIGHT / 5;
+        double y = STANDARD_HEIGHT / 2.5;
+        double gutter = STANDARD_WIDTH / 16;
         boolean first = true;
-        double lineWidth = HEIGHT / 80;
+        double lineWidth = STANDARD_HEIGHT / 80;
         
         for (char c : superCardString.toCharArray()) {
             
@@ -85,9 +93,9 @@ public class SuperCardSquare extends SVGDocument {
                     color));
             if (first) {
                 add(new SVGRect(new SVGDoubleValue(x - 2 * lineWidth),
-                                new SVGDoubleValue(y -  HEIGHT / 19 - transformation),
+                                new SVGDoubleValue(y -  STANDARD_HEIGHT / 19 - transformation),
                         new SVGDoubleValue(dg.getXAdvance() + 6 * lineWidth), 
-                        new SVGDoubleValue(HEIGHT / 3.5),
+                        new SVGDoubleValue(STANDARD_HEIGHT / 3.5),
                     lineWidth,
                     "#31859c",
                     null));
@@ -95,14 +103,14 @@ public class SuperCardSquare extends SVGDocument {
             }
             x += dg.getXAdvance() + gutter;
             color = CORE_COLOR;
-            transformation = HEIGHT / 3.6;
-            y = HEIGHT / 2.6;
-            gutter = WIDTH / 70;
+            transformation = STANDARD_HEIGHT / 3.6;
+            y = STANDARD_HEIGHT / 2.6;
+            gutter = STANDARD_WIDTH / 70;
         }
         add(new SVGText(new SVGDoubleValue(x),
-                new SVGDoubleValue(y - HEIGHT / 10),
+                new SVGDoubleValue(y - STANDARD_HEIGHT / 10),
                 "Sans-serif",
-                HEIGHT / 10,
+                STANDARD_HEIGHT / 10,
                 SVGText.TEXT_ANCHOR.START,
                 "TM").setFontWeight(SVGText.FONT_WEIGHTS.BOLD)
                      .setFontColor(CORE_COLOR)

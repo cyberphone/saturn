@@ -29,8 +29,8 @@ public class Bank extends SVGDocument {
         super(5, 5);
     }
 
-    static final int BANK_HEIGHT = 70;
-    static final int BANK_WIDTH = 100;
+    public static final int BANK_HEIGHT = 70;
+    public static final int BANK_WIDTH = 100;
     
     static final int ROOF_WIDTH = 90;
     
@@ -74,7 +74,7 @@ public class Bank extends SVGDocument {
             "</linearGradient>\n";
     }
     
-    static String getBankDefs() {
+    public static String getBankDefs() {
         return
             getBankPillarDefs() +
             "<filter width=\"200%\" height=\"200%\" x=\"-50%\" y=\"-50%\" id=\"bankShaddow\">\n" +

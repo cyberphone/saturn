@@ -19,18 +19,14 @@ package org.webpki.saturn.svg.diagrams;
 import org.webpki.tools.svg.SVGDocument;
 import org.webpki.tools.svg.SVGDoubleValue;
 import org.webpki.tools.svg.SVGEllipse;
-import org.webpki.tools.svg.SVGEmbeddedText;
-import org.webpki.tools.svg.SVGPath;
 import org.webpki.tools.svg.SVGRect;
 import org.webpki.tools.svg.SVGText;
+import org.webpki.tools.svg.SVGText.FONT_WEIGHTS;
 
-public class BankDirectSquare extends SVGDocument {
+public class BankDirectSquare extends SVGDocument implements StandardCardData {
     public BankDirectSquare() {
         super(0, 0);
     }
-
-    final static double WIDTH  = 300;
-    final static double HEIGHT = 180;
     
     final static double WHITE_SQUARE_WIDTH  = 138;
     final static double WHITE_SQUARE_HEIGHT = 98;
@@ -41,6 +37,8 @@ public class BankDirectSquare extends SVGDocument {
     final static double BANK_PAD            = 7;
     
     final static double BANK_SIZE           = 0.34;
+    
+    final static double NAME_Y_COORDINATE   = STANDARD_HEIGHT * 0.8056;
 
     @Override
     public String getFilters() {
@@ -61,22 +59,30 @@ public class BankDirectSquare extends SVGDocument {
         add(new SVGRect(
                 new SVGDoubleValue(0),
                 new SVGDoubleValue(0),
-                new SVGDoubleValue(WIDTH),
-                new SVGDoubleValue(HEIGHT),
+                new SVGDoubleValue(STANDARD_WIDTH),
+                new SVGDoubleValue(STANDARD_HEIGHT),
                 null,
                 null,
                 "url(#bankdirectGradient)"));
 
         add(new SVGText(
-                new SVGDoubleValue(WIDTH/2),
-                new SVGDoubleValue(HEIGHT * 0.86),
+                new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                new SVGDoubleValue(NAME_Y_COORDINATE),
                 "Sans-serif",
-                26,
-                SVGText.TEXT_ANCHOR.MIDDLE,
-                "Luke Skywalker"));
+                STANDARD_NAME_FONT_SIZE,
+                null,
+                STANDARD_NAME));
 
         add(new SVGText(
-                new SVGDoubleValue((WIDTH + WHITE_SQUARE_WIDTH + WHITE_SQUARE_PAD) / 2),
+                new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                new SVGDoubleValue(NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
+                "monospace",
+                STANDARD_ACCOUNT_FONT_SIZE,
+                null,
+                STANDARD_ACCOUNT).setFontWeight(FONT_WEIGHTS.BOLD));
+
+        add(new SVGText(
+                new SVGDoubleValue((STANDARD_WIDTH + WHITE_SQUARE_WIDTH + WHITE_SQUARE_PAD) / 2),
                 new SVGDoubleValue(WHITE_SQUARE_PAD + 10 + WHITE_SQUARE_HEIGHT / 2),
                 "Serif",
                 28,
