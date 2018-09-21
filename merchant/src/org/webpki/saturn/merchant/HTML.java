@@ -713,7 +713,12 @@ public class HTML implements MerchantProperties {
     }
     
     static String gasStation(String header, boolean visiblePumpDisplay) {
-        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>");
+        StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\"><table>" +
+          "<tr><td id=\"phase\" style=\"padding-bottom:10pt;text-align:center;" +
+                "font-weight:bolder;font-size:11pt;font-family:" +
+                FONT_ARIAL + "\">")
+            .append(header)
+            .append("</td></tr>");
         if (visiblePumpDisplay) {
             s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table title=\"This is [sort of] a pump display\"><tr>"+
                      "<td align=\"center\" style=\"box-shadow:5pt 5pt 5pt #c0c0c0;background:linear-gradient(135deg, #516287 0%,#5697e2 71%,#5697e2 71%,#516287 100%);border-radius:4pt\">" +
@@ -722,11 +727,7 @@ public class HTML implements MerchantProperties {
              .append(pumpDisplay(3, 2, "To Pay", "&#8364;", "ppri"))
              .append("</td></tr></table></td></tr>");
         }
-        return s.append("<tr><td id=\"phase\" style=\"padding-bottom:10pt;text-align:center;" +
-                        "font-weight:bolder;font-size:11pt;font-family:" +
-                        FONT_ARIAL + "\">")
-                .append(header)
-                .append("</td></tr>").toString();
+        return s.toString();
 
     }
 
@@ -967,7 +968,7 @@ public class HTML implements MerchantProperties {
             "    }, 100);\n" +
             "    document.getElementById('waiting').style.display = 'table-row';\n" +
             "    setTimeout(function() {\n" +
-            "      document.getElementById('cmd').innerHTML = 'Click here to <i style=\"color:red\">stop</i> pumping...';\n" +
+            "      document.getElementById('cmd').innerHTML = 'Click here to <i style=\"color:red;font-weight:bolder\">stop</i> pumping...';\n" +
             "      document.getElementById('waiting').style.display = 'none';\n" +
             "    }, 1000);\n" +
             "  }\n" +
@@ -986,7 +987,7 @@ public class HTML implements MerchantProperties {
             gasStation("4. Fill Tank", true) +
             selectionButtons(new FuelTypes[]{fuelType}) +
             "<tr><td style=\"padding-top:20pt;text-align:center\" id=\"pumpbtn\">" +
-            fancyButton("Click here to <i style=\"color:green\">start</i> pumping!",
+            fancyButton("Click here to <i style=\"color:green;font-weight:bolder\">start</i> pumping!",
                         "Since we don't have a real pump we &quot;simulate&quot; one",
                         "execute()") +
             "</td></tr>" +

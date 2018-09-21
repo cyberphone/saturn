@@ -1,4 +1,4 @@
-<project name="Web2Native Bridge (Demo) Key Provider" default="help" basedir=".">
+<project name="Saturn (Demo) Key Provider" default="help" basedir=".">
 
   <!-- set properties for this build -->
   <property name="src.dir" value="src"/>
