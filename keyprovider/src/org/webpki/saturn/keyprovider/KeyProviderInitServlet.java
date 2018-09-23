@@ -141,7 +141,7 @@ public class KeyProviderInitServlet extends HttpServlet {
         }
         HttpSession session = request.getSession(true);
         session.setAttribute(KEYGEN2_SESSION_ATTR,
-                             new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagemenentKey)));
+                             new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey)));
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // The following is the actual contract between an issuing server and a KeyGen2 client.

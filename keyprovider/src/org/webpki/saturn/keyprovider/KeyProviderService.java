@@ -79,7 +79,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
-    static KeyStoreEnumerator keyManagemenentKey;
+    static KeyStoreEnumerator keyManagementKey;
     
     static Integer serverPortMapping;
 
@@ -134,12 +134,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // KeyGen2
             ////////////////////////////////////////////////////////////////////////////////////////////
-            keygen2JSONCache = new JSONDecoderCache ();
-            keygen2JSONCache.addToCache (InvocationResponseDecoder.class);
-            keygen2JSONCache.addToCache (ProvisioningInitializationResponseDecoder.class);
-            keygen2JSONCache.addToCache (CredentialDiscoveryResponseDecoder.class);
-            keygen2JSONCache.addToCache (KeyCreationResponseDecoder.class);
-            keygen2JSONCache.addToCache (ProvisioningFinalizationResponseDecoder.class);
+            keygen2JSONCache = new JSONDecoderCache();
+            keygen2JSONCache.addToCache(InvocationResponseDecoder.class);
+            keygen2JSONCache.addToCache(ProvisioningInitializationResponseDecoder.class);
+            keygen2JSONCache.addToCache(CredentialDiscoveryResponseDecoder.class);
+            keygen2JSONCache.addToCache(KeyCreationResponseDecoder.class);
+            keygen2JSONCache.addToCache(ProvisioningFinalizationResponseDecoder.class);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials
@@ -188,7 +188,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // SKS key management key
             ////////////////////////////////////////////////////////////////////////////////////////////
-            keyManagemenentKey = new KeyStoreEnumerator(getResource(getPropertyString(KEYPROV_KMK)),
+            keyManagementKey = new KeyStoreEnumerator(getResource(getPropertyString(KEYPROV_KMK)),
                                                                     getPropertyString(KEYSTORE_PASSWORD));
 
             if (getPropertyString(SERVER_PORT_MAP).length () > 0) {

@@ -241,7 +241,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                                    1000,
                                                                    (short)50);
                   provisioningInitRequest.setKeyManagementKey(
-                          KeyProviderService.keyManagemenentKey.getPublicKey());
+                          KeyProviderService.keyManagementKey.getPublicKey());
                   keygen2JSONBody(response, provisioningInitRequest);
                   return;
 
@@ -250,11 +250,11 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                   keygen2State.update(provisioningInitResponse, KeyProviderService.tlsCertificate);
 
                   log.info("Device Certificate=" + certificateData(keygen2State.getDeviceCertificate()));
-                  CredentialDiscoveryRequestEncoder credentiaDiscoveryRequest =
+                  CredentialDiscoveryRequestEncoder credentialDiscoveryRequest =
                       new CredentialDiscoveryRequestEncoder(keygen2State, keygen2EnrollmentUrl);
-                  credentiaDiscoveryRequest.addLookupDescriptor(
-                      KeyProviderService.keyManagemenentKey.getPublicKey());
-                  keygen2JSONBody(response, credentiaDiscoveryRequest);
+                  credentialDiscoveryRequest.addLookupDescriptor(
+                      KeyProviderService.keyManagementKey.getPublicKey());
+                  keygen2JSONBody(response, credentialDiscoveryRequest);
                   return;
 
                 case CREDENTIAL_DISCOVERY:
@@ -266,7 +266,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                           keygen2State.addPostDeleteKey(matchingCredential.getClientSessionId(), 
                                                         matchingCredential.getServerSessionId(),
                                                         endEntityCertificate,
-                                                        KeyProviderService.keyManagemenentKey.getPublicKey());
+                                                        KeyProviderService.keyManagementKey.getPublicKey());
                           log.info("Deleting key=" + certificateData(endEntityCertificate));
                       }
                   }
