@@ -42,12 +42,14 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     static boolean browserIsSupported(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String userAgent = request.getHeader("User-Agent");
-        if ((!userAgent.contains(" Chrome/") || userAgent.contains(" Edge/")) &&
-            (!userAgent.contains("Mozilla/") || !userAgent.contains(" Firefox/"))) {
-            ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium and Firefox");
-            return false;
-        }
-        return true;
+        if (!userAgent.contains(" Edge/") &&
+            (userAgent.contains(" Chrome/") ||
+             userAgent.contains(" Safari/") ||
+             userAgent.contains(" Firefox/"))) {
+            return true;
+          }
+        ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium, Safari and Firefox");
+        return false;
     }
     
     static boolean isAndroid(HttpServletRequest request) {
