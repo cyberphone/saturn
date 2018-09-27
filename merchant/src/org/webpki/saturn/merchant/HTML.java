@@ -318,8 +318,7 @@ public class HTML implements MerchantProperties {
 
         HTML.output(response, HTML.getHTML(temp_string.toString(),
             "onload=\"closeFundFlash()\"><div id=\"fundlimit\" style=\"position:absolute;left:15pt;bottom:15pt;z-index:3;font-size:8pt\">Your funds at the bank are limited to 1MEUR...</div>" +
-            "<div id=\"emptybasket\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:"
-            + FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">Nothing ordered yet...</div",
+            "<div id=\"emptybasket\" class=\"toasting\">Nothing ordered yet...</div",
             page_data.toString()));
     }
 
@@ -665,16 +664,16 @@ public class HTML implements MerchantProperties {
                       ".png\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
                                                                :
                       "")
-            .append("<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod()\"></td></tr>" +
-                    "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod()\"></td></tr>" +
+            .append("<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod(this)\"></td></tr>" +
+                    "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod(this)\"></td></tr>" +
                     "<tr><td style=\"text-align:center;padding:15pt\">")
             .append(fancyButton("Return to shop..", "Changed your mind?", "document.forms.restore.submit()"))
             .append("</td></tr></table></td></tr></table></td></tr>");
 
         HTML.output(response, HTML.getHTML(
                 STICK_TO_HOME_URL +
-                "\nfunction noSuchMethod() {\n" +
-                        "    document.getElementById('notimplemented').style.top = ((window.innerHeight - document.getElementById('notimplemented').offsetHeight) / 2) + 'px';\n" +
+                "\nfunction noSuchMethod(element) {\n" +
+                        "    document.getElementById('notimplemented').style.top = (element.getBoundingClientRect().top - document.getElementById('notimplemented').offsetHeight * 1.5) + 'px';\n" +
                         "    document.getElementById('notimplemented').style.left = ((window.innerWidth - document.getElementById('notimplemented').offsetWidth) / 2) + 'px';\n" +
                         "    document.getElementById('notimplemented').style.visibility = 'visible';\n" +
                         "    setTimeout(function() {\n" +
@@ -684,8 +683,7 @@ public class HTML implements MerchantProperties {
                 "><form name=\"shoot\" method=\"POST\" action=\"" + 
                 (android ? "androidplugin" : "w2nbwallet") +
                 "\"></form><form name=\"restore\" method=\"POST\" action=\"shop\">" +
-                "</form><div id=\"notimplemented\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
-                FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">This demo only supports Saturn!</div",
+                "</form><div id=\"notimplemented\" class=\"toasting\">This demo only supports Saturn!</div",
                 s.toString()));
     }
     
@@ -751,7 +749,7 @@ public class HTML implements MerchantProperties {
             "  document.getElementById('qridflasher').style.visibility = 'visible';\n" +
             "  setTimeout(function() {\n" +
             "    document.getElementById('qridflasher').style.visibility = 'hidden';\n" +
-            "  }, 5000);\n" +
+            "  }, 2000);\n" +
             "}\n\n" +
             "function startComet() {\n" +
             "  fetch('")
@@ -794,8 +792,7 @@ public class HTML implements MerchantProperties {
     
     static String bodyStartQR(String optional) {
         return "onload=\"startComet()\">" + optional + 
-               "<div id=\"qridflasher\" style=\"border-color:grey;border-style:solid;border-width:3px;text-align:center;font-family:" +
-               FONT_ARIAL+ ";z-index:3;background:#f0f0f0;position:absolute;visibility:hidden;padding:5pt 10pt 5pt 10pt\">" +
+               "<div id=\"qridflasher\" class=\"toasting\">" +
                "You get it automatically when you install the<br>&quot;WebPKI&nbsp;Suite&quot;, just look for the icon!</div";       
     }
     
