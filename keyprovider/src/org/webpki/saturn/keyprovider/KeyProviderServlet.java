@@ -91,7 +91,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     
     void keygen2JSONBody(HttpServletResponse response, JSONEncoder object) throws IOException {
         byte[] jsonData = object.serializeJSONDocument(JSONOutputFormats.PRETTY_PRINT);
-        if (KeyProviderService.isDebug()) {
+        if (KeyProviderService.logging) {
             log.info("Sent message\n" + new String(jsonData, "UTF-8"));
         }
         response.setContentType(JSON_CONTENT_TYPE);
@@ -225,7 +225,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             if (!request.getContentType().equals(JSON_CONTENT_TYPE)) {
                 throw new IOException("Wrong \"Content-Type\": " + request.getContentType());
             }
-            if (KeyProviderService.isDebug()) {
+            if (KeyProviderService.logging) {
                 log.info("Received message:\n" + new String(jsonData, "UTF-8"));
             }
             JSONDecoder jsonObject = KeyProviderService.keygen2JSONCache.parse(jsonData);

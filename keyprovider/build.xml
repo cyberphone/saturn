@@ -6,6 +6,7 @@
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/keyprovider"/>
   <property name="tls_cert_path" location="c:\apache-tomcat-8.5.23\conf\localhost-and-192.168.1.79.cer"/>
   <basename property="tls_cert_file" file="${tls_cert_path}"/>
+  <property name="logging" value="false"/>
   
   <property name="appcorename" value="webpay-keyprovider"/>
   <property name="application" value="${appcorename}.war"/>
@@ -84,6 +85,7 @@
       <replacefilter token="@keyprov-kmk@" value="${kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
       <replacefilter token="@server-tls-certificate@" value="${tls_cert_file}"/>
+      <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">

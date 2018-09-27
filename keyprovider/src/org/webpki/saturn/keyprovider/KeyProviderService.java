@@ -75,6 +75,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static final String TLS_CERTIFICATE       = "server_tls_certificate";
 
+    static final String LOGGING               = "logging";
+
     static final String[] CREDENTIALS         = {"paycred1", "paycred2", "paycred3"};
     
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
@@ -88,6 +90,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static X509Certificate tlsCertificate;
 
     static String[] grantedVersions;
+    
+    static boolean logging;
 
     static class PaymentCredential {
         KeyStoreEnumerator signatureKey;
@@ -218,13 +222,14 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                     .getCertificateFromBlob(ArrayUtil
                             .getByteArrayFromInputStream(getResource(getPropertyString(TLS_CERTIFICATE))));
 
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Are we logging?
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            logging = getPropertyBoolean(LOGGING);
+            
             logger.info("Saturn KeyProvider-server initiated: " + tlsCertificate.getSubjectX500Principal().getName());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }
-    }
-
-    static boolean isDebug() {
-        return true;
     }
 }

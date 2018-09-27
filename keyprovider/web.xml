@@ -82,6 +82,12 @@
         <param-value>@server-tls-certificate@</param-value>
     </context-param>
 
+    <context-param>
+        <description>Logging</description>
+        <param-name>logging</param-name>
+        <param-value>@logging@</param-value>
+    </context-param>
+
     <listener>
         <listener-class>org.webpki.saturn.keyprovider.KeyProviderService</listener-class>
     </listener>

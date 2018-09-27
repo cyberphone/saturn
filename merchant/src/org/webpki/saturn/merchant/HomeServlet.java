@@ -47,7 +47,7 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
              userAgent.contains(" Safari/") ||
              userAgent.contains(" Firefox/"))) {
             return true;
-          }
+        }
         ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium, Safari and Firefox");
         return false;
     }
