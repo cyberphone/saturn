@@ -673,7 +673,7 @@ public class HTML implements MerchantProperties {
         HTML.output(response, HTML.getHTML(
                 STICK_TO_HOME_URL +
                 "\nfunction noSuchMethod(element) {\n" +
-                        "    document.getElementById('notimplemented').style.top = (element.getBoundingClientRect().top - document.getElementById('notimplemented').offsetHeight * 1.5) + 'px';\n" +
+                        "    document.getElementById('notimplemented').style.top = (element.getBoundingClientRect().top + window.scrollY - document.getElementById('notimplemented').offsetHeight * 1.5) + 'px';\n" +
                         "    document.getElementById('notimplemented').style.left = ((window.innerWidth - document.getElementById('notimplemented').offsetWidth) / 2) + 'px';\n" +
                         "    document.getElementById('notimplemented').style.visibility = 'visible';\n" +
                         "    setTimeout(function() {\n" +
