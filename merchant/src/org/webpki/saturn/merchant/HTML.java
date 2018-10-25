@@ -807,7 +807,7 @@ public class HTML implements MerchantProperties {
                 "<img border=\"1\" src=\"images/qr_launcher.png\"></a> application to start the Wallet</td></tr>" +
                 "<tr")
              .append(display)
-             .append(" id=\"qr2\"><td align=\"center\"><img title=\"Do NOT put the cursor here because then the QR reader won't work\" src=\"data:image/png;base64,")
+             .append(" id=\"qr2\"><td style=\"cursor:none\" align=\"center\"><img src=\"data:image/png;base64,")
              .append(new Base64(false).getBase64StringFromBinary(qrImage))
              .append("\"></td></tr>"+
                      "<tr id=\"authhelp\" style=\"display:none\"><td style=\"padding-top:15pt;text-align:center\">"+
