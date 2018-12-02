@@ -219,7 +219,7 @@ function serverError(response, message) {
   if (message === undefined || typeof message != 'string') {
     message = 'Unrecoverable error message';
   }
-  message = new Buffer(message);
+  message = Buffer.from(message);
   response.writeHead(500, {'Content-Type'  : 'text/plain; charset=UTF-8',
                            'Connection'    : 'close',
                            'Content-Length': message.length});
@@ -247,7 +247,7 @@ function writeData(response, data, contentType) {
 }
 
 function returnJsonData(request, response, jsonWriter) {
-  writeData(response, new Buffer(jsonWriter.getNormalizedData()), BaseProperties.JSON_CONTENT_TYPE);
+  writeData(response, Buffer.from(jsonWriter.getNormalizedData()), BaseProperties.JSON_CONTENT_TYPE);
   successLog('Returned data', request, jsonWriter);
 }
 

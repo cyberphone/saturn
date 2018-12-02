@@ -31,7 +31,7 @@ public class PINKeyBoard extends SVGDocument {
     final static double BUTTON_MARGIN = 2;
     final static double CLICK_MARGIN  = 6; 
     final static double BUTTON_HSPACE = 36;
-    final static double BUTTON_VSPACE = 20;
+    final static double BUTTON_VSPACE = 26;
     final static double VALIDATE_WIDTH = 126;
     final static double VALIDATE_HEIGHT = 60;
     
@@ -109,7 +109,7 @@ public class PINKeyBoard extends SVGDocument {
                 y += BUTTON_HEIGHT + BUTTON_VSPACE;
             }
         }
-        double validateX = 3 * BUTTON_WIDTH + 4 * BUTTON_HSPACE;
+        double validateX = 3.5 * BUTTON_WIDTH + 3 * BUTTON_HSPACE;
         basicButton(validateX + VALIDATE_WIDTH - BUTTON_WIDTH, 0, BUTTON_WIDTH, BUTTON_HEIGHT,
                     "Roboto", 45, "&#171;", 12, "deleteDigit()")
             .setFontColor("#be1018");
