@@ -27,6 +27,7 @@ import org.webpki.crypto.AsymSignatureAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -56,7 +57,7 @@ public class PayeeCoreProperties implements BaseProperties {
         if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
             optionalAccountHashes = new Vector<byte[]>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
-            if (!accountVerifier.getString(JSONSignatureDecoder.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
+            if (!accountVerifier.getString(JSONCryptoHelper.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
                 throw new IOException("Unexpected hash algorithm");
             }
             JSONArrayReader accountHashes = accountVerifier.getArray(HASHED_PAYEE_ACCOUNTS_JSON);
@@ -71,7 +72,7 @@ public class PayeeCoreProperties implements BaseProperties {
             parameterArray.add(
                 new SignatureParameter(
                     AsymSignatureAlgorithms
-                        .getAlgorithmFromId(signatureParameter.getString(JSONSignatureDecoder.ALGORITHM_JSON),
+                        .getAlgorithmFromId(signatureParameter.getString(JSONCryptoHelper.ALGORITHM_JSON),
                                             AlgorithmPreferences.JOSE),
                     signatureParameter.getPublicKey()));
         } while (jsonParameterArray.hasMore());
@@ -112,12 +113,12 @@ public class PayeeCoreProperties implements BaseProperties {
         decoratedPayee.writeObject(wr);
         if (optionalAccountHashes != null) {
             wr.setObject(ACCOUNT_VERIFIER_JSON)
-                  .setString(JSONSignatureDecoder.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
+                  .setString(JSONCryptoHelper.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
                   .setBinaryArray(HASHED_PAYEE_ACCOUNTS_JSON, optionalAccountHashes);
         }
         JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PARAMETERS_JSON);
         for (SignatureParameter signatureParameter : signatureParameters) {
-            jsonArray.setObject().setString(JSONSignatureDecoder.ALGORITHM_JSON,
+            jsonArray.setObject().setString(JSONCryptoHelper.ALGORITHM_JSON,
                                             signatureParameter
                                                 .signatureAlgorithm
                                                     .getAlgorithmId(AlgorithmPreferences.JOSE))

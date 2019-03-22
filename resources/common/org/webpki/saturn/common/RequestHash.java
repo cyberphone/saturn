@@ -20,10 +20,10 @@ import java.io.IOException;
 
 import org.webpki.crypto.HashAlgorithms;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONSignatureDecoder;
 
 public class RequestHash implements BaseProperties {
     
@@ -34,14 +34,14 @@ public class RequestHash implements BaseProperties {
     }
 
     public static byte[] getRequestHash(JSONObjectWriter request) throws IOException {
-        return getRequestHash(request.serializeToBytes(JSONOutputFormats.NORMALIZED));
+        return getRequestHash(request.serializeToBytes(JSONOutputFormats.CANONICALIZED));
     }
 
     public static byte[] parse(JSONObjectReader rd) throws IOException {
         rd = rd.getObject(REQUEST_HASH_JSON);
-        if (!rd.getString(JSONSignatureDecoder.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
+        if (!rd.getString(JSONCryptoHelper.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
             throw new IOException("Expected algorithm: " + JOSE_SHA_256_ALG_ID);
         }
-        return rd.getBinary(JSONSignatureDecoder.VALUE_JSON);
+        return rd.getBinary(JSONCryptoHelper.VALUE_JSON);
     }
 }

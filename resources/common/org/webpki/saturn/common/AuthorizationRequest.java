@@ -17,14 +17,13 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-
 import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
 import org.webpki.crypto.HashAlgorithms;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
@@ -34,9 +33,8 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 
-import org.webpki.json.encryption.DecryptionKeyHolder;
-
 import org.webpki.util.ArrayUtil;
+import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequest implements BaseProperties {
     
@@ -90,14 +88,16 @@ public class AuthorizationRequest implements BaseProperties {
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
-        encryptedAuthorizationData = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject().require(true);
+        encryptedAuthorizationData = 
+                rd.getObject(ENCRYPTED_AUTHORIZATION_JSON)
+                    .getEncryptionObject(new JSONCryptoHelper.Options()).require(true);
         undecodedPaymentMethodSpecific = rd.getObject(PAYMENT_METHOD_SPECIFIC_JSON);
         rd.scanAway(PAYMENT_METHOD_SPECIFIC_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
-        timeStamp = rd.getDateTime(TIME_STAMP_JSON);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
+        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
         rd.checkForUnread();
     }
 
@@ -184,12 +184,13 @@ public class AuthorizationRequest implements BaseProperties {
             .setObject(PAYMENT_METHOD_SPECIFIC_JSON, paymentMethodSpecific.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, PaymentRequest.SOFTWARE_VERSION))
             .setSignature(signer);
     }
 
-    public AuthorizationData getDecryptedAuthorizationData(Vector<DecryptionKeyHolder> decryptionKeys)
+    public AuthorizationData getDecryptedAuthorizationData(
+            Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
             new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));

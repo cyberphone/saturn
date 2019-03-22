@@ -24,6 +24,8 @@ import java.util.LinkedHashMap;
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
 
+import org.webpki.util.ISODateTime;
+
 public class EncryptedMessage implements BaseProperties {
      
     public EncryptedMessage(JSONObjectReader rd) throws IOException {
@@ -41,7 +43,7 @@ public class EncryptedMessage implements BaseProperties {
             } while (ar.hasMore());
             optionalUserChallengeItems = items.values().toArray(new UserChallengeItem[0]);
         }
-        dateTime = rd.getDateTime(TIME_STAMP_JSON);
+        dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         rd.checkForUnread();
     }
 

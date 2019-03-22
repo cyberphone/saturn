@@ -25,13 +25,15 @@ import java.util.Vector;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
+import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.KeyEncryptionAlgorithms;
 
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
-import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+import org.webpki.util.ISODateTime;
 
 public class ProviderAuthority implements BaseProperties {
     
@@ -102,9 +104,9 @@ public class ProviderAuthority implements BaseProperties {
             })
             .setDynamic((wr) -> optionalHostingProvider == null ? 
                 wr : wr.setObject(HOSTING_PROVIDER_JSON, optionalHostingProvider.writeObject()))
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
-            .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
-            .setSignature(signer);
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
+            .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
+            .setSignature(ATTESTATION_JSON, signer);
     }
 
     public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
@@ -173,7 +175,7 @@ public class ProviderAuthority implements BaseProperties {
             if (notRecognized) {
                 encryptionParameter.scanAway(DATA_ENCRYPTION_ALGORITHM_JSON);
                 encryptionParameter.scanAway(KEY_ENCRYPTION_ALGORITHM_JSON);
-                encryptionParameter.scanAway(JSONSignatureDecoder.PUBLIC_KEY_JSON);
+                encryptionParameter.scanAway(JSONCryptoHelper.PUBLIC_KEY_JSON);
             }
         } while (jsonParameterArray.hasMore());
         if (parameterArray.isEmpty()) {
@@ -188,10 +190,10 @@ public class ProviderAuthority implements BaseProperties {
             optionalHostingProvider = new HostingProvider(rd.getObject(HOSTING_PROVIDER_JSON));
         }
 
-        timeStamp = rd.getDateTime(TIME_STAMP_JSON);
-        expires = rd.getDateTime(EXPIRES_JSON);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         expiresInMillis = expires.getTimeInMillis();
-        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
+        signatureDecoder = rd.getSignature(ATTESTATION_JSON, new JSONCryptoHelper.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }

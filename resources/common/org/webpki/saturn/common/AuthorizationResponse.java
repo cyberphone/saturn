@@ -23,6 +23,7 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONDecryptionDecoder;
@@ -31,8 +32,9 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
+import org.webpki.json.JSONAsymKeyEncrypter;
 
-import org.webpki.json.encryption.DecryptionKeyHolder;
+import org.webpki.util.ISODateTime;
 
 public class AuthorizationResponse implements BaseProperties {
     
@@ -74,12 +76,14 @@ public class AuthorizationResponse implements BaseProperties {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
         authorizationRequest = new AuthorizationRequest(Messages.AUTHORIZATION_REQUEST.getEmbeddedMessage(rd));
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
-        encryptedAccountData = rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON).getEncryptionObject().require(true);
+        encryptedAccountData = 
+                rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON)
+                    .getEncryptionObject(new JSONCryptoHelper.Options()).require(true);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON);
+        dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
+        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
@@ -132,18 +136,17 @@ public class AuthorizationResponse implements BaseProperties {
                            .createEncryptionObject(
                                accountData.writeObject().serializeToBytes(JSONOutputFormats.NORMALIZED),
                                encryptionParameter.getDataEncryptionAlgorithm(),
-                               encryptionParameter.getEncryptionKey(),
-                               null,
-                               encryptionParameter.getKeyEncryptionAlgorithm()))
+                               new JSONAsymKeyEncrypter(encryptionParameter.getEncryptionKey(),
+                               encryptionParameter.getKeyEncryptionAlgorithm())))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
     }
 
     public AccountDataDecoder getProtectedAccountData(JSONDecoderCache knownAccountTypes, 
-                                                      Vector<DecryptionKeyHolder> decryptionKeys)
+                                                      Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
          return (AccountDataDecoder) knownAccountTypes.parse(encryptedAccountData.getDecryptedData(decryptionKeys));
     }

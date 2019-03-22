@@ -24,7 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 import java.security.PublicKey;
-
 import java.security.cert.X509Certificate;
 
 import java.util.Vector;
@@ -37,12 +36,12 @@ import org.webpki.crypto.SignatureWrapper;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -165,24 +164,24 @@ public class JCSPaper implements BaseProperties {
         JSONObjectWriter josePaymentRequest = new JSONObjectWriter(JSONParser.parse(paymentRequest.toString()));
         paymentRequest.setSignature(paymentRequestSigner);
         JSONObjectReader joseHeader = JSONParser.parse(paymentRequest.toString())
-            .getObject(JSONSignatureDecoder.SIGNATURE_JSON)
-                .getObject(JSONSignatureDecoder.PUBLIC_KEY_JSON);
+            .getObject(JSONObjectWriter.SIGNATURE_DEFAULT_LABEL_JSON)
+                .getObject(JSONCryptoHelper.PUBLIC_KEY_JSON);
         JSONObjectWriter joseSignedPaymentRequest = 
             jws(josePaymentRequest, 
                 new JSONObjectWriter()
                     .setString(JOSE_ALG, AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE))
                     .setObject(JOSE_JWK, new JSONObjectWriter()
-                        .setString(JOSE_KTY, joseHeader.getString(JSONSignatureDecoder.KTY_JSON))
-                        .setString(JOSE_CRV, joseHeader.getString(JSONSignatureDecoder.CRV_JSON))
-                        .setString(JSONSignatureDecoder.X_JSON, joseHeader.getString(JSONSignatureDecoder.X_JSON))
-                        .setString(JSONSignatureDecoder.Y_JSON, joseHeader.getString(JSONSignatureDecoder.Y_JSON))),
+                        .setString(JOSE_KTY, joseHeader.getString(JSONCryptoHelper.KTY_JSON))
+                        .setString(JOSE_CRV, joseHeader.getString(JSONCryptoHelper.CRV_JSON))
+                        .setString(JSONCryptoHelper.X_JSON, joseHeader.getString(JSONCryptoHelper.X_JSON))
+                        .setString(JSONCryptoHelper.Y_JSON, joseHeader.getString(JSONCryptoHelper.Y_JSON))),
                  paymentRequestKey);
         JSONObjectWriter writer = new JSONObjectWriter();
         writer.setString(JSONDecoderCache.CONTEXT_JSON, CONTEXT);
         writer.setString(JSONDecoderCache.QUALIFIER_JSON, AUTHORIZATION);
         writer.setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         writer.setString("transactionId", "#1250000005");
-        writer.setString(TIME_STAMP_JSON, "2016-02-02T10:07:42Z");
+        writer.setString(TIME_STAMP_JSON, "2019-02-02T10:07:42Z");
         JSONObjectWriter joseAuthorization = new JSONObjectWriter(JSONParser.parse(writer.toString()));
         joseAuthorization.setupForRewrite(PAYMENT_REQUEST_JSON);
         joseAuthorization.setObject(PAYMENT_REQUEST_JSON, joseSignedPaymentRequest);
@@ -274,11 +273,11 @@ public class JCSPaper implements BaseProperties {
         if (protectedHeader.hasProperty(JOSE_JWK)) {
             JSONObjectReader jwk = protectedHeader.getObject(JOSE_JWK);
             JSONObjectWriter josePK = new JSONObjectWriter()
-                .setObject(JSONSignatureDecoder.PUBLIC_KEY_JSON, new JSONObjectWriter()
-                    .setString(JSONSignatureDecoder.KTY_JSON, jwk.getString(JOSE_KTY))
-                    .setString(JSONSignatureDecoder.CRV_JSON, jwk.getString(JOSE_CRV))
-                    .setString(JSONSignatureDecoder.X_JSON, jwk.getString(JSONSignatureDecoder.X_JSON))
-                    .setString(JSONSignatureDecoder.Y_JSON, jwk.getString(JSONSignatureDecoder.Y_JSON)));
+                .setObject(JSONCryptoHelper.PUBLIC_KEY_JSON, new JSONObjectWriter()
+                    .setString(JSONCryptoHelper.KTY_JSON, jwk.getString(JOSE_KTY))
+                    .setString(JSONCryptoHelper.CRV_JSON, jwk.getString(JOSE_CRV))
+                    .setString(JSONCryptoHelper.X_JSON, jwk.getString(JSONCryptoHelper.X_JSON))
+                    .setString(JSONCryptoHelper.Y_JSON, jwk.getString(JSONCryptoHelper.Y_JSON)));
             publicKey = JSONParser.parse(josePK.toString()).getPublicKey();
         } else {
             JSONArrayReader ar = protectedHeader.getArray(JOSE_X5C);

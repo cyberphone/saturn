@@ -22,9 +22,11 @@ import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONSignatureDecoder;
+
+import org.webpki.util.ISODateTime;
 
 public class PayeeAuthority implements BaseProperties {
     
@@ -36,9 +38,9 @@ public class PayeeAuthority implements BaseProperties {
         return payeeCoreProperties.writeObject(Messages.PAYEE_AUTHORITY.createBaseMessage()
                                      .setString(AUTHORITY_URL_JSON, authorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
-            .setDateTime(BaseProperties.EXPIRES_JSON, expires, true)
-            .setSignature(attestSigner);
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
+            .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
+            .setSignature(ATTESTATION_JSON, attestSigner);
     }
 
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
@@ -50,10 +52,10 @@ public class PayeeAuthority implements BaseProperties {
         }
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         payeeCoreProperties = new PayeeCoreProperties(rd);
-        timeStamp = rd.getDateTime(TIME_STAMP_JSON);
-        expires = rd.getDateTime(EXPIRES_JSON);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         expiresInMillis = expires.getTimeInMillis();
-        attestationKey = rd.getSignature(new JSONSignatureDecoder.Options()).getPublicKey();
+        attestationKey = rd.getSignature(ATTESTATION_JSON, new JSONCryptoHelper.Options()).getPublicKey();
         rd.checkForUnread();
     }
 

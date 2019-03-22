@@ -24,8 +24,14 @@
     
   <path id="compile.classpath">
      <fileset dir="${common.lib.dir}">
-       <include name="*.jar"/>
+       <include name="pr*.jar"/>
     </fileset>
+    <fileset dir="${webpki.lib.dir}">
+      <include name="*.jar"/>
+   </fileset>
+    <fileset dir="${bcprovider.lib.dir}">
+      <include name="*.jar"/>
+   </fileset>
     <fileset dir="${reference.lib.dir}">
       <include name="*.jar"/>
     </fileset>

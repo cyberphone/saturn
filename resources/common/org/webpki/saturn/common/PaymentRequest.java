@@ -22,10 +22,13 @@ import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONSignatureDecoder;
+
+import org.webpki.util.ISODateTime;
 
 public class PaymentRequest implements BaseProperties {
     
@@ -42,13 +45,13 @@ public class PaymentRequest implements BaseProperties {
                                           JSONAsymKeySigner signer) throws IOException {
         return new JSONObjectWriter()
             .setObject(PAYEE_JSON, payee.writeObject())
-            .setBigDecimal(AMOUNT_JSON, amount, currency.getDecimals())
+            .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
             .setDynamic((wr) -> optionalNonDirectPayment == null ?
                     wr : wr.setString(NON_DIRECT_PAYMENT_JSON, optionalNonDirectPayment.toString()))
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, timeStamp, true)
-            .setDateTime(EXPIRES_JSON, expires, true)
+            .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.UTC_NO_SUBSECONDS)
+            .setDateTime(EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(signer);
     }
@@ -60,12 +63,12 @@ public class PaymentRequest implements BaseProperties {
         if (rd.hasProperty(NON_DIRECT_PAYMENT_JSON)) {
             nonDirectPayment = NonDirectPayments.fromType(rd.getString(NON_DIRECT_PAYMENT_JSON));
         }
-        amount = rd.getBigDecimal(AMOUNT_JSON, currency.getDecimals());
+        amount = rd.getMoney(AMOUNT_JSON, currency.getDecimals());
         referenceId = rd.getString(REFERENCE_ID_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON);
-        expires = rd.getDateTime(EXPIRES_JSON);
+        dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
+        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
         rd.checkForUnread();
     }
 

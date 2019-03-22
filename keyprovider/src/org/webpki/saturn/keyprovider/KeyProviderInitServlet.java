@@ -18,23 +18,17 @@
 package org.webpki.saturn.keyprovider;
 
 import java.io.IOException;
-
 import java.util.logging.Logger;
-
 import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.keygen2.ServerState;
-
-import org.webpki.util.Base64URL;
-
 import org.webpki.webutil.ServletUtil;
 
 public class KeyProviderInitServlet extends HttpServlet {
@@ -43,9 +37,6 @@ public class KeyProviderInitServlet extends HttpServlet {
 
     static Logger logger = Logger.getLogger(KeyProviderInitServlet.class.getCanonicalName());
 
-    static final String ANDROID_WEBPKI_VERSION_TAG     = "VER";
-    static final String ANDROID_WEBPKI_VERSION_MACRO   = "$VER$";  // KeyGen2 Android PoC
-    
     static final String KEYGEN2_SESSION_ATTR           = "keygen2";
 
     static final String INIT_TAG = "init";     // Note: This is currently also a part of the KeyGen2 client!
@@ -83,10 +74,9 @@ public class KeyProviderInitServlet extends HttpServlet {
             s.append(' ').append(bodyscript);
         }
         s.append(
-                "><div style=\"cursor:pointer;padding:2pt 0 0 0;position:absolute;top:15pt;left:15pt;z-index:5;visibility:visible;width:100pt;" +
-                "height:47pt;border-width:1px;border-style:solid;border-color:black;box-shadow:3pt 3pt 3pt #D0D0D0\"" +
-                " onclick=\"document.location.href='http://webpki.org'\" title=\"Home of WebPKI.org\">")
-         .append (KeyProviderService.webpkiLogotype)
+                "><div style=\"cursor:pointer;position:absolute;top:15pt;left:15pt;z-index:5;width:100pt\"" +
+                " onclick=\"document.location.href='http://cyberphone.github.io/doc/saturn'\" title=\"Home of Saturn\">")
+         .append (KeyProviderService.saturnLogotype)
          .append ("</div><table cellapdding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
                 .append(box).append("</table></body></html>");
         return s.toString();
@@ -101,7 +91,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     static String keygen2EnrollmentUrl;
     
-    static String successImageAndMessage;
+    static String successMessage;
     
     synchronized void initGlobals(String baseUrl) throws IOException {
 
@@ -120,9 +110,7 @@ public class KeyProviderInitServlet extends HttpServlet {
         }
         String merchantUrl = new URL(hostUrl.getProtocol(), merchantHost, hostUrl.getPort(), "/webpay-merchant").toExternalForm(); 
         logger.info(merchantUrl);
-        successImageAndMessage = new StringBuilder("<div style=\"width:150pt;height:" + (150 * 170 / 420) + "pt;margin-bottom:5pt\">")
-            .append(KeyProviderService.saturnLogotype)
-            .append("</div><b>Enrollment Succeeded!</b><p><a href=\"")
+        successMessage = new StringBuilder("<b>Enrollment Succeeded!</b><p><a href=\"")
             .append(merchantUrl)
             .append("\">Continue to merchant site</a></p>").toString();
     }
@@ -140,23 +128,27 @@ public class KeyProviderInitServlet extends HttpServlet {
         if (keygen2EnrollmentUrl == null) {
             initGlobals(ServletUtil.getContextURL(request));
         }
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        session = request.getSession(true);
         session.setAttribute(KEYGEN2_SESSION_ATTR,
-                             new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey)));
+                             new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey), 
+                                             keygen2EnrollmentUrl,
+                                             null));
 
         ////////////////////////////////////////////////////////////////////////////////////////////
         // The following is the actual contract between an issuing server and a KeyGen2 client.
-        // The "cookie" element is optional while the HTTP GET "url" argument is mandatory.
-        // The "url" argument bootstraps the protocol.
-        //
-        // The "init" element on the bootstrap URL is a local Mobile RA convention.
-        // The purpose of the random element is suppressing caching of bootstrap data.
+        // The "cookie" element is optional while the "url" argument is mandatory.
+        // The "init" argument bootstraps the protocol via an HTTP GET
         ////////////////////////////////////////////////////////////////////////////////////////////
-        String extra = "cookie=JSESSIONID%3D" +
-                     session.getId() +
-                     "&url=" + URLEncoder.encode(keygen2EnrollmentUrl + "?" +
-                     INIT_TAG + "=" + Base64URL.generateURLFriendlyRandom(8) +
-                     (KeyProviderService.grantedVersions == null ? "" : "&" + ANDROID_WEBPKI_VERSION_TAG + "=" + ANDROID_WEBPKI_VERSION_MACRO), "UTF-8");
+        String urlEncoded = URLEncoder.encode(keygen2EnrollmentUrl, "utf-8");
+        String extra = "?cookie=JSESSIONID%3D" + session.getId() +
+                       "&url=" + urlEncoded +
+                       "&ver=" + KeyProviderService.grantedVersions +
+                       "&init=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
+                       "&cncl=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue";
         output(response, 
                getHTML(null,
                        null,
@@ -164,7 +156,7 @@ public class KeyProviderInitServlet extends HttpServlet {
                        "<tr><td>This proof-of-concept system provisions secure payment<br>" +
                        "credentials to be used in the Android version of the \"Wallet\"<br>&nbsp;</td></tr>" +
                        "<tr><td align=\"center\">" +
-                       "<a href=\"intent://keygen2?" + extra +
+                       "<a href=\"intent://keygen2" + extra +
                        "#Intent;scheme=webpkiproxy;" +
                        "package=org.webpki.mobile.android;end\">Start KeyGen2</a></td></tr></table></td></tr>"));
     }

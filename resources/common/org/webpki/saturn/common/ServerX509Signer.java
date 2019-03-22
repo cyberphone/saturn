@@ -50,7 +50,7 @@ public class ServerX509Signer extends JSONX509Signer {
                 }
             }
         });
-        setSignatureCertificateAttributes(true);
+//        setSignatureCertificateAttributes(true);
         setSignatureAlgorithm(key.getPublicKey() instanceof RSAPublicKey ?
                   AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256);
         setAlgorithmPreferences(AlgorithmPreferences.JOSE);

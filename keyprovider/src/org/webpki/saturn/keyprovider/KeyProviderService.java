@@ -38,8 +38,8 @@ import org.webpki.crypto.CustomCryptoProvider;
 
 import org.webpki.json.JSONDecoderCache;
 
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
-import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.CredentialDiscoveryResponseDecoder;
 import org.webpki.keygen2.InvocationResponseDecoder;
@@ -89,7 +89,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static X509Certificate tlsCertificate;
 
-    static String[] grantedVersions;
+    static String grantedVersions;
     
     static boolean logging;
 
@@ -211,9 +211,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             saturnLogotype = getResourceAsString(SATURN_LOGO);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // Android WebPKI version check
+            // Android WebPKI version check (vlow-vhigh)
             ////////////////////////////////////////////////////////////////////////////////////////////
-            grantedVersions = getPropertyStringList(VERSION_CHECK);
+            grantedVersions = getPropertyString(VERSION_CHECK);
  
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Get TLS server certificate

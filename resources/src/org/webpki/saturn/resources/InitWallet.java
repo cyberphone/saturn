@@ -44,8 +44,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
-
-import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
@@ -66,12 +65,12 @@ import org.webpki.sks.PatternRestriction;
 import org.webpki.sks.SKSException;
 import org.webpki.sks.SecureKeyStore;
 
-import org.webpki.sks.test.Device;
-import org.webpki.sks.test.GenKey;
-import org.webpki.sks.test.KeySpecifier;
-import org.webpki.sks.test.PINPol;
-import org.webpki.sks.test.ProvSess;
-import org.webpki.sks.test.SKSReferenceImplementation;
+import org.webpki.sks.Device;
+import org.webpki.sks.GenKey;
+import org.webpki.sks.KeySpecifier;
+import org.webpki.sks.PINPol;
+import org.webpki.sks.ProvSess;
+import org.webpki.sks.SKSReferenceImplementation;
 
 import org.webpki.util.ArrayUtil;
 

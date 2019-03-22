@@ -35,7 +35,7 @@ import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CustomCryptoProvider;
 
-import org.webpki.crypto.test.DeterministicSignatureWrapper;
+import org.webpki.crypto.DeterministicSignatureWrapper;
 
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONAsymKeySigner;
@@ -130,8 +130,8 @@ public class InitTestPage implements BaseProperties {
                                   Currencies.USD,
                                   null,
                                   "#6100004",
-                                  ISODateTime.parseDateTime("2016-12-27T09:45:23Z"),
-                                  ISODateTime.parseDateTime("2030-09-14T00:00:00Z"),
+                                  ISODateTime.parseDateTime("2016-12-27T09:45:23Z", ISODateTime.UTC_NO_SUBSECONDS),
+                                  ISODateTime.parseDateTime("2030-09-14T00:00:00Z", ISODateTime.UTC_NO_SUBSECONDS),
                                   signer);
         // Header
         write("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Payment Agent (Wallet) Tester</title>"

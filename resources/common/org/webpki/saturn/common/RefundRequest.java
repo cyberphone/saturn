@@ -22,10 +22,13 @@ import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Verifier;
+
+import org.webpki.util.ISODateTime;
 
 public class RefundRequest implements BaseProperties {
     
@@ -33,13 +36,12 @@ public class RefundRequest implements BaseProperties {
         root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponse(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
-        amount = rd.getBigDecimal(AMOUNT_JSON,
-                                        authorizationResponse
-                                            .authorizationRequest.paymentRequest.currency.decimals);
+        amount = rd.getMoney(AMOUNT_JSON,
+                             authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
         referenceId = rd.getString(REFERENCE_ID_JSON);
-        timeStamp = rd.getDateTime(TIME_STAMP_JSON);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
+        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
         if (cardNetwork != null &&
             authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ cardNetwork) {
             throw new IOException("Incompatible payment method: " + 
@@ -102,11 +104,11 @@ public class RefundRequest implements BaseProperties {
         return Messages.REFUND_REQUEST.createBaseMessage()
             .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
             .setString(RECEPIENT_URL_JSON, recepientUrl)
-            .setBigDecimal(AMOUNT_JSON,
-                           amount,
-                           authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
+            .setMoney(AMOUNT_JSON,
+                      amount,
+                      authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 
                                                       PaymentRequest.SOFTWARE_VERSION))
             .setSignature(signer);

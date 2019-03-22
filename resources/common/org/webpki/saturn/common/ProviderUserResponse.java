@@ -23,19 +23,23 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.JSONSymKeyEncrypter;
 
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.util.ISODateTime;
 
 public class ProviderUserResponse implements BaseProperties {
  
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
         Messages.PROVIDER_USER_RESPONSE.parseBaseMessage(rd);
-        encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON).getEncryptionObject().require(false);
+        encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON)
+                .getEncryptionObject(new JSONCryptoHelper.Options()).require(false);
         rd.checkForUnread();
     }
 
@@ -64,12 +68,12 @@ public class ProviderUserResponse implements BaseProperties {
                 aw.setObject(UserChallengeItem.writeObject());
             }
         }
-        wr.setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true);
+        wr.setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS);
         return Messages.PROVIDER_USER_RESPONSE.createBaseMessage()
             .setObject(ENCRYPTED_MESSAGE_JSON,
-                       JSONObjectWriter.createEncryptionObject(wr.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                                               dataEncryptionAlgorithm,
-                                                               null,
-                                                               dataEncryptionKey));
+                JSONObjectWriter
+                    .createEncryptionObject(wr.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                                                                dataEncryptionAlgorithm,
+                                                                new JSONSymKeyEncrypter(dataEncryptionKey)));
     }
 }

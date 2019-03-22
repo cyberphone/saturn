@@ -20,10 +20,13 @@ import java.io.IOException;
 
 import java.util.GregorianCalendar;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
+
+import org.webpki.util.ISODateTime;
 
 public class RefundResponse implements BaseProperties {
     
@@ -32,9 +35,9 @@ public class RefundResponse implements BaseProperties {
         refundRequest = new RefundRequest(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON);
+        dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONSignatureDecoder.Options());
+        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
@@ -74,7 +77,7 @@ public class RefundResponse implements BaseProperties {
             .setObject(Messages.REFUND_REQUEST.lowerCamelCase(), refundRequest.root)
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), true)
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(TransactionResponse.SOFTWARE_NAME,
                                                       TransactionResponse.SOFTWARE_VERSION))
             .setSignature(signer);

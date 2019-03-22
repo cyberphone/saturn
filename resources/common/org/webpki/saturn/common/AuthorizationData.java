@@ -28,12 +28,13 @@ import org.webpki.crypto.AsymKeySignerInterface;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONAsymKeySigner;
-import org.webpki.json.JSONSignatureDecoder;
+import org.webpki.json.DataEncryptionAlgorithms;
 
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
+import org.webpki.util.ISODateTime;
 
 public class AuthorizationData implements BaseProperties {
 
@@ -51,14 +52,14 @@ public class AuthorizationData implements BaseProperties {
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
-                .setString(JSONSignatureDecoder.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
-                .setBinary(JSONSignatureDecoder.VALUE_JSON, paymentRequest.getRequestHash()))
+                .setString(JSONCryptoHelper.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
+                .setBinary(JSONCryptoHelper.VALUE_JSON, paymentRequest.getRequestHash()))
             .setString(DOMAIN_NAME_JSON, domainName)
             .setString(PAYMENT_METHOD_JSON, paymentMethod)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setObject(ENCRYPTION_PARAMETERS_JSON, 
                        new JSONObjectWriter()
-                .setString(JSONSignatureDecoder.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
+                .setString(JSONCryptoHelper.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setBinary(KEY_JSON, dataEncryptionKey));
         if (optionalUserResponseItems != null && optionalUserResponseItems.length > 0) {
             JSONArrayWriter aw = wr.setArray(USER_RESPONSE_ITEMS_JSON);
@@ -66,7 +67,7 @@ public class AuthorizationData implements BaseProperties {
                 aw.setObject(challengeResult.writeObject());
             }
         }
-        return wr.setDateTime(TIME_STAMP_JSON, timeStamp, false)
+        return wr.setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
                  .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
                  .setSignature (signer);
     }
@@ -111,7 +112,7 @@ public class AuthorizationData implements BaseProperties {
         accountId = rd.getString(ACCOUNT_ID_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
-            .getAlgorithmFromId(encryptionParameters.getString(JSONSignatureDecoder.ALGORITHM_JSON));
+            .getAlgorithmFromId(encryptionParameters.getString(JSONCryptoHelper.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
         if (rd.hasProperty(USER_RESPONSE_ITEMS_JSON)) {
             JSONArrayReader ar = rd.getArray(USER_RESPONSE_ITEMS_JSON);
@@ -122,9 +123,9 @@ public class AuthorizationData implements BaseProperties {
                 }
             } while (ar.hasMore());
         }
-        timeStamp = rd.getDateTime(TIME_STAMP_JSON);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        publicKey = rd.getSignature(new JSONSignatureDecoder.Options()).getPublicKey();
+        publicKey = rd.getSignature(new JSONCryptoHelper.Options()).getPublicKey();
         rd.checkForUnread();
     }
 

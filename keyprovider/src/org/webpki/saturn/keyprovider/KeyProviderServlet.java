@@ -155,8 +155,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
         }
     
         keygen2JSONBody(response, 
-                        new KeyCreationRequestEncoder(keygen2State,
-                                                      KeyProviderInitServlet.keygen2EnrollmentUrl));
+                        new KeyCreationRequestEncoder(keygen2State));
       }
 
     String certificateData(X509Certificate certificate) {
@@ -167,13 +166,10 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
            throws IOException, ServletException {
-        executeRequest(request, response, null, false);
+        executeRequest(request, response, false);
     }
 
-    void executeRequest(HttpServletRequest request,
-                        HttpServletResponse response,
-                        String versionMacro,
-                        boolean init)
+    void executeRequest(HttpServletRequest request, HttpServletResponse response, boolean init)
          throws IOException, ServletException {
         String keygen2EnrollmentUrl = KeyProviderInitServlet.keygen2EnrollmentUrl;
         HttpSession session = request.getSession(false);
@@ -194,25 +190,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             // Check if it is the first (trigger) message from the client
             ////////////////////////////////////////////////////////////////////////////////////////////
             if (init) {
-                boolean found = false;;
-                for (String version : KeyProviderService.grantedVersions) {
-                    if (version.equals(versionMacro)) {
-                        found = true;
-                        break;
-                      }
-                }
-                if (!found) {
-                    returnKeyGen2Error(response, "Wrong version of the WebPKI app, you need to update");
-                    return;
-                }
-                InvocationRequestEncoder invocationRequest =
-                    new InvocationRequestEncoder(keygen2State,
-                                                 keygen2EnrollmentUrl,
-                                                 null);
-                invocationRequest.setAbortUrl(keygen2EnrollmentUrl +
-                                                  "?" +
-                                                  KeyProviderInitServlet.ABORT_TAG +
-                                                  "=true");
+                InvocationRequestEncoder invocationRequest = new InvocationRequestEncoder(keygen2State);
                 keygen2State.addImageAttributesQuery(KeyGen2URIs.LOGOTYPES.LIST);
                 keygen2JSONBody(response, invocationRequest);
                 return;
@@ -237,7 +215,6 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                   // Now we really start doing something
                   ProvisioningInitializationRequestEncoder provisioningInitRequest =
                       new ProvisioningInitializationRequestEncoder(keygen2State,
-                                                                   keygen2EnrollmentUrl,
                                                                    1000,
                                                                    (short)50);
                   provisioningInitRequest.setKeyManagementKey(
@@ -251,7 +228,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
                   log.info("Device Certificate=" + certificateData(keygen2State.getDeviceCertificate()));
                   CredentialDiscoveryRequestEncoder credentialDiscoveryRequest =
-                      new CredentialDiscoveryRequestEncoder(keygen2State, keygen2EnrollmentUrl);
+                      new CredentialDiscoveryRequestEncoder(keygen2State);
                   credentialDiscoveryRequest.addLookupDescriptor(
                       KeyProviderService.keyManagementKey.getPublicKey());
                   keygen2JSONBody(response, credentialDiscoveryRequest);
@@ -276,9 +253,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 case KEY_CREATION:
                   KeyCreationResponseDecoder keyCreationResponse = (KeyCreationResponseDecoder) jsonObject;
                   keygen2State.update(keyCreationResponse);
-                  keygen2JSONBody(response,
-                                  new ProvisioningFinalizationRequestEncoder(keygen2State,
-                                                                             keygen2EnrollmentUrl));
+                  keygen2JSONBody(response, new ProvisioningFinalizationRequestEncoder(keygen2State));
                   return;
 
                 case PROVISIONING_FINALIZATION:
@@ -322,10 +297,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     public void doGet(HttpServletRequest request, HttpServletResponse response)
            throws IOException, ServletException {
         if (request.getParameter(KeyProviderInitServlet.INIT_TAG) != null) {
-            executeRequest(request,
-                           response,
-                           request.getParameter(KeyProviderInitServlet.ANDROID_WEBPKI_VERSION_TAG),
-                           true);
+            executeRequest(request, response, true);
             return;
         }
         StringBuilder html = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
@@ -345,7 +317,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 html.append("<b>You need to restart the session</b>");
             } else {
                 session.invalidate();
-                html.append(KeyProviderInitServlet.successImageAndMessage);
+                html.append(KeyProviderInitServlet.successMessage);
             }
         }
         KeyProviderInitServlet.output(response, 
