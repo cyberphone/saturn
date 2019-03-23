@@ -74,17 +74,16 @@ import javax.swing.plaf.metal.MetalButtonUI;
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.AsymKeySignerInterface;
+import org.webpki.crypto.CryptoRandom;
 
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
-import org.webpki.json.JSONSignatureDecoder;
-
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
-import org.webpki.json.encryption.KeyEncryptionAlgorithms;
-import org.webpki.json.encryption.EncryptionCore;
+import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
@@ -93,8 +92,7 @@ import org.webpki.sks.Extension;
 import org.webpki.sks.KeyProtectionInfo;
 import org.webpki.sks.SKSException;
 import org.webpki.sks.SecureKeyStore;
-
-import org.webpki.sks.test.SKSReferenceImplementation;
+import org.webpki.sks.SKSReferenceImplementation;
 
 import org.webpki.util.ArrayUtil;
 
@@ -1021,7 +1019,7 @@ public class Wallet {
                                     cardProperties.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON),
                                     paymentRequest);
                     JSONObjectReader encryptionParameters = cardProperties.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
-                    card.optionalKeyId = encryptionParameters.getStringConditional(JSONSignatureDecoder.KEY_ID_JSON);
+                    card.optionalKeyId = encryptionParameters.getStringConditional(JSONCryptoHelper.KEY_ID_JSON);
                     card.keyEncryptionAlgorithm = KeyEncryptionAlgorithms
                              .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
                     card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
@@ -1051,7 +1049,7 @@ public class Wallet {
                 try {
                     // User authorizations are always signed by a key that only needs to be
                     // understood by the issuing Payment Provider (bank).
-                    dataEncryptionKey = EncryptionCore.generateRandom(selectedCard.dataEncryptionAlgorithm.getKeyLength());
+                    dataEncryptionKey = CryptoRandom.generateRandom(selectedCard.dataEncryptionAlgorithm.getKeyLength());
                     JSONObjectWriter authorizationData = AuthorizationData.encode(
                         selectedCard.paymentRequest,
                         domainName,

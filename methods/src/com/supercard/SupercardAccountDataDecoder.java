@@ -25,6 +25,8 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.AuthorizationResponse;
 
+import org.webpki.util.ISODateTime;
+
 public final class SupercardAccountDataDecoder extends AuthorizationResponse.AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
@@ -53,7 +55,7 @@ public final class SupercardAccountDataDecoder extends AuthorizationResponse.Acc
     protected void readJSONData(JSONObjectReader rd) throws IOException {
         cardNumber = rd.getString(SupercardAccountDataEncoder.CARD_NUMBER_JSON);
         cardHolder = rd.getString(SupercardAccountDataEncoder.CARD_HOLDER_JSON);
-        expirationDate = rd.getDateTime(BaseProperties.EXPIRES_JSON);
+        expirationDate = rd.getDateTime(BaseProperties.EXPIRES_JSON, ISODateTime.COMPLETE);
         securityCode = rd.getString(SupercardAccountDataEncoder.SECURITY_CODE_JSON);
     }
 

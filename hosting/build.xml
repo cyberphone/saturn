@@ -82,15 +82,15 @@
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
-      <lib dir="${zip.common.lib.dir}">
-         <include name="${webpki-libext.jar}"/>
-      </lib>
-       <lib dir="${zip.common.lib.dir}">
-         <include name="${bcprovider.jar}"/>
-       </lib>
-      <lib dir="${zip.common.lib.dir}">
-         <include name="${webpki-webutil.jar}"/>
-      </lib>
+	    <lib dir="${webpki.lib.dir}">
+	       <include name="${webpki-libext.jar}"/>
+	    </lib>
+	     <lib dir="${bcprovider.lib.dir}">
+	       <include name="${bcprovider.jar}"/>
+	     </lib>
+	    <lib dir="${webpki.lib.dir}">
+	       <include name="${webpki-webutil.jar}"/>
+	    </lib>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
          <include name="${hostingattestationkey}.p12"/>
       </zipfileset>
@@ -109,12 +109,15 @@
        <isset property="err.payment.root"/>
      </condition>
      <path id="tomcat.compile.classpath">
-       <fileset dir="${common.lib.dir}">
-         <include name="*.jar"/>
-       </fileset>
-       <fileset dir="${reference.lib.dir}">
-         <include name="*.jar"/>
-       </fileset>
+        <fileset dir="${reference.lib.dir}">
+          <include name="*.jar"/>
+        </fileset>
+         <fileset dir="${webpki.lib.dir}">
+           <include name="*.jar"/>
+         </fileset>
+         <fileset dir="${bcprovider.lib.dir}">
+           <include name="${bcprovider.jar}"/>
+         </fileset>
      </path>
      <antcall target="_build">
        <param name="javaversion" value="1.8"/>

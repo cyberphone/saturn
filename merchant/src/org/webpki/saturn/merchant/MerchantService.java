@@ -42,6 +42,7 @@ import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
@@ -307,7 +308,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
             payeeAcquirerAuthorityUrl = getPropertyString(PAYEE_ACQUIRER_AUTHORITY_URL);
-
+/*
             new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
 
             new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));
@@ -316,11 +317,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             
             encryptedMessageSample = new EncryptedMessage(JSONParser.parse(
                 providerUserResponseSample.getObject(BaseProperties.ENCRYPTED_MESSAGE_JSON)
-                    .getEncryptionObject()
+                    .getEncryptionObject(new JSONCryptoHelper.Options())
                         .getDecryptedData(
                     userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
                         .getBinary(BaseProperties.KEY_JSON))));
-
+*/
             walletSupercardAuthz = getImageDataURI(SUPERCARD_AUTHZ_SAMPLE);
 
             walletBankdirectAuthz = getImageDataURI(BANKDIRECT_AUTHZ_SAMPLE);

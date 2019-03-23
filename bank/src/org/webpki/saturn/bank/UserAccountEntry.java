@@ -24,10 +24,10 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONSignatureDecoder;
+import org.webpki.json.JSONCryptoHelper;
 
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
-import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.saturn.common.BaseProperties;
 
@@ -54,8 +54,8 @@ public class UserAccountEntry implements BaseProperties {
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         publicKey = rd.getPublicKey();
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        if (encryptionParameters.hasProperty(JSONSignatureDecoder.KEY_ID_JSON)) {
-            optionalKeyId = encryptionParameters.getString(JSONSignatureDecoder.KEY_ID_JSON);
+        if (encryptionParameters.hasProperty(JSONCryptoHelper.KEY_ID_JSON)) {
+            optionalKeyId = encryptionParameters.getString(JSONCryptoHelper.KEY_ID_JSON);
         }
         encryptionKey = encryptionParameters.getPublicKey();
         dataEncryptionAlgorithm = DataEncryptionAlgorithms

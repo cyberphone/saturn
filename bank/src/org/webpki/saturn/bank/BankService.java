@@ -52,10 +52,10 @@ import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
+import org.webpki.json.JSONDecryptionDecoder;
 
-import org.webpki.json.encryption.DataEncryptionAlgorithms;
-import org.webpki.json.encryption.DecryptionKeyHolder;
-import org.webpki.json.encryption.KeyEncryptionAlgorithms;
+import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
@@ -107,7 +107,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
-    static Vector<DecryptionKeyHolder> decryptionKeys = new Vector<DecryptionKeyHolder>();
+    static Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys =
+            new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
     
     static SortedMap<String,UserAccountEntry> userAccountDb = new TreeMap<String,UserAccountEntry>();
     
@@ -164,11 +165,12 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     void addDecryptionKey(String name) throws IOException {
         KeyStoreEnumerator keyStoreEnumerator = new KeyStoreEnumerator(getResource(name),
                                                                        getPropertyString(KEYSTORE_PASSWORD));
-        decryptionKeys.add(new DecryptionKeyHolder(keyStoreEnumerator.getPublicKey(),
-                                                   keyStoreEnumerator.getPrivateKey(),
-                                                   keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey ?
-                                                            KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID,
-                                                   null));
+        decryptionKeys.add(new JSONDecryptionDecoder.DecryptionKeyHolder(
+                                       keyStoreEnumerator.getPublicKey(),
+                                       keyStoreEnumerator.getPrivateKey(),
+                                       keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey ?
+                     KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID,
+                                       null));
     }
 
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {

@@ -25,6 +25,8 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.AuthorizationResponse;
 
+import org.webpki.util.ISODateTime;
+
 public final class SupercardAccountDataEncoder extends AuthorizationResponse.AccountDataEncoder {
 
     static final String ACCOUNT_DATA       = "https://supercard.com/saturn/v3#ad";
@@ -52,7 +54,7 @@ public final class SupercardAccountDataEncoder extends AuthorizationResponse.Acc
     protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
         return wr.setString(CARD_NUMBER_JSON, cardNumber)
                  .setString(CARD_HOLDER_JSON, cardHolder)
-                 .setDateTime(BaseProperties.EXPIRES_JSON, expirationDate, true)
+                 .setDateTime(BaseProperties.EXPIRES_JSON, expirationDate, ISODateTime.UTC_NO_SUBSECONDS)
                  .setString(SECURITY_CODE_JSON, securityCode);
     }
 

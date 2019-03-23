@@ -218,10 +218,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Pure sample data...
         // Separate credit-card and account2account payments
         AuthorizationResponse.AccountDataEncoder accountData = cardPayment ?
-            new com.supercard.SupercardAccountDataEncoder(authorizationData.getAccountId(), 
-                                                          "Luke Skywalker",
-                                                          ISODateTime.parseDateTime("2022-12-31T00:00:00Z"),
-                                                          "943")
+            new com.supercard.SupercardAccountDataEncoder(
+                    authorizationData.getAccountId(), 
+                    "Luke Skywalker",
+                    ISODateTime.parseDateTime("2022-12-31T00:00:00Z", ISODateTime.COMPLETE),
+                    "943")
                                                      :
             new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606");
 

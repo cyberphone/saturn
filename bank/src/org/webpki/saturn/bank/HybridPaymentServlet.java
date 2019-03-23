@@ -22,7 +22,7 @@ import java.util.Arrays;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONSignatureDecoder;
+import org.webpki.json.JSONCryptoHelper;
 
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -50,7 +50,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         AuthorizationResponse authorizationResponse = transactionRequest.getAuthorizationResponse();
         if (!Arrays.equals(BankService.bankCertificatePath,
                            authorizationResponse.getSignatureDecoder().getCertificatePath())) {
-            throw new IOException("\"" + JSONSignatureDecoder.CERTIFICATE_PATH_JSON + "\" mismatch");
+            throw new IOException("\"" + JSONCryptoHelper.CERTIFICATE_PATH_JSON + "\" mismatch");
         }
 
         // Although we have already verified the Payee (merchant) during the authorization phase

@@ -255,8 +255,14 @@
           dir="${key.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
+            <fileset dir="${reference.lib.dir}">
+              <include name="*.jar"/>
+            </fileset>
+             <fileset dir="${webpki.lib.dir}">
+               <include name="*.jar"/>
+             </fileset>
+             <fileset dir="${bcprovider.lib.dir}">
+               <include name="${bcprovider.jar}"/>
              </fileset>
              <pathelement location="${temp.dir}"/>
         </classpath>

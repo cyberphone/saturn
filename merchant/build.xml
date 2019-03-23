@@ -112,15 +112,15 @@
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
-      <lib dir="${zip.common.lib.dir}">
-         <include name="${webpki-libext.jar}"/>
-      </lib>
-       <lib dir="${zip.common.lib.dir}">
-         <include name="${bcprovider.jar}"/>
-       </lib>
-      <lib dir="${zip.common.lib.dir}">
-         <include name="${webpki-webutil.jar}"/>
-      </lib>
+	    <lib dir="${webpki.lib.dir}">
+	       <include name="${webpki-libext.jar}"/>
+	    </lib>
+	     <lib dir="${bcprovider.lib.dir}">
+	       <include name="${bcprovider.jar}"/>
+	     </lib>
+	    <lib dir="${webpki.lib.dir}">
+	       <include name="${webpki-webutil.jar}"/>
+	    </lib>
       <lib dir="${zip.extra.lib.dir}">
          <include name="proxy-support.jar"/>
       </lib>
@@ -155,15 +155,21 @@
        <isset property="other.network"/>
      </condition>
      <path id="tomcat.compile.classpath">
-       <fileset dir="${common.lib.dir}">
-         <include name="*.jar"/>
-       </fileset>
-       <fileset dir="${reference.lib.dir}">
-         <include name="*.jar"/>
-       </fileset>
-       <fileset dir="lib">
-         <include name="*.jar"/>
-       </fileset>
+        <fileset dir="${reference.lib.dir}">
+          <include name="*.jar"/>
+        </fileset>
+         <fileset dir="${webpki.lib.dir}">
+           <include name="*.jar"/>
+         </fileset>
+         <fileset dir="${bcprovider.lib.dir}">
+           <include name="${bcprovider.jar}"/>
+         </fileset>
+         <fileset dir="lib">
+           <include name="*.jar"/>
+         </fileset>
+        <fileset dir="../resources/common.lib">
+          <include name="proxy*.jar"/>
+        </fileset>
      </path>
      <antcall target="_build">
        <param name="javaversion" value="1.8"/>

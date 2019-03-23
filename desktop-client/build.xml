@@ -19,7 +19,7 @@
   <fail message="&quot;common.app.dir&quot; does not point to a valid installation directory!" unless="install.dir.found"/>
 
   <path id="compile.classpath">
-     <fileset dir="${common.lib.dir}">
+     <fileset dir="../../web2native-bridge/proxy/install/libs">
        <include name="*.jar"/>
     </fileset>
   </path>

@@ -321,7 +321,12 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             }
         }
         KeyProviderInitServlet.output(response, 
-                                      KeyProviderInitServlet.getHTML(null,
+                                      KeyProviderInitServlet.getHTML(
+                                              "history.pushState(null, null, 'init');\n" +
+                                                      "window.addEventListener('popstate', function(event) {\n" +
+                                                      "    history.pushState(null, null, 'init');\n" +
+                                                      "});\n"
+,
                                                                      null,
                                                                      html.append("</td></tr>").toString()));
     }
