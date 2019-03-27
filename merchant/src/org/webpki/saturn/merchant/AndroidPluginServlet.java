@@ -42,15 +42,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     static final String QR_SUCCESS_URL                = "local";
     
     void doPlugin (String httpSessionId, String qrSessionId, HttpServletResponse response) throws IOException, ServletException {
-/*
- * 
- *         String urlEncoded = URLEncoder.encode(keygen2EnrollmentUrl, "utf-8");
-        String extra = "?cookie=JSESSIONID%3D" + session.getId() +
-                       "&url=" + urlEncoded +
-                       "&ver=" + KeyProviderService.grantedVersions +
-                       "&init=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
-                       "&cncl=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue";
- */
+
         String encodedUrl = URLEncoder.encode(HomeServlet.merchantBaseUrl, "utf-8");
         String cancelUrl = encodedUrl + "%2Fandroidplugin%3F" + ANDROID_CANCEL + "%3D";
         if (qrSessionId != null) {
@@ -115,7 +107,6 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             }
             // Here we assume that we are being called from the Android client trying
             // to retrieve the payment request
-//            boolean qrMode = request.getParameter(QR_RETRIEVE) != null;
             logger.info(request.getRequestURL().toString());
             HttpSession session = request.getSession(false);
             if (session == null) {
@@ -127,40 +118,9 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             if (session.getAttribute(RESULT_DATA_SESSION_ATTR) != null) {
                 ErrorServlet.systemFail(response, "Session already used");
             }
-//TODO
-/*
-            String versionMacro = request.getParameter(ANDROID_WEBPKI_VERSION_TAG);
-            boolean found = false;;
-            for (String version : MerchantService.grantedVersions) {
-                if (version.equals(versionMacro)) {
-                    found = true;
-                    break;
-                  }
-            }
-            if (!found) {
-                ErrorServlet.systemFail(response, "Wrong version of the WebPKI app, you need to update");
-                return;
-            }
-            String cancelUrl = getPluginUrl() + "?" + ANDROID_CANCEL + "=";
-            if (qrMode) {
-                cancelUrl = "get:" + cancelUrl + (String) session.getAttribute(QR_SESSION_ID_ATTR);
-            }
-*/
-/*
-            String successUrl = qrMode ? QR_SUCCESS_URL
-                                       :
-                   HomeServlet.merchantBaseUrl + "/result";
-*/
+
             String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
-//TODO
-/*
-            HttpSupport.writeJsonData(response, 
-                                      new WalletRequest(session,
-                                                        nonDirectPayment == null ? null : NonDirectPayments.fromType(nonDirectPayment),
-                                                            HomeServlet.merchantBaseUrl,
-                                                        cancelUrl,
-                                                        successUrl).requestObject);
-*/
+
             HttpSupport.writeJsonData(response, 
                     new WalletRequest(session,
                                       nonDirectPayment == null ?

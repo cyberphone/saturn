@@ -379,7 +379,6 @@ public class HTML implements MerchantProperties {
             .append(walletRequest)
             .append(";\n\n" +
 
-                    "var failureFlag = true; // Race condition between W2NB and location.href\n" +
                     "var nativePort = null;\n\n" +
 
                     "function closeWallet() {\n" +
@@ -454,19 +453,18 @@ public class HTML implements MerchantProperties {
                     "           },\n" +
                     "           method: 'POST',\n" +
                     "           credentials: 'same-origin',\n" +
+                    "           redirect: 'manual',\n" +
                     "           body: JSON.stringify(message)\n" +
                     "        }).then(function (response) {\n" +
+                    "          if (response.type == 'opaqueredirect') {\n" +
+                    "// \"Normal\" return\n" +
+                    "            document.location.href='result';\n" +
+                    "          }\n" +
                     "          return response.json();\n" +
                     "        }).then(function (resultData) {\n" +
                     "          if (typeof resultData == 'object' && !Array.isArray(resultData)) {\n" +
-                    "            if (resultData['@qualifier'] == '" + Messages.PAYMENT_CLIENT_SUCCESS.toString() + "') {\n" +
-                    "// \"Normal\" return\n" +
-                    "              failureFlag = false;\n" +
-                    "              document.location.href='result';\n" +
-                    "            } else {\n" +
                     "// \"Exceptional\" return with error or RBA\n" +
-                    "              nativePort.postMessage(resultData);\n" +
-                    "            }\n" +
+                    "            nativePort.postMessage(resultData);\n" +
                     "          } else {\n" +
                     "            setFail('Unexpected wallet return data');\n" +
                     "          }\n" +
@@ -493,7 +491,7 @@ public class HTML implements MerchantProperties {
                                      MerchantService.w2nbWalletName + ".jar\" appears to be missing!');\n" +
                     "      nativePort = null;\n" +
                     "// User cancel\n" +
-                    "      if (failureFlag) document.forms.restore.submit();\n" +
+                    "      document.forms.restore.submit();\n" +
                     "    });\n");
        }
        temp_string.append(

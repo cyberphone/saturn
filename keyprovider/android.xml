@@ -21,6 +21,7 @@
             <include name="**/AuthorizationData.java"/>
             <include name="**/BaseProperties.java"/>
             <include name="**/Currencies.java"/>
+            <include name="**/Messages.java"/>
             <include name="**/EncryptedMessage.java"/>
             <include name="**/Payee.java"/>
             <include name="**/PayerAuthorizationEncoder.java"/>

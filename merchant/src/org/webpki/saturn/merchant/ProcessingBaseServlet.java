@@ -43,7 +43,6 @@ import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.PayerAuthorization;
@@ -140,13 +139,15 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                             urlHolder)) {
            
                 // This may be a QR session
-                QRSessions.optionalSessionSetReady((String) session.getAttribute(QR_SESSION_ID_ATTR));
+                String qrId = (String) session.getAttribute(QR_SESSION_ID_ATTR);
+                QRSessions.optionalSessionSetReady(qrId);
     
                 logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
                 /////////////////////////////////////////////////////////////////////////////////////////
                 // Normal return                                                                       //
                 /////////////////////////////////////////////////////////////////////////////////////////
-                HttpSupport.writeJsonData(response, Messages.PAYMENT_CLIENT_SUCCESS.createBaseMessage());
+                response.sendRedirect(qrId == null ? 
+                        HomeServlet.merchantBaseUrl + "/result" : SATURN_LOCAL_SUCCESS_URI);
             }
 
         } catch (Exception e) {

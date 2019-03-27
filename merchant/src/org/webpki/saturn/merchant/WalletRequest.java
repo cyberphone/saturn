@@ -79,15 +79,6 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                 .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         }
         
-        // Android and QR wallets need special arrangements...
-//TODO
-/*
-        if (androidCancelUrl != null) {
-            requestObject.setString(ANDROID_CANCEL_URL_JSON, androidCancelUrl)
-                         .setString(ANDROID_SUCCESS_URL_JSON, androidSuccessUrl)
-                         .setString(ANDROID_TRANSACTION_URL_JSON, androidTransactionUrl + "/authorize");
-        }
-*/
         if (debugMode) {
             debugData.InvokeWallet = ProcessingBaseServlet.makeReader(requestObject);
         }
@@ -95,10 +86,4 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         // Must keep
         session.setAttribute(WALLET_REQUEST_SESSION_ATTR, requests);
     }
-
-/*
-    WalletRequest(HttpSession session, NonDirectPayments optionalNonDirectPayment) throws IOException {
-        this(session, optionalNonDirectPayment, null, null, null);
-    }
-*/
 }
