@@ -178,7 +178,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     private static int referenceId = 1000000;
 
-    static String[] grantedVersions;
+    static String grantedVersions;
 
     static boolean localInstallation;
 
@@ -308,7 +308,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
             payeeAcquirerAuthorityUrl = getPropertyString(PAYEE_ACQUIRER_AUTHORITY_URL);
-/*
+
             new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
 
             new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));
@@ -321,7 +321,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                         .getDecryptedData(
                     userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
                         .getBinary(BaseProperties.KEY_JSON))));
-*/
+
             walletSupercardAuthz = getImageDataURI(SUPERCARD_AUTHZ_SAMPLE);
 
             walletBankdirectAuthz = getImageDataURI(BANKDIRECT_AUTHZ_SAMPLE);
@@ -342,7 +342,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check
             ////////////////////////////////////////////////////////////////////////////////////////////
-            grantedVersions = getPropertyStringList(VERSION_CHECK);
+            grantedVersions = getPropertyString(VERSION_CHECK);
 
             logger.info("Saturn Merchant-server initiated");
         } catch (Exception e) {

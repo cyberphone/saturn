@@ -23,12 +23,7 @@ public interface BaseProperties {
     String HEIGHT_JSON                      = "height";
     String WIDTH_JSON                       = "width";
 
-    // For the Android/QR wallet
-    String ANDROID_CANCEL_URL_JSON          = "androidCancelUrl";
-    String ANDROID_SUCCESS_URL_JSON         = "androidSuccessUrl";
-    String ANDROID_TRANSACTION_URL_JSON     = "androidTransactionUrl";
-
-    String ATTESTATION_JSON                 = "attestation";
+    String ATTESTATION_JSON                 = "attestation";                // Used for Authority Object signatures
 
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
     String NAME_JSON                        = "name";

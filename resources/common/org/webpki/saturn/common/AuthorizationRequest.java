@@ -51,7 +51,7 @@ public class AuthorizationRequest implements BaseProperties {
         public byte[] getAccountHash() throws IOException {
             JSONObjectReader account = getAccountObject();
             return account == null ? null :
-                HashAlgorithms.SHA256.digest(account.serializeToBytes(JSONOutputFormats.NORMALIZED));
+                HashAlgorithms.SHA256.digest(account.serializeToBytes(JSONOutputFormats.CANONICALIZED));
         }
 
         protected JSONObjectReader getAccountObject() throws IOException {

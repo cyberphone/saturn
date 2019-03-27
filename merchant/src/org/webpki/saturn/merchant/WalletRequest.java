@@ -43,10 +43,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
     JSONObjectWriter requestObject;
     
     WalletRequest(HttpSession session,
-                  NonDirectPayments optionalNonDirectPayment,
-                  String androidTransactionUrl,
-                  String androidCancelUrl,
-                  String androidSuccessUrl) throws IOException {
+                  NonDirectPayments optionalNonDirectPayment) throws IOException {
         debugMode = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
         DebugData debugData = null;
         if (debugMode) {
@@ -83,12 +80,14 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         }
         
         // Android and QR wallets need special arrangements...
+//TODO
+/*
         if (androidCancelUrl != null) {
             requestObject.setString(ANDROID_CANCEL_URL_JSON, androidCancelUrl)
                          .setString(ANDROID_SUCCESS_URL_JSON, androidSuccessUrl)
                          .setString(ANDROID_TRANSACTION_URL_JSON, androidTransactionUrl + "/authorize");
         }
-
+*/
         if (debugMode) {
             debugData.InvokeWallet = ProcessingBaseServlet.makeReader(requestObject);
         }
@@ -97,7 +96,9 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         session.setAttribute(WALLET_REQUEST_SESSION_ATTR, requests);
     }
 
+/*
     WalletRequest(HttpSession session, NonDirectPayments optionalNonDirectPayment) throws IOException {
         this(session, optionalNonDirectPayment, null, null, null);
     }
+*/
 }
