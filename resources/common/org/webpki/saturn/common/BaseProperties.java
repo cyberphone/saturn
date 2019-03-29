@@ -85,10 +85,10 @@ public interface BaseProperties {
     String TYPE_JSON                        = "type";
     String VERSION_JSON                     = "version";
 
-    String SATURN_WEB_PAY_CONTEXT_URI       = "https://saturn-pay.github.io/v3";
+    String SATURN_WEB_PAY_CONTEXT_URI       = "https://webpki.github.io/saturn/v3";
 
                                                                             // Optional for QR schemes terminating locally
-    String SATURN_LOCAL_SUCCESS_URI         = "https://saturn-pay.github.io/v3/uris#local-success"; 
+    String SATURN_LOCAL_SUCCESS_URI         = "https://webpki.github.io/saturn/v3/uris#local-success"; 
 
     String JSON_CONTENT_TYPE                = "application/json";
 }
