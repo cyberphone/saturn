@@ -35,9 +35,9 @@ import javax.servlet.ServletContextListener;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
+import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.JSONDecoderCache;
-
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
@@ -87,7 +87,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static JSONDecoderCache keygen2JSONCache;
     
-    static X509Certificate tlsCertificate;
+    static byte[] serverCertificateFingerprint;
 
     static String grantedVersions;
     
@@ -214,20 +214,21 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // Android WebPKI version check (vlow-vhigh)
             ////////////////////////////////////////////////////////////////////////////////////////////
             grantedVersions = getPropertyString(VERSION_CHECK);
- 
+
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Get TLS server certificate
             ////////////////////////////////////////////////////////////////////////////////////////////
-            tlsCertificate = CertificateUtil
+            X509Certificate serverCertificate = CertificateUtil
                     .getCertificateFromBlob(ArrayUtil
                             .getByteArrayFromInputStream(getResource(getPropertyString(TLS_CERTIFICATE))));
+            serverCertificateFingerprint = HashAlgorithms.SHA256.digest(serverCertificate.getEncoded());
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Are we logging?
             ////////////////////////////////////////////////////////////////////////////////////////////
             logging = getPropertyBoolean(LOGGING);
             
-            logger.info("Saturn KeyProvider-server initiated: " + tlsCertificate.getSubjectX500Principal().getName());
+            logger.info("Saturn KeyProvider-server initiated: " + serverCertificate.getSubjectX500Principal().getName());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }

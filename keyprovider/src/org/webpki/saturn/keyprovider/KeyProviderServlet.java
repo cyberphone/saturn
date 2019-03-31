@@ -224,7 +224,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
                 case PROVISIONING_INITIALIZATION:
                   ProvisioningInitializationResponseDecoder provisioningInitResponse = (ProvisioningInitializationResponseDecoder) jsonObject;
-                  keygen2State.update(provisioningInitResponse, KeyProviderService.tlsCertificate);
+                  keygen2State.update(provisioningInitResponse);
 
                   log.info("Device Certificate=" + certificateData(keygen2State.getDeviceCertificate()));
                   CredentialDiscoveryRequestEncoder credentialDiscoveryRequest =
