@@ -47,7 +47,7 @@
     <property name="hosting.provider.path" value="webpay-payeebank"/>
     <property name="hosting.host" value="https://localhost:8442"/>
     <property name="hosting.provider.host" value="https://localhost:8442"/>
-    <property name="merchants.db" value="merchants.${payeebankpath}.json"/>
+    <property name="merchants.db" value="merchants.${@payeebankpath}.json"/>
     <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
@@ -63,15 +63,15 @@
        includes="**/*.java"/>
     <copy file="web.xml" todir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
+           source="${@javaversion}"
+           target="${@javaversion}"
            srcdir="${src.dir}:${compile.common.src.dir}"
            destdir="${temp.dir}"
            classpath="${compile.classpath}"
            includeAntRuntime="false"/>
     <replace file="${temp.dir}/web.xml">
-      <replacefilter token="@key-password@" value="${keypassword}"/>
-      <replacefilter token="@hosting-key@" value="${hostingattestationkey}.p12"/>
+      <replacefilter token="@key-password@" value="${@keypassword}"/>
+      <replacefilter token="@hosting-key@" value="${@hostingattestationkey}.p12"/>
       <replacefilter token="@hosting-base-url@" value="${hosting.host}/${hosting.path}"/>
       <replacefilter token="@provider-base-url@" value="${hosting.provider.host}/${hosting.provider.path}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
@@ -82,17 +82,17 @@
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
-	    <lib dir="${webpki.lib.dir}">
-	       <include name="${webpki-libext.jar}"/>
-	    </lib>
-	     <lib dir="${bcprovider.lib.dir}">
-	       <include name="${bcprovider.jar}"/>
-	     </lib>
-	    <lib dir="${webpki.lib.dir}">
-	       <include name="${webpki-webutil.jar}"/>
-	    </lib>
+        <lib dir="${webpki.lib.dir}">
+           <include name="${webpki-libext.jar}"/>
+        </lib>
+         <lib dir="${bcprovider.lib.dir}">
+           <include name="${bcprovider.jar}"/>
+         </lib>
+        <lib dir="${webpki.lib.dir}">
+           <include name="${webpki-webutil.jar}"/>
+        </lib>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
-         <include name="${hostingattestationkey}.p12"/>
+         <include name="${@hostingattestationkey}.p12"/>
       </zipfileset>
       <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
          <include name="${merchants.db}"/>
@@ -105,7 +105,7 @@
      <property file="../resources/common.properties"/>
      <property name="temp.dir" value=".tmp"/>
      <delete dir="${temp.dir}"/>
-     <condition property="payment_root" value="${merchantroot}" else="${paymentroot}">
+     <condition property="payment_root" value="${merchantroot}" else="${@paymentnetworkroot}">
        <isset property="err.payment.root"/>
      </condition>
      <path id="tomcat.compile.classpath">
@@ -122,15 +122,15 @@
      <antcall target="_build">
        <param name="javaversion" value="1.8"/>
 
-       <param name="compile.common.src.dir" value="${common.src.dir}"/>
+       <param name="compile.common.src.dir" value="${@common.src.dir}"/>
        
        <param name="compile.classpath" refid="tomcat.compile.classpath"/>
        
        <param name="zip.common.lib.dir" value="${common.lib.dir}"/>
        
-       <param name="zip.key.dir" value="${key.dir}"/>
+       <param name="zip.key.dir" value="${@key.dir}"/>
        
-       <param name="zip.credentials.dir" value="${credentials.dir}"/>
+       <param name="zip.credentials.dir" value="${@credentials.dir}"/>
      </antcall>
      <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
   </target>
@@ -162,7 +162,7 @@
        
        <param name="zip.key.dir" value="keys"/>
 
-       <param name="payment.var.root" value="${paymentroot}"/>
+       <param name="payment.var.root" value="${@paymentnetworkroot}"/>
 
        <param name="zip.credentials.dir" value="credentials"/>
        
@@ -202,9 +202,9 @@
         <exclude name="**/bin/**"/>
         <exclude name="dist/**"/>
       </zipfileset>
-      <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
-      <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>
-      <zipfileset dir="${credentials.dir}" prefix="${appcorename}/credentials">
+      <zipfileset dir="${@common.src.dir}" prefix="${appcorename}/common.src"/>
+      <zipfileset dir="${@key.dir}" prefix="${appcorename}/keys"/>
+      <zipfileset dir="${@credentials.dir}" prefix="${appcorename}/credentials">
         <include name="*.json"/>
       </zipfileset>
       <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>

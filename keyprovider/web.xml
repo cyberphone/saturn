@@ -5,12 +5,6 @@
     version="2.4">
 
     <context-param>
-        <description>WebPKI.org Logotype</description>
-        <param-name>webpki_logotype</param-name>
-        <param-value>@webpki-logotype@</param-value>
-    </context-param>
-
-    <context-param>
         <description>Saturn Logotype</description>
         <param-name>saturn_logotype</param-name>
         <param-value>@saturn-logotype@</param-value>
@@ -29,21 +23,15 @@
     </context-param>
  
     <context-param>
-        <description>Bank Host</description>
-        <param-name>bank_host</param-name>
-        <param-value>@bank-host@</param-value>
+        <description>Payer Bank Host</description>
+        <param-name>payer_bank_host</param-name>
+        <param-value>@payer-bank-host@</param-value>
     </context-param>
 
     <context-param>
         <description>Key Provider Base URL</description>
         <param-name>keyprov_base_url</param-name>
         <param-value>@keyprov-base-url@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Server Port Mapping (may be undefined)</description>
-        <param-name>server_port_map</param-name>
-        <param-value>@server-port-map@</param-value>
     </context-param>
 
     <context-param>

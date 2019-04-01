@@ -48,9 +48,9 @@
        eof="remove"
        includes="**/*.java"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
-           srcdir="${src.dir}:${common.src.dir}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
@@ -62,8 +62,8 @@
         <exclude name="**/DecryptionKeyHolder.class"/>
       </fileset>
       <zipfileset dir="${image.dir}" prefix="${client.package.dir}"/>
-      <zipfileset dir="${credentials.dir}" prefix="${client.package.dir}">
-        <include name="${credentials_store}"/>
+      <zipfileset dir="${@credentials.dir}" prefix="${client.package.dir}">
+        <include name="${@credentials_store}"/>
       </zipfileset>
       <manifest>
         <attribute name="Main-Class" value="${java.dotted.path}.Wallet"/>

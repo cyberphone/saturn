@@ -16,24 +16,23 @@
     <isset property="localhost"/>
   </condition>
   
-  <property name="javaversion" value="1.8" />
   <property name="debug" value="on"/>
   
   <property environment="env"/>
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
     
   <path id="compile.classpath">
-     <fileset dir="${common.lib.dir}">
-       <include name="pr*.jar"/>
+    <fileset dir="${@webpki.lib.dir}">
+       <include name="${@webpki-libext.jar}"/>
     </fileset>
-    <fileset dir="${webpki.lib.dir}">
-      <include name="*.jar"/>
-   </fileset>
-    <fileset dir="${bcprovider.lib.dir}">
-      <include name="*.jar"/>
-   </fileset>
-    <fileset dir="${reference.lib.dir}">
-      <include name="*.jar"/>
+    <fileset dir="${@webpki.lib.dir}">
+       <include name="${@webpki-webutil.jar}"/>
+    </fileset>
+    <fileset dir="${@bcprovider.lib.dir}">
+       <include name="${@bcprovider.jar}"/>
+    </fileset>
+    <fileset dir="${@reference.lib.dir}">
+       <include name="*.jar"/>
     </fileset>
   </path>
   
@@ -46,60 +45,78 @@
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
-           srcdir="${src.dir}:${common.src.dir}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
     </javac>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitTestPage"
-          dir="${key.dir}"
+          dir="${@key.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
-             <pathelement location="${temp.dir}"/>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
+          <pathelement location="${temp.dir}"/>
         </classpath>
         <arg value="${testpage}"/>
-        <arg value="${merchantkey}.p12"/>
-        <arg value="${keypassword}"/>
-        <arg value="${merchantcn}"/>
-        <arg value="${merchantid}"/>
-        <arg value="${w2nb.webwallet}"/>
+        <arg value="${@merchantkey}.p12"/>
+        <arg value="${@keypassword}"/>
+        <arg value="${@merchantcn}"/>
+        <arg value="${@merchantid}"/>
+        <arg value="${@w2nb.webwallet}"/>
     </java>
   </target>
 
   <target name="jcspaper">
-    <property name="logotype" location="${logotype.dir}/${webpki-logotype.file}"/>
+    <property name="logotype" location="${@logotype.dir}/${@webpki-logotype.file}"/>
     <delete file="${jcspaper}"/>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
-           srcdir="${src.dir}:${common.src.dir}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
     </javac>
     <java fork="yes"
           classname="org.webpki.saturn.resources.JCSPaper"
-          dir="${key.dir}"
+          dir="${@key.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
-             <pathelement location="${temp.dir}"/>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
+          <pathelement location="${temp.dir}"/>
         </classpath>
         <arg value="${jcspaper}"/>
         <arg value="${logotype}"/>
-        <arg value="${merchantkey}.p12"/>
-        <arg value="${payeebankpath}-eecert.p12"/>
-        <arg value="${keypassword}"/>
+        <arg value="${@merchantkey}.p12"/>
+        <arg value="${@payeebankpath}-eecert.p12"/>
+        <arg value="${@keypassword}"/>
     </java>
   </target>
 
@@ -108,12 +125,12 @@
     <condition property="additional.src.dir" value=":${additional.src}" else="">
       <isset property="additional.src"/>
     </condition>
-  	<delete dir="${temp.dir}"/>
+    <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
-           srcdir="${src.dir}:${common.src.dir}${additional.src.dir}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}${additional.src.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
@@ -129,10 +146,19 @@
           dir="."
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
-             <pathelement location="${temp.dir}"/>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
+          <pathelement location="${temp.dir}"/>
         </classpath>
         <arg line="${svgfile} ${svgclass} ${svgfilters}"/>
     </java>
@@ -247,12 +273,12 @@
   <target name="_import">
     <property name="card.number" value="@"/>
     <property name="sks.encryption" value="@"/>
-    <property name="card.path" location="${cardimage.dir}/${card.image}"/>
-    <property name="sks.path" location="${credentials.dir}/${credentials_store}"/>
-    <property name="db.path" location="${credentials.dir}/users.${bankpath}.json"/>
+    <property name="card.path" location="${@cardimage.dir}/${card.image}"/>
+    <property name="sks.path" location="${@credentials.dir}/${@credentials_store}"/>
+    <property name="db.path" location="${@credentials.dir}/users.${bankpath}.json"/>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitWallet"
-          dir="${key.dir}"
+          dir="${@key.dir}"
           failonerror="true">
         <classpath>
             <fileset dir="${reference.lib.dir}">
@@ -269,7 +295,7 @@
         <arg value="${sks.path}"/>
         <arg value="${db.path}"/>
         <arg value="${sks.certificate}.p12"/>
-        <arg value="${keypassword}"/>
+        <arg value="${@keypassword}"/>
         <arg value="${sks.pin}"/>
         <arg value="${card.type}"/>
         <arg value="${card.number}"/>
@@ -281,52 +307,52 @@
   </target>
 
   <target name="initwallet">
-    <delete file="${credentials.dir}/${credentials_store}"/>
-    <mkdir dir="${credentials.dir}"/>
+    <delete file="${@credentials.dir}/${@credentials_store}"/>
+    <mkdir dir="${@credentials.dir}"/>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
-           srcdir="${src.dir}:${common.src.dir}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
     </javac>
     <antcall target="_import">
-       <param name="sks.certificate" value="${clientkey_super}"/>
+       <param name="sks.certificate" value="${@clientkey_super}"/>
        <param name="sks.pin" value="1234"/>
        <param name="card.type" value="SUPER_CARD"/>
-       <param name="card.number" value="${account_id_super}"/>
+       <param name="card.number" value="${@account_id_super}"/>
        <param name="card.image" value="supercard.png"/>
-       <param name="bankpath" value="${payerbankpath}"/>
-       <param name="sks.encryption" value="${payerbankpath}-enc-key-ec"/>
+       <param name="bankpath" value="${@payerbankpath}"/>
+       <param name="sks.encryption" value="${@payerbankpath}-enc-key-ec"/>
        <param name="dea" value="A128CBC-HS256"/>
     </antcall>
     <antcall target="_import">
-       <param name="sks.certificate" value="${clientkey_bankdir}"/>
+       <param name="sks.certificate" value="${@clientkey_bankdir}"/>
        <param name="sks.pin" value="1234"/>
        <param name="card.type" value="BANK_DIRECT"/>
-       <param name="card.number" value="!${account_id_bankdir}"/>
+       <param name="card.number" value="!${@account_id_bankdir}"/>
        <param name="card.image" value="bankdirect.png"/>
-       <param name="bankpath" value="${payerbankpath}"/>
-       <param name="sks.encryption" value="${payerbankpath}-enc-key-ec"/>
+       <param name="bankpath" value="${@payerbankpath}"/>
+       <param name="sks.encryption" value="${@payerbankpath}-enc-key-ec"/>
        <param name="dea" value="A128CBC-HS256"/>
      </antcall>
      <antcall target="_import">
-       <param name="bankpath" value="${payerbankpath}"/>
-       <param name="sks.certificate" value="${clientkey_other}"/>
+       <param name="bankpath" value="${@payerbankpath}"/>
+       <param name="sks.certificate" value="${@clientkey_other}"/>
        <param name="sks.pin" value="1234"/>
        <param name="card.type" value="@"/>
      </antcall>
      <antcall target="_import">
-       <param name="sks.certificate" value="${clientkey_unusual}"/>
+       <param name="sks.certificate" value="${@clientkey_unusual}"/>
        <param name="sks.pin" value="1234"/>
        <param name="card.type" value="UNUSUAL_CARD"/>
-       <param name="card.number" value="${account_id_unusual}"/>
+       <param name="card.number" value="${@account_id_unusual}"/>
        <param name="card.image" value="unusualcard.png"/>
-       <param name="bankpath" value="${payeebankpath}"/>
-       <param name="sks.encryption" value="${payeebankpath}-enc-key-ec"/>
+       <param name="bankpath" value="${@payeebankpath}"/>
+       <param name="sks.encryption" value="${@payeebankpath}-enc-key-ec"/>
        <param name="dea" value="A128CBC-HS256"/>
      </antcall>
   </target>
@@ -337,9 +363,9 @@
     <delete dir="${nodejscryptotest.dir}"/>
     <mkdir dir="${nodejscryptotest.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
-           srcdir="${src.dir}:${common.src.dir}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
@@ -353,10 +379,19 @@
           classname="org.webpki.saturn.resources.CryptoTesting"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
-             <pathelement location="${temp.dir}"/>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
+          <pathelement location="${temp.dir}"/>
         </classpath>
         <arg value="${nodejscryptotest.dir}/ecdh.js"/>
     </java>
@@ -365,135 +400,144 @@
   <target name="_createcert">
     <java fork="yes"
           classname="org.webpki.ca.CommandLineCA"
-          dir="${key.dir}"
+          dir="${@key.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
         </classpath>
         <arg line="${cmd}"/>
     </java>
   </target>
 
   <target name="_getroot">
-    <exec executable="keytool" failonerror="true" dir="${key.dir}">
-      <arg line="-exportcert -keystore ${rootfile}.p12 -alias mykey -storepass ${keypassword} -storetype PKCS12 -file ${rootfile}.cer"/>
+    <exec executable="keytool" failonerror="true" dir="${@key.dir}">
+      <arg line="-exportcert -keystore ${rootfile}.p12 -alias mykey -storepass ${@keypassword} -storetype PKCS12 -file ${rootfile}.cer"/>
     </exec>
   </target>
   
   <target name="_certpaymentnetwork">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ca -subject &quot;CN=Payment Network Root CA1, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${paymentroot}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 4096 -sigalg RSA_SHA512 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ca -subject &quot;CN=Payment Network Root CA1, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@paymentnetworkroot}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 4096 -sigalg RSA_SHA512 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${paymentroot}"/>
+       <param name="rootfile" value="${@paymentnetworkroot}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${keypassword} -ca/storetype PKCS12 -ca/storepass ${keypassword} -ca/keystore ${paymentroot}.p12 -entity/ca -subject &quot;CN=Payment Network Sub CA3, C=EU&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${paymentsubca}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg RSA_SHA512 -serial 3"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@paymentnetworkroot}.p12 -entity/ca -subject &quot;CN=Payment Network Sub CA3, C=EU&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@paymentsubca}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg RSA_SHA512 -serial 3"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${keypassword} -ca/storetype PKCS12 -ca/storepass ${keypassword} -ca/keystore ${paymentsubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=mybank.com, serialNumber=4501, C=FR&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${payerbankpath}-eecert.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@paymentsubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=mybank.com, serialNumber=4501, C=FR&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payerbankpath}-eecert.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${keypassword} -ca/storetype PKCS12 -ca/storepass ${keypassword} -ca/keystore ${paymentsubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=Big Bank, serialNumber=896640, C=DE&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${payeebankpath}-eecert.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@paymentsubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=Big Bank, serialNumber=896640, C=DE&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payeebankpath}-eecert.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     </target>
 
   <target name="_certacquirernetwork">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ca -subject &quot;CN=Acquirer Network Root CA1, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${acquirerroot}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 4096 -sigalg RSA_SHA512 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ca -subject &quot;CN=Acquirer Network Root CA1, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirerroot}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 4096 -sigalg RSA_SHA512 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${acquirerroot}"/>
+       <param name="rootfile" value="${@acquirerroot}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${keypassword} -ca/storetype PKCS12 -ca/storepass ${keypassword} -ca/keystore ${acquirerroot}.p12 -entity/ca -subject &quot;CN=Acquirer Network Sub CA5, C=US&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${acquirersubca}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg RSA_SHA512 -serial 3"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@acquirerroot}.p12 -entity/ca -subject &quot;CN=Acquirer Network Sub CA5, C=US&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirersubca}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg RSA_SHA512 -serial 3"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${keypassword} -ca/storetype PKCS12 -ca/storepass ${keypassword} -ca/keystore ${acquirersubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=cardprocessor.com, serialNumber=809956, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${acquirersignaturekey}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@acquirersubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=cardprocessor.com, serialNumber=809956, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirersignaturekey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:ec -selfsigned -entity/ee -extension/ku keyAgreement -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${acquirerencryptionkey_ec}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:ec -selfsigned -entity/ee -extension/ku keyAgreement -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirerencryptionkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:rsa -selfsigned -entity/ee -extension/ku keyEncipherment -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${acquirerencryptionkey_rsa}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:rsa -selfsigned -entity/ee -extension/ku keyEncipherment -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirerencryptionkey_rsa}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA256"/>
     </antcall>
   </target>
 
   <target name="_merchantkeys">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${merchantkey}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantkey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${merchantkey}"/>
+       <param name="rootfile" value="${@merchantkey}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Old Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${merchantkey.old}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Old Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantkey.old}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${merchantkey.old}"/>
+       <param name="rootfile" value="${@merchantkey.old}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, O=Other Network, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${othernetworkkey}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, O=Other Network, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@othernetworkkey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${othernetworkkey}"/>
+       <param name="rootfile" value="${@othernetworkkey}"/>
     </antcall>
   </target>
 
   <target name="_clientkeys">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${clientkey_bankdir}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_bankdir}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${clientkey_super}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_super}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${clientkey_unusual}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_unusual}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${clientkey_other}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_other}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
   </target>
 
   <target name="_bankencryption">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${payerbankpath}-enc-key-rsa.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payerbankpath}-enc-key-rsa.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${payerbankpath}-enc-key-rsa"/>
+       <param name="rootfile" value="${@payerbankpath}-enc-key-rsa"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${payerbankpath}-enc-key-ec.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payerbankpath}-enc-key-ec.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${payerbankpath}-enc-key-ec"/>
+       <param name="rootfile" value="${@payerbankpath}-enc-key-ec"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${payeebankpath}-enc-key-rsa.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payeebankpath}-enc-key-rsa.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${payeebankpath}-enc-key-rsa"/>
+       <param name="rootfile" value="${@payeebankpath}-enc-key-rsa"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${payeebankpath}-enc-key-ec.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payeebankpath}-enc-key-ec.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${payeebankpath}-enc-key-ec"/>
+       <param name="rootfile" value="${@payeebankpath}-enc-key-ec"/>
     </antcall>
    </target>
   
   <target name="_kg2kmkey">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Key Management Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${kg2kmkey_ec}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Key Management Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@kg2kmkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
   </target>
 
   <target name="_hostingkey">
-	<antcall target="_createcert">
-	   <param name="cmd" value="-out/keyalias 20170101:hosting.com:ec -selfsigned -entity/ee -subject &quot;CN=Hosting Attestation Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${hostingattestationkey}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
-	</antcall>
+    <antcall target="_createcert">
+       <param name="cmd" value="-out/keyalias 20170101:hosting.com:ec -selfsigned -entity/ee -subject &quot;CN=Hosting Attestation Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@hostingattestationkey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+    </antcall>
   </target>
 
   <target name="srcclean">

@@ -8,14 +8,14 @@
   <property name="debug" value="on"/>
 
     
-	<target name="help">
-	    <echo message="android"/>
-	</target>
-		
-	<target name="android">
-	    <delete dir="${temp.dir}"/>
-	    <delete file="${dist.file}"/>
-	    <mkdir dir="${temp.dir}"/>
+    <target name="help">
+        <echo message="android"/>
+    </target>
+        
+    <target name="android">
+        <delete dir="${temp.dir}"/>
+        <delete file="${dist.file}"/>
+        <mkdir dir="${temp.dir}"/>
         <copy todir="${temp.dir}/org/webpki/mobile/android/saturn/common" preservelastmodified="true" includeEmptyDirs="false" flatten="true">
           <fileset dir="${src.dir}">
             <include name="**/AuthorizationData.java"/>
@@ -33,13 +33,13 @@
             <include name="**/UserResponseItem.java"/>
           </fileset>
         </copy>
-      	<replace dir="${temp.dir}" value="org.webpki.mobile.android.saturn.common">
-      	  <include name="**/*.java"/>
-      	  <replacetoken>org.webpki.saturn.common</replacetoken>
-      	</replace>
+        <replace dir="${temp.dir}" value="org.webpki.mobile.android.saturn.common">
+          <include name="**/*.java"/>
+          <replacetoken>org.webpki.saturn.common</replacetoken>
+        </replace>
          <zip destfile="${dist.file}">
-	      <zipfileset dir="${temp.dir}"/>
-	    </zip>
+          <zipfileset dir="${temp.dir}"/>
+        </zip>
     </target>
    
 </project>

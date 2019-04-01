@@ -3,15 +3,46 @@
   <!-- set properties for this build -->
   <property name="src.dir" value="src"/>
   <property name="conf.dir" value="conf"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="temp.dir" value=".tmp"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/bank"/>
-  
+
+  <property file="../resources/common.properties"/>
+
+  <condition property="appcorename" value="${@payeebankpath}" else="${@payerbankpath}">
+    <isset property="payeebank"/>
+  </condition>
+
+  <condition property="bankhost" value="${@payeebankhost}" else="${@payerbankhost}">
+    <isset property="payeebank"/>
+  </condition>
+    
+  <condition property="reference.id.start" value="120004" else="96744">
+    <isset property="payeebank"/>
+  </condition>
+
+  <condition property="common.name" value="Big Bank" else="My Bank">
+    <isset property="payeebank"/>
+  </condition>
+
+  <condition property="hosting.provider.key" value="${@hostingattestationkey}.p12" else="">
+    <and>
+      <isset property="payeebank"/>
+      <isset property="hostingoption"/>
+    </and>
+  </condition>
+
+  <property name="logging" value="false"/>
+    
+  <property name="server.port.map" value=""/>
+
   <property name="debug" value="on"/>
   <property environment="env"/>
 
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-      <echo message="both tomcat [-Dpayeebank=0] [-Dhostingoption=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+      <echo message="both tomcat [-Dpayeebank=0] [-Dhostingoption=0]"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -20,54 +51,53 @@
       <isset property="env.CATALINA_HOME"/>
     </condition>
     <fail message="CATALINA_HOME must be set to environment!" unless="tomcat_app_root_set"/>
-
-    <!-- Set path to application.  -->
-    <property name="dist.dir" value="dist"/>
   </target>
 
-  <target name="_build">
-    <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
-    <property name="bank.host" value="https://localhost:8442"/>
+  <target name="build">
+    <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
+    <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
+    <delete dir="${temp.dir}"/>
     <property name="bank.path" value="${appcorename}"/>
-  	<property name="payee.account.validation" value="true"/>
+    <property name="payee.account.validation" value="true"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
-    <property name="logging" value="false"/>
     <property name="server.port.map" value=""/>
     <property name="users.db" value="users.${appcorename}.json"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
     <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa.p12"/>
     <property name="enc.key.ec" value="${appcorename}-enc-key-ec.p12"/>
     <property name="cert.key" value="${appcorename}-eecert.p12"/>
-    <condition property="reference.id.start" value="120004" else="96744">
-      <equals arg1="${payeebankpath}" arg2="${appcorename}"/>
-    </condition>
-    <condition property="common.name" value="Big Bank" else="My Bank">
-      <equals arg1="${payeebankpath}" arg2="${appcorename}"/>
-    </condition>
-    <condition property="hosting.provider.key" value="${hostingattestationkey}.p12" else="">
-      <and>
-        <equals arg1="${payeebankpath}" arg2="${appcorename}"/>
-        <isset property="hostingoption"/>
-      </and>
-    </condition>
     <property name="bouncycastle.first" value="true"/>
-    <fixcrlf srcdir="${src.dir}"
+    <fixcrlf srcdir="."
        tab="remove"
        tablength="4"
        eol="lf"
        eof="remove"
-       includes="**/*.java"/>
+       includes="**/*.java, **/*.xml, **/*.json"/>
     <copy file="web.xml" todir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
-           srcdir="${src.dir}:${compile.common.src.dir}:${compile.methods.src.dir}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}:${@methods.src.dir}"
            destdir="${temp.dir}"
-           classpath="${compile.classpath}"
-           includeAntRuntime="false"/>
+           includeAntRuntime="false">
+        <classpath>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
+        </classpath>
+    </javac>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
-      <replacefilter token="@key-password@" value="${keypassword}"/>
+      <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@bank-name@" value="${common.name}"/>
       <replacefilter token="@hosting-provider-key@" value="${hosting.provider.key}"/>
       <replacefilter token="@provider-extensions@" value="${extensions.file}"/>
@@ -75,9 +105,9 @@
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
       <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
       <replacefilter token="@bank-reference-id-start@" value="${reference.id.start}"/>
-      <replacefilter token="@payment-root@" value="${paymentroot}.cer"/>
-      <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
-      <replacefilter token="@bank-base-url@" value="${bank.host}/${bank.path}"/>
+      <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
+      <replacefilter token="@acquirer-root@" value="${@acquirerroot}.cer"/>
+      <replacefilter token="@bank-base-url@" value="${bankhost}/${bank.path}"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@merchant-account-validation@" value="${payee.account.validation}"/>
@@ -88,24 +118,24 @@
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
-	    <lib dir="${webpki.lib.dir}">
-	       <include name="${webpki-libext.jar}"/>
-	    </lib>
-	     <lib dir="${bcprovider.lib.dir}">
-	       <include name="${bcprovider.jar}"/>
-	     </lib>
-	    <lib dir="${webpki.lib.dir}">
-	       <include name="${webpki-webutil.jar}"/>
-	    </lib>
-      <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
+        <lib dir="${zip.webpki.lib.dir}">
+           <include name="${@webpki-libext.jar}"/>
+        </lib>
+         <lib dir="${zip.bcprovider.lib.dir}">
+           <include name="${@bcprovider.jar}"/>
+         </lib>
+        <lib dir="${zip.webpki.lib.dir}">
+           <include name="${@webpki-webutil.jar}"/>
+        </lib>
+      <zipfileset dir="${@key.dir}" prefix="${class_war_path}">
          <include name="${enc.key.rsa}"/>
          <include name="${enc.key.ec}"/>
          <include name="${cert.key}"/>
-         <include name="${paymentroot}.cer"/>
-         <include name="${acquirerroot}.cer"/>
+         <include name="${@paymentnetworkroot}.cer"/>
+         <include name="${@acquirerroot}.cer"/>
          <include name="${hosting.provider.key}"/>
       </zipfileset>
-      <zipfileset dir="${zip.credentials.dir}" prefix="${class_war_path}">
+      <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
          <include name="${users.db}"/>
          <include name="${merchants.db}"/>
       </zipfileset>
@@ -128,135 +158,8 @@
   </target>
 
   <target name="tomcat" depends="_init">
-     <property file="../resources/common.properties"/>
-     <condition property="appcorename" value="${payeebankpath}" else="${payerbankpath}">
-        <isset property="payeebank"/>
-     </condition>
-     <property name="temp.dir" value=".tmp"/>
-     <delete dir="${temp.dir}"/>
-     <path id="tomcat.compile.classpath">
-        <fileset dir="${reference.lib.dir}">
-          <include name="*.jar"/>
-        </fileset>
-         <fileset dir="${webpki.lib.dir}">
-           <include name="*.jar"/>
-         </fileset>
-         <fileset dir="${bcprovider.lib.dir}">
-           <include name="${bcprovider.jar}"/>
-         </fileset>
-     </path>
-     <antcall target="_build">
-       <param name="javaversion" value="1.8"/>
-
-       <param name="compile.common.src.dir" value="${common.src.dir}"/>
-       
-       <param name="compile.methods.src.dir" value="${methods.src.dir}"/>
-        
-       <param name="compile.classpath" refid="tomcat.compile.classpath"/>
-       
-       <param name="zip.key.dir" value="${key.dir}"/>
-
-       <param name="zip.credentials.dir" value="${credentials.dir}"/>
-     </antcall>
-     <copy file="${dist.dir}/${appcorename}.war" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
-  </target>
-  
-  <!-- mobilepki using EJBCA plugin mode -->
-  <target name="mobilepki-ejbca">
-     <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Bank Plugin"/>
-
-  	 <property name="zip.common.lib.dir" value="empty.lib"/>
-     <property file="common.properties"/>
-     <condition property="appcorename" value="${payeebankpath}" else="${payerbankpath}">
-        <isset property="plugin.ejbca.ant.custom.payee"/>
-     </condition>
-     <condition property="logging" value="true" else="false">
-        <isset property="plugin.ejbca.ant.custom.logging"/>
-     </condition>
-     <property name="bouncycastle.first" value="false"/>
-     <property name="bank.host" value="https://mobilepki.org"/>
-     <property name="server.port.map" value="8442"/>
-     <property file="common.properties"/>
-     <property name="temp.dir" value="${ejbca.tmp.path}"/>
-     <property name="dist.dir" value="${ejbca.gen.path}"/>
-     <path id="ejbca.compile.classpath">
-        <fileset dir="${plugin.ejbca.ant.custom.enrollment_plugin_directory}/lib.common">
-           <include name="*.jar"/>
-        </fileset>
-        <pathelement path="${ejbca.classpath}"/>
-     </path>
-     <antcall target="_build">
-       <param name="javaversion" value="1.6"/>
-
-       <param name="compile.common.src.dir" value="common.src"/>
-       
-       <param name="compile.methods.src.dir" value="methods.src"/>
-        
-       <param name="compile.classpath" refid="ejbca.compile.classpath"/>
-       
-       <param name="zip.key.dir" value="keys"/>
-
-       <param name="zip.credentials.dir" value="credentials"/>
-     </antcall>
-     <!-- Update application.xml -->
-     <resources id="w2nb_application.xml">
-<string><![CDATA[    <!-- Web2 Payment Demo -->
-    <module>
-        <web>
-            <web-uri>${appcorename}.war</web-uri>
-            <context-root>/${appcorename}</context-root>
-        </web>
-    </module>
-</application>]]></string>
-     </resources>
-     <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
-     <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">
-        <replacetoken><![CDATA[</application>]]></replacetoken>
-     </replace>
-  </target>
-  
-  <target name="localhost-ejbca">
-     <echo message="Web2Native Bridge &quot;localhost&quot; Bank Plugin"/>
-     <property name="bank.host" value="https://localhost:8442"/>
-     <property name="server.port.map" value=""/>
-     <antcall target="mobilepki-ejbca"/>
-  </target>
-  
-  <target name="_unzipit" if="uu">
-    <delete dir="${dd}/${banksourcepath}"/>
-    <unzip src="${dd}/${banksourcepath}.zip" dest="${dd}"/>
-  </target>
-  
-  <target name="zip-distribution">
-    <property name="banksourcepath" value="webpay-bank"/>
-    <property file="../resources/common.properties"/>
-    <fail unless="dd" message="-&#10;
-***************************************************************&#10;
- You must define a distribution directory using the -D option:&#10;
- ant zip-distribution -Ddd=the_path_to_the_directory.&#10;
- Optionally you can specify -Duu=0 which deletes ${banksourcepath}&#10;
- and replaces the directory with the unzipped content&#10;
-***************************************************************&#10;"/>
-    <echo message="Producing ${banksourcepath} .zip and .zip.SHA1 files..."/> 
-    <delete file="${dd}/${banksourcepath}.zip" failonerror="false"/>
-    <zip destfile="${dd}/${banksourcepath}.zip">
-      <zipfileset dir="." prefix="${banksourcepath}">
-        <exclude name="/**/.*"/>
-        <exclude name="/.tmp/**"/>
-        <exclude name="**/.settings/**"/>
-        <exclude name="**/bin/**"/>
-        <exclude name="dist/**"/>
-      </zipfileset>
-      <zipfileset dir="${common.src.dir}" prefix="${banksourcepath}/common.src"/>
-      <zipfileset dir="${methods.src.dir}" prefix="${banksourcepath}/methods.src"/>
-      <zipfileset dir="${key.dir}" prefix="${banksourcepath}/keys"/>
-      <zipfileset dir="${credentials.dir}" prefix="${banksourcepath}/credentials">
-        <include name="*.json"/>
-      </zipfileset>
-      <zipfileset file="../resources/common.properties" prefix="${banksourcepath}"/>
-    </zip>
-    <checksum file="${dd}/${banksourcepath}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
-    <antcall target="_unzipit"/>
+    <antcall target="build"/>
+    <copy file="${dist.dir}/${appcorename}.war" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
   </target>
    
 </project>

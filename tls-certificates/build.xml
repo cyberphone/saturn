@@ -8,12 +8,6 @@
   <property name="root.dir" value="root"/>
   <property name="server.dir" value="server"/>
   
-  <path id="compile.classpath">
-     <fileset dir="${common.lib.dir}">
-       <include name="*.jar"/>
-    </fileset>
-  </path>
-  
   <target name="help">
       <echo message="createroot createcert -Dserver=HostNameOrIpAddress"/>
   </target>
@@ -24,9 +18,18 @@
           dir="${target.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
         </classpath>
         <arg line="${cmd} -out/keyalias mykey"/>
     </java>
@@ -52,29 +55,47 @@
     </condition>
     <antcall target="_createcert">
        <param name="target.dir" value="${server.dir}"/>
-       <param name="cmd" value="-ca/keypass ${keypassword} -ca/storetype PKCS12 -ca/storepass ${keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} -subject &quot;CN=TLS certificate for ${server}&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${server}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
+       <param name="cmd" value="-ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} -subject &quot;CN=TLS certificate for ${server}&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${server}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
     </antcall>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2PEMConverter"
           dir="${server.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
         </classpath>
-        <arg line="${server}.p12 ${keypassword} ${server}.cert.pem certificate"/>
+        <arg line="${server}.p12 ${@keypassword} ${server}.cert.pem certificate"/>
     </java>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2PEMConverter"
           dir="${server.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
         </classpath>
-        <arg line="${server}.p12 ${keypassword} ${server}.key.pem private"/>
+        <arg line="${server}.p12 ${@keypassword} ${server}.key.pem private"/>
     </java>
   </target>
 <!-- 
@@ -87,21 +108,30 @@ qualifier = [public private certificate trust]
     <mkdir dir="${server.dir}"/>
     <antcall target="_createcert">
        <param name="target.dir" value="${root.dir}"/>
-       <param name="cmd" value="-selfsigned -entity/ca -subject &quot;CN=WebPKI.org TLS Root CA&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${rootfile}.p12 -out/storepass ${keypassword} -out/keypass ${keypassword} -keysize 4096 -sigalg RSA_SHA512 -serial 1"/>
+       <param name="cmd" value="-selfsigned -entity/ca -subject &quot;CN=WebPKI.org TLS Root CA&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${rootfile}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 4096 -sigalg RSA_SHA512 -serial 1"/>
     </antcall>
     <exec executable="keytool" failonerror="true" dir="${root.dir}">
-      <arg line="-exportcert -keystore ${rootfile}.p12 -alias mykey -storepass ${keypassword} -storetype PKCS12 -file ${rootfile}.cer"/>
+      <arg line="-exportcert -keystore ${rootfile}.p12 -alias mykey -storepass ${@keypassword} -storetype PKCS12 -file ${rootfile}.cer"/>
     </exec>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2PEMConverter"
           dir="${root.dir}"
           failonerror="true">
         <classpath>
-             <fileset dir="${common.lib.dir}">
-                <include name="*.jar"/>
-             </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
         </classpath>
-        <arg line="${rootfile}.p12 ${keypassword} ${rootfile}.pem certificate"/>
+        <arg line="${rootfile}.p12 ${@keypassword} ${rootfile}.pem certificate"/>
     </java>
   </target>
 

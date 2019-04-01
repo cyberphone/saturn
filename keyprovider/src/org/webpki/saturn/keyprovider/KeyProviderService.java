@@ -59,19 +59,15 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static Logger logger = Logger.getLogger(KeyProviderService.class.getCanonicalName());
     
-    static final String WEBPKI_LOGO           = "webpki_logotype";
-
     static final String SATURN_LOGO           = "saturn_logotype";
 
     static final String VERSION_CHECK         = "android_webpki_versions";
 
     static final String KEYSTORE_PASSWORD     = "key_password";
 
-    static final String BANK_HOST             = "bank_host";
+    static final String PAYER_BANK_HOST       = "payer_bank_host";
     
     static final String KEYPROV_KMK           = "keyprov_kmk";
-    
-    static final String SERVER_PORT_MAP       = "server_port_map";
     
     static final String TLS_CERTIFICATE       = "server_tls_certificate";
 
@@ -107,8 +103,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     }
 
     static Vector<PaymentCredential> paymentCredentials = new Vector<PaymentCredential>();
-
-    static String webpkiLogotype;
 
     static String saturnLogotype;
 
@@ -148,7 +142,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials
             ////////////////////////////////////////////////////////////////////////////////////////////
-            String bankHost = getPropertyString(BANK_HOST);
+            String bankHost = getPropertyString(PAYER_BANK_HOST);
             for (String credentialEntry : CREDENTIALS) {
                 final String[] arguments = getPropertyStringList(credentialEntry);
                 PaymentCredential paymentCredential = new PaymentCredential();
@@ -195,16 +189,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             keyManagementKey = new KeyStoreEnumerator(getResource(getPropertyString(KEYPROV_KMK)),
                                                                     getPropertyString(KEYSTORE_PASSWORD));
 
-            if (getPropertyString(SERVER_PORT_MAP).length () > 0) {
-                serverPortMapping = getPropertyInt(SERVER_PORT_MAP);
-            }
-
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            // WebPKI.org logotype
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            webpkiLogotype = getResourceAsString(WEBPKI_LOGO);
-
-
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Saturn logotype
             ////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,9 +202,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Get TLS server certificate
             ////////////////////////////////////////////////////////////////////////////////////////////
-            X509Certificate serverCertificate = CertificateUtil
-                    .getCertificateFromBlob(ArrayUtil
-                            .getByteArrayFromInputStream(getResource(getPropertyString(TLS_CERTIFICATE))));
+            X509Certificate serverCertificate = 
+                    CertificateUtil.getCertificateFromBlob(
+                            ArrayUtil.readFile(getPropertyString(TLS_CERTIFICATE)));
             serverCertificateFingerprint = HashAlgorithms.SHA256.digest(serverCertificate.getEncoded());
 
             ////////////////////////////////////////////////////////////////////////////////////////////

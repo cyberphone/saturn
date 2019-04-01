@@ -43,7 +43,7 @@
     <property name="local.installation" value="true"/>
     <property name="desktop.wallet" value="true"/>
 
-  	<property name="zip.extra.lib.dir" value="${common.lib.dir}"/>
+    <property name="zip.extra.lib.dir" value="${common.lib.dir}"/>
     <property name="zip.common.lib.dir" value="${common.lib.dir}"/>
     <property name="zip.lib.dir" value="lib"/>
     
@@ -52,7 +52,7 @@
     <property name="acquirer.host" value="https://localhost:8442"/>
     <property name="acquirerpath.S" value="${acquirerpath}/"/>
     <property name="payee_provider.host" value="https://localhost:8442"/>
-    <condition property="payee_provider.path" value="${hostingpath}" else="${payeebankpath}">
+    <condition property="payee_provider.path" value="${hostingpath}" else="${@payeebankpath}">
       <isset property="hostingoption"/>
     </condition>
     <property name="server.port.map" value=""/>
@@ -80,8 +80,8 @@
        includes="**/*.java"/>
     <copy file="web.xml" todir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${javaversion}"
-           target="${javaversion}"
+           source="${@javaversion}"
+           target="${@javaversion}"
            srcdir="${src.dir}:${compile.common.src.dir}:${compile.methods.src.dir}"
            destdir="${temp.dir}"
            classpath="${compile.classpath}"
@@ -90,14 +90,14 @@
       <replacefilter token="@local-installation@" value="${local.installation}"/>
       <replacefilter token="@desktop-wallet@" value="${desktop.wallet}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
-      <replacefilter token="@key-password@" value="${keypassword}"/>
-      <replacefilter token="@merchant-key@" value="${merchantkey}.p12"/>
+      <replacefilter token="@key-password@" value="${@keypassword}"/>
+      <replacefilter token="@merchant-key@" value="${@merchantkey}.p12"/>
       <replacefilter token="@merchant-cn@" value="${merchantcn}"/>
       <replacefilter token="@merchant-id@" value="${merchantid}"/>
       <replacefilter token="@othernetwork-key@" value="${other.key}"/>
       <replacefilter token="@othernetwork-id@" value="${othernetworkid}"/>
       <replacefilter token="@payment-root@" value="${payment.var.root}.cer"/>
-      <replacefilter token="@acquirer-root@" value="${acquirerroot}.cer"/>
+      <replacefilter token="@acquirer-root@" value="${@acquirerroot}.cer"/>
       <replacefilter token="@payee-acquirer-authority-url@" value="${acquirer.host}/${acquirerpath.S}payees/${merchantid}"/>
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.host}/${payee_provider.path}/payees/${merchantid}"/>
       <replacefilter token="@currency@" value="${currency}"/>
@@ -112,24 +112,24 @@
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
-	    <lib dir="${webpki.lib.dir}">
-	       <include name="${webpki-libext.jar}"/>
-	    </lib>
-	     <lib dir="${bcprovider.lib.dir}">
-	       <include name="${bcprovider.jar}"/>
-	     </lib>
-	    <lib dir="${webpki.lib.dir}">
-	       <include name="${webpki-webutil.jar}"/>
-	    </lib>
+        <lib dir="${webpki.lib.dir}">
+           <include name="${webpki-libext.jar}"/>
+        </lib>
+         <lib dir="${bcprovider.lib.dir}">
+           <include name="${bcprovider.jar}"/>
+         </lib>
+        <lib dir="${webpki.lib.dir}">
+           <include name="${webpki-webutil.jar}"/>
+        </lib>
       <lib dir="${zip.extra.lib.dir}">
          <include name="proxy-support.jar"/>
       </lib>
       <lib dir="${zip.lib.dir}"/>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
-         <include name="${merchantkey}.p12"/>
-         <include name="${othernetworkkey}.p12"/>
+         <include name="${@merchantkey}.p12"/>
+         <include name="${@othernetworkkey}.p12"/>
          <include name="${payment.var.root}.cer"/>
-         <include name="${acquirerroot}.cer"/>
+         <include name="${@acquirerroot}.cer"/>
       </zipfileset>
       <zipfileset file="sepa-account.json" prefix="${class_war_path}"/>
       <zipfileset dir="debug-samples" prefix="${class_war_path}"/>
@@ -142,7 +142,7 @@
      <property file="../resources/merchants.properties"/>
      <property name="temp.dir" value=".tmp"/>
      <delete dir="${temp.dir}"/>
-     <condition property="payment_root" value="${merchantroot}" else="${paymentroot}">
+     <condition property="payment_root" value="${merchantroot}" else="${@paymentnetworkroot}">
        <isset property="err.payment.root"/>
      </condition>
      <condition property="unusualcard" value="true">
@@ -151,7 +151,7 @@
      <condition property="var.slow.operation" value="true">
        <isset property="slow.operation"/>
      </condition>
-     <condition property="other.key" value="${othernetworkkey}.p12">
+     <condition property="other.key" value="${@othernetworkkey}.p12">
        <isset property="other.network"/>
      </condition>
      <path id="tomcat.compile.classpath">
@@ -174,13 +174,13 @@
      <antcall target="_build">
        <param name="javaversion" value="1.8"/>
 
-       <param name="compile.common.src.dir" value="${common.src.dir}"/>
+       <param name="compile.common.src.dir" value="${@common.src.dir}"/>
        
        <param name="compile.methods.src.dir" value="${methods.src.dir}"/>
         
        <param name="compile.classpath" refid="tomcat.compile.classpath"/>
        
-       <param name="zip.key.dir" value="${key.dir}"/>
+       <param name="zip.key.dir" value="${@key.dir}"/>
        
        <param name="payment.var.root" value="${payment_root}"/>
 
@@ -201,7 +201,7 @@
          </fileset>
      </copy>
 
-  	 <property name="zip.extra.lib.dir" value="extra.lib"/>
+     <property name="zip.extra.lib.dir" value="extra.lib"/>
      <property name="zip.common.lib.dir" value="empty.lib"/>
      <property name="zip.lib.dir" value="empty.lib"/>
    
@@ -233,7 +233,7 @@
        
        <param name="zip.key.dir" value="keys"/>
 
-       <param name="payment.var.root" value="${paymentroot}"/>
+       <param name="payment.var.root" value="${@paymentnetworkroot}"/>
      </antcall>
      <!-- Update application.xml -->
      <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">
@@ -273,9 +273,9 @@
         <exclude name="**/bin/**"/>
         <exclude name="dist/**"/>
       </zipfileset>
-      <zipfileset dir="${common.src.dir}" prefix="${appcorename}/common.src"/>
+      <zipfileset dir="${@common.src.dir}" prefix="${appcorename}/common.src"/>
       <zipfileset dir="${methods.src.dir}" prefix="${appcorename}/methods.src"/>
-      <zipfileset dir="${key.dir}" prefix="${appcorename}/keys"/>
+      <zipfileset dir="${@key.dir}" prefix="${appcorename}/keys"/>
       <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>
       <zipfileset file="../resources/merchants.properties" prefix="${appcorename}"/>
       <zipfileset file="${common.lib.dir}/proxy-support.jar" prefix="${appcorename}/extra.lib"/>
