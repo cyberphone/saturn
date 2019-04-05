@@ -53,7 +53,7 @@
     </context-param>
 
     <context-param>
-        <description>Loading of Bouncycastle (EJBCA or Tomcat)</description>
+        <description>Loading of Bouncycastle</description>
         <param-name>bouncycastle_first</param-name>
         <param-value>@bouncycastle-first@</param-value>
     </context-param>

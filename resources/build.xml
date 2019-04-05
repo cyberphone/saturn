@@ -34,6 +34,9 @@
     <fileset dir="${@reference.lib.dir}">
        <include name="*.jar"/>
     </fileset>
+    <fileset dir="${@common.lib.dir}">
+       <include name="*.jar"/>
+    </fileset>
   </path>
   
   <target name="help">
@@ -67,6 +70,9 @@
              <include name="${@bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
+             <include name="*.jar"/>
+          </fileset>
+          <fileset dir="${@common.lib.dir}">
              <include name="*.jar"/>
           </fileset>
           <pathelement location="${temp.dir}"/>

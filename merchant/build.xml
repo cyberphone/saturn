@@ -2,6 +2,7 @@
 
   <!-- set properties for this build -->
   <property name="src.dir" value="src"/>
+  <property name="dist.dir" value="dist"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/merchant"/>
   
   <property name="appcorename" value="webpay-merchant"/>
@@ -12,20 +13,8 @@
 
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
-  <resources id="w2nb_application.xml">
-<string><![CDATA[    <!-- Web2 Payment Demo -->
-    <module>
-        <web>
-            <web-uri>${application}</web-uri>
-            <context-root>/${appcorename}</context-root>
-        </web>
-    </module>
-</application>]]></string>
-  </resources>
-  <property name="ejbca-app-xml-mod" refid="w2nb_application.xml"/>
-
   <target name="help">
-    <echo message="tomcat [-Dunusual.card=0] [-Dcurrency=XYZ] [-Dslow.operation=0] [-Dhostingoption=0] mobilepki-ejbca localhost-ejbca zip-distribution"/>
+    <echo message="tomcat [-Dunusual.card=0] [-Dcurrency=XYZ] [-Dslow.operation=0] [-Dhostingoption=0]"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -34,9 +23,6 @@
       <isset property="env.CATALINA_HOME"/>
     </condition>
     <fail message="CATALINA_HOME must be set to environment!" unless="tomcat_app_root_set"/>
-
-    <!-- Set path to application.  -->
-    <property name="dist.dir" value="dist"/>
   </target>
 
   <target name="_build">
@@ -58,7 +44,6 @@
     <property name="server.port.map" value=""/>
     <property name="unusualcard" value="false"/>
     <property name="currency" value="EUR"/>
-    <property name="bouncycastle.first" value="true"/>
     <property name="other.key" value=""/>
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
@@ -104,7 +89,7 @@
       <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>
       <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
       <replacefilter token="@w2nb-wallet@" value="${w2nb.webwallet}"/>
-      <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
+      <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@android-webpki-versions@" value="${android.webpki.versions}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
@@ -112,17 +97,14 @@
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
-        <lib dir="${webpki.lib.dir}">
-           <include name="${webpki-libext.jar}"/>
-        </lib>
-         <lib dir="${bcprovider.lib.dir}">
-           <include name="${bcprovider.jar}"/>
-         </lib>
-        <lib dir="${webpki.lib.dir}">
-           <include name="${webpki-webutil.jar}"/>
-        </lib>
-      <lib dir="${zip.extra.lib.dir}">
-         <include name="proxy-support.jar"/>
+      <lib dir="${zip.webpki.lib.dir}">
+         <include name="${@webpki-libext.jar}"/>
+      </lib>
+      <lib dir="${zip.bcprovider.lib.dir}">
+        <include name="${@bcprovider.jar}"/>
+      </lib>
+      <lib dir="${zip.webpki.lib.dir}">
+        <include name="${@webpki-webutil.jar}"/>
       </lib>
       <lib dir="${zip.lib.dir}"/>
       <zipfileset dir="${zip.key.dir}" prefix="${class_war_path}">
@@ -138,150 +120,7 @@
   </target>
 
   <target name="tomcat" depends="_init">
-     <property file="../resources/common.properties"/>
-     <property file="../resources/merchants.properties"/>
-     <property name="temp.dir" value=".tmp"/>
-     <delete dir="${temp.dir}"/>
-     <condition property="payment_root" value="${merchantroot}" else="${@paymentnetworkroot}">
-       <isset property="err.payment.root"/>
-     </condition>
-     <condition property="unusualcard" value="true">
-       <isset property="unusual.card"/>
-     </condition>
-     <condition property="var.slow.operation" value="true">
-       <isset property="slow.operation"/>
-     </condition>
-     <condition property="other.key" value="${@othernetworkkey}.p12">
-       <isset property="other.network"/>
-     </condition>
-     <path id="tomcat.compile.classpath">
-        <fileset dir="${reference.lib.dir}">
-          <include name="*.jar"/>
-        </fileset>
-         <fileset dir="${webpki.lib.dir}">
-           <include name="*.jar"/>
-         </fileset>
-         <fileset dir="${bcprovider.lib.dir}">
-           <include name="${bcprovider.jar}"/>
-         </fileset>
-         <fileset dir="lib">
-           <include name="*.jar"/>
-         </fileset>
-        <fileset dir="../resources/common.lib">
-          <include name="proxy*.jar"/>
-        </fileset>
-     </path>
-     <antcall target="_build">
-       <param name="javaversion" value="1.8"/>
-
-       <param name="compile.common.src.dir" value="${@common.src.dir}"/>
-       
-       <param name="compile.methods.src.dir" value="${methods.src.dir}"/>
-        
-       <param name="compile.classpath" refid="tomcat.compile.classpath"/>
-       
-       <param name="zip.key.dir" value="${@key.dir}"/>
-       
-       <param name="payment.var.root" value="${payment_root}"/>
-
-       <param name="server.port.map" value=""/>
-     </antcall>
      <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
-  </target>
-  
-  <!-- mobilepki using EJBCA plugin mode -->
-  <target name="mobilepki-ejbca">
-     <echo message="Web2Native Bridge &quot;mobilepki.org&quot; Merchant Plugin"/>
-     <condition property="logging" value="true" else="false">
-        <isset property="plugin.ejbca.ant.custom.logging"/>
-     </condition>
-     <copy todir="${ejbca.gen.path}/lib" overwrite="true" preservelastmodified="true">
-         <fileset dir="lib">
-             <include name="*.jar"/>
-         </fileset>
-     </copy>
-
-     <property name="zip.extra.lib.dir" value="extra.lib"/>
-     <property name="zip.common.lib.dir" value="empty.lib"/>
-     <property name="zip.lib.dir" value="empty.lib"/>
-   
-     <property name="bouncycastle.first" value="false"/>
-     <property name="acquirer.host" value="https://mobilepki.org"/>
-     <property name="payee_provider.host" value="https://mobilepki.org"/>
-     <property name="server.port.map" value="8442"/>
-     <property file="common.properties"/>
-     <property file="merchants.properties"/>
-     <property name="temp.dir" value="${ejbca.tmp.path}"/>
-     <property name="dist.dir" value="${ejbca.gen.path}"/>
-     <path id="ejbca.compile.classpath">
-        <fileset dir="${ejbca.gen.path}/lib">
-           <include name="*.jar"/>
-        </fileset>
-        <fileset dir="extra.lib">
-           <include name="*.jar"/>
-        </fileset>
-        <pathelement path="${ejbca.classpath}"/>
-     </path>
-     <antcall target="_build">
-       <param name="javaversion" value="1.6"/>
-
-       <param name="compile.common.src.dir" value="common.src"/>
-       
-       <param name="compile.methods.src.dir" value="methods.src"/>
-        
-       <param name="compile.classpath" refid="ejbca.compile.classpath"/>
-       
-       <param name="zip.key.dir" value="keys"/>
-
-       <param name="payment.var.root" value="${@paymentnetworkroot}"/>
-     </antcall>
-     <!-- Update application.xml -->
-     <replace file="${ejbca.app.xml}" value="${ejbca-app-xml-mod}">
-        <replacetoken><![CDATA[</application>]]></replacetoken>
-     </replace>
-  </target>
-  
-  <target name="localhost-ejbca">
-     <echo message="Web2Native Bridge &quot;localhost&quot; Merchant Plugin"/>
-     <property name="acquirer.host" value="https://localhost:8442"/>
-     <property name="payee_provider.host" value="https://localhost:8442"/>
-     <property name="server.port.map" value=""/>
-     <antcall target="mobilepki-ejbca"/>
-  </target>
-  
-  <target name="_unzipit" if="uu">
-    <delete dir="${dd}/${appcorename}"/>
-    <unzip src="${dd}/${appcorename}.zip" dest="${dd}"/>
-  </target>
-  
-  <target name="zip-distribution">
-    <property file="../resources/common.properties"/>
-    <fail unless="dd" message="-&#10;
-***************************************************************&#10;
- You must define a distribution directory using the -D option:&#10;
- ant zip-distribution -Ddd=the_path_to_the_directory.&#10;
- Optionally you can specify -Duu=0 which deletes ${appcorename}&#10;
- and replaces the directory with the unzipped content&#10;
-***************************************************************&#10;"/>
-    <echo message="Producing ${appcorename} .zip and .zip.SHA1 files..."/> 
-    <delete file="${dd}/${appcorename}.zip" failonerror="false"/>
-    <zip destfile="${dd}/${appcorename}.zip">
-      <zipfileset dir="." prefix="${appcorename}">
-        <exclude name="/**/.*"/>
-        <exclude name="/.tmp/**"/>
-        <exclude name="**/.settings/**"/>
-        <exclude name="**/bin/**"/>
-        <exclude name="dist/**"/>
-      </zipfileset>
-      <zipfileset dir="${@common.src.dir}" prefix="${appcorename}/common.src"/>
-      <zipfileset dir="${methods.src.dir}" prefix="${appcorename}/methods.src"/>
-      <zipfileset dir="${@key.dir}" prefix="${appcorename}/keys"/>
-      <zipfileset file="../resources/common.properties" prefix="${appcorename}"/>
-      <zipfileset file="../resources/merchants.properties" prefix="${appcorename}"/>
-      <zipfileset file="${common.lib.dir}/proxy-support.jar" prefix="${appcorename}/extra.lib"/>
-    </zip>
-    <checksum file="${dd}/${appcorename}.zip" fileext=".SHA1" algorithm="sha1" forceOverwrite="yes"/>
-    <antcall target="_unzipit"/>
   </target>
    
 </project>

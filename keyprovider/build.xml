@@ -35,7 +35,6 @@
     <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
     <property name="zip.qr.lib.dir" value="${@qr.lib.dir}"/>
     <delete dir="${temp.dir}"/>
-    <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="."
        tab="remove"
        tablength="4"
@@ -76,7 +75,7 @@
       <replacefilter token="@paycred3@"
         value="${@clientkey_unusual}.p12,UNUSUAL_CARD,${@account_id_unusual},unusualcard.svg,${@payeebankpath}-enc-key-ec.cer,${@payeebankpath},Money-77,A128CBC-HS256"/>
       <replacefilter token="@keyprov-kmk@" value="${@kg2kmkey_ec}.p12"/>
-      <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
+      <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@server-tls-certificate@" value="${@kg2_tls_cert_file}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>

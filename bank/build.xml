@@ -66,7 +66,6 @@
     <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa.p12"/>
     <property name="enc.key.ec" value="${appcorename}-enc-key-ec.p12"/>
     <property name="cert.key" value="${appcorename}-eecert.p12"/>
-    <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="."
        tab="remove"
        tablength="4"
@@ -111,7 +110,7 @@
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@merchant-account-validation@" value="${payee.account.validation}"/>
-      <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
+      <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${appcorename}.war" webxml="${temp.dir}/web.xml">

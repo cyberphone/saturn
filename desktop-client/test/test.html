@@ -22,10 +22,10 @@ function setString(rawString) {
 var nativePort = null;
 
 var normalRequest = {
-  "@context": "http://webpki.org/saturn/v3",
+  "@context": "https://webpki.github.io/saturn/v3",
   "@qualifier": "PaymentClientRequest",
   paymentNetworks: [{
-    paymentMethods: ["https://nosuchcard.com","https://supercard.com","https://bankdirect.net"],
+    paymentMethods: ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net"],
     paymentRequest: {
       payee: {
         commonName: "Demo Merchant",
@@ -48,7 +48,7 @@ var normalRequest = {
           x: "rZ344aiTaOATmLBOdfYThvnQu_zyB1aJZrbbbks2P9I",
           y: "lKOvfJdgN8WqEbXMDYPRSMsPicm0Tk10pmer9LxvxLg"
         },
-        value: "yyjgmZucdxX9CoDY5Hp3B5cWy7-Rfdcul1ZuocBmlXzEr1a6i8BstVDQmxrbcXVWigSlFUjR5vEwaVxjx-r2Fg"
+        value: "yyjgmZucdxX9CoDY5Hp3B5cWy7-Rfdcul1ZuocBmlXxxtB7kxbairGsoG3EolRu_OJGJj24i2rG1huNBIzbDOw"
       }
     }
   }]
@@ -98,7 +98,7 @@ function activateExtension() {
                             setExtensionPosition('Center', 'Center')).then(function(port) {
     nativePort = port;
     port.addMessageListener(function(message) {
-      if (message["@context"] != "http://webpki.org/saturn/v3") {
+      if (message["@context"] != "https://webpki.github.io/saturn/v3") {
         setString("Missing or wrong \"@context\"");
         return;
       }

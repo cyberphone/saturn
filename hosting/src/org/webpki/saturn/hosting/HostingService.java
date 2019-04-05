@@ -58,9 +58,9 @@ public class HostingService extends InitPropertyReader implements ServletContext
 
     static final String HOSTING_KEY           = "hosting_key";
 
-    static final String HOSTING_BASE_URL       = "hosting_base_url";
+    static final String HOSTING_BASE_URL      = "hosting_base_url";
 
-    static final String PROVIDER_BASE_URL      = "provider_base_url";
+    static final String PROVIDER_BASE_URL     = "provider_base_url";
 
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
 

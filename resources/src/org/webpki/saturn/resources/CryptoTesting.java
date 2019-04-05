@@ -79,7 +79,7 @@ public class CryptoTesting {
     static void createPEM(boolean rsa, String string, byte[] encoded) {
         js.append("const " + (rsa ? "RSA" : "ECHD") + "_TEST_" + string + "_KEY = \n" +
                   "'-----BEGIN " + string + " KEY-----\\\n")
-          .append(new Base64(true).getBase64StringFromBinary(encoded).replace("\r\n", "\\\n"))
+          .append(new Base64(true).getBase64StringFromBinary(encoded).replace("\n", "\\\n"))
           .append("\\\n-----END " + string + " KEY-----';\n\n");
     }
  
@@ -140,7 +140,7 @@ public class CryptoTesting {
         encryptedData =
             JSONObjectWriter.createEncryptionObject(
                     JEF_TEST_STRING.getBytes("UTF-8"),
-                    DataEncryptionAlgorithms.JOSE_A192CBC_HS384_ALG_ID,
+                    DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID,
                     new JSONAsymKeyEncrypter(alice.getPublic(),
                                              KeyEncryptionAlgorithms.JOSE_ECDH_ES_A192KW_ALG_ID).setKeyId(JEF_EC_KEY_ID));
         js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
@@ -150,7 +150,7 @@ public class CryptoTesting {
               JSONObjectWriter.createEncryptionObject(
                       JEF_TEST_STRING.getBytes("UTF-8"),
                       DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                      new JSONAsymKeyEncrypter(alice.getPublic(),
+                      new JSONAsymKeyEncrypter(rsa.getPublic(),
                                                KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID));
         js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
           .append(";\n\n" +
@@ -159,7 +159,7 @@ public class CryptoTesting {
               JSONObjectWriter.createEncryptionObject(
                       JEF_TEST_STRING.getBytes("UTF-8"),
                       DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                      new JSONAsymKeyEncrypter(alice.getPublic(),
+                      new JSONAsymKeyEncrypter(rsa.getPublic(),
                                                KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID).setKeyId(JEF_RSA_KEY_ID));
       js.append(encryptedData.serializeToString(JSONOutputFormats.PRETTY_JS_NATIVE))
         .append(";\n\n" +

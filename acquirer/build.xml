@@ -36,7 +36,6 @@
     <delete dir="${temp.dir}"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
-    <property name="bouncycastle.first" value="true"/>
     <fixcrlf srcdir="."
        tab="remove"
        tablength="4"
@@ -74,7 +73,7 @@
       <replacefilter token="@acquirer-base-url@" value="${@acquirerhost}/${@acquirerpath}"/>
       <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
-      <replacefilter token="@bouncycastle-first@" value="${bouncycastle.first}"/>
+      <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
@@ -94,7 +93,7 @@
          <include name="${@acquirerencryptionkey_rsa}.p12"/>
          <include name="${@acquirerencryptionkey_ec}.p12"/>
          <include name="${@acquirersignaturekey}.p12"/>
-         <include name="${payment.var.root}.cer"/>
+         <include name="${@paymentnetworkroot}.cer"/>
       </zipfileset>
       <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
          <include name="${merchants.db}"/>
