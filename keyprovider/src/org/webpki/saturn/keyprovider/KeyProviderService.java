@@ -35,7 +35,6 @@ import javax.servlet.ServletContextListener;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
-import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.DataEncryptionAlgorithms;
@@ -83,7 +82,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static JSONDecoderCache keygen2JSONCache;
     
-    static byte[] serverCertificateFingerprint;
+    static X509Certificate serverCertificate;
 
     static String grantedVersions;
     
@@ -202,10 +201,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Get TLS server certificate
             ////////////////////////////////////////////////////////////////////////////////////////////
-            X509Certificate serverCertificate = 
-                    CertificateUtil.getCertificateFromBlob(
-                            ArrayUtil.readFile(getPropertyString(TLS_CERTIFICATE)));
-            serverCertificateFingerprint = HashAlgorithms.SHA256.digest(serverCertificate.getEncoded());
+            serverCertificate = CertificateUtil.getCertificateFromBlob(
+                    ArrayUtil.readFile(getPropertyString(TLS_CERTIFICATE)));
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Are we logging?
