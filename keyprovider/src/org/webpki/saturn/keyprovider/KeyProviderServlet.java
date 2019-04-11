@@ -215,7 +215,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                   // Now we really start doing something
                   ProvisioningInitializationRequestEncoder provisioningInitRequest =
                       new ProvisioningInitializationRequestEncoder(keygen2State,
-                                                                   1000,
+                                                                   (short)1000,
                                                                    (short)50);
                   provisioningInitRequest.setKeyManagementKey(
                           KeyProviderService.keyManagementKey.getPublicKey());
