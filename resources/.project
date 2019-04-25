@@ -14,6 +14,13 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>w2nb</name>
+			<type>2</type>
+			<location>C:/github.repositories/saturn/desktop-client/w2nb</location>
+		</link>
+	</linkedResources>
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>

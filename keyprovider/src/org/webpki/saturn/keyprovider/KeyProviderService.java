@@ -47,7 +47,6 @@ import org.webpki.keygen2.ProvisioningFinalizationResponseDecoder;
 import org.webpki.keygen2.ProvisioningInitializationResponseDecoder;
 
 import org.webpki.util.ArrayUtil;
-import org.webpki.util.MIMETypedObject;
 
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PaymentMethods;
@@ -95,7 +94,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         boolean cardFormatted;
         byte[] optionalServerPin;
         String authorityUrl;
-        MIMETypedObject cardImage;
+        String svgCardImage;
         PublicKey encryptionKey;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
@@ -159,16 +158,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 }
                 paymentCredential.accountId = arguments[2];
                 paymentCredential.cardFormatted = cardFormatted;
-                paymentCredential.cardImage = new MIMETypedObject() {
-                    @Override
-                    public byte[] getData() throws IOException {
-                        return ArrayUtil.getByteArrayFromInputStream(getResource(arguments[3]));
-                    }
-                    @Override
-                    public String getMimeType() throws IOException {
-                        return "image/svg+xml";
-                    }
-                };
+                paymentCredential.svgCardImage = new String(ArrayUtil.getByteArrayFromInputStream(getResource(arguments[3])), "utf-8");
                 paymentCredential.encryptionKey =
                     CertificateUtil.getCertificateFromBlob(
                         ArrayUtil.getByteArrayFromInputStream(getResource(arguments[4]))).getPublicKey();

@@ -34,7 +34,13 @@ public class PayerAuthorization implements BaseProperties {
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
         Messages.PAYER_AUTHORIZATION.parseBaseMessage(rd);
         // Only syntax checking for intermediaries
-        rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(new JSONCryptoHelper.Options()).require(true);
+        JSONObjectReader ea = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON);
+        JSONCryptoHelper.Options options = new JSONCryptoHelper.Options();
+        if (ea.hasProperty(JSONCryptoHelper.KEY_ID_JSON)) {
+            options.setRequirePublicKeyInfo(false)
+                   .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.REQUIRED);
+        }
+        ea.getEncryptionObject(options).require(true);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
         rd.checkForUnread();
@@ -54,18 +60,21 @@ public class PayerAuthorization implements BaseProperties {
                                           String providerAuthorityUrl,
                                           String paymentMethod,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
-                                          PublicKey keyEncryptionKey,
-                                          String optionalKeyId,
-                                          KeyEncryptionAlgorithms keyEncryptionAlgorithm) throws IOException, GeneralSecurityException {
+                                          KeyEncryptionAlgorithms keyEncryptionAlgorithm,
+                                          PublicKey encryptionKey,
+                                          String optionalKeyId) throws IOException, GeneralSecurityException {
+        JSONAsymKeyEncrypter encrypter = new JSONAsymKeyEncrypter(encryptionKey, keyEncryptionAlgorithm);
+        if (optionalKeyId != null) {
+            encrypter.setKeyId(optionalKeyId).setOutputPublicKeyInfo(false);
+        }
         return Messages.PAYER_AUTHORIZATION.createBaseMessage()
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(PAYMENT_METHOD_JSON, paymentMethod)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, 
                        JSONObjectWriter
-                          .createEncryptionObject(unencryptedAuthorizationData.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                                  dataEncryptionAlgorithm,
-                                                  new JSONAsymKeyEncrypter(
-                                                  keyEncryptionKey,
-                                                  keyEncryptionAlgorithm).setKeyId(optionalKeyId)));
+                          .createEncryptionObject(
+                              unencryptedAuthorizationData.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                              dataEncryptionAlgorithm,
+                              encrypter));
     }
 }

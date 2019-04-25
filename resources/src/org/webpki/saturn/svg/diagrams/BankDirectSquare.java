@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.svg.diagrams;
 
+import org.webpki.saturn.common.CardImageData;
+
 import org.webpki.tools.svg.SVGDocument;
 import org.webpki.tools.svg.SVGDoubleValue;
 import org.webpki.tools.svg.SVGEllipse;
@@ -23,7 +25,7 @@ import org.webpki.tools.svg.SVGRect;
 import org.webpki.tools.svg.SVGText;
 import org.webpki.tools.svg.SVGText.FONT_WEIGHTS;
 
-public class BankDirectSquare extends SVGDocument implements StandardCardData {
+public class BankDirectSquare extends SVGDocument implements CardImageData {
     public BankDirectSquare() {
         super(0, 0);
     }
@@ -38,7 +40,7 @@ public class BankDirectSquare extends SVGDocument implements StandardCardData {
     
     final static double BANK_SIZE           = 0.34;
     
-    final static double NAME_Y_COORDINATE   = STANDARD_HEIGHT * 0.8056;
+    final static double NAME_Y_COORDINATE   = STANDARD_HEIGHT * 0.785;
 
     @Override
     public String getFilters() {

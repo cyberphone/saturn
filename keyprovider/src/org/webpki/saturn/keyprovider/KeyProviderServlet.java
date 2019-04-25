@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 import java.security.cert.X509Certificate;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.RSAKey;
 
 import java.net.URLEncoder;
 
@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
@@ -59,13 +58,17 @@ import org.webpki.sks.Grouping;
 import org.webpki.sks.AppUsage;
 import org.webpki.sks.PassphraseFormat;
 
+import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.CardDataEncoder;
+import org.webpki.saturn.common.CardImageData;
+
+import org.webpki.util.MIMETypedObject;
 
 import org.webpki.webutil.ServletUtil;
 
 import org.webpki.json.JSONEncoder;
 import org.webpki.json.JSONDecoder;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
 // A KeyGen2 protocol runner that setups pre-configured wallet keys.
@@ -128,30 +131,41 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                         paymentCredential.optionalServerPin);                           
 
             AsymSignatureAlgorithms signAlg =
-                paymentCredential.signatureKey.getPublicKey() instanceof RSAPublicKey ?
+                paymentCredential.signatureKey.getPublicKey() instanceof RSAKey ?
                     AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256;
-            key.setEndorsedAlgorithms(new String[]{signAlg.getAlgorithmId(AlgorithmPreferences.SKS)});
+            key.addEndorsedAlgorithm(signAlg);
             key.setCertificatePath(paymentCredential.signatureKey.getCertificatePath());
             key.setPrivateKey(paymentCredential.signatureKey.getPrivateKey().getEncoded());
             key.setFriendlyName("Account " + paymentCredential.accountId);
-
             key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
-                             new JSONObjectWriter()
-                .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentCredential.paymentMethod)
-                .setString(BaseProperties.ACCOUNT_ID_JSON, paymentCredential.accountId)
-                .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON, paymentCredential.cardFormatted)
-                .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, paymentCredential.authorityUrl)
-                .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
-                           signAlg.getAlgorithmId(AlgorithmPreferences.JOSE))
-                .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                    .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON,
-                           paymentCredential.dataEncryptionAlgorithm.toString())
-                    .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
-                           paymentCredential.keyEncryptionAlgorithm.toString())
-                    .setPublicKey(paymentCredential.encryptionKey))
-                             .serializeToBytes(JSONOutputFormats.NORMALIZED));
+                             CardDataEncoder.encode(paymentCredential.paymentMethod,
+                                                    paymentCredential.accountId, 
+                                                    paymentCredential.authorityUrl, 
+                                                    signAlg, 
+                                                    paymentCredential.dataEncryptionAlgorithm, 
+                                                    paymentCredential.keyEncryptionAlgorithm, 
+                                                    paymentCredential.encryptionKey,
+                                                    null,
+                                                    null).serializeToBytes(JSONOutputFormats.NORMALIZED));
 
-           key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, paymentCredential.cardImage);
+            key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
+
+                @Override
+                public byte[] getData() throws IOException {
+                    return new String(paymentCredential.svgCardImage)
+                        .replace(CardImageData.STANDARD_NAME, "Luke Skywalker")
+                        .replace(CardImageData.STANDARD_ACCOUNT, paymentCredential.cardFormatted ?
+                            AuthorizationData.formatCardNumber(paymentCredential.accountId) 
+                                                                        :
+                            paymentCredential.accountId).getBytes("utf-8");
+                }
+
+                @Override
+                public String getMimeType() throws IOException {
+                    return "image/svg+xml";
+                }
+               
+            });
         }
     
         keygen2JSONBody(response, 

@@ -33,6 +33,8 @@ import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.Messages;
 
+import org.webpki.saturn.w2nb.support.W2NB;
+
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
 public class HTML implements MerchantProperties {
@@ -427,7 +429,7 @@ public class HTML implements MerchantProperties {
                     "        return;\n" +
                     "      }\n" +
                     "      var qualifier = message['@qualifier'];\n" +
-                    "      if ((initMode && qualifier != '" + Messages.PAYMENT_CLIENT_IS_READY.toString() + "')  ||\n" +
+                    "      if ((initMode && qualifier != '" + W2NB.PAYMENT_CLIENT_IS_READY.toString() + "')  ||\n" +
                     "          (!initMode && qualifier != '" +  Messages.PAYER_AUTHORIZATION.toString() + "')) {\n" +  
                     "        setFail('Wrong or missing \"@qualifier\"');\n" +
                     "        return;\n" +
@@ -440,7 +442,7 @@ public class HTML implements MerchantProperties {
        if (!tapConnectMode) {
            temp_string.append(
                     "        document.getElementById('wallet').style.height = message." + 
-                                         BaseProperties.WINDOW_JSON + "." + BaseProperties.HEIGHT_JSON + " + 'px';\n");
+                                W2NB.WINDOW_JSON + "." + W2NB.HEIGHT_JSON + " + 'px';\n");
        }
        temp_string.append(
                     "        initMode = false;\n" +

@@ -50,6 +50,8 @@ import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequest;
 
+import org.webpki.saturn.w2nb.support.W2NB;
+
 import org.webpki.util.ISODateTime;
 
 import org.webpki.w2nbproxy.ExtensionPositioning;
@@ -232,7 +234,7 @@ public class InitTestPage implements BaseProperties {
               "        return;\n" +
               "      }\n" +
               "      var qualifier = message[\"@qualifier\"];\n" +
-              "      if ((initMode && qualifier != \"" + Messages.PAYMENT_CLIENT_IS_READY.toString() + "\" ) ||\n" +
+              "      if ((initMode && qualifier != \"" + W2NB.PAYMENT_CLIENT_IS_READY.toString() + "\" ) ||\n" +
               "          (!initMode && qualifier != \"" + Messages.PAYER_AUTHORIZATION.toString() + "\")) {\n" +  
               "        setString(\"Wrong or missing \\\"@qualifier\\\"\");\n" +
               "        closeExtension();\n" +
@@ -241,8 +243,8 @@ public class InitTestPage implements BaseProperties {
               "      if (initMode) {\n" +
               "        initMode = false;\n" +
               "        if (document.getElementById(\"positionWallet\").checked) {\n" +
-              "          document.getElementById(\"wallet\").style.width = message." + WINDOW_JSON + "." + WIDTH_JSON + " + 'px';\n" +
-              "          document.getElementById(\"wallet\").style.height = message." + WINDOW_JSON + "." + HEIGHT_JSON + " + 'px';\n" +
+              "          document.getElementById(\"wallet\").style.width = message." + W2NB.WINDOW_JSON + "." + W2NB.WIDTH_JSON + " + 'px';\n" +
+              "          document.getElementById(\"wallet\").style.height = message." + W2NB.WINDOW_JSON + "." + W2NB.HEIGHT_JSON + " + 'px';\n" +
               "        }\n" +
               "        if (test == \"" + TESTS.Normal + "\") {\n" +
               "          sendMessageConditional(normalRequest);\n" +

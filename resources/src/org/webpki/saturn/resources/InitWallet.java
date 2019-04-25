@@ -23,10 +23,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import java.security.KeyPair;
 import java.security.PublicKey;
 
 import java.security.interfaces.RSAPublicKey;
@@ -36,9 +36,9 @@ import java.util.EnumSet;
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CertificateUtil;
-import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyAlgorithms;
 
+import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -49,6 +49,7 @@ import org.webpki.json.KeyEncryptionAlgorithms;
 import org.webpki.keygen2.KeyGen2URIs;
 
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.CardDataEncoder;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PaymentMethods;
 
@@ -64,7 +65,6 @@ import org.webpki.sks.PassphraseFormat;
 import org.webpki.sks.PatternRestriction;
 import org.webpki.sks.SKSException;
 import org.webpki.sks.SecureKeyStore;
-
 import org.webpki.sks.Device;
 import org.webpki.sks.GenKey;
 import org.webpki.sks.KeySpecifier;
@@ -84,8 +84,7 @@ public class InitWallet {
                                " authorityUrl keyEncryptionKey imageFile dataEncrytionAlgorithm");
             System.exit(-3);
         }
-        CustomCryptoProvider.forcedLoad(true);
-        
+  
         // Read importedKey/certificate to be imported
         KeyStoreEnumerator importedKey = new KeyStoreEnumerator(new FileInputStream(args[2]), args[3]);
         boolean rsa_flag = importedKey.getPublicKey() instanceof RSAPublicKey;
@@ -139,36 +138,33 @@ public class InitWallet {
                                              new KeySpecifier(KeyAlgorithms.NIST_P_256), endorsed_algs);
 
         surrogateKey.setCertificatePath(importedKey.getCertificatePath());
-        surrogateKey.setPrivateKey(importedKey.getPrivateKey());
+        surrogateKey.setPrivateKey(new KeyPair(importedKey.getPublicKey(), importedKey.getPrivateKey()));
         JSONObjectWriter ow = null;
         if (!args[5].equals("@")) {
             PaymentMethods paymentMethod = PaymentMethods.valueOf(args[5]);
             String accountId = args[6];
-            boolean cardFormatted = true;
+            String authorityUrl = args[7];
+            DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[10]);
+            PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
+            KeyEncryptionAlgorithms keyEncryptionAlgorithm = encryptionKey instanceof RSAPublicKey ?
+                KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID 
+                    : 
+                KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID;
             if (accountId.startsWith("!")) {
-                cardFormatted = false;
                 accountId = accountId.substring(1);
             }
-            ow = new JSONObjectWriter()
-                 .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUri())
-                 .setString(BaseProperties.ACCOUNT_ID_JSON, accountId)
-                 .setBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON, cardFormatted)
-                 .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, args[7])
-                 .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
-                         rsa_flag ?
-                    AsymSignatureAlgorithms.RSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE)
-                                  :
-                    AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE))
-                 .setPublicKey(importedKey.getCertificatePath()[0].getPublicKey());
-            PublicKey publicKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
-            ow.setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
-                  .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, args[10])
-                  .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
-                        (publicKey instanceof RSAPublicKey ?
-                             KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID 
-                                                           : 
-                             KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID).toString())
-                  .setPublicKey(publicKey);
+            ow = CardDataEncoder.encode(paymentMethod.getPaymentMethodUri(), 
+                                        accountId, 
+                                        authorityUrl,
+                                        rsa_flag ?
+                                             AsymSignatureAlgorithms.RSA_SHA256
+                                                               :
+                                             AsymSignatureAlgorithms.ECDSA_SHA256,
+                                        dataEncryptionAlgorithm, 
+                                        keyEncryptionAlgorithm, 
+                                        encryptionKey, 
+                                        null,
+                                        null);
             surrogateKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                                       SecureKeyStore.SUB_TYPE_EXTENSION,
                                       "",
@@ -204,7 +200,8 @@ public class InitWallet {
             url = url.substring(0, url.lastIndexOf('/'));  // Remove "/authority"
             if (args[1].substring(args[1].lastIndexOf(File.separator) + 7)
                     .startsWith(url.substring(url.lastIndexOf('/') + 1))) {
-                aw.setObject(new JSONObjectWriter(rd));
+                aw.setObject(new JSONObjectWriter(rd).setPublicKey(
+                        sks.getKeyAttributes(ek.getProvisioningHandle()).getCertificatePath()[0].getPublicKey()));
             }
         }
         ArrayUtil.writeFile(args[1], aw.serializeToBytes(JSONOutputFormats.PRETTY_PRINT));

@@ -4,6 +4,7 @@
   <property name="src.dir" value="src"/>
   
   <property name="temp.dir" location=".tmp"/>
+  <property name="w2nb.dir" value="../desktop-client/w2nb"/>
   <property name="testpage" location="../desktop-client/test/test.html"/>
   <property name="jcspaper" location="../../doc/security/jsonsignatures.html"/>
   <property name="nodejscryptotest.dir" location="nodejscryptotest"/>
@@ -50,7 +51,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
@@ -94,7 +95,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
@@ -136,7 +137,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}${additional.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}${additional.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
@@ -287,14 +288,11 @@
           dir="${@key.dir}"
           failonerror="true">
         <classpath>
-            <fileset dir="${reference.lib.dir}">
+            <fileset dir="${@reference.lib.dir}">
               <include name="*.jar"/>
             </fileset>
-             <fileset dir="${webpki.lib.dir}">
+             <fileset dir="${@webpki.lib.dir}">
                <include name="*.jar"/>
-             </fileset>
-             <fileset dir="${bcprovider.lib.dir}">
-               <include name="${bcprovider.jar}"/>
              </fileset>
              <pathelement location="${temp.dir}"/>
         </classpath>
@@ -320,7 +318,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
@@ -343,7 +341,7 @@
        <param name="card.image" value="bankdirect.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>
        <param name="sks.encryption" value="${@payerbankpath}-enc-key-ec"/>
-       <param name="dea" value="A128CBC-HS256"/>
+       <param name="dea" value="A256GCM"/>
      </antcall>
      <antcall target="_import">
        <param name="bankpath" value="${@payerbankpath}"/>
@@ -371,7 +369,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">

@@ -46,13 +46,11 @@ import java.lang.reflect.Field;
 import java.net.URL;
 
 import java.security.PublicKey;
-import java.security.Security;
 
 import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
-
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -77,11 +75,9 @@ import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.CryptoRandom;
 
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONParser;
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
@@ -97,6 +93,7 @@ import org.webpki.sks.SKSReferenceImplementation;
 import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.CardDataDecoder;
 import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.AuthorizationData;
@@ -107,13 +104,13 @@ import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.WalletAlertMessage;
 
+import org.webpki.saturn.w2nb.support.W2NB;
+
 import org.webpki.w2nbproxy.BrowserWindow;
 import org.webpki.w2nbproxy.ExtensionPositioning;
 import org.webpki.w2nbproxy.StdinJSONPipe;
 import org.webpki.w2nbproxy.StdoutJSONPipe;
 import org.webpki.w2nbproxy.LoggerConfiguration;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 //////////////////////////////////////////////////////////////////////////
 // Web2Native Bridge emulator Payment Agent (a.k.a. Wallet) application //
@@ -122,9 +119,9 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 // for evaluating a bunch of WebPKI.org technologies including:         //
 //  - Saturn (Payment authorization system)                             //
 //  - SKS (Secure Key Store)                                            //
-//  - JCS (JSON Clear-text Signature)                                   //
+//  - JSF (JSON Signature Format)                                       //
 //  - JEF (JSON Encryption Format)                                      //
-//  - YASMIN (JSON Message Format)                                           //
+//  - YASMIN (JSON Message Format)                                      //
 //  - Federation using credentials with embedded links                  //
 // and (of course...), the Web2Native Bridge.                           //
 //                                                                      //
@@ -178,7 +175,7 @@ public class Wallet {
         String optionalKeyId;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
-        PublicKey keyEncryptionKey;
+        PublicKey encryptionKey;
         PaymentRequest paymentRequest;
         
         Account(String paymentMethod,
@@ -669,7 +666,7 @@ public class Wallet {
             logger.info("Selected Card: Key=" + keyHandle +
                         ", AccountId=" + selectedCard.accountId +
                         ", URL=" + selectedCard.authorityUrl +
-                        ", KeyEncryptionKey=" + selectedCard.keyEncryptionKey);
+                        ", KeyEncryptionKey=" + selectedCard.encryptionKey);
             this.keyHandle = keyHandle;
             amountField.setText("\u200a" + amountString);
             payeeField.setText("\u200a" + payeeCommonName);
@@ -939,7 +936,7 @@ public class Wallet {
                                         // This key had the attribute signifying that it is a Saturn payment credential
                                         // but it might still not match the Payee's list of supported account types.
                                         collectPotentialCard(ek.getKeyHandle(),
-                                                             JSONParser.parse(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
+                                                             new CardDataDecoder(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
                                                              paymentRequest,
                                                              paymentMethods);
                                     }
@@ -1001,30 +998,25 @@ public class Wallet {
         }
 
         void collectPotentialCard(int keyHandle,
-                                  JSONObjectReader cardProperties,
+                                  CardDataDecoder cardProperties,
                                   PaymentRequest paymentRequest, String[] paymentMethods) throws IOException {
-            String paymentMethod = cardProperties.getString(BaseProperties.PAYMENT_METHOD_JSON);
+            String paymentMethod = cardProperties.getPaymentMethod();
             for (String acceptedPaymentMethod : paymentMethods) {
                 if (acceptedPaymentMethod.equals(paymentMethod)) {
                     Account card =
                         new Account(paymentMethod,
-                                    cardProperties.getString(BaseProperties.ACCOUNT_ID_JSON),
-                                    cardProperties.getBoolean(BaseProperties.CARD_FORMAT_ACCOUNT_ID_JSON),
+                                    cardProperties.getAccountId(),
+                                    true,
                                     getImageIcon(sks.getExtension(keyHandle, 
                                                  KeyGen2URIs.LOGOTYPES.CARD).getExtensionData(SecureKeyStore.SUB_TYPE_LOGOTYPE),
                                                  false),
-                                    AsymSignatureAlgorithms.getAlgorithmFromId(
-                                            cardProperties.getString(BaseProperties.SIGNATURE_ALGORITHM_JSON),
-                                            AlgorithmPreferences.JOSE),
-                                    cardProperties.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON),
+                                    cardProperties.getSignatureAlgorithm(),
+                                    cardProperties.getAuthorityUrl(),
                                     paymentRequest);
-                    JSONObjectReader encryptionParameters = cardProperties.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
-                    card.optionalKeyId = encryptionParameters.getStringConditional(JSONCryptoHelper.KEY_ID_JSON);
-                    card.keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-                             .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
-                    card.dataEncryptionAlgorithm = DataEncryptionAlgorithms
-                             .getAlgorithmFromId(encryptionParameters.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
-                    card.keyEncryptionKey = encryptionParameters.getPublicKey();
+                    card.optionalKeyId = cardProperties.getOptionalKeyId();
+                    card.keyEncryptionAlgorithm = cardProperties.getKeyEncryptionAlgorithm();
+                    card.dataEncryptionAlgorithm = cardProperties.getDataEncryptionAlgorithm();
+                    card.encryptionKey = cardProperties.getEncryptionKey();
 
                     // We found a useful card!
                     cardCollection.put(keyHandle, card);
@@ -1082,9 +1074,9 @@ public class Wallet {
                                                               selectedCard.authorityUrl,
                                                               selectedCard.paymentMethod,
                                                               selectedCard.dataEncryptionAlgorithm,
-                                                              selectedCard.keyEncryptionKey,
-                                                              selectedCard.optionalKeyId,
-                                                              selectedCard.keyEncryptionAlgorithm);
+                                                              selectedCard.keyEncryptionAlgorithm,
+                                                              selectedCard.encryptionKey,
+                                                              selectedCard.optionalKeyId);
                     logger.info("About to send to the browser:\n" + resultMessage);
                     return true;
                 } catch (SKSException e) {
@@ -1133,9 +1125,6 @@ public class Wallet {
             logger.info("ARG[" + i + "]=" + args[i]);
         }
 
-        // To get the crypto support needed 
-        Security.insertProviderAt(new BouncyCastleProvider(), 1);
-        
         // Read the calling window information provided by W2NB
         BrowserWindow browserWindow = null;
         ExtensionPositioning extensionPositioning = null;
@@ -1222,11 +1211,11 @@ public class Wallet {
         // it more look like a Web application.  Note that this measurement
         // lacks the 'px' part; you have to add it in the Web application.
         try {
-            JSONObjectWriter readyMessage = Messages.PAYMENT_CLIENT_IS_READY.createBaseMessage();
+            JSONObjectWriter readyMessage = W2NB.createReadyMessage();
             if (extWidth != 0) {
-                readyMessage.setObject(BaseProperties.WINDOW_JSON)
-                    .setDouble(BaseProperties.WIDTH_JSON, extWidth)
-                    .setDouble(BaseProperties.HEIGHT_JSON, extHeight);
+                readyMessage.setObject(W2NB.WINDOW_JSON)
+                    .setDouble(W2NB.WIDTH_JSON, extWidth)
+                    .setDouble(W2NB.HEIGHT_JSON, extHeight);
             }
             logger.info("Sent to browser:\n" + readyMessage);
             stdout.writeJSONObject(readyMessage);

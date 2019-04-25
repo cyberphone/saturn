@@ -24,7 +24,6 @@ import org.webpki.json.JSONObjectWriter;
 
 public enum Messages {
 
-    PAYMENT_CLIENT_IS_READY       ("PaymentClientIsReady"),          // PaymentClient to payee Web page message
     PAYMENT_CLIENT_REQUEST        ("PaymentClientRequest"),          // Payee payment request + other data
     PAYMENT_CLIENT_ALERT          ("PaymentClientAlert"),            // Payee to PaymentClient message
     PAYER_AUTHORIZATION           ("PayerAuthorization"),            // Created by the PaymentClient

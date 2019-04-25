@@ -18,11 +18,6 @@ package org.webpki.saturn.common;
 
 public interface BaseProperties {
 
-    // For the Web2Native Bridge wallet 
-    String WINDOW_JSON                      = "window";
-    String HEIGHT_JSON                      = "height";
-    String WIDTH_JSON                       = "width";
-
     String ATTESTATION_JSON                 = "attestation";                // Used for Authority Object signatures
 
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
@@ -67,7 +62,6 @@ public interface BaseProperties {
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_ID_JSON                  = "accountId";                  // Account identifier or PAN
     String ACCOUNT_REFERENCE_JSON           = "accountReference";           // Account/Card number for payee (like ************5678)
-    String CARD_FORMAT_ACCOUNT_ID_JSON      = "cardFormatAccountId";        // Display formatting like cards or not
     String ENCRYPTED_ACCOUNT_DATA_JSON      = "encryptedAccountData";       // Account data that (only) an acquirer needs
     String REQUEST_HASH_JSON                = "requestHash";                // Wallet authorization
     String DOMAIN_NAME_JSON                 = "domainName";

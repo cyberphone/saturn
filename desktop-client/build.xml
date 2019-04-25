@@ -4,6 +4,7 @@
 
   <property name="temp.dir" location=".tmp" />
   <property name="src.dir" value="src"/>
+  <property name="w2nb.dir" value="w2nb"/>
   <property name="image.dir" value="images"/>
   <property name="client.package.dir" value="org/webpki/saturn/w2nb/desktopclient"/>
   <property name="javaversion" value="1.8" />
@@ -26,7 +27,7 @@
   
   <target name="clean">
     <delete dir="${temp.dir}"/>
-    <delete dir="${common.app.dir}/${w2nb.webwallet}"/>
+    <delete dir="${common.app.dir}/${@w2nb.webwallet}"/>
   </target>
   
   <target name="build" depends="clean">
@@ -40,7 +41,7 @@
       </filterchain>
     </loadresource>
     <mkdir dir="${temp.dir}" />
-    <mkdir dir="${common.app.dir}/${w2nb.webwallet}" />
+    <mkdir dir="${common.app.dir}/${@w2nb.webwallet}" />
     <fixcrlf srcdir="${src.dir}"
        tab="remove"
        tablength="4"
@@ -50,13 +51,13 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
            includeAntRuntime="false">
            <include name="**/Wallet.java"/>
     </javac>
-    <jar jarfile="${common.app.dir}/${w2nb.webwallet}/${w2nb.webwallet}.jar">
+    <jar jarfile="${common.app.dir}/${@w2nb.webwallet}/${@w2nb.webwallet}.jar">
       <fileset dir="${temp.dir}">
         <exclude name="**/AccountTypes.class"/>
         <exclude name="**/DecryptionKeyHolder.class"/>
@@ -67,10 +68,10 @@
       </zipfileset>
       <manifest>
         <attribute name="Main-Class" value="${java.dotted.path}.Wallet"/>
-        <attribute name="Class-path" value="../../libs/${webpki-libext.jar} ../../libs/${bcprovider.jar} ../../libs/proxy-support.jar"/>
+        <attribute name="Class-path" value="../../libs/${@webpki-libext.jar} ../../libs/proxy-support.jar"/>
       </manifest>
     </jar>
-    <copy file="manifest.json" todir="${common.app.dir}/${w2nb.webwallet}" overwrite="true" preservelastmodified="true"/>
+    <copy file="manifest.json" todir="${common.app.dir}/${@w2nb.webwallet}" overwrite="true" preservelastmodified="true"/>
   </target>
   
 </project>

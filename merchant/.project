@@ -25,6 +25,11 @@
 			<type>2</type>
 			<locationURI>copy_PARENT/methods/src</locationURI>
 		</link>
+		<link>
+			<name>w2nb</name>
+			<type>2</type>
+			<location>copy_PARENT/desktop-client/w2nb</location>
+		</link>
 	</linkedResources>
 	<variableList>
 		<variable>

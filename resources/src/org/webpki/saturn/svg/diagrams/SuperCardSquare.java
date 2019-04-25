@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.svg.diagrams;
 
+import org.webpki.saturn.common.CardImageData;
+
 import org.webpki.tools.svg.SVGDocument;
 import org.webpki.tools.svg.SVGDoubleValue;
 import org.webpki.tools.svg.SVGEmbeddedText;
@@ -24,7 +26,7 @@ import org.webpki.tools.svg.SVGRect;
 import org.webpki.tools.svg.SVGText;
 import org.webpki.tools.svg.SVGText.FONT_WEIGHTS;
 
-public class SuperCardSquare extends SVGDocument implements StandardCardData {
+public class SuperCardSquare extends SVGDocument implements CardImageData {
     public SuperCardSquare() {
         super(0, 0);
     }
