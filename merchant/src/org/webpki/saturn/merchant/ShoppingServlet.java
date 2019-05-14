@@ -40,7 +40,7 @@ public class ShoppingServlet extends HttpServlet {
     static LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<String,ProductEntry>();
     
     static {
-        products.put("7d688", new ProductEntry("product-car.png", "Sports Car", 8599900)); 
+        products.put("7d688", new ProductEntry("product-car.png", "Model Car", 49999)); 
         products.put("90555", new ProductEntry("product-icecream.png", "Ice Cream", 325)); 
     }
     

@@ -94,6 +94,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String PAYEE_ACQUIRER_AUTHORITY_URL = "payee_acquirer_authority_url";
 
+    static final String NO_MATCHING_METHODS_URL      = "no_matching_methods_url";
+
     static final String SERVER_PORT_MAP              = "server_port_map";
     
     static final String LOCAL_INSTALLATION           = "local_installation";
@@ -139,6 +141,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static String payeeAcquirerAuthorityUrl;
     
     static String payeeProviderAuthorityUrl;
+    
+    static String noMatchingMethodsUrl;
 
     static Currencies currency;
 
@@ -308,6 +312,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 
             payeeAcquirerAuthorityUrl = getPropertyString(PAYEE_ACQUIRER_AUTHORITY_URL);
+
+            String noMatching = getPropertyString(NO_MATCHING_METHODS_URL);
+            if (noMatching.length() != 0) {
+                noMatchingMethodsUrl = noMatching;
+            }
 
             new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
 

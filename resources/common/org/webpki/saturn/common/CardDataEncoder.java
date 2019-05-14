@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.security.PublicKey;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -41,7 +43,8 @@ public class CardDataEncoder {
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                           PublicKey encryptionKey,
                                           String optionalKeyId,
-                                          byte[] optionalAccountStatusKeyHash) throws IOException {
+                                          byte[] optionalAccountStatusKeyHash,
+                                          BigDecimal tempBalanceFix) throws IOException {
         return new JSONObjectWriter()
             .setString(CardDataDecoder.VERSION_JSON, CardDataDecoder.ACTUAL_VERSION)
             .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentMethod)
@@ -56,6 +59,7 @@ public class CardDataEncoder {
                 .setDynamic((wr)-> optionalKeyId == null ?
                         wr : wr.setString(JSONCryptoHelper.KEY_ID_JSON, optionalKeyId)))
             .setDynamic((wr)-> optionalAccountStatusKeyHash == null ?
-                    wr : wr.setBinary(CardDataDecoder.ACCOUNT_STATUS_KEY_HASH, optionalAccountStatusKeyHash));
+                    wr : wr.setBinary(CardDataDecoder.ACCOUNT_STATUS_KEY_HASH, optionalAccountStatusKeyHash))
+            .setMoney(CardDataDecoder.TEMPORARY_BALANCE_FIX, tempBalanceFix);
     }
 }

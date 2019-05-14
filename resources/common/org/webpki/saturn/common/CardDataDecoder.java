@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.security.PublicKey;
 
 import org.webpki.crypto.AlgorithmPreferences;
@@ -40,7 +42,8 @@ public class CardDataDecoder {
     static final String ACTUAL_VERSION = "1";
     
     static final String ACCOUNT_STATUS_KEY_HASH = "accountStatusKeyHash";
-    
+    static final String TEMPORARY_BALANCE_FIX   = "temp.bal.fix";
+
     public CardDataDecoder(byte[] cardDataBlob) throws IOException {
         JSONObjectReader rd = JSONParser.parse(cardDataBlob);
         version = rd.getString(VERSION_JSON);
@@ -61,6 +64,7 @@ public class CardDataDecoder {
         encryptionKey = ep.getPublicKey();
         optionalKeyId = ep.getStringConditional(JSONCryptoHelper.KEY_ID_JSON);
         optionalAccountStatusKeyHash = rd.getBinaryConditional(ACCOUNT_STATUS_KEY_HASH);
+        tempBalanceFix = rd.getMoney(TEMPORARY_BALANCE_FIX, 2);
         rd.checkForUnread();
     }
 
@@ -113,4 +117,9 @@ public class CardDataDecoder {
     public byte[] getOptionalAccountStatusKeyHash() {
         return optionalAccountStatusKeyHash;
     }
+
+    BigDecimal tempBalanceFix;
+    public BigDecimal getTempBalanceFix() {
+        return tempBalanceFix;
+    }    
 }

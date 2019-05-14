@@ -29,27 +29,9 @@
     </context-param>
 
     <context-param>
-        <description>Key Provider Base URL</description>
-        <param-name>keyprov_base_url</param-name>
-        <param-value>@keyprov-base-url@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Payment Credential</description>
-        <param-name>paycred1</param-name>
-        <param-value>@paycred1@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Payment Credential</description>
-        <param-name>paycred2</param-name>
-        <param-value>@paycred2@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Payment Credential</description>
-        <param-name>paycred3</param-name>
-        <param-value>@paycred3@</param-value>
+        <description>User Accounts</description>
+        <param-name>accounts</param-name>
+        <param-value>@accounts@</param-value>
     </context-param>
 
     <context-param>

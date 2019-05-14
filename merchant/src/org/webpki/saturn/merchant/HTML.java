@@ -928,9 +928,11 @@ public class HTML implements MerchantProperties {
               "Note: The Android Wallet is a <i>proof-of-concept implementation</i> rather than a product.</td></tr>" +
             "<tr><td>Installation: <a href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">" +
               "https://play.google.com/store/apps/details?id=org.webpki.mobile.android</a></td></tr>" +
+            (MerchantService.noMatchingMethodsUrl == null ? "" :  
             "<tr><td>Enroll payment <i>test credentials</i> " +
-              "by surfing (with the Android device...) to: <a href=\"https://mobilepki.org/webpay-keyprovider\">" +
-              "https://mobilepki.org/webpay-keyprovider</td></tr>" +
+              "by surfing (with the Android device...) to: <a href=\"" +
+              MerchantService.noMatchingMethodsUrl + "\">" +
+              MerchantService.noMatchingMethodsUrl + "</td></tr>") +
             (MerchantService.desktopWallet ?
               "<tr><td>Unlike the desktop (Windows, Linux, and OS/X-based) Wallet, " +
               "the Android version also supports remote operation using QR codes.  This mode is " +

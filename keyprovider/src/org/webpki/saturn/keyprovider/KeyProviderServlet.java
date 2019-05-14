@@ -26,8 +26,6 @@ import java.util.logging.Logger;
 
 import java.security.cert.X509Certificate;
 
-import java.security.interfaces.RSAKey;
-
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
@@ -37,7 +35,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
 import org.webpki.keygen2.ServerState;
@@ -130,30 +127,29 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                         serverPinPolicy,
                                                         paymentCredential.optionalServerPin);                           
 
-            AsymSignatureAlgorithms signAlg =
-                paymentCredential.signatureKey.getPublicKey() instanceof RSAKey ?
-                    AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256;
-            key.addEndorsedAlgorithm(signAlg);
-            key.setCertificatePath(paymentCredential.signatureKey.getCertificatePath());
-            key.setPrivateKey(paymentCredential.signatureKey.getPrivateKey().getEncoded());
+            key.addEndorsedAlgorithm(paymentCredential.signatureAlgorithm);
+            key.setCertificatePath(paymentCredential.dummyCertificatePath);
+            key.setPrivateKey(paymentCredential.signatureKey.getEncoded());
             key.setFriendlyName("Account " + paymentCredential.accountId);
             key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                              CardDataEncoder.encode(paymentCredential.paymentMethod,
                                                     paymentCredential.accountId, 
                                                     paymentCredential.authorityUrl, 
-                                                    signAlg, 
+                                                    paymentCredential.signatureAlgorithm, 
                                                     paymentCredential.dataEncryptionAlgorithm, 
                                                     paymentCredential.keyEncryptionAlgorithm, 
                                                     paymentCredential.encryptionKey,
                                                     null,
-                                                    null).serializeToBytes(JSONOutputFormats.NORMALIZED));
+                                                    null,
+                                                    paymentCredential.tempBalanceFix)
+                                                        .serializeToBytes(JSONOutputFormats.NORMALIZED));
 
             key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
 
                 @Override
                 public byte[] getData() throws IOException {
                     return new String(paymentCredential.svgCardImage)
-                        .replace(CardImageData.STANDARD_NAME, "Luke Skywalker")
+                        .replace(CardImageData.STANDARD_NAME, paymentCredential.cardHolder)
                         .replace(CardImageData.STANDARD_ACCOUNT, paymentCredential.cardFormatted ?
                             AuthorizationData.formatCardNumber(paymentCredential.accountId) 
                                                                         :

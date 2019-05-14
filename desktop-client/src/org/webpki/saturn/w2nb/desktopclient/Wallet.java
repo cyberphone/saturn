@@ -41,6 +41,8 @@ import java.awt.event.WindowAdapter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
+import java.math.BigDecimal;
+
 import java.lang.reflect.Field;
 
 import java.net.URL;
@@ -163,7 +165,7 @@ public class Wallet {
 
     static final int TIMEOUT_FOR_REQUEST       = 10000;
     
-    static final String DUMMY_ACCOUNT_ID       = "12341234123412341234";
+    static final String DUMMY_BALANCE       = "12341234123412341234";
 
     static class Account {
         String paymentMethod;
@@ -177,6 +179,7 @@ public class Wallet {
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey encryptionKey;
         PaymentRequest paymentRequest;
+        BigDecimal tempBalanceFix;
         
         Account(String paymentMethod,
                 String accountId,
@@ -184,7 +187,8 @@ public class Wallet {
                 ImageIcon cardIcon,
                 AsymSignatureAlgorithms signatureAlgorithm,
                 String authorityUrl,
-                PaymentRequest paymentRequest) {
+                PaymentRequest paymentRequest,
+                BigDecimal tempBalanceFix) {
             this.paymentMethod = paymentMethod;
             this.accountId = accountId;
             this.cardFormatAccountId = cardFormatAccountId;
@@ -192,6 +196,7 @@ public class Wallet {
             this.signatureAlgorithm = signatureAlgorithm;
             this.authorityUrl = authorityUrl;
             this.paymentRequest = paymentRequest;
+            this.tempBalanceFix = tempBalanceFix;
         }
     }
 
@@ -299,7 +304,7 @@ public class Wallet {
         String payeeCommonName;
         JPasswordField pinText;
         JButton selectedCardImage;
-        JLabel selectedCardNumber;
+        JLabel selectedCardBalance;
         JButton authorizationCancelButton;  // Used as a master for creating unified button widths
         ImageIcon dummyCardIcon;
         boolean macOS;
@@ -369,13 +374,6 @@ public class Wallet {
             cardSelectionViewCore.add(new JLabel(), c);
         }
 
-        String formatAccountId(Account card) {
-            return card.cardFormatAccountId ?
-                AuthorizationData.formatCardNumber(card.accountId) 
-                                            :
-                card.accountId;
-        }
-
         String processExternalHtml(String simpleHtml) {
             return "<html><div style='width:" +
                    String.valueOf(fontSize * 20) + "px'>" +
@@ -416,7 +414,7 @@ public class Wallet {
                                       0,
                                       0,
                                       0);
-                JLabel accountId = new JLabel(formatAccountId(card), JLabel.CENTER);
+                JLabel accountId = new JLabel(card.tempBalanceFix.toPlainString(), JLabel.CENTER);
                 accountId.setFont(cardNumberFont);
                 cardSelectionViewCore.add(accountId, c);
                 if (!even) {
@@ -453,8 +451,8 @@ public class Wallet {
             } else {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<Integer,Account>();
                 for (int i = 0; i < 2; i++) {
-                    cards.put(i, new Account("n/a", DUMMY_ACCOUNT_ID,
-                                             true, dummyCardIcon, null, null, null));
+                    cards.put(i, new Account("n/a", DUMMY_BALANCE,
+                                             true, dummyCardIcon, null, null, null, new BigDecimal("1.00")));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
             }
@@ -651,11 +649,11 @@ public class Wallet {
             GridBagConstraints c2 = new GridBagConstraints();
             selectedCardImage = createCardButton(dummyCardIcon, TOOLTIP_SELECTED_CARD);
             cardAndNumber.add(selectedCardImage, c2);
-            selectedCardNumber = new JLabel(DUMMY_ACCOUNT_ID);
-            selectedCardNumber.setFont(cardNumberFont);
+            selectedCardBalance = new JLabel(DUMMY_BALANCE);
+            selectedCardBalance.setFont(cardNumberFont);
             c2.insets = new Insets(0, 0, 0, 0);
             c2.gridy = 1;
-            cardAndNumber.add(selectedCardNumber, c2);
+            cardAndNumber.add(selectedCardBalance, c2);
             authorizationView.add(cardAndNumber, c);
 
             views.add(authorizationView, VIEW_AUTHORIZE);
@@ -672,7 +670,7 @@ public class Wallet {
             payeeField.setText("\u200a" + payeeCommonName);
             selectedCardImage.setIcon(selectedCard.cardIcon);
             selectedCardImage.setPressedIcon(selectedCard.cardIcon);
-            selectedCardNumber.setText(formatAccountId(selectedCard));
+            selectedCardBalance.setText(selectedCard.tempBalanceFix.toPlainString());
             ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
             payeeField.setCaretPosition(0);
             pinText.requestFocusInWindow();
@@ -1012,7 +1010,8 @@ public class Wallet {
                                                  false),
                                     cardProperties.getSignatureAlgorithm(),
                                     cardProperties.getAuthorityUrl(),
-                                    paymentRequest);
+                                    paymentRequest,
+                                    cardProperties.getTempBalanceFix());
                     card.optionalKeyId = cardProperties.getOptionalKeyId();
                     card.keyEncryptionAlgorithm = cardProperties.getKeyEncryptionAlgorithm();
                     card.dataEncryptionAlgorithm = cardProperties.getDataEncryptionAlgorithm();

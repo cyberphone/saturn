@@ -19,11 +19,12 @@ package org.webpki.saturn.keyprovider;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.math.BigDecimal;
+
+import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import java.security.cert.X509Certificate;
-
-import java.security.interfaces.RSAPublicKey;
 
 import java.util.Vector;
 
@@ -35,9 +36,12 @@ import javax.servlet.ServletContextListener;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
+import org.webpki.crypto.AsymSignatureAlgorithms;
 
+import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.JSONParser;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.CredentialDiscoveryResponseDecoder;
@@ -50,6 +54,7 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PaymentMethods;
+import org.webpki.saturn.common.TemporaryCardDBDecoder;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -71,7 +76,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String LOGGING               = "logging";
 
-    static final String[] CREDENTIALS         = {"paycred1", "paycred2", "paycred3"};
+    static final String ACCOUNTS              = "accounts";
     
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
@@ -88,9 +93,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static boolean logging;
 
     static class PaymentCredential {
-        KeyStoreEnumerator signatureKey;
+        PrivateKey signatureKey;
+        AsymSignatureAlgorithms signatureAlgorithm;
+        X509Certificate[] dummyCertificatePath;
         String paymentMethod;
         String accountId;
+        String cardHolder;
         boolean cardFormatted;
         byte[] optionalServerPin;
         String authorityUrl;
@@ -98,6 +106,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         PublicKey encryptionKey;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
+        
+        BigDecimal tempBalanceFix;
     }
 
     static Vector<PaymentCredential> paymentCredentials = new Vector<PaymentCredential>();
@@ -140,35 +150,33 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials
             ////////////////////////////////////////////////////////////////////////////////////////////
-            String bankHost = getPropertyString(PAYER_BANK_HOST);
-            for (String credentialEntry : CREDENTIALS) {
-                final String[] arguments = getPropertyStringList(credentialEntry);
-                PaymentCredential paymentCredential = new PaymentCredential();
-                paymentCredentials.add(paymentCredential);
-                paymentCredential.authorityUrl = bankHost + "/" + arguments[5] + "/authority";
-                paymentCredential.optionalServerPin = arguments[6].equals("@") ? null : arguments[6].getBytes("utf-8");
-                paymentCredential.signatureKey =
-                    new KeyStoreEnumerator(getResource(arguments[0]),
-                                           getPropertyString(KEYSTORE_PASSWORD));
-                paymentCredential.paymentMethod = PaymentMethods.valueOf(arguments[1]).getPaymentMethodUri();
-                boolean cardFormatted = true;
-                if (arguments[2].charAt(0) == '!') {
-                    cardFormatted = false;
-                    arguments[2] = arguments[2].substring(1);
+            String bankHost = getPropertyString(PAYER_BANK_HOST); // For next iteration...
+
+            for (String accountFile : getPropertyStringList(ACCOUNTS)) {
+                JSONArrayReader ar = 
+                        JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(getResource(accountFile)))
+                                .getJSONArrayReader();
+                while (ar.hasMore()) {
+                    PaymentCredential paymentCredential = new PaymentCredential();
+                    paymentCredentials.add(paymentCredential);
+                    TemporaryCardDBDecoder temp = new TemporaryCardDBDecoder(ar.getObject());
+                    paymentCredential.authorityUrl = temp.coreCardData.getAuthorityUrl();
+                    paymentCredential.optionalServerPin = temp.cardPIN.equals("@") ? 
+                                                                              null : temp.cardPIN.getBytes("utf-8");
+                    paymentCredential.signatureKey = temp.cardPrivateKey;
+                    paymentCredential.signatureAlgorithm = temp.coreCardData.getSignatureAlgorithm();
+                    paymentCredential.dummyCertificatePath = new X509Certificate[]{temp.cardDummyCertificate};
+                    PaymentMethods.fromTypeUri(paymentCredential.paymentMethod = temp.coreCardData.getPaymentMethod());
+                    paymentCredential.accountId = temp.coreCardData.getAccountId();
+                    paymentCredential.cardHolder = temp.cardHolder;
+                    paymentCredential.cardFormatted = temp.formatAccountAsCard;
+                    paymentCredential.svgCardImage = 
+                            new String(ArrayUtil.getByteArrayFromInputStream(getResource(temp.logotypeName)), "utf-8");
+                    paymentCredential.encryptionKey = temp.coreCardData.getEncryptionKey();
+                    paymentCredential.keyEncryptionAlgorithm = temp.coreCardData.getKeyEncryptionAlgorithm();
+                    paymentCredential.dataEncryptionAlgorithm = temp.coreCardData.getDataEncryptionAlgorithm();
+                    paymentCredential.tempBalanceFix = temp.coreCardData.getTempBalanceFix();
                 }
-                paymentCredential.accountId = arguments[2];
-                paymentCredential.cardFormatted = cardFormatted;
-                paymentCredential.svgCardImage = new String(ArrayUtil.getByteArrayFromInputStream(getResource(arguments[3])), "utf-8");
-                paymentCredential.encryptionKey =
-                    CertificateUtil.getCertificateFromBlob(
-                        ArrayUtil.getByteArrayFromInputStream(getResource(arguments[4]))).getPublicKey();
-                paymentCredential.keyEncryptionAlgorithm = 
-                        paymentCredential.encryptionKey instanceof RSAPublicKey ?
-                        KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID 
-                                                                                : 
-                        KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID;
-                paymentCredential.dataEncryptionAlgorithm = 
-                        DataEncryptionAlgorithms.getAlgorithmFromId(arguments[7]);
             }
 
 

@@ -186,7 +186,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         BigDecimal amount = paymentRequest.getAmount();
         // Sorry but you don't appear to have a million bucks :-)
-        if (amount.compareTo(DEMO_ACCOUNT_LIMIT) >= 0) {
+        if (amount.compareTo(account.balance) >= 0) {
             BankService.rejectedTransactions++;
             return createProviderUserResponse("Your request for " + 
                                                 amountInHtml(paymentRequest, amount) +

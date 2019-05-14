@@ -34,7 +34,8 @@ public interface BaseProperties {
 
     String USER_RESPONSE_ITEMS_JSON         = "userResponseItems";          // Result of ProviderUserResponse 
 
-    String PAYMENT_NETWORKS_JSON            = "paymentNetworks";
+    String PAYMENT_NETWORKS_JSON            = "paymentNetworks";            // Main request data for Payer
+    String NO_MATCHING_METHODS_URL_JSON     = "noMatchingMethodsUrl";       // Optional tip by Payer to Payee in case nothing matches
     String PAYMENT_REQUEST_JSON             = "paymentRequest";
     String HTTP_VERSION_JSON                = "httpVersion";                // For per partner being able to use HTTP/2 and further
     String EXPIRES_JSON                     = "expires";                    // Object expiration time

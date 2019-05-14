@@ -61,7 +61,7 @@
     <property name="payee.account.validation" value="true"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="server.port.map" value=""/>
-    <property name="users.db" value="users.${appcorename}.json"/>
+    <property name="users.db" value="accounts.${appcorename}.json"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
     <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa.p12"/>
     <property name="enc.key.ec" value="${appcorename}-enc-key-ec.p12"/>

@@ -161,16 +161,24 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
     }
+    
+    void addDecryptioKey(KeyStoreEnumerator keyStoreEnumerator, KeyEncryptionAlgorithms keyEncryptionAlgorithm) {
+        decryptionKeys.add(new JSONDecryptionDecoder.DecryptionKeyHolder(
+                keyStoreEnumerator.getPublicKey(),
+                keyStoreEnumerator.getPrivateKey(),
+                keyEncryptionAlgorithm,
+                null));
+    }
 
     void addDecryptionKey(String name) throws IOException {
         KeyStoreEnumerator keyStoreEnumerator = new KeyStoreEnumerator(getResource(name),
                                                                        getPropertyString(KEYSTORE_PASSWORD));
-        decryptionKeys.add(new JSONDecryptionDecoder.DecryptionKeyHolder(
-                                       keyStoreEnumerator.getPublicKey(),
-                                       keyStoreEnumerator.getPrivateKey(),
-                                       keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey ?
-                     KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID,
-                                       null));
+        if (keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey) {
+            addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID);
+        } else {
+            addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
+            addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_ECDH_ES_A128KW_ALG_ID);
+        }
     }
 
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {

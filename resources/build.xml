@@ -10,7 +10,7 @@
   <property name="nodejscryptotest.dir" location="nodejscryptotest"/>
   
   <property file="../resources/common.properties"/>
-  <property file="../resources/users.properties"/>
+  <property file="../resources/accounts.properties"/>
   <property file="../resources/merchants.properties"/>
 
   <condition property="bank.host" value="https://localhost:8442" else="https://mobilepki.org">
@@ -278,11 +278,9 @@
   </target>
   
   <target name="_import">
-    <property name="card.number" value="@"/>
-    <property name="sks.encryption" value="@"/>
     <property name="card.path" location="${@cardimage.dir}/${card.image}"/>
     <property name="sks.path" location="${@credentials.dir}/${@credentials_store}"/>
-    <property name="db.path" location="${@credentials.dir}/users.${bankpath}.json"/>
+    <property name="db.path" location="${@credentials.dir}/accounts.${bankpath}.json"/>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitWallet"
           dir="${@key.dir}"
@@ -298,21 +296,24 @@
         </classpath>
         <arg value="${sks.path}"/>
         <arg value="${db.path}"/>
-        <arg value="${sks.certificate}.p12"/>
-        <arg value="${@keypassword}"/>
-        <arg value="${sks.pin}"/>
+        <arg value="${client.key.core}"/>
+        <arg value="${kg2.pin}"/>
         <arg value="${card.type}"/>
         <arg value="${card.number}"/>
+        <arg value="${card.balance}"/>
         <arg value="${bank.host}/${bankpath}/authority"/>
-        <arg value="${sks.encryption}.cer"/>
+        <arg value="${key.encryption.key}.cer"/>
         <arg value="${card.path}"/>
         <arg value="${dea}"/>
+        <arg value="${kea}"/>
     </java>
   </target>
 
   <target name="initwallet">
     <delete file="${@credentials.dir}/${@credentials_store}"/>
     <mkdir dir="${@credentials.dir}"/>
+    <echo file="${@credentials.dir}/accounts.${@payeebankpath}.json">[]</echo>
+    <echo file="${@credentials.dir}/accounts.${@payerbankpath}.json">[]</echo>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
@@ -324,40 +325,40 @@
            includeAntRuntime="false">
     </javac>
     <antcall target="_import">
-       <param name="sks.certificate" value="${@clientkey_super}"/>
-       <param name="sks.pin" value="1234"/>
+       <param name="client.key.core" value="${@clientkey_super}"/>
+       <param name="kg2.pin" value="@"/>
        <param name="card.type" value="SUPER_CARD"/>
        <param name="card.number" value="${@account_id_super}"/>
+       <param name="card.balance" value="2390.00"/>
        <param name="card.image" value="supercard.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>
-       <param name="sks.encryption" value="${@payerbankpath}-enc-key-ec"/>
+       <param name="key.encryption.key" value="${@payerbankpath}-enc-key-ec"/>
        <param name="dea" value="A128CBC-HS256"/>
+       <param name="kea" value="ECDH-ES+A128KW"/>
     </antcall>
     <antcall target="_import">
-       <param name="sks.certificate" value="${@clientkey_bankdir}"/>
-       <param name="sks.pin" value="1234"/>
+       <param name="client.key.core" value="${@clientkey_bankdir}"/>
+       <param name="kg2.pin" value="@"/>
        <param name="card.type" value="BANK_DIRECT"/>
        <param name="card.number" value="!${@account_id_bankdir}"/>
+       <param name="card.balance" value="5543.00"/>
        <param name="card.image" value="bankdirect.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>
-       <param name="sks.encryption" value="${@payerbankpath}-enc-key-ec"/>
+       <param name="key.encryption.key" value="${@payerbankpath}-enc-key-ec"/>
        <param name="dea" value="A256GCM"/>
-     </antcall>
+       <param name="kea" value="ECDH-ES"/>
+    </antcall>
      <antcall target="_import">
-       <param name="bankpath" value="${@payerbankpath}"/>
-       <param name="sks.certificate" value="${@clientkey_other}"/>
-       <param name="sks.pin" value="1234"/>
-       <param name="card.type" value="@"/>
-     </antcall>
-     <antcall target="_import">
-       <param name="sks.certificate" value="${@clientkey_unusual}"/>
-       <param name="sks.pin" value="1234"/>
+       <param name="client.key.core" value="${@clientkey_unusual}"/>
+       <param name="kg2.pin" value="Money-77"/>
        <param name="card.type" value="UNUSUAL_CARD"/>
        <param name="card.number" value="${@account_id_unusual}"/>
+       <param name="card.balance" value="120.00"/>
        <param name="card.image" value="unusualcard.png"/>
        <param name="bankpath" value="${@payeebankpath}"/>
-       <param name="sks.encryption" value="${@payeebankpath}-enc-key-ec"/>
+       <param name="key.encryption.key" value="${@payeebankpath}-enc-key-ec"/>
        <param name="dea" value="A128CBC-HS256"/>
+       <param name="kea" value="ECDH-ES"/>
      </antcall>
   </target>
   

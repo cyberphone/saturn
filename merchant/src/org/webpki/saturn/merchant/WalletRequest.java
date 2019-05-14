@@ -78,6 +78,9 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                 .setStringArray(PAYMENT_METHODS_JSON, paymentNetwork.acceptedAccountTypes)
                 .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         }
+        if (MerchantService.noMatchingMethodsUrl != null) {
+            requestObject.setString(NO_MATCHING_METHODS_URL_JSON, MerchantService.noMatchingMethodsUrl);
+        }
         
         if (debugMode) {
             debugData.InvokeWallet = ProcessingBaseServlet.makeReader(requestObject);

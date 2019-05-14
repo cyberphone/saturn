@@ -6,7 +6,7 @@
   <property name="packimage_dir" value="packaged-images"/>
   <property name="temp.dir" value=".tmp"/>
   <property file="../resources/common.properties"/>
-  <property file="../resources/users.properties"/>
+  <property file="../resources/accounts.properties"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/keyprovider"/>
   <property name="logging" value="false"/>
   
@@ -68,12 +68,7 @@
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@payer-bank-host@" value="${@payerbankhost}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
-      <replacefilter token="@paycred1@"
-        value="${@clientkey_super}.p12,SUPER_CARD,${@account_id_super},supercard.svg,${@payerbankpath}-enc-key-ec.cer,${@payerbankpath},@,A128CBC-HS256"/>
-      <replacefilter token="@paycred2@"
-        value="${@clientkey_bankdir}.p12,BANK_DIRECT,!${@account_id_bankdir},bankdirect.svg,${@payerbankpath}-enc-key-ec.cer,${@payerbankpath},@,A128GCM"/>
-      <replacefilter token="@paycred3@"
-        value="${@clientkey_unusual}.p12,UNUSUAL_CARD,${@account_id_unusual},unusualcard.svg,${@payeebankpath}-enc-key-ec.cer,${@payeebankpath},Money-77,A128CBC-HS256"/>
+      <replacefilter token="@accounts@" value="accounts.${@payerbankpath}.json,accounts.${@payeebankpath}.json"/>
       <replacefilter token="@keyprov-kmk@" value="${@kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@server-tls-certificate@" value="${@kg2_tls_cert_file}"/>
@@ -103,6 +98,9 @@
       </zipfileset>
       <zipfileset dir="card-images" prefix="${class_war_path}"/>
       <zipfileset dir="${@logotype.dir}" prefix="${class_war_path}"/>
+      <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
+        <include name="accounts*"/>
+      </zipfileset>
       <fileset dir="web"/>
     </war>
   </target>

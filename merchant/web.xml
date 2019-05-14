@@ -77,6 +77,12 @@
     </context-param>
 
     <context-param>
+        <description>Optional URL to guide a user without cards</description>
+        <param-name>no_matching_methods_url</param-name>
+        <param-value>@no-matching-methods-url@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Currency</description>
         <param-name>currency</param-name>
         <param-value>@currency@</param-value>

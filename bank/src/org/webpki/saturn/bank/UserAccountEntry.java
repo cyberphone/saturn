@@ -18,24 +18,24 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.security.PublicKey;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONCryptoHelper;
 
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
-import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.TemporaryCardDBDecoder;
 
-public class UserAccountEntry implements BaseProperties {
+public class UserAccountEntry {
     PublicKey publicKey;
     String paymentMethod;
     String accountId;
-    boolean cardFormatAccountId;
+    BigDecimal balance;
     String providerAuthorityUrl;
     AsymSignatureAlgorithms signatureAlgorithm;
     String optionalKeyId;
@@ -46,27 +46,22 @@ public class UserAccountEntry implements BaseProperties {
     RiskBasedAuthentication riskBasedAuthentication = new RiskBasedAuthentication();
 
     public UserAccountEntry(JSONObjectReader rd) throws IOException {
-        paymentMethod = rd.getString(PAYMENT_METHOD_JSON);
-        accountId = rd.getString(ACCOUNT_ID_JSON);
-        cardFormatAccountId = rd.getBoolean(CARD_FORMAT_ACCOUNT_ID_JSON);
-        signatureAlgorithm = AsymSignatureAlgorithms
-            .getAlgorithmFromId(rd.getString(SIGNATURE_ALGORITHM_JSON), AlgorithmPreferences.JOSE);
-        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
-        publicKey = rd.getPublicKey();
-        JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        if (encryptionParameters.hasProperty(JSONCryptoHelper.KEY_ID_JSON)) {
-            optionalKeyId = encryptionParameters.getString(JSONCryptoHelper.KEY_ID_JSON);
-        }
-        encryptionKey = encryptionParameters.getPublicKey();
-        dataEncryptionAlgorithm = DataEncryptionAlgorithms
-            .getAlgorithmFromId(encryptionParameters.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
-        keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-            .getAlgorithmFromId(encryptionParameters.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
+        TemporaryCardDBDecoder temp = new TemporaryCardDBDecoder(rd);
+        publicKey = temp.cardPublicKey;
+        paymentMethod = temp.coreCardData.getPaymentMethod();
+        accountId = temp.coreCardData.getAccountId();
+        balance = temp.coreCardData.getTempBalanceFix();
+        providerAuthorityUrl = temp.coreCardData.getAuthorityUrl();
+        signatureAlgorithm = temp.coreCardData.getSignatureAlgorithm();
+        optionalKeyId = temp.coreCardData.getOptionalKeyId();
+        encryptionKey = temp.coreCardData.getEncryptionKey();
+        dataEncryptionAlgorithm = temp.coreCardData.getDataEncryptionAlgorithm();
+        keyEncryptionAlgorithm = temp.coreCardData.getKeyEncryptionAlgorithm();
         rd.checkForUnread();
     }
 
     public String getAccountId() {
-         return accountId;
+        return accountId;
     }
 
     public PublicKey getPublicKey() {
