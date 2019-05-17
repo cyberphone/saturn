@@ -18,7 +18,7 @@
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-    <echo message="build tomcat [-Dunusual.card=0] [-Dcurrency=XYZ] [-Dslow.operation=0] [-Dhostingoption=0]"/>
+    <echo message="build tomcat [-Dunusual.card=true] [-Dcurrency=XYZ] [-Dslow.operation=0] [-Dhostingoption=0]"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -44,7 +44,7 @@
       <isset property="hostingoption"/>
     </condition>
     <property name="server.port.map" value=""/>
-    <property name="unusualcard" value="false"/>
+    <property name="unusual.card" value="false"/>
     <property name="currency" value="EUR"/>
     <property name="other.key" value=""/>
     <fixcrlf srcdir="${src.dir}"
@@ -109,7 +109,7 @@
       <replacefilter token="@payee-provider-authority-url@" value="${@payeebankhost}/${@payeebankpath}/payees/${@merchantid}"/>
       <replacefilter token="@no-matching-methods-url@" value="${@keyprovhost}/${@keyprovpath}"/>
       <replacefilter token="@currency@" value="${currency}"/>
-      <replacefilter token="@add-unusual-card@" value="${unusualcard}"/>
+      <replacefilter token="@add-unusual-card@" value="${unusual.card}"/>
       <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
       <replacefilter token="@w2nb-wallet@" value="${@w2nb.webwallet}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>

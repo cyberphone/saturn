@@ -201,18 +201,25 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             (((userResponseItem = authorizationData.getUserResponseItems().get(RBA_PARM_MOTHER)) == null) ||
             (!userResponseItem.getText().equals(MOTHER_NAME)))) {
             BankService.rejectedTransactions++;
+            boolean specialTest = amount.compareTo(DEMO_RBA_LIMIT_CT) == 0;
             return createProviderUserResponse("Transaction requests exceeding " +
                                                 amountInHtml(paymentRequest, DEMO_RBA_LIMIT) +
                                                 " require additional user authentication to " +
-                                                "be performed. Please enter your <span style=\"color:blue\">mother's maiden name</span>." +
-                                                "<p>Since <i>this is a demo</i>, " +
-                                                "answer <span style=\"color:red\">" + MOTHER_NAME + "</span>&nbsp; :-)</p>",
-                                              new UserChallengeItem[]{new UserChallengeItem(RBA_PARM_MOTHER,
-                                                    amount.compareTo(DEMO_RBA_LIMIT_CT) == 0 ?
-                                                         UserChallengeItem.TYPE.ALPHANUMERIC : UserChallengeItem.TYPE.ALPHANUMERIC_SECRET,
-                                                                                           20,
-                                                                                           null)},
-                                              authorizationData);
+                                                "be performed. Please enter your " +
+                                                "<span style=\"color:blue\">mother's maiden name</span>." +
+                                                "<br>&nbsp;<br>Since <i>this is a demo</i>, " +
+                                                "answer <span style=\"color:red\">" + 
+                                                MOTHER_NAME + 
+                                                "</span>&nbsp;&#x1f642;",
+              new UserChallengeItem[]{new UserChallengeItem(RBA_PARM_MOTHER,
+                                                            specialTest ?
+                                             UserChallengeItem.TYPE.ALPHANUMERIC
+                                                                        : 
+                                             UserChallengeItem.TYPE.ALPHANUMERIC_SECRET,
+                                                            20,
+                                                            specialTest ? 
+                                                 "Mother's maiden name" : null)},
+              authorizationData);
         }
 
         // Pure sample data...

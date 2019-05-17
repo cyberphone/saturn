@@ -219,11 +219,6 @@ public class HTML implements MerchantProperties {
     static void merchantPage(HttpServletResponse response,
                              SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
         StringBuilder temp_string = new StringBuilder(
-            "\nfunction closeFundFlash() {\n" +
-            "    setTimeout(function() {\n" +
-            "        document.getElementById('fundlimit').style.visibility = 'hidden';\n" +
-            "    }, 5000);\n" +
-            "}\n\n" +
             "function userPay() {\n" +
             "    if (getTotal()) {\n" +
             "        document.getElementById('" + W2NBWalletServlet.SHOPPING_CART_FORM_ATTR + "').value = JSON.stringify(shoppingCart);\n" +
@@ -319,8 +314,7 @@ public class HTML implements MerchantProperties {
             "var shoppingCart = [];\n");
 
         HTML.output(response, HTML.getHTML(temp_string.toString(),
-            "onload=\"closeFundFlash()\"><div id=\"fundlimit\" style=\"position:absolute;left:15pt;bottom:15pt;z-index:3;font-size:8pt\">Your funds at the bank are limited to 1MEUR...</div>" +
-            "<div id=\"emptybasket\" class=\"toasting\">Nothing ordered yet...</div",
+            "><div id=\"emptybasket\" class=\"toasting\">Nothing ordered yet...</div",
             page_data.toString()));
     }
 
