@@ -2,14 +2,9 @@
   "@context": "https://webpki.github.io/saturn/v3",
   "@qualifier": "ProviderUserResponse",
   "encryptedMessage": {
-    "algorithm": "A128CBC-HS256",
-    "iv": "rXhgFCQBo5Yq90nM9YYiFw",
-    "tag": "-bucHqk09GrH6XQOaGXDwA",
-    "cipherText": "r4QL7ED3vUBQhQTRn9-4dePLw88UQfVaabgk_033s0VZfuI-ahHavY54CZZtLsIAKsEYH2Fh9dEXxX3MDvBmn9rNpXpy6JyeFhcY0TtMUoXcLggKg__ugjLf2x2Xae4SeJhUM2uyIlIH8ghw9krhAkU7oqJPq3JTTng-UD20pBWRbe4zFdYcvx_JtlU70tV5sASkGPL7uJTrKU5cWiDgfq5xtiul0ssfbfXHcUA2yh3RHphs3OIVPm2CRRv-QhnJBTxY_ZfAQtQgIoRRfG9jAhcTH7hgpIMEm097zE1zvdiwlA316-nPb33nzywg4jRxbgUfyw69YMDbiNZRzWjnuujaKxR4Ly5LcT0kjg_pEKCfYOjkiP-GIPTr1QqdwPmHJhbajHhs7ZzWOiGTa_2GA9tcKRqoPax-2vrkY0jb-DgwL7ncFD7bxU9JEUmsiMYjSWyQjiqBk86VWjjUgYzIqvjTzOaVDd7GdlBFPUab_OAj54Y4l7MMME5OCoDrooE3CPymXgKO89WvOOwbYxAfFB-PI4i9QWxwYfbeZGPRYi9mSOOWJb5bYvbXXWj89AlZOhiwmz1KjITAV3637mAY4PEefszkYjMy10f3nYlpweF-Rzc1Vppn5pWFMf4GtBeH"
+    "algorithm": "A256GCM",
+    "iv": "IIFZTm7Gvzzfdzzn",
+    "tag": "FTJgISdfnpiIU4KgTjPqZw",
+    "cipherText": "NrQE27R-S9w5BsuHh2M8SbF04rnzkILbdVoyep6THRaqsx0UocnovKlZCwDzsIxTqufI5hE9mDNoLS9EF3Kn2uPPMrvv7qFbUlQahFkGzWuv7J8BGbTkcupV4PmX9xKmx3BnbLoCWsgqneRiMWXoTU_sYWHv5B39Hd5LtJgkgZYFhURb08PzX-XMrpGIu19buo1gtcKsXZuOo-C61VtIr7UiP_O9fjKDXKi_isGUYYjjxaz4tjcMYf64Q6IUqEtV_fRlOkBhPPN-gjAoXBois48YAUoLJ-Z44Rfm4m7Qh5LimJjJK-ErxRsz0DfP2Gd_3Wc_6TCE2dkFsHEXRcd5OW652p-dPQBiTEH3zc4oH315TWkBTozinXac8qIjOFeNXpwRo-Gh2S2VpCM80vrOHlRgIIoqZm3OZ-hnV0BZ7P4sbuVJ6c6_mWt5Cb1jbxPrzhRVNgeLB1SzJBJNGPilXM8iO-98cbz17VZuTJ449_CoobiFEN_0Rb-80uCaCuGDRE6KNuMsgRT6BLDmJhHYreI3hjAye89kjJy0Pu9R6cTbEHUh1fGwJa4GnUPt1QqZrdAFI0W2p43uYAswGZtdEPbPbUgIzp7l3aFS2bBqxvcFwOGqqtOHqP6s73DLF1OJnDc"
   }
 }
-
-
-
-
-

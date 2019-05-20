@@ -19,16 +19,10 @@ package org.webpki.saturn.merchant;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.URL;
-
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PublicKey;
 
-import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
@@ -50,7 +44,6 @@ import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecoderCache;
 
 import org.webpki.util.ArrayUtil;
-import org.webpki.util.Base64;
 
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -118,10 +111,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String PROV_USER_RESPONSE_SAMPLE    = "provider-user-response.json";
 
-    static final String SUPERCARD_AUTHZ_SAMPLE       = "wallet-supercard-auth.png";
-
-    static final String BANKDIRECT_AUTHZ_SAMPLE      = "wallet-bankdirect-auth.png";
-
     static final String VERSION_CHECK                = "android_webpki_versions";
 
     static final String BOUNCYCASTLE_FIRST           = "bouncycastle_first";
@@ -160,10 +149,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static JSONObjectWriter protectedAccountData;
 
-    static String walletSupercardAuthz;
-
-    static String walletBankdirectAuthz;
-    
     static PaymentNetwork primaryMerchant;
     
     static AuthorizationRequest.PaymentMethodEncoder superCardPaymentEncoder = new SupercardPaymentMethodEncoder();
@@ -207,13 +192,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                 ArrayUtil.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name)));        
     }
 
-    String getImageDataURI (String name) throws IOException  {
-        byte[] image = ArrayUtil.getByteArrayFromInputStream (this.getClass().getResourceAsStream(name));
-        return "data:image/" + name.substring(name.lastIndexOf('.') + 1) +
-               ";base64," +
-               new Base64 (false).getBase64StringFromBinary (image);
-    }
-
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load (null, null);
@@ -223,36 +201,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
-    String getURL (String inUrl) throws IOException {
-        URL url = new URL(inUrl);
-        if (!url.getHost().equals("localhost")) {
-            return inUrl;
-        }
-        String autoHost = null;
-        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-        int foundAddresses = 0;
-        while (networkInterfaces.hasMoreElements()) {
-            NetworkInterface networkInterface = networkInterfaces.nextElement();
-            if (networkInterface.isUp() && !networkInterface.isVirtual() && !networkInterface.isLoopback() &&
-                networkInterface.getDisplayName().indexOf("VMware") < 0) {  // Well.... 
-                Enumeration<InetAddress> inetAddresses = networkInterface.getInetAddresses();
-                while (inetAddresses.hasMoreElements()) {
-                    InetAddress inetAddress = inetAddresses.nextElement();
-                    if (inetAddress instanceof Inet4Address) {
-                        foundAddresses++;
-                        autoHost = inetAddress.getHostAddress();
-                    }
-                }
-            }
-        }
-        if (foundAddresses != 1) throw new IOException("Couldn't determine network interface");
-        logger.info("Host automagically set to: " + autoHost);
-        return new URL(url.getProtocol(),
-                       autoHost,
-                       url.getPort(),
-                       url.getFile()).toExternalForm();
-    }
-
     PaymentNetwork addPaymentNetwork(String keyIdProperty, String merchantIdProperty, String[] acceptedAccountTypes) throws IOException {
         KeyStoreEnumerator kse = new KeyStoreEnumerator(getResource(keyIdProperty),
                                                         getPropertyString(KEYSTORE_PASSWORD));
@@ -330,10 +278,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                         .getDecryptedData(
                     userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
                         .getBinary(BaseProperties.KEY_JSON))));
-
-            walletSupercardAuthz = getImageDataURI(SUPERCARD_AUTHZ_SAMPLE);
-
-            walletBankdirectAuthz = getImageDataURI(BANKDIRECT_AUTHZ_SAMPLE);
 
             if (getPropertyString(TEST_MODE).length () > 0) {
                 testMode = getPropertyBoolean(TEST_MODE);

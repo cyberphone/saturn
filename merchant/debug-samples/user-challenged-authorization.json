@@ -1,20 +1,20 @@
 {
   "requestHash": {
     "algorithm": "S256",
-    "value": "3wRZ946hIZxWAYMXVxZUF8GHuOMDhyuGHrrY95_ean4"
+    "value": "EfvMIRlZUN1AhTtL0BrSrdIMANZ0iFSwKo89XZah9Uw"
   },
   "domainName": "localhost",
   "paymentMethod": "https://bankdirect.net",
   "accountId": "8645-7800239403",
   "encryptionParameters": {
-    "algorithm": "A128CBC-HS256",
-    "key": "irLFHbnXpFWE742MaYhQKKVudlfd6fUxk8Zx210Ej38"
+    "algorithm": "A256GCM",
+    "key": "nH7owEZZ5d61kv6kHoo-U5UGfh9aPk-b8pNBF83wrVs"
   },
   "userResponseItems": [{
     "id": "mother",
     "text": "garbo"
   }],
-  "timeStamp": "2019-03-29T11:08:54+01:00",
+  "timeStamp": "2019-05-19T08:25:01+02:00",
   "software": {
     "name": "WebPKI.org - Wallet",
     "version": "1.00"
@@ -27,6 +27,6 @@
       "x": "rQ4WXMB6_wQKHSiY_mbJ4QkGpfWLssF7hvIiiFpDEx8",
       "y": "Fh2rl0LGTtvaomOuhuRNo9Drz9o0--WXV2ITvdVQFRY"
     },
-    "value": "-B7YuQGSEO0okc4P1jd6rH3VLTkVEdc66_DRm4w2VBAZwe0muEOevJhUHQMKhQpuSV_AwCQBAyBkLIM2gLzhZg"
+    "value": "5QMOmuZx_xuoXDPB93YsHzTyw7EjSqa44Mei_c0psxkkSKu02ak5Jf43w-B63I0wHUdWhdNF1Q3oAJHj2KsrGw"
   }
 }

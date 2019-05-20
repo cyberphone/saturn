@@ -40,6 +40,8 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONTypes;
 
+import org.webpki.util.ArrayUtil;
+import org.webpki.util.Base64;
 import org.webpki.util.Base64URL;
 import org.webpki.util.ISODateTime;
 
@@ -60,11 +62,22 @@ class DebugPrintout implements BaseProperties {
 
     String encryptedAccount;
 
+    static final String SUPERCARD_AUTHZ_SAMPLE       = "wallet-supercard-auth.png";
+
+    static final String BANKDIRECT_AUTHZ_SAMPLE      = "wallet-bankdirect-auth.png";
+
   
     static final String REFUND_TRANSACTION = "Refund&nbsp;Transaction";
     static final String PROV_USER_RESPONSE = "Provider&nbsp;User&nbsp;Response";
     static final String UNENCRYPTED_AUTHZ  = "Unencrypted&nbsp;User&nbsp;Authorization";
     
+    String getImageDataURI(String name) throws IOException  {
+        byte[] image = ArrayUtil.getByteArrayFromInputStream (this.getClass().getResourceAsStream(name));
+        return "data:image/" + name.substring(name.lastIndexOf('.') + 1) +
+               ";base64," +
+               new Base64 (false).getBase64StringFromBinary (image);
+    }
+
     String getShortenedB64(byte[] bin, int maxLength) throws IOException {
         String b64 = Base64URL.encode(bin);
         if (b64.length() > maxLength) {
@@ -90,6 +103,7 @@ class DebugPrintout implements BaseProperties {
         if (jsonTree.hasProperty(target)) {
             StringBuilder value = new StringBuilder(jsonTree.getString(target));
             if (rewrittenUrl(value, "/webpay-payerbank/", "https://payments.mybank.com") ||
+                rewrittenUrl(value, "/webpay-keyprovider", "https://enroll.mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank/", "https://payments.bigbank.com") ||
                 rewrittenUrl(value, "/webpay-acquirer/", "https://secure.cardprocessor.com") ||
                 rewrittenUrl(value, "/webpay-payerbank", "https://mybank.com") ||
@@ -151,6 +165,7 @@ class DebugPrintout implements BaseProperties {
             }
         }
         updateUrls(jsonTree, rewriter, KnownExtensions.HYBRID_PAYMENT);
+        updateUrls(jsonTree, rewriter, NO_MATCHING_METHODS_URL_JSON);
         updateUrls(jsonTree, rewriter, HOME_PAGE_JSON);
         updateUrls(jsonTree, rewriter, RECEPIENT_URL_JSON);
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
@@ -168,13 +183,6 @@ class DebugPrintout implements BaseProperties {
         s.append("<div class=\"jsonbox\">" +
                  reader.serializeToString(JSONOutputFormats.PRETTY_HTML) +
                  "</div>");
-    }
-
-    void fancyBoxNoClean(JSONObjectReader reader) throws IOException, GeneralSecurityException {
-        boolean temp = clean;
-        clean = false;
-        fancyBox(reader);
-        clean = temp;
     }
 
     void fancyBox(JSONObjectWriter writer) throws IOException, GeneralSecurityException {
@@ -265,8 +273,10 @@ class DebugPrintout implements BaseProperties {
         description(point.sub() +
             "<p>After an <i>optional</i> selection of account (card) in the <b>Wallet</b> UI, the user " +
             "authorizes the payment request (typically using a PIN):</p>" +
-            "<img style=\"display:block;margin-left:auto;margin-right:auto;height:33%;width:33%\" src=\"" +
-            (debugData.acquirerMode ? MerchantService.walletSupercardAuthz : MerchantService.walletBankdirectAuthz) + 
+            "<img style=\"display:block;margin-left:auto;margin-right:auto;max-width:250pt;" +
+            "border-width:1px;border-style:solid;border-color:grey;box-shadow:3pt 3pt 3pt #d0d0d0\" src=\"" +
+            getImageDataURI(debugData.acquirerMode ?
+                            SUPERCARD_AUTHZ_SAMPLE : BANKDIRECT_AUTHZ_SAMPLE) + 
             "\">");
         description(point.sub() +
             "<p>The result of this process is not supposed be " +
@@ -300,7 +310,7 @@ class DebugPrintout implements BaseProperties {
             HTML.FONT_ARIAL + "\">" + UNENCRYPTED_AUTHZ + "</p>" +
             "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted:");
 
-        fancyBoxNoClean(MerchantService.userAuthzSample);
+        fancyBox(MerchantService.userAuthzSample);
         descriptionStdMargin("Explanations:<p>" +
             keyWord(REQUEST_HASH_JSON) + " holds the hash of the " +
             keyWord(PAYMENT_REQUEST_JSON) + " object.</p><p>" +
@@ -316,7 +326,7 @@ class DebugPrintout implements BaseProperties {
             "In the case the <b>User&nbsp;Bank</b> requires additional authentication data from the user it will not " +
             "return an " +
             keyWord(Messages.AUTHORIZATION_RESPONSE) + " message, but the following:");
-        fancyBoxNoClean(MerchantService.providerUserResponseSample);
+        fancyBox(MerchantService.providerUserResponseSample);
         descriptionStdMargin("Note that the <b>Merchant</b> is supposed to transfer the " +
             keyWord(Messages.PROVIDER_USER_RESPONSE) +
             " to the already open <b>Wallet</b> and be prepared for receiving a renewed " +
@@ -330,7 +340,7 @@ class DebugPrintout implements BaseProperties {
             keyWord(ENCRYPTION_PARAMETERS_JSON) +
             " the <b>Wallet</b> included in the <i>preceding</i> " +
             "user authentication object:");
-        fancyBoxNoClean(MerchantService.encryptedMessageSample.getRoot());
+        fancyBox(MerchantService.encryptedMessageSample.getRoot());
         descriptionStdMargin("<p>Note that if there are no " +
             keyWord(USER_CHALLENGE_ITEMS_JSON) +
             " elements, there is only a text message to the user like &quot;Out of funds&quot; " +
@@ -357,7 +367,7 @@ class DebugPrintout implements BaseProperties {
             "now also contains a matching " +
             keyWord(USER_RESPONSE_ITEMS_JSON) +
             " list:");
-        fancyBoxNoClean(MerchantService.userChallAuthzSample);
+        fancyBox(MerchantService.userChallAuthzSample);
         descriptionStdMargin("<p>This object is returned to the <b>Merchant</b> in a " +
             keyWord(Messages.PAYER_AUTHORIZATION) + " message, effectively resuming operation at <a href=\"#3\">step&nbsp;3</a>.</p><p>This process may be repeated " +
             "until <b>User&nbsp;Bank</b> is satisfied or blocks further attempts.</p>");
