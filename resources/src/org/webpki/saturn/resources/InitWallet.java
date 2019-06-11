@@ -40,6 +40,7 @@ import java.util.EnumSet;
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CertificateUtil;
+import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
 import org.webpki.json.DataEncryptionAlgorithms;
@@ -76,6 +77,7 @@ import org.webpki.sks.ProvSess;
 import org.webpki.sks.SKSReferenceImplementation;
 
 import org.webpki.util.ArrayUtil;
+import org.webpki.util.DebugFormatter;
 
 public class InitWallet {
 
@@ -157,13 +159,13 @@ public class InitWallet {
 
         surrogateKey.setCertificatePath(certPath);
         surrogateKey.setPrivateKey(new KeyPair(keyPair.getPublic(), keyPair.getPrivate()));
-        JSONObjectWriter ow = null;
         boolean cardNumberFormatting = true;
         if (accountId.startsWith("!")) {
             cardNumberFormatting = false;
             accountId = accountId.substring(1);
         }
-        ow = CardDataEncoder.encode(paymentMethod.getPaymentMethodUri(), 
+        JSONObjectWriter ow =
+             CardDataEncoder.encode(paymentMethod.getPaymentMethodUri(), 
                                     accountId, 
                                     authorityUrl,
                                     rsa_flag ?
@@ -209,6 +211,8 @@ public class InitWallet {
         System.out.println("Imported Subject: " +
                 certPath[0].getSubjectX500Principal().getName() +
                 "\nID=#" + surrogateKey.keyHandle + ", " + (rsa_flag ? "RSA" : "EC") +
-                (ow == null ? ", Not a card" : ", Card=\n" + ow));
+                ", Card=\n" + ow +
+                "\n\nSha256=" +
+                DebugFormatter.getHexString(HashAlgorithms.SHA256.digest(certPath[0].getPublicKey().getEncoded())));
     }
 }
