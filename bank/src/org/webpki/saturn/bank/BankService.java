@@ -43,6 +43,11 @@ import javax.servlet.ServletRegistration;
 
 import javax.servlet.http.HttpServlet;
 
+import javax.sql.DataSource;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
@@ -153,6 +158,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static JSONDecoderCache knownPaymentMethods = new JSONDecoderCache();
 
     static JSONDecoderCache knownAccountTypes = new JSONDecoderCache();
+    
+    static DataSource jdbcDataSource;
 
     static boolean logging;
     
@@ -322,6 +329,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                               logger,
                                               getPropertyString(SERVER_PORT_MAP).length () > 0 ?
                                                                getPropertyInt(SERVER_PORT_MAP) : null);
+            
+            Context initContext = new InitialContext();
+            Context envContext  = (Context)initContext.lookup("java:/comp/env");
+            jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
 
             started = new GregorianCalendar();
 

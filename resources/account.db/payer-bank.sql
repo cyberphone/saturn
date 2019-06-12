@@ -1,6 +1,6 @@
 -- SQL Script for MySQL 5.7
 --
--- root priviledges are required!!!
+-- root privileges are required!!!
 --
 -- Clear and create DB to begin with
 --
@@ -8,13 +8,14 @@ DROP DATABASE IF EXISTS PAYER_BANK;
 CREATE DATABASE PAYER_BANK CHARACTER SET utf8;
 --
 -- Create a user but remove any existing user first
-DROP USER IF EXISTS PAYER_BANK@localhost;
+DROP USER IF EXISTS saturn@localhost;
 --
-CREATE USER PAYER_BANK@localhost IDENTIFIED BY 'foo123';
+CREATE USER saturn@localhost IDENTIFIED BY 'foo123';
 --
 -- Let user access
 --
-GRANT ALL ON PAYER_BANK.* TO PAYER_BANK@localhost;
+GRANT ALL ON PAYER_BANK.* TO saturn@localhost;
+GRANT SELECT ON mysql.proc TO saturn@localhost;
 --
 -- Create tables
 --
@@ -147,10 +148,11 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
       UPDATE USERS INNER JOIN ACCOUNTS ON USERS.UserId = ACCOUNTS.UserId
           SET LastAccess = CURRENT_TIMESTAMP, AccessCount = AccessCount + 1
           WHERE ACCOUNTS.AccountId = p_AccountId;	  
-	ELSE                         -- Failed => Find reason
+	ELSE                       -- Failed => Find reason
 	  IF EXISTS (SELECT * FROM ACCOUNTS WHERE ACCOUNTS.AccountId = p_AccountId) THEN
-	    SET p_Error = 3;         -- No such key
         IF EXISTS (SELECT * FROM CREDENTIALS WHERE CREDENTIALS.MethodUri = p_MethodUri) THEN
+	      SET p_Error = 3;       -- No such key
+        ELSE
           SET p_Error = 2;       -- No such method
         END IF;
 	  ELSE

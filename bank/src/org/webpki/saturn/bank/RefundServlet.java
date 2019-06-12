@@ -18,6 +18,8 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
+import java.sql.Connection;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
@@ -36,7 +38,9 @@ public class RefundServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
-    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
+    JSONObjectWriter processCall(UrlHolder urlHolder, 
+                                 JSONObjectReader providerRequest,
+                                 Connection connection) throws Exception {
 
         // Decode refund request which embeds the authorization response
         RefundRequest refundRequest = new RefundRequest(providerRequest, false);

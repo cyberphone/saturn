@@ -19,6 +19,8 @@ package org.webpki.saturn.bank;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import java.sql.Connection;
+
 import java.math.BigDecimal;
 
 import java.security.GeneralSecurityException;
@@ -85,10 +87,13 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                                            authorizationData.getDataEncryptionAlgorithm());
     }
 
-    abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception;
+    abstract JSONObjectWriter processCall(UrlHolder urlHolder, 
+                                          JSONObjectReader providerRequest,
+                                          Connection connection) throws Exception;
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = null;
+        Connection connection = null;
         try {
             urlHolder = new UrlHolder(request);
 
@@ -107,7 +112,11 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Each method has its own servlet in this setup but that is just an option            //
             /////////////////////////////////////////////////////////////////////////////////////////
-            JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest); 
+            connection = BankService.jdbcDataSource.getConnection();
+            JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest, connection);
+            connection.close();
+            connection = null;
+
             if (BankService.logging) {
                 logger.info("Responded to caller"  + urlHolder.getCallerAddress() + "with data:\n" + providerResponse);
             }
@@ -132,6 +141,11 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             PrintWriter writer = response.getWriter();
             writer.print(message);
             writer.flush();
+            if (connection != null) {
+                try {
+                    connection.close();
+                } catch (Exception sql) {}
+            }
         }
     }
 }

@@ -22,10 +22,15 @@ import java.math.BigDecimal;
 
 import java.text.SimpleDateFormat;
 
+import java.sql.Connection;
+import java.sql.CallableStatement;
+
 import java.util.Locale;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+
+import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.UrlHolder;
@@ -52,7 +57,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     private static final long serialVersionUID = 1L;
     
     @Override
-    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
+    JSONObjectWriter processCall(UrlHolder urlHolder,
+                                 JSONObjectReader providerRequest,
+                                 Connection connection) throws Exception {
 
         // Decode authorization request message
         AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);
@@ -146,16 +153,29 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Verify that the there is a matching Payer account
         String accountId = authorizationData.getAccountId();
         String authorizedPaymentMethod = authorizationData.getPaymentMethod();
-        UserAccountEntry account = BankService.userAccountDb.get(accountId);
-        if (account == null) {
-            logger.severe("No such account ID: " + accountId);
-            throw new IOException("No such user account ID");
-        }
-        if (!authorizedPaymentMethod.equals(account.getPaymentMethod())) {
-            logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
-            throw new IOException("Wrong payment method");
-        }
-        if (!account.getPublicKey().equals(authorizationData.getPublicKey())) {
+/*
+         REATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
+                                               IN p_AccountId VARCHAR(20),
+                                               IN p_MethodUri VARCHAR(50),
+                                               IN p_S256PayReq BINARY(32))
+*/
+        CallableStatement stmt = connection.prepareCall("{call AuthenticatePayReqSP(?, ?, ?, ?)}");
+        stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+        stmt.setString(2, accountId);
+        stmt.setString(3, authorizedPaymentMethod);
+        stmt.setBytes(4, HashAlgorithms.SHA256.digest(authorizationData.getPublicKey().getEncoded()));
+        stmt.execute();
+        int result = stmt.getInt(1);            
+        stmt.close ();
+        if (result != 0) {
+            if (result == 1) {
+                logger.severe("No such account ID: " + accountId);
+                throw new IOException("No such user account ID");
+            }
+            if (result == 2) {
+                logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
+                throw new IOException("Wrong payment method");
+            }
             logger.severe("Wrong public key for account ID: " + accountId);
             throw new IOException("Wrong user public key");
         }
@@ -176,26 +196,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                               authorizationData);
         }
             
-        // Merchant provides the client's IP address which can be used for RBA
-        String clientIpAddress = authorizationRequest.getClientIpAddress();
-        
         ////////////////////////////////////////////////////////////////////////////
         // We got an authentic request.  Now we need to check available funds etc.//
-        // Since we don't have a real bank this part is rather simplistic :-)     //
         ////////////////////////////////////////////////////////////////////////////
-
         BigDecimal amount = paymentRequest.getAmount();
-        // Sorry but you don't appear to have a million bucks :-)
-        if (amount.compareTo(account.balance) >= 0) {
-            BankService.rejectedTransactions++;
-            return createProviderUserResponse("Your request for " + 
-                                                amountInHtml(paymentRequest, amount) +
-                                                " appears to be slightly out of your current capabilities...",
-                                              null,
-                                              authorizationData);
-        }
 
-        // RBA v0.001...
+        // First we apply RBA v0.001...
+        // Merchant provides the client's IP address which also could be used for RBA
+        String clientIpAddress = authorizationRequest.getClientIpAddress();
         UserResponseItem userResponseItem;
         if (amount.compareTo(DEMO_RBA_LIMIT) >= 0 &&
             (((userResponseItem = authorizationData.getUserResponseItems().get(RBA_PARM_MOTHER)) == null) ||
@@ -222,11 +230,28 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
               authorizationData);
         }
 
+        boolean testMode = authorizationRequest.getTestMode();
+        String optionalLogData = null;
+        if (!testMode) {
+            // Here we would actually update things...
+            // If Payer and Payee are in the same bank it will not require any networking of course.
+            // Note that card and nonDirectPayments payments only reserve an amount.
+            String errorMessage = performRequest(amount, accountId, cardPayment, connection);
+            if (errorMessage != null) {
+                return createProviderUserResponse(errorMessage,
+                                                  null,
+                                                  authorizationData);
+            }
+            if (!cardPayment && nonDirectPayment == null) {
+                optionalLogData = "Bank payment network log data...";
+            }
+        }
+
         // Pure sample data...
         // Separate credit-card and account2account payments
         AuthorizationResponse.AccountDataEncoder accountData = cardPayment ?
             new com.supercard.SupercardAccountDataEncoder(
-                    authorizationData.getAccountId(), 
+                    accountId, 
                     "Luke Skywalker",
                     ISODateTime.parseDateTime("2022-12-31T00:00:00Z", ISODateTime.COMPLETE),
                     "943")
@@ -239,7 +264,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         for (char c : accountId.toCharArray()) {
             accountReference.append((--q < 0) ? c : '*');
         }
-        boolean testMode = authorizationRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ": "") +
                 "Authorized Amount=" + amount.toString() + 
                 ", Account ID=" + accountId + 
@@ -247,16 +271,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 ", Client IP=" + clientIpAddress +
                 ", Method Specific=" + paymentMethodSpecific.logLine());
 
-        String optionalLogData = null;
-        if (!testMode) {
-            // Here we would actually update things...
-            // If Payer and Payee are in the same bank it will not require any networking of course.
-            // Note that card and nonDirectPayments payments only reserve an amount.
-            if (!cardPayment && nonDirectPayment == null) {
-                optionalLogData = "Bank payment network log data...";
-            }
-        }
-        
         // We did it!
         BankService.successfulTransactions++;
         return AuthorizationResponse.encode(authorizationRequest,
@@ -266,5 +280,27 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                             getReferenceId(),
                                             optionalLogData,
                                             BankService.bankKey);
+    }
+
+    private String performRequest(BigDecimal amount,
+                                  String accountId,
+                                  boolean cardPayment,
+                                  Connection connection) throws Exception {
+/*
+        CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
+                                     IN p_Amount DECIMAL(8,2),
+                                     IN p_AccountId VARCHAR(20))
+*/
+        CallableStatement stmt = connection.prepareCall("{call WithDrawSP(?, ?, ?)}");
+        stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+        stmt.setBigDecimal(2, amount);
+        stmt.setString(3, accountId);
+        stmt.execute();
+        int result = stmt.getInt(1);          
+        stmt.close ();
+        if (result == 0) {
+            return null;
+        }
+        return "urban";
     }
 }

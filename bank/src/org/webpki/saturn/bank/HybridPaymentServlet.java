@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.util.Arrays;
 
+import java.sql.Connection;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONCryptoHelper;
@@ -41,7 +43,9 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
     
-    JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
+    JSONObjectWriter processCall(UrlHolder urlHolder, 
+                                 JSONObjectReader providerRequest,
+                                 Connection connection) throws Exception {
 
         // Decode and finalize the cardpay request which in hybrid mode actually is account-2-account
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, false);
