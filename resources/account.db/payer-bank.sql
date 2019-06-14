@@ -38,41 +38,35 @@ CREATE TABLE USERS
 
 
 /*=============================================*/
+/*                 ACCOUNT_TYPES               */
+/*=============================================*/
+
+CREATE TABLE ACCOUNT_TYPES
+  (
+    AccountType INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Type ID
+    MethodUri   VARCHAR(50)   NOT NULL  UNIQUE,                          -- Unique Method URI
+    CappedAt    DECIMAL(8,2)  NOT NULL,                                  -- Capped at
+    Format      VARCHAR(80)   NOT NULL,                                  -- Account Number Syntax
+    NextNumber  INT(11)       NOT NULL,                                  -- Account Number Core
+    PRIMARY KEY (AccountType)
+  );
+
+
+/*=============================================*/
 /*                 ACCOUNTS                    */
 /*=============================================*/
 
 CREATE TABLE ACCOUNTS
   (
-    AccountId   VARCHAR(20)   NOT NULL  UNIQUE,                          -- Unique Account ID
+    AccountId   VARCHAR(30)   NOT NULL  UNIQUE,                          -- Unique Account ID
     UserId      INT           NOT NULL,                                  -- Unique User ID (account holder)
+    AccountType INT           NOT NULL,                                  -- Unique Type ID
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
     Balance     DECIMAL(8,2)  NOT NULL,                                  -- Disponible
     Currency    CHAR(3)       NOT NULL  DEFAULT "EUR",                   -- SEK, USD, EUR etc.
     PRIMARY KEY (AccountId),
+    FOREIGN KEY (AccountType) REFERENCES ACCOUNT_TYPES(AccountType),
     FOREIGN KEY (UserId) REFERENCES USERS(UserId) ON DELETE CASCADE
-  );
-
-
-/*=============================================*/
-/*                PAYMENT_METHODS              */
-/*=============================================*/
-
-CREATE TABLE PAYMENT_METHODS
-  (
-    MethodUri   VARCHAR(50)   NOT NULL  UNIQUE,                          -- Unique Method URI
-    PRIMARY KEY (MethodUri)
-  );
-
-
-/*=============================================*/
-/*                DEFAULT_BALANCES             */
-/*=============================================*/
-
-CREATE TABLE DEFAULT_BALANCES
-  (
-    MethodUri   VARCHAR(50)   NOT NULL,                                  -- Unique Method URI
-    Balance     DECIMAL(8,2)  NOT NULL,                                  -- Disponible
-    FOREIGN KEY (MethodUri) REFERENCES PAYMENT_METHODS(MethodUri)
   );
 
 
@@ -82,12 +76,10 @@ CREATE TABLE DEFAULT_BALANCES
 
 CREATE TABLE CREDENTIALS
   (
-    AccountId   VARCHAR(20)   NOT NULL,                                  -- Unique User ID
-    MethodUri   VARCHAR(50)   NOT NULL,                                  -- Unique Method URI
+    AccountId   VARCHAR(30)   NOT NULL,                                  -- Unique Account ID
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
     S256PayReq  BINARY(32)    NOT NULL,                                  -- Payment request key hash 
     S256BalReq  BINARY(32)    NULL,                                      -- Optional: balance key hash 
-    FOREIGN KEY (MethodUri) REFERENCES PAYMENT_METHODS(MethodUri),
     FOREIGN KEY (AccountId) REFERENCES ACCOUNTS(AccountId) ON DELETE CASCADE
   );
 
@@ -104,38 +96,39 @@ CREATE PROCEDURE CreateUserSP (IN p_Name VARCHAR(50),
 
 
 CREATE PROCEDURE CreateAccountSP (IN p_UserId INT, 
-                                  IN p_AccountId VARCHAR(20),
-                                  IN p_Balance DECIMAL(8,2))
+                                  IN p_AccountId VARCHAR(30),
+                                  IN p_MethodUri VARCHAR(50))
   BEGIN
-    INSERT INTO ACCOUNTS(UserId, AccountId, Balance) VALUES(p_UserId, p_AccountId, p_Balance);
+    INSERT INTO ACCOUNTS(UserId, AccountId, AccountType, Balance)
+        SELECT p_UserId, p_AccountId, ACCOUNT_TYPES.AccountType, ACCOUNT_TYPES.CappedAt 
+        FROM ACCOUNT_TYPES WHERE MethodUri = p_MethodUri;
   END
 //
 
 CREATE PROCEDURE CreateDemoAccountSP (IN p_UserId INT, 
-                                      IN p_AccountId VARCHAR(20),
+                                      IN p_AccountId VARCHAR(30),
                                       IN p_MethodUri VARCHAR(50),
                                       IN p_S256PayReq BINARY(32),
                                       IN p_S256BalReq BINARY(32))
   BEGIN
-    DECLARE v_Balance DECIMAL(8,2);
-
-	SELECT DEFAULT_BALANCES.Balance INTO v_Balance FROM DEFAULT_BALANCES WHERE MethodUri = p_methodUri;
-    CALL CreateAccountSP(p_UserId, p_AccountId, v_Balance);
-    INSERT INTO CREDENTIALS(AccountId, MethodUri, S256PayReq, S256BalReq) 
-        VALUES(p_AccountId, p_MethodUri, p_S256PayReq, p_S256BalReq);
+    CALL CreateAccountSP(p_UserId, p_AccountId, p_MethodUri);
+    INSERT INTO CREDENTIALS(AccountId, S256PayReq, S256BalReq) 
+        VALUES(p_AccountId, p_S256PayReq, p_S256BalReq);
   END
 //
 
-CREATE PROCEDURE CreateMethodSP (IN p_MethodUri VARCHAR(50),
-                                 IN p_Balance DECIMAL(8,2))
+CREATE PROCEDURE CreateAccountTypeSP (IN p_MethodUri VARCHAR(50),
+                                      IN p_CappedAt DECIMAL(8,2),
+                                      IN p_Format VARCHAR(80),
+                                      IN p_NextNumber INT(11))
   BEGIN
-    INSERT INTO PAYMENT_METHODS(MethodUri) VALUES(p_MethodUri);
-    INSERT INTO DEFAULT_BALANCES(MethodUri, Balance) VALUES(p_MethodUri, p_Balance);
+    INSERT INTO ACCOUNT_TYPES(MethodUri, CappedAt, Format, NextNumber) 
+        VALUES(p_MethodUri, p_CappedAt, p_Format, p_NextNumber);
   END
 //
 
 CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
-                                       IN p_AccountId VARCHAR(20),
+                                       IN p_AccountId VARCHAR(30),
                                        IN p_MethodUri VARCHAR(50),
                                        IN p_S256PayReq BINARY(32))
   BEGIN
@@ -164,7 +157,7 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
 
 CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Balance DECIMAL(8,2),
                                        OUT p_Error INT,
-                                       IN p_AccountId VARCHAR(20),
+                                       IN p_AccountId VARCHAR(30),
                                        IN p_S256BalReq BINARY(32))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
@@ -188,7 +181,7 @@ CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Balance DECIMAL(8,2),
 
 CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
                              IN p_Amount DECIMAL(8,2),
-                             IN p_AccountId VARCHAR(20))
+                             IN p_AccountId VARCHAR(30))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
 
@@ -211,11 +204,85 @@ CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
   END
 //
 
+CREATE FUNCTION FRENCH_IBAN(v_AccountNumber INT(11)) RETURNS VARCHAR(30) DETERMINISTIC
+  BEGIN
+	RETURN CONCAT('FR653000211111', LPAD(CONVERT(v_AccountNumber, DECIMAL), 11, '0'), '67');
+  END
+//
+
+CREATE PROCEDURE CreateAccountNoSP (OUT p_AccountId VARCHAR(30),
+                                    IN p_MethodUri VARCHAR(50))
+  BEGIN
+    DECLARE v_NextNumber INT(11);
+    DECLARE v_Format VARCHAR(70);
+
+	START TRANSACTION;
+	SELECT ACCOUNT_TYPES.NextNumber, ACCOUNT_TYPES.Format
+	    INTO v_NextNumber, v_Format FROM ACCOUNT_TYPES
+	    WHERE ACCOUNT_TYPES.MethodUri = p_MethodUri
+	    FOR UPDATE;
+    UPDATE ACCOUNT_TYPES SET NextNumber = v_NextNumber + 1
+	    WHERE ACCOUNT_TYPES.MethodUri = p_MethodUri;
+	COMMIT;
+    SET @format = v_Format;
+    SET @nextNumber = v_NextNumber;
+    SET @sql = CONCAT('SET @accountId = ', @format);
+    PREPARE stmt FROM @sql;
+    EXECUTE stmt;
+    DEALLOCATE PREPARE stmt;
+    SET p_AccountId = @accountId;
+  END
+//
+
+CREATE PROCEDURE RestoreAccountsSP (IN p_Unconditionally BOOLEAN)
+  BEGIN
+    DECLARE v_Done BOOLEAN DEFAULT FALSE;
+    DECLARE v_AccountId VARCHAR(30);
+    DECLARE v_AccountId_cursor CURSOR FOR SELECT AccountId FROM ACCOUNTS;
+    DECLARE CONTINUE HANDLER FOR NOT FOUND SET v_Done = TRUE;
+
+    OPEN v_AccountId_cursor;
+    REPEAT
+      FETCH v_AccountId_cursor INTO v_AccountId;
+      IF NOT v_Done THEN
+        BEGIN
+          DECLARE v_UserId INT;
+          DECLARE v_LastAccess TIMESTAMP;
+          DECLARE v_Balance DECIMAL(8,2);
+          SELECT USERS.UserId, USERS.LastAccess INTO v_UserId, v_LastAccess 
+             FROM USERS INNER JOIN ACCOUNTS
+             ON USERS.UserId = ACCOUNTS.UserId
+             WHERE ACCOUNTS.AccountId = v_AccountId;
+          IF v_LastAccess IS NOT NULL THEN
+            IF p_Unconditially OR (v_LastAccess < (NOW() - INTERVAL 30 MINUTE)) THEN
+              UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE UserId = v_UserID;
+              UPDATE ACCOUNTS SET Balance = v_Balance
+                  WHERE AccountId = v_AccountId;
+            END IF;
+          END IF;
+        END;
+      END IF;
+    UNTIL v_Done END REPEAT;
+    CLOSE v_AccountId_cursor;
+  END
+//
+
 DELIMITER ;
 
-CALL CreateMethodSP("https://supercard.com",  2390.00);
-CALL CreateMethodSP("https://bankdirect.net", 5543.00);
-CALL CreateMethodSP("https://unusualcard.com", 120.00);
+CALL CreateAccountTypeSP("https://supercard.com",
+                         2390.00,
+                         "LPAD(CONVERT(@nextNumber, DECIMAL), 16, '0')",
+                         10);
+
+CALL CreateAccountTypeSP("https://bankdirect.net", 
+                         5543.00,
+                         "FRENCH_IBAN(@nextNumber)",
+                         300000000);
+
+CALL CreateAccountTypeSP("https://unusualcard.com", 
+                         120.00,
+                         "LPAD(CONVERT(@nextNumber, DECIMAL), 16, '0')",
+                         78);
 
 -- Demo data
 CALL CreateUserSP("Luke Skywalker", @userid);
