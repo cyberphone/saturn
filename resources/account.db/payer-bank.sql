@@ -144,9 +144,9 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
 	ELSE                       -- Failed => Find reason
 	  IF EXISTS (SELECT * FROM ACCOUNTS WHERE ACCOUNTS.AccountId = p_AccountId) THEN
         IF EXISTS (SELECT * FROM CREDENTIALS WHERE CREDENTIALS.MethodUri = p_MethodUri) THEN
-	      SET p_Error = 3;       -- No such key
+	      SET p_Error = 3;       -- Key does not match account
         ELSE
-          SET p_Error = 2;       -- No such method
+          SET p_Error = 2;       -- Method does not match account type
         END IF;
 	  ELSE
 	    SET p_Error = 1;         -- No such account
@@ -168,7 +168,7 @@ CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Balance DECIMAL(8,2),
               CREDENTIALS.S256BalReq = p_S256BalReq;
     IF v_Balance IS NULL THEN    -- Failed => Find reason
 	  IF EXISTS (SELECT * FROM ACCOUNTS WHERE ACCOUNTS.AccountId = p_AccountId) THEN
-	    SET p_Error = 3;           -- No such key
+	    SET p_Error = 3;           -- Key does not match account
 	  ELSE
 	    SET p_Error = 1;           -- No such account
 	  END IF;
@@ -206,7 +206,10 @@ CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
 
 CREATE FUNCTION FRENCH_IBAN(v_AccountNumber INT(11)) RETURNS VARCHAR(30) DETERMINISTIC
   BEGIN
-	RETURN CONCAT('FR653000211111', LPAD(CONVERT(v_AccountNumber, DECIMAL), 11, '0'), '67');
+    set @chk = LPAD(CONVERT(97 - (2836843 + 3 * v_AccountNumber) % 97, CHAR), 2, '0');
+    set @bban = CONCAT('3000211111', LPAD(CONVERT(v_AccountNumber, DECIMAL(11)), 11, '0'), @chk);
+    set @key = LPAD(CONVERT(98 - (CONVERT(CONCAT(@bban, '152700'), DECIMAL(30)) % 97), CHAR), 2, '0');
+    RETURN CONCAT('FR', @key, @bban);
   END
 //
 
