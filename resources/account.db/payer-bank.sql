@@ -204,16 +204,41 @@ CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
   END
 //
 
-CREATE FUNCTION FRENCH_IBAN(v_AccountNumber INT(11)) RETURNS VARCHAR(30) DETERMINISTIC
+CREATE FUNCTION FRENCH_IBAN(p_AccountNumber INT(11)) RETURNS VARCHAR(30)
+DETERMINISTIC
   BEGIN
-    set @chk = LPAD(CONVERT(97 - (2836843 + 3 * v_AccountNumber) % 97, CHAR), 2, '0');
-    set @bban = CONCAT('3000211111', LPAD(CONVERT(v_AccountNumber, DECIMAL(11)), 11, '0'), @chk);
+    -- https://fr.wikipedia.org/wiki/Cl%C3%A9_RIB
+    set @chk = LPAD(CONVERT(97 - (2836843 + 3 * p_AccountNumber) % 97, CHAR), 2, '0');
+    set @bban = CONCAT('3000211111', LPAD(CONVERT(p_AccountNumber, DECIMAL(11)), 11, '0'), @chk);
     set @key = LPAD(CONVERT(98 - (CONVERT(CONCAT(@bban, '152700'), DECIMAL(30)) % 97), CHAR), 2, '0');
     RETURN CONCAT('FR', @key, @bban);
   END
 //
 
-CREATE PROCEDURE CreateAccountNoSP (OUT p_AccountId VARCHAR(30),
+CREATE FUNCTION CREDIT_CARD(p_Brand4 VARCHAR(4),
+                            p_AccountNumber INT(11)) RETURNS VARCHAR(30)
+DETERMINISTIC
+  BEGIN
+    -- https://gefvert.org/blog/archives/57
+    DECLARE i, s, r, weight INT;
+    DECLARE baseNumber VARCHAR(16);
+ 
+    SET baseNumber = CONCAT(p_Brand4, LPAD(CONVERT(p_AccountNumber, DECIMAL(11)), 11, '0'));
+    SET weight = 2;
+    SET s = 0;
+    SET i = LENGTH(baseNumber);
+ 
+    WHILE i > 0 DO
+      SET r = SUBSTRING(baseNumber, i, 1) * weight;
+      SET s = s + IF(r > 9, r - 9, r);
+      SET i = i - 1;
+      SET weight = 3 - weight;
+    END WHILE;
+    RETURN CONCAT(baseNumber, (10 - s % 10) % 10);
+  END 
+//
+
+CREATE PROCEDURE GenerateAccountSP (OUT p_AccountId VARCHAR(30),
                                     IN p_MethodUri VARCHAR(50))
   BEGIN
     DECLARE v_NextNumber INT(11);
@@ -274,18 +299,18 @@ DELIMITER ;
 
 CALL CreateAccountTypeSP("https://supercard.com",
                          2390.00,
-                         "LPAD(CONVERT(@nextNumber, DECIMAL), 16, '0')",
-                         10);
+                         "CREDIT_CARD('4532', @nextNumber)",  -- VISA
+                         800000123);
 
 CALL CreateAccountTypeSP("https://bankdirect.net", 
                          5543.00,
-                         "FRENCH_IBAN(@nextNumber)",
-                         300000000);
+                         "FRENCH_IBAN(@nextNumber)",          -- LCL
+                         300000867);
 
 CALL CreateAccountTypeSP("https://unusualcard.com", 
                          120.00,
-                         "LPAD(CONVERT(@nextNumber, DECIMAL), 16, '0')",
-                         78);
+                         "CREDIT_CARD('6011', @nextNumber)",  -- DISCOVER
+                         000000078);
 
 -- Demo data
 CALL CreateUserSP("Luke Skywalker", @userid);
