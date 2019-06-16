@@ -19,6 +19,9 @@ GRANT SELECT ON mysql.proc TO saturn@localhost;
 --
 -- Create tables
 --
+-- #############################################################
+-- # Note: a bank probably uses a much more elaborate database #
+-- #############################################################
 
 USE PAYER_BANK;
 
@@ -132,26 +135,31 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
                                        IN p_MethodUri VARCHAR(50),
                                        IN p_S256PayReq BINARY(32))
   BEGIN
-	IF EXISTS (SELECT ACCOUNTS.Balance FROM ACCOUNTS INNER JOIN CREDENTIALS
-	               ON ACCOUNTS.AccountId = CREDENTIALS.AccountId
-	               WHERE CREDENTIALS.AccountId = p_AccountId AND
-	               CREDENTIALS.MethodUri = p_MethodUri AND
-	               CREDENTIALS.S256PayReq = p_S256PayReq) THEN
-	  SET p_Error = 0;          -- Success => Update access info
+    IF EXISTS (SELECT * FROM ACCOUNTS 
+        INNER JOIN CREDENTIALS ON ACCOUNTS.AccountId = CREDENTIALS.AccountId
+        INNER JOIN ACCOUNT_TYPES ON ACCOUNTS.AccountType = ACCOUNT_TYPES.AccountType
+            WHERE ACCOUNTS.AccountId = p_AccountId AND
+                  ACCOUNT_TYPES.MethodUri = p_MethodUri AND
+                  CREDENTIALS.S256PayReq = p_S256PayReq) THEN
+      SET p_Error = 0;          -- Success => Update access info
       UPDATE USERS INNER JOIN ACCOUNTS ON USERS.UserId = ACCOUNTS.UserId
           SET LastAccess = CURRENT_TIMESTAMP, AccessCount = AccessCount + 1
           WHERE ACCOUNTS.AccountId = p_AccountId;	  
-	ELSE                       -- Failed => Find reason
-	  IF EXISTS (SELECT * FROM ACCOUNTS WHERE ACCOUNTS.AccountId = p_AccountId) THEN
-        IF EXISTS (SELECT * FROM CREDENTIALS WHERE CREDENTIALS.MethodUri = p_MethodUri) THEN
-	      SET p_Error = 3;       -- Key does not match account
+    ELSE                       -- Failed => Find reason
+      IF EXISTS (SELECT * FROM ACCOUNTS WHERE ACCOUNTS.AccountId = p_AccountId) THEN
+        IF EXISTS (SELECT * FROM ACCOUNTS 
+            INNER JOIN CREDENTIALS ON ACCOUNTS.AccountId = CREDENTIALS.AccountId
+            INNER JOIN ACCOUNT_TYPES ON ACCOUNTS.AccountType = ACCOUNT_TYPES.AccountType
+                WHERE ACCOUNTS.AccountId = p_AccountId AND
+                      ACCOUNT_TYPES.MethodUri = p_MethodUri) THEN
+          SET p_Error = 3;       -- Key does not match account
         ELSE
           SET p_Error = 2;       -- Method does not match account type
         END IF;
-	  ELSE
-	    SET p_Error = 1;         -- No such account
-	  END IF;
-	END IF;
+      ELSE
+        SET p_Error = 1;         -- No such account
+      END IF;
+    END IF;
   END
 //
 
@@ -162,20 +170,21 @@ CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Balance DECIMAL(8,2),
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
 
-	SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS INNER JOIN CREDENTIALS
-        ON ACCOUNTS.AccountId = CREDENTIALS.AccountId
-        WHERE CREDENTIALS.AccountId = p_AccountId AND
-              CREDENTIALS.S256BalReq = p_S256BalReq;
+    SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS
+        INNER JOIN CREDENTIALS ON ACCOUNTS.AccountId = CREDENTIALS.AccountId
+        INNER JOIN ACCOUNT_TYPES ON ACCOUNTS.AccountType = ACCOUNT_TYPES.AccountType
+            WHERE ACCOUNT_TYPES.MethodUri = p_MethodUri AND
+                  CREDENTIALS.S256BalReq = p_S256BalReq;
     IF v_Balance IS NULL THEN    -- Failed => Find reason
-	  IF EXISTS (SELECT * FROM ACCOUNTS WHERE ACCOUNTS.AccountId = p_AccountId) THEN
-	    SET p_Error = 3;           -- Key does not match account
-	  ELSE
-	    SET p_Error = 1;           -- No such account
-	  END IF;
-	ELSE
-	  SET p_Error = 0;           -- Success
-	END IF;
-	SET p_Balance = v_Balance;
+      IF EXISTS (SELECT * FROM ACCOUNTS WHERE ACCOUNTS.AccountId = p_AccountId) THEN
+        SET p_Error = 3;           -- Key does not match account
+      ELSE
+        SET p_Error = 1;           -- No such account
+      END IF;
+    ELSE
+      SET p_Error = 0;           -- Success
+    END IF;
+    SET p_Balance = v_Balance;
   END
 //
 
@@ -185,22 +194,22 @@ CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
 
-	SET p_Error = 0;
-	START TRANSACTION;
-	SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS
-	    WHERE ACCOUNTS.AccountId = p_AccountId
-	    FOR UPDATE;
-	IF v_Balance IS NULL THEN    -- Failed
+    SET p_Error = 0;
+    START TRANSACTION;
+    SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS
+        WHERE ACCOUNTS.AccountId = p_AccountId
+        FOR UPDATE;
+    IF v_Balance IS NULL THEN    -- Failed
       SET p_Error = 1;             -- No such account
-	ELSE
-	  IF p_Amount > v_Balance THEN
+    ELSE
+      IF p_Amount > v_Balance THEN
         SET p_Error = 4;           -- Out of funds
       ELSE                       -- Success => Withdraw the specified amount
         UPDATE ACCOUNTS SET Balance = Balance - p_Amount
             WHERE ACCOUNTS.AccountId = p_AccountId;
-	  END IF;
-	END IF;
-	COMMIT;
+      END IF;
+    END IF;
+    COMMIT;
   END
 //
 
@@ -215,15 +224,16 @@ DETERMINISTIC
   END
 //
 
-CREATE FUNCTION CREDIT_CARD(p_Brand4 VARCHAR(4),
-                            p_AccountNumber INT(11)) RETURNS VARCHAR(30)
+CREATE FUNCTION CREDIT_CARD(p_IIN VARCHAR(8),
+                            p_AccountNumber INT(11),
+                            p_AccountDigits INT) RETURNS VARCHAR(30)
 DETERMINISTIC
   BEGIN
     -- https://gefvert.org/blog/archives/57
     DECLARE i, s, r, weight INT;
     DECLARE baseNumber VARCHAR(16);
  
-    SET baseNumber = CONCAT(p_Brand4, LPAD(CONVERT(p_AccountNumber, DECIMAL(11)), 11, '0'));
+    SET baseNumber = CONCAT(p_IIN, LPAD(CONVERT(p_AccountNumber, DECIMAL(11)), p_AccountDigits, '0'));
     SET weight = 2;
     SET s = 0;
     SET i = LENGTH(baseNumber);
@@ -238,20 +248,20 @@ DETERMINISTIC
   END 
 //
 
-CREATE PROCEDURE GenerateAccountSP (OUT p_AccountId VARCHAR(30),
-                                    IN p_MethodUri VARCHAR(50))
+CREATE PROCEDURE GenerateAccountIdSP (OUT p_AccountId VARCHAR(30),
+                                      IN p_MethodUri VARCHAR(50))
   BEGIN
     DECLARE v_NextNumber INT(11);
     DECLARE v_Format VARCHAR(70);
 
-	START TRANSACTION;
-	SELECT ACCOUNT_TYPES.NextNumber, ACCOUNT_TYPES.Format
-	    INTO v_NextNumber, v_Format FROM ACCOUNT_TYPES
-	    WHERE ACCOUNT_TYPES.MethodUri = p_MethodUri
-	    FOR UPDATE;
+    START TRANSACTION;
+    SELECT ACCOUNT_TYPES.NextNumber, ACCOUNT_TYPES.Format
+        INTO v_NextNumber, v_Format FROM ACCOUNT_TYPES
+        WHERE ACCOUNT_TYPES.MethodUri = p_MethodUri
+        FOR UPDATE;
     UPDATE ACCOUNT_TYPES SET NextNumber = v_NextNumber + 1
-	    WHERE ACCOUNT_TYPES.MethodUri = p_MethodUri;
-	COMMIT;
+        WHERE ACCOUNT_TYPES.MethodUri = p_MethodUri;
+    COMMIT;
     SET @format = v_Format;
     SET @nextNumber = v_NextNumber;
     SET @sql = CONCAT('SET @accountId = ', @format);
@@ -299,34 +309,45 @@ DELIMITER ;
 
 CALL CreateAccountTypeSP("https://supercard.com",
                          2390.00,
-                         "CREDIT_CARD('4532', @nextNumber)",  -- VISA
+                         "CREDIT_CARD('453256', @nextNumber, 9)",  -- VISA
                          800000123);
 
 CALL CreateAccountTypeSP("https://bankdirect.net", 
                          5543.00,
-                         "FRENCH_IBAN(@nextNumber)",          -- LCL
+                         "FRENCH_IBAN(@nextNumber)",               -- LCL
                          300000867);
 
 CALL CreateAccountTypeSP("https://unusualcard.com", 
                          120.00,
-                         "CREDIT_CARD('6011', @nextNumber)",  -- DISCOVER
+                         "CREDIT_CARD('601103', @nextNumber, 9)",  -- DISCOVER
                          000000078);
 
 -- Demo data
 CALL CreateUserSP("Luke Skywalker", @userid);
-CALL CreateDemoAccountSP(@userid, "6875056745552109", 
-                                  "https://supercard.com",
-                                  x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
-                                  NULL);
-CALL CreateDemoAccountSP(@userid, "8645-7800239403",
-                                  "https://bankdirect.net",
-                                  x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
-                                  x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
-CALL CreateDemoAccountSP(@userid, "1111222233334444", 
-                                  "https://unusualcard.com",
-                                  x'19aed933edacc289d0d63fba788cf424612d346754d110863cd043b52abecd53',
-                                  NULL);
+
+CALL CreateDemoAccountSP(@userid, 
+                         "6875056745552109", 
+                         "https://supercard.com",
+                         x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
+                         NULL);
+
+CALL CreateDemoAccountSP(@userid, 
+                         "8645-7800239403",
+                         "https://bankdirect.net",
+                         x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
+                         x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
+
+CALL CreateDemoAccountSP(@userid,
+                         "1111222233334444", 
+                         "https://unusualcard.com",
+                         x'19aed933edacc289d0d63fba788cf424612d346754d110863cd043b52abecd53',
+                         NULL);
 
 
-CALL CreateUserSP("Kurtron", @userid);
-CALL CreateDemoAccountSP(@userid, "6875056745552108", "https://supercard.com",   x'f3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a', NULL);
+CALL CreateUserSP("Chewbacca", @userid);
+
+CALL CreateDemoAccountSP(@userid, 
+                         "6875056745552108",
+                         "https://supercard.com",  
+                         x'f3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a', 
+                         NULL);
