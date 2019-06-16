@@ -19,6 +19,9 @@ package org.webpki.saturn.bank;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.sql.Connection;
+import java.sql.CallableStatement;
+
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
@@ -58,7 +61,6 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecryptionDecoder;
-
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
@@ -164,6 +166,31 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static boolean logging;
     
     static ExternalCalls externalCalls;
+    
+    class AccountRestorer implements Runnable {
+
+        @Override
+        public void run() {
+            Connection connection = null;
+            try {
+                Thread.sleep(300000);
+                connection = jdbcDataSource.getConnection();
+                CallableStatement stmt = connection.prepareCall("{call RestoreAccountsSP(FALSE)}");
+                stmt.execute();
+                stmt.close ();
+                connection.close();
+                connection = null;
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Database problem", e);
+                if (connection != null) {
+                    try {
+                        connection.close();
+                    } catch (Exception e1) {
+                    }
+                }
+            }
+        }
+    }
 
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -333,6 +360,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
             jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
+            
+            new Thread(new AccountRestorer()).start();
 
             started = new GregorianCalendar();
 
