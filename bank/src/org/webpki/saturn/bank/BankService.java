@@ -171,21 +171,23 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
         @Override
         public void run() {
-            Connection connection = null;
-            try {
-                Thread.sleep(300000);
-                connection = jdbcDataSource.getConnection();
-                CallableStatement stmt = connection.prepareCall("{call RestoreAccountsSP(FALSE)}");
-                stmt.execute();
-                stmt.close ();
-                connection.close();
-                connection = null;
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Database problem", e);
-                if (connection != null) {
-                    try {
-                        connection.close();
-                    } catch (Exception e1) {
+            while(true) {
+                Connection connection = null;
+                try {
+                    Thread.sleep(300000);
+                    connection = jdbcDataSource.getConnection();
+                    CallableStatement stmt = connection.prepareCall("{call RestoreAccountsSP(FALSE)}");
+                    stmt.execute();
+                    stmt.close ();
+                    connection.close();
+                    connection = null;
+                } catch (Exception e) {
+                    logger.log(Level.SEVERE, "Database problem", e);
+                    if (connection != null) {
+                        try {
+                            connection.close();
+                        } catch (Exception e1) {
+                        }
                     }
                 }
             }

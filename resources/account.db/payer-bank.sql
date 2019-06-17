@@ -103,13 +103,45 @@ CREATE TABLE CREDENTIALS
   );
 
 
+/*=============================================*/
+/*             TRANSACTION_TYPES               */
+/*=============================================*/
+
+CREATE TABLE TRANSACTION_TYPES
+  (
+    Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Transaction Type ID
+    SymbolicName VARCHAR(20)  NOT NULL,                                  -- As as symbolic name
+    Description VARCHAR(80)   NOT NULL,                                  -- A bit more on the topic
+    PRIMARY KEY (Id)
+  );
+
+
+/*=============================================*/
+/*               TRANSACTIONS                  */
+/*=============================================*/
+
+CREATE TABLE TRANSACTIONS
+  (
+    Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Transaction ID
+    AccountId   INT           NOT NULL,                                  -- Unique Account ID
+    TransactionType INT       NOT NULL,                                  -- Unique Transaction Type ID
+    Amount      DECIMAL(8,2)  NOT NULL,                                  -- The Amount involved
+    Originator  VARCHAR(50),                                             -- Optional Merchant
+    ExtReference VARCHAR(50),                                            -- Optional External Ref
+    CredentialId VARCHAR(30),                                            -- Optional Credential ID
+    Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
+    PRIMARY KEY (Id),
+    FOREIGN KEY (TransactionType) REFERENCES TRANSACTION_TYPES(Id),
+    FOREIGN KEY (AccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
+  ) AUTO_INCREMENT=100345078;
+
 DELIMITER //
 
 CREATE PROCEDURE CreateUserSP (IN p_Name VARCHAR(50), 
                                OUT p_UserId INT)
   BEGIN
     INSERT INTO USERS(Name) VALUES(p_Name);
-    SET p_UserID = LAST_INSERT_ID();
+    SET p_UserId = LAST_INSERT_ID();
   END
 //
 
@@ -127,6 +159,25 @@ CREATE PROCEDURE CreateCredentialTypeSP (IN p_MethodUri VARCHAR(50),
   BEGIN
     INSERT INTO CREDENTIAL_TYPES(MethodUri, Format)
         VALUES(p_MethodUri, p_Format);
+  END
+//
+
+CREATE PROCEDURE CreateTransactionTypeSP (IN p_SymbolicName VARCHAR(20),
+                                          IN p_Description VARCHAR(80))
+  BEGIN
+    INSERT INTO TRANSACTION_TYPES(SymbolicName, Description)
+        VALUES(p_SymbolicName, p_Description);
+  END
+//
+
+CREATE FUNCTION GetTransactionTypeSP(p_SymbolicName VARCHAR(20)) RETURNS INT
+DETERMINISTIC
+  BEGIN
+    DECLARE v_Id INT;
+
+    SELECT TRANSACTION_TYPES.Id INTO v_Id FROM TRANSACTION_TYPES
+        WHERE TRANSACTION_TYPES.SymbolicName = p_SymbolicName;
+    RETURN v_Id;
   END
 //
 
@@ -226,16 +277,16 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
                                        IN p_MethodUri VARCHAR(50),
                                        IN p_S256PayReq BINARY(32))
   BEGIN
-    DECLARE p_UserId INT;
+    DECLARE v_UserId INT;
     
-    SELECT ACCOUNTS.UserId INTO p_UserID FROM ACCOUNTS 
+    SELECT ACCOUNTS.UserId INTO v_UserId FROM ACCOUNTS 
         INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
         INNER JOIN CREDENTIAL_TYPES ON CREDENTIAL_TYPES.Id = CREDENTIALS.CredentialType
             WHERE CREDENTIALS.Id = p_CredentialId AND
                   CREDENTIAL_TYPES.MethodUri = p_MethodUri AND
                   CREDENTIALS.S256PayReq = p_S256PayReq
             LIMIT 1;
-    IF p_UserId IS NULL THEN   -- Failed => Find reason
+    IF v_UserId IS NULL THEN   -- Failed => Find reason
       IF EXISTS (SELECT * FROM CREDENTIALS WHERE CREDENTIALS.Id = p_CredentialId) THEN
         IF EXISTS (SELECT * FROM ACCOUNTS 
             INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
@@ -252,7 +303,7 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
     ELSE                       
       SET p_Error = 0;          -- Success => Update access info
       UPDATE USERS SET LastAccess = CURRENT_TIMESTAMP, AccessCount = AccessCount + 1
-          WHERE USERS.Id = p_UserId;     
+          WHERE USERS.Id = v_UserId;     
     END IF;
   END
 //
@@ -282,9 +333,13 @@ CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Error INT,
   END
 //
 
-CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
-                             IN p_Amount DECIMAL(8,2),
-                             IN p_CredentialId VARCHAR(30))
+CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
+                                     OUT p_TransactionId INT,
+                                     IN p_OptionalOriginator VARCHAR(50),
+                                     IN p_OptionalExtReference VARCHAR(50),
+                                     IN p_TransactionType INT,
+                                     IN p_Amount DECIMAL(8,2),
+                                     IN p_CredentialId VARCHAR(30))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
     DECLARE v_AccountId INT(11);
@@ -294,6 +349,50 @@ CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
     SELECT ACCOUNTS.Balance, ACCOUNTS.Id INTO v_Balance, v_AccountId FROM ACCOUNTS
         INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
         WHERE CREDENTIALS.Id = p_CredentialId
+        LIMIT 1
+        FOR UPDATE;
+    IF v_AccountId IS NULL THEN    -- Failed
+      SET p_Error = 1;             -- No such account
+    ELSE
+      IF p_Amount > v_Balance THEN
+        SET p_Error = 4;           -- Out of funds
+      ELSE                       -- Success => Withdraw the specified amount
+        UPDATE ACCOUNTS SET Balance = Balance - p_Amount
+            WHERE ACCOUNTS.Id = v_AccountId;
+        INSERT INTO TRANSACTIONS(TransactionType, 
+                                 AccountId,
+                                 Amount,
+                                 CredentialId, 
+                                 Originator, 
+                                 ExtReference) 
+             VALUES(p_TransactionType,
+                    v_AccountId,
+                    p_Amount,
+                    p_CredentialId,
+                    p_OptionalOriginator, 
+                    p_OptionalExtReference);
+        SET p_TransactionId = LAST_INSERT_ID();
+      END IF;
+    END IF;
+    COMMIT;
+  END
+//
+
+CREATE PROCEDURE InternalWithDrawSP (OUT p_Error INT,
+                                     OUT p_TransactionId INT,
+                                     IN p_OptionalOriginator VARCHAR(50),
+                                     IN p_OptionalExtReference VARCHAR(50),
+                                     IN p_TransactionType INT,
+                                     IN p_Amount DECIMAL(8,2),
+                                     IN p_AccountId INT)
+  BEGIN
+    DECLARE v_Balance DECIMAL(8,2);
+
+    SET p_Error = 0;
+    START TRANSACTION;
+    SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS
+        WHERE ACCOUNTS.Id = p_AccountId
+        LIMIT 1
         FOR UPDATE;
     IF v_Balance IS NULL THEN    -- Failed
       SET p_Error = 1;             -- No such account
@@ -303,10 +402,37 @@ CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
       ELSE                       -- Success => Withdraw the specified amount
         UPDATE ACCOUNTS SET Balance = Balance - p_Amount
             WHERE ACCOUNTS.Id = v_AccountId;
+        INSERT INTO TRANSACTIONS(TransactionType, 
+                                 AccountId,
+                                 Amount,
+                                 CredentialId, 
+                                 Originator, 
+                                 ExtReference) 
+             VALUES(p_TransactionType,
+                    p_AccountId,
+                    p_Amount,
+                    p_CredentialId,
+                    p_OptionalOriginator, 
+                    p_OptionalExtReference);
+        SET p_TransactionId = LAST_INSERT_ID();
       END IF;
     END IF;
     COMMIT;
   END
+//
+
+CREATE PROCEDURE RestoreUserAccountsSP(IN p_UserId INT)
+  BEGIN
+    UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = v_UserID;
+    SET SQL_SAFE_UPDATES = 0;
+    UPDATE ACCOUNTS INNER JOIN ACCOUNT_TYPES ON ACCOUNTS.AccountType = ACCOUNT_TYPES.Id
+        SET Balance = ACCOUNT_TYPES.CappedAt
+        WHERE ACCOUNTS.UserId = p_UserId;
+    DELETE target FROM TRANSACTIONS AS target
+        INNER JOIN ACCOUNTS ON ACCOUNTS.Id = target.AccountId
+        WHERE ACCOUNTS.UserId = p_UserId;
+    SET SQL_SAFE_UPDATES = 1;
+  END;
 //
 
 CREATE PROCEDURE RestoreAccountsSP (IN p_Unconditionally BOOLEAN)
@@ -326,15 +452,9 @@ CREATE PROCEDURE RestoreAccountsSP (IN p_Unconditionally BOOLEAN)
         LEAVE ReadLoop;
       END IF;
       SELECT USERS.LastAccess INTO v_LastAccess FROM USERS WHERE USERS.Id = v_UserId;
-      IF v_LastAccess IS NOT NULL THEN
-        IF p_Unconditionally OR (v_LastAccess < (NOW() - INTERVAL 30 MINUTE)) THEN
-          UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = v_UserID;
-          SET SQL_SAFE_UPDATES = 0;
-          UPDATE ACCOUNTS INNER JOIN ACCOUNT_TYPES ON ACCOUNTS.AccountType = ACCOUNT_TYPES.Id
-              SET Balance = ACCOUNT_TYPES.CappedAt
-              WHERE ACCOUNTS.UserId = v_UserId;
-          SET SQL_SAFE_UPDATES = 1;
-        END IF;
+      IF p_Unconditionally OR (IFNULL(v_LastAccess, FALSE) AND 
+                              (v_LastAccess < (NOW() - INTERVAL 30 MINUTE))) THEN
+        CALL RestoreUserAccountsSP(v_UserId);
       END IF;
     END LOOP;
     CLOSE v_UserId_cursor;
@@ -369,6 +489,23 @@ CALL CreateCredentialTypeSP("https://bankdirect.net",    -- LCL
 CALL CreateCredentialTypeSP("https://unusualcard.com",   -- DISCOVER
                             "CREDIT_CARD('601103', @accountId, 9)");
 
+
+-- Transaction Types:
+
+CALL CreateTransactionTypeSP("DIRECT_DEBIT",
+                             "Single step payment operation");
+
+CALL CreateTransactionTypeSP("RESERVE",
+                             "Phase one of a two-step payment operation");
+
+CALL CreateTransactionTypeSP("RESERVE_MULTI",
+                             "Phase one of an open multi-step payment operation");
+
+CALL CreateTransactionTypeSP("TRANSACT",
+                             "Phase two or more of a multi-step payment operation");
+
+CALL CreateTransactionTypeSP("REFUND",
+                             "Phase two or more of a multi-step payment operation");
 
 -- Demo data
 

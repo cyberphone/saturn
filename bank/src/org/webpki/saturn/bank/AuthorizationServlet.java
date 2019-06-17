@@ -56,6 +56,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
   
     private static final long serialVersionUID = 1L;
     
+    class RequestStatus {
+        String optionalError;
+        String transactionId;
+    }
+    
     @Override
     JSONObjectWriter processCall(UrlHolder urlHolder,
                                  JSONObjectReader providerRequest,
@@ -154,8 +159,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         String accountId = authorizationData.getAccountId();
         String authorizedPaymentMethod = authorizationData.getPaymentMethod();
 /*
-         REATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
-                                               IN p_AccountId VARCHAR(20),
+        CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
+                                               IN p_CredentialId VARCHAR(30),
                                                IN p_MethodUri VARCHAR(50),
                                                IN p_S256PayReq BINARY(32))
 */
@@ -232,13 +237,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         boolean testMode = authorizationRequest.getTestMode();
         String optionalLogData = null;
-        if (!testMode) {
+        RequestStatus requestStatus;
+        if (testMode) {
+            requestStatus = new RequestStatus();
+            requestStatus.transactionId = getReferenceId();
+        } else {
             // Here we would actually update things...
             // If Payer and Payee are in the same bank it will not require any networking of course.
             // Note that card and nonDirectPayments payments only reserve an amount.
-            String errorMessage = performRequest(amount, accountId, cardPayment, connection);
-            if (errorMessage != null) {
-                return createProviderUserResponse(errorMessage,
+            requestStatus = performRequest(amount, accountId, cardPayment, connection);
+            if (requestStatus.optionalError != null) {
+                return createProviderUserResponse(requestStatus.optionalError,
                                                   null,
                                                   authorizationData);
             }
@@ -266,6 +275,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
         logger.info((testMode ? "TEST ONLY: ": "") +
                 "Authorized Amount=" + amount.toString() + 
+                ", Transaction ID=" + requestStatus.transactionId + 
                 ", Account ID=" + accountId + 
                 ", Payment Method=" + authorizedPaymentMethod + 
                 ", Client IP=" + clientIpAddress +
@@ -277,30 +287,41 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                             accountReference.toString(),
                                             providerAuthority.getEncryptionParameters()[0],
                                             accountData,
-                                            getReferenceId(),
+                                            requestStatus.transactionId,
                                             optionalLogData,
                                             BankService.bankKey);
     }
 
-    private String performRequest(BigDecimal amount,
-                                  String accountId,
-                                  boolean cardPayment,
-                                  Connection connection) throws Exception {
+    private RequestStatus performRequest(BigDecimal amount,
+                                         String accountId,
+                                         boolean cardPayment,
+                                         Connection connection) throws Exception {
 /*
-        CREATE PROCEDURE WithDrawSP (OUT p_Error INT,
+CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
+                                     OUT p_TransactionId INT,
+                                     IN p_OptionalOriginator VARCHAR(50),
+                                     IN p_OptionalReference VARCHAR(50),
+                                     IN p_TransactionType INT,
                                      IN p_Amount DECIMAL(8,2),
-                                     IN p_AccountId VARCHAR(20))
+                                     IN p_CredentialId VARCHAR(30))
 */
-        CallableStatement stmt = connection.prepareCall("{call WithDrawSP(?, ?, ?)}");
+        CallableStatement stmt = connection.prepareCall("{call ExternalWithDrawSP(?, ?, ?, ?, ?, ?, ?)}");
         stmt.registerOutParameter(1, java.sql.Types.INTEGER);
-        stmt.setBigDecimal(2, amount);
-        stmt.setString(3, accountId);
+        stmt.registerOutParameter(2, java.sql.Types.INTEGER);
+        stmt.setString(3, "demoblaha");
+        stmt.setString(4, null);
+        stmt.setInt(5, 1);
+        stmt.setBigDecimal(6, amount);
+        stmt.setString(7, accountId);
         stmt.execute();
-        int result = stmt.getInt(1);          
-        stmt.close ();
+        RequestStatus rs = new RequestStatus();
+        int result = stmt.getInt(1);
         if (result == 0) {
-            return null;
+            rs.transactionId = "#" + stmt.getInt(2);
+        } else {
+            rs.optionalError = "urban";
         }
-        return "urban";
+        stmt.close ();
+        return rs;
     }
 }
