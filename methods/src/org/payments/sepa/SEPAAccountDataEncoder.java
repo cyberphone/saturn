@@ -19,7 +19,6 @@ package org.payments.sepa;
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectWriter;
-
 import org.webpki.saturn.common.AuthorizationResponse;
 
 public final class SEPAAccountDataEncoder extends AuthorizationResponse.AccountDataEncoder {
@@ -42,5 +41,11 @@ public final class SEPAAccountDataEncoder extends AuthorizationResponse.AccountD
     @Override
     public String getContext() {
         return CONTEXT;
+    }
+
+    @Override
+    public String getPartialAccountIdentifier() {
+        int q = payerIban.length();
+        return payerIban.substring(0,2) + '*' + payerIban.substring(q - 6, q - 2);
     }
 }

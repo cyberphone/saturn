@@ -95,6 +95,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         UrlHolder urlHolder = null;
         Connection connection = null;
         try {
+// TODO Here there should be a generic input/output cache to provide idempotent operation
+// because you don't want a retried request to pass the transaction mechanism.
+
             urlHolder = new UrlHolder(request);
 
             /////////////////////////////////////////////////////////////////////////////////////////

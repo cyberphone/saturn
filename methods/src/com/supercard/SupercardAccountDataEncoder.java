@@ -33,33 +33,38 @@ public final class SupercardAccountDataEncoder extends AuthorizationResponse.Acc
 
     static final String CARD_NUMBER_JSON   = "cardNumber";    // PAN
     static final String CARD_HOLDER_JSON   = "cardHolder";    // Name
-    static final String SECURITY_CODE_JSON = "securityCode";  // CCV
 
     String cardNumber;                   // PAN
     String cardHolder;                   // Name
     GregorianCalendar expirationDate;    // Card expiration date
-    String securityCode;                 // CCV or similar
 
     public SupercardAccountDataEncoder(String cardNumber,
                                        String cardHolder,
-                                       GregorianCalendar expirationDate,
-                                       String securityCode) {
+                                       GregorianCalendar expirationDate) {
         this.cardNumber = cardNumber;
         this.cardHolder = cardHolder;
         this.expirationDate = expirationDate;
-        this.securityCode = securityCode;
     }
 
     @Override
     protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
         return wr.setString(CARD_NUMBER_JSON, cardNumber)
                  .setString(CARD_HOLDER_JSON, cardHolder)
-                 .setDateTime(BaseProperties.EXPIRES_JSON, expirationDate, ISODateTime.UTC_NO_SUBSECONDS)
-                 .setString(SECURITY_CODE_JSON, securityCode);
+                 .setDateTime(BaseProperties.EXPIRES_JSON, expirationDate, ISODateTime.UTC_NO_SUBSECONDS);
     }
 
     @Override
     public String getContext() {
         return ACCOUNT_DATA;
+    }
+
+    @Override
+    public String getPartialAccountIdentifier() {
+        StringBuilder accountReference = new StringBuilder();
+        int q = cardNumber.length() - 4;
+        for (char c : cardNumber.toCharArray()) {
+            accountReference.append((--q < 0) ? c : '*');
+        }
+        return accountReference.toString();
     }
 }

@@ -46,17 +46,11 @@ public final class SupercardAccountDataDecoder extends AuthorizationResponse.Acc
         return expirationDate;
     }
 
-    String securityCode;                 // CCV or similar
-    public String getSecurityCode() {
-        return securityCode;
-    }
-
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
         cardNumber = rd.getString(SupercardAccountDataEncoder.CARD_NUMBER_JSON);
         cardHolder = rd.getString(SupercardAccountDataEncoder.CARD_HOLDER_JSON);
         expirationDate = rd.getDateTime(BaseProperties.EXPIRES_JSON, ISODateTime.COMPLETE);
-        securityCode = rd.getString(SupercardAccountDataEncoder.SECURITY_CODE_JSON);
     }
 
     @Override

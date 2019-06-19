@@ -239,18 +239,32 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         String optionalLogData = null;
         RequestStatus requestStatus;
         if (testMode) {
+            // In test mode we only authenticate using the "real" solution, the rest is"fake".
             requestStatus = new RequestStatus();
             requestStatus.transactionId = getReferenceId();
         } else {
             // Here we would actually update things...
-            // If Payer and Payee are in the same bank it will not require any networking of course.
-            // Note that card and nonDirectPayments payments only reserve an amount.
             requestStatus = performRequest(amount, accountId, cardPayment, connection);
             if (requestStatus.optionalError != null) {
                 return createProviderUserResponse(requestStatus.optionalError,
                                                   null,
                                                   authorizationData);
             }
+            //###################################################
+            //# Payment backend networking would happen here... #
+            //###################################################
+            //
+            // Not implemented in the demo.
+            //
+            // If Payer and Payee are in the same bank networking is not needed.
+            //
+            // Note that if backend networking for some reason fails, the transaction
+            // must be reversed.
+            //
+            // If successful one could imagine updating the transaction record with
+            // a reference to that part as well.
+            //
+            // Note that card and nonDirectPayments payments only reserve an amount locally.
             if (!cardPayment && nonDirectPayment == null) {
                 optionalLogData = "Bank payment network log data...";
             }
@@ -262,17 +276,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             new com.supercard.SupercardAccountDataEncoder(
                     accountId, 
                     "Luke Skywalker",
-                    ISODateTime.parseDateTime("2022-12-31T00:00:00Z", ISODateTime.COMPLETE),
-                    "943")
+                    ISODateTime.parseDateTime("2022-12-31T00:00:00Z", ISODateTime.COMPLETE))
                                                      :
             new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606");
 
-        // Reference to Merchant
-        StringBuilder accountReference = new StringBuilder();
-        int q = accountId.length() - 4;
-        for (char c : accountId.toCharArray()) {
-            accountReference.append((--q < 0) ? c : '*');
-        }
         logger.info((testMode ? "TEST ONLY: ": "") +
                 "Authorized Amount=" + amount.toString() + 
                 ", Transaction ID=" + requestStatus.transactionId + 
@@ -284,7 +291,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // We did it!
         BankService.successfulTransactions++;
         return AuthorizationResponse.encode(authorizationRequest,
-                                            accountReference.toString(),
                                             providerAuthority.getEncryptionParameters()[0],
                                             accountData,
                                             requestStatus.transactionId,

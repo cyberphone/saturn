@@ -423,7 +423,7 @@ CREATE PROCEDURE InternalWithDrawSP (OUT p_Error INT,
 
 CREATE PROCEDURE RestoreUserAccountsSP(IN p_UserId INT)
   BEGIN
-    UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = v_UserID;
+    UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = p_UserId;
     SET SQL_SAFE_UPDATES = 0;
     UPDATE ACCOUNTS INNER JOIN ACCOUNT_TYPES ON ACCOUNTS.AccountType = ACCOUNT_TYPES.Id
         SET Balance = ACCOUNT_TYPES.CappedAt

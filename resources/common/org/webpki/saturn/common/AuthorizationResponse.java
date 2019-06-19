@@ -56,6 +56,8 @@ public class AuthorizationResponse implements BaseProperties {
         
         public abstract String getContext();
         
+        public abstract String getPartialAccountIdentifier();  // Like ************4567
+        
         public String getQualifier() {
             return null;  // Optional
         }
@@ -122,7 +124,6 @@ public class AuthorizationResponse implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
-                                          String accountReference,
                                           ProviderAuthority.EncryptionParameter encryptionParameter,
                                           AccountDataEncoder accountData,
                                           String referenceId,
@@ -130,7 +131,7 @@ public class AuthorizationResponse implements BaseProperties {
                                           ServerX509Signer signer) throws IOException, GeneralSecurityException {
         return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
             .setObject(Messages.AUTHORIZATION_REQUEST.lowerCamelCase(), authorizationRequest.root)
-            .setString(ACCOUNT_REFERENCE_JSON, accountReference)
+            .setString(ACCOUNT_REFERENCE_JSON, accountData.getPartialAccountIdentifier())
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
                        JSONObjectWriter
                            .createEncryptionObject(
