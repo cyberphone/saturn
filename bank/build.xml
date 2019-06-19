@@ -17,6 +17,10 @@
     <isset property="payeebank"/>
   </condition>
     
+  <condition property="users.db" value="jdbc/PAYER_BANK" else="jdbc/PAYER_BANK">
+    <isset property="payeebank"/>
+  </condition>  
+  
   <condition property="reference.id.start" value="120004" else="96744">
     <isset property="payeebank"/>
   </condition>
@@ -61,7 +65,6 @@
     <property name="payee.account.validation" value="true"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="server.port.map" value=""/>
-    <property name="users.db" value="accounts.${appcorename}.json"/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
     <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa.p12"/>
     <property name="enc.key.ec" value="${appcorename}-enc-key-ec.p12"/>
@@ -135,7 +138,6 @@
          <include name="${hosting.provider.key}"/>
       </zipfileset>
       <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
-         <include name="${users.db}"/>
          <include name="${merchants.db}"/>
       </zipfileset>
       <zipfileset dir="${conf.dir}" prefix="${class_war_path}">

@@ -117,9 +117,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys =
             new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
     
-    static SortedMap<String,UserAccountEntry> userAccountDb = new TreeMap<String,UserAccountEntry>();
-    
-    static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
+     static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
         new TreeMap<String,PayeeCoreProperties>(new Comparator<String>() {
             @Override
             public int compare(String arg0, String arg1) {
@@ -194,10 +192,15 @@ public class BankService extends InitPropertyReader implements ServletContextLis
         }
     }
 
+    void initDataBaseEnums(Connection connection) throws Exception {
+        TransactionTypes.init(connection);
+        connection.close();
+    }
+
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
     }
-    
+
     void addDecryptioKey(KeyStoreEnumerator keyStoreEnumerator, KeyEncryptionAlgorithms keyEncryptionAlgorithm) {
         decryptionKeys.add(new JSONDecryptionDecoder.DecryptionKeyHolder(
                 keyStoreEnumerator.getPublicKey(),
@@ -287,19 +290,12 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             acquirerRoot = getRoot(ACQUIRER_ROOT);
             
-            JSONArrayReader accounts = JSONParser.parse(
-                                          ArrayUtil.getByteArrayFromInputStream (getResource(USER_ACCOUNT_DB))
-                                                       ).getJSONArrayReader();
-            while (accounts.hasMore()) {
-                UserAccountEntry account = new UserAccountEntry(accounts.getObject());
-                userAccountDb.put(account.getAccountId(), account);
-            }
-
             boolean accountValidation = getPropertyBoolean(ACCOUNT_VALIDATION);
             if (hostingProvider == null) {
-                accounts = JSONParser.parse(
-                                       ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
-                                           ).getJSONArrayReader();
+                JSONArrayReader accounts = 
+                    JSONParser.parse(ArrayUtil
+                        .getByteArrayFromInputStream(getResource(MERCHANT_ACCOUNT_DB)))
+                            .getJSONArrayReader();
                 while (accounts.hasMore()) {
                     PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
                                                                            knownPaymentMethods,
@@ -361,7 +357,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
-            jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
+            jdbcDataSource = (DataSource)envContext.lookup(getPropertyString(USER_ACCOUNT_DB));
+            
+            initDataBaseEnums(jdbcDataSource.getConnection());
             
             new Thread(new AccountRestorer()).start();
 

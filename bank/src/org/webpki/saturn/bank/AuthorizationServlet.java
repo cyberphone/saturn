@@ -244,7 +244,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             requestStatus.transactionId = getReferenceId();
         } else {
             // Here we would actually update things...
-            requestStatus = performRequest(amount, accountId, cardPayment, connection);
+            TransactionTypes transactionType = 
+                    !cardPayment && nonDirectPayment == null ? 
+                               TransactionTypes.DIRECT_DEBIT : TransactionTypes.RESERVE;
+            requestStatus = performRequest(amount, accountId, transactionType, connection);
             if (requestStatus.optionalError != null) {
                 return createProviderUserResponse(requestStatus.optionalError,
                                                   null,
@@ -300,7 +303,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
     private RequestStatus performRequest(BigDecimal amount,
                                          String accountId,
-                                         boolean cardPayment,
+                                         TransactionTypes transactionType,
                                          Connection connection) throws Exception {
 /*
 CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
@@ -316,7 +319,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
         stmt.registerOutParameter(2, java.sql.Types.INTEGER);
         stmt.setString(3, "demoblaha");
         stmt.setString(4, null);
-        stmt.setInt(5, 1);
+        stmt.setInt(5, transactionType.getIntValue());
         stmt.setBigDecimal(6, amount);
         stmt.setString(7, accountId);
         stmt.execute();
