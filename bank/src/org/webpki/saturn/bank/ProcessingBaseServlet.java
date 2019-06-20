@@ -66,8 +66,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static final String RBA_PARM_MOTHER             = "mother";
     static final String MOTHER_NAME                 = "garbo";
     
-    static String getReferenceId() {
-        return "#" + (BankService.referenceId++);
+    static String formatReferenceId(int referenceId) {
+        return String.format("#%010d", referenceId);
     }
     
     static String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {

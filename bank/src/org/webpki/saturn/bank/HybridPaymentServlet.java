@@ -18,6 +18,8 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.util.Arrays;
 
 import java.sql.Connection;
@@ -72,24 +74,50 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
             authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         boolean testMode = transactionRequest.getTestMode();
-        logger.info((testMode ? "TEST ONLY: ":"") +
-                    "Charging for Account ID=" + authorizationData.getAccountId() + 
-                    ", Amount=" + transactionRequest.getAmount().toString() +
-                    " " + paymentRequest.getCurrency().toString());
         String optionalLogData = null;
         TransactionResponse.ERROR transactionError = null;
-        if (!testMode) {
-
+        String referenceId;
+        if (testMode) {
+            referenceId = formatReferenceId(BankService.testReferenceId++);
+        } else {
+            WithDrawFromAccount wdfa = 
+                    new WithDrawFromAccount(transactionRequest.getAmount()
+                                                .subtract(paymentRequest.getAmount()),
+                                            authorizationData.getAccountId(),
+                                            TransactionTypes.TRANSACT,
+                                            connection);
+            if (wdfa.getResult() == 0) {
+                referenceId = formatReferenceId(wdfa.getTransactionId());
+            } else {
+                throw new RuntimeException("transact");
+            }
             // Here we are supposed to do the actual payment
+            //###################################################
+            //# Payment backend networking would happen here... #
+            //###################################################
+            //
+            // Not implemented in the demo.
+            //
+            // If Payer and Payee are in the same bank networking is not needed.
+            //
+            // Note that if backend networking for some reason fails, the transaction
+            // must be reversed.
+            //
+            // If successful one could imagine updating the transaction record with
+            // a reference to that part as well.
+            //
             optionalLogData = "Bank payment network log data...";
         }
 
         // It appears that we succeeded
+        logger.info((testMode ? "TEST ONLY: ":"") +
+                    "Charging for Account ID=" + authorizationData.getAccountId() + 
+                    ", Amount=" + transactionRequest.getAmount().toString() +
+                    " " + paymentRequest.getCurrency().toString());
         return TransactionResponse.encode(transactionRequest,
                                           transactionError,
-                                          getReferenceId(),
+                                          referenceId,
                                           optionalLogData,
                                           BankService.bankKey);
     }
-
 }

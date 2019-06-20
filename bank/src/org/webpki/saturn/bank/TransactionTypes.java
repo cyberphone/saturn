@@ -18,6 +18,8 @@ package org.webpki.saturn.bank;
 
 import java.sql.Connection;
 
+import org.webpki.saturn.common.EnumDataBase;
+
 public enum TransactionTypes implements EnumDataBase {
 
     DIRECT_DEBIT(), 
@@ -28,7 +30,7 @@ public enum TransactionTypes implements EnumDataBase {
     TransactionTypes () {
     }
 
-    static int[] dataBaseValues = new int[values().length];
+    private static int[] dataBaseValues = new int[values().length];
 
     @Override
     public int getIntValue() {

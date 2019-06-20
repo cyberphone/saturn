@@ -145,7 +145,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static String serviceUrl;
 
-    static int referenceId;
+    static int testReferenceId;
     
     static AuthorityObjectManager authorityObjectManager;
     
@@ -307,7 +307,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             addDecryptionKey(DECRYPTION_KEY1);
             addDecryptionKey(DECRYPTION_KEY2);
 
-            referenceId = getPropertyInt(REFERENCE_ID_START);
+            testReferenceId = getPropertyInt(REFERENCE_ID_START);
             
             String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             

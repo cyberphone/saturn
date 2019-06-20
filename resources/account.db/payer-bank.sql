@@ -46,7 +46,8 @@ CREATE TABLE USERS
 
 CREATE TABLE ACCOUNT_TYPES
   (
-    Id          CHAR(4)       NOT NULL  UNIQUE,                          -- Unique Type ID
+    Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Type ID
+    SymbolicName VARCHAR(20)  NOT NULL,                                  -- As as symbolic name
     Description VARCHAR(50)   NOT NULL  UNIQUE,                          -- Description
     CappedAt    DECIMAL(8,2)  NOT NULL,                                  -- Capped at
     PRIMARY KEY (Id)
@@ -61,7 +62,7 @@ CREATE TABLE ACCOUNTS
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Account ID
     UserId      INT           NOT NULL,                                  -- Unique User ID (account holder)
-    AccountType CHAR(4)       NOT NULL,                                  -- Unique Type ID
+    AccountType INT           NOT NULL,                                  -- Unique Type ID
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
     Balance     DECIMAL(8,2)  NOT NULL,                                  -- Disponible
     Currency    CHAR(3)       NOT NULL  DEFAULT "EUR",                   -- SEK, USD, EUR etc.
@@ -145,12 +146,12 @@ CREATE PROCEDURE CreateUserSP (IN p_Name VARCHAR(50),
   END
 //
 
-CREATE PROCEDURE CreateAccountTypeSP (IN p_Id CHAR(4),
+CREATE PROCEDURE CreateAccountTypeSP (IN p_SymbolicName VARCHAR(20),
                                       IN p_Description VARCHAR(50),
                                       IN p_CappedAt DECIMAL(8,2))
   BEGIN
-    INSERT INTO ACCOUNT_TYPES(Id, Description, CappedAt)
-        VALUES(p_Id, p_Description, p_CappedAt);
+    INSERT INTO ACCOUNT_TYPES(SymbolicName, Description, CappedAt)
+        VALUES(p_SymbolicName, p_Description, p_CappedAt);
   END
 //
 
@@ -177,6 +178,17 @@ DETERMINISTIC
 
     SELECT TRANSACTION_TYPES.Id INTO v_Id FROM TRANSACTION_TYPES
         WHERE TRANSACTION_TYPES.SymbolicName = p_SymbolicName;
+    RETURN v_Id;
+  END
+//
+
+CREATE FUNCTION GetAccountTypeSP(p_SymbolicName VARCHAR(20)) RETURNS INT
+DETERMINISTIC
+  BEGIN
+    DECLARE v_Id INT;
+
+    SELECT ACCOUNT_TYPES.Id INTO v_Id FROM ACCOUNT_TYPES
+        WHERE ACCOUNT_TYPES.SymbolicName = p_SymbolicName;
     RETURN v_Id;
   END
 //
@@ -465,15 +477,15 @@ DELIMITER ;
 
 -- Account Types:
 
-CALL CreateAccountTypeSP("CC",
-                         "Credit Card Account",
+CALL CreateAccountTypeSP("CREDIT_CARD_ACCOUNT",
+                         "Credit Card Account (loan)",
                          2390.00);
 
-CALL CreateAccountTypeSP("SEPA",
+CALL CreateAccountTypeSP("STANDARD_ACCOUNT",
                          "SEPA Primary Account", 
                          5543.00);
 
-CALL CreateAccountTypeSP("NEW",
+CALL CreateAccountTypeSP("NEW_USER_ACCOUNT",
                          "Low Value Account for New Users", 
                          120.00);
 
@@ -511,7 +523,7 @@ CALL CreateTransactionTypeSP("REFUND",
 
 CALL CreateUserSP("Luke Skywalker", @userid);
 
-CALL CreateAccountSP(@accountid, @userid, "CC");
+CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("CREDIT_CARD_ACCOUNT"));
 
 CALL CreateDemoCredentialSP(@accountid, 
                             "6875056745552109", 
@@ -519,7 +531,7 @@ CALL CreateDemoCredentialSP(@accountid,
                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
                             NULL);
 
-CALL CreateAccountSP(@accountid, @userid, "SEPA");
+CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("STANDARD_ACCOUNT"));
 
 CALL CreateDemoCredentialSP(@accountid, 
                             "8645-7800239403",
@@ -527,7 +539,7 @@ CALL CreateDemoCredentialSP(@accountid,
                             x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
 
-CALL CreateAccountSP(@accountid, @userid, "NEW");
+CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("NEW_USER_ACCOUNT"));
 
 CALL CreateDemoCredentialSP(@accountid, 
                             "1111222233334444", 
@@ -537,7 +549,7 @@ CALL CreateDemoCredentialSP(@accountid,
                             
 CALL CreateUserSP("Chewbacca", @userid);
 
-CALL CreateAccountSP(@accountid, @userid, "CC");
+CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("CREDIT_CARD_ACCOUNT"));
 
 CALL CreateDemoCredentialSP(@accountid, 
                             "6875056745552108",
@@ -547,14 +559,14 @@ CALL CreateDemoCredentialSP(@accountid,
 
 CALL CreateAccountAndCredentialSP(@credid,
                                   @userid,
-                                  "CC",
+                                  GetAccountTypeSP("CREDIT_CARD_ACCOUNT"),
                                   "https://supercard.com",  
                                   x'f3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a', 
                                   NULL);
 
 CALL CreateAccountAndCredentialSP(@credid,
                                   @userid,
-                                  "SEPA",
+                                  GetAccountTypeSP("STANDARD_ACCOUNT"),
                                   "https://bankdirect.net",
                                   x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
                                   x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');

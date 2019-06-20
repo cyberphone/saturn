@@ -14,12 +14,12 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.bank;
+package org.webpki.saturn.common;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
 
-interface EnumDataBase {
+public interface EnumDataBase {
 
     public int getIntValue();
     

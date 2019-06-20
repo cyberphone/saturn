@@ -56,11 +56,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
   
     private static final long serialVersionUID = 1L;
     
-    class RequestStatus {
-        String optionalError;
-        String transactionId;
-    }
-    
     @Override
     JSONObjectWriter processCall(UrlHolder urlHolder,
                                  JSONObjectReader providerRequest,
@@ -236,20 +231,26 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         boolean testMode = authorizationRequest.getTestMode();
+        TransactionTypes transactionType = 
+                !cardPayment && nonDirectPayment == null ? 
+                           TransactionTypes.DIRECT_DEBIT : TransactionTypes.RESERVE;
         String optionalLogData = null;
-        RequestStatus requestStatus;
+        String transactionId;
         if (testMode) {
-            // In test mode we only authenticate using the "real" solution, the rest is"fake".
-            requestStatus = new RequestStatus();
-            requestStatus.transactionId = getReferenceId();
+            // In test mode we only authenticate using the "real" solution, the rest is "fake".
+            transactionId = formatReferenceId(BankService.testReferenceId++);
         } else {
-            // Here we would actually update things...
-            TransactionTypes transactionType = 
-                    !cardPayment && nonDirectPayment == null ? 
-                               TransactionTypes.DIRECT_DEBIT : TransactionTypes.RESERVE;
-            requestStatus = performRequest(amount, accountId, transactionType, connection);
-            if (requestStatus.optionalError != null) {
-                return createProviderUserResponse(requestStatus.optionalError,
+            // Here we actually update things...
+            WithDrawFromAccount wdfa = new WithDrawFromAccount(amount,
+                                                               accountId,
+                                                               transactionType,
+                                                               connection);
+            if (wdfa.getResult() == 0) {
+                transactionId = formatReferenceId(wdfa.getTransactionId());
+            } else {
+                return createProviderUserResponse("Your request for " + 
+                                                  amountInHtml(paymentRequest, amount) +
+                        " appears to be slightly out of your current capabilities...",
                                                   null,
                                                   authorizationData);
             }
@@ -284,53 +285,21 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606");
 
         logger.info((testMode ? "TEST ONLY: ": "") +
-                "Authorized Amount=" + amount.toString() + 
-                ", Transaction ID=" + requestStatus.transactionId + 
-                ", Account ID=" + accountId + 
-                ", Payment Method=" + authorizedPaymentMethod + 
-                ", Client IP=" + clientIpAddress +
-                ", Method Specific=" + paymentMethodSpecific.logLine());
+                    "Authorized Amount=" + amount.toString() + 
+                    ", Transaction Type=" + transactionType.toString() + 
+                    ", Transaction ID=" + transactionId + 
+                    ", Account ID=" + accountId + 
+                    ", Payment Method=" + authorizedPaymentMethod + 
+                    ", Client IP=" + clientIpAddress +
+                    ", Method Specific=" + paymentMethodSpecific.logLine());
 
         // We did it!
         BankService.successfulTransactions++;
         return AuthorizationResponse.encode(authorizationRequest,
                                             providerAuthority.getEncryptionParameters()[0],
                                             accountData,
-                                            requestStatus.transactionId,
+                                            transactionId,
                                             optionalLogData,
                                             BankService.bankKey);
-    }
-
-    private RequestStatus performRequest(BigDecimal amount,
-                                         String accountId,
-                                         TransactionTypes transactionType,
-                                         Connection connection) throws Exception {
-/*
-CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
-                                     OUT p_TransactionId INT,
-                                     IN p_OptionalOriginator VARCHAR(50),
-                                     IN p_OptionalReference VARCHAR(50),
-                                     IN p_TransactionType INT,
-                                     IN p_Amount DECIMAL(8,2),
-                                     IN p_CredentialId VARCHAR(30))
-*/
-        CallableStatement stmt = connection.prepareCall("{call ExternalWithDrawSP(?, ?, ?, ?, ?, ?, ?)}");
-        stmt.registerOutParameter(1, java.sql.Types.INTEGER);
-        stmt.registerOutParameter(2, java.sql.Types.INTEGER);
-        stmt.setString(3, "demoblaha");
-        stmt.setString(4, null);
-        stmt.setInt(5, transactionType.getIntValue());
-        stmt.setBigDecimal(6, amount);
-        stmt.setString(7, accountId);
-        stmt.execute();
-        RequestStatus rs = new RequestStatus();
-        int result = stmt.getInt(1);
-        if (result == 0) {
-            rs.transactionId = "#" + stmt.getInt(2);
-        } else {
-            rs.optionalError = "urban";
-        }
-        stmt.close ();
-        return rs;
     }
 }

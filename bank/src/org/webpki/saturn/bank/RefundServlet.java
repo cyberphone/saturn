@@ -73,7 +73,7 @@ public class RefundServlet extends ProcessingBaseServlet {
 
         // It appears that we succeeded
         return RefundResponse.encode(refundRequest,
-                                     getReferenceId(),
+                                     formatReferenceId(BankService.testReferenceId++),
                                      optionalLogData,
                                      BankService.bankKey);
     }
