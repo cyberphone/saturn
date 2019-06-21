@@ -159,25 +159,26 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                IN p_MethodUri VARCHAR(50),
                                                IN p_S256PayReq BINARY(32))
 */
-        CallableStatement stmt = connection.prepareCall("{call AuthenticatePayReqSP(?, ?, ?, ?)}");
-        stmt.registerOutParameter(1, java.sql.Types.INTEGER);
-        stmt.setString(2, accountId);
-        stmt.setString(3, authorizedPaymentMethod);
-        stmt.setBytes(4, HashAlgorithms.SHA256.digest(authorizationData.getPublicKey().getEncoded()));
-        stmt.execute();
-        int result = stmt.getInt(1);            
-        stmt.close ();
-        if (result != 0) {
-            if (result == 1) {
-                logger.severe("No such account ID: " + accountId);
-                throw new IOException("No such user account ID");
+        try (CallableStatement stmt = 
+                connection.prepareCall("{call AuthenticatePayReqSP(?, ?, ?, ?)}");) {
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            stmt.setString(2, accountId);
+            stmt.setString(3, authorizedPaymentMethod);
+            stmt.setBytes(4, HashAlgorithms.SHA256.digest(authorizationData.getPublicKey().getEncoded()));
+            stmt.execute();
+            int result = stmt.getInt(1);            
+            if (result != 0) {
+                if (result == 1) {
+                    logger.severe("No such account ID: " + accountId);
+                    throw new IOException("No such user account ID");
+                }
+                if (result == 2) {
+                    logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
+                    throw new IOException("Wrong payment method");
+                }
+                logger.severe("Wrong public key for account ID: " + accountId);
+                throw new IOException("Wrong user public key");
             }
-            if (result == 2) {
-                logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
-                throw new IOException("Wrong payment method");
-            }
-            logger.severe("Wrong public key for account ID: " + accountId);
-            throw new IOException("Wrong user public key");
         }
 
         // We don't accept requests that are old or ahead of time
@@ -244,13 +245,16 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             WithDrawFromAccount wdfa = new WithDrawFromAccount(amount,
                                                                accountId,
                                                                transactionType,
+                                                               paymentRequest.getPayee().getCommonName(),
                                                                connection);
             if (wdfa.getResult() == 0) {
                 transactionId = formatReferenceId(wdfa.getTransactionId());
             } else {
                 return createProviderUserResponse("Your request for " + 
                                                   amountInHtml(paymentRequest, amount) +
-                        " appears to be slightly out of your current capabilities...",
+                        " appears to be slightly out of your current capabilities..." +
+                        "<br>&nbsp;<br>Since <i>this is a demo</i> your account will be restored " +
+                        "in <span style=\"color:red\">30 minutes</span>&nbsp;&#x1f642;",
                                                   null,
                                                   authorizationData);
             }

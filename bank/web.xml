@@ -137,6 +137,11 @@
         <servlet-class>org.webpki.saturn.bank.PayeeAuthorityServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>TransactionListingServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.TransactionListingServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -155,6 +160,11 @@
     <servlet-mapping>
         <servlet-name>PayeeAuthorityServlet</servlet-name>
         <url-pattern>/payees/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>TransactionListingServlet</servlet-name>
+        <url-pattern>/transactions</url-pattern>
     </servlet-mapping>
 
     <security-constraint>

@@ -43,7 +43,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
-
 import javax.servlet.http.HttpServlet;
 
 import javax.sql.DataSource;
@@ -165,6 +164,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static ExternalCalls externalCalls;
     
+    
     class AccountRestorer implements Runnable {
 
         @Override
@@ -174,11 +174,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 try {
                     Thread.sleep(300000);
                     connection = jdbcDataSource.getConnection();
-                    CallableStatement stmt = connection.prepareCall("{call RestoreAccountsSP(FALSE)}");
-                    stmt.execute();
-                    stmt.close ();
+                    try (CallableStatement stmt = 
+                            connection.prepareCall("{call RestoreAccountsSP(FALSE)}");) {
+                        stmt.execute();
+                    }
                     connection.close();
-                    connection = null;
                 } catch (Exception e) {
                     logger.log(Level.SEVERE, "Database problem", e);
                     if (connection != null) {

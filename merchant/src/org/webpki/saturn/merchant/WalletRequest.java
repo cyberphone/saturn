@@ -60,7 +60,10 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         // Create a signed payment request for each payment network
         for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
             JSONObjectWriter paymentRequest =
-                PaymentRequest.encode(new Payee(MerchantService.merchantCommonName, paymentNetwork.merchantId),
+                PaymentRequest.encode(new Payee(optionalNonDirectPayment == null ? 
+                        // We cheated a bit and only defined a single merchant...
+                                              MerchantService.merchantCommonName : "Gas Station", 
+                                                paymentNetwork.merchantId),
                                       new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
                                                      MerchantService.currency.getDecimals()),
                                       MerchantService.currency,

@@ -82,7 +82,6 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 JSONObjectReader rd = JSONParser.parse(authorityData);
                 rd.getString(JSONDecoderCache.CONTEXT_JSON);
                 rd.getString(JSONDecoderCache.QUALIFIER_JSON);
-                response.setContentType(HttpSupport.HTML_CONTENT_TYPE + "; charset=utf-8");
                 StringBuilder html = new StringBuilder(TOP_ELEMENT +
                             "<link rel=\"icon\" href=\"")
                     .append(isProvider() ? "" : "../")

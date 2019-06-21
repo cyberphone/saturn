@@ -18,8 +18,6 @@ package org.webpki.saturn.bank;
 
 import java.io.IOException;
 
-import java.math.BigDecimal;
-
 import java.util.Arrays;
 
 import java.sql.Connection;
@@ -85,6 +83,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                                 .subtract(paymentRequest.getAmount()),
                                             authorizationData.getAccountId(),
                                             TransactionTypes.TRANSACT,
+                                            paymentRequest.getPayee().getCommonName(),
                                             connection);
             if (wdfa.getResult() == 0) {
                 referenceId = formatReferenceId(wdfa.getTransactionId());

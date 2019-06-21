@@ -18,6 +18,7 @@ package org.webpki.saturn.common;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public interface EnumDataBase {
 
@@ -25,17 +26,17 @@ public interface EnumDataBase {
     
     public static int init(Connection connection,
                            String functionName,
-                           String enumName) throws Exception {
-        CallableStatement stmt = 
-                connection.prepareCall("{? = call " + functionName + "(?)}");
-        stmt.registerOutParameter(1,java.sql.Types.INTEGER);
-        stmt.setString(2, enumName);
-        stmt.execute();
-        int outputValue = stmt.getInt(1);
-        stmt.close();
-        if (outputValue == 0) {
-            throw new RuntimeException("Failed on enum=" + enumName);
+                           String enumName) throws SQLException {
+        try (CallableStatement stmt = 
+                connection.prepareCall("{? = call " + functionName + "(?)}");) {
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            stmt.setString(2, enumName);
+            stmt.execute();
+            int outputValue = stmt.getInt(1);
+            if (outputValue == 0) {
+                throw new SQLException("Failed on enum=" + enumName);
+            }
+            return outputValue;
         }
-        return outputValue;
     }
 }

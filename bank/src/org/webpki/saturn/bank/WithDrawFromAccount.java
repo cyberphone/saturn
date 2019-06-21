@@ -42,6 +42,7 @@ public class WithDrawFromAccount {
     public WithDrawFromAccount(BigDecimal amount, 
                                String accountId,
                                TransactionTypes transactionType,
+                               String payeeCommonName, 
                                Connection connection) throws SQLException {
 /*
         CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
@@ -52,22 +53,22 @@ public class WithDrawFromAccount {
                                              IN p_Amount DECIMAL(8,2),
                                              IN p_CredentialId VARCHAR(30))
 */
-        CallableStatement stmt = connection.prepareCall("{call ExternalWithDrawSP(?, ?, ?, ?, ?, ?, ?)}");
-        stmt.registerOutParameter(1, java.sql.Types.INTEGER);
-        stmt.registerOutParameter(2, java.sql.Types.INTEGER);
-        stmt.setString(3, "demoblaha");
-        stmt.setString(4, null);
-        stmt.setInt(5, transactionType.getIntValue());
-        stmt.setBigDecimal(6, amount);
-        stmt.setString(7, accountId);
-        stmt.execute();
-        int result = stmt.getInt(1);
-        if (result == 0) {
-            transactionId = stmt.getInt(2);
-        } else if (result != 4) {
-            stmt.close ();
-            throw new SQLException("Unknown account/credential: " + accountId);
+        try (CallableStatement stmt = 
+                connection.prepareCall("{call ExternalWithDrawSP(?, ?, ?, ?, ?, ?, ?)}");) {
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            stmt.registerOutParameter(2, java.sql.Types.INTEGER);
+            stmt.setString(3, payeeCommonName);
+            stmt.setString(4, null);
+            stmt.setInt(5, transactionType.getIntValue());
+            stmt.setBigDecimal(6, amount);
+            stmt.setString(7, accountId);
+            stmt.execute();
+            result = stmt.getInt(1);
+            if (result == 0) {
+                transactionId = stmt.getInt(2);
+            } else if (result != 4) {
+                throw new SQLException("Unknown account/credential: " + accountId);
+            }
         }
-        stmt.close ();
     }
 }

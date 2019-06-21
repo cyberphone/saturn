@@ -379,7 +379,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                  ExtReference) 
              VALUES(p_TransactionType,
                     v_AccountId,
-                    p_Amount,
+                    -p_Amount,
                     p_CredentialId,
                     p_OptionalOriginator, 
                     p_OptionalExtReference);
