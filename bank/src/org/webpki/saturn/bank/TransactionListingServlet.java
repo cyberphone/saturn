@@ -42,10 +42,10 @@ public class TransactionListingServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     static final String SQL = "SELECT " +
-            "TRANSACTIONS.Created AS `DateTime`, " +
+            "TRANSACTIONS.Created AS `Created`, " +
             "TRANSACTIONS.Amount AS `Amount`, " +
             "ACCOUNTS.Id AS `Account`, " +
-            "USERS.Name As `User`, " +
+            "USERS.Name As `Account Holder`, " +
             "TRANSACTIONS.Originator AS Originator, " +
             "TRANSACTIONS.CredentialId AS Credential, " +
             "TRANSACTIONS.Id AS `Id`, " +
@@ -76,8 +76,9 @@ public class TransactionListingServlet extends HttpServlet {
                         "<div style=\"padding-bottom:10pt\">This " +
                         AuthorityBaseServlet.SATURN_LINK +
                         " demo/debug service shows the last 50 transactions in the payers' bank. " +
-                        "To make it possible start over a demo, a user's account is reset after 30 " +
-                        "minutes of inactivity.</div><table class=\"tftable\"><tr>");
+                        "To make it possible start over a demo without enrolling again, " +
+                        "<i>a user account is restored (and associated transactions deleted) after 30 " +
+                        "minutes of inactivity</i>.</div><table class=\"tftable\"><tr>");
                 for (int q = 1; q <= numberOfColumns; q++) {
                     html.append("<th>").append(rsmd.getColumnLabel(q)).append("</th>");
                 }
@@ -86,7 +87,10 @@ public class TransactionListingServlet extends HttpServlet {
                 while (rs.next() && i++ < 50) {
                     html.append("<tr>");
                     for (int q = 1; q <= numberOfColumns; q++) {
-                        html.append(q == 2 ? "<td style=\"text-align:right\">" : "<td>").append(rs.getString(q)).append("</td>");
+                        String field = rs.getString(q);
+                        html.append(q == 2 ? "<td style=\"text-align:right\">" : "<td>")
+                            .append(q == 2 && field.charAt(0) != '-' ? "+" + field : field)
+                            .append("</td>");
                     }
                     html.append("</tr>");
                 }
