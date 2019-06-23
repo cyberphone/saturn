@@ -377,13 +377,18 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
             INNER JOIN ACCOUNTS ON ACCOUNTS.Id = TRANSACTIONS.AccountId
             INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
             WHERE TRANSACTIONS.Id = p_OptionalReserveId AND
+                  TRANSACTIONS.TransactionType = 2 AND
                   ACCOUNTS.Id = v_AccountId AND
                   CREDENTIALS.Id = p_CredentialId
             LIMIT 1;
         IF v_PreviousAmount IS NULL THEN
           SET p_Error = 5;         -- Reservation not found
         ELSE
-          SET v_NewBalance = v_NewBalance + v_PreviousAmount;
+          IF EXISTS (SELECT * FROM TRANSACTIONS WHERE TRANSACTIONS.ReserveId = p_OptionalReserveId) THEN
+            SET p_Error = 6;         -- Reservation already used
+          ELSE
+            SET v_NewBalance = v_NewBalance + v_PreviousAmount;
+          END IF;
         END IF;
       END IF;
       IF p_Error = 0 THEN
