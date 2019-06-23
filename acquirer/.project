@@ -21,6 +21,11 @@
 			<locationURI>copy_PARENT/resources/common</locationURI>
 		</link>
 		<link>
+			<name>interbanking</name>
+			<type>2</type>
+			<locationURI>copy_PARENT/interbanking/src</locationURI>
+		</link>
+		<link>
 			<name>methods</name>
 			<type>2</type>
 			<locationURI>copy_PARENT/methods/src</locationURI>

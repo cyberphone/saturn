@@ -45,10 +45,12 @@ public class TransactionListingServlet extends HttpServlet {
             "TRANSACTIONS.Created AS `Created`, " +
             "TRANSACTIONS.Amount AS `Amount`, " +
             "ACCOUNTS.Id AS `Account`, " +
+            "TRANSACTIONS.Balance AS `Balance`, " +
             "USERS.Name As `Account Holder`, " +
             "TRANSACTIONS.Originator AS Originator, " +
             "TRANSACTIONS.CredentialId AS Credential, " +
             "TRANSACTIONS.Id AS `Id`, " +
+            "COALESCE(TRANSACTIONS.ReserveId,'') AS `ReserveId`, " +
             "TRANSACTION_TYPES.SymbolicName AS `Type` " +
             "FROM TRANSACTIONS " +
             "INNER JOIN ACCOUNTS ON " +
@@ -87,10 +89,9 @@ public class TransactionListingServlet extends HttpServlet {
                 while (rs.next() && i++ < 50) {
                     html.append("<tr>");
                     for (int q = 1; q <= numberOfColumns; q++) {
-                        String field = rs.getString(q);
-                        html.append(q == 2 ? "<td style=\"text-align:right\">" : "<td>")
-                            .append(q == 2 && field.charAt(0) != '-' ? "+" + field : field)
-                            .append("</td>");
+                         html.append(q == 2 || q == 4 ? "<td style=\"text-align:right\">" : "<td>")
+                             .append(rs.getString(q))
+                             .append("</td>");
                     }
                     html.append("</tr>");
                 }

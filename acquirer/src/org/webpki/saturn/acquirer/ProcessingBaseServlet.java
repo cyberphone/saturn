@@ -38,6 +38,8 @@ import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
 
+import com.supercard.SupercardAccountDataDecoder;
+
 ////////////////////////////////////////////////////////////////////////////
 // This is the core Acquirer (Card-Processor) payment transaction servlet //
 ////////////////////////////////////////////////////////////////////////////
@@ -54,10 +56,13 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return "#" + (referenceId++);
     }
 
-    static AuthorizationResponse.AccountDataDecoder getAccountData(AuthorizationResponse authorizationResponse)
+    static SupercardAccountDataDecoder getAccountData(AuthorizationResponse authorizationResponse)
     throws IOException, GeneralSecurityException {
-        return authorizationResponse.getProtectedAccountData(AcquirerService.knownAccountTypes,
-                                                             AcquirerService.decryptionKeys);
+        AuthorizationResponse.AccountDataDecoder accountData = 
+                authorizationResponse
+                    .getProtectedAccountData(AcquirerService.knownAccountTypes,
+                                             AcquirerService.decryptionKeys);
+        return (SupercardAccountDataDecoder)accountData;
     }
 
     abstract JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception;

@@ -16,18 +16,22 @@
  */
 package org.webpki.saturn.acquirer;
 
+import io.interbanking.IBRequest;
+import io.interbanking.IBResponse;
+
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.Payee;
+
+import com.supercard.SupercardAccountDataDecoder;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // This is the core Acquirer (Card-Processor) Saturn basic mode payment authorization servlet //
@@ -55,7 +59,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(payee, transactionRequest.getSignatureDecoder());
         payeeCoreProperties.verify(payee, paymentRequest.getSignatureDecoder());
 
-        AuthorizationResponse.AccountDataDecoder accountData = getAccountData(transactionRequest.getAuthorizationResponse());
+        SupercardAccountDataDecoder accountData = getAccountData(transactionRequest.getAuthorizationResponse());
         boolean testMode = transactionRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Acquiring for Account=" + accountData.logLine() + 
@@ -64,11 +68,20 @@ public class TransactionServlet extends ProcessingBaseServlet {
         
         String optionalLogData = null;
         TransactionResponse.ERROR transactionError = null;
+        
+        // Here we are supposed to talk to the card payment network....
+        IBResponse ibResponse = 
+                IBRequest.perform(AcquirerService.payerInterbankUrl,
+                                  IBRequest.Operations.CREDIT_CARD_TRANSACT,
+                                  accountData.getCardNumber(),
+                                  transactionRequest.getAuthorizationResponse().getReferenceId(),
+                                  transactionRequest.getAmount(),
+                                  paymentRequest.getCurrency().toString(),
+                                  paymentRequest.getPayee().getCommonName(),
+                                  testMode,
+                                  AcquirerService.acquirerKey);
         if (!testMode) {
-
-            // Here we are supposed to talk to the card payment network....
-            optionalLogData = "Card payment network log data...";
-
+            optionalLogData = "Payer interbanking ref: " + ibResponse.getReferenceId();
         }
 
         // It appears that we succeeded

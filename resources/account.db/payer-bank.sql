@@ -127,9 +127,11 @@ CREATE TABLE TRANSACTIONS
     AccountId   INT           NOT NULL,                                  -- Unique Account ID
     TransactionType INT       NOT NULL,                                  -- Unique Transaction Type ID
     Amount      DECIMAL(8,2)  NOT NULL,                                  -- The Amount involved
+    Balance     DECIMAL(8,2)  NOT NULL,                                  -- Outgoing Account balance
     Originator  VARCHAR(50),                                             -- Optional Merchant
     ExtReference VARCHAR(50),                                            -- Optional External Ref
     CredentialId VARCHAR(30),                                            -- Optional Credential ID
+    ReserveId   INT,                                                     -- Reservation Transaction ID
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
     PRIMARY KEY (Id),
     FOREIGN KEY (TransactionType) REFERENCES TRANSACTION_TYPES(Id),
@@ -350,10 +352,13 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                      IN p_OptionalOriginator VARCHAR(50),
                                      IN p_OptionalExtReference VARCHAR(50),
                                      IN p_TransactionType INT,
+                                     IN p_OptionalReserveId INT,
                                      IN p_Amount DECIMAL(8,2),
                                      IN p_CredentialId VARCHAR(30))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
+    DECLARE v_NewBalance DECIMAL(8,2);
+    DECLARE v_PreviousAmount DECIMAL(8,2);
     DECLARE v_AccountId INT(11);
 
     SET p_Error = 0;
@@ -366,24 +371,45 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
     IF v_AccountId IS NULL THEN    -- Failed
       SET p_Error = 1;             -- No such account
     ELSE
-      IF p_Amount > v_Balance THEN
-        SET p_Error = 4;           -- Out of funds
-      ELSE                       -- Success => Withdraw the specified amount
-        UPDATE ACCOUNTS SET Balance = Balance - p_Amount
-            WHERE ACCOUNTS.Id = v_AccountId;
-        INSERT INTO TRANSACTIONS(TransactionType, 
-                                 AccountId,
-                                 Amount,
-                                 CredentialId, 
-                                 Originator, 
-                                 ExtReference) 
-             VALUES(p_TransactionType,
-                    v_AccountId,
-                    -p_Amount,
-                    p_CredentialId,
-                    p_OptionalOriginator, 
-                    p_OptionalExtReference);
-        SET p_TransactionId = LAST_INSERT_ID();
+      SET v_NewBalance = v_Balance - p_Amount;
+      IF p_OptionalReserveId IS NOT NULL THEN
+        SELECT TRANSACTIONS.Amount INTO v_PreviousAmount FROM TRANSACTIONS
+            INNER JOIN ACCOUNTS ON ACCOUNTS.Id = TRANSACTIONS.AccountId
+            INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
+            WHERE TRANSACTIONS.Id = p_OptionalReserveId AND
+                  ACCOUNTS.Id = v_AccountId AND
+                  CREDENTIALS.Id = p_CredentialId
+            LIMIT 1;
+        IF v_PreviousAmount IS NULL THEN
+          SET p_Error = 5;         -- Reservation not found
+        ELSE
+          SET v_NewBalance = v_NewBalance + v_PreviousAmount;
+        END IF;
+      END IF;
+      IF p_Error = 0 THEN
+        IF v_NewBalance < 0 THEN
+          SET p_Error = 4;           -- Out of funds
+        ELSE                       -- Success => Withdraw the specified amount
+          UPDATE ACCOUNTS SET Balance = v_NewBalance
+              WHERE ACCOUNTS.Id = v_AccountId;
+          INSERT INTO TRANSACTIONS(TransactionType, 
+                                   AccountId,
+                                   Amount,
+                                   Balance,
+                                   CredentialId, 
+                                   Originator, 
+                                   ExtReference,
+                                   ReserveId) 
+               VALUES(p_TransactionType,
+                      v_AccountId,
+                      p_Amount,
+                      v_NewBalance,
+                      p_CredentialId,
+                      p_OptionalOriginator, 
+                      p_OptionalExtReference,
+                      p_OptionalReserveId);
+          SET p_TransactionId = LAST_INSERT_ID();
+        END IF;
       END IF;
     END IF;
     COMMIT;

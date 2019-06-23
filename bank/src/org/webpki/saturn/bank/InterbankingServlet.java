@@ -17,14 +17,11 @@
 package org.webpki.saturn.bank;
 
 import io.interbanking.IBRequest;
+import io.interbanking.IBResponse;
 
 import java.io.IOException;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -51,7 +48,17 @@ public class InterbankingServlet extends ProcessingBaseServlet {
 
             case CREDIT_CARD_TRANSACT:
                 ibRequest.verifyCallerAuthenticity(BankService.acquirerRoot);
-                ibResponse = null;
+                // The following call will throw exceptions on errors
+                WithDrawFromAccount wdfa = 
+                        new WithDrawFromAccount(ibRequest.getAmount(),
+                                                ibRequest.getAccountId(),
+                                                TransactionTypes.TRANSACT,
+                                                ibRequest.getMerchant(),
+                                                decodeReferenceId(ibRequest.getReferenceId()),
+                                                true,
+                                                connection);
+                ibResponse = IBResponse.encode(formatReferenceId(wdfa.transactionId), 
+                                               ibRequest.getTestMode());
                 break;
 
             default:

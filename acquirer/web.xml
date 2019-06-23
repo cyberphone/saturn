@@ -39,7 +39,13 @@
         <param-name>acquirer_base_url</param-name>
         <param-value>@acquirer-base-url@</param-value>
     </context-param>
-    
+
+    <context-param>
+        <description>Payer Interbank URL</description>
+        <param-name>payer_interbank_url</param-name>
+        <param-value>@payer-interbank-url@</param-value>
+    </context-param>
+
     <context-param>
         <description>Payment Network Root Certificate</description>
         <param-name>payment_root</param-name>

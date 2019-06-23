@@ -78,18 +78,17 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         if (testMode) {
             referenceId = formatReferenceId(BankService.testReferenceId++);
         } else {
+            // The following call will throw exceptions on errors
             WithDrawFromAccount wdfa = 
-                    new WithDrawFromAccount(transactionRequest.getAmount()
-                                                .subtract(paymentRequest.getAmount()),
+                    new WithDrawFromAccount(transactionRequest.getAmount(),
                                             authorizationData.getAccountId(),
                                             TransactionTypes.TRANSACT,
                                             paymentRequest.getPayee().getCommonName(),
+                                            decodeReferenceId(transactionRequest
+                                                    .getAuthorizationResponse().getReferenceId()),
+                                            true,
                                             connection);
-            if (wdfa.getResult() == 0) {
-                referenceId = formatReferenceId(wdfa.getTransactionId());
-            } else {
-                throw new RuntimeException("transact");
-            }
+            referenceId = formatReferenceId(wdfa.getTransactionId());
             // Here we are supposed to do the actual payment
             //###################################################
             //# Payment backend networking would happen here... #

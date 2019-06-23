@@ -142,6 +142,11 @@
         <servlet-class>org.webpki.saturn.bank.TransactionListingServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>InterbankingServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.bank.InterbankingServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -165,6 +170,11 @@
     <servlet-mapping>
         <servlet-name>TransactionListingServlet</servlet-name>
         <url-pattern>/transactions</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>InterbankingServlet</servlet-name>
+        <url-pattern>/interbanking</url-pattern>
     </servlet-mapping>
 
     <security-constraint>

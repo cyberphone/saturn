@@ -21,12 +21,13 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.RefundRequest;
 import org.webpki.saturn.common.RefundResponse;
+
+import com.supercard.SupercardAccountDataDecoder;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // This is the Saturn "refund" decoder servlet                                           //
@@ -50,7 +51,7 @@ public class RefundServlet extends ProcessingBaseServlet {
         }
         payeeCoreProperties.verify(payee, refundRequest.getSignatureDecoder());
 
-        AuthorizationResponse.AccountDataDecoder accountData = getAccountData(refundRequest.getAuthorizationResponse());
+        SupercardAccountDataDecoder accountData = getAccountData(refundRequest.getAuthorizationResponse());
 
         boolean testMode = refundRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +

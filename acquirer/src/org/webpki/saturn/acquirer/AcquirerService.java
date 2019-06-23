@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.acquirer;
 
+import io.interbanking.IBRequest;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -38,7 +40,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
-
 import javax.servlet.http.HttpServlet;
 
 import org.webpki.crypto.CertificateUtil;
@@ -88,6 +89,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static final String LOGGING               = "logging";
 
+    static final String PAYER_INTERBANK_URL   = "payer_interbank_url";
+
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
     static Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys = 
@@ -110,6 +113,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static String providerAuthorityUrl;
     
     static String payeeAuthorityBaseUrl;
+    
+    static String payerInterbankUrl;  // Static since we do not have a card database and associated URL's
 
     static long transactionCount;
     
@@ -241,7 +246,10 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                            KnownExtensions.REFUND_REQUEST,
                            RefundServlet.class,
                            "Refund Servlet");
-            
+
+            payerInterbankUrl = getPropertyString(PAYER_INTERBANK_URL);
+            IBRequest.setLogging(true, logger);
+
             started = new GregorianCalendar();
 
             logger.info("Saturn Acquirer-server initiated");

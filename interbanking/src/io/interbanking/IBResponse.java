@@ -56,14 +56,13 @@ public class IBResponse extends IBCommon {
         return testMode;
     }
 
-    public static JSONObjectWriter encode(Operations operation,
-                                          String referenceId,
-                                          Boolean testMode) throws IOException {
+    public static JSONObjectWriter encode(String referenceId,
+                                          boolean testMode) throws IOException {
         return new JSONObjectWriter()
             .setString(JSONDecoderCache.CONTEXT_JSON, INTERBANKING_CONTEXT_URI)
-            .setString(JSONDecoderCache.CONTEXT_JSON, INTERBANKING_RESPONSE)
+            .setString(JSONDecoderCache.QUALIFIER_JSON, INTERBANKING_RESPONSE)
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
+            .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS);
     }
 }

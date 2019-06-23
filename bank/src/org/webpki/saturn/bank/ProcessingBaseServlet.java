@@ -70,6 +70,14 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return String.format("#%010d", referenceId);
     }
     
+    static int decodeReferenceId(String referenceId) throws IOException {
+        int r = Integer.valueOf(referenceId.substring(1));
+        if (!formatReferenceId(r).equals(referenceId)) {
+            throw new IOException("Bad referenceId: " + referenceId);
+        }
+        return r;
+    }
+
     static String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
         return "<span style=\"font-weight:bold;white-space:nowrap\">" + 
                paymentRequest.getCurrency().amountToDisplayString(amount, true) +

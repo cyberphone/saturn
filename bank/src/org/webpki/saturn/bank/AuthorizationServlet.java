@@ -246,6 +246,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                accountId,
                                                                transactionType,
                                                                paymentRequest.getPayee().getCommonName(),
+                                                               null,
+                                                               false,
                                                                connection);
             if (wdfa.getResult() == 0) {
                 transactionId = formatReferenceId(wdfa.getTransactionId());

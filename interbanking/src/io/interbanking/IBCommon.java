@@ -31,6 +31,7 @@ class IBCommon {
     static final String REFERENCE_ID_JSON                = "referenceId";                // Reference to a payer bank transaction ID
     static final String AMOUNT_JSON                      = "amount";                     // Money
     static final String CURRENCY_JSON                    = "currency";                   // In this format
+    static final String MERCHANT_JSON                    = "merchant";                   // Common name
     static final String TIME_STAMP_JSON                  = "timeStamp";                  // Everywhere
     static final String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
 
@@ -39,12 +40,13 @@ class IBCommon {
     static final String INTERBANKING_REQUEST             = "InterbankingRequest";
     static final String INTERBANKING_RESPONSE            = "InterbankingResponse";
 
-    void check(JSONObjectReader rd, String qualifier) throws IOException {
+    void check(JSONObjectReader rd, String expectedQualifier) throws IOException {
         String context = rd.getString(JSONDecoderCache.CONTEXT_JSON);
         if (!context.equals(INTERBANKING_CONTEXT_URI)) {
             throw new IOException("Wrong '" + JSONDecoderCache.CONTEXT_JSON + "' :" + context);
         }
-        if (!context.equals(JSONDecoderCache.QUALIFIER_JSON)) {
+        String qualifier = rd.getString(JSONDecoderCache.QUALIFIER_JSON);
+        if (!qualifier.equals(expectedQualifier)) {
             throw new IOException("Wrong '" + JSONDecoderCache.QUALIFIER_JSON + "' :" + qualifier);
         }
     }

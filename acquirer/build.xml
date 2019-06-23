@@ -46,7 +46,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}:${@methods.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${@methods.src.dir}:${@interbanking.src.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
       <classpath>
@@ -71,6 +71,7 @@
       <replacefilter token="@acquirer-decryptionkey1@" value="${@acquirerencryptionkey_ec}.p12"/>
       <replacefilter token="@acquirer-decryptionkey2@" value="${@acquirerencryptionkey_rsa}.p12"/>
       <replacefilter token="@acquirer-base-url@" value="${@acquirerhost}/${@acquirerpath}"/>
+      <replacefilter token="@payer-interbank-url@" value="${@payerbankhost}/${@payerbankpath}/interbanking"/>
       <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
