@@ -84,6 +84,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                             authorizationData.getAccountId(),
                                             TransactionTypes.TRANSACT,
                                             paymentRequest.getPayee().getCommonName(),
+                                            paymentRequest.getReferenceId(),
                                             decodeReferenceId(transactionRequest
                                                     .getAuthorizationResponse().getReferenceId()),
                                             true,

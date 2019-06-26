@@ -4,6 +4,13 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
     version="2.4">
 
+    <resource-ref>
+        <description>DB Connection</description>
+        <res-ref-name>jdbc/PAYER_BANK</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
     <context-param>
         <description>Saturn Logotype</description>
         <param-name>saturn_logotype</param-name>
@@ -20,18 +27,6 @@
         <description>Key Password</description>
         <param-name>key_password</param-name>
         <param-value>@key-password@</param-value>
-    </context-param>
- 
-    <context-param>
-        <description>Payer Bank Host</description>
-        <param-name>payer_bank_host</param-name>
-        <param-value>@payer-bank-host@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>User Accounts</description>
-        <param-name>accounts</param-name>
-        <param-value>@accounts@</param-value>
     </context-param>
 
     <context-param>

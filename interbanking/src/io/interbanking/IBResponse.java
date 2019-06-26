@@ -16,8 +16,6 @@
  */
 package io.interbanking;
 
-import io.interbanking.IBRequest.Operations;
-
 import java.io.IOException;
 
 import java.util.GregorianCalendar;

@@ -61,7 +61,8 @@ public class IBRequest extends IBCommon {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         amount = rd.getBigDecimal(AMOUNT_JSON);
         currency = rd.getString(CURRENCY_JSON);
-        merchant = rd.getString(MERCHANT_JSON);
+        merchantName = rd.getString(MERCHANT_NAME_JSON);
+        merchantRef = rd.getString(MERCHANT_REF_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
@@ -88,9 +89,14 @@ public class IBRequest extends IBCommon {
         return currency;
     }
 
-    private String merchant;
-    public String getMerchant() {
-        return merchant;
+    private String merchantName;
+    public String getMerchantName() {
+        return merchantName;
+    }
+
+    private String merchantRef;
+    public String getMerchantRef() {
+        return merchantRef;
     }
 
     private String referenceId;
@@ -119,7 +125,8 @@ public class IBRequest extends IBCommon {
                                      String referenceId,
                                      BigDecimal amount,
                                      String currency,
-                                     String merchant,
+                                     String merchantName,
+                                     String merchantRef,
                                      boolean testMode,
                                      ServerX509Signer signer) throws IOException {
         JSONObjectWriter request = new JSONObjectWriter()
@@ -130,8 +137,9 @@ public class IBRequest extends IBCommon {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setBigDecimal(AMOUNT_JSON, amount)
             .setString(CURRENCY_JSON, currency)
-            .setString(MERCHANT_JSON, merchant)
-           .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
+            .setString(MERCHANT_NAME_JSON, merchantName)
+            .setString(MERCHANT_REF_JSON, merchantRef)
+            .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setSignature(signer);
         if (logging) {

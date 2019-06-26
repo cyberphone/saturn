@@ -42,7 +42,8 @@ public class WithDrawFromAccount {
     public WithDrawFromAccount(BigDecimal amount, 
                                String accountId,
                                TransactionTypes transactionType,
-                               String payeeCommonName, 
+                               String payeeCommonName,
+                               String payeeReference,
                                Integer optionalRoundtripId,
                                boolean throwOnOutOfFounds,
                                Connection connection) throws SQLException {
@@ -61,7 +62,7 @@ public class WithDrawFromAccount {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             stmt.registerOutParameter(2, java.sql.Types.INTEGER);
             stmt.setString(3, payeeCommonName);
-            stmt.setString(4, null);
+            stmt.setString(4, payeeReference);
             stmt.setInt(5, transactionType.getIntValue());
             if (optionalRoundtripId == null) {
                 stmt.setNull(6, java.sql.Types.INTEGER);

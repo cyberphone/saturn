@@ -21,26 +21,35 @@ import java.io.InputStream;
 
 import java.math.BigDecimal;
 
-import java.security.PrivateKey;
 import java.security.PublicKey;
 
 import java.security.cert.X509Certificate;
+
+import java.sql.Connection;
 
 import java.util.Vector;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import javax.sql.DataSource;
+
+import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.KeyAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
@@ -54,7 +63,6 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.TemporaryCardDBDecoder;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -68,16 +76,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String KEYSTORE_PASSWORD     = "key_password";
 
-    static final String PAYER_BANK_HOST       = "payer_bank_host";
-    
     static final String KEYPROV_KMK           = "keyprov_kmk";
     
     static final String TLS_CERTIFICATE       = "server_tls_certificate";
 
     static final String LOGGING               = "logging";
 
-    static final String ACCOUNTS              = "accounts";
-    
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
     static KeyStoreEnumerator keyManagementKey;
@@ -89,18 +93,20 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static X509Certificate serverCertificate;
 
     static String grantedVersions;
+
+    static DataSource jdbcDataSource;
     
     static boolean logging;
 
-    static class PaymentCredential {
-        PrivateKey signatureKey;
+    class CredentialTemplate {
+
         AsymSignatureAlgorithms signatureAlgorithm;
-        X509Certificate[] dummyCertificatePath;
+        AccountTypes accountType;
+        KeyAlgorithms keyAlgorithm;
         String paymentMethod;
-        String accountId;
-        String cardHolder;
         boolean cardFormatted;
         byte[] optionalServerPin;
+        String friendlyName;
         String authorityUrl;
         String svgCardImage;
         PublicKey encryptionKey;
@@ -108,9 +114,41 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         
         BigDecimal tempBalanceFix;
+        
+        public CredentialTemplate(JSONObjectReader rd) throws IOException {
+            signatureAlgorithm =
+                    AsymSignatureAlgorithms.getAlgorithmFromId(rd.getString("signatureAlgorithm"),
+                                                               AlgorithmPreferences.JOSE);
+            accountType = AccountTypes.valueOf(rd.getString("accountType"));
+            keyAlgorithm = 
+                    KeyAlgorithms.getKeyAlgorithmFromId(rd.getString("signatureKeyAlgorithm"), 
+                                                        AlgorithmPreferences.JOSE);
+            PaymentMethods.fromTypeUri(paymentMethod = rd.getString("paymentMethod"));
+            cardFormatted = rd.getBoolean("cardFormatted");
+            if (rd.hasProperty("serverSetPIN")) {
+                optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");
+            }
+            authorityUrl = rd.getString("authorityUrl");
+            friendlyName = rd.getString("friendlyName");
+            svgCardImage = new String(ArrayUtil
+                    .getByteArrayFromInputStream(getResource(rd.getString("cardImage"))), "utf-8");
+            JSONObjectReader encryptionParameters = rd.getObject("encryptionParameters");
+            encryptionKey = encryptionParameters.getPublicKey();
+            dataEncryptionAlgorithm = 
+                    DataEncryptionAlgorithms
+                        .getAlgorithmFromId(encryptionParameters
+                                .getString("dataEncryptionAlgorithm"));
+            keyEncryptionAlgorithm = 
+                    KeyEncryptionAlgorithms
+                        .getAlgorithmFromId(encryptionParameters
+                            .getString("keyEncryptionAlgorithm"));
+            
+            tempBalanceFix = rd.getBigDecimal("temp.bal.fix");
+            rd.checkForUnread();
+        }
     }
 
-    static Vector<PaymentCredential> paymentCredentials = new Vector<PaymentCredential>();
+    static Vector<CredentialTemplate> credentialTemplates = new Vector<CredentialTemplate>();
 
     static String saturnLogotype;
 
@@ -125,6 +163,11 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     String getResourceAsString(String propertyName) throws IOException {
         return new String(ArrayUtil.getByteArrayFromInputStream(getResource(getPropertyString(propertyName))),
                           "UTF-8");
+    }
+
+    void initDataBaseEnums(Connection connection) throws Exception {
+        AccountTypes.init(connection);
+        connection.close();
     }
 
     @Override
@@ -150,33 +193,11 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials
             ////////////////////////////////////////////////////////////////////////////////////////////
-            String bankHost = getPropertyString(PAYER_BANK_HOST); // For next iteration...
-
-            for (String accountFile : getPropertyStringList(ACCOUNTS)) {
-                JSONArrayReader ar = 
-                        JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(getResource(accountFile)))
-                                .getJSONArrayReader();
-                while (ar.hasMore()) {
-                    PaymentCredential paymentCredential = new PaymentCredential();
-                    paymentCredentials.add(paymentCredential);
-                    TemporaryCardDBDecoder temp = new TemporaryCardDBDecoder(ar.getObject());
-                    paymentCredential.authorityUrl = temp.coreCardData.getAuthorityUrl();
-                    paymentCredential.optionalServerPin = temp.cardPIN.equals("@") ? 
-                                                                              null : temp.cardPIN.getBytes("utf-8");
-                    paymentCredential.signatureKey = temp.cardPrivateKey;
-                    paymentCredential.signatureAlgorithm = temp.coreCardData.getSignatureAlgorithm();
-                    paymentCredential.dummyCertificatePath = new X509Certificate[]{temp.cardDummyCertificate};
-                    PaymentMethods.fromTypeUri(paymentCredential.paymentMethod = temp.coreCardData.getPaymentMethod());
-                    paymentCredential.accountId = temp.coreCardData.getAccountId();
-                    paymentCredential.cardHolder = temp.cardHolder;
-                    paymentCredential.cardFormatted = temp.formatAccountAsCard;
-                    paymentCredential.svgCardImage = 
-                            new String(ArrayUtil.getByteArrayFromInputStream(getResource(temp.logotypeName)), "utf-8");
-                    paymentCredential.encryptionKey = temp.coreCardData.getEncryptionKey();
-                    paymentCredential.keyEncryptionAlgorithm = temp.coreCardData.getKeyEncryptionAlgorithm();
-                    paymentCredential.dataEncryptionAlgorithm = temp.coreCardData.getDataEncryptionAlgorithm();
-                    paymentCredential.tempBalanceFix = temp.coreCardData.getTempBalanceFix();
-                }
+            JSONArrayReader ar = 
+                    JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(getResource("credential-templates.json")))
+                            .getJSONArrayReader();
+            while (ar.hasMore()) {
+                credentialTemplates.add(new CredentialTemplate(ar.getObject()));
             }
 
 
@@ -206,7 +227,13 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // Are we logging?
             ////////////////////////////////////////////////////////////////////////////////////////////
             logging = getPropertyBoolean(LOGGING);
+
+            Context initContext = new InitialContext();
+            Context envContext  = (Context)initContext.lookup("java:/comp/env");
+            jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
             
+            initDataBaseEnums(jdbcDataSource.getConnection());
+
             logger.info("Saturn KeyProvider-server initiated: " + serverCertificate.getSubjectX500Principal().getName());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);

@@ -53,7 +53,8 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                         new WithDrawFromAccount(ibRequest.getAmount(),
                                                 ibRequest.getAccountId(),
                                                 TransactionTypes.TRANSACT,
-                                                ibRequest.getMerchant(),
+                                                ibRequest.getMerchantName(),
+                                                ibRequest.getMerchantRef(),
                                                 decodeReferenceId(ibRequest.getReferenceId()),
                                                 true,
                                                 connection);

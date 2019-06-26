@@ -246,6 +246,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                accountId,
                                                                transactionType,
                                                                paymentRequest.getPayee().getCommonName(),
+                                                               paymentRequest.getReferenceId(),
                                                                null,
                                                                false,
                                                                connection);

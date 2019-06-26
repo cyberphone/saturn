@@ -116,8 +116,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                              3,
                                              null);
     
-        for (KeyProviderService.PaymentCredential paymentCredential : KeyProviderService.paymentCredentials) {
-            ServerState.Key key = paymentCredential.optionalServerPin == null ?
+        for (KeyProviderService.CredentialTemplate credentialTemplate : KeyProviderService.credentialTemplates) {
+            ServerState.Key key = credentialTemplate.optionalServerPin == null ?
                     keygen2State.createKey(AppUsage.SIGNATURE,
                                            new KeySpecifier(KeyAlgorithms.NIST_P_256),
                                            standardPinPolicy) 
@@ -125,8 +125,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     keygen2State.createKeyWithPresetPIN(AppUsage.SIGNATURE,
                                                         new KeySpecifier(KeyAlgorithms.NIST_P_256),
                                                         serverPinPolicy,
-                                                        paymentCredential.optionalServerPin);                           
-
+                                                        credentialTemplate.optionalServerPin);                           
+/*
             key.addEndorsedAlgorithm(paymentCredential.signatureAlgorithm);
             key.setCertificatePath(paymentCredential.dummyCertificatePath);
             key.setPrivateKey(paymentCredential.signatureKey.getEncoded());
@@ -143,6 +143,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                     null,
                                                     paymentCredential.tempBalanceFix)
                                                         .serializeToBytes(JSONOutputFormats.NORMALIZED));
+
 
             key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
 
@@ -162,6 +163,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 }
                
             });
+*/
         }
     
         keygen2JSONBody(response, 

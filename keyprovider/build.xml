@@ -66,9 +66,7 @@
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@saturn-logotype@" value="${@saturn-logotype.file}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
-      <replacefilter token="@payer-bank-host@" value="${@payerbankhost}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
-      <replacefilter token="@accounts@" value="accounts.${@payerbankpath}.json,accounts.${@payeebankpath}.json"/>
       <replacefilter token="@keyprov-kmk@" value="${@kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@server-tls-certificate@" value="${@kg2_tls_cert_file}"/>
@@ -88,19 +86,11 @@
          <include name="${@webpki-webutil.jar}"/>
       </lib>
       <zipfileset dir="${@key.dir}" prefix="${class_war_path}">
-         <include name="${@payerbankpath}-enc-key-rsa.cer"/>
-         <include name="${@payerbankpath}-enc-key-ec.cer"/>
-         <include name="${@payeebankpath}-enc-key-ec.cer"/>
-         <include name="${@clientkey_super}.p12"/>
-         <include name="${@clientkey_bankdir}.p12"/>
-         <include name="${@clientkey_unusual}.p12"/>
          <include name="${@kg2kmkey_ec}.p12"/>
       </zipfileset>
       <zipfileset dir="card-images" prefix="${class_war_path}"/>
       <zipfileset dir="${@logotype.dir}" prefix="${class_war_path}"/>
-      <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
-        <include name="accounts*"/>
-      </zipfileset>
+      <zipfileset file="credential-templates.json" prefix="${class_war_path}"/>
       <fileset dir="web"/>
     </war>
   </target>

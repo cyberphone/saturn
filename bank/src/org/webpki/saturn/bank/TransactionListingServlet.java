@@ -47,7 +47,8 @@ public class TransactionListingServlet extends HttpServlet {
             "ACCOUNTS.Id AS `Account`, " +
             "TRANSACTIONS.Balance AS `Balance`, " +
             "USERS.Name As `Account Holder`, " +
-            "TRANSACTIONS.Originator AS Originator, " +
+            "COALESCE(TRANSACTIONS.Originator,'') AS Originator, " +
+            "COALESCE(TRANSACTIONS.ExtReference,'') AS ExtRef, " +
             "TRANSACTIONS.CredentialId AS Credential, " +
             "TRANSACTIONS.Id AS `Id`, " +
             "COALESCE(TRANSACTIONS.ReserveId,'') AS `ReserveId`, " +
