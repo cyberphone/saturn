@@ -116,21 +116,23 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                              3,
                                              null);
     
-        for (KeyProviderService.CredentialTemplate credentialTemplate : KeyProviderService.credentialTemplates) {
+        for (KeyProviderService.CredentialTemplate credentialTemplate 
+                              : 
+             KeyProviderService.credentialTemplates) {
             ServerState.Key key = credentialTemplate.optionalServerPin == null ?
-                    keygen2State.createKey(AppUsage.SIGNATURE,
-                                           new KeySpecifier(KeyAlgorithms.NIST_P_256),
-                                           standardPinPolicy) 
-                                                                              :
-                    keygen2State.createKeyWithPresetPIN(AppUsage.SIGNATURE,
-                                                        new KeySpecifier(KeyAlgorithms.NIST_P_256),
-                                                        serverPinPolicy,
-                                                        credentialTemplate.optionalServerPin);                           
+                keygen2State.createKey(AppUsage.SIGNATURE,
+                                       new KeySpecifier(credentialTemplate.keyAlgorithm),
+                                       standardPinPolicy) 
+                                                                          :
+                keygen2State
+                    .createKeyWithPresetPIN(AppUsage.SIGNATURE,
+                                            new KeySpecifier(credentialTemplate.keyAlgorithm),
+                                            serverPinPolicy,
+                                            credentialTemplate.optionalServerPin);                           
+                key.addEndorsedAlgorithm(credentialTemplate.signatureAlgorithm);
+                key.setFriendlyName(credentialTemplate.friendlyName);
 /*
-            key.addEndorsedAlgorithm(paymentCredential.signatureAlgorithm);
             key.setCertificatePath(paymentCredential.dummyCertificatePath);
-            key.setPrivateKey(paymentCredential.signatureKey.getEncoded());
-            key.setFriendlyName("Account " + paymentCredential.accountId);
             key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                              CardDataEncoder.encode(paymentCredential.paymentMethod,
                                                     paymentCredential.accountId, 
@@ -221,64 +223,146 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             JSONDecoder jsonObject = KeyProviderService.keygen2JSONCache.parse(jsonData);
             switch (keygen2State.getProtocolPhase()) {
                 case INVOCATION:
-                  InvocationResponseDecoder invocationResponse = (InvocationResponseDecoder) jsonObject;
-                  keygen2State.update(invocationResponse);
+                    InvocationResponseDecoder invocationResponse = (InvocationResponseDecoder) jsonObject;
+                    keygen2State.update(invocationResponse);
 
-                  // Now we really start doing something
-                  ProvisioningInitializationRequestEncoder provisioningInitRequest =
-                      new ProvisioningInitializationRequestEncoder(keygen2State,
-                                                                   (short)1000,
-                                                                   (short)50);
-                  provisioningInitRequest.setKeyManagementKey(
-                          KeyProviderService.keyManagementKey.getPublicKey());
-                  keygen2JSONBody(response, provisioningInitRequest);
-                  return;
+                    // Now we really start doing something
+                    ProvisioningInitializationRequestEncoder provisioningInitRequest =
+                        new ProvisioningInitializationRequestEncoder(keygen2State,
+                                                                       (short)1000,
+                                                                       (short)50);
+                    provisioningInitRequest.setKeyManagementKey(
+                            KeyProviderService.keyManagementKey.getPublicKey());
+                    keygen2JSONBody(response, provisioningInitRequest);
+                    return;
 
                 case PROVISIONING_INITIALIZATION:
-                  ProvisioningInitializationResponseDecoder provisioningInitResponse = (ProvisioningInitializationResponseDecoder) jsonObject;
-                  keygen2State.update(provisioningInitResponse);
+                    ProvisioningInitializationResponseDecoder provisioningInitResponse = (ProvisioningInitializationResponseDecoder) jsonObject;
+                    keygen2State.update(provisioningInitResponse);
 
-                  log.info("Device Certificate=" + certificateData(keygen2State.getDeviceCertificate()));
-                  CredentialDiscoveryRequestEncoder credentialDiscoveryRequest =
-                      new CredentialDiscoveryRequestEncoder(keygen2State);
-                  credentialDiscoveryRequest.addLookupDescriptor(
-                      KeyProviderService.keyManagementKey.getPublicKey());
-                  keygen2JSONBody(response, credentialDiscoveryRequest);
-                  return;
+                    log.info("Device Certificate=" +
+                            certificateData(keygen2State.getDeviceCertificate()));
+
+                    ////////////////////////////////////////////////////////////////////////
+                    // Finding out keys that should be deleted.  We don't want duplicate 
+                    // payment credentials 
+                    ////////////////////////////////////////////////////////////////////////
+                    CredentialDiscoveryRequestEncoder credentialDiscoveryRequest =
+                            new CredentialDiscoveryRequestEncoder(keygen2State);
+                    credentialDiscoveryRequest.addLookupDescriptor(
+                            KeyProviderService.keyManagementKey.getPublicKey());
+                    keygen2JSONBody(response, credentialDiscoveryRequest);
+                    return;
 
                 case CREDENTIAL_DISCOVERY:
-                  CredentialDiscoveryResponseDecoder credentiaDiscoveryResponse = (CredentialDiscoveryResponseDecoder) jsonObject;
-                  keygen2State.update(credentiaDiscoveryResponse);
-                  for (CredentialDiscoveryResponseDecoder.LookupResult lookupResult : credentiaDiscoveryResponse.getLookupResults()) {
-                      for (CredentialDiscoveryResponseDecoder.MatchingCredential matchingCredential : lookupResult.getMatchingCredentials()) {
-                          X509Certificate endEntityCertificate = matchingCredential.getCertificatePath()[0];
-                          keygen2State.addPostDeleteKey(matchingCredential.getClientSessionId(), 
-                                                        matchingCredential.getServerSessionId(),
-                                                        endEntityCertificate,
-                                                        KeyProviderService.keyManagementKey.getPublicKey());
+                    CredentialDiscoveryResponseDecoder credentiaDiscoveryResponse =
+                        (CredentialDiscoveryResponseDecoder) jsonObject;
+                    keygen2State.update(credentiaDiscoveryResponse);
+
+                    ////////////////////////////////////////////////////////////////////////
+                    // Mark keys for deletion
+                    ////////////////////////////////////////////////////////////////////////
+                    for (CredentialDiscoveryResponseDecoder.LookupResult lookupResult 
+                           : 
+                         credentiaDiscoveryResponse.getLookupResults()) {
+                        for (CredentialDiscoveryResponseDecoder
+                                .MatchingCredential matchingCredential
+                                 : 
+                             lookupResult.getMatchingCredentials()) {
+                            X509Certificate endEntityCertificate = 
+                                    matchingCredential.getCertificatePath()[0];
+                            keygen2State
+                                .addPostDeleteKey(matchingCredential.getClientSessionId(), 
+                                                  matchingCredential.getServerSessionId(),
+                                                  endEntityCertificate,
+                                                  KeyProviderService.keyManagementKey.getPublicKey());
                           log.info("Deleting key=" + certificateData(endEntityCertificate));
-                      }
-                  }
-                  requestKeyGen2KeyCreation(response, keygen2State);
-                  return;
+                        }
+                    }
+
+                    ////////////////////////////////////////////////////////////////////////
+                    // Now order a set of new keys including suitable protection objects
+                    ////////////////////////////////////////////////////////////////////////
+                    ServerState.PINPolicy standardPinPolicy = 
+                            keygen2State.createPINPolicy(PassphraseFormat.NUMERIC,
+                                                         4,
+                                                         8,
+                                                         3,
+                                                         null);
+                    standardPinPolicy.setGrouping(Grouping.SHARED);
+                    ServerState.PINPolicy serverPinPolicy = 
+                            keygen2State.createPINPolicy(PassphraseFormat.STRING,
+                                                         4,
+                                                         8,
+                                                         3,
+                                                         null);
+                  
+                    for (KeyProviderService.CredentialTemplate credentialTemplate 
+                                        : 
+                         KeyProviderService.credentialTemplates) {
+                        ServerState.Key key = credentialTemplate.optionalServerPin == null ?
+                                keygen2State.createKey(AppUsage.SIGNATURE,
+                                                       new KeySpecifier(credentialTemplate
+                                                               .keyAlgorithm),
+                                                       standardPinPolicy) 
+                                              :
+                                keygen2State
+                                    .createKeyWithPresetPIN(AppUsage.SIGNATURE,
+                                                            new KeySpecifier(
+                                                          credentialTemplate.keyAlgorithm),
+                                                            serverPinPolicy,
+                                                            credentialTemplate.optionalServerPin);                           
+                        key.addEndorsedAlgorithm(credentialTemplate.signatureAlgorithm);
+                        key.setFriendlyName(credentialTemplate.friendlyName);
+                        key.setUserObject(credentialTemplate);
+                    }
+                    keygen2JSONBody(response, new KeyCreationRequestEncoder(keygen2State));
+                    return;
 
                 case KEY_CREATION:
-                  KeyCreationResponseDecoder keyCreationResponse = (KeyCreationResponseDecoder) jsonObject;
-                  keygen2State.update(keyCreationResponse);
-                  keygen2JSONBody(response, new ProvisioningFinalizationRequestEncoder(keygen2State));
-                  return;
+                    KeyCreationResponseDecoder keyCreationResponse = 
+                        (KeyCreationResponseDecoder) jsonObject;
+                    keygen2State.update(keyCreationResponse);
+
+                    ////////////////////////////////////////////////////////////////////////
+                    // Keys have been created, now add the data needed in order to make 
+                    // them usable in Saturn as well
+                    ////////////////////////////////////////////////////////////////////////
+                    
+                    // However, since this is a demo without KYC and login we need to
+                    // first create a user since even demo users are supposed to be
+                    // independent of each other.  Note, user name is just an "alias"
+                    // so it does NOT function as a user ID...
+                    String userName = "Funny Guy";
+                    int userId = DataBaseOperations.createUser(userName);
+                    for (ServerState.Key key : keygen2State.getKeys()) {
+                        KeyProviderService.CredentialTemplate credentialTemplate =
+                                (KeyProviderService.CredentialTemplate)key.getUserObject();
+                        String credentialId = 
+                                DataBaseOperations
+                                    .createAccountAndCredential(userId, 
+                                                                credentialTemplate
+                                                                    .accountType.getIntValue(),
+                                                                credentialTemplate.paymentMethod,
+                                                                key.getPublicKey(),
+                                                                null);
+                    }
+                    keygen2JSONBody(response, 
+                                    new ProvisioningFinalizationRequestEncoder(keygen2State));
+                    return;
 
                 case PROVISIONING_FINALIZATION:
-                  ProvisioningFinalizationResponseDecoder provisioningFinalResponse =
-                      (ProvisioningFinalizationResponseDecoder) jsonObject;
-                  keygen2State.update(provisioningFinalResponse);
-                  log.info("Successful KeyGen2 run");
+                    ProvisioningFinalizationResponseDecoder provisioningFinalResponse =
+                        (ProvisioningFinalizationResponseDecoder) jsonObject;
+                    keygen2State.update(provisioningFinalResponse);
+                    log.info("Successful KeyGen2 run");
 
-                  ////////////////////////////////////////////////////////////////////////////////////////////
-                  // We are done, return an HTTP redirect taking the client out of its KeyGen2 mode
-                  ////////////////////////////////////////////////////////////////////////////////////////////
-                  response.sendRedirect(keygen2EnrollmentUrl);
-                  return;
+                    ////////////////////////////////////////////////////////////////////////
+                    // We are done, return an HTTP redirect taking 
+                    // the client out of its KeyGen2 mode
+                    ////////////////////////////////////////////////////////////////////////
+                    response.sendRedirect(keygen2EnrollmentUrl);
+                    return;
 
                 default:
                   throw new IOException("Unxepected state");

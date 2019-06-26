@@ -140,8 +140,8 @@ CREATE TABLE TRANSACTIONS
 
 DELIMITER //
 
-CREATE PROCEDURE CreateUserSP (IN p_Name VARCHAR(50), 
-                               OUT p_UserId INT)
+CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
+                               IN p_Name VARCHAR(50))
   BEGIN
     INSERT INTO USERS(Name) VALUES(p_Name);
     SET p_UserId = LAST_INSERT_ID();
@@ -232,7 +232,7 @@ DETERMINISTIC
 
 CREATE PROCEDURE CreateAccountSP (OUT p_AccountId INT(11),
                                   IN p_UserId INT, 
-                                  IN p_AccountType CHAR(4))
+                                  IN p_AccountType INT)
   BEGIN
     INSERT INTO ACCOUNTS(UserId, AccountType, Balance)
         SELECT p_UserId, p_AccountType, ACCOUNT_TYPES.CappedAt 
@@ -268,7 +268,7 @@ CREATE TABLE CREDENTIALS
 */
 CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
                                                IN p_UserId INT, 
-                                               IN p_AccountType CHAR(4),
+                                               IN p_AccountType INT,
                                                IN p_MethodUri VARCHAR(50),
                                                IN p_S256PayReq BINARY(32),
                                                IN p_S256BalReq BINARY(32))
@@ -552,7 +552,7 @@ CALL CreateTransactionTypeSP("REFUND",
 
 -- Demo data
 
-CALL CreateUserSP("Luke Skywalker", @userid);
+CALL CreateUserSP(@userid, "Luke Skywalker");
 
 CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("CREDIT_CARD_ACCOUNT"));
 
@@ -578,7 +578,7 @@ CALL CreateDemoCredentialSP(@accountid,
                             x'19aed933edacc289d0d63fba788cf424612d346754d110863cd043b52abecd53',
                             NULL);
                             
-CALL CreateUserSP("Chewbacca", @userid);
+CALL CreateUserSP(@userid, "Chewbacca");
 
 CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("CREDIT_CARD_ACCOUNT"));
 
