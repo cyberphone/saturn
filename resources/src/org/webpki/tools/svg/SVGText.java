@@ -20,7 +20,8 @@ public class SVGText extends SVGObject {
 
     public enum FONT_WEIGHTS {
         NORMAL ("normal"),
-        BOLD   ("bold");
+        BOLD   ("bold"),
+        W500   ("500");
         
         String value;
         

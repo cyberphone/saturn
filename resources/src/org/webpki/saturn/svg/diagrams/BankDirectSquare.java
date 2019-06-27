@@ -78,10 +78,10 @@ public class BankDirectSquare extends SVGDocument implements CardImageData {
         add(new SVGText(
                 new SVGDoubleValue(STANDARD_TEXT_LEFT),
                 new SVGDoubleValue(NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
-                "monospace",
+                "Noto Sans",
                 STANDARD_ACCOUNT_FONT_SIZE,
                 null,
-                STANDARD_ACCOUNT).setFontWeight(FONT_WEIGHTS.BOLD));
+                STANDARD_ACCOUNT).setFontWeight(SVGText.FONT_WEIGHTS.W500));
 
         add(new SVGText(
                 new SVGDoubleValue((STANDARD_WIDTH + WHITE_SQUARE_WIDTH + WHITE_SQUARE_PAD) / 2),

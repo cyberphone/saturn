@@ -65,10 +65,10 @@ public class SuperCardSquare extends SVGDocument implements CardImageData {
 
         add(new SVGText(new SVGDoubleValue(STANDARD_TEXT_LEFT),
                         new SVGDoubleValue(NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
-                        "monospace",
+                        "Noto Sans",
                         STANDARD_ACCOUNT_FONT_SIZE,
                         null,
-                        STANDARD_ACCOUNT).setFontWeight(FONT_WEIGHTS.BOLD));
+                        STANDARD_ACCOUNT).setFontWeight(SVGText.FONT_WEIGHTS.W500));
 
         SVGEmbeddedText et = new SVGEmbeddedText(org.webpki.saturn.svg.diagrams.SupercardGlyphs.class);
 

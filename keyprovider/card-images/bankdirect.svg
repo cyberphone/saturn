@@ -16,7 +16,7 @@
 </defs>
 <rect x="0" y="0" width="300" height="180" fill="url(#bankdirectGradient)"/>
 <text x="30" y="141.3" font-family="Sans-serif" font-size="20">Luke Skywalker</text>
-<text x="30" y="163.3" font-family="monospace" font-size="14" font-weight="bold">1234 1234 1234 1234</text>
+<text x="30" y="163.3" font-family="Noto Sans" font-size="15" font-weight="500">1234 1234 1234 1234</text>
 <text x="226" y="73" font-family="Serif" font-size="28" text-anchor="middle" fill="#558ed5" font-weight="bold">MyBank</text>
 <rect x="14" y="14" width="138" height="98" stroke="#000000" stroke-width="1.2" fill="#ffffff"/>
 <ellipse cx="83" cy="63" rx="60" ry="40" stroke="#f20707" stroke-width="2" fill="none"/>
