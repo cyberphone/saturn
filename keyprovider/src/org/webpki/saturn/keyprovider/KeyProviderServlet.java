@@ -46,7 +46,6 @@ import javax.servlet.http.HttpSession;
 import org.webpki.asn1.cert.DistinguishedName;
 
 import org.webpki.ca.CA;
-
 import org.webpki.ca.CertSpec;
 
 import org.webpki.crypto.AsymKeySignerInterface;
@@ -278,7 +277,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     // first create a user since even demo users are supposed to be
                     // independent of each other.  Note, user name is just an "alias"
                     // so it does NOT function as a user ID...
-                    String userName = "Funny Guy";
+                    String userName = 
+                            (String) session.getAttribute(KeyProviderInitServlet.USERNAME_SESSION_ATTR);
                     int userId = DataBaseOperations.createUser(userName);
 
                     // now create Saturn payment credentials based on the template

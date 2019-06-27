@@ -5,7 +5,7 @@
 -- Clear and create DB to begin with
 --
 DROP DATABASE IF EXISTS PAYER_BANK;
-CREATE DATABASE PAYER_BANK CHARACTER SET utf8;
+CREATE DATABASE PAYER_BANK CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 --
 -- Create a user but remove any existing user first
 DROP USER IF EXISTS saturn@localhost;

@@ -18,11 +18,14 @@
 package org.webpki.saturn.keyprovider;
 
 import java.io.IOException;
+
 import java.util.logging.Logger;
+
 import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
@@ -38,6 +41,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     static Logger logger = Logger.getLogger(KeyProviderInitServlet.class.getCanonicalName());
 
     static final String KEYGEN2_SESSION_ATTR           = "keygen2";
+    static final String USERNAME_SESSION_ATTR          = "userName";
 
     static final String INIT_TAG = "init";     // Note: This is currently also a part of the KeyGen2 client!
     static final String ABORT_TAG = "abort";
@@ -79,6 +83,7 @@ public class KeyProviderInitServlet extends HttpServlet {
          .append (KeyProviderService.saturnLogotype)
          .append ("</div><table cellapdding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
                 .append(box).append("</table></body></html>");
+        logger.info(s.toString());
         return s.toString();
     }
   
@@ -115,6 +120,21 @@ public class KeyProviderInitServlet extends HttpServlet {
             .append("\">Continue to merchant site</a></p>").toString();
     }
     
+    String createIntent(HttpSession session) throws IOException {
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        // The following is the actual contract between an issuing server and a KeyGen2 client.
+        // The "cookie" element is optional while the "url" argument is mandatory.
+        // The "init" argument bootstraps the protocol via an HTTP GET
+        ////////////////////////////////////////////////////////////////////////////////////////////
+        String urlEncoded = URLEncoder.encode(keygen2EnrollmentUrl, "utf-8");
+        return "intent://keygen2?cookie=JSESSIONID%3D" + session.getId() +
+               "&url=" + urlEncoded +
+               "&ver=" + KeyProviderService.grantedVersions +
+               "&init=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
+               "&cncl=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue" +
+               "#Intent;scheme=webpkiproxy;package=org.webpki.mobile.android;end";
+    }
+    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (!request.getHeader("User-Agent").contains("Android")) {
@@ -128,37 +148,41 @@ public class KeyProviderInitServlet extends HttpServlet {
         if (keygen2EnrollmentUrl == null) {
             initGlobals(ServletUtil.getContextURL(request));
         }
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        session = request.getSession(true);
-        session.setAttribute(KEYGEN2_SESSION_ATTR,
-                             new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey), 
-                                             keygen2EnrollmentUrl,
-                                             KeyProviderService.serverCertificate,
-                                             null));
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // The following is the actual contract between an issuing server and a KeyGen2 client.
-        // The "cookie" element is optional while the "url" argument is mandatory.
-        // The "init" argument bootstraps the protocol via an HTTP GET
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        String urlEncoded = URLEncoder.encode(keygen2EnrollmentUrl, "utf-8");
-        String extra = "?cookie=JSESSIONID%3D" + session.getId() +
-                       "&url=" + urlEncoded +
-                       "&ver=" + KeyProviderService.grantedVersions +
-                       "&init=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
-                       "&cncl=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue";
+        request.getSession(true);
+
         output(response, 
                getHTML(null,
                        null,
-                       "<tr><td align=\"center\"><table>" +
+                       "<tr><td align=\"center\"><form name=\"shoot\" method=\"POST\" action=\"init\"><table>" +
                        "<tr><td>This proof-of-concept system provisions secure payment<br>" +
                        "credentials to be used in the Android version of the \"Wallet\"<br>&nbsp;</td></tr>" +
-                       "<tr><td align=\"center\">" +
-                       "<a href=\"intent://keygen2" + extra +
-                       "#Intent;scheme=webpkiproxy;" +
-                       "package=org.webpki.mobile.android;end\">Start KeyGen2</a></td></tr></table></td></tr>"));
+                       "<tr><td><div>Your name</div><div><input type=\"text\" " +
+                       "name=\"" + USERNAME_SESSION_ATTR + "\" value=\"Luke Skywalker\"></div></td></tr>" +
+                       "<tr><td align=\"center\" onclick=\"document.forms.shoot.submit()\">Start KeyGen2</td></tr></table></form></td></tr>"));
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("init");
+            return;
+        }
+        request.setCharacterEncoding("utf-8");
+        session.setAttribute(KEYGEN2_SESSION_ATTR,
+                new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey), 
+                                keygen2EnrollmentUrl,
+                                KeyProviderService.serverCertificate,
+                                null));
+        session.setAttribute(USERNAME_SESSION_ATTR, request.getParameter(USERNAME_SESSION_ATTR));
+        output(response,
+               getHTML(
+               "history.pushState(null, null, 'init');\n" +
+                       "window.addEventListener('popstate', function(event) {\n" +
+                       "    history.pushState(null, null, 'init');\n" +
+                       "});\n",
+                "onload=\"document.location.href = '" + createIntent(session) + "';\"", 
+                "<tr><td align=\"center\">Android Bootstrap</td></tr>"));
     }
 }
