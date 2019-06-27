@@ -19,7 +19,6 @@
 
 package org.webpki.saturn.resources;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,8 +43,8 @@ import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
 import org.webpki.json.DataEncryptionAlgorithms;
+
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
@@ -57,7 +56,6 @@ import org.webpki.keygen2.KeyGen2URIs;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataEncoder;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.TemporaryCardDBDecoder;
 
 import org.webpki.sks.AppUsage;
 import org.webpki.sks.BiometricProtection;
@@ -82,25 +80,25 @@ import org.webpki.util.DebugFormatter;
 public class InitWallet {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 12) {
+        if (args.length != 11) {
             System.out.println("\nUsage: " +
                                InitWallet.class.getCanonicalName() +
-                               "sksFile accountDbFile clientKeyCore kg2Pin accountType accountId balance" +
+                               "sksFile clientKeyCore kg2Pin accountType accountId balance" +
                                " authorityUrl keyEncryptionKey imageFile dataEncrytionAlgorithm keyEncrytionAlgorithm");
             System.exit(-3);
         }
         String sksFile = args[0];
-        String accountDbFile = args[1];
-        String clientKeyCore = args[2];
-        String kg2Pin = args[3];
-        PaymentMethods paymentMethod = PaymentMethods.valueOf(args[4]);
-        String accountId = args[5];
-        String balance = args[6];
-        String authorityUrl = args[7];
-        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
-        String imageFile = args[9];
-        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[10]);
-        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[11]);
+//        String accountDbFile = args[1];
+        String clientKeyCore = args[1];
+        String kg2Pin = args[2];
+        PaymentMethods paymentMethod = PaymentMethods.valueOf(args[3]);
+        String accountId = args[4];
+        String balance = args[5];
+        String authorityUrl = args[6];
+        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[7])).getPublicKey();
+        String imageFile = args[8];
+        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[9]);
+        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[10]);
   
         // Read importedKey/certificate to be imported
         JSONObjectReader privateKeyJWK = JSONParser.parse(ArrayUtil.readFile(clientKeyCore + ".jwk"));
@@ -159,11 +157,6 @@ public class InitWallet {
 
         surrogateKey.setCertificatePath(certPath);
         surrogateKey.setPrivateKey(new KeyPair(keyPair.getPublic(), keyPair.getPrivate()));
-        boolean cardNumberFormatting = true;
-        if (accountId.startsWith("!")) {
-            cardNumberFormatting = false;
-            accountId = accountId.substring(1);
-        }
         JSONObjectWriter ow =
              CardDataEncoder.encode(paymentMethod.getPaymentMethodUri(), 
                                     accountId, 
@@ -191,21 +184,6 @@ public class InitWallet {
         ObjectOutputStream oos = new ObjectOutputStream (new FileOutputStream(sksFile));
         oos.writeObject (sks);
         oos.close ();
-        // Add the account to the account DB
-        imageFile = imageFile.substring(imageFile.lastIndexOf(File.separatorChar));
-        JSONArrayWriter accountDb =
-                new JSONArrayWriter(JSONParser.parse(ArrayUtil.readFile(accountDbFile)).getJSONArrayReader());
-        accountDb.setObject()
-            .setObject(TemporaryCardDBDecoder.CORE_CARD_DATA_JSON, ow)
-            .setString(TemporaryCardDBDecoder.LOGOTYPE_NAME_JSON, 
-                    imageFile.substring(1, imageFile.lastIndexOf('.')) + ".svg")
-            .setBoolean(TemporaryCardDBDecoder.FORMAT_ACCOUNT_AS_CARD_JSON, cardNumberFormatting)
-            .setString(TemporaryCardDBDecoder.CARD_HOLDER_JSON, "Luke Skywalker")
-            .setString(TemporaryCardDBDecoder.CARD_PIN_JSON, kg2Pin)
-            .setObject(TemporaryCardDBDecoder.CARD_PRIVATE_KEY_JSON, privateKeyJWK)
-            .setArray(TemporaryCardDBDecoder.CARD_DUMMY_CERTIFICATE_JSON, new JSONArrayWriter(certPathJSON));
-
-        ArrayUtil.writeFile(accountDbFile, accountDb.serializeToBytes(JSONOutputFormats.PRETTY_PRINT));
 
         // Report
         System.out.println("Imported Subject: " +

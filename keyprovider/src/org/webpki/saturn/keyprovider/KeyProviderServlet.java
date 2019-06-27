@@ -21,10 +21,18 @@ import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
+import java.util.Date;
+import java.util.Hashtable;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.security.GeneralSecurityException;
+import java.security.PublicKey;
+
 import java.security.cert.X509Certificate;
+
+import java.math.BigInteger;
 
 import java.net.URLEncoder;
 
@@ -35,7 +43,16 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.crypto.KeyAlgorithms;
+import org.webpki.asn1.cert.DistinguishedName;
+
+import org.webpki.ca.CA;
+
+import org.webpki.ca.CertSpec;
+
+import org.webpki.crypto.AsymKeySignerInterface;
+import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.KeyUsageBits;
+import org.webpki.crypto.SignatureWrapper;
 
 import org.webpki.keygen2.ServerState;
 import org.webpki.keygen2.KeySpecifier;
@@ -68,7 +85,7 @@ import org.webpki.json.JSONEncoder;
 import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONOutputFormats;
 
-// A KeyGen2 protocol runner that setups pre-configured wallet keys.
+// KeyGen2 protocol runner that creates Saturn wallet keys.
 
 public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
@@ -99,78 +116,6 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
         response.setDateHeader("EXPIRES", 0);
         response.getOutputStream().write(jsonData);
     }
-
-    void requestKeyGen2KeyCreation(HttpServletResponse response, ServerState keygen2State)
-            throws IOException {
-        ServerState.PINPolicy standardPinPolicy = 
-            keygen2State.createPINPolicy(PassphraseFormat.NUMERIC,
-                                         4,
-                                         8,
-                                         3,
-                                         null);
-        standardPinPolicy.setGrouping(Grouping.SHARED);
-        ServerState.PINPolicy serverPinPolicy = 
-                keygen2State.createPINPolicy(PassphraseFormat.STRING,
-                                             4,
-                                             8,
-                                             3,
-                                             null);
-    
-        for (KeyProviderService.CredentialTemplate credentialTemplate 
-                              : 
-             KeyProviderService.credentialTemplates) {
-            ServerState.Key key = credentialTemplate.optionalServerPin == null ?
-                keygen2State.createKey(AppUsage.SIGNATURE,
-                                       new KeySpecifier(credentialTemplate.keyAlgorithm),
-                                       standardPinPolicy) 
-                                                                          :
-                keygen2State
-                    .createKeyWithPresetPIN(AppUsage.SIGNATURE,
-                                            new KeySpecifier(credentialTemplate.keyAlgorithm),
-                                            serverPinPolicy,
-                                            credentialTemplate.optionalServerPin);                           
-                key.addEndorsedAlgorithm(credentialTemplate.signatureAlgorithm);
-                key.setFriendlyName(credentialTemplate.friendlyName);
-/*
-            key.setCertificatePath(paymentCredential.dummyCertificatePath);
-            key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
-                             CardDataEncoder.encode(paymentCredential.paymentMethod,
-                                                    paymentCredential.accountId, 
-                                                    paymentCredential.authorityUrl, 
-                                                    paymentCredential.signatureAlgorithm, 
-                                                    paymentCredential.dataEncryptionAlgorithm, 
-                                                    paymentCredential.keyEncryptionAlgorithm, 
-                                                    paymentCredential.encryptionKey,
-                                                    null,
-                                                    null,
-                                                    paymentCredential.tempBalanceFix)
-                                                        .serializeToBytes(JSONOutputFormats.NORMALIZED));
-
-
-            key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
-
-                @Override
-                public byte[] getData() throws IOException {
-                    return new String(paymentCredential.svgCardImage)
-                        .replace(CardImageData.STANDARD_NAME, paymentCredential.cardHolder)
-                        .replace(CardImageData.STANDARD_ACCOUNT, paymentCredential.cardFormatted ?
-                            AuthorizationData.formatCardNumber(paymentCredential.accountId) 
-                                                                        :
-                            paymentCredential.accountId).getBytes("utf-8");
-                }
-
-                @Override
-                public String getMimeType() throws IOException {
-                    return "image/svg+xml";
-                }
-               
-            });
-*/
-        }
-    
-        keygen2JSONBody(response, 
-                        new KeyCreationRequestEncoder(keygen2State));
-      }
 
     String certificateData(X509Certificate certificate) {
         return ", Subject='" + certificate.getSubjectX500Principal().getName() +
@@ -335,10 +280,14 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     // so it does NOT function as a user ID...
                     String userName = "Funny Guy";
                     int userId = DataBaseOperations.createUser(userName);
+
+                    // now create Saturn payment credentials based on the template
                     for (ServerState.Key key : keygen2State.getKeys()) {
                         KeyProviderService.CredentialTemplate credentialTemplate =
                                 (KeyProviderService.CredentialTemplate)key.getUserObject();
-                        String credentialId = 
+
+                        // 1. Create an account and get an ID for accessing it
+                        String credentialId = // A credentialId uniquely points to an account 
                                 DataBaseOperations
                                     .createAccountAndCredential(userId, 
                                                                 credentialTemplate
@@ -346,6 +295,81 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                                 credentialTemplate.paymentMethod,
                                                                 key.getPublicKey(),
                                                                 null);
+
+                        // 2. Create a "carrier" certificate for the signature key (SKS need that)
+                        CertSpec certSpec = new CertSpec();
+                        certSpec.setKeyUsageBit(KeyUsageBits.DIGITAL_SIGNATURE);
+                        certSpec.setSubject("CN=" + userName + ", serialNumber=" + credentialId);
+                        Hashtable<String,String> issuer = new Hashtable<String,String>();
+                        issuer.put("CN", "Saturn SKS Carrier Certificate");
+                        long startTime = System.currentTimeMillis();
+                        key.setCertificatePath(new X509Certificate[]{new CA().
+                                 createCert(certSpec,
+                                            new DistinguishedName(issuer),
+                                            BigInteger.ONE,
+                                            new Date(startTime),
+                                            new Date(startTime + (20 * 365 * 24 * 3600 * 1000l)),
+                                            AsymSignatureAlgorithms.ECDSA_SHA256,
+                                            new AsymKeySignerInterface() {
+
+                                                @Override
+                                                public PublicKey getPublicKey() throws IOException {
+                                                    return KeyProviderService
+                                                               .carrierCaKeyPair.getPublic();
+                                                }
+
+                                                @Override
+                                                public byte[] signData(
+                                                        byte[] data,
+                                                        AsymSignatureAlgorithms algorithm)
+                                                        throws IOException {
+                                                    try {
+                                                        return new SignatureWrapper(algorithm,
+                                                                                    KeyProviderService
+                                                                         .carrierCaKeyPair.getPrivate())
+                                                            .setEcdsaSignatureEncoding(true)
+                                                            .update(data)
+                                                            .sign();
+                                                    } catch (GeneralSecurityException e) {
+                                                        throw new IOException(e);
+                                                    }
+                                                }
+                                            },
+                                            key.getPublicKey())});
+
+                        // 3. Add card data blob to the key entry
+                        key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
+                                CardDataEncoder.encode(credentialTemplate.paymentMethod,
+                                                       credentialId, 
+                                                       credentialTemplate.authorityUrl, 
+                                                       credentialTemplate.signatureAlgorithm, 
+                                                       credentialTemplate.dataEncryptionAlgorithm, 
+                                                       credentialTemplate.keyEncryptionAlgorithm, 
+                                                       credentialTemplate.encryptionKey,
+                                                       null,
+                                                       null,
+                                                       credentialTemplate.tempBalanceFix)
+                                                           .serializeToBytes(JSONOutputFormats.NORMALIZED));
+
+                        // 4. Add personalized card image
+                        key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
+
+                            @Override
+                            public byte[] getData() throws IOException {
+                                return new String(credentialTemplate.svgCardImage)
+                                    .replace(CardImageData.STANDARD_NAME, userName)
+                                    .replace(CardImageData.STANDARD_ACCOUNT, credentialTemplate.cardFormatted ?
+                                        AuthorizationData.formatCardNumber(credentialId) 
+                                                        :
+                                        credentialId).getBytes("utf-8");
+                            }
+
+                            @Override
+                            public String getMimeType() throws IOException {
+                                return "image/svg+xml";
+                            }
+                           
+                        });
                     }
                     keygen2JSONBody(response, 
                                     new ProvisioningFinalizationRequestEncoder(keygen2State));

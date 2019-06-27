@@ -44,14 +44,14 @@ public class TransactionListingServlet extends HttpServlet {
     static final String SQL = "SELECT " +
             "TRANSACTIONS.Created AS `Created`, " +
             "TRANSACTIONS.Amount AS `Amount`, " +
-            "ACCOUNTS.Id AS `Account`, " +
+            "ACCOUNTS.Id AS `Account Id`, " +
             "TRANSACTIONS.Balance AS `Balance`, " +
             "USERS.Name As `Account Holder`, " +
             "COALESCE(TRANSACTIONS.Originator,'') AS Originator, " +
-            "COALESCE(TRANSACTIONS.ExtReference,'') AS ExtRef, " +
-            "TRANSACTIONS.CredentialId AS Credential, " +
-            "TRANSACTIONS.Id AS `Id`, " +
-            "COALESCE(TRANSACTIONS.ReserveId,'') AS `ReserveId`, " +
+            "COALESCE(TRANSACTIONS.ExtReference,'') AS `Ext Ref`, " +
+            "TRANSACTIONS.CredentialId AS `Ext Account Id`, " +
+            "TRANSACTIONS.Id AS `Trans Id`, " +
+            "COALESCE(TRANSACTIONS.ReservationId,'') AS `Res Id`, " +
             "TRANSACTION_TYPES.SymbolicName AS `Type` " +
             "FROM TRANSACTIONS " +
             "INNER JOIN ACCOUNTS ON " +

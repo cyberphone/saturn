@@ -69,7 +69,7 @@ CREATE TABLE ACCOUNTS
     PRIMARY KEY (Id),
     FOREIGN KEY (AccountType) REFERENCES ACCOUNT_TYPES(Id),
     FOREIGN KEY (UserId) REFERENCES USERS(Id) ON DELETE CASCADE
-  ) AUTO_INCREMENT=800500123;
+  ) AUTO_INCREMENT=200500123;
 
 
 /*=============================================*/
@@ -131,7 +131,7 @@ CREATE TABLE TRANSACTIONS
     Originator  VARCHAR(50),                                             -- Optional Merchant
     ExtReference VARCHAR(50),                                            -- Optional External Ref
     CredentialId VARCHAR(30),                                            -- Optional Credential ID
-    ReserveId   INT,                                                     -- Reservation Transaction ID
+    ReservationId INT,                                                   -- Reservation Transaction ID
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
     PRIMARY KEY (Id),
     FOREIGN KEY (TransactionType) REFERENCES TRANSACTION_TYPES(Id),
@@ -252,20 +252,7 @@ CREATE PROCEDURE CreateDemoCredentialSP (IN p_AccountId INT(11),
         FROM CREDENTIAL_TYPES WHERE MethodUri = p_MethodUri;
   END
 //
-/*
-CREATE TABLE CREDENTIALS
-  (
-    Id          VARCHAR(30)   NOT NULL  UNIQUE,                          -- Unique Credential ID 
-    AccountId   INT           NOT NULL,                                  -- Account ID Reference
-    CredentialType  INT       NOT NULL,                                  -- Credential Type Reference
-    Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
-    S256PayReq  BINARY(32)    NOT NULL,                                  -- Payment request key hash 
-    S256BalReq  BINARY(32)    NULL,                                      -- Optional: balance key hash 
-    PRIMARY KEY (Id),
-    FOREIGN KEY (CredentialType) REFERENCES CREDENTIAL_TYPES(Id),
-    FOREIGN KEY (AccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
-  );
-*/
+
 CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
                                                IN p_UserId INT, 
                                                IN p_AccountType INT,
@@ -352,7 +339,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                      IN p_OptionalOriginator VARCHAR(50),
                                      IN p_OptionalExtReference VARCHAR(50),
                                      IN p_TransactionType INT,
-                                     IN p_OptionalReserveId INT,
+                                     IN p_OptionalReservationId INT,
                                      IN p_Amount DECIMAL(8,2),
                                      IN p_CredentialId VARCHAR(30))
   BEGIN
@@ -372,11 +359,11 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
       SET p_Error = 1;             -- No such account
     ELSE
       SET v_NewBalance = v_Balance - p_Amount;
-      IF p_OptionalReserveId IS NOT NULL THEN
+      IF p_OptionalReservationId IS NOT NULL THEN
         SELECT TRANSACTIONS.Amount INTO v_PreviousAmount FROM TRANSACTIONS
             INNER JOIN ACCOUNTS ON ACCOUNTS.Id = TRANSACTIONS.AccountId
             INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
-            WHERE TRANSACTIONS.Id = p_OptionalReserveId AND
+            WHERE TRANSACTIONS.Id = p_OptionalReservationId AND
                   TRANSACTIONS.TransactionType = 2 AND
                   ACCOUNTS.Id = v_AccountId AND
                   CREDENTIALS.Id = p_CredentialId
@@ -384,7 +371,8 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
         IF v_PreviousAmount IS NULL THEN
           SET p_Error = 5;         -- Reservation not found
         ELSE
-          IF EXISTS (SELECT * FROM TRANSACTIONS WHERE TRANSACTIONS.ReserveId = p_OptionalReserveId) THEN
+          IF EXISTS (SELECT * FROM TRANSACTIONS
+              WHERE TRANSACTIONS.ReservationId = p_OptionalReservationId) THEN
             SET p_Error = 6;         -- Reservation already used
           ELSE
             SET v_NewBalance = v_NewBalance + v_PreviousAmount;
@@ -404,7 +392,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                    CredentialId, 
                                    Originator, 
                                    ExtReference,
-                                   ReserveId) 
+                                   ReservationId) 
                VALUES(p_TransactionType,
                       v_AccountId,
                       p_Amount,
@@ -412,7 +400,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                       p_CredentialId,
                       p_OptionalOriginator, 
                       p_OptionalExtReference,
-                      p_OptionalReserveId);
+                      p_OptionalReservationId);
           SET p_TransactionId = LAST_INSERT_ID();
         END IF;
       END IF;

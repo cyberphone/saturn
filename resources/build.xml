@@ -280,7 +280,6 @@
   <target name="_import">
     <property name="card.path" location="${@cardimage.dir}/${card.image}"/>
     <property name="sks.path" location="${@credentials.dir}/${@credentials_store}"/>
-    <property name="db.path" location="${@credentials.dir}/accounts.${bankpath}.json"/>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitWallet"
           dir="${@key.dir}"
@@ -295,7 +294,6 @@
              <pathelement location="${temp.dir}"/>
         </classpath>
         <arg value="${sks.path}"/>
-        <arg value="${db.path}"/>
         <arg value="${client.key.core}"/>
         <arg value="${kg2.pin}"/>
         <arg value="${card.type}"/>
@@ -340,7 +338,7 @@
        <param name="client.key.core" value="${@clientkey_bankdir}"/>
        <param name="kg2.pin" value="@"/>
        <param name="card.type" value="BANK_DIRECT"/>
-       <param name="card.number" value="!${@account_id_bankdir}"/>
+       <param name="card.number" value="${@account_id_bankdir}"/>
        <param name="card.balance" value="5543.00"/>
        <param name="card.image" value="bankdirect.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>

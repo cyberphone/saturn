@@ -21,9 +21,14 @@ import java.io.InputStream;
 
 import java.math.BigDecimal;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 
 import java.security.cert.X509Certificate;
+
+import java.security.spec.ECGenParameterSpec;
 
 import java.sql.Connection;
 
@@ -91,6 +96,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static JSONDecoderCache keygen2JSONCache;
     
     static X509Certificate serverCertificate;
+
+    static KeyPair carrierCaKeyPair;
 
     static String grantedVersions;
 
@@ -205,7 +212,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // SKS key management key
             ////////////////////////////////////////////////////////////////////////////////////////////
             keyManagementKey = new KeyStoreEnumerator(getResource(getPropertyString(KEYPROV_KMK)),
-                                                                    getPropertyString(KEYSTORE_PASSWORD));
+                                                      getPropertyString(KEYSTORE_PASSWORD));
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Saturn logotype
@@ -222,6 +229,14 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             serverCertificate = CertificateUtil.getCertificateFromBlob(
                     ArrayUtil.readFile(getPropertyString(TLS_CERTIFICATE)));
+            
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Create a CA keys.  Note Saturn payment credentials do not use PKI
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
+            ECGenParameterSpec eccgen = new ECGenParameterSpec(KeyAlgorithms.NIST_P_256.getJceName());
+            generator.initialize(eccgen, new SecureRandom());
+            carrierCaKeyPair = generator.generateKeyPair();
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Are we logging?
