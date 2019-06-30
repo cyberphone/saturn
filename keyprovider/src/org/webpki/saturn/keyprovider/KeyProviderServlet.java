@@ -90,6 +90,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
     private static final long serialVersionUID = 1L;
 
+    static final int MAX_CARD_NAME_LENGTH = 30;  // Sorry :(
+    static final int MAX_CARD_NAME_BIG    = 20;
+
     static Logger log = Logger.getLogger(KeyProviderServlet.class.getCanonicalName());
     
     static String success_image_and_message;
@@ -356,8 +359,22 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
                             @Override
                             public byte[] getData() throws IOException {
-                                return new String(credentialTemplate.svgCardImage)
-                                    .replace(CardImageData.STANDARD_NAME, userName)
+                                String cardImage = new String(credentialTemplate.svgCardImage);
+                                String cardUserName = userName;
+                                if (cardUserName.length() > MAX_CARD_NAME_LENGTH) {
+                                    cardUserName = cardUserName.substring(0, MAX_CARD_NAME_LENGTH);
+                                }
+                                if (cardUserName.length() > MAX_CARD_NAME_BIG) {
+                                    cardImage = cardImage.replace(
+                                            CardImageData.STANDARD_NAME_FONT_SIZE + 
+                                                "\">" + 
+                                                CardImageData.STANDARD_NAME,
+                                            ((2 * CardImageData.STANDARD_NAME_FONT_SIZE) / 3) +
+                                                "\">" + 
+                                                CardImageData.STANDARD_NAME);
+                                }
+                                return cardImage
+                                    .replace(CardImageData.STANDARD_NAME, cardUserName)
                                     .replace(CardImageData.STANDARD_ACCOUNT, credentialTemplate.cardFormatted ?
                                         AuthorizationData.formatCardNumber(credentialId) 
                                                         :
@@ -420,35 +437,32 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             executeRequest(request, response, true);
             return;
         }
-        StringBuilder html = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">");
+        StringBuilder html = new StringBuilder("<div class=\"label\">");
         StringBuilder result = new StringBuilder();
         if (foundData(request, result, KeyProviderInitServlet.ERROR_TAG)) {
-            html.append("<table><tr><td><b>Failure Report:</b></td></tr><tr><td><pre><font color=\"red\">")
+            html.append("<table><tr><td>Failure Report:</td></tr><tr><td>" +
+                        "<pre style=\"color:red;font-size:10pt\">")
                 .append(result)
-                .append("</font></pre></td></tr></table>");
+                .append("</pre></td></tr></table>");
         } else if (foundData(request, result, KeyProviderInitServlet.PARAM_TAG)) {
             html.append(result);
         } else if (foundData(request, result, KeyProviderInitServlet.ABORT_TAG)) {
             log.info("KeyGen2 run aborted by the user");
-            html.append("<b>Aborted by the user!</b>");
+            html.append("Aborted by the user!");
         } else {
             HttpSession session = request.getSession(false);
             if (session == null) {
-                html.append("<b>You need to restart the session</b>");
+                html.append("You need to restart the session");
             } else {
                 session.invalidate();
                 html.append(KeyProviderInitServlet.successMessage);
             }
         }
         KeyProviderInitServlet.output(response, 
-                                      KeyProviderInitServlet.getHTML(
-                                              "history.pushState(null, null, 'init');\n" +
-                                                      "window.addEventListener('popstate', function(event) {\n" +
-                                                      "    history.pushState(null, null, 'init');\n" +
-                                                      "});\n"
-,
-                                                                     null,
-                                                                     html.append("</td></tr>").toString()));
+                          KeyProviderInitServlet.getHTML(
+                                 KeyProviderInitServlet.GO_HOME,
+                                 null,
+                                 html.append("</div>").toString()));
     }
 
 }

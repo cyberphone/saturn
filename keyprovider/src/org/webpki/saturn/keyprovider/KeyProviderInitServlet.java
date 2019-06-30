@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.keygen2.ServerState;
+
 import org.webpki.webutil.ServletUtil;
 
 public class KeyProviderInitServlet extends HttpServlet {
@@ -42,29 +43,103 @@ public class KeyProviderInitServlet extends HttpServlet {
 
     static final String KEYGEN2_SESSION_ATTR           = "keygen2";
     static final String USERNAME_SESSION_ATTR          = "userName";
+    
+    static final int NAME_MAX_LENGTH                   = 50;  // Reflected in the DB
 
     static final String INIT_TAG = "init";     // Note: This is currently also a part of the KeyGen2 client!
     static final String ABORT_TAG = "abort";
     static final String PARAM_TAG = "msg";
     static final String ERROR_TAG = "err";
+    
+    static final String GO_HOME =              
+            "history.pushState(null, null, 'init');\n" +
+            "window.addEventListener('popstate', function(event) {\n" +
+            "    history.pushState(null, null, 'init');\n" +
+            "});\n";
 
     static final String HTML_INIT = 
-            "<!DOCTYPE HTML>"+
-            "<html><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>" +
-            "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\">"+
-            "<title>Payment Credential Enrollment</title>"+
-            "<style type=\"text/css\">html {overflow:auto} html, body {margin:0px;padding:0px;height:100%} "+
-            "body {font-size:8pt;color:#000000;font-family:verdana,arial;background-color:white} "+
-            "h2 {font-weight:bold;font-size:12pt;color:#000000;font-family:arial,verdana,helvetica} "+
-            "h3 {font-weight:bold;font-size:11pt;color:#000000;font-family:arial,verdana,helvetica} "+
-            "a:link {font-weight:bold;font-size:8pt;color:blue;font-family:arial,verdana;text-decoration:none} "+
-            "a:visited {font-weight:bold;font-size:8pt;color:blue;font-family:arial,verdana;text-decoration:none} "+
-            "a:active {font-weight:bold;font-size:8pt;color:blue;font-family:arial,verdana} "+
-            "input {font-weight:normal;font-size:8pt;font-family:verdana,arial} "+
-            "td {font-size:8pt;font-family:verdana,arial} "+
-            ".smalltext {font-size:6pt;font-family:verdana,arial} "+
-            "button {font-weight:normal;font-size:8pt;font-family:verdana,arial;padding-top:2px;padding-bottom:2px} "+
-            ".headline {font-weight:bolder;font-size:10pt;font-family:arial,verdana} "+
+            "<!DOCTYPE html><html>" + 
+            "<head>" + 
+            "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\">" + 
+            "<title>Payment Credential Enrollment</title>" + 
+            "<meta charset=\"utf-8\">" + 
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" + 
+            "<style type=\"text/css\">" + 
+            ".displayContainer {" + 
+            "    display: block;" + 
+            "    height: 100%;" + 
+            "    width: 100%;" + 
+            "    align-items: center;" + 
+            "    display: flex;" + 
+            "    flex-direction: column;" + 
+            "    justify-content: center;" + 
+            "}" +
+            
+            ".link {" +
+            "  font-weight:bold;" +
+            "  font-size:8pt;" +
+            "  color:blue;" +
+            "  font-family:arial,verdana;text-decoration:none;" +
+            "}" +
+
+            ".stdbtn {" + 
+            "  cursor:pointer;" + 
+            "  background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" + 
+            "  border-width:1px;" + 
+            "  border-style:solid;" + 
+            "  border-color:#a9a9a9;" + 
+            "  border-radius:5pt;" + 
+            "  padding:3pt 10pt;" + 
+            "  box-shadow:3pt 3pt 3pt #d0d0d0;" + 
+            "}" +
+ 
+            ".label, .stdbtn {" +
+            "  font-family:Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans';" + 
+            "  font-size:11pt;" + 
+            "}" +
+            
+            "body {" + 
+            "    font-size:10pt;" + 
+            "    color:#000000;" + 
+            "    font-family:verdana,arial;" + 
+            "    background-color: white;" + 
+            "    height: 100%;" + 
+            "    margin: 0;" + 
+            "    width: 100%;" + 
+            "}" + 
+
+            "html {" + 
+            "    height: 100%;" + 
+            "    width: 100%;" + 
+            "}" +
+
+            ".sitefooter {" + 
+            "  display:flex;" + 
+            "  align-items:center;" + 
+            "  border-width:1px 0 0 0;" + 
+            "  border-style:solid;" + 
+            "  border-color:#a9a9a9;" + 
+            "  position:absolute;" + 
+            "  z-index:5;" + 
+            "  left:0px;" + 
+            "  bottom:0px;" + 
+            "  right:0px;" + 
+            "  background-color:#ffffe0;" + 
+            "  padding:0.3em 0.7em;" + 
+            "}" +
+
+            "@media (max-width:768px) {" +
+ 
+            "  .stdbtn {" + 
+            "    box-shadow:2pt 2pt 2pt #d0d0d0;" + 
+            "  }" +
+
+            "  body {" + 
+            "    font-size:8pt;" + 
+            "  }" +
+
+            "}" +
+
             "</style>";
 
     static String getHTML(String javascript, String bodyscript, String box) {
@@ -81,9 +156,8 @@ public class KeyProviderInitServlet extends HttpServlet {
                 "><div style=\"cursor:pointer;position:absolute;top:15pt;left:15pt;z-index:5;width:100pt\"" +
                 " onclick=\"document.location.href='http://cyberphone.github.io/doc/saturn'\" title=\"Home of Saturn\">")
          .append (KeyProviderService.saturnLogotype)
-         .append ("</div><table cellapdding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
-                .append(box).append("</table></body></html>");
-        logger.info(s.toString());
+         .append ("</div><div class=\"displayContainer\">")
+                .append(box).append("</div></body></html>");
         return s.toString();
     }
   
@@ -115,9 +189,12 @@ public class KeyProviderInitServlet extends HttpServlet {
         }
         String merchantUrl = new URL(hostUrl.getProtocol(), merchantHost, hostUrl.getPort(), "/webpay-merchant").toExternalForm(); 
         logger.info(merchantUrl);
-        successMessage = new StringBuilder("<b>Enrollment Succeeded!</b><p><a href=\"")
-            .append(merchantUrl)
-            .append("\">Continue to merchant site</a></p>").toString();
+        successMessage = 
+                new StringBuilder(
+                            "<div style=\"text-align:center\"><div class=\"label\" " +
+                            "style=\"margin-bottom:10pt\">Enrollment Succeeded!</div><div><a href=\"")
+                    .append(merchantUrl)
+                    .append("\" class=\"link\">Continue to merchant site</a></div></div>").toString();
     }
     
     String createIntent(HttpSession session) throws IOException {
@@ -141,48 +218,80 @@ public class KeyProviderInitServlet extends HttpServlet {
             output(response, 
                     getHTML(null,
                             null,
-                            "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
-                            "This proof-of-concept system only supports Android</td></tr>"));
+                             "<div class=\"label\">This proof-of-concept system only supports Android</div>"));
             return;
         }
         if (keygen2EnrollmentUrl == null) {
             initGlobals(ServletUtil.getContextURL(request));
         }
+        
+        request.setCharacterEncoding("utf-8");
+        String userName = request.getParameter(USERNAME_SESSION_ATTR);
+        if (userName == null) {
+            userName = "Luke Skywalker &#129412;";
+        }
 
         request.getSession(true);
 
         output(response, 
-               getHTML(null,
+               getHTML("function enroll() {\n" +
+                       "  console.log('Mobile application is supposed to start here');\n" +
+                       "  document.forms.shoot.submit();\n" +
+                       "}",
                        null,
-                       "<tr><td align=\"center\"><form name=\"shoot\" method=\"POST\" action=\"init\"><table>" +
-                       "<tr><td>This proof-of-concept system provisions secure payment<br>" +
-                       "credentials to be used in the Android version of the \"Wallet\"<br>&nbsp;</td></tr>" +
-                       "<tr><td><div>Your name</div><div><input type=\"text\" " +
-                       "name=\"" + USERNAME_SESSION_ATTR + "\" value=\"Luke Skywalker\"></div></td></tr>" +
-                       "<tr><td align=\"center\" onclick=\"document.forms.shoot.submit()\">Start KeyGen2</td></tr></table></form></td></tr>"));
+                       "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
+                       "<div>This proof-of-concept system provisions secure payment credentials<br>" + 
+                       "to be used in the Android version of the Saturn &quot;Wallet&quot;.</div>" + 
+                       "<div style=\"display:flex;justify-content:center;padding-top:15pt\"><table>" + 
+                       "     <tr><td>Your name (real or made up):</td></tr>" + 
+                       "     <tr><td><input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
+                       "\" value=\"" + userName + "\" size=\"30\" maxlength=\"50\" " + 
+                       "style=\"background-color:#def7fc\"></td></tr>" + 
+                       "</table></div>" + 
+                       "<div style=\"text-align:center\">This name will be printed on your virtual payment cards.</div>" + 
+                       "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
+                       "<div class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
+                       "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not already " +
+                       "installed Saturn, this is the time to do it!</div>" +
+                       "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
+                       "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
+                       "title=\"Android\" onclick=\"document.location.href = " +
+                       "'https://play.google.com/store/apps/details?id=org.webpki.mobile.android'\"></div>" + 
+                       "</form>" + 
+                       "</div>" + 
+                       "<div class=\"sitefooter\">Note: in a real configuration you would also need to " +
+                       "authenticate as a part of the enrollment."));
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
+        request.setCharacterEncoding("utf-8");
+        String userName = request.getParameter(USERNAME_SESSION_ATTR);
+        if (userName == null || (userName = userName.trim()).isEmpty()) {
             response.sendRedirect("init");
             return;
         }
-        request.setCharacterEncoding("utf-8");
+        HttpSession session = request.getSession(false);
+        if (session == null) {
+            response.sendRedirect("init?" + USERNAME_SESSION_ATTR + 
+                                  "=" + URLEncoder.encode(userName, "utf-8"));
+            return;
+        }
+        if (userName.length() > NAME_MAX_LENGTH) {
+            userName = userName.substring(0, NAME_MAX_LENGTH);
+        }
         session.setAttribute(KEYGEN2_SESSION_ATTR,
                 new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey), 
                                 keygen2EnrollmentUrl,
                                 KeyProviderService.serverCertificate,
                                 null));
-        session.setAttribute(USERNAME_SESSION_ATTR, request.getParameter(USERNAME_SESSION_ATTR));
+        session.setAttribute(USERNAME_SESSION_ATTR, userName);
         output(response,
-               getHTML(
-               "history.pushState(null, null, 'init');\n" +
-                       "window.addEventListener('popstate', function(event) {\n" +
-                       "    history.pushState(null, null, 'init');\n" +
-                       "});\n",
-                "onload=\"document.location.href = '" + createIntent(session) + "';\"", 
-                "<tr><td align=\"center\">Android Bootstrap</td></tr>"));
+               getHTML(GO_HOME,
+                       "onload=\"document.location.href = '" + createIntent(session) + "';\"", 
+                       "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
+                       "<div style=\"padding-top:15pt\">If this is all you get there is " +
+                       "something wrong with the installation.</div>" +
+                       "</div>"));
     }
 }
