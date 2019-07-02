@@ -310,8 +310,6 @@
   <target name="initwallet">
     <delete file="${@credentials.dir}/${@credentials_store}"/>
     <mkdir dir="${@credentials.dir}"/>
-    <echo file="${@credentials.dir}/accounts.${@payeebankpath}.json">[]</echo>
-    <echo file="${@credentials.dir}/accounts.${@payerbankpath}.json">[]</echo>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"

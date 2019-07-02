@@ -110,26 +110,18 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
            
         }
  
-        AuthorizationRequest.PaymentMethodEncoder paymentMethodEncoder = null;
         TransactionOperation transactionOperation = new TransactionOperation();
-        if (cardPayment) {
-            transactionOperation.urlToCall = ownProviderAuthority.getServiceUrl();
-            transactionOperation.verifier = MerchantService.acquirerRoot;
-            if (debugData != null) {
-                debugData.acquirerAuthority = ownProviderAuthority.getRoot();
+
+        AuthorizationRequest.PaymentBackendMethodEncoder paymentBackendMethodEncoder = null;
+        for (String paymentMethod : providerAuthority.getBackendPaymentMethods()) {
+            if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
+                paymentBackendMethodEncoder = payeeAuthority.getPayeeCoreProperties().getAccountHashes() == null ?
+                        MerchantService.sepaPlainAccount : MerchantService.sepaVerifiableAccount;
+                break;
             }
-            paymentMethodEncoder = MerchantService.superCardPaymentEncoder;
-        } else {
-            for (String paymentMethod : providerAuthority.getPaymentMethods()) {
-                if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
-                    paymentMethodEncoder = payeeAuthority.getPayeeCoreProperties().getAccountHashes() == null ?
-                            MerchantService.sepaPlainAccount : MerchantService.sepaVerifiableAccount;
-                    break;
-                }
-            }
-            if (paymentMethodEncoder == null) {
-                throw new IOException("No matching account type: " + providerAuthority.getPaymentMethods());
-            }
+        }
+        if (paymentBackendMethodEncoder == null) {
+            throw new IOException("No matching account type: " + providerAuthority.getBackendPaymentMethods());
         }
 
         // Attest the user's encrypted authorization to show "intent"
@@ -141,7 +133,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                         request.getRemoteAddr(),
                                         paymentRequest,
-                                        paymentMethodEncoder,
+                                        paymentBackendMethodEncoder,
                                         MerchantService.getReferenceId(),
                                         MerchantService.paymentNetworks.get(paymentRequest
                                                                                 .getSignatureDecoder()
@@ -196,6 +188,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Two-phase operation: perform the final step
         if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
+            transactionOperation.urlToCall = ownProviderAuthority.getServiceUrl();
+            transactionOperation.verifier = MerchantService.acquirerRoot;
+            if (debugData != null) {
+                debugData.acquirerAuthority = ownProviderAuthority.getRoot();
+            }
             resultData.transactionError =
                 processTransaction(transactionOperation,
                                    // Just a copy since we don't have a complete scenario 

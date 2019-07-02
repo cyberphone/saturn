@@ -17,14 +17,10 @@
     <isset property="payeebank"/>
   </condition>
     
-  <condition property="users.db" value="jdbc/PAYER_BANK" else="jdbc/PAYER_BANK">
+  <condition property="users.db" value="" else="jdbc/PAYER_BANK">
     <isset property="payeebank"/>
   </condition>  
   
-  <condition property="reference.id.start" value="120004" else="96744">
-    <isset property="payeebank"/>
-  </condition>
-
   <condition property="common.name" value="Big Bank" else="My Bank">
     <isset property="payeebank"/>
   </condition>
@@ -106,7 +102,6 @@
       <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
       <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
-      <replacefilter token="@bank-reference-id-start@" value="${reference.id.start}"/>
       <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
       <replacefilter token="@acquirer-root@" value="${@acquirerroot}.cer"/>
       <replacefilter token="@bank-base-url@" value="${bankhost}/${bank.path}"/>

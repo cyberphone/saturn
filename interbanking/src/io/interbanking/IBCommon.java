@@ -33,6 +33,7 @@ class IBCommon {
     static final String CURRENCY_JSON                    = "currency";                   // In this format
     static final String MERCHANT_NAME_JSON               = "merchantName";               // Common name of merchant
     static final String MERCHANT_REF_JSON                = "merchantRef";                // Merchant transaction ID etc.
+    static final String MERCHANT_ACCOUNT_ID_JSON         = "merchantAccountId";          // Source or destination account ID
     static final String TIME_STAMP_JSON                  = "timeStamp";                  // Everywhere
     static final String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
 

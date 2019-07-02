@@ -23,7 +23,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.BaseProperties;
 
-public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.PaymentMethodEncoder {
+public final class SEPAPaymentBackendMethodEncoder extends AuthorizationRequest.PaymentBackendMethodEncoder {
 
     static final String CONTEXT = "https://sepa.payments.org/saturn/v3#pms";
 
@@ -33,12 +33,12 @@ public final class SEPAPaymentMethodEncoder extends AuthorizationRequest.Payment
     
     byte[] nonce;
 
-    public SEPAPaymentMethodEncoder(SEPAPaymentMethodDecoder sepaPaymentMethodDecoder) {
+    public SEPAPaymentBackendMethodEncoder(SEPAPaymentBackendMethodDecoder sepaPaymentMethodDecoder) {
         this(sepaPaymentMethodDecoder.payeeIban);
         nonce = sepaPaymentMethodDecoder.nonce;
     }
 
-    public SEPAPaymentMethodEncoder(String payeeIban) {
+    public SEPAPaymentBackendMethodEncoder(String payeeIban) {
         this.payeeIban = payeeIban;
     }
 

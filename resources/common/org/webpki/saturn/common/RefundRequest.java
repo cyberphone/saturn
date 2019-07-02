@@ -38,6 +38,7 @@ public class RefundRequest implements BaseProperties {
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         amount = rd.getMoney(AMOUNT_JSON,
                              authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
+        payeeSourceAccount = rd.getString(PAYEE_SOURCE_ACCOUNT_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
@@ -67,6 +68,11 @@ public class RefundRequest implements BaseProperties {
     BigDecimal amount;
     public BigDecimal getAmount() {
         return amount;
+    }
+
+    String payeeSourceAccount;
+    public String getPayeeSourceAccount() {
+        return payeeSourceAccount;
     }
 
     String referenceId;
@@ -99,6 +105,7 @@ public class RefundRequest implements BaseProperties {
     public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
                                           String recepientUrl,
                                           BigDecimal amount,
+                                          String payeeSourceAccount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.REFUND_REQUEST.createBaseMessage()
@@ -107,6 +114,7 @@ public class RefundRequest implements BaseProperties {
             .setMoney(AMOUNT_JSON,
                       amount,
                       authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
+            .setString(PAYEE_SOURCE_ACCOUNT_JSON, payeeSourceAccount)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 

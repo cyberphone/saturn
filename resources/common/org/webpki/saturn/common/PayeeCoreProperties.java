@@ -85,8 +85,8 @@ public class PayeeCoreProperties implements BaseProperties {
         JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
         Vector<byte[]> optionalAccountHashes = new Vector<byte[]>();
         do {
-            AuthorizationRequest.PaymentMethodDecoder paymentMethodDecoder =
-                    (AuthorizationRequest.PaymentMethodDecoder)knownPaymentMethods.parse(payeeAccounts.getObject());
+            AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodDecoder =
+                    (AuthorizationRequest.PaymentBackendMethodDecoder)knownPaymentMethods.parse(payeeAccounts.getObject());
             byte[] accountHash = paymentMethodDecoder.getAccountHash();
             if (accountHash != null && addVerifier) {
                 optionalAccountHashes.add(accountHash);

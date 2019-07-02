@@ -17,7 +17,9 @@
 package io.interbanking;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 
@@ -31,10 +33,13 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Verifier;
+
 import org.webpki.net.HTTPSWrapper;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.ServerX509Signer;
+
 import org.webpki.util.ISODateTime;
 
 // Note that this class is deliberately not aligned with Saturn because
@@ -52,7 +57,7 @@ public class IBRequest extends IBCommon {
         IBRequest.logger = logger;
     }
 
-    public enum Operations {CREDIT_CARD_TRANSACT}
+    public enum Operations {CREDIT_CARD_TRANSACT, REFUND}
 
     public IBRequest(JSONObjectReader rd) throws IOException {
         check(rd, INTERBANKING_REQUEST);
@@ -63,6 +68,7 @@ public class IBRequest extends IBCommon {
         currency = rd.getString(CURRENCY_JSON);
         merchantName = rd.getString(MERCHANT_NAME_JSON);
         merchantRef = rd.getString(MERCHANT_REF_JSON);
+        merchantAccountId = rd.getString(MERCHANT_ACCOUNT_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
@@ -99,6 +105,11 @@ public class IBRequest extends IBCommon {
         return merchantRef;
     }
 
+    private String merchantAccountId;
+    public String getMerchantAccountId() {
+        return merchantAccountId;
+    }
+
     private String referenceId;
     public String getReferenceId() {
         return referenceId;
@@ -127,6 +138,7 @@ public class IBRequest extends IBCommon {
                                      String currency,
                                      String merchantName,
                                      String merchantRef,
+                                     String merchantAccountId,
                                      boolean testMode,
                                      ServerX509Signer signer) throws IOException {
         JSONObjectWriter request = new JSONObjectWriter()
@@ -139,6 +151,7 @@ public class IBRequest extends IBCommon {
             .setString(CURRENCY_JSON, currency)
             .setString(MERCHANT_NAME_JSON, merchantName)
             .setString(MERCHANT_REF_JSON, merchantRef)
+            .setString(MERCHANT_ACCOUNT_ID_JSON, merchantAccountId)
             .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setSignature(signer);

@@ -17,12 +17,10 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,14 +28,12 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.RefundRequest;
 import org.webpki.saturn.common.RefundResponse;
-
 import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
@@ -49,6 +45,8 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
     private static final long serialVersionUID = 1L;
     
     static Logger logger = Logger.getLogger(RefundServlet.class.getCanonicalName());
+
+    static String DEMO_SOURCE_ACCOUNT = "FR7630002700060000000045660";
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -90,6 +88,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                 RefundRequest.encode(resultData.optionalRefund,
                                      refundUrl,
                                      resultData.amount,
+                                     DEMO_SOURCE_ACCOUNT ,
                                      MerchantService.getReferenceId(),
                                      MerchantService.paymentNetworks.get(authorizationRequest
                                                                              .getSignatureDecoder()

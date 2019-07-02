@@ -60,12 +60,6 @@
     </context-param>
 
     <context-param>
-        <description>Bank Reference ID Start</description>
-        <param-name>bank_reference_id_start</param-name>
-        <param-value>@bank-reference-id-start@</param-value>
-    </context-param>
-
-    <context-param>
         <description>Payment Network Root Certificate</description>
         <param-name>payment_root</param-name>
         <param-value>@payment-root@</param-value>
@@ -138,11 +132,6 @@
     </servlet>
 
     <servlet>
-        <servlet-name>TransactionListingServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.bank.TransactionListingServlet</servlet-class>
-    </servlet>
-
-    <servlet>
         <servlet-name>InterbankingServlet</servlet-name>
         <servlet-class>org.webpki.saturn.bank.InterbankingServlet</servlet-class>
     </servlet>
@@ -165,11 +154,6 @@
     <servlet-mapping>
         <servlet-name>PayeeAuthorityServlet</servlet-name>
         <url-pattern>/payees/*</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>TransactionListingServlet</servlet-name>
-        <url-pattern>/transactions</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

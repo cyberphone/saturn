@@ -123,10 +123,14 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             // Each method has its own servlet in this setup but that is just an option            //
             /////////////////////////////////////////////////////////////////////////////////////////
-            connection = BankService.jdbcDataSource.getConnection();
+            if (BankService.jdbcDataSource != null) {
+                connection = BankService.jdbcDataSource.getConnection();
+            }
             JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest, connection);
-            connection.close();
-            connection = null;
+            if (BankService.jdbcDataSource != null) {
+                connection.close();
+                connection = null;
+            }
 
             if (BankService.logging) {
                 logger.info("Responded to caller"  + urlHolder.getCallerAddress() + "with data:\n" + providerResponse);

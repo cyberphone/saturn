@@ -394,7 +394,7 @@ class DebugPrintout implements BaseProperties {
                     keyWord(PAYMENT_REQUEST_JSON) + "), to the <b>User&nbsp;Bank</b>:</p>");
         
         fancyBox(debugData.authorizationRequest);
-            descriptionStdMargin("Note the use of " + keyWord(PAYMENT_METHOD_SPECIFIC_JSON) + 
+            descriptionStdMargin("Note the use of " + keyWord(BACKEND_METHOD_SPECIFIC_JSON) + 
                     " which holds data needed for the actual payment method.");
         
         description(point.sub() + 
@@ -488,7 +488,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(ACCOUNT_VERIFIER_JSON) + " in the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
                 " matches the account provided in the " +
-                keyWord(PAYMENT_METHOD_SPECIFIC_JSON) +
+                keyWord(BACKEND_METHOD_SPECIFIC_JSON) +
                 " object.</li>" +
                 "<li>Verifying that the " +
                 keyWord(TIME_STAMP_JSON) +
@@ -650,7 +650,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(message) +
                 " and checking that the <b>User</b> actually has funds matching the request," +
                 " the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by the " +
-                keyWord(PAYMENT_METHOD_SPECIFIC_JSON) +
+                keyWord(BACKEND_METHOD_SPECIFIC_JSON) +
                 " object.</p>" +
                 "<p>Note that the actual payment process may be fully <i>asynchronous</i> where the " +
                 "authorization is only used for <i>initiation</i>.</p> ");

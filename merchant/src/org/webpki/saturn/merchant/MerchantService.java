@@ -58,10 +58,8 @@ import org.webpki.saturn.common.ExternalCalls;
 
 import org.webpki.webutil.InitPropertyReader;
 
-import com.supercard.SupercardPaymentMethodEncoder;
-
-import org.payments.sepa.SEPAPaymentMethodEncoder;
-import org.payments.sepa.SEPAPaymentMethodDecoder;
+import org.payments.sepa.SEPAPaymentBackendMethodEncoder;
+import org.payments.sepa.SEPAPaymentBackendMethodDecoder;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
 
@@ -151,11 +149,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static PaymentNetwork primaryMerchant;
     
-    static AuthorizationRequest.PaymentMethodEncoder superCardPaymentEncoder = new SupercardPaymentMethodEncoder();
+    static AuthorizationRequest.PaymentBackendMethodEncoder sepaVerifiableAccount;
 
-    static AuthorizationRequest.PaymentMethodEncoder sepaVerifiableAccount;
-
-    static AuthorizationRequest.PaymentMethodEncoder sepaPlainAccount;
+    static AuthorizationRequest.PaymentBackendMethodEncoder sepaPlainAccount;
 
     static Boolean testMode;
 
@@ -243,11 +239,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             primaryMerchant = addPaymentNetwork(MERCHANT_KEY, MERCHANT_ID, acceptedAccountTypes.toArray(new String[0]));
 
             JSONDecoderCache sepaAccount = new JSONDecoderCache();
-            sepaAccount.addToCache(SEPAPaymentMethodDecoder.class);
-            SEPAPaymentMethodDecoder sepaAccountDecoder = 
-                    (SEPAPaymentMethodDecoder)sepaAccount.parse(readJSONFile(SEPA_ACCOUNT));
-            sepaVerifiableAccount = new SEPAPaymentMethodEncoder(sepaAccountDecoder);
-            sepaPlainAccount = new SEPAPaymentMethodEncoder(sepaAccountDecoder.getPayeeIban());
+            sepaAccount.addToCache(SEPAPaymentBackendMethodDecoder.class);
+            SEPAPaymentBackendMethodDecoder sepaAccountDecoder = 
+                    (SEPAPaymentBackendMethodDecoder)sepaAccount.parse(readJSONFile(SEPA_ACCOUNT));
+            sepaVerifiableAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder);
+            sepaPlainAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder.getPayeeIban());
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 

@@ -70,8 +70,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Verify that we understand the payment method
-        AuthorizationRequest.PaymentMethodDecoder paymentMethodSpecific =
-            authorizationRequest.getPaymentMethodSpecific(BankService.knownPaymentMethods);
+        AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
+            authorizationRequest.getPaymentBackendMethodSpecific(BankService.knownPayeeMethods);
 
         // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
@@ -289,7 +289,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     "Luke Skywalker",
                     ISODateTime.parseDateTime("2022-12-31T00:00:00Z", ISODateTime.COMPLETE))
                                                      :
-            new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606");
+            new org.payments.sepa.SEPAAccountDataEncoder(accountId);
 
         logger.info((testMode ? "TEST ONLY: ": "") +
                     "Authorized Amount=" + amount.toString() + 

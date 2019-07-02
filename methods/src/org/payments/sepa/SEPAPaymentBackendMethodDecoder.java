@@ -21,10 +21,9 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.AuthorizationRequest;
 
-public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.PaymentMethodDecoder {
+public final class SEPAPaymentBackendMethodDecoder extends AuthorizationRequest.PaymentBackendMethodDecoder {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,7 +33,7 @@ public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.Payment
     
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        payeeIban = rd.getString(SEPAPaymentMethodEncoder.PAYEE_IBAN_JSON);
+        payeeIban = rd.getString(SEPAPaymentBackendMethodEncoder.PAYEE_IBAN_JSON);
         nonce = rd.getBinaryConditional(BaseProperties.NONCE_JSON);
     }
 
@@ -49,11 +48,6 @@ public final class SEPAPaymentMethodDecoder extends AuthorizationRequest.Payment
 
     @Override
     public String getContext() {
-        return SEPAPaymentMethodEncoder.CONTEXT;
-    }
-
-    @Override
-    public boolean match(PaymentMethods payerAccountType) throws IOException {
-        return PaymentMethods.BANK_DIRECT == payerAccountType;
+        return SEPAPaymentBackendMethodEncoder.CONTEXT;
     }
 }

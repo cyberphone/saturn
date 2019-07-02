@@ -36,7 +36,7 @@ public class AuthorityObjectManager extends Thread {
     String providerHomePage;
     String serviceUrl;
     JSONObjectReader optionalExtensions;
-    String[] optionalProviderAccountTypes;
+    String[] backendPaymentMethods;
     SignatureProfiles[] signatureProfiles;
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
     HostingProvider optionalHostingProvider; 
@@ -60,7 +60,7 @@ public class AuthorityObjectManager extends Thread {
                                                                  providerHomePage,
                                                                  serviceUrl,
                                                                  optionalExtensions,
-                                                                 optionalProviderAccountTypes,
+                                                                 backendPaymentMethods,
                                                                  signatureProfiles,
                                                                  encryptionParameters,
                                                                  optionalHostingProvider, 
@@ -97,7 +97,7 @@ public class AuthorityObjectManager extends Thread {
                                   String providerHomePage,
                                   String serviceUrl,
                                   JSONObjectReader optionalExtensions,
-                                  String[] optionalProviderAccountTypes,
+                                  String[] backendPaymentMethods,
                                   SignatureProfiles[] signatureProfiles,
                                   ProviderAuthority.EncryptionParameter[] encryptionParameters,
                                   HostingProvider optionalHostingProvider, 
@@ -114,7 +114,7 @@ public class AuthorityObjectManager extends Thread {
         this.providerHomePage = providerHomePage;
         this.serviceUrl = serviceUrl;
         this.optionalExtensions = optionalExtensions;
-        this.optionalProviderAccountTypes = optionalProviderAccountTypes;
+        this.backendPaymentMethods = backendPaymentMethods;
         this.signatureProfiles = signatureProfiles;
         this.encryptionParameters = encryptionParameters;
         this.optionalHostingProvider = optionalHostingProvider; 

@@ -31,7 +31,6 @@ import java.security.interfaces.RSAPublicKey;
 
 import java.util.TreeMap;
 import java.util.SortedMap;
-import java.util.Map;
 import java.util.Vector;
 import java.util.Comparator;
 import java.util.GregorianCalendar;
@@ -89,7 +88,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String BANK_BASE_URL         = "bank_base_url";
     static final String DECRYPTION_KEY1       = "bank_decryptionkey1";
     static final String DECRYPTION_KEY2       = "bank_decryptionkey2";
-    static final String REFERENCE_ID_START    = "bank_reference_id_start";
 
     static final String HOSTING_PROVIDER_KEY  = "hosting_provider_key";
 
@@ -154,7 +152,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static long rejectedTransactions;
     
-    static JSONDecoderCache knownPaymentMethods = new JSONDecoderCache();
+    static JSONDecoderCache knownPayeeMethods = new JSONDecoderCache();
 
     static JSONDecoderCache knownAccountTypes = new JSONDecoderCache();
     
@@ -228,21 +226,24 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            ArrayUtil.getByteArrayFromInputStream (getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
+    
+    static void registerServlet(ServletContextEvent sce,
+                               String path,
+                               Class<? extends HttpServlet> servlet,
+                               String description) {
+        final ServletContext servletContext = sce.getServletContext();
+        final ServletRegistration.Dynamic dynamic = servletContext.addServlet(description, servlet);
+        dynamic.addMapping(path);
+        logger.info("Dynamically registered servlet: " + description);
+    }
 
     static void dynamicServlet(ServletContextEvent sce,
                                String extension,
                                Class<? extends HttpServlet> servlet,
                                String description) throws IOException {
         if (optionalProviderExtensions != null && optionalProviderExtensions.hasProperty(extension)) {
-            final ServletContext servletContext = sce.getServletContext();
-            final ServletRegistration.Dynamic dynamic = servletContext.addServlet(description, servlet);
             String url = optionalProviderExtensions.getString(extension);
-            dynamic.addMapping(url.substring(url.lastIndexOf('/')));
-     
-            final Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
-            for (String key : map.keySet()) {
-                logger.info("Registered Servlet: " + map.get(key).getName());
-            }
+            registerServlet(sce, url.substring(url.lastIndexOf('/')), servlet, description);
         }
     }
 
@@ -265,8 +266,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
-            knownPaymentMethods.addToCache(com.supercard.SupercardPaymentMethodDecoder.class);
-            knownPaymentMethods.addToCache(org.payments.sepa.SEPAPaymentMethodDecoder.class);
+            knownPayeeMethods.addToCache(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class);
 
             knownAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
 
@@ -298,7 +298,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                             .getJSONArrayReader();
                 while (accounts.hasMore()) {
                     PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
-                                                                           knownPaymentMethods,
+                                                                           knownPayeeMethods,
                                                                            accountValidation);
                     merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
                 }
@@ -307,7 +307,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             addDecryptionKey(DECRYPTION_KEY1);
             addDecryptionKey(DECRYPTION_KEY2);
 
-            testReferenceId = getPropertyInt(REFERENCE_ID_START);
+            testReferenceId = 10000;
             
             String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
@@ -355,13 +355,21 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                               getPropertyString(SERVER_PORT_MAP).length () > 0 ?
                                                                getPropertyInt(SERVER_PORT_MAP) : null);
             
-            Context initContext = new InitialContext();
-            Context envContext  = (Context)initContext.lookup("java:/comp/env");
-            jdbcDataSource = (DataSource)envContext.lookup(getPropertyString(USER_ACCOUNT_DB));
-            
-            initDataBaseEnums(jdbcDataSource.getConnection());
-            
-            new Thread(new AccountRestorer()).start();
+            String userDataBase = getPropertyString(USER_ACCOUNT_DB);
+            if (!userDataBase.isEmpty()) {
+                Context initContext = new InitialContext();
+                Context envContext  = (Context)initContext.lookup("java:/comp/env");
+                jdbcDataSource = (DataSource)envContext.lookup(userDataBase);
+                
+                initDataBaseEnums(jdbcDataSource.getConnection());
+                
+                new Thread(new AccountRestorer()).start();
+                
+                registerServlet(sce, 
+                                "/transactions",
+                                TransactionListingServlet.class, 
+                                "List transactions");
+            }
 
             started = new GregorianCalendar();
 
