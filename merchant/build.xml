@@ -88,7 +88,7 @@
         <fileset dir="${@qr.lib.dir}">
            <include name="*.jar"/>
         </fileset>
-        <fileset dir="../../web2native-bridge/proxy/install/libs">
+        <fileset dir="${@common.lib.dir}">
           <include name="proxy-support.jar"/>
         </fileset>
       </classpath>
@@ -130,7 +130,7 @@
          <include name="${@webpki-webutil.jar}"/>
       </lib>
       <lib dir="${zip.qr.lib.dir}"/>
-      <lib dir="../../web2native-bridge/proxy/install/libs">
+      <lib dir="${@common.lib.dir}">
          <include name="proxy-support.jar"/>
       </lib>
       <zipfileset dir="${@key.dir}" prefix="${class_war_path}">

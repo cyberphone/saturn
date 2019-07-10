@@ -82,7 +82,7 @@ public class ProviderAuthority implements BaseProperties {
             .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
-            .setStringArray(BACKEND_PAYMENT_METHODS_JSON, backendPaymentMethods)
+            .setStringArray(BACKEND_METHODS_JSON, backendPaymentMethods)
             .setDynamic((wr) -> {
                 JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PROFILES_JSON);
                 for (SignatureProfiles signatureProfile : signatureProfiles) {
@@ -129,7 +129,7 @@ public class ProviderAuthority implements BaseProperties {
             }
             rd.scanAway(EXTENSIONS_JSON);
         }
-        backendPaymentMethods = rd.getStringArray(BACKEND_PAYMENT_METHODS_JSON);
+        backendPaymentMethods = rd.getStringArray(BACKEND_METHODS_JSON);
 
         // Signature profiles tell other parties what kind of signatures that are accepted
         // Additional signature profiles can be introduced without breaking existing applications
