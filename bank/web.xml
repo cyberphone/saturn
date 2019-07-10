@@ -171,4 +171,24 @@
       </user-data-constraint>
     </security-constraint>
 
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Bank admin manager</web-resource-name>
+      <url-pattern>/transactions</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+       <role-name>manager</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>Bank admin</realm-name>
+  </login-config>
+
+  <security-role>
+    <description>The role that is required to log in as admin</description>
+    <role-name>manager</role-name>
+  </security-role>
+
 </web-app>
