@@ -27,7 +27,6 @@ import java.security.KeyStore;
 import java.security.interfaces.RSAPublicKey;
 
 import java.util.GregorianCalendar;
-import java.util.Map;
 import java.util.TreeMap;
 import java.util.SortedMap;
 import java.util.Comparator;
@@ -164,11 +163,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             final ServletRegistration.Dynamic dynamic = servletContext.addServlet(description, servlet);
             String url = optionalProviderExtensions.getString(extension);
             dynamic.addMapping(url.substring(url.lastIndexOf('/')));
-
-            final Map<String, ? extends ServletRegistration> map = servletContext.getServletRegistrations();
-            for (String key : map.keySet()) {
-                logger.info("Registered Servlet: " + map.get(key).getName());
-            }
+            logger.info("Dynamically registered servlet: " + description);
         }
     }
 

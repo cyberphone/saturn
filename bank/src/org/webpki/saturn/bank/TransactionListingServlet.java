@@ -71,8 +71,7 @@ public class TransactionListingServlet extends HttpServlet {
             "INNER JOIN TRANSACTION_TYPES ON " +
             "LASTTRANS.TransactionType = TRANSACTION_TYPES.Id " +
             "INNER JOIN USERS ON " +
-            "ACCOUNTS.UserId = USERS.Id " +
-            "ORDER BY LASTTRANS.TId";
+            "ACCOUNTS.UserId = USERS.Id";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Connection connection = null; 
