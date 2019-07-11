@@ -123,7 +123,7 @@ CREATE TABLE TRANSACTION_TYPES
 
 CREATE TABLE TRANSACTIONS
   (
-    Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Transaction ID
+    Id          INT           NOT NULL  UNIQUE,                          -- Unique Transaction ID
     AccountId   INT           NOT NULL,                                  -- Unique Account ID
     TransactionType INT       NOT NULL,                                  -- Unique Transaction Type ID
     Amount      DECIMAL(8,2)  NOT NULL,                                  -- The Amount involved
@@ -136,9 +136,30 @@ CREATE TABLE TRANSACTIONS
     PRIMARY KEY (Id),
     FOREIGN KEY (TransactionType) REFERENCES TRANSACTION_TYPES(Id),
     FOREIGN KEY (AccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
-  ) AUTO_INCREMENT=100345078;
+  );
+
+
+/*=============================================*/
+/*            TRANSACTION_COUNTER              */
+/*=============================================*/
+
+CREATE TABLE TRANSACTION_COUNTER
+  (
+    Next        INT           NOT NULL                                   -- Monotonic counter
+  );
+
+INSERT INTO TRANSACTION_COUNTER(Next) VALUES(100345078);
 
 DELIMITER //
+
+CREATE FUNCTION GetNextTransactionIdSP() RETURNS INT
+  BEGIN
+     SET SQL_SAFE_UPDATES = 0;
+     UPDATE TRANSACTION_COUNTER SET Next = LAST_INSERT_ID(Next + 1);
+     SET SQL_SAFE_UPDATES = 1;
+     RETURN LAST_INSERT_ID();
+  END
+//
 
 CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
                                IN p_Name VARCHAR(50))
@@ -385,7 +406,9 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
         ELSE                       -- Success => Withdraw the specified amount
           UPDATE ACCOUNTS SET Balance = v_NewBalance
               WHERE ACCOUNTS.Id = v_AccountId;
-          INSERT INTO TRANSACTIONS(TransactionType, 
+          SET p_TransactionId = GetNextTransactionIdSP();
+          INSERT INTO TRANSACTIONS(Id,
+                                   TransactionType, 
                                    AccountId,
                                    Amount,
                                    Balance,
@@ -393,7 +416,8 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                    Originator, 
                                    ExtReference,
                                    ReservationId) 
-               VALUES(p_TransactionType,
+               VALUES(p_TransactionId,
+                      p_TransactionType,
                       v_AccountId,
                       p_Amount,
                       v_NewBalance,
@@ -401,7 +425,6 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                       p_OptionalOriginator, 
                       p_OptionalExtReference,
                       p_OptionalReservationId);
-          SET p_TransactionId = LAST_INSERT_ID();
         END IF;
       END IF;
     END IF;
@@ -433,19 +456,21 @@ CREATE PROCEDURE InternalWithDrawSP (OUT p_Error INT,
       ELSE                       -- Success => Withdraw the specified amount
         UPDATE ACCOUNTS SET Balance = Balance - p_Amount
             WHERE ACCOUNTS.Id = v_AccountId;
-        INSERT INTO TRANSACTIONS(TransactionType, 
+        SET p_TransactionId = GetNextTransactionIdSP();
+        INSERT INTO TRANSACTIONS(Id,
+                                 TransactionType, 
                                  AccountId,
                                  Amount,
                                  CredentialId, 
                                  Originator, 
                                  ExtReference) 
-             VALUES(p_TransactionType,
+             VALUES(p_TransactionId,
+                    p_TransactionType,
                     p_AccountId,
                     p_Amount,
                     p_CredentialId,
                     p_OptionalOriginator, 
                     p_OptionalExtReference);
-        SET p_TransactionId = LAST_INSERT_ID();
       END IF;
     END IF;
     COMMIT;
