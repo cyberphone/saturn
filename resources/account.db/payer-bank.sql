@@ -152,11 +152,12 @@ INSERT INTO TRANSACTION_COUNTER(Next) VALUES(100345078);
 
 DELIMITER //
 
+-- MySQL 5.7 auto increment is unreliable for this application since it
+-- loses track for power fails if TRANSACTIONS is emptied like in the demo
+
 CREATE FUNCTION GetNextTransactionIdSP() RETURNS INT
   BEGIN
-     SET SQL_SAFE_UPDATES = 0;
-     UPDATE TRANSACTION_COUNTER SET Next = LAST_INSERT_ID(Next + 1);
-     SET SQL_SAFE_UPDATES = 1;
+     UPDATE TRANSACTION_COUNTER SET Next = LAST_INSERT_ID(Next + 1) LIMIT 1;
      RETURN LAST_INSERT_ID();
   END
 //
