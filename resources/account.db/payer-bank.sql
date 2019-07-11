@@ -155,7 +155,7 @@ DELIMITER //
 -- MySQL 5.7 auto increment is unreliable for this application since it
 -- loses track for power fails if TRANSACTIONS is emptied like in the demo
 
-CREATE FUNCTION GetNextTransactionIdSP() RETURNS INT
+CREATE FUNCTION GetNextTransactionIdSP () RETURNS INT
   BEGIN
      UPDATE TRANSACTION_COUNTER SET Next = LAST_INSERT_ID(Next + 1) LIMIT 1;
      RETURN LAST_INSERT_ID();
@@ -195,7 +195,7 @@ CREATE PROCEDURE CreateTransactionTypeSP (IN p_SymbolicName VARCHAR(20),
   END
 //
 
-CREATE FUNCTION GetTransactionTypeSP(p_SymbolicName VARCHAR(20)) RETURNS INT
+CREATE FUNCTION GetTransactionTypeSP (p_SymbolicName VARCHAR(20)) RETURNS INT
 DETERMINISTIC
   BEGIN
     DECLARE v_Id INT;
@@ -206,7 +206,7 @@ DETERMINISTIC
   END
 //
 
-CREATE FUNCTION GetAccountTypeSP(p_SymbolicName VARCHAR(20)) RETURNS INT
+CREATE FUNCTION GetAccountTypeSP (p_SymbolicName VARCHAR(20)) RETURNS INT
 DETERMINISTIC
   BEGIN
     DECLARE v_Id INT;
@@ -217,7 +217,7 @@ DETERMINISTIC
   END
 //
 
-CREATE FUNCTION FRENCH_IBAN(p_AccountId INT(11)) RETURNS VARCHAR(30)
+CREATE FUNCTION FRENCH_IBAN (p_AccountId INT(11)) RETURNS VARCHAR(30)
 DETERMINISTIC
   BEGIN
     -- https://fr.wikipedia.org/wiki/Cl%C3%A9_RIB
@@ -228,9 +228,9 @@ DETERMINISTIC
   END
 //
 
-CREATE FUNCTION CREDIT_CARD(p_IIN VARCHAR(8),
-                            p_AccountId INT(11),
-                            p_AccountDigits INT) RETURNS VARCHAR(30)
+CREATE FUNCTION CREDIT_CARD (p_IIN VARCHAR(8),
+                             p_AccountId INT(11),
+                             p_AccountDigits INT) RETURNS VARCHAR(30)
 DETERMINISTIC
   BEGIN
     -- https://gefvert.org/blog/archives/57
@@ -473,6 +473,56 @@ CREATE PROCEDURE InternalWithDrawSP (OUT p_Error INT,
                     p_OptionalOriginator, 
                     p_OptionalExtReference);
       END IF;
+    END IF;
+    COMMIT;
+  END
+//
+
+CREATE PROCEDURE ExternalRefundSP (OUT p_Error INT,
+                                   OUT p_TransactionId INT,
+                                   IN p_OptionalOriginator VARCHAR(50),
+                                   IN p_OptionalExtReference VARCHAR(50),
+                                   IN p_OptionalReservationId INT,
+                                   IN p_Amount DECIMAL(8,2),
+                                   IN p_CredentialId VARCHAR(30))
+  BEGIN
+    DECLARE v_Balance DECIMAL(8,2);
+    DECLARE v_NewBalance DECIMAL(8,2);
+    DECLARE v_PreviousAmount DECIMAL(8,2);
+    DECLARE v_AccountId INT(11);
+
+    SET p_Error = 0;
+    START TRANSACTION;
+    SELECT ACCOUNTS.Balance, ACCOUNTS.Id INTO v_Balance, v_AccountId FROM ACCOUNTS
+        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
+        WHERE CREDENTIALS.Id = p_CredentialId
+        LIMIT 1
+        FOR UPDATE;
+    IF v_AccountId IS NULL THEN    -- Failed
+      SET p_Error = 1;             -- No such account
+    ELSE
+      SET v_NewBalance = v_Balance + p_Amount;
+      UPDATE ACCOUNTS SET Balance = v_NewBalance
+          WHERE ACCOUNTS.Id = v_AccountId;
+      SET p_TransactionId = GetNextTransactionIdSP();
+      INSERT INTO TRANSACTIONS(Id,
+                               TransactionType, 
+                               AccountId,
+                               Amount,
+                               Balance,
+                               CredentialId, 
+                               Originator, 
+                               ExtReference,
+                               ReservationId) 
+           VALUES(p_TransactionId,
+                  5,
+                  v_AccountId,
+                  p_Amount,
+                  v_NewBalance,
+                  p_CredentialId,
+                  p_OptionalOriginator, 
+                  p_OptionalExtReference,
+                  p_OptionalReservationId);
     END IF;
     COMMIT;
   END
