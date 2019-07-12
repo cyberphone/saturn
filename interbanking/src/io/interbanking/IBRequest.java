@@ -57,18 +57,18 @@ public class IBRequest extends IBCommon {
         IBRequest.logger = logger;
     }
 
-    public enum Operations {CREDIT_CARD_TRANSACT, REFUND}
+    public enum Operations {CREDIT_CARD_TRANSACT, CARD_REFUND, ACCOUNT_REFUND}
 
     public IBRequest(JSONObjectReader rd) throws IOException {
         check(rd, INTERBANKING_REQUEST);
         operation = Operations.valueOf(rd.getString(OPERATION_JSON));
-        accountId = rd.getString(ACCOUNT_ID_JSON);
-        referenceId = rd.getString(REFERENCE_ID_JSON);
+        account = rd.getString(ACCOUNT_JSON);
+        transactionReference = rd.getStringConditional(TRANSACTION_REFERENCE_JSON);
         amount = rd.getBigDecimal(AMOUNT_JSON);
         currency = rd.getString(CURRENCY_JSON);
         merchantName = rd.getString(MERCHANT_NAME_JSON);
         merchantRef = rd.getString(MERCHANT_REF_JSON);
-        merchantAccountId = rd.getString(MERCHANT_ACCOUNT_ID_JSON);
+        merchantAccount = rd.getString(MERCHANT_ACCOUNT_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
@@ -85,9 +85,9 @@ public class IBRequest extends IBCommon {
         return amount;
     }
 
-    private String accountId;
-    public String getAccountId() {
-        return accountId;
+    private String account;
+    public String getAccount() {
+        return account;
     }
 
     private String currency;
@@ -105,14 +105,14 @@ public class IBRequest extends IBCommon {
         return merchantRef;
     }
 
-    private String merchantAccountId;
-    public String getMerchantAccountId() {
-        return merchantAccountId;
+    private String merchantAccount;
+    public String getMerchantAccount() {
+        return merchantAccount;
     }
 
-    private String referenceId;
-    public String getReferenceId() {
-        return referenceId;
+    private String transactionReference;
+    public String getTransactionReference() {
+        return transactionReference;
     }
 
     private Operations operation;
@@ -132,26 +132,27 @@ public class IBRequest extends IBCommon {
 
     public static IBResponse perform(String url,
                                      Operations operation,
-                                     String accountId,
-                                     String referenceId,
+                                     String account,
+                                     String transactionReference,
                                      BigDecimal amount,
                                      String currency,
                                      String merchantName,
                                      String merchantRef,
-                                     String merchantAccountId,
+                                     String merchantAccount,
                                      boolean testMode,
                                      ServerX509Signer signer) throws IOException {
         JSONObjectWriter request = new JSONObjectWriter()
             .setString(JSONDecoderCache.CONTEXT_JSON, INTERBANKING_CONTEXT_URI)
             .setString(JSONDecoderCache.QUALIFIER_JSON, INTERBANKING_REQUEST)
             .setString(OPERATION_JSON, operation.toString())
-            .setString(ACCOUNT_ID_JSON, accountId)
-            .setString(REFERENCE_ID_JSON, referenceId)
+            .setString(ACCOUNT_JSON, account)
+            .setDynamic((wr) -> transactionReference == null ?
+                    wr : wr.setString(TRANSACTION_REFERENCE_JSON, transactionReference))
             .setBigDecimal(AMOUNT_JSON, amount)
             .setString(CURRENCY_JSON, currency)
             .setString(MERCHANT_NAME_JSON, merchantName)
             .setString(MERCHANT_REF_JSON, merchantRef)
-            .setString(MERCHANT_ACCOUNT_ID_JSON, merchantAccountId)
+            .setString(MERCHANT_ACCOUNT_JSON, merchantAccount)
             .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setSignature(signer);

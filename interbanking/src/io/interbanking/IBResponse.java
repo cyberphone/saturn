@@ -33,7 +33,7 @@ public class IBResponse extends IBCommon {
     
     public IBResponse(JSONObjectReader rd) throws IOException {
         check(rd, INTERBANKING_RESPONSE);
-        referenceId = rd.getString(REFERENCE_ID_JSON);
+        referenceId = rd.getString(TRANSACTION_REFERENCE_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         rd.checkForUnread();
@@ -59,7 +59,7 @@ public class IBResponse extends IBCommon {
         return new JSONObjectWriter()
             .setString(JSONDecoderCache.CONTEXT_JSON, INTERBANKING_CONTEXT_URI)
             .setString(JSONDecoderCache.QUALIFIER_JSON, INTERBANKING_RESPONSE)
-            .setString(REFERENCE_ID_JSON, referenceId)
+            .setString(TRANSACTION_REFERENCE_JSON, referenceId)
             .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS);
     }

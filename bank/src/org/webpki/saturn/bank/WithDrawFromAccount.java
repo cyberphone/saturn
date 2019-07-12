@@ -23,7 +23,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// Withdraw an amount from the database                                                       //
+// Withdraw an amount from the account using a stored procedure                               //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 public class WithDrawFromAccount {
@@ -44,7 +44,7 @@ public class WithDrawFromAccount {
                                TransactionTypes transactionType,
                                String payeeCommonName,
                                String payeeReference,
-                               Integer optionalRoundtripId,
+                               Integer optionalReservationId,
                                boolean throwOnOutOfFounds,
                                Connection connection) throws SQLException {
 /*
@@ -53,7 +53,7 @@ public class WithDrawFromAccount {
                                              IN p_OptionalOriginator VARCHAR(50),
                                              IN p_OptionalExtReference VARCHAR(50),
                                              IN p_TransactionType INT,
-                                             IN p_OptionalRoundtripId INT,
+                                             IN p_OptionalReservationId INT,
                                              IN p_Amount DECIMAL(8,2),
                                              IN p_CredentialId VARCHAR(30))
 */
@@ -64,10 +64,10 @@ public class WithDrawFromAccount {
             stmt.setString(3, payeeCommonName);
             stmt.setString(4, payeeReference);
             stmt.setInt(5, transactionType.getIntValue());
-            if (optionalRoundtripId == null) {
+            if (optionalReservationId == null) {
                 stmt.setNull(6, java.sql.Types.INTEGER);
             } else {
-                stmt.setInt(6, optionalRoundtripId);
+                stmt.setInt(6, optionalReservationId);
             }
             stmt.setBigDecimal(7, amount);
             stmt.setString(8, accountId);

@@ -482,7 +482,6 @@ CREATE PROCEDURE ExternalRefundSP (OUT p_Error INT,
                                    OUT p_TransactionId INT,
                                    IN p_OptionalOriginator VARCHAR(50),
                                    IN p_OptionalExtReference VARCHAR(50),
-                                   IN p_OptionalReservationId INT,
                                    IN p_Amount DECIMAL(8,2),
                                    IN p_CredentialId VARCHAR(30))
   BEGIN
@@ -512,8 +511,7 @@ CREATE PROCEDURE ExternalRefundSP (OUT p_Error INT,
                                Balance,
                                CredentialId, 
                                Originator, 
-                               ExtReference,
-                               ReservationId) 
+                               ExtReference) 
            VALUES(p_TransactionId,
                   5,
                   v_AccountId,
@@ -521,8 +519,7 @@ CREATE PROCEDURE ExternalRefundSP (OUT p_Error INT,
                   v_NewBalance,
                   p_CredentialId,
                   p_OptionalOriginator, 
-                  p_OptionalExtReference,
-                  p_OptionalReservationId);
+                  p_OptionalExtReference);
     END IF;
     COMMIT;
   END

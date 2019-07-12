@@ -51,14 +51,29 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                 // The following call will throw exceptions on errors
                 WithDrawFromAccount wdfa = 
                         new WithDrawFromAccount(ibRequest.getAmount(),
-                                                ibRequest.getAccountId(),
+                                                ibRequest.getAccount(),
                                                 TransactionTypes.TRANSACT,
                                                 ibRequest.getMerchantName(),
                                                 ibRequest.getMerchantRef(),
-                                                decodeReferenceId(ibRequest.getReferenceId()),
+                                                decodeReferenceId(ibRequest.getTransactionReference()),
                                                 true,
                                                 connection);
                 ibResponse = IBResponse.encode(formatReferenceId(wdfa.transactionId), 
+                                               ibRequest.getTestMode());
+                break;
+
+            case CARD_REFUND:
+            case ACCOUNT_REFUND:
+                ibRequest.verifyCallerAuthenticity(
+                        ibRequest.getOperation() == IBRequest.Operations.CARD_REFUND ?
+                                BankService.acquirerRoot : BankService.paymentRoot);
+                // The following call will throw exceptions on errors
+                RefundAccount rfa = new RefundAccount(ibRequest.getAmount(),
+                                                      ibRequest.getAccount(),
+                                                      ibRequest.getMerchantName(),
+                                                      ibRequest.getMerchantRef(),
+                                                      connection);
+                ibResponse = IBResponse.encode(formatReferenceId(rfa.transactionId), 
                                                ibRequest.getTestMode());
                 break;
 
