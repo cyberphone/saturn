@@ -67,7 +67,7 @@ public class IBRequest extends IBCommon {
         amount = rd.getBigDecimal(AMOUNT_JSON);
         currency = rd.getString(CURRENCY_JSON);
         merchantName = rd.getString(MERCHANT_NAME_JSON);
-        merchantRef = rd.getString(MERCHANT_REF_JSON);
+        merchantRef = rd.getString(MERCHANT_REFERENCE_JSON);
         merchantAccount = rd.getString(MERCHANT_ACCOUNT_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
@@ -151,7 +151,7 @@ public class IBRequest extends IBCommon {
             .setBigDecimal(AMOUNT_JSON, amount)
             .setString(CURRENCY_JSON, currency)
             .setString(MERCHANT_NAME_JSON, merchantName)
-            .setString(MERCHANT_REF_JSON, merchantRef)
+            .setString(MERCHANT_REFERENCE_JSON, merchantRef)
             .setString(MERCHANT_ACCOUNT_JSON, merchantAccount)
             .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)

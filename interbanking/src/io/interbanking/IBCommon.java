@@ -38,7 +38,7 @@ class IBCommon {
 
     static final String MERCHANT_NAME_JSON               = "merchantName";               // Common name of merchant
 
-    static final String MERCHANT_REF_JSON                = "merchantRef";                // Merchant internal order ID etc.
+    static final String MERCHANT_REFERENCE_JSON          = "merchantReference";          // Merchant internal order ID etc.
 
     static final String MERCHANT_ACCOUNT_JSON            = "merchantAccount";            // Source or destination account ID
 
