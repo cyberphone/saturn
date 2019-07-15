@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.bank;
 
+import io.interbanking.IBRequest;
+
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -107,6 +109,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
+    static final String PAYER_INTERBANK_URL   = "payer_interbank_url";
+
     static final String LOGGING               = "logging";
     
     static final int PROVIDER_EXPIRATION_TIME = 3600;
@@ -139,6 +143,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static String providerAuthorityUrl;
     
     static String payeeAuthorityBaseUrl;
+
+    static String payerInterbankUrl;  // Static since we do not have a card or SEPA database and associated URL's
 
     static String serviceUrl;
 
@@ -370,6 +376,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                 TransactionListingServlet.class, 
                                 "List transactions");
             }
+
+            payerInterbankUrl = getPropertyString(PAYER_INTERBANK_URL);
+            IBRequest.setLogging(true, logger);
 
             started = new GregorianCalendar();
 

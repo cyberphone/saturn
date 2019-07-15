@@ -60,7 +60,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder,
                                  JSONObjectReader providerRequest,
                                  Connection connection) throws Exception {
-
+ 
         // Decode authorization request message
         AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);
 
@@ -231,15 +231,15 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
               authorizationData);
         }
 
-        boolean testMode = authorizationRequest.getTestMode();
         TransactionTypes transactionType = 
                 !cardPayment && nonDirectPayment == null ? 
                            TransactionTypes.DIRECT_DEBIT : TransactionTypes.RESERVE;
+        int transactionId;
+        boolean testMode = authorizationRequest.getTestMode();
         String optionalLogData = null;
-        String transactionId;
         if (testMode) {
             // In test mode we only authenticate using the "real" solution, the rest is "fake".
-            transactionId = formatReferenceId(BankService.testReferenceId++);
+            transactionId = BankService.testReferenceId++;
         } else {
             // Here we actually update things...
             WithDrawFromAccount wdfa = new WithDrawFromAccount(amount,
@@ -251,7 +251,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                false,
                                                                connection);
             if (wdfa.getResult() == 0) {
-                transactionId = formatReferenceId(wdfa.getTransactionId());
+                transactionId = wdfa.getTransactionId();
             } else {
                 return createProviderUserResponse("Your request for " + 
                                                   amountInHtml(paymentRequest, amount) +
@@ -305,7 +305,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return AuthorizationResponse.encode(authorizationRequest,
                                             providerAuthority.getEncryptionParameters()[0],
                                             accountData,
-                                            transactionId,
+                                            formatReferenceId(transactionId),
                                             optionalLogData,
                                             BankService.bankKey);
     }

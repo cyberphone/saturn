@@ -79,6 +79,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayee().getCommonName(),
                                   paymentRequest.getReferenceId(),
+//TODO
                                   "fixme",
                                   testMode,
                                   AcquirerService.acquirerKey);

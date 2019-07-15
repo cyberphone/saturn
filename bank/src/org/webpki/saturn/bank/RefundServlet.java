@@ -16,6 +16,9 @@
  */
 package org.webpki.saturn.bank;
 
+import io.interbanking.IBRequest;
+import io.interbanking.IBResponse;
+
 import java.io.IOException;
 
 import java.sql.Connection;
@@ -26,9 +29,14 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayeeCoreProperties;
+import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.RefundRequest;
 import org.webpki.saturn.common.RefundResponse;
+
+import com.supercard.SupercardAccountDataDecoder;
+
+import org.payments.sepa.SEPAAccountDataDecoder;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // This is the Saturn "refund" decoder servlet                                           //
@@ -58,22 +66,39 @@ public class RefundServlet extends ProcessingBaseServlet {
         AuthorizationResponse.AccountDataDecoder accountData = 
             refundRequest.getAuthorizationResponse().getProtectedAccountData(BankService.knownAccountTypes,
                                                                              BankService.decryptionKeys);
-
+        String account = accountData instanceof SupercardAccountDataDecoder ?
+                ((SupercardAccountDataDecoder)accountData).getCardNumber()  :
+                ((SEPAAccountDataDecoder)accountData).geyPayerIban();
+        PaymentRequest paymentRequest = refundRequest.getPaymentRequest();
         boolean testMode = refundRequest.getTestMode();
-        logger.info((testMode ? "TEST ONLY: ":"") +
-                    "Refunding for Account=" + accountData.logLine() +
-                    ", Amount=" + refundRequest.getAmount().toString() +
-                    " " + refundRequest.getPaymentRequest().getCurrency().toString());
         String optionalLogData = null;
         if (!testMode) {
 
-            // Here we are supposed to do the actual payment
-            optionalLogData = "Bank payment network log data...";
+            // Here we are supposed to do the actual payment with respect to databases
         }
+        IBResponse ibResponse = 
+                IBRequest.perform(BankService.payerInterbankUrl,
+                                  IBRequest.Operations.ACCOUNT_REFUND,
+                                  account,
+                                  null,
+                                  refundRequest.getAmount(),
+                                  paymentRequest.getCurrency().toString(),
+                                  paymentRequest.getPayee().getCommonName(),
+                                  paymentRequest.getReferenceId(),
+//TODO
+                                  "fixme",
+                                  testMode,
+                                  BankService.bankKey);
+        String transactionId = ibResponse.getReferenceId();
+        logger.info((testMode ? "TEST ONLY: ":"") +
+                    "Refunding for Account=" + accountData.logLine() +
+                    ", Amount=" + refundRequest.getAmount().toString() +
+                    " " + paymentRequest.getCurrency().toString());
+
 
         // It appears that we succeeded
         return RefundResponse.encode(refundRequest,
-                                     formatReferenceId(BankService.testReferenceId++),
+                                     transactionId,
                                      optionalLogData,
                                      BankService.bankKey);
     }

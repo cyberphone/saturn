@@ -105,6 +105,7 @@
       <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
       <replacefilter token="@acquirer-root@" value="${@acquirerroot}.cer"/>
       <replacefilter token="@bank-base-url@" value="${bankhost}/${bank.path}"/>
+      <replacefilter token="@payer-interbank-url@" value="${@payerbankhost}/${@payerbankpath}/interbanking"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
       <replacefilter token="@merchant-account-validation@" value="${payee.account.validation}"/>
