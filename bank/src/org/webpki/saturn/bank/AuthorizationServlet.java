@@ -245,6 +245,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             WithDrawFromAccount wdfa = new WithDrawFromAccount(amount,
                                                                accountId,
                                                                transactionType,
+                                                               "fixme",
                                                                paymentRequest.getPayee().getCommonName(),
                                                                paymentRequest.getReferenceId(),
                                                                null,

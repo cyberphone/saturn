@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
+
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletResponse;
@@ -57,7 +58,26 @@ public class IBRequest extends IBCommon {
         IBRequest.logger = logger;
     }
 
-    public enum Operations {CREDIT_CARD_TRANSACT, CARD_REFUND, ACCOUNT_REFUND}
+    static final String OPERATION_JSON                   = "operation";                  // What is actually requested
+
+    static final String ACCOUNT_JSON                     = "account";                    // Reference to a payer account/credential ID
+
+    static final String TRANSACTION_REFERENCE_JSON       = "transactionReference";       // Reference to a payer bank transaction ID
+                                                                                         // Only applies to two phase payments
+
+    static final String AMOUNT_JSON                      = "amount";                     // Money
+    static final String CURRENCY_JSON                    = "currency";                   // In this format
+
+    static final String PAYEE_NAME_JSON                  = "payeeName";                  // Common name of payee/merchant
+
+    static final String PAYEE_REFERENCE_JSON             = "payeeReference";             // Payee/merchant internal order ID etc.
+
+    static final String PAYEE_ACCOUNT_JSON               = "payeeAccount";               // Source or destination account ID
+
+
+    static final String INTERBANKING_REQUEST             = "InterbankingRequest";
+
+    public enum Operations {CREDIT_CARD_TRANSACT, CREDIT_CARD_REFUND, REVERSE_CREDIT_TRANSFER}
 
     public IBRequest(JSONObjectReader rd) throws IOException {
         check(rd, INTERBANKING_REQUEST);
@@ -66,9 +86,9 @@ public class IBRequest extends IBCommon {
         transactionReference = rd.getStringConditional(TRANSACTION_REFERENCE_JSON);
         amount = rd.getBigDecimal(AMOUNT_JSON);
         currency = rd.getString(CURRENCY_JSON);
-        merchantName = rd.getString(MERCHANT_NAME_JSON);
-        merchantReference = rd.getString(MERCHANT_REFERENCE_JSON);
-        merchantAccount = rd.getString(MERCHANT_ACCOUNT_JSON);
+        payeeName = rd.getString(PAYEE_NAME_JSON);
+        payeeReference = rd.getString(PAYEE_REFERENCE_JSON);
+        payeeAccount = rd.getString(PAYEE_ACCOUNT_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
@@ -95,19 +115,19 @@ public class IBRequest extends IBCommon {
         return currency;
     }
 
-    private String merchantName;
-    public String getMerchantName() {
-        return merchantName;
+    private String payeeName;
+    public String getPayeeName() {
+        return payeeName;
     }
 
-    private String merchantReference;
-    public String getMerchantRef() {
-        return merchantReference;
+    private String payeeReference;
+    public String getPayeeReference() {
+        return payeeReference;
     }
 
-    private String merchantAccount;
-    public String getMerchantAccount() {
-        return merchantAccount;
+    private String payeeAccount;
+    public String getPayeeAccount() {
+        return payeeAccount;
     }
 
     private String transactionReference;
@@ -136,9 +156,9 @@ public class IBRequest extends IBCommon {
                                      String transactionReference,
                                      BigDecimal amount,
                                      String currency,
-                                     String merchantName,
-                                     String merchantReference,
-                                     String merchantAccount,
+                                     String payeeName,
+                                     String payeeReference,
+                                     String payeeAccount,
                                      boolean testMode,
                                      ServerX509Signer signer) throws IOException {
         JSONObjectWriter request = new JSONObjectWriter()
@@ -150,9 +170,9 @@ public class IBRequest extends IBCommon {
                     wr : wr.setString(TRANSACTION_REFERENCE_JSON, transactionReference))
             .setBigDecimal(AMOUNT_JSON, amount)
             .setString(CURRENCY_JSON, currency)
-            .setString(MERCHANT_NAME_JSON, merchantName)
-            .setString(MERCHANT_REFERENCE_JSON, merchantReference)
-            .setString(MERCHANT_ACCOUNT_JSON, merchantAccount)
+            .setString(PAYEE_NAME_JSON, payeeName)
+            .setString(PAYEE_REFERENCE_JSON, payeeReference)
+            .setString(PAYEE_ACCOUNT_JSON, payeeAccount)
             .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setSignature(signer);

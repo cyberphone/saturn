@@ -46,12 +46,13 @@ public class TransactionListingServlet extends HttpServlet {
     static final String SQL = "SELECT " +
             "LASTTRANS.Created AS `Created`, " +
             "LASTTRANS.Amount AS `Amount`, " +
-            "ACCOUNTS.Id AS `Account Id`, " +
             "LASTTRANS.Balance AS `Balance`, " +
+            "ACCOUNTS.Id AS `Account Id`, " +
             "USERS.Name As `Account Holder`, " +
-            "COALESCE(LASTTRANS.Originator,'') AS Originator, " +
-            "COALESCE(LASTTRANS.ExtReference,'') AS `Ext Ref`, " +
-            "LASTTRANS.CredentialId AS `Ext Account Id`, " +
+            "LASTTRANS.CredentialId AS `Credential Id`, " +
+            "LASTTRANS.PayeeAccount AS `Payee Account`, " +
+            "COALESCE(LASTTRANS.PayeeName,'') AS `Payee Name`, " +
+            "COALESCE(LASTTRANS.PayeeReference,'') AS `Payee Ref`, " +
             "LASTTRANS.TId AS `Trans Id`, " +
             "COALESCE(LASTTRANS.ReservationId,'') AS `Res Id`, " +
             "TRANSACTION_TYPES.SymbolicName AS `Type` " +
@@ -59,9 +60,10 @@ public class TransactionListingServlet extends HttpServlet {
                     "Created, " + 
                     "Amount, " +
                     "TransactionType, " +
-                    "Originator, " +
                     "Balance, " +
-                    "ExtReference, " +
+                    "PayeeAccount, " +
+                    "PayeeName, " +
+                    "PayeeReference, " +
                     "AccountId, " +
                     "ReservationId, " +
                     "CredentialId FROM TRANSACTIONS " +
@@ -71,7 +73,8 @@ public class TransactionListingServlet extends HttpServlet {
             "INNER JOIN TRANSACTION_TYPES ON " +
             "LASTTRANS.TransactionType = TRANSACTION_TYPES.Id " +
             "INNER JOIN USERS ON " +
-            "ACCOUNTS.UserId = USERS.Id";
+            "ACCOUNTS.UserId = USERS.Id " +
+            "ORDER BY LASTTRANS.TId DESC";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         Connection connection = null; 
@@ -101,7 +104,7 @@ public class TransactionListingServlet extends HttpServlet {
                 while (rs.next()) {
                     html.append("<tr>");
                     for (int q = 1; q <= numberOfColumns; q++) {
-                         html.append(q == 2 || q == 4 ? "<td style=\"text-align:right\">" : "<td>")
+                         html.append(q == 2 || q == 3 ? "<td style=\"text-align:right\">" : "<td>")
                              .append(rs.getString(q))
                              .append("</td>");
                     }

@@ -83,6 +83,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     new WithDrawFromAccount(transactionRequest.getAmount(),
                                             authorizationData.getAccountId(),
                                             TransactionTypes.TRANSACT,
+                                            "fixme",
                                             paymentRequest.getPayee().getCommonName(),
                                             paymentRequest.getReferenceId(),
                                             decodeReferenceId(transactionRequest

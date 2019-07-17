@@ -26,31 +26,12 @@ import org.webpki.json.JSONObjectReader;
 
 class IBCommon {
 
-    static final String OPERATION_JSON                   = "operation";                  // What is actually requested
-
-    static final String ACCOUNT_JSON                     = "account";                    // Reference to a payer account/credential ID
-
-    static final String TRANSACTION_REFERENCE_JSON       = "transactionReference";       // Reference to a payer bank transaction ID
-                                                                                         // Only applies to two phase payments
-
-    static final String AMOUNT_JSON                      = "amount";                     // Money
-    static final String CURRENCY_JSON                    = "currency";                   // In this format
-
-    static final String MERCHANT_NAME_JSON               = "merchantName";               // Common name of merchant
-
-    static final String MERCHANT_REFERENCE_JSON          = "merchantReference";          // Merchant internal order ID etc.
-
-    static final String MERCHANT_ACCOUNT_JSON            = "merchantAccount";            // Source or destination account ID
-
     static final String TIME_STAMP_JSON                  = "timeStamp";                  // Everywhere
 
     static final String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
 
     static final String INTERBANKING_CONTEXT_URI         = "https://webpki.github.io/interbanking.io";
     
-    static final String INTERBANKING_REQUEST             = "InterbankingRequest";
-    static final String INTERBANKING_RESPONSE            = "InterbankingResponse";
-
     void check(JSONObjectReader rd, String expectedQualifier) throws IOException {
         String context = rd.getString(JSONDecoderCache.CONTEXT_JSON);
         if (!context.equals(INTERBANKING_CONTEXT_URI)) {

@@ -84,7 +84,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                                   testMode,
                                   AcquirerService.acquirerKey);
         if (!testMode) {
-            optionalLogData = "Payer interbanking ref: " + ibResponse.getReferenceId();
+            optionalLogData = "Payer interbanking ref: " + ibResponse.getOurReference();
         }
 
         // It appears that we succeeded

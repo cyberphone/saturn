@@ -25,7 +25,7 @@ public enum TransactionTypes implements EnumDataBase {
     DIRECT_DEBIT(), 
     RESERVE(),
     TRANSACT(),
-    REFUND();
+    CREDIT_ACCOUNT();
 
     TransactionTypes () {
     }

@@ -53,8 +53,9 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                         new WithDrawFromAccount(ibRequest.getAmount(),
                                                 ibRequest.getAccount(),
                                                 TransactionTypes.TRANSACT,
-                                                ibRequest.getMerchantName(),
-                                                ibRequest.getMerchantRef(),
+                                                ibRequest.getPayeeAccount(),
+                                                ibRequest.getPayeeName(),
+                                                ibRequest.getPayeeReference(),
                                                 decodeReferenceId(ibRequest.getTransactionReference()),
                                                 true,
                                                 connection);
@@ -62,16 +63,17 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                                                ibRequest.getTestMode());
                 break;
 
-            case CARD_REFUND:
-            case ACCOUNT_REFUND:
+            case CREDIT_CARD_REFUND:
+            case REVERSE_CREDIT_TRANSFER:
                 ibRequest.verifyCallerAuthenticity(
-                        ibRequest.getOperation() == IBRequest.Operations.CARD_REFUND ?
+                        ibRequest.getOperation() == IBRequest.Operations.CREDIT_CARD_REFUND ?
                                 BankService.acquirerRoot : BankService.paymentRoot);
                 // The following call will throw exceptions on errors
                 RefundAccount rfa = new RefundAccount(ibRequest.getAmount(),
                                                       ibRequest.getAccount(),
-                                                      ibRequest.getMerchantName(),
-                                                      ibRequest.getMerchantRef(),
+                                                      ibRequest.getPayeeAccount(),
+                                                      ibRequest.getPayeeName(),
+                                                      ibRequest.getPayeeReference(),
                                                       connection);
                 ibResponse = IBResponse.encode(formatReferenceId(rfa.transactionId), 
                                                ibRequest.getTestMode());

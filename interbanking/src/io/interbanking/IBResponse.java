@@ -31,9 +31,13 @@ import org.webpki.util.ISODateTime;
 
 public class IBResponse extends IBCommon {
     
+    static final String OUR_REFERENCE_JSON               = "ourReference";       // Responder's reference ID
+
+    static final String INTERBANKING_RESPONSE            = "InterbankingResponse";
+
     public IBResponse(JSONObjectReader rd) throws IOException {
         check(rd, INTERBANKING_RESPONSE);
-        referenceId = rd.getString(TRANSACTION_REFERENCE_JSON);
+        ourReference = rd.getString(OUR_REFERENCE_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         rd.checkForUnread();
@@ -44,9 +48,9 @@ public class IBResponse extends IBCommon {
         return timeStamp;
     }
 
-    private String referenceId;
-    public String getReferenceId() {
-        return referenceId;
+    private String ourReference;
+    public String getOurReference() {
+        return ourReference;
     }
 
     private boolean testMode;
@@ -54,12 +58,12 @@ public class IBResponse extends IBCommon {
         return testMode;
     }
 
-    public static JSONObjectWriter encode(String referenceId,
+    public static JSONObjectWriter encode(String ourReference,
                                           boolean testMode) throws IOException {
         return new JSONObjectWriter()
             .setString(JSONDecoderCache.CONTEXT_JSON, INTERBANKING_CONTEXT_URI)
             .setString(JSONDecoderCache.QUALIFIER_JSON, INTERBANKING_RESPONSE)
-            .setString(TRANSACTION_REFERENCE_JSON, referenceId)
+            .setString(OUR_REFERENCE_JSON, ourReference)
             .setDynamic((wr) -> testMode ? wr.setBoolean(TEST_MODE_JSON, true) : wr)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS);
     }

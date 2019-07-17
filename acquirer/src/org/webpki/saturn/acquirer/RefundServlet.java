@@ -16,6 +16,9 @@
  */
 package org.webpki.saturn.acquirer;
 
+import io.interbanking.IBRequest;
+import io.interbanking.IBResponse;
+
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
@@ -23,6 +26,7 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayeeCoreProperties;
+import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.RefundRequest;
 import org.webpki.saturn.common.RefundResponse;
@@ -52,19 +56,31 @@ public class RefundServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(payee, refundRequest.getSignatureDecoder());
 
         SupercardAccountDataDecoder accountData = getAccountData(refundRequest.getAuthorizationResponse());
+        PaymentRequest paymentRequest = refundRequest.getPaymentRequest();
 
         boolean testMode = refundRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Refunding for Account=" + accountData.logLine() +
                     ", Amount=" + refundRequest.getAmount().toString() +
-                    " " + refundRequest.getPaymentRequest().getCurrency().toString());
+                    " " + paymentRequest.getCurrency().toString());
         String optionalLogData = null;
         if (!testMode) {
 
-            // Here we are supposed to do the actual payment
-            optionalLogData = "Card payment network log data...";
+            // Here we are supposed to do the actual payment with respect to databases
         }
-
+        IBResponse ibResponse = 
+                IBRequest.perform(AcquirerService.payerInterbankUrl,
+                                  IBRequest.Operations.CREDIT_CARD_REFUND,
+                                  accountData.getCardNumber(),
+                                  null,
+                                  refundRequest.getAmount(),
+                                  paymentRequest.getCurrency().toString(),
+                                  paymentRequest.getPayee().getCommonName(),
+                                  paymentRequest.getReferenceId(),
+//TODO
+                                  "fixme",
+                                  testMode,
+                                  AcquirerService.acquirerKey);
         // It appears that we succeeded
         return RefundResponse.encode(refundRequest,
                                      getReferenceId(),

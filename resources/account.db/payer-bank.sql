@@ -32,10 +32,15 @@ USE PAYER_BANK;
 CREATE TABLE USERS
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique User ID
+
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
+
     AccessCount INT           NOT NULL  DEFAULT 0,                       -- Administrator data
+
     LastAccess  TIMESTAMP     NULL,                                      -- Administrator data
+
     Name        VARCHAR(50)   NOT NULL,                                  -- Human name
+
     PRIMARY KEY (Id)
   );
 
@@ -47,9 +52,13 @@ CREATE TABLE USERS
 CREATE TABLE ACCOUNT_TYPES
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Type ID
+
     SymbolicName VARCHAR(20)  NOT NULL,                                  -- As as symbolic name
+
     Description VARCHAR(50)   NOT NULL  UNIQUE,                          -- Description
+
     CappedAt    DECIMAL(8,2)  NOT NULL,                                  -- Capped at
+
     PRIMARY KEY (Id)
   );
 
@@ -61,11 +70,17 @@ CREATE TABLE ACCOUNT_TYPES
 CREATE TABLE ACCOUNTS
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Account ID
+
     UserId      INT           NOT NULL,                                  -- Unique User ID (account holder)
+
     AccountType INT           NOT NULL,                                  -- Unique Type ID
+
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
+
     Balance     DECIMAL(8,2)  NOT NULL,                                  -- Disponible
+
     Currency    CHAR(3)       NOT NULL  DEFAULT "EUR",                   -- SEK, USD, EUR etc.
+
     PRIMARY KEY (Id),
     FOREIGN KEY (AccountType) REFERENCES ACCOUNT_TYPES(Id),
     FOREIGN KEY (UserId) REFERENCES USERS(Id) ON DELETE CASCADE
@@ -79,9 +94,13 @@ CREATE TABLE ACCOUNTS
 CREATE TABLE CREDENTIAL_TYPES
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Credential Type
+
     MethodUri   VARCHAR(50)   NOT NULL  UNIQUE,                          -- Payment method
+
     Format      VARCHAR(80)   NOT NULL,                                  -- Account syntax
+
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
+
     PRIMARY KEY (Id)
   );
 
@@ -93,11 +112,17 @@ CREATE TABLE CREDENTIAL_TYPES
 CREATE TABLE CREDENTIALS
   (
     Id          VARCHAR(30)   NOT NULL  UNIQUE,                          -- Unique Credential ID 
+
     AccountId   INT           NOT NULL,                                  -- Account ID Reference
+
     CredentialType  INT       NOT NULL,                                  -- Credential Type Reference
+
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
+
     S256PayReq  BINARY(32)    NOT NULL,                                  -- Payment request key hash 
+
     S256BalReq  BINARY(32)    NULL,                                      -- Optional: balance key hash 
+
     PRIMARY KEY (Id),
     FOREIGN KEY (CredentialType) REFERENCES CREDENTIAL_TYPES(Id),
     FOREIGN KEY (AccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
@@ -111,8 +136,11 @@ CREATE TABLE CREDENTIALS
 CREATE TABLE TRANSACTION_TYPES
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Transaction Type ID
+
     SymbolicName VARCHAR(20)  NOT NULL,                                  -- As as symbolic name
+
     Description VARCHAR(80)   NOT NULL,                                  -- A bit more on the topic
+
     PRIMARY KEY (Id)
   );
 
@@ -124,14 +152,29 @@ CREATE TABLE TRANSACTION_TYPES
 CREATE TABLE TRANSACTIONS
   (
     Id          INT           NOT NULL  UNIQUE,                          -- Unique Transaction ID
+
     AccountId   INT           NOT NULL,                                  -- Unique Account ID
+
+    CredentialId VARCHAR(30),                                            /* Optional Credential ID
+                                                                            linked to the Account ID */
+
+    ReservationId INT,                                                   /* Reservation Transaction ID
+                                                                            linked to a previous
+                                                                            Transaction ID */
+
     TransactionType INT       NOT NULL,                                  -- Unique Transaction Type ID
+
     Amount      DECIMAL(8,2)  NOT NULL,                                  -- The Amount involved
+
     Balance     DECIMAL(8,2)  NOT NULL,                                  -- Outgoing Account balance
-    Originator  VARCHAR(50),                                             -- Optional Merchant
-    ExtReference VARCHAR(50),                                            -- Optional External Ref
-    CredentialId VARCHAR(30),                                            -- Optional Credential ID
-    ReservationId INT,                                                   -- Reservation Transaction ID
+    
+    PayeeAccount VARCHAR(50)  NOT NULL,                                  -- Destination account ID
+
+    PayeeName  VARCHAR(50),                                              -- Optional Payee name
+
+    PayeeReference VARCHAR(50),                                          /* Optional Payee reference
+                                                                            like internal order ID */
+
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
     PRIMARY KEY (Id),
     FOREIGN KEY (TransactionType) REFERENCES TRANSACTION_TYPES(Id),
@@ -358,8 +401,9 @@ CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Error INT,
 
 CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                      OUT p_TransactionId INT,
-                                     IN p_OptionalOriginator VARCHAR(50),
-                                     IN p_OptionalExtReference VARCHAR(50),
+                                     IN p_PayeeAccount VARCHAR(50),
+                                     IN p_OptionalPayeeName VARCHAR(50),
+                                     IN p_OptionalPayeeReference VARCHAR(50),
                                      IN p_TransactionType INT,
                                      IN p_OptionalReservationId INT,
                                      IN p_Amount DECIMAL(8,2),
@@ -413,18 +457,20 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                    AccountId,
                                    Amount,
                                    Balance,
-                                   CredentialId, 
-                                   Originator, 
-                                   ExtReference,
-                                   ReservationId) 
+                                   CredentialId,
+                                   PayeeAccount,
+                                   PayeeName,
+                                   PayeeReference,
+                                   ReservationId)
                VALUES(p_TransactionId,
                       p_TransactionType,
                       v_AccountId,
                       p_Amount,
                       v_NewBalance,
                       p_CredentialId,
-                      p_OptionalOriginator, 
-                      p_OptionalExtReference,
+                      p_PayeeAccount,
+                      p_OptionalPayeeName,
+                      p_OptionalPayeeReference,
                       p_OptionalReservationId);
         END IF;
       END IF;
@@ -435,8 +481,9 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
 
 CREATE PROCEDURE InternalWithDrawSP (OUT p_Error INT,
                                      OUT p_TransactionId INT,
-                                     IN p_OptionalOriginator VARCHAR(50),
-                                     IN p_OptionalExtReference VARCHAR(50),
+                                     IN p_PayeeAccount VARCHAR(50),
+                                     IN p_OptionalPayeeName VARCHAR(50),
+                                     IN p_OptionalPayeeReference VARCHAR(50),
                                      IN p_TransactionType INT,
                                      IN p_Amount DECIMAL(8,2),
                                      IN p_AccountId INT)
@@ -462,28 +509,31 @@ CREATE PROCEDURE InternalWithDrawSP (OUT p_Error INT,
                                  TransactionType, 
                                  AccountId,
                                  Amount,
-                                 CredentialId, 
-                                 Originator, 
-                                 ExtReference) 
+                                 CredentialId,
+                                 PayeeAccount,
+                                 PayeeName,
+                                 PayeeReference)
              VALUES(p_TransactionId,
                     p_TransactionType,
                     p_AccountId,
                     p_Amount,
                     p_CredentialId,
-                    p_OptionalOriginator, 
-                    p_OptionalExtReference);
+                    p_PayeeAccount,
+                    p_OptionalPayeeName,
+                    p_OptionalPayeeReference);
       END IF;
     END IF;
     COMMIT;
   END
 //
 
-CREATE PROCEDURE ExternalRefundSP (OUT p_Error INT,
-                                   OUT p_TransactionId INT,
-                                   IN p_OptionalOriginator VARCHAR(50),
-                                   IN p_OptionalExtReference VARCHAR(50),
-                                   IN p_Amount DECIMAL(8,2),
-                                   IN p_CredentialId VARCHAR(30))
+CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
+                                  OUT p_TransactionId INT,
+                                  IN p_PayeeAccount VARCHAR(50),
+                                  IN p_OptionalPayeeName VARCHAR(50),
+                                  IN p_OptionalPayeeReference VARCHAR(50),
+                                  IN p_Amount DECIMAL(8,2),
+                                  IN p_CredentialId VARCHAR(30))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
     DECLARE v_NewBalance DECIMAL(8,2);
@@ -509,17 +559,19 @@ CREATE PROCEDURE ExternalRefundSP (OUT p_Error INT,
                                AccountId,
                                Amount,
                                Balance,
-                               CredentialId, 
-                               Originator, 
-                               ExtReference) 
+                               CredentialId,
+                               PayeeAccount,
+                               PayeeName,
+                               PayeeReference)
            VALUES(p_TransactionId,
                   5,
                   v_AccountId,
                   p_Amount,
                   v_NewBalance,
                   p_CredentialId,
-                  p_OptionalOriginator, 
-                  p_OptionalExtReference);
+                  p_PayeeAccount,
+                  p_OptionalPayeeName,
+                  p_OptionalPayeeReference);
     END IF;
     COMMIT;
   END
@@ -608,8 +660,8 @@ CALL CreateTransactionTypeSP("RESERVE_MULTI",
 CALL CreateTransactionTypeSP("TRANSACT",
                              "Phase two or more of a multi-step payment operation");
 
-CALL CreateTransactionTypeSP("REFUND",
-                             "Phase two or more of a multi-step payment operation");
+CALL CreateTransactionTypeSP("CREDIT_ACCOUNT",
+                             "Money sent to the account");
 
 -- Demo data
 

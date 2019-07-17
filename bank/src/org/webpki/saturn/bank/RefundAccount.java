@@ -41,25 +41,28 @@ public class RefundAccount {
 
     public RefundAccount(BigDecimal amount, 
                          String accountId,
-                         String payeeCommonName,
+                         String payeeAccount,
+                         String payeeName,
                          String payeeReference,
                          Connection connection) throws SQLException {
 /*
-    CREATE PROCEDURE ExternalRefundSP (OUT p_Error INT,
-                                       OUT p_TransactionId INT,
-                                       IN p_OptionalOriginator VARCHAR(50),
-                                       IN p_OptionalExtReference VARCHAR(50),
-                                       IN p_Amount DECIMAL(8,2),
-                                       IN p_CredentialId VARCHAR(30))
+CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
+                                  OUT p_TransactionId INT,
+                                  IN p_PayeeAccount VARCHAR(50),
+                                  IN p_OptionalPayeeName VARCHAR(50),
+                                  IN p_OptionalPayeeReference VARCHAR(50),
+                                  IN p_Amount DECIMAL(8,2),
+                                  IN p_CredentialId VARCHAR(30))
 */
         try (CallableStatement stmt = 
-                connection.prepareCall("{call ExternalRefundSP(?, ?, ?, ?, ?, ?)}");) {
+                connection.prepareCall("{call CreditAccountSP(?, ?, ?, ?, ?, ?, ?)}");) {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             stmt.registerOutParameter(2, java.sql.Types.INTEGER);
-            stmt.setString(3, payeeCommonName);
-            stmt.setString(4, payeeReference);
-            stmt.setBigDecimal(5, amount);
-            stmt.setString(6, accountId);
+            stmt.setString(3, payeeAccount);
+            stmt.setString(4, payeeName);
+            stmt.setString(5, payeeReference);
+            stmt.setBigDecimal(6, amount);
+            stmt.setString(7, accountId);
             stmt.execute();
             switch (result = stmt.getInt(1)) {
                 case 0:

@@ -78,7 +78,7 @@ public class RefundServlet extends ProcessingBaseServlet {
         }
         IBResponse ibResponse = 
                 IBRequest.perform(BankService.payerInterbankUrl,
-                                  IBRequest.Operations.ACCOUNT_REFUND,
+                                  IBRequest.Operations.REVERSE_CREDIT_TRANSFER,
                                   account,
                                   null,
                                   refundRequest.getAmount(),
@@ -89,7 +89,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                                   "fixme",
                                   testMode,
                                   BankService.bankKey);
-        String transactionId = ibResponse.getReferenceId();
+        String transactionId = ibResponse.getOurReference();
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Refunding for Account=" + accountData.logLine() +
                     ", Amount=" + refundRequest.getAmount().toString() +

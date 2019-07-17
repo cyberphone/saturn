@@ -42,35 +42,38 @@ public class WithDrawFromAccount {
     public WithDrawFromAccount(BigDecimal amount, 
                                String accountId,
                                TransactionTypes transactionType,
-                               String payeeCommonName,
+                               String payeeAccount,
+                               String payeeName,
                                String payeeReference,
                                Integer optionalReservationId,
                                boolean throwOnOutOfFounds,
                                Connection connection) throws SQLException {
 /*
-        CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
-                                             OUT p_TransactionId INT,
-                                             IN p_OptionalOriginator VARCHAR(50),
-                                             IN p_OptionalExtReference VARCHAR(50),
-                                             IN p_TransactionType INT,
-                                             IN p_OptionalReservationId INT,
-                                             IN p_Amount DECIMAL(8,2),
-                                             IN p_CredentialId VARCHAR(30))
+CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
+                                     OUT p_TransactionId INT,
+                                     IN p_PayeeAccount VARCHAR(50),
+                                     IN p_OptionalPayeeName VARCHAR(50),
+                                     IN p_OptionalPayeeReference VARCHAR(50),
+                                     IN p_TransactionType INT,
+                                     IN p_OptionalReservationId INT,
+                                     IN p_Amount DECIMAL(8,2),
+                                     IN p_CredentialId VARCHAR(30))
 */
         try (CallableStatement stmt = 
-                connection.prepareCall("{call ExternalWithDrawSP(?, ?, ?, ?, ?, ?, ?, ?)}");) {
+                connection.prepareCall("{call ExternalWithDrawSP(?, ?, ?, ?, ?, ?, ?, ?, ?)}");) {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             stmt.registerOutParameter(2, java.sql.Types.INTEGER);
-            stmt.setString(3, payeeCommonName);
-            stmt.setString(4, payeeReference);
-            stmt.setInt(5, transactionType.getIntValue());
+            stmt.setString(3, payeeAccount);
+            stmt.setString(4, payeeName);
+            stmt.setString(5, payeeReference);
+            stmt.setInt(6, transactionType.getIntValue());
             if (optionalReservationId == null) {
-                stmt.setNull(6, java.sql.Types.INTEGER);
+                stmt.setNull(7, java.sql.Types.INTEGER);
             } else {
-                stmt.setInt(6, optionalReservationId);
+                stmt.setInt(7, optionalReservationId);
             }
-            stmt.setBigDecimal(7, amount);
-            stmt.setString(8, accountId);
+            stmt.setBigDecimal(8, amount);
+            stmt.setString(9, accountId);
             stmt.execute();
             switch (result = stmt.getInt(1)) {
                 case 0:
