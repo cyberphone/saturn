@@ -127,6 +127,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     
     static boolean logging;
 
+    static JSONDecoderCache knownPayeeMethods = new JSONDecoderCache();;
+
     
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -187,6 +189,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
             
             knownAccountTypes.addToCache(com.supercard.SupercardAccountDataDecoder.class);
+
+            knownPayeeMethods.addToCache(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class);
 
             KeyStoreEnumerator acquirercreds = new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD));

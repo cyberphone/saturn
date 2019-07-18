@@ -37,7 +37,8 @@ public final class SEPAPaymentBackendMethodDecoder extends AuthorizationRequest.
         nonce = rd.getBinaryConditional(BaseProperties.NONCE_JSON);
     }
 
-    public String getPayeeIban() {
+    @Override
+    public String getPayeeAccount() {
         return payeeIban;
     }
 

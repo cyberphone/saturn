@@ -42,6 +42,12 @@
     </context-param>
 
     <context-param>
+        <description>Payee Interbank URL</description>
+        <param-name>payee_interbank_url</param-name>
+        <param-value>@payee-interbank-url@</param-value>
+    </context-param>
+
+    <context-param>
         <description>[Optional] Hosting Provider Key</description>
         <param-name>hosting_provider_key</param-name>
         <param-value>@hosting-provider-key@</param-value>

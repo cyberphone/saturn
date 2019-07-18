@@ -23,10 +23,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// Refund an amount to the account using a stored procedure                                   //
+// Add an amount to the account using a stored procedure                                      //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
-public class RefundAccount {
+public class CreditAccount {
     
     int result;
     int transactionId;
@@ -39,7 +39,7 @@ public class RefundAccount {
         return transactionId;
     }
 
-    public RefundAccount(BigDecimal amount, 
+    public CreditAccount(BigDecimal amount, 
                          String accountId,
                          String payeeAccount,
                          String payeeName,
@@ -73,7 +73,7 @@ CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
                     throw new SQLException("Unknown account/credential: " + accountId);
                     
                 default:
-                    throw new SQLException("Refund returned: " + result);
+                    throw new SQLException("Credit account returned: " + result);
             }
         }
     }

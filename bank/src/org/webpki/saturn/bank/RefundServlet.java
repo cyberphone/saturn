@@ -85,8 +85,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayee().getCommonName(),
                                   paymentRequest.getReferenceId(),
-//TODO
-                                  "fixme",
+                                  refundRequest.getPayeeSourceAccount(),
                                   testMode,
                                   BankService.bankKey);
         String transactionId = ibResponse.getOurReference();

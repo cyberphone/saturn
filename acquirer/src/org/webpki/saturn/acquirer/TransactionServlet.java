@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
@@ -46,6 +47,12 @@ public class TransactionServlet extends ProcessingBaseServlet {
         // Decode and finalize the cardpay request
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, true);
         PaymentRequest paymentRequest = transactionRequest.getPaymentRequest();
+        
+        // Verify that we understand the payee payment method
+        AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
+                transactionRequest.getAuthorizationResponse()
+                    .getAuthorizationRequest()
+                        .getPaymentBackendMethodSpecific(AcquirerService.knownPayeeMethods);
 
         // Verify that the payer's (user) bank is known
         transactionRequest.verifyPayerBank(AcquirerService.paymentRoot);
@@ -79,8 +86,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayee().getCommonName(),
                                   paymentRequest.getReferenceId(),
-//TODO
-                                  "fixme",
+                                  paymentMethodSpecific.getPayeeAccount(),
                                   testMode,
                                   AcquirerService.acquirerKey);
         if (!testMode) {

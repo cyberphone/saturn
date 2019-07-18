@@ -77,7 +77,10 @@ public class IBRequest extends IBCommon {
 
     static final String INTERBANKING_REQUEST             = "InterbankingRequest";
 
-    public enum Operations {CREDIT_CARD_TRANSACT, CREDIT_CARD_REFUND, REVERSE_CREDIT_TRANSFER}
+    public enum Operations {CREDIT_CARD_TRANSACT, 
+                            CREDIT_CARD_REFUND,
+                            CREDIT_TRANSFER,
+                            REVERSE_CREDIT_TRANSFER}
 
     public IBRequest(JSONObjectReader rd) throws IOException {
         check(rd, INTERBANKING_REQUEST);

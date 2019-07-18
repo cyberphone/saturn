@@ -16,6 +16,9 @@
  */
 package org.webpki.saturn.bank;
 
+import io.interbanking.IBRequest;
+import io.interbanking.IBResponse;
+
 import java.io.IOException;
 
 import java.math.BigDecimal;
@@ -245,7 +248,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             WithDrawFromAccount wdfa = new WithDrawFromAccount(amount,
                                                                accountId,
                                                                transactionType,
-                                                               "fixme",
+                                                               paymentMethodSpecific.getPayeeAccount(),
                                                                paymentRequest.getPayee().getCommonName(),
                                                                paymentRequest.getReferenceId(),
                                                                null,
@@ -262,23 +265,34 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                   null,
                                                   authorizationData);
             }
-            //###################################################
-            //# Payment backend networking would happen here... #
-            //###################################################
-            //
-            // Not implemented in the demo.
-            //
-            // If Payer and Payee are in the same bank networking is not needed.
-            //
-            // Note that if backend networking for some reason fails, the transaction
-            // must be reversed.
-            //
-            // If successful one could imagine updating the transaction record with
-            // a reference to that part as well.
-            //
-            // Note that card and nonDirectPayments payments only reserve an amount locally.
             if (!cardPayment && nonDirectPayment == null) {
-                optionalLogData = "Bank payment network log data...";
+                //#################################################
+                //# Payment backend networking take place here... #
+                //#################################################
+                //
+                // If Payer and Payee are in the same bank networking is not needed
+                // and is replaced by a local database account adjust operations.
+                //
+                // Note that if backend networking for some reason fails, the transaction
+                // must be reversed.
+                //
+                // If successful one could imagine updating the transaction record with
+                // a reference to that part as well.
+                //
+                // Note that card and nonDirectPayments payments only reserve an amount locally.
+                IBResponse ibResponse = 
+                        IBRequest.perform(BankService.payeeInterbankUrl,
+                                          IBRequest.Operations.CREDIT_TRANSFER,
+                                          accountId, 
+                                          null,
+                                          amount,
+                                          paymentRequest.getCurrency().toString(),
+                                          paymentRequest.getPayee().getCommonName(),
+                                          paymentRequest.getReferenceId(),
+                                          paymentMethodSpecific.getPayeeAccount(),
+                                          testMode, 
+                                          BankService.bankKey);
+                optionalLogData = ibResponse.getOurReference();
             }
         }
 

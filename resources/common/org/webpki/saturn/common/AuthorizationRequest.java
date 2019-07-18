@@ -17,7 +17,9 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
+
 import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
@@ -52,9 +54,9 @@ public class AuthorizationRequest implements BaseProperties {
                 HashAlgorithms.SHA256.digest(account.serializeToBytes(JSONOutputFormats.CANONICALIZED));
         }
 
-        protected JSONObjectReader getAccountObject() throws IOException {
-            return null;
-        }
+        protected abstract JSONObjectReader getAccountObject() throws IOException;
+
+        public abstract String getPayeeAccount();
     }
 
     public static abstract class PaymentBackendMethodEncoder {
@@ -122,8 +124,8 @@ public class AuthorizationRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    public PaymentBackendMethodDecoder getPaymentBackendMethodSpecific
-            (JSONDecoderCache knownPaymentMethods) throws IOException {
+    public PaymentBackendMethodDecoder getPaymentBackendMethodSpecific(
+                                  JSONDecoderCache knownPaymentMethods) throws IOException {
         return (PaymentBackendMethodDecoder) knownPaymentMethods
                 .parse(undecodedPaymentMethodSpecific.clone()); // Clone => Fresh read
     }

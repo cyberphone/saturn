@@ -16,16 +16,16 @@
  */
 package org.webpki.saturn.bank;
 
+import io.interbanking.IBRequest;
+import io.interbanking.IBResponse;
+
 import java.io.IOException;
-
 import java.util.Arrays;
-
 import java.sql.Connection;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONCryptoHelper;
-
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
@@ -60,6 +60,10 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         // Although we have already verified the Payee (merchant) during the authorization phase
         // we should do it for this round as well...
         AuthorizationRequest authorizationRequest = authorizationResponse.getAuthorizationRequest();
+
+        // Verify that we understand the payment method
+        AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
+            authorizationRequest.getPaymentBackendMethodSpecific(BankService.knownPayeeMethods);
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
         PayeeAuthority payeeAuthority =
             BankService.externalCalls.getPayeeAuthority(urlHolder,
@@ -83,7 +87,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     new WithDrawFromAccount(transactionRequest.getAmount(),
                                             authorizationData.getAccountId(),
                                             TransactionTypes.TRANSACT,
-                                            "fixme",
+                                            paymentMethodSpecific.getPayeeAccount(),
                                             paymentRequest.getPayee().getCommonName(),
                                             paymentRequest.getReferenceId(),
                                             decodeReferenceId(transactionRequest
@@ -91,24 +95,32 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                             true,
                                             connection);
             referenceId = formatReferenceId(wdfa.getTransactionId());
-            // Here we are supposed to do the actual payment
-            //###################################################
-            //# Payment backend networking would happen here... #
-            //###################################################
-            //
-            // Not implemented in the demo.
-            //
-            // If Payer and Payee are in the same bank networking is not needed.
-            //
-            // Note that if backend networking for some reason fails, the transaction
-            // must be reversed.
-            //
-            // If successful one could imagine updating the transaction record with
-            // a reference to that part as well.
-            //
-            optionalLogData = "Bank payment network log data...";
         }
-
+        //#################################################
+        //# Payment backend networking take place here... #
+        //#################################################
+        //
+        // If Payer and Payee are in the same bank networking is not needed
+        // and is replaced by a local database account adjust operations.
+        //
+        // Note that if backend networking for some reason fails, the transaction
+        // must be reversed.
+        //
+        // If successful one could imagine updating the transaction record with
+        // a reference to that part as well.
+        IBResponse ibResponse = 
+                IBRequest.perform(BankService.payeeInterbankUrl,
+                                  IBRequest.Operations.CREDIT_TRANSFER,
+                                  authorizationData.getAccountId(), 
+                                  null,
+                                  transactionRequest.getAmount(),
+                                  paymentRequest.getCurrency().toString(),
+                                  paymentRequest.getPayee().getCommonName(),
+                                  paymentRequest.getReferenceId(),
+                                  paymentMethodSpecific.getPayeeAccount(),
+                                  testMode, 
+                                  BankService.bankKey);
+        optionalLogData = ibResponse.getOurReference();
         // It appears that we succeeded
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Charging for Account ID=" + authorizationData.getAccountId() + 

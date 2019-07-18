@@ -29,7 +29,7 @@ import java.security.KeyStore;
 
 import java.security.cert.X509Certificate;
 
-import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.RSAKey;
 
 import java.util.TreeMap;
 import java.util.SortedMap;
@@ -111,6 +111,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static final String PAYER_INTERBANK_URL   = "payer_interbank_url";
 
+    static final String PAYEE_INTERBANK_URL   = "payee_interbank_url";
+
     static final String LOGGING               = "logging";
     
     static final int PROVIDER_EXPIRATION_TIME = 3600;
@@ -145,6 +147,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static String payeeAuthorityBaseUrl;
 
     static String payerInterbankUrl;  // Static since we do not have a card or SEPA database and associated URL's
+
+    static String payeeInterbankUrl;  //     -"-
 
     static String serviceUrl;
 
@@ -216,7 +220,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     void addDecryptionKey(String name) throws IOException {
         KeyStoreEnumerator keyStoreEnumerator = new KeyStoreEnumerator(getResource(name),
                                                                        getPropertyString(KEYSTORE_PASSWORD));
-        if (keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey) {
+        if (keyStoreEnumerator.getPublicKey() instanceof RSAKey) {
             addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID);
         } else {
             addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
@@ -334,7 +338,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                                            new ProviderAuthority.EncryptionParameter[]{
                     new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                            decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
+                            decryptionKeys.get(0).getPublicKey() instanceof RSAKey ?
                         KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
                                                               decryptionKeys.get(0).getPublicKey())},
                                            hostingProvider,
@@ -378,6 +382,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             }
 
             payerInterbankUrl = getPropertyString(PAYER_INTERBANK_URL);
+            payeeInterbankUrl = getPropertyString(PAYEE_INTERBANK_URL);
             IBRequest.setLogging(true, logger);
 
             started = new GregorianCalendar();

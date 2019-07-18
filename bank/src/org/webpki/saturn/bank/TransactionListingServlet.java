@@ -47,7 +47,7 @@ public class TransactionListingServlet extends HttpServlet {
             "LASTTRANS.Created AS `Created`, " +
             "LASTTRANS.Amount AS `Amount`, " +
             "LASTTRANS.Balance AS `Balance`, " +
-            "ACCOUNTS.Id AS `Account Id`, " +
+            "ACCOUNTS.Id AS `Account`, " +
             "USERS.Name As `Account Holder`, " +
             "LASTTRANS.CredentialId AS `Credential Id`, " +
             "LASTTRANS.PayeeAccount AS `Payee Account`, " +

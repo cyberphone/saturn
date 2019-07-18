@@ -77,8 +77,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayee().getCommonName(),
                                   paymentRequest.getReferenceId(),
-//TODO
-                                  "fixme",
+                                  refundRequest.getPayeeSourceAccount(),
                                   testMode,
                                   AcquirerService.acquirerKey);
         // It appears that we succeeded

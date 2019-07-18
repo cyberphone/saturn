@@ -36,6 +36,8 @@ import org.webpki.saturn.common.UrlHolder;
 public class InterbankingServlet extends ProcessingBaseServlet {
   
     private static final long serialVersionUID = 1L;
+    
+    private static int creditTransferId = 100000;
 
 
     @Override
@@ -49,7 +51,7 @@ public class InterbankingServlet extends ProcessingBaseServlet {
             case CREDIT_CARD_TRANSACT:
                 ibRequest.verifyCallerAuthenticity(BankService.acquirerRoot);
                 // The following call will throw exceptions on errors
-                WithDrawFromAccount wdfa = 
+                WithDrawFromAccount withDrawFromAccount = 
                         new WithDrawFromAccount(ibRequest.getAmount(),
                                                 ibRequest.getAccount(),
                                                 TransactionTypes.TRANSACT,
@@ -59,7 +61,7 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                                                 decodeReferenceId(ibRequest.getTransactionReference()),
                                                 true,
                                                 connection);
-                ibResponse = IBResponse.encode(formatReferenceId(wdfa.transactionId), 
+                ibResponse = IBResponse.encode(formatReferenceId(withDrawFromAccount.transactionId), 
                                                ibRequest.getTestMode());
                 break;
 
@@ -69,13 +71,20 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                         ibRequest.getOperation() == IBRequest.Operations.CREDIT_CARD_REFUND ?
                                 BankService.acquirerRoot : BankService.paymentRoot);
                 // The following call will throw exceptions on errors
-                RefundAccount rfa = new RefundAccount(ibRequest.getAmount(),
-                                                      ibRequest.getAccount(),
-                                                      ibRequest.getPayeeAccount(),
-                                                      ibRequest.getPayeeName(),
-                                                      ibRequest.getPayeeReference(),
-                                                      connection);
-                ibResponse = IBResponse.encode(formatReferenceId(rfa.transactionId), 
+                CreditAccount creditAccount = new CreditAccount(ibRequest.getAmount(),
+                                                                ibRequest.getAccount(),
+                                                                ibRequest.getPayeeAccount(),
+                                                                ibRequest.getPayeeName(),
+                                                                ibRequest.getPayeeReference(),
+                                                                connection);
+                ibResponse = IBResponse.encode(formatReferenceId(creditAccount.transactionId), 
+                                               ibRequest.getTestMode());
+                break;
+
+            case CREDIT_TRANSFER:
+                // The demo does nothing DB-wise in the payee bank for credit transfers
+                ibRequest.verifyCallerAuthenticity(BankService.paymentRoot);
+                ibResponse = IBResponse.encode("CT" + creditTransferId++, 
                                                ibRequest.getTestMode());
                 break;
 
