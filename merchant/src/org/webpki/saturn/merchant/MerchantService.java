@@ -243,7 +243,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             SEPAPaymentBackendMethodDecoder sepaAccountDecoder = 
                     (SEPAPaymentBackendMethodDecoder)sepaAccount.parse(readJSONFile(SEPA_ACCOUNT));
             sepaVerifiableAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder);
-            sepaPlainAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder.getPayeeIban());
+            sepaPlainAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder.getPayeeAccount());
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 

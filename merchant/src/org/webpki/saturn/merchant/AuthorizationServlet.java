@@ -205,7 +205,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         // Gas Station: Save reservation part for future fulfillment
         if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
-            if (!cardPayment) {
+            if (cardPayment) {
+                transactionOperation.urlToCall = ownProviderAuthority.getServiceUrl();
+                transactionOperation.verifier = MerchantService.acquirerRoot;
+            } else {
                 transactionOperation.urlToCall = getHybridModeUrl(providerAuthority);
                 transactionOperation.verifier = MerchantService.paymentRoot;
                 if (debug) {
