@@ -28,8 +28,8 @@ import java.sql.SQLException;
 
 public class CreditAccount {
     
-    int result;
-    int transactionId;
+    private int result;
+    private int transactionId;
 
     public int getResult() {
         return result;

@@ -20,12 +20,15 @@ import io.interbanking.IBRequest;
 import io.interbanking.IBResponse;
 
 import java.io.IOException;
+
 import java.util.Arrays;
+
 import java.sql.Connection;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONCryptoHelper;
+
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
@@ -78,9 +81,9 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         boolean testMode = transactionRequest.getTestMode();
         String optionalLogData = null;
         TransactionResponse.ERROR transactionError = null;
-        String referenceId;
+        int transactionId;
         if (testMode) {
-            referenceId = formatReferenceId(BankService.testReferenceId++);
+            transactionId = BankService.testReferenceId++;
         } else {
             // The following call will throw exceptions on errors
             WithDrawFromAccount wdfa = 
@@ -94,7 +97,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                                     .getAuthorizationResponse().getReferenceId()),
                                             true,
                                             connection);
-            referenceId = formatReferenceId(wdfa.getTransactionId());
+            transactionId = wdfa.getTransactionId();
         }
         //#################################################
         //# Payment backend networking take place here... #
@@ -108,7 +111,8 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         //
         // If successful one could imagine updating the transaction record with
         // a reference to that part as well.
-        IBResponse ibResponse = 
+        try {
+            IBResponse ibResponse = 
                 IBRequest.perform(BankService.payeeInterbankUrl,
                                   IBRequest.Operations.CREDIT_TRANSFER,
                                   authorizationData.getAccountId(), 
@@ -120,7 +124,11 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                   paymentMethodSpecific.getPayeeAccount(),
                                   testMode, 
                                   BankService.bankKey);
-        optionalLogData = ibResponse.getOurReference();
+            optionalLogData = ibResponse.getOurReference();
+        } catch (Exception e) {
+            new NullifyTransaction(transactionId, connection);
+            throw e;
+        }
         // It appears that we succeeded
         logger.info((testMode ? "TEST ONLY: ":"") +
                     "Charging for Account ID=" + authorizationData.getAccountId() + 
@@ -128,7 +136,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     " " + paymentRequest.getCurrency().toString());
         return TransactionResponse.encode(transactionRequest,
                                           transactionError,
-                                          referenceId,
+                                          formatReferenceId(transactionId),
                                           optionalLogData,
                                           BankService.bankKey);
     }

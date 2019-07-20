@@ -441,7 +441,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
               WHERE TRANSACTIONS.ReservationId = p_OptionalReservationId) THEN
             SET p_Error = 6;         -- Reservation already used
           ELSE
-            SET v_NewBalance = v_NewBalance + v_PreviousAmount;
+            SET v_NewBalance = v_NewBalance - v_PreviousAmount;
           END IF;
         END IF;
       END IF;
@@ -465,7 +465,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                VALUES(p_TransactionId,
                       p_TransactionType,
                       v_AccountId,
-                      p_Amount,
+                      -p_Amount,
                       v_NewBalance,
                       p_CredentialId,
                       p_PayeeAccount,
@@ -577,6 +577,52 @@ CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
   END
 //
 
+CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, IN p_FailedTransactionId INT)
+  BEGIN
+    DECLARE v_Balance DECIMAL(8,2);
+    DECLARE v_Amount DECIMAL(8,2);
+    DECLARE v_NewBalance DECIMAL(8,2);
+    DECLARE v_AccountId INT(11);
+
+    SET p_Error = 0;
+    START TRANSACTION;
+    SELECT ACCOUNTS.Balance, 
+           ACCOUNTS.Id,
+           TRANSACTIONS.Amount
+        INTO 
+           v_Balance, 
+           v_AccountId,
+           v_Amount
+        FROM ACCOUNTS INNER JOIN TRANSACTIONS ON ACCOUNTS.Id = TRANSACTIONS.AccountId
+        WHERE TRANSACTIONS.Id = p_FailedTransactionId
+        LIMIT 1
+        FOR UPDATE;
+    IF v_AccountId IS NULL THEN    -- Failed
+      SET p_Error = 1;             -- No such account
+    ELSE
+      SET v_NewBalance = v_Balance - v_Amount;
+      UPDATE ACCOUNTS SET Balance = v_NewBalance WHERE ACCOUNTS.Id = v_AccountId;
+      INSERT INTO TRANSACTIONS(Id,
+                               TransactionType, 
+                               AccountId,
+                               Amount,
+                               Balance,
+                               CredentialId,
+                               PayeeAccount,
+                               ReservationId)
+           VALUES(GetNextTransactionIdSP(),
+                  6,
+                  v_AccountId,
+                  -v_Amount,
+                  v_NewBalance,
+                  "",
+                  "",
+                  p_FailedTransactionId);
+    END IF;
+    COMMIT;
+  END
+// 
+
 CREATE PROCEDURE RestoreUserAccountsSP(IN p_UserId INT)
   BEGIN
     UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = p_UserId;
@@ -662,6 +708,9 @@ CALL CreateTransactionTypeSP("TRANSACT",
 
 CALL CreateTransactionTypeSP("CREDIT_ACCOUNT",
                              "Money sent to the account");
+
+CALL CreateTransactionTypeSP("*FAILED*",
+                             "Referenced transaction failed and was nullified");
 
 -- Demo data
 

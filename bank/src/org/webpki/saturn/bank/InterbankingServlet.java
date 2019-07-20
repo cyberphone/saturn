@@ -61,8 +61,13 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                                                 decodeReferenceId(ibRequest.getTransactionReference()),
                                                 true,
                                                 connection);
-                ibResponse = IBResponse.encode(formatReferenceId(withDrawFromAccount.transactionId), 
-                                               ibRequest.getTestMode());
+                try {
+                    ibResponse = IBResponse.encode(formatReferenceId(withDrawFromAccount.getTransactionId()), 
+                                                   ibRequest.getTestMode());
+                } catch (Exception e) {
+                    new NullifyTransaction(withDrawFromAccount.getTransactionId(), connection);
+                    throw e;
+                }
                 break;
 
             case CREDIT_CARD_REFUND:
@@ -77,8 +82,13 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                                                                 ibRequest.getPayeeName(),
                                                                 ibRequest.getPayeeReference(),
                                                                 connection);
-                ibResponse = IBResponse.encode(formatReferenceId(creditAccount.transactionId), 
-                                               ibRequest.getTestMode());
+                try {
+                    ibResponse = IBResponse.encode(formatReferenceId(creditAccount.getTransactionId()), 
+                                                   ibRequest.getTestMode());
+                } catch (Exception e) {
+                    new NullifyTransaction(creditAccount.getTransactionId(), connection);
+                    throw e;
+                }
                 break;
 
             case CREDIT_TRANSFER:

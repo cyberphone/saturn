@@ -280,7 +280,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 // a reference to that part as well.
                 //
                 // Note that card and nonDirectPayments payments only reserve an amount locally.
-                IBResponse ibResponse = 
+                try {
+                    IBResponse ibResponse = 
                         IBRequest.perform(BankService.payeeInterbankUrl,
                                           IBRequest.Operations.CREDIT_TRANSFER,
                                           accountId, 
@@ -292,7 +293,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                           paymentMethodSpecific.getPayeeAccount(),
                                           testMode, 
                                           BankService.bankKey);
-                optionalLogData = ibResponse.getOurReference();
+                    optionalLogData = ibResponse.getOurReference();
+                } catch (Exception e) {
+                    // Since the external operation failed we must restore the account
+                    // with the amount involved.
+                    new NullifyTransaction(transactionId, connection);
+                    throw e;
+                }
             }
         }
 
