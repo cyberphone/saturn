@@ -50,7 +50,8 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                  JSONObjectReader providerRequest,
                                  Connection connection) throws Exception {
 
-        // Decode and finalize the cardpay request which in hybrid mode actually is account-2-account
+        // Decode and finalize the "emulated" card pay request which in 
+        // hybrid mode actually is account-2-account
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, false);
  
         // Verify that it was actually we who created the original response

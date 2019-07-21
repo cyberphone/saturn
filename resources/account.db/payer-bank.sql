@@ -339,6 +339,7 @@ CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
 //
 
 CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
+                                       OUT p_Name VARCHAR(50),
                                        IN p_CredentialId VARCHAR(30),
                                        IN p_MethodUri VARCHAR(50),
                                        IN p_S256PayReq BINARY(32))
@@ -369,7 +370,8 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
     ELSE                       
       SET p_Error = 0;          -- Success => Update access info
       UPDATE USERS SET LastAccess = CURRENT_TIMESTAMP, AccessCount = AccessCount + 1
-          WHERE USERS.Id = v_UserId;     
+          WHERE USERS.Id = v_UserId;
+      SELECT Name INTO p_Name FROM USERS WHERE USERS.Id = v_UserId;
     END IF;
   END
 //

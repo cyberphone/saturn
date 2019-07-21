@@ -62,6 +62,18 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                                                 true,
                                                 connection);
                 try {
+                    IBResponse ibResponse1 = 
+                            IBRequest.perform(BankService.payeeInterbankUrl,
+                                              IBRequest.Operations.CREDIT_TRANSFER,
+                                              ibRequest.getAccount(), 
+                                              null,
+                                              ibRequest.getAmount(),
+                                              ibRequest.getCurrency(),
+                                              ibRequest.getPayeeName(),
+                                              ibRequest.getPayeeReference(),
+                                              ibRequest.getPayeeAccount(),
+                                              ibRequest.getTestMode(), 
+                                              BankService.bankKey);
                     ibResponse = IBResponse.encode(formatReferenceId(withDrawFromAccount.getTransactionId()), 
                                                    ibRequest.getTestMode());
                 } catch (Exception e) {

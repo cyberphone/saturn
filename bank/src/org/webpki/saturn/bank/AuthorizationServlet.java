@@ -162,12 +162,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                IN p_MethodUri VARCHAR(50),
                                                IN p_S256PayReq BINARY(32))
 */
+        String userName;
         try (CallableStatement stmt = 
-                connection.prepareCall("{call AuthenticatePayReqSP(?, ?, ?, ?)}");) {
+                connection.prepareCall("{call AuthenticatePayReqSP(?, ?, ?, ?, ?)}");) {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
-            stmt.setString(2, accountId);
-            stmt.setString(3, authorizedPaymentMethod);
-            stmt.setBytes(4, HashAlgorithms.SHA256.digest(authorizationData.getPublicKey().getEncoded()));
+            stmt.registerOutParameter(2, java.sql.Types.VARCHAR);
+            stmt.setString(3, accountId);
+            stmt.setString(4, authorizedPaymentMethod);
+            stmt.setBytes(5, HashAlgorithms.SHA256.digest(authorizationData.getPublicKey().getEncoded()));
             stmt.execute();
             int result = stmt.getInt(1);            
             if (result != 0) {
@@ -181,6 +183,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 }
                 logger.severe("Wrong public key for account ID: " + accountId);
                 throw new IOException("Wrong user public key");
+            } else {
+                userName = stmt.getString(2);
             }
         }
 
@@ -308,7 +312,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         AuthorizationResponse.AccountDataEncoder accountData = cardPayment ?
             new com.supercard.SupercardAccountDataEncoder(
                     accountId, 
-                    "Luke Skywalker",
+                    userName,
                     ISODateTime.parseDateTime("2022-12-31T00:00:00Z", ISODateTime.COMPLETE))
                                                      :
             new org.payments.sepa.SEPAAccountDataEncoder(accountId);
