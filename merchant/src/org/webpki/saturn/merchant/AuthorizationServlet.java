@@ -57,7 +57,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String MERCHANT_PAYMENT_METHOD = "https://sepa.payments.org";
+    private static final String MERCHANT_PAYMENT_BACKEND_METHOD = "https://sepa.payments.org/saturn/v3#bpm";
 
     @Override
     boolean processCall(JSONObjectReader walletResponse,
@@ -111,17 +111,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
  
         TransactionOperation transactionOperation = new TransactionOperation();
-
+        String clientPaymentMethodUri = payerAuthorization.getPaymentMethod().getPaymentMethodUri();
         AuthorizationRequest.PaymentBackendMethodEncoder paymentBackendMethodEncoder = null;
-        for (String paymentMethod : providerAuthority.getBackendPaymentMethods()) {
-            if (paymentMethod.equals(MERCHANT_PAYMENT_METHOD)) {
+        for (String paymentMethod : providerAuthority.getPaymentBackendMethods(clientPaymentMethodUri)) {
+            if (paymentMethod.equals(MERCHANT_PAYMENT_BACKEND_METHOD)) {
                 paymentBackendMethodEncoder = payeeAuthority.getPayeeCoreProperties().getAccountHashes() == null ?
                         MerchantService.sepaPlainAccount : MerchantService.sepaVerifiableAccount;
                 break;
             }
         }
         if (paymentBackendMethodEncoder == null) {
-            throw new IOException("No matching account type: " + providerAuthority.getBackendPaymentMethods());
+            throw new IOException("No matching account type: " + clientPaymentMethodUri);
         }
 
         // Attest the user's encrypted authorization to show "intent"

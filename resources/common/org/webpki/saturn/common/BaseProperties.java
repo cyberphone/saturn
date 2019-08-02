@@ -58,7 +58,6 @@ public interface BaseProperties {
     String HOSTING_PROVIDER_JSON            = "hostingProvider";            // Optional object in ProviderAuthority
     String HOME_PAGE_JSON                   = "homePage";                   // URL to the public Web of the entity
     String BACKEND_METHOD_SPECIFIC_JSON     = "backendMethodSpecific";      // Holding a payment backend method specific object
-    String BACKEND_METHODS_JSON             = "backendMethods";             // List of supported backend systems
     String PAYMENT_METHODS_JSON             = "paymentMethods";             // List of accepted payment methods (URIs)
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URI)
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data

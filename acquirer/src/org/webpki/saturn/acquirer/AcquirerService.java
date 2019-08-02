@@ -23,8 +23,7 @@ import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-
-import java.security.interfaces.RSAPublicKey;
+import java.security.interfaces.RSAKey;
 
 import java.util.GregorianCalendar;
 import java.util.TreeMap;
@@ -39,6 +38,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
+
 import javax.servlet.http.HttpServlet;
 
 import org.webpki.crypto.CertificateUtil;
@@ -60,6 +60,7 @@ import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.ServerAsymKeySigner;
@@ -140,7 +141,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         decryptionKeys.add(new JSONDecryptionDecoder.DecryptionKeyHolder(
                                                    keyStoreEnumerator.getPublicKey(),
                                                    keyStoreEnumerator.getPrivateKey(),
-                                                   keyStoreEnumerator.getPublicKey() instanceof RSAPublicKey ?
+                                                   keyStoreEnumerator.getPublicKey() instanceof RSAKey ?
                                                             KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : 
                                                             KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID,
                                                    keyStoreEnumerator.getKeyId()));
@@ -223,12 +224,16 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 new AuthorityObjectManager(providerAuthorityUrl = acquirerBaseUrl + "/authority",
                                            acquirerBaseUrl,
                                            acquirerBaseUrl + "/service",
+                                           new ProviderAuthority.PaymentMethodDeclarations()
+                                           .add(new ProviderAuthority
+                                                   .PaymentMethodDeclaration(
+                                                           PaymentMethods.SUPER_CARD.getPaymentMethodUri())
+                                               .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
                                            optionalProviderExtensions,
-                                           new String[]{"https://supercard.com"},
                                            new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                                            new ProviderAuthority.EncryptionParameter[]{
                     new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                            decryptionKeys.get(0).getPublicKey() instanceof RSAPublicKey ?
+                            decryptionKeys.get(0).getPublicKey() instanceof RSAKey ?
                         KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
                                                               decryptionKeys.get(0).getPublicKey())},
                                            null,
@@ -247,7 +252,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                            "Refund Servlet");
 
             payerInterbankUrl = getPropertyString(PAYER_INTERBANK_URL);
-            IBRequest.setLogging(true, logger);
+            IBRequest.setLogging(logging, logger);
 
             started = new GregorianCalendar();
 

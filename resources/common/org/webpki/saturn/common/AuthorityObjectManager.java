@@ -36,7 +36,7 @@ public class AuthorityObjectManager extends Thread {
     String providerHomePage;
     String serviceUrl;
     JSONObjectReader optionalExtensions;
-    String[] backendPaymentMethods;
+    ProviderAuthority.PaymentMethodDeclarations paymentMethods;
     SignatureProfiles[] signatureProfiles;
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
     HostingProvider optionalHostingProvider; 
@@ -59,8 +59,8 @@ public class AuthorityObjectManager extends Thread {
                 providerAuthorityBlob = ProviderAuthority.encode(providerAuthorityUrl,
                                                                  providerHomePage,
                                                                  serviceUrl,
+                                                                 paymentMethods,
                                                                  optionalExtensions,
-                                                                 backendPaymentMethods,
                                                                  signatureProfiles,
                                                                  encryptionParameters,
                                                                  optionalHostingProvider, 
@@ -96,8 +96,8 @@ public class AuthorityObjectManager extends Thread {
                                   // ProviderAuthority (may be null)
                                   String providerHomePage,
                                   String serviceUrl,
+                                  ProviderAuthority.PaymentMethodDeclarations paymentMethods,
                                   JSONObjectReader optionalExtensions,
-                                  String[] backendPaymentMethods,
                                   SignatureProfiles[] signatureProfiles,
                                   ProviderAuthority.EncryptionParameter[] encryptionParameters,
                                   HostingProvider optionalHostingProvider, 
@@ -113,8 +113,8 @@ public class AuthorityObjectManager extends Thread {
         this.providerAuthorityUrl = providerAuthorityUrl;
         this.providerHomePage = providerHomePage;
         this.serviceUrl = serviceUrl;
+        this.paymentMethods = paymentMethods;
         this.optionalExtensions = optionalExtensions;
-        this.backendPaymentMethods = backendPaymentMethods;
         this.signatureProfiles = signatureProfiles;
         this.encryptionParameters = encryptionParameters;
         this.optionalHostingProvider = optionalHostingProvider; 

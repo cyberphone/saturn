@@ -87,7 +87,7 @@ const BaseProperties = {
     TYPE_JSON                        : 'type',
     VERSION_JSON                     : 'version',
 
-    SATURN_WEB_PAY_CONTEXT_URI       : 'http://webpki.org/saturn/v3',
+    SATURN_WEB_PAY_CONTEXT_URI       : 'https://webpki.github.io/saturn/v3',
 
     JSON_CONTENT_TYPE                : 'application/json'
 };

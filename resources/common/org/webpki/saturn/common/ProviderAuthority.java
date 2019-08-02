@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import org.webpki.json.JSONArrayReader;
@@ -31,6 +32,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONSignatureTypes;
 import org.webpki.json.DataEncryptionAlgorithms;
+
 import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
@@ -64,13 +66,60 @@ public class ProviderAuthority implements BaseProperties {
         }
     }
 
+    public static class PaymentMethodDeclaration {
+        String clientPaymentMethod;
+        Vector<String> backendPaymentMethods = new Vector<String>();
+        
+        public PaymentMethodDeclaration(String clientPaymentMethod) {
+            this.clientPaymentMethod = clientPaymentMethod;
+        }
+        
+        PaymentMethodDeclaration(String clientPaymentMethod,
+                                 String[] backendPaymentMethods) {
+            this(clientPaymentMethod);
+            for (String backendPaymentMethod : backendPaymentMethods) {
+                this.backendPaymentMethods.add(backendPaymentMethod);
+            }
+        }
+
+        public PaymentMethodDeclaration add(
+            Class<? extends AuthorizationRequest.PaymentBackendMethodDecoder> pbmd) 
+                throws InstantiationException, IllegalAccessException {
+            backendPaymentMethods.add(pbmd.newInstance().getContext());
+            return this;
+        }
+        
+        public String[] getBackendPaymentMethods() {
+            return backendPaymentMethods.toArray(new String[0]);
+        }
+    }
+
+    public static class PaymentMethodDeclarations {
+        LinkedHashMap<String,PaymentMethodDeclaration> paymentMethodDeclarations =
+                new LinkedHashMap<String,PaymentMethodDeclaration>();
+        public PaymentMethodDeclarations add(PaymentMethodDeclaration pmb) {
+            paymentMethodDeclarations.put(pmb.clientPaymentMethod, pmb);
+            return this;
+        }
+
+        public JSONObjectWriter toObject() throws IOException {
+            JSONObjectWriter pmdObject = new JSONObjectWriter();
+            for (String clientPaymentMethod : paymentMethodDeclarations.keySet()) {
+                pmdObject.setStringArray(clientPaymentMethod, 
+                                         paymentMethodDeclarations.get(clientPaymentMethod)
+                                             .getBackendPaymentMethods());
+            }
+            return pmdObject;
+        }
+    }
+
     public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
 
     public static JSONObjectWriter encode(String authorityUrl,
                                           String homePage,
                                           String serviceUrl,
+                                          PaymentMethodDeclarations paymentMethods,
                                           JSONObjectReader optionalExtensions,
-                                          String[] backendPaymentMethods,
                                           SignatureProfiles[] signatureProfiles,
                                           EncryptionParameter[] encryptionParameters,
                                           HostingProvider optionalHostingProvider,
@@ -81,8 +130,8 @@ public class ProviderAuthority implements BaseProperties {
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
+            .setObject(PAYMENT_METHODS_JSON, paymentMethods.toObject())
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
-            .setStringArray(BACKEND_METHODS_JSON, backendPaymentMethods)
             .setDynamic((wr) -> {
                 JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PROFILES_JSON);
                 for (SignatureProfiles signatureProfile : signatureProfiles) {
@@ -122,6 +171,12 @@ public class ProviderAuthority implements BaseProperties {
         }
         homePage = rd.getString(HOME_PAGE_JSON);
         serviceUrl = rd.getString(SERVICE_URL_JSON);
+        JSONObjectReader paymentMethodsObject = rd.getObject(PAYMENT_METHODS_JSON);
+        paymentMethods = new PaymentMethodDeclarations();
+        for (String clientPaymentMethod : paymentMethodsObject.getProperties()) {
+            paymentMethods.add(new PaymentMethodDeclaration(clientPaymentMethod,
+                    paymentMethodsObject.getStringArray(clientPaymentMethod)));
+        }
         if (rd.hasProperty(EXTENSIONS_JSON)) {
             optionalExtensions = rd.getObject(EXTENSIONS_JSON);
             if (optionalExtensions.getProperties().length == 0) {
@@ -129,7 +184,6 @@ public class ProviderAuthority implements BaseProperties {
             }
             rd.scanAway(EXTENSIONS_JSON);
         }
-        backendPaymentMethods = rd.getStringArray(BACKEND_METHODS_JSON);
 
         // Signature profiles tell other parties what kind of signatures that are accepted
         // Additional signature profiles can be introduced without breaking existing applications
@@ -230,9 +284,15 @@ public class ProviderAuthority implements BaseProperties {
         return signatureProfiles;
     }
 
-    String[] backendPaymentMethods;
-    public String[] getBackendPaymentMethods() {
-        return backendPaymentMethods;
+    PaymentMethodDeclarations paymentMethods;
+    public String[] getPaymentBackendMethods(String clientPaymentMethod)
+            throws IOException {
+        PaymentMethodDeclaration pmd = 
+                paymentMethods.paymentMethodDeclarations.get(clientPaymentMethod);
+        if (pmd == null) {
+            throw new IOException("Unknown method: " + clientPaymentMethod);
+        }
+        return pmd.getBackendPaymentMethods();
     }
 
     EncryptionParameter[] encryptionParameters;

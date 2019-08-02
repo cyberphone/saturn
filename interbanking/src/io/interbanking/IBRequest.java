@@ -90,7 +90,7 @@ public class IBRequest extends IBCommon {
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         account = rd.getString(ACCOUNT_JSON);
         transactionReference = rd.getStringConditional(TRANSACTION_REFERENCE_JSON);
-        amount = rd.getBigDecimal(AMOUNT_JSON);
+        amount = rd.getMoney(AMOUNT_JSON);
         currency = rd.getString(CURRENCY_JSON);
         payeeName = rd.getString(PAYEE_NAME_JSON);
         payeeReference = rd.getString(PAYEE_REFERENCE_JSON);
@@ -180,7 +180,7 @@ public class IBRequest extends IBCommon {
             .setString(ACCOUNT_JSON, account)
             .setDynamic((wr) -> transactionReference == null ?
                     wr : wr.setString(TRANSACTION_REFERENCE_JSON, transactionReference))
-            .setBigDecimal(AMOUNT_JSON, amount)
+            .setMoney(AMOUNT_JSON, amount)
             .setString(CURRENCY_JSON, currency)
             .setString(PAYEE_NAME_JSON, payeeName)
             .setString(PAYEE_REFERENCE_JSON, payeeReference)

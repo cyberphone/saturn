@@ -27,7 +27,7 @@ const BaseProperties = require('./BaseProperties');
 const Messages       = require('./Messages');
 
 const PAYMENT_METHOD    = 'https://supercard.com';  // Only one...
-const SIGNATURE_PROFILE = 'http://webpki.org/saturn/v3/signatures#P-256.ES256'; // Only one
+const SIGNATURE_PROFILE = 'https://webpki.github.io/saturn/v3/signatures#P-256.ES256'; // Only one
 
 function ProviderAuthority() {
 }

@@ -44,6 +44,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
+
 import javax.servlet.http.HttpServlet;
 
 import javax.sql.DataSource;
@@ -71,6 +72,7 @@ import org.webpki.saturn.common.HostingProvider;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.ServerAsymKeySigner;
@@ -333,8 +335,16 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 new AuthorityObjectManager(providerAuthorityUrl = bankBaseUrl + "/authority",
                                            bankBaseUrl,
                                            serviceUrl = bankBaseUrl + "/service",
+                                           new ProviderAuthority.PaymentMethodDeclarations()
+                                            .add(new ProviderAuthority
+                                                    .PaymentMethodDeclaration(
+                                                            PaymentMethods.BANK_DIRECT.getPaymentMethodUri())
+                                                .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class))
+                                            .add(new ProviderAuthority
+                                                    .PaymentMethodDeclaration(
+                                                            PaymentMethods.SUPER_CARD.getPaymentMethodUri())
+                                                .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
                                            optionalProviderExtensions,
-                                           new String[]{"https://sepa.payments.org", "https://ultragiro.se"},
                                            new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                                            new ProviderAuthority.EncryptionParameter[]{
                     new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
@@ -383,7 +393,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             payerInterbankUrl = getPropertyString(PAYER_INTERBANK_URL);
             payeeInterbankUrl = getPropertyString(PAYEE_INTERBANK_URL);
-            IBRequest.setLogging(true, logger);
+            IBRequest.setLogging(logging, logger);
 
             started = new GregorianCalendar();
 

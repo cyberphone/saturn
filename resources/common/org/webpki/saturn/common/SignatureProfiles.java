@@ -20,7 +20,7 @@ package org.webpki.saturn.common;
 
 public enum SignatureProfiles {
     
-    P256_ES256 ("http://webpki.org/saturn/v3/signatures#P-256.ES256");
+    P256_ES256 ("https://webpki.github.io/saturn/v3/signatures#P-256.ES256");
     
     String id;
     

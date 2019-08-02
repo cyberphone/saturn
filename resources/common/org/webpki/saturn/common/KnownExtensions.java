@@ -20,7 +20,7 @@ package org.webpki.saturn.common;
 
 public interface KnownExtensions {
     
-    String HYBRID_PAYMENT  = "http://webpki.org/saturn/v3/extensions#hybrid";
+    String HYBRID_PAYMENT  = "https://webpki.github.io/saturn/v3/extensions#hybrid";
     
-    String REFUND_REQUEST  = "http://webpki.org/saturn/v3/extensions#refund";
+    String REFUND_REQUEST  = "https://webpki.github.io/saturn/v3/extensions#refund";
 }
