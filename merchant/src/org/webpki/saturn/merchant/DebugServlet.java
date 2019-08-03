@@ -556,11 +556,12 @@ class DebugPrintout implements BaseProperties {
     private void authorizationResponse() throws IOException, GeneralSecurityException {
         JSONObjectWriter sampleAccountData = (
             debugData.acquirerMode ?
-                new com.supercard.SupercardAccountDataEncoder("6875056745552109",
-                                                       "Luke Skywalker", 
-                                                       ISODateTime.parseDateTime("2022-03-14T00:00:00Z", ISODateTime.COMPLETE))
+                new com.supercard.SupercardAccountDataEncoder("4532562005001506",
+                                                              "Luke Skywalker", 
+                                                              ISODateTime.parseDateTime("2024-03-14T00:00:00Z",
+                                                                                        ISODateTime.COMPLETE))
                                    :
-                new org.payments.sepa.SEPAAccountDataEncoder("FR1420041010050500013M02606")).writeObject();
+                new org.payments.sepa.SEPAAccountDataEncoder("FR7630002111110020050015158")).writeObject();
         description(point.sub() +
                 "<p>After a <i>successful</i> preceding step, the <b>User&nbsp;Bank</b> embeds the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +

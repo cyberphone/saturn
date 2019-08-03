@@ -143,8 +143,6 @@ public class HTML implements MerchantProperties {
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/web/yasmin.html\">YASMIN</a></td><td>JSON Message Scheme</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/keygen2.html\">KeyGen2</a></td><td>Wallet Credential Enrollment Protocol</td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/security/sks-api-arch.pdf\">SKS</a></td><td>Wallet Credential Store</td></tr>" +
-                   "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Related Application</b></td></tr>" +
-                   "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://play.google.com/store/apps/details?id=org.webpki.mobile.android\">SKS/KeyGen2</a></td><td>Android PoC</td></tr>" +
                  "</table></td></tr></table></td></tr>"));
     }
 

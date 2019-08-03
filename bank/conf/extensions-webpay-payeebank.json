@@ -1,4 +1,4 @@
 {
-  "http://webpki.org/saturn/v3/extensions#refund": "${host}/refund"
+  "https://webpki.github.io/saturn/v3/extensions#refund": "${host}/refund"
 }
 
