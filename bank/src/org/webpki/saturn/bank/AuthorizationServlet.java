@@ -158,6 +158,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         String authorizedPaymentMethod = authorizationData.getPaymentMethod();
 /*
         CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
+                                               OUT p_Name VARCHAR(50),
                                                IN p_CredentialId VARCHAR(30),
                                                IN p_MethodUri VARCHAR(50),
                                                IN p_S256PayReq BINARY(32))
