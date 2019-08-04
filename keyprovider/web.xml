@@ -24,6 +24,12 @@
     </context-param>
 
     <context-param>
+        <description>Where to go after success</description>
+        <param-name>merchant_url</param-name>
+        <param-value>@merchant-url@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Key Password</description>
         <param-name>key_password</param-name>
         <param-value>@key-password@</param-value>

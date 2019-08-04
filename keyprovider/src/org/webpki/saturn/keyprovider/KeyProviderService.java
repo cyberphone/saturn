@@ -79,6 +79,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String VERSION_CHECK         = "android_webpki_versions";
 
+    static final String MERCHANT_URL          = "merchant_url";
+
     static final String KEYSTORE_PASSWORD     = "key_password";
 
     static final String KEYPROV_KMK           = "keyprov_kmk";
@@ -159,6 +161,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static String saturnLogotype;
 
+    static String merchantUrl;
+
     InputStream getResource(String name) throws IOException {
         InputStream is = this.getClass().getResourceAsStream(name);
         if (is == null) {
@@ -237,6 +241,11 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ECGenParameterSpec eccgen = new ECGenParameterSpec(KeyAlgorithms.NIST_P_256.getJceName());
             generator.initialize(eccgen, new SecureRandom());
             carrierCaKeyPair = generator.generateKeyPair();
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Success URL
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            merchantUrl = getPropertyString(MERCHANT_URL);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Are we logging?

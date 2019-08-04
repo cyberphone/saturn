@@ -70,6 +70,7 @@
       <replacefilter token="@keyprov-kmk@" value="${@kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@server-tls-certificate@" value="${@kg2_tls_cert_file}"/>
+      <replacefilter token="@merchant-url@" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">

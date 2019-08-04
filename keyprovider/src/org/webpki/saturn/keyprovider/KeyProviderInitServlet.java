@@ -182,18 +182,11 @@ public class KeyProviderInitServlet extends HttpServlet {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Show a sign that the user succeeded getting Saturn credentials
         ////////////////////////////////////////////////////////////////////////////////////////////
-        URL hostUrl = new URL(keygen2EnrollmentUrl);
-        String merchantHost = hostUrl.getHost();
-        if (merchantHost.equals("mobilepki.org")) {
-            merchantHost = "test.webpki.org";
-        }
-        String merchantUrl = new URL(hostUrl.getProtocol(), merchantHost, hostUrl.getPort(), "/webpay-merchant").toExternalForm(); 
-        logger.info(merchantUrl);
         successMessage = 
                 new StringBuilder(
                             "<div style=\"text-align:center\"><div class=\"label\" " +
                             "style=\"margin-bottom:10pt\">Enrollment Succeeded!</div><div><a href=\"")
-                    .append(merchantUrl)
+                    .append(KeyProviderService.merchantUrl)
                     .append("\" class=\"link\">Continue to merchant site</a></div></div>").toString();
     }
     
