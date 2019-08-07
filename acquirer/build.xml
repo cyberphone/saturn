@@ -60,7 +60,7 @@
            <include name="${@bcprovider.jar}"/>
         </fileset>
         <fileset dir="${@reference.lib.dir}">
-           <include name="*.jar"/>
+           <include name="servlet-api.jar"/>
         </fileset>
       </classpath>
     </javac>

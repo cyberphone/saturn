@@ -21,7 +21,6 @@ import java.io.IOException;
 
 import java.util.logging.Logger;
 
-import java.net.URL;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;

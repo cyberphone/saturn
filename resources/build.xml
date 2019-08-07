@@ -33,7 +33,7 @@
        <include name="${@bcprovider.jar}"/>
     </fileset>
     <fileset dir="${@reference.lib.dir}">
-       <include name="*.jar"/>
+       <include name="servlet-api.jar"/>
     </fileset>
     <fileset dir="${@common.lib.dir}">
        <include name="*.jar"/>
@@ -71,7 +71,7 @@
              <include name="${@bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
-             <include name="*.jar"/>
+             <include name="servlet-api.jar"/>
           </fileset>
           <fileset dir="${@common.lib.dir}">
              <include name="*.jar"/>
@@ -115,7 +115,7 @@
              <include name="${@bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
-             <include name="*.jar"/>
+             <include name="servlet-api.jar"/>
           </fileset>
           <pathelement location="${temp.dir}"/>
         </classpath>
@@ -163,7 +163,7 @@
              <include name="${@bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
-             <include name="*.jar"/>
+             <include name="servlet-api.jar"/>
           </fileset>
           <pathelement location="${temp.dir}"/>
         </classpath>
@@ -286,7 +286,7 @@
           failonerror="true">
         <classpath>
             <fileset dir="${@reference.lib.dir}">
-              <include name="*.jar"/>
+              <include name="servlet-api.jar"/>
             </fileset>
              <fileset dir="${@webpki.lib.dir}">
                <include name="*.jar"/>
@@ -390,7 +390,7 @@
              <include name="${@bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
-             <include name="*.jar"/>
+             <include name="servlet-api.jar"/>
           </fileset>
           <pathelement location="${temp.dir}"/>
         </classpath>
@@ -414,7 +414,7 @@
              <include name="${@bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
-             <include name="*.jar"/>
+             <include name="servlet-api.jar"/>
           </fileset>
         </classpath>
         <arg line="${cmd}"/>
