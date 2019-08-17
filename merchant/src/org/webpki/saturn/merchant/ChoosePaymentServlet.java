@@ -70,7 +70,7 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
         savedShoppingCart.roundedPaymentAmount = ((savedShoppingCart.tax + total + 24) / 25) * 25;
         session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
 
-        HTML.userChoosePage(response, savedShoppingCart, HomeServlet.isAndroid(request));
+        HTML.userChoosePage(request, response, savedShoppingCart);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

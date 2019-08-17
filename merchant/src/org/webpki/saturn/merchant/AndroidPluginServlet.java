@@ -41,21 +41,24 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     static final String ANDROID_CANCEL                = "qric";
     static final String QR_SUCCESS_URL                = "local";
     
-    void doPlugin (String httpSessionId, String qrSessionId, HttpServletResponse response) throws IOException, ServletException {
-
+    static String getInvocationUrl(String httpSessionId, String qrSessionId) throws IOException {
         String encodedUrl = URLEncoder.encode(HomeServlet.merchantBaseUrl, "utf-8");
         String cancelUrl = encodedUrl + "%2Fandroidplugin%3F" + ANDROID_CANCEL + "%3D";
         if (qrSessionId != null) {
             cancelUrl += qrSessionId;
         }
-        String url = "intent://saturn?cookie=JSESSIONID%3D" + httpSessionId +
-                     "&url=" + encodedUrl + "%2Fauthorize" + 
-                     "&ver=" + MerchantService.grantedVersions +
-                     "&init=" + encodedUrl + "%2Fandroidplugin" +
-                     "&cncl=" + cancelUrl +
-                     (qrSessionId == null ? "" : "&qr=") +
-                     "#Intent;scheme=webpkiproxy;package=org.webpki.mobile.android;end";
-        HTML.androidPluginActivate(response, url);
+        return "saturn?cookie=JSESSIONID%3D" + httpSessionId +
+               "&url=" + encodedUrl + "%2Fauthorize" + 
+               "&ver=" + MerchantService.grantedVersions +
+               "&init=" + encodedUrl + "%2Fandroidplugin" +
+               "&cncl=" + cancelUrl +
+               (qrSessionId == null ? "" : "&qr=");
+    }
+
+    void doPlugin (String httpSessionId, String qrSessionId, HttpServletResponse response) throws IOException, ServletException {
+        HTML.androidPluginActivate(response,
+                                   "intent://" + getInvocationUrl(httpSessionId, qrSessionId) +
+                                        "#Intent;scheme=webpkiproxy;package=org.webpki.mobile.android;end");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////

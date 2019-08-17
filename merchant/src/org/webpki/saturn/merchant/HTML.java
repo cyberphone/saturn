@@ -429,7 +429,7 @@ public class HTML implements MerchantProperties {
                     "      if (initMode) {\n");
        if (debugMode) {
            temp_string.append(
-                    "        console.debug(JSON.stringify(message));\n");
+                    "        console.info(JSON.stringify(message));\n");
        }
        if (!tapConnectMode) {
            temp_string.append(
@@ -473,7 +473,7 @@ public class HTML implements MerchantProperties {
                    "      if (initialize) {\n" +
                    "        document.getElementById('state').src = 'images/loading-gears-animation-3.gif';\n" +
                    "      } else {\n" +
-                   "        if (initMode) console.debug('Wallet prematurely closed!');\n" +
+                   "        if (initMode) console.info('Wallet prematurely closed!');\n" +
                    "        nativePort = null;\n" +
                    "        document.forms.restore.submit();\n" +
                    "      }\n" +
@@ -490,7 +490,7 @@ public class HTML implements MerchantProperties {
        }
        temp_string.append(
                     "  }, function(err) {\n" +
-                    "    console.debug(err);\n" +
+                    "    console.info(err);\n" +
                     "  });\n");
        if (firefox) {
            temp_string.append("}, 10);\n");
@@ -639,15 +639,16 @@ public class HTML implements MerchantProperties {
             .append("</div>");
      }
 
-    static void userChoosePage(HttpServletResponse response,
-                               SavedShoppingCart savedShoppingCart,
-                               boolean android) throws IOException, ServletException {
+    static void userChoosePage(HttpServletRequest request,
+                               HttpServletResponse response,
+                               SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
+        boolean android = HomeServlet.isAndroid(request);
         StringBuilder s = currentOrder(savedShoppingCart)
             .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
                     "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:" +
                     FONT_ARIAL + "\">Select Payment Method</td></tr>")
             .append(MerchantService.desktopWallet || android ?
-                      "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"document.forms.shoot.submit()\"></td></tr>" 
+                      "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"goSaturnGo()\"></td></tr>" 
                                                                 :
                       "")
             .append(MerchantService.desktopWallet || !android ?
@@ -664,14 +665,77 @@ public class HTML implements MerchantProperties {
 
         HTML.output(response, HTML.getHTML(
                 STICK_TO_HOME_URL +
-                "\nfunction noSuchMethod(element) {\n" +
-                        "    document.getElementById('notimplemented').style.top = (element.getBoundingClientRect().top + window.scrollY - document.getElementById('notimplemented').offsetHeight * 1.5) + 'px';\n" +
-                        "    document.getElementById('notimplemented').style.left = ((window.innerWidth - document.getElementById('notimplemented').offsetWidth) / 2) + 'px';\n" +
-                        "    document.getElementById('notimplemented').style.visibility = 'visible';\n" +
-                        "    setTimeout(function() {\n" +
-                        "        document.getElementById('notimplemented').style.visibility = 'hidden';\n" +
-                        "    }, 1000);\n" +
-                        "}\n\n",
+                "\n" +
+                "function noSuchMethod(element) {\n" +
+                "  document.getElementById('notimplemented').style.top = (element.getBoundingClientRect().top + window.scrollY - document.getElementById('notimplemented').offsetHeight * 1.5) + 'px';\n" +
+                "  document.getElementById('notimplemented').style.left = ((window.innerWidth - document.getElementById('notimplemented').offsetWidth) / 2) + 'px';\n" +
+                "  document.getElementById('notimplemented').style.visibility = 'visible';\n" +
+                "  setTimeout(function() {\n" +
+                "    document.getElementById('notimplemented').style.visibility = 'hidden';\n" +
+                "  }, 1000);\n" +
+                "}\n\n" +
+                (MerchantService.useW3cPaymentRequest ?
+                "function buildPaymentRequest() {\n" +
+                "  if (!window.PaymentRequest) {\n" +
+                "    return null;\n" +
+                "  }\n\n" +
+                "  const details = {\n" +
+                "    total: {\n" +
+                "      label: 'total', \n" +
+                "      amount: {\n" +
+                "        currency: 'USD',\n" +
+                "        value: '1.00'\n" +
+                "      }\n" +
+                "    }\n" +
+                "  };\n\n" +
+                (android ? 
+                "  const supportedInstruments = [{\n" +
+                "    supportedMethods: 'https://192.168.1.79:8442/w3cpay/method',\n" +
+                "    data: {url: 'w3cpay://" + AndroidPluginServlet.getInvocationUrl(request.getSession(false).getId(), null) + "'}\n" +
+                "  }];\n\n"
+                            : 
+                "  const supportedInstruments = [{\n" +
+                "    supportedMethods: 'basic-card',\n" +
+                "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
+                "  }];\n\n") +
+                "  let request = null;\n\n" +
+                "  try {\n" +
+                "    request = new PaymentRequest(supportedInstruments, details);\n" +
+                "    if (request.canMakePayment) {\n" +
+                "      request.canMakePayment().then(function(result) {\n" +
+                "        console.info(result ? 'Can make payment' : 'Cannot make payment');\n" +
+                "      }).catch(function(err) {\n" +
+                "        console.info(err);\n" +
+                "      });\n" +
+                "    }\n" +
+                "  } catch (e) {\n" +
+                "    console.info('Developer mistake:' + e.message);\n" +
+                "  }\n" +
+                "  return request;\n" +
+                "}\n\n" +
+                "let w3creq = buildPaymentRequest();\n\n" +
+                "function goSaturnGo() {\n" +
+                "  if (w3creq) {\n" +
+                "    try {\n" +
+                "      w3creq.show().then(function(response) {\n" +
+                "        response.complete('success');\n" +
+                "        console.info('Success!');\n" +
+                "        document.location.href = response.details.goto;\n" +
+                "      }).catch(function(err) {\n" +
+                "        console.info(err.message);\n" +
+                "        document.forms.restore.submit();\n" +
+                "      });\n" +
+                "    } catch (e) {\n" +
+                "      console.info('Developer mistake:' + e.message);\n" +
+                "    }\n" +
+                "  } else {\n" +
+                "    document.forms.shoot.submit();\n" +
+                "  }\n" +
+                "}\n"
+                            :
+                "function goSaturnGo() {\n" +
+                "  document.forms.shoot.submit();\n" +
+                "}\n"),
                 "><form name=\"shoot\" method=\"POST\" action=\"" + 
                 (android ? "androidplugin" : "w2nbwallet") +
                 "\"></form><form name=\"restore\" method=\"POST\" action=\"shop\">" +

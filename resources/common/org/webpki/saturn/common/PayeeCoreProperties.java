@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.net.URLEncoder;
+
 import java.security.PublicKey;
 
 import java.util.Vector;
@@ -33,13 +35,17 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
+import org.webpki.util.Base64URL;
+
 public class PayeeCoreProperties implements BaseProperties {
     
-    static final String PAYEE_ACCOUNTS_JSON = "payeeAccounts";  // Only for "init" not part of Saturn vocabularly
+    static final String PAYEE_ACCOUNTS_JSON = "payeeAccounts";  // Only for "init" not part of Saturn vocabulary
 
     Vector<byte[]> optionalAccountHashes;
     SignatureParameter[] signatureParameters;
     DecoratedPayee decoratedPayee;
+    String urlSafeId;
+    String payeeAuthorityUrl;
 
     public static class SignatureParameter {
         
@@ -79,7 +85,8 @@ public class PayeeCoreProperties implements BaseProperties {
         signatureParameters = parameterArray.toArray(new SignatureParameter[0]);
     }
 
-    public static PayeeCoreProperties init(JSONObjectReader rd, 
+    public static PayeeCoreProperties init(JSONObjectReader rd,
+                                           String payeeBaseAuthorityUrl,
                                            JSONDecoderCache knownPaymentMethods,
                                            boolean addVerifier) throws IOException {
         JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
@@ -94,6 +101,12 @@ public class PayeeCoreProperties implements BaseProperties {
         } while (payeeAccounts.hasMore());
         PayeeCoreProperties payeeCoreProperties = new PayeeCoreProperties(rd);
         payeeCoreProperties.optionalAccountHashes = optionalAccountHashes.isEmpty() ? null : optionalAccountHashes;
+        String urlSafeId = payeeCoreProperties.decoratedPayee.id;
+        if (!URLEncoder.encode(urlSafeId, "utf-8").equals(urlSafeId)) {
+            urlSafeId = Base64URL.encode(urlSafeId.getBytes("utf-8"));
+        }
+        payeeCoreProperties.urlSafeId = urlSafeId;
+        payeeCoreProperties.payeeAuthorityUrl = payeeBaseAuthorityUrl + urlSafeId;
         return payeeCoreProperties;
     }
 
@@ -107,6 +120,10 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public Vector<byte[]> getAccountHashes() {
         return optionalAccountHashes;
+    }
+
+    public String getPayeeAuthorityUrl() {
+        return payeeAuthorityUrl;
     }
 
     public JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {

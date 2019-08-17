@@ -42,7 +42,6 @@ public class AuthorityObjectManager extends Thread {
     HostingProvider optionalHostingProvider; 
 
     SortedMap<String,PayeeCoreProperties> payees;
-    String payeeBaseAuthorityUrl;
 
     int expiryTimeInSeconds;
     long renewCycle;
@@ -76,8 +75,8 @@ public class AuthorityObjectManager extends Thread {
             for (String id : payees.keySet()) {
                 PayeeCoreProperties payeeCoreProperties = payees.get(id);
                 synchronized(this) {
-                    payeeAuthorityBlobs.put(id, 
-                                            PayeeAuthority.encode(payeeBaseAuthorityUrl + id,
+                    payeeAuthorityBlobs.put(payeeCoreProperties.urlSafeId, 
+                                            PayeeAuthority.encode(payeeCoreProperties.payeeAuthorityUrl,
                                                                   providerAuthorityUrl,
                                                                   payeeCoreProperties,
                                                                   TimeUtil.inSeconds(expiryTimeInSeconds),
@@ -105,7 +104,6 @@ public class AuthorityObjectManager extends Thread {
                                     
                                   // PayeeAuthority (may be null)
                                   SortedMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
-                                  String payeeBaseAuthorityUrl,
                                   ServerAsymKeySigner attestationSigner,
 
                                   int expiryTimeInSeconds /* Both */,
@@ -120,7 +118,6 @@ public class AuthorityObjectManager extends Thread {
         this.optionalHostingProvider = optionalHostingProvider; 
 
         this.payees = payees;
-        this.payeeBaseAuthorityUrl = payeeBaseAuthorityUrl;
         
         this.expiryTimeInSeconds = expiryTimeInSeconds;
         this.renewCycle = expiryTimeInSeconds * 500;

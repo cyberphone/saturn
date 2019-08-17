@@ -101,6 +101,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String W2NB_WALLET                  = "w2nb_wallet";
 
+    static final String USE_W3C_PAYMENT_REQUEST      = "use_w3c_payment_request";
+
     static final String SEPA_ACCOUNT                 = "sepa-account.json";
 
     static final String USER_AUTHZ_SAMPLE            = "user-authorization.json";
@@ -156,6 +158,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static Boolean testMode;
 
     static boolean logging;
+    
+    static boolean useW3cPaymentRequest;
     
     static ExternalCalls externalCalls;
     
@@ -252,6 +256,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             currency = Currencies.valueOf(getPropertyString(CURRENCY));
 
             w2nbWalletName = getPropertyString(W2NB_WALLET);
+
+            useW3cPaymentRequest = getPropertyBoolean(USE_W3C_PAYMENT_REQUEST);
 
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 

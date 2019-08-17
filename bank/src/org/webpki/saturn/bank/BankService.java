@@ -34,7 +34,6 @@ import java.security.interfaces.RSAKey;
 import java.util.TreeMap;
 import java.util.SortedMap;
 import java.util.Vector;
-import java.util.Comparator;
 import java.util.GregorianCalendar;
 
 import java.util.logging.Level;
@@ -123,14 +122,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
     
      static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
-        new TreeMap<String,PayeeCoreProperties>(new Comparator<String>() {
-            @Override
-            public int compare(String arg0, String arg1) {
-                if (arg0.length() > arg1.length()) {
-                    return 1;
-                }
-                return arg0.compareTo(arg1);
-            }});
+            new TreeMap<String,PayeeCoreProperties>();
     
     static String bankCommonName;
 
@@ -146,8 +138,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static String providerAuthorityUrl;
     
-    static String payeeAuthorityBaseUrl;
-
     static String payerInterbankUrl;  // Static since we do not have a card or SEPA database and associated URL's
 
     static String payeeInterbankUrl;  //     -"-
@@ -302,6 +292,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             acquirerRoot = getRoot(ACQUIRER_ROOT);
             
+            String bankBaseUrl = getPropertyString(BANK_BASE_URL);
+            
             boolean accountValidation = getPropertyBoolean(ACCOUNT_VALIDATION);
             if (hostingProvider == null) {
                 JSONArrayReader accounts = 
@@ -310,6 +302,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                             .getJSONArrayReader();
                 while (accounts.hasMore()) {
                     PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
+                                                                           bankBaseUrl + "/payees/",
                                                                            knownPayeeMethods,
                                                                            accountValidation);
                     merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
@@ -320,8 +313,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             addDecryptionKey(DECRYPTION_KEY2);
 
             testReferenceId = 10000;
-            
-            String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
             String extensions =
                 new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
@@ -355,7 +346,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            bankKey,
 
                                            merchantAccountDb,
-                                           payeeAuthorityBaseUrl = bankBaseUrl + "/payees/",
                                            hostingProvider == null ? new ServerAsymKeySigner(bankcreds) : null,
 
                                            PROVIDER_EXPIRATION_TIME,

@@ -119,6 +119,12 @@
     </context-param>
 
     <context-param>
+        <description>Support W3C PaymentRequest</description>
+        <param-name>use_w3c_payment_request</param-name>
+        <param-value>@use-w3c-payment-request@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Slow operation flag</description>
         <param-name>slow_operation</param-name>
         <param-value>@slow-operation@</param-value>

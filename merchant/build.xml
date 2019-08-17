@@ -112,6 +112,7 @@
       <replacefilter token="@add-unusual-card@" value="${unusual.card}"/>
       <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
       <replacefilter token="@w2nb-wallet@" value="${@w2nb.webwallet}"/>
+      <replacefilter token="@use-w3c-payment-request@" value="${@w3c.paymentrequest}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
       <replacefilter token="@logging@" value="${logging}"/>

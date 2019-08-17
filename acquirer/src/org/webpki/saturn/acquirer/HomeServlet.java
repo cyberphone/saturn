@@ -66,7 +66,7 @@ public class HomeServlet extends HttpServlet {
                 "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : AcquirerService.merchantAccountDb.values()) {
                 String id = payeeCoreProperties.getDecoratedPayee().getId();
-                authorityUrl = AcquirerService.payeeAuthorityBaseUrl + id;
+                authorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
                 html.append("<tr><td style=\"text-align:right\">")
                  .append(id)
                  .append("</td><td>")

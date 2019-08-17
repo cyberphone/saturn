@@ -28,7 +28,6 @@ import java.security.interfaces.RSAKey;
 import java.util.GregorianCalendar;
 import java.util.TreeMap;
 import java.util.SortedMap;
-import java.util.Comparator;
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -97,22 +96,13 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
 
     static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
-        new TreeMap<String,PayeeCoreProperties>(new Comparator<String>() {
-            @Override
-            public int compare(String arg0, String arg1) {
-                if (arg0.length() > arg1.length()) {
-                    return 1;
-                }
-                return arg0.compareTo(arg1);
-            }});
+            new TreeMap<String,PayeeCoreProperties>();
 
     static JSONX509Verifier paymentRoot;
 
     static ServerX509Signer acquirerKey;
     
     static String providerAuthorityUrl;
-    
-    static String payeeAuthorityBaseUrl;
     
     static String payerInterbankUrl;  // Static since we do not have a card database and associated URL's
 
@@ -202,15 +192,18 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             JSONArrayReader accounts = JSONParser.parse(
                     ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
+            String acquirerBaseUrl = getPropertyString(ACQUIRER_BASE_URL);
+
             while (accounts.hasMore()) {
-                PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
+                PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
+                                                                       acquirerBaseUrl + "/payees/",
+                                                                       knownPayeeMethods,
+                                                                       false);
                 merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
             addDecryptionKey(DECRYPTION_KEY2);
-            
-            String acquirerBaseUrl = getPropertyString(ACQUIRER_BASE_URL);
 
             String extensions =
                     new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
@@ -240,7 +233,6 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                            acquirerKey,
 
                                            merchantAccountDb, 
-                                           payeeAuthorityBaseUrl = acquirerBaseUrl + "/payees/",
                                            new ServerAsymKeySigner(acquirercreds),
 
                                            PROVIDER_EXPIRATION_TIME,
