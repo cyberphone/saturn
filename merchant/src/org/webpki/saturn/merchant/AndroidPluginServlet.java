@@ -31,7 +31,8 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.NonDirectPayments;
-import org.webpki.saturn.common.MobileProxyParameters;
+
+import org.webpki.net.MobileProxyParameters;
 
 public class AndroidPluginServlet extends HttpServlet implements MerchantProperties {
 
@@ -42,13 +43,13 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     static final String ANDROID_CANCEL                = "qric";
     static final String QR_SUCCESS_URL                = "local";
     
-    static String getInvocationUrl(String httpSessionId, String qrSessionId) throws IOException {
+    static String getInvocationUrl(String scheme, String httpSessionId, String qrSessionId) throws IOException {
         String encodedUrl = URLEncoder.encode(HomeServlet.merchantBaseUrl, "utf-8");
         String cancelUrl = encodedUrl + "%2Fandroidplugin%3F" + ANDROID_CANCEL + "%3D";
         if (qrSessionId != null) {
             cancelUrl += qrSessionId;
         }
-        return MobileProxyParameters.PROXY_HOST_SATURN +
+        return scheme + "://" + MobileProxyParameters.HOST_SATURN +
                "?cookie=JSESSIONID%3D" + httpSessionId +
                "&url=" + encodedUrl + "%2Fauthorize" + 
                "&ver=" + MerchantService.grantedVersions +
@@ -67,10 +68,9 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             return;
         }
         HTML.androidPluginActivate(response,
-                                   MobileProxyParameters.PROTOCOL_URLHANDLER + 
-                                       getInvocationUrl(session.getId(), null) +
+                                   getInvocationUrl(MobileProxyParameters.SCHEME_URLHANDLER, session.getId(), null) +
                                        "#Intent;scheme=webpkiproxy;package=" +
-                                       MobileProxyParameters.PACKAGE_NAME +
+                                       MobileProxyParameters.ANDROID_PACKAGE_NAME +
                                        ";end");
     }
 
@@ -137,7 +137,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                 Synchronizer synchronizer = QRSessions.getSynchronizer(id);
                 if (synchronizer != null) {
                     synchronizer.setInProgress();
-                    HTML.output(response, MobileProxyParameters.PROTOCOL_QRCODE + getInvocationUrl(httpSessionId, id));
+                    HTML.output(response, getInvocationUrl(MobileProxyParameters.SCHEME_QRCODE, httpSessionId, id));
                 }
             }
         }

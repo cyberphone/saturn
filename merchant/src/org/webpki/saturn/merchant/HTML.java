@@ -29,10 +29,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
 
+import org.webpki.net.MobileProxyParameters;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.MobileProxyParameters;
 
 import org.webpki.saturn.w2nb.support.W2NB;
 
@@ -692,8 +693,9 @@ public class HTML implements MerchantProperties {
                 (android ? 
                 "  const supportedInstruments = [{\n" +
                 "    supportedMethods: 'https://192.168.1.79:8442/w3cpay/method',\n" +
-                "    data: {url: '" + MobileProxyParameters.PROTOCOL_W3CPAY +
-                        AndroidPluginServlet.getInvocationUrl(request.getSession(false).getId(), null) + "'}\n" +
+                "    data: {url: '" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
+                                                                            request.getSession(false).getId(),
+                                                                            null) + "'}\n" +
                 "  }];\n\n"
                             : 
                 "  const supportedInstruments = [{\n" +
