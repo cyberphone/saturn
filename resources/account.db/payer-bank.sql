@@ -7,20 +7,21 @@
 DROP DATABASE IF EXISTS PAYER_BANK;
 CREATE DATABASE PAYER_BANK CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 --
--- Create a user but remove any existing user first
-DROP USER IF EXISTS saturn@localhost;
+-- Create our single user
 --
+DROP USER IF EXISTS saturn@localhost;
 CREATE USER saturn@localhost IDENTIFIED BY 'foo123';
 --
--- Let user access
+-- Give this user access
 --
 GRANT ALL ON PAYER_BANK.* TO saturn@localhost;
 GRANT SELECT ON mysql.proc TO saturn@localhost;
 --
--- Create tables
+-- Create tables and stored procedures
 --
 -- #############################################################
--- # Note: a bank probably uses a much more elaborate database #
+-- # This is the Payer side of a PoC database holding data for #
+-- # Users, Accounts, Credentials and Transactions             #
 -- #############################################################
 
 USE PAYER_BANK;
@@ -71,13 +72,13 @@ CREATE TABLE ACCOUNTS
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Account ID
 
-    UserId      INT           NOT NULL,                                  -- Unique User ID (account holder)
+    UserId      INT           NOT NULL,                                  -- User ID (account holder)
 
-    AccountType INT           NOT NULL,                                  -- Unique Type ID
+    AccountType INT           NOT NULL,                                  -- Type ID
 
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
 
-    Balance     DECIMAL(8,2)  NOT NULL,                                  -- Disponible
+    Balance     DECIMAL(8,2)  NOT NULL,                                  -- Currently available
 
     Currency    CHAR(3)       NOT NULL  DEFAULT "EUR",                   -- SEK, USD, EUR etc.
 
@@ -111,13 +112,22 @@ CREATE TABLE CREDENTIAL_TYPES
 
 CREATE TABLE CREDENTIALS
   (
+
+-- Note: a Credential ID is an external representation of an Account ID
+-- like an IBAN or Card Number.  Their contents are (database-wise)
+-- independent of the actual Account IDs.
+
     Id          VARCHAR(30)   NOT NULL  UNIQUE,                          -- Unique Credential ID 
 
-    AccountId   INT           NOT NULL,                                  -- Account ID Reference
+    AccountId   INT           NOT NULL,                                  -- Account Reference
 
     CredentialType  INT       NOT NULL,                                  -- Credential Type Reference
 
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
+
+-- Authentication of user authorization signatures is performed
+-- by verifying that both SHA256 of the public key (in X.509 DER
+-- format) and claimed Id (Card number, IBAN) match.
 
     S256PayReq  BINARY(32)    NOT NULL,                                  -- Payment request key hash 
 
@@ -153,7 +163,7 @@ CREATE TABLE TRANSACTIONS
   (
     Id          INT           NOT NULL  UNIQUE,                          -- Unique Transaction ID
 
-    AccountId   INT           NOT NULL,                                  -- Unique Account ID
+    AccountId   INT           NOT NULL,                                  -- Referring to an Account
 
     CredentialId VARCHAR(30),                                            /* Optional Credential ID
                                                                             linked to the Account ID */
@@ -162,7 +172,7 @@ CREATE TABLE TRANSACTIONS
                                                                             linked to a previous
                                                                             Transaction ID */
 
-    TransactionType INT       NOT NULL,                                  -- Unique Transaction Type ID
+    TransactionType INT       NOT NULL,                                  -- Transaction Type ID
 
     Amount      DECIMAL(8,2)  NOT NULL,                                  -- The Amount involved
 
@@ -188,15 +198,23 @@ CREATE TABLE TRANSACTIONS
 
 CREATE TABLE TRANSACTION_COUNTER
   (
+-- MySQL 5.7 auto increment is unreliable for this application since it
+-- loses track for power fails if TRANSACTIONS are emptied like in the demo.
+
+-- Therefore we use a regular table with a single column and row.
+
     Next        INT           NOT NULL                                   -- Monotonic counter
+
   );
 
 INSERT INTO TRANSACTION_COUNTER(Next) VALUES(100345078);
 
 DELIMITER //
 
--- MySQL 5.7 auto increment is unreliable for this application since it
--- loses track for power fails if TRANSACTIONS is emptied like in the demo
+
+-- This particular implementation builds on creating the pending transaction ID
+-- before the transaction is performed.  There are pros and cons with all such
+-- schemes. This one leave "holes" in the sequence for failed transactions.
 
 CREATE FUNCTION GetNextTransactionIdSP () RETURNS INT
   BEGIN
@@ -263,7 +281,10 @@ DETERMINISTIC
 CREATE FUNCTION FRENCH_IBAN (p_AccountId INT(11)) RETURNS VARCHAR(30)
 DETERMINISTIC
   BEGIN
-    -- https://fr.wikipedia.org/wiki/Cl%C3%A9_RIB
+
+-- https://fr.wikipedia.org/wiki/Cl%C3%A9_RIB
+-- Hard coded financial institution and branch office (LCL)
+
     set @chk = LPAD(CONVERT(97 - (2836843 + 3 * p_AccountId) % 97, CHAR), 2, '0');
     set @bban = CONCAT('3000211111', LPAD(CONVERT(p_AccountId, DECIMAL(11)), 11, '0'), @chk);
     set @key = LPAD(CONVERT(98 - (CONVERT(CONCAT(@bban, '152700'), DECIMAL(30)) % 97), CHAR), 2, '0');
@@ -276,7 +297,10 @@ CREATE FUNCTION CREDIT_CARD (p_IIN VARCHAR(8),
                              p_AccountDigits INT) RETURNS VARCHAR(30)
 DETERMINISTIC
   BEGIN
-    -- https://gefvert.org/blog/archives/57
+
+-- https://gefvert.org/blog/archives/57
+-- Luhn number calculation
+
     DECLARE i, s, r, weight INT;
     DECLARE baseNumber VARCHAR(16);
  
@@ -418,6 +442,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
 
     SET p_Error = 0;
     START TRANSACTION;
+    -- Lock the actual account record for updates
     SELECT ACCOUNTS.Balance, ACCOUNTS.Id INTO v_Balance, v_AccountId FROM ACCOUNTS
         INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
         WHERE CREDENTIALS.Id = p_CredentialId
@@ -478,6 +503,8 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
       END IF;
     END IF;
     COMMIT;
+    -- Perform the transaction if it was not rejected
+    -- Unlock the account 
   END
 //
 
@@ -579,6 +606,11 @@ CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
   END
 //
 
+-- Although it would (maybe) be cool doing all internal and external operations
+-- as a super transaction, this also complicates the implementation. 
+-- Therefore we rather do a "cleanup" of our internal data in case an external
+-- operation failed.
+
 CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, IN p_FailedTransactionId INT)
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
@@ -625,6 +657,8 @@ CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, IN p_FailedTransactionId
   END
 // 
 
+-- For the PoC demo only, see "RestoreAccountsSP".
+
 CREATE PROCEDURE RestoreUserAccountsSP(IN p_UserId INT)
   BEGIN
     UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = p_UserId;
@@ -638,6 +672,9 @@ CREATE PROCEDURE RestoreUserAccountsSP(IN p_UserId INT)
     SET SQL_SAFE_UPDATES = 1;
   END;
 //
+
+-- For the PoC demo only, restore a user's account after 30 minutes of idling
+-- so they can test again without creating a new account :-)
 
 CREATE PROCEDURE RestoreAccountsSP (IN p_Unconditionally BOOLEAN)
   BEGIN
