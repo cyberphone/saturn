@@ -31,6 +31,7 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.NonDirectPayments;
+import org.webpki.saturn.common.MobileProxyParameters;
 
 public class AndroidPluginServlet extends HttpServlet implements MerchantProperties {
 
@@ -47,22 +48,16 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
         if (qrSessionId != null) {
             cancelUrl += qrSessionId;
         }
-        return "saturn?cookie=JSESSIONID%3D" + httpSessionId +
+        return MobileProxyParameters.PROXY_HOST_SATURN +
+               "?cookie=JSESSIONID%3D" + httpSessionId +
                "&url=" + encodedUrl + "%2Fauthorize" + 
                "&ver=" + MerchantService.grantedVersions +
                "&init=" + encodedUrl + "%2Fandroidplugin" +
-               "&cncl=" + cancelUrl +
-               (qrSessionId == null ? "" : "&qr=");
-    }
-
-    void doPlugin (String httpSessionId, String qrSessionId, HttpServletResponse response) throws IOException, ServletException {
-        HTML.androidPluginActivate(response,
-                                   "intent://" + getInvocationUrl(httpSessionId, qrSessionId) +
-                                        "#Intent;scheme=webpkiproxy;package=org.webpki.mobile.android;end");
+               "&cncl=" + cancelUrl;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
-    // The POST method is only called by Saturn Web pay for Android                  //
+    // The POST method is only called by Saturn Web pay for Android using URLhandler //
     ///////////////////////////////////////////////////////////////////////////////////
     @Override
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -71,14 +66,19 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        doPlugin(session.getId(), null, response);
+        HTML.androidPluginActivate(response,
+                                   MobileProxyParameters.PROTOCOL_URLHANDLER + 
+                                       getInvocationUrl(session.getId(), null) +
+                                       "#Intent;scheme=webpkiproxy;package=" +
+                                       MobileProxyParameters.PACKAGE_NAME +
+                                       ";end");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////
     // The GET method used for multiple purposes                                     //
     //                                                                               //
-    // Note: Most of this slimy and error-prone code would be redundant if Android   //
-    // had a useful Web2App concept.                                                 //
+    // Note: Most of this slimy and error-prone code is redundant when Android is    //
+    // using the W3C PaymentRequest API.                                             //
     ///////////////////////////////////////////////////////////////////////////////////
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -137,7 +137,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                 Synchronizer synchronizer = QRSessions.getSynchronizer(id);
                 if (synchronizer != null) {
                     synchronizer.setInProgress();
-                    doPlugin(httpSessionId, id, response);
+                    HTML.output(response, MobileProxyParameters.PROTOCOL_QRCODE + getInvocationUrl(httpSessionId, id));
                 }
             }
         }

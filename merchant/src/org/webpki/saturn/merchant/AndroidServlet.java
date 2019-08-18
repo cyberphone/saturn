@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 //////////////////////////////////////////////////////////////////////////
-// This servlet shows the result of a transaction to the user           //
+// This servlet shows data about the Android version and enrollment     //
 //////////////////////////////////////////////////////////////////////////
 
 public class AndroidServlet extends HttpServlet {
