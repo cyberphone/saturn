@@ -125,6 +125,12 @@
     </context-param>
 
     <context-param>
+        <description>W3C PaymentRequest Manifest Host</description>
+        <param-name>w3c_payment_request_host</param-name>
+        <param-value>@w3c-payment-request-host@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Slow operation flag</description>
         <param-name>slow_operation</param-name>
         <param-value>@slow-operation@</param-value>

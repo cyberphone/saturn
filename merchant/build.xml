@@ -113,6 +113,7 @@
       <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
       <replacefilter token="@w2nb-wallet@" value="${@w2nb.webwallet}"/>
       <replacefilter token="@use-w3c-payment-request@" value="${@w3c.paymentrequest}"/>
+      <replacefilter token="@w3c-payment-request-host@" value="${@w3c.manifesthost}/${@w3c.manifestpath}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
       <replacefilter token="@logging@" value="${logging}"/>

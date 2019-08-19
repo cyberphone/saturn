@@ -692,7 +692,7 @@ public class HTML implements MerchantProperties {
                 "  };\n\n" +
                 (android ? 
                 "  const supportedInstruments = [{\n" +
-                "    supportedMethods: 'https://192.168.1.79:8442/w3cpay/method',\n" +
+                "    supportedMethods: '" + MerchantService.w3cPaymentRequestMethod + "',\n" +
                 "    data: {url: '" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
                                                                             request.getSession(false).getId(),
                                                                             null) + "'}\n" +

@@ -1,0 +1,84 @@
+<project name="W3C PaymentRequest/Manifest" default="help">
+
+  <!-- set properties for this build -->
+  <property file="../resources/common.properties"/>
+  <property name="src.dir" value="src"/>
+  <property name="temp.dir" value=".tmp"/>
+  <property name="dist.dir" value="dist"/>
+  <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/w3c/manifest"/>
+  
+  <property name="application" value="${@w3c.manifestpath}.war"/>
+  
+  <property name="zip.webpki.lib.dir" location="${@webpki.lib.dir}"/>
+  
+  <property name="javaversion" value="1.8"/>
+  <property name="debug" value="on"/>
+
+  <property environment="env"/>
+  <property name="catalina.home" value="${env.CATALINA_HOME}"/>
+
+  <target name="help">
+      <echo message="build tomcat"/>
+  </target>
+
+  <target name="_init" unless="app_path">
+    <!-- Set up where application should reside --> 
+    <condition property="tomcat_app_root_set">
+      <isset property="env.CATALINA_HOME"/>
+    </condition>
+    <fail message="CATALINA_HOME must be set to environment!" unless="tomcat_app_root_set"/>
+
+  </target>
+
+  <target name="tomcat">
+  	<antcall target="build"/>
+    <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
+  </target>
+
+  <target name="build">
+    <mkdir dir="${dist.dir}"/>
+    <delete dir="${temp.dir}"/>
+    <mkdir dir="${temp.dir}"/>
+    <fixcrlf srcdir="${src.dir}"
+       tab="remove"
+       tablength="4"
+       eol="lf"
+       eof="remove"
+       includes="**/*.java"/>
+    <copy file="web.xml" todir="${temp.dir}"/>
+    <javac debug="${debug}"
+           source="${javaversion}"
+           target="${javaversion}"
+           srcdir="${src.dir}"
+           destdir="${temp.dir}"
+           includeAntRuntime="false">
+		<classpath>
+			  <fileset dir="${@webpki.lib.dir}">
+		         <include name="webpki.org-libext*.jar"/>
+		         <include name="webpki.org-webutil*.jar"/>
+		     </fileset>
+			 <fileset dir="${@reference.lib.dir}">
+                <include name="servlet-api.jar"/>
+			 </fileset>
+		</classpath>
+    </javac>
+    <replace file="${temp.dir}/web.xml">
+      <replacefilter token="@host-path@" value="${@w3c.manifesthost}/${@w3c.manifestpath}"/>
+    </replace>
+    <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
+      <classes dir="${temp.dir}">
+         <exclude name="web.xml"/>
+      </classes>
+      <lib dir="${zip.webpki.lib.dir}">
+         <include name="webpki.org-libext*.jar"/>
+         <include name="webpki.org-webutil*.jar"/>
+      </lib>
+      <fileset dir="web"/>
+<!--
+    <zipfileset dir="${logotype.dir}" prefix="${class_war_path}"/>
+-->
+      <zipfileset file="signer-certificate.cer" prefix="${class_war_path}"/>
+    </war>
+  </target>
+  
+</project>
