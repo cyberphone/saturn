@@ -101,7 +101,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // Server errors are returned as HTTP redirects taking the client out of its KeyGen2 mode
         ////////////////////////////////////////////////////////////////////////////////////////////
-        response.sendRedirect(KeyProviderInitServlet.keygen2EnrollmentUrl + 
+        response.sendRedirect(KeyProviderService.keygen2RunUrl + 
                               "?" +
                               KeyProviderInitServlet.ERROR_TAG +
                               "=" +
@@ -132,7 +132,6 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
     void executeRequest(HttpServletRequest request, HttpServletResponse response, boolean init)
          throws IOException, ServletException {
-        String keygen2EnrollmentUrl = KeyProviderInitServlet.keygen2EnrollmentUrl;
         HttpSession session = request.getSession(false);
         try {
             ////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,7 +401,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     // We are done, return an HTTP redirect taking 
                     // the client out of its KeyGen2 mode
                     ////////////////////////////////////////////////////////////////////////
-                    response.sendRedirect(keygen2EnrollmentUrl);
+                    response.sendRedirect(KeyProviderService.keygen2RunUrl);
                     return;
 
                 default:
@@ -455,7 +454,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 html.append("You need to restart the session");
             } else {
                 session.invalidate();
-                html.append(KeyProviderInitServlet.successMessage);
+                html.append(KeyProviderService.successMessage);
             }
         }
         KeyProviderInitServlet.output(response, 

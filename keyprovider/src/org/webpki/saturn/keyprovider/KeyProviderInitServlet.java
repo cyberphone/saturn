@@ -32,7 +32,7 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.keygen2.ServerState;
 
-import org.webpki.webutil.ServletUtil;
+import org.webpki.net.MobileProxyParameters;
 
 public class KeyProviderInitServlet extends HttpServlet {
 
@@ -157,6 +157,7 @@ public class KeyProviderInitServlet extends HttpServlet {
          .append (KeyProviderService.saturnLogotype)
          .append ("</div><div class=\"displayContainer\">")
                 .append(box).append("</div></body></html>");
+        System.out.println(s.toString());
         return s.toString();
     }
   
@@ -167,41 +168,19 @@ public class KeyProviderInitServlet extends HttpServlet {
         response.getOutputStream().write(html.getBytes("UTF-8"));
     }
     
-    static String keygen2EnrollmentUrl;
-    
-    static String successMessage;
-    
-    synchronized void initGlobals(String baseUrl) throws IOException {
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Get KeyGen2 protocol entry
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        keygen2EnrollmentUrl = baseUrl + "/getkeys";
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        // Show a sign that the user succeeded getting Saturn credentials
-        ////////////////////////////////////////////////////////////////////////////////////////////
-        successMessage = 
-                new StringBuilder(
-                            "<div style=\"text-align:center\"><div class=\"label\" " +
-                            "style=\"margin-bottom:10pt\">Enrollment Succeeded!</div><div><a href=\"")
-                    .append(KeyProviderService.merchantUrl)
-                    .append("\" class=\"link\">Continue to merchant site</a></div></div>").toString();
-    }
-    
-    String createIntent(HttpSession session) throws IOException {
+    static String getInvocationUrl(String scheme, HttpSession session) throws IOException {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // The following is the actual contract between an issuing server and a KeyGen2 client.
         // The "cookie" element is optional while the "url" argument is mandatory.
         // The "init" argument bootstraps the protocol via an HTTP GET
         ////////////////////////////////////////////////////////////////////////////////////////////
-        String urlEncoded = URLEncoder.encode(keygen2EnrollmentUrl, "utf-8");
-        return "intent://keygen2?cookie=JSESSIONID%3D" + session.getId() +
+        String urlEncoded = URLEncoder.encode(KeyProviderService.keygen2RunUrl, "utf-8");
+        return scheme + "://" + MobileProxyParameters.HOST_KEYGEN2 + 
+                "?cookie=JSESSIONID%3D" + session.getId() +
                "&url=" + urlEncoded +
                "&ver=" + KeyProviderService.grantedVersions +
                "&init=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
-               "&cncl=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue" +
-               "#Intent;scheme=webpkiproxy;package=org.webpki.mobile.android;end";
+               "&cncl=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue";
     }
     
     @Override
@@ -213,20 +192,70 @@ public class KeyProviderInitServlet extends HttpServlet {
                              "<div class=\"label\">This proof-of-concept system only supports Android</div>"));
             return;
         }
-        if (keygen2EnrollmentUrl == null) {
-            initGlobals(ServletUtil.getContextURL(request));
-        }
-        
         request.setCharacterEncoding("utf-8");
         String userName = request.getParameter(USERNAME_SESSION_ATTR);
         if (userName == null) {
             userName = "Luke Skywalker &#129412;";
         }
 
-        request.getSession(true);
+        HttpSession session = request.getSession(true);
 
         output(response, 
-               getHTML("function enroll() {\n" +
+               getHTML(KeyProviderService.useW3cPaymentRequest ? 
+                       "function buildPaymentRequest() {\n" +
+                       "  if (!window.PaymentRequest) {\n" +
+                       "    return null;\n" +
+                       "  }\n\n" +
+                       "  const details = {\n" +
+                       "    total: {\n" +
+                       "      label: 'total', \n" +
+                       "      amount: {\n" +
+                       "        currency: 'USD',\n" +
+                       "        value: '1.00'\n" +
+                       "      }\n" +
+                       "    }\n" +
+                       "  };\n\n" +
+                       "  const supportedInstruments = [{\n" +
+                       "    supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
+                       "    data: {url: '" + getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
+                                                              session) + "'}\n" +
+                       "  }];\n\n" +
+                       "  let request = null;\n\n" +
+                       "  try {\n" +
+                       "    request = new PaymentRequest(supportedInstruments, details);\n" +
+                       "    if (request.canMakePayment) {\n" +
+                       "      request.canMakePayment().then(function(result) {\n" +
+                       "        console.info(result ? 'Can make payment' : 'Cannot make payment');\n" +
+                       "      }).catch(function(err) {\n" +
+                       "        console.info(err);\n" +
+                       "      });\n" +
+                       "    }\n" +
+                       "  } catch (e) {\n" +
+                       "    console.info('Developer mistake:' + e.message);\n" +
+                       "  }\n" +
+                       "  return request;\n" +
+                       "}\n\n" +
+                       "let w3creq = buildPaymentRequest();\n\n" +
+                       "function enroll() {\n" +
+                       "  if (w3creq) {\n" +
+                       "    try {\n" +
+                       "      w3creq.show().then(function(response) {\n" +
+                       "        response.complete('success');\n" +
+                       "        console.info('Success!');\n" +
+                       "        document.location.href = response.details.goto;\n" +
+                       "      }).catch(function(err) {\n" +
+                       "        console.info(err.message);\n" +
+                        "      });\n" +
+                       "    } catch (e) {\n" +
+                       "      console.info('Developer mistake:' + e.message);\n" +
+                       "    }\n" +
+                       "  } else {\n" +
+                       "    console.log('Mobile application is supposed to start here');\n" +
+                       "    document.forms.shoot.submit();\n" +
+                       "  }\n" +
+                       "}\n"
+                         :
+                       "function enroll() {\n" +
                        "  console.log('Mobile application is supposed to start here');\n" +
                        "  document.forms.shoot.submit();\n" +
                        "}",
@@ -274,13 +303,16 @@ public class KeyProviderInitServlet extends HttpServlet {
         }
         session.setAttribute(KEYGEN2_SESSION_ATTR,
                 new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey), 
-                                keygen2EnrollmentUrl,
+                                KeyProviderService.keygen2RunUrl,
                                 KeyProviderService.serverCertificate,
                                 null));
         session.setAttribute(USERNAME_SESSION_ATTR, userName);
         output(response,
                getHTML(GO_HOME,
-                       "onload=\"document.location.href = '" + createIntent(session) + "';\"", 
+                       "onload=\"document.location.href = '" + 
+                           getInvocationUrl(MobileProxyParameters.SCHEME_URLHANDLER, session) + 
+                           "#Intent;scheme=webpkiproxy;package=" +  MobileProxyParameters.ANDROID_PACKAGE_NAME +
+                           ";end';\"", 
                        "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
                        "<div style=\"padding-top:15pt\">If this is all you get there is " +
                        "something wrong with the installation.</div>" +

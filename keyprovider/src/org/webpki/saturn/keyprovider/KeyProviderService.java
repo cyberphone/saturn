@@ -47,7 +47,6 @@ import javax.sql.DataSource;
 
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CertificateUtil;
-import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
@@ -75,21 +74,25 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static Logger logger = Logger.getLogger(KeyProviderService.class.getCanonicalName());
     
-    static final String SATURN_LOGO           = "saturn_logotype";
+    static final String SATURN_LOGO                 = "saturn_logotype";
 
-    static final String VERSION_CHECK         = "android_webpki_versions";
+    static final String VERSION_CHECK               = "android_webpki_versions";
 
-    static final String MERCHANT_URL          = "merchant_url";
+    static final String MERCHANT_URL                = "merchant_url";
 
-    static final String KEYSTORE_PASSWORD     = "key_password";
+    static final String KEYGEN2_BASE_URL            = "keygen2_base_url";
 
-    static final String KEYPROV_KMK           = "keyprov_kmk";
+    static final String KEYSTORE_PASSWORD           = "key_password";
+
+    static final String KEYPROV_KMK                 = "keyprov_kmk";
     
-    static final String TLS_CERTIFICATE       = "server_tls_certificate";
+    static final String TLS_CERTIFICATE             = "server_tls_certificate";
 
-    static final String LOGGING               = "logging";
+    static final String USE_W3C_PAYMENT_REQUEST     = "use_w3c_payment_request";
 
-    static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
+    static final String W3C_PAYMENT_REQUEST_HOST    = "w3c_payment_request_host";
+
+    static final String LOGGING                     = "logging";
 
     static KeyStoreEnumerator keyManagementKey;
     
@@ -161,7 +164,13 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static String saturnLogotype;
 
-    static String merchantUrl;
+    static String keygen2RunUrl;
+
+    static boolean useW3cPaymentRequest;
+
+    static String w3cPaymentRequestMethod;
+
+    static String successMessage;
 
     InputStream getResource(String name) throws IOException {
         InputStream is = this.getClass().getResourceAsStream(name);
@@ -189,8 +198,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     public void contextInitialized(ServletContextEvent sce) {
         initProperties (sce);
         try {
-            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
-
             ////////////////////////////////////////////////////////////////////////////////////////////
             // KeyGen2
             ////////////////////////////////////////////////////////////////////////////////////////////
@@ -242,15 +249,32 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             generator.initialize(eccgen, new SecureRandom());
             carrierCaKeyPair = generator.generateKeyPair();
 
+
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // Success URL
+            // Own URL
             ////////////////////////////////////////////////////////////////////////////////////////////
-            merchantUrl = getPropertyString(MERCHANT_URL);
+            keygen2RunUrl = getPropertyString(KEYGEN2_BASE_URL) + "/getkeys";
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Success message
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            successMessage = 
+                    new StringBuilder(
+                                "<div style=\"text-align:center\"><div class=\"label\" " +
+                                "style=\"margin-bottom:10pt\">Enrollment Succeeded!</div><div><a href=\"")
+                        .append(getPropertyString(MERCHANT_URL))
+                        .append("\" class=\"link\">Continue to merchant site</a></div></div>").toString();
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Are we logging?
             ////////////////////////////////////////////////////////////////////////////////////////////
             logging = getPropertyBoolean(LOGGING);
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // W3C PaymentRequest
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            useW3cPaymentRequest = getPropertyBoolean(USE_W3C_PAYMENT_REQUEST);
+            w3cPaymentRequestMethod = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
 
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
