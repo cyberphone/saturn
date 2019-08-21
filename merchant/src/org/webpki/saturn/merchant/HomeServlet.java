@@ -29,6 +29,8 @@ import org.webpki.webutil.ServletUtil;
 public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
+
+    static final int MINIMUM_CHROME_VERSION = 75;
     
     static String merchantBaseUrl;  // For QR and Android only
     
@@ -42,13 +44,29 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     static boolean browserIsSupported(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String userAgent = request.getHeader("User-Agent");
+        boolean notOk = false;
+        if (userAgent.contains("Android ")) {
+            notOk = true;
+            int i = userAgent.indexOf(" Chrome/");
+            if (i > 0) {
+                String chromeVersion = userAgent.substring(i + 8, userAgent.indexOf('.', i));
+                if (Integer.parseInt(chromeVersion) >= MINIMUM_CHROME_VERSION) {
+                    notOk = false;
+                }
+            }
+        }
+        if (notOk) {
+            ErrorServlet.systemFail(response, "This proof-of-concept system requires \"Chrome\" (min version: " + 
+                                              MINIMUM_CHROME_VERSION + ") when using Android");
+            return false;
+        }
         if (userAgent.contains(" Chrome/") ||
             userAgent.contains(" Edge/") ||
             userAgent.contains(" Safari/") ||
             userAgent.contains(" Firefox/")) {
             return true;
         }
-        ErrorServlet.systemFail(response, "This proof-of-concept site only supports Chrome/Chromium, Safari, Edge and Firefox");
+        ErrorServlet.systemFail(response, "This proof-of-concept application only supports Chrome/Chromium, Safari, Edge and Firefox");
         return false;
     }
     

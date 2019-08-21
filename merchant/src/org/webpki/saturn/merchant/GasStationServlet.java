@@ -48,11 +48,11 @@ public class GasStationServlet extends HttpServlet implements MerchantProperties
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        if (!HomeServlet.browserIsSupported(request, response)) {
-            return;
-        }
         if (HomeServlet.isAndroid(request)) {
             HTML.notification(response, "This application is supposed to be invoked from a <i>desktop</i> browser");
+            return;
+        }
+        if (!HomeServlet.browserIsSupported(request, response)) {
             return;
         }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
