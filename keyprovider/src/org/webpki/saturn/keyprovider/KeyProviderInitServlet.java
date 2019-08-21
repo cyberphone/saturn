@@ -146,6 +146,8 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     static final String ANONYMOUS_JAVA         = "Anonymous " + 
                         new String(Character.toChars(Integer.parseInt("1f47d", 16)));
+    
+    static final int MINIMUM_CHROME_VERSION    = 75;
 
     static String getHTML(String javascript, String bodyscript, String box) {
         StringBuilder s = new StringBuilder(HTML_INIT);
@@ -190,15 +192,26 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-/*
-        if (!request.getHeader("User-Agent").contains("Android")) {
+        String userAgent = request.getHeader("User-Agent");
+        boolean notOk = true;
+        if (userAgent.contains("Android ")) {
+            int i = userAgent.indexOf(" Chrome/");
+            if (i > 0) {
+                String chromeVersion = userAgent.substring(i + 8, userAgent.indexOf('.', i));
+                if (Integer.parseInt(chromeVersion) >= MINIMUM_CHROME_VERSION) {
+                    notOk = false;
+                }
+            }
+        }
+        if (notOk) {
             output(response, 
                     getHTML(null,
                             null,
-                             "<div class=\"label\">This proof-of-concept system only supports Android</div>"));
+                            "<div class=\"label\">This proof-of-concept system only supports " +
+                              "Android and using the \"Chrome\" browser (min version: " + 
+                              MINIMUM_CHROME_VERSION + ")</div>"));
             return;
         }
-*/
         output(response, 
                getHTML(GO_HOME +
                        (KeyProviderService.useW3cPaymentRequest ?
