@@ -42,6 +42,7 @@ public class KeyProviderInitServlet extends HttpServlet {
 
     static final String KEYGEN2_SESSION_ATTR           = "keygen2";
     static final String USERNAME_SESSION_ATTR          = "userName";
+    static final String CHECK_SESSION_ATTR             = "check";
     
     static final int NAME_MAX_LENGTH                   = 50;  // Reflected in the DB
 
@@ -141,6 +142,11 @@ public class KeyProviderInitServlet extends HttpServlet {
 
             "</style>";
 
+    static final String DEFAULT_USER_NAME_HTML = "Luke Skywalker &#129412;";
+    
+    static final String ANONYMOUS_JAVA         = "Anonymous " + 
+                        new String(Character.toChars(Integer.parseInt("1f47d", 16)));
+
     static String getHTML(String javascript, String bodyscript, String box) {
         StringBuilder s = new StringBuilder(HTML_INIT);
         if (javascript != null) {
@@ -157,7 +163,6 @@ public class KeyProviderInitServlet extends HttpServlet {
          .append (KeyProviderService.saturnLogotype)
          .append ("</div><div class=\"displayContainer\">")
                 .append(box).append("</div></body></html>");
-        System.out.println(s.toString());
         return s.toString();
     }
   
@@ -176,7 +181,7 @@ public class KeyProviderInitServlet extends HttpServlet {
         ////////////////////////////////////////////////////////////////////////////////////////////
         String urlEncoded = URLEncoder.encode(KeyProviderService.keygen2RunUrl, "utf-8");
         return scheme + "://" + MobileProxyParameters.HOST_KEYGEN2 + 
-                "?cookie=JSESSIONID%3D" + session.getId() +
+               "?cookie=JSESSIONID%3D" + session.getId() +
                "&url=" + urlEncoded +
                "&ver=" + KeyProviderService.grantedVersions +
                "&init=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
@@ -185,6 +190,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+/*
         if (!request.getHeader("User-Agent").contains("Android")) {
             output(response, 
                     getHTML(null,
@@ -192,20 +198,16 @@ public class KeyProviderInitServlet extends HttpServlet {
                              "<div class=\"label\">This proof-of-concept system only supports Android</div>"));
             return;
         }
-        request.setCharacterEncoding("utf-8");
-        String userName = request.getParameter(USERNAME_SESSION_ATTR);
-        if (userName == null) {
-            userName = "Luke Skywalker &#129412;";
-        }
-
-        HttpSession session = request.getSession(true);
-
+*/
         output(response, 
-               getHTML(KeyProviderService.useW3cPaymentRequest ? 
-                       "function buildPaymentRequest() {\n" +
-                       "  if (!window.PaymentRequest) {\n" +
-                       "    return null;\n" +
-                       "  }\n\n" +
+               getHTML(GO_HOME +
+                       (KeyProviderService.useW3cPaymentRequest ?
+                       "function paymentRequestError(msg) {\n" +
+                       "  console.info('Payment request error:' + msg);\n" +
+                       "  document.getElementById('doubleUse').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
+                         "msg + '</div>';\n" +
+                       "}\n\n" +
+                       "function executePaymentRequest(invocationUrl) {\n" +
                        "  const details = {\n" +
                        "    total: {\n" +
                        "      label: 'total', \n" +
@@ -217,48 +219,43 @@ public class KeyProviderInitServlet extends HttpServlet {
                        "  };\n\n" +
                        "  const supportedInstruments = [{\n" +
                        "    supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
-                       "    data: {url: '" + getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
-                                                              session) + "'}\n" +
+//                       "    supportedMethods: 'weird-pay',\n" +
+                       "    data: {url: invocationUrl}\n" +
+//                       "    supportedMethods: 'basic-card',\n" +
+//                       "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
                        "  }];\n\n" +
-                       "  let request = null;\n\n" +
                        "  try {\n" +
-                       "    request = new PaymentRequest(supportedInstruments, details);\n" +
-                       "    if (request.canMakePayment) {\n" +
-                       "      request.canMakePayment().then(function(result) {\n" +
-                       "        console.info(result ? 'Can make payment' : 'Cannot make payment');\n" +
-                       "      }).catch(function(err) {\n" +
-                       "        console.info(err);\n" +
-                       "      });\n" +
-                       "    }\n" +
+                       "    let request = new PaymentRequest(supportedInstruments, details);\n" +
+                       "    request.show().then(function(response) {\n" +
+                       "      response.complete('success');\n" +
+                       "      console.info('Success!');\n" +
+                       "      document.location.href = response.details.goto;\n" +
+                       "    }).catch(error => paymentRequestError(error.message));\n" +
                        "  } catch (e) {\n" +
-                       "    console.info('Developer mistake:' + e.message);\n" +
+                       "    paymentRequestError(e.message);\n" +
                        "  }\n" +
-                       "  return request;\n" +
                        "}\n\n" +
-                       "let w3creq = buildPaymentRequest();\n\n" +
                        "function enroll() {\n" +
-                       "  if (w3creq) {\n" +
-                       "    try {\n" +
-                       "      w3creq.show().then(function(response) {\n" +
-                       "        response.complete('success');\n" +
-                       "        console.info('Success!');\n" +
-                       "        document.location.href = response.details.goto;\n" +
-                       "      }).catch(function(err) {\n" +
-                       "        console.info(err.message);\n" +
-                        "      });\n" +
-                       "    } catch (e) {\n" +
-                       "      console.info('Developer mistake:' + e.message);\n" +
-                       "    }\n" +
-                       "  } else {\n" +
+                       "  if (window.PaymentRequest) {\n" +
+                       "    var formData = new URLSearchParams();\n" +
+                       "    formData.append('" + USERNAME_SESSION_ATTR +
+                         "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
+                       "    formData.append('" + CHECK_SESSION_ATTR + "', 1);\n" +
+                       "    fetch('init', {\n" +
+                       "      method: 'POST',\n" +
+                       "      body: formData\n" +
+                       "    }).then(response => response.text())\n" +
+                       "      .then(response => executePaymentRequest(response))\n" +
+                       "    .catch(error => console.error('Error:', error));\n" +
                        "    console.log('Mobile application is supposed to start here');\n" +
+                       "  } else {\n" +
                        "    document.forms.shoot.submit();\n" +
                        "  }\n" +
-                       "}\n"
-                         :
+                       "}"
+                            :
                        "function enroll() {\n" +
-                       "  console.log('Mobile application is supposed to start here');\n" +
                        "  document.forms.shoot.submit();\n" +
-                       "}",
+                       "}"),
                        null,
                        "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
                        "<div>This proof-of-concept system provisions secure payment credentials<br>" + 
@@ -266,18 +263,19 @@ public class KeyProviderInitServlet extends HttpServlet {
                        "<div style=\"display:flex;justify-content:center;padding-top:15pt\"><table>" + 
                        "     <tr><td>Your name (real or made up):</td></tr>" + 
                        "     <tr><td><input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
-                       "\" value=\"" + userName + "\" size=\"30\" maxlength=\"50\" " + 
+                       "\" value=\"" + DEFAULT_USER_NAME_HTML + "\" size=\"30\" maxlength=\"50\" " + 
                        "style=\"background-color:#def7fc\"></td></tr>" + 
                        "</table></div>" + 
                        "<div style=\"text-align:center\">This name will be printed on your virtual payment cards.</div>" + 
                        "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
-                       "<div class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
-                       "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not already " +
-                       "installed Saturn, this is the time to do it!</div>" +
-                       "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
-                       "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
-                       "title=\"Android\" onclick=\"document.location.href = " +
-                       "'https://play.google.com/store/apps/details?id=org.webpki.mobile.android'\"></div>" + 
+                         "<div id=\"doubleUse\" class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
+                         "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not already " +
+                           "installed Saturn, this is the time to do it!</div>" +
+                         "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
+                         "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
+                           "title=\"Android\" onclick=\"document.location.href = " +
+                           "'https://play.google.com/store/apps/details?id=org.webpki.mobile.android'\">" +
+                       "</div>" + 
                        "</form>" + 
                        "</div>" + 
                        "<div class=\"sitefooter\">Note: in a real configuration you would also need to " +
@@ -287,16 +285,10 @@ public class KeyProviderInitServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("utf-8");
+        HttpSession session = request.getSession(true);
         String userName = request.getParameter(USERNAME_SESSION_ATTR);
         if (userName == null || (userName = userName.trim()).isEmpty()) {
-            response.sendRedirect("init");
-            return;
-        }
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            response.sendRedirect("init?" + USERNAME_SESSION_ATTR + 
-                                  "=" + URLEncoder.encode(userName, "utf-8"));
-            return;
+            userName = ANONYMOUS_JAVA;
         }
         if (userName.length() > NAME_MAX_LENGTH) {
             userName = userName.substring(0, NAME_MAX_LENGTH);
@@ -307,15 +299,21 @@ public class KeyProviderInitServlet extends HttpServlet {
                                 KeyProviderService.serverCertificate,
                                 null));
         session.setAttribute(USERNAME_SESSION_ATTR, userName);
-        output(response,
-               getHTML(GO_HOME,
-                       "onload=\"document.location.href = '" + 
-                           getInvocationUrl(MobileProxyParameters.SCHEME_URLHANDLER, session) + 
-                           "#Intent;scheme=webpkiproxy;package=" +  MobileProxyParameters.ANDROID_PACKAGE_NAME +
-                           ";end';\"", 
-                       "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
-                       "<div style=\"padding-top:15pt\">If this is all you get there is " +
-                       "something wrong with the installation.</div>" +
-                       "</div>"));
+        if (request.getParameter(CHECK_SESSION_ATTR) == null) {
+            output(response,
+                   getHTML(GO_HOME,
+                           "onload=\"document.location.href = '" + 
+                               getInvocationUrl(MobileProxyParameters.SCHEME_URLHANDLER, session) + 
+                               "#Intent;scheme=webpkiproxy;package=" +  MobileProxyParameters.ANDROID_PACKAGE_NAME +
+                               ";end';\"", 
+                           "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
+                           "<div style=\"padding-top:15pt\">If this is all you get there is " +
+                           "something wrong with the installation.</div>" +
+                           "</div>"));
+        } else {
+            output(response, 
+                   getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
+                   session));
+        }
     }
 }
