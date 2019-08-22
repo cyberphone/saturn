@@ -34,6 +34,8 @@ import org.webpki.keygen2.ServerState;
 
 import org.webpki.net.MobileProxyParameters;
 
+// Initiation code for KeyGen2
+
 public class KeyProviderInitServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -216,89 +218,89 @@ public class KeyProviderInitServlet extends HttpServlet {
         }
         output(response, 
                getHTML(GO_HOME +
-                       (KeyProviderService.useW3cPaymentRequest ?
-                       "function paymentRequestError(msg) {\n" +
-                       "  console.info('Payment request error:' + msg);\n" +
-                       "  document.getElementById('" + BUTTON_ID + 
-                       "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
-                         "msg + '</div>';\n" +
-                       "}\n\n" +
-                       "function executePaymentRequest(invocationUrl) {\n" +
-                       "  const details = {\n" +
-                       "    total: {\n" +
-                       "      label: 'total', \n" +
-                       "      amount: {\n" +
-                       "        currency: 'USD',\n" +
-                       "        value: '1.00'\n" +
-                       "      }\n" +
-                       "    }\n" +
-                       "  };\n\n" +
-                       "  const supportedInstruments = [{\n" +
-                       "    supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
-//                       "    supportedMethods: 'weird-pay',\n" +
-                       "    data: {url: invocationUrl}\n" +
-//                       "    supportedMethods: 'basic-card',\n" +
-//                       "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
-                       "  }];\n\n" +
-                       "  try {\n" +
-                       "    let request = new PaymentRequest(supportedInstruments, details);\n" +
-                       "    request.show().then(function(response) {\n" +
-                       "      response.complete('success');\n" +
-                       "      console.info('Success!');\n" +
-                       "      document.location.href = response.details.goto;\n" +
-                       "    }).catch(error => paymentRequestError(error.message));\n" +
-                       "  } catch (e) {\n" +
-                       "    paymentRequestError(e.message);\n" +
-                       "  }\n" +
-                       "}\n\n" +
-                       "function enroll() {\n" +
-                       "  if (window.PaymentRequest) {\n" +
-                       "    var element = document.getElementById('" + BUTTON_ID + "');\n" +
-                       "    element.innerHTML = '<i>Working &#x1f680;</i>';\n" +
-                       "    element.onclick = '';\n" +
-                       "    var formData = new URLSearchParams();\n" +
-                       "    formData.append('" + USERNAME_SESSION_ATTR +
-                         "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
-                       "    formData.append('" + CHECK_SESSION_ATTR + "', 1);\n" +
-                       "    fetch('init', {\n" +
-                       "      method: 'POST',\n" +
-                       "      body: formData\n" +
-                       "    }).then(response => response.text())\n" +
-                       "      .then(response => executePaymentRequest(response))\n" +
-                       "    .catch(error => console.error('Error:', error));\n" +
-                       "    console.log('Mobile application is supposed to start here');\n" +
-                       "  } else {\n" +
-                       "    document.forms.shoot.submit();\n" +
-                       "  }\n" +
-                       "}"
-                            :
-                       "function enroll() {\n" +
-                       "  document.forms.shoot.submit();\n" +
-                       "}"),
-                       null,
-                       "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
-                       "<div>This proof-of-concept system provisions secure payment credentials<br>" + 
-                       "to be used in the Android version of the Saturn &quot;Wallet&quot;.</div>" + 
-                       "<div style=\"display:flex;justify-content:center;padding-top:15pt\"><table>" + 
-                       "     <tr><td>Your name (real or made up):</td></tr>" + 
-                       "     <tr><td><input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
-                       "\" value=\"" + DEFAULT_USER_NAME_HTML + "\" size=\"30\" maxlength=\"50\" " + 
-                       "style=\"background-color:#def7fc\"></td></tr>" + 
-                       "</table></div>" + 
-                       "<div style=\"text-align:center\">This name will be printed on your virtual payment cards.</div>" + 
-                       "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
-                         "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
-                         "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not already " +
-                           "installed Saturn, this is the time to do it!</div>" +
-                         "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
-                         "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
-                           "title=\"Android\" onclick=\"document.location.href = " +
-                           "'https://play.google.com/store/apps/details?id=org.webpki.mobile.android'\">" +
-                       "</div>" + 
-                       "</form>" + 
-                       "</div>" + 
-                       "<div class=\"sitefooter\">Note: in a real configuration you would also need to " +
-                       "authenticate as a part of the enrollment."));
+            (KeyProviderService.useW3cPaymentRequest ?
+            "function paymentRequestError(msg) {\n" +
+            "  console.info('Payment request error:' + msg);\n" +
+            "  document.getElementById('" + BUTTON_ID + 
+            "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
+              "msg + '</div>';\n" +
+            "}\n\n" +
+            "function executePaymentRequest(invocationUrl) {\n" +
+            "  const details = {\n" +
+            "    total: {\n" +
+            "      label: 'total', \n" +
+            "      amount: {\n" +
+            "        currency: 'USD',\n" +
+            "        value: '1.00'\n" +
+            "      }\n" +
+            "    }\n" +
+            "  };\n\n" +
+            "  const supportedInstruments = [{\n" +
+            "    supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
+//            "    supportedMethods: 'weird-pay',\n" +
+            "    data: {url: invocationUrl}\n" +
+//            "    supportedMethods: 'basic-card',\n" +
+//            "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
+            "  }];\n\n" +
+            "  try {\n" +
+            "    let request = new PaymentRequest(supportedInstruments, details);\n" +
+            "    request.show().then(function(response) {\n" +
+            "      response.complete('success');\n" +
+            "      console.info('Success!');\n" +
+            "      document.location.href = response.details.goto;\n" +
+            "    }).catch(error => paymentRequestError(error.message));\n" +
+            "  } catch (e) {\n" +
+            "    paymentRequestError(e.message);\n" +
+            "  }\n" +
+            "}\n\n" +
+            "function enroll() {\n" +
+            "  if (window.PaymentRequest) {\n" +
+            "    var element = document.getElementById('" + BUTTON_ID + "');\n" +
+            "    element.innerHTML = '<i>Working &#x1f680;</i>';\n" +
+            "    element.onclick = '';\n" +
+            "    var formData = new URLSearchParams();\n" +
+            "    formData.append('" + USERNAME_SESSION_ATTR +
+              "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
+            "    formData.append('" + CHECK_SESSION_ATTR + "', 1);\n" +
+            "    fetch('init', {\n" +
+            "      method: 'POST',\n" +
+            "      body: formData\n" +
+            "    }).then(response => response.text())\n" +
+            "      .then(response => executePaymentRequest(response))\n" +
+            "    .catch(error => console.error('Error:', error));\n" +
+            "    console.log('Mobile application is supposed to start here');\n" +
+            "  } else {\n" +
+            "    document.forms.shoot.submit();\n" +
+            "  }\n" +
+            "}"
+                 :
+            "function enroll() {\n" +
+            "  document.forms.shoot.submit();\n" +
+            "}"),
+            null,
+            "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
+            "<div>This proof-of-concept system provisions secure payment credentials<br>" + 
+            "to be used in the Android version of the Saturn &quot;Wallet&quot;.</div>" + 
+            "<div style=\"display:flex;justify-content:center;padding-top:15pt\"><table>" + 
+            "     <tr><td>Your name (real or made up):</td></tr>" + 
+            "     <tr><td><input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
+            "\" value=\"" + DEFAULT_USER_NAME_HTML + "\" size=\"30\" maxlength=\"50\" " + 
+            "style=\"background-color:#def7fc\"></td></tr>" + 
+            "</table></div>" + 
+            "<div style=\"text-align:center\">This name will be printed on your virtual payment cards.</div>" + 
+            "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
+              "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
+              "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not already " +
+                "installed Saturn, this is the time to do it!</div>" +
+              "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
+              "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
+                "title=\"Android\" onclick=\"document.location.href = " +
+                "'https://play.google.com/store/apps/details?id=org.webpki.mobile.android'\">" +
+            "</div>" + 
+            "</form>" + 
+            "</div>" + 
+            "<div class=\"sitefooter\">Note: in a real configuration you would also need to " +
+            "authenticate as a part of the enrollment."));
     }
 
     @Override
@@ -321,14 +323,14 @@ public class KeyProviderInitServlet extends HttpServlet {
         if (request.getParameter(CHECK_SESSION_ATTR) == null) {
             output(response,
                    getHTML(GO_HOME,
-                           "onload=\"document.location.href = '" + 
-                               getInvocationUrl(MobileProxyParameters.SCHEME_URLHANDLER, session) + 
-                               "#Intent;scheme=webpkiproxy;package=" +  MobileProxyParameters.ANDROID_PACKAGE_NAME +
-                               ";end';\"", 
-                           "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
-                           "<div style=\"padding-top:15pt\">If this is all you get there is " +
-                           "something wrong with the installation.</div>" +
-                           "</div>"));
+                "onload=\"document.location.href = '" + 
+                    getInvocationUrl(MobileProxyParameters.SCHEME_URLHANDLER, session) + 
+                    "#Intent;scheme=webpkiproxy;package=" +  MobileProxyParameters.ANDROID_PACKAGE_NAME +
+                    ";end';\"", 
+                "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
+                "<div style=\"padding-top:15pt\">If this is all you get there is " +
+                "something wrong with the installation.</div>" +
+                "</div>"));
         } else {
             output(response, 
                    getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
