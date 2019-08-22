@@ -51,6 +51,8 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final String PARAM_TAG = "msg";
     static final String ERROR_TAG = "err";
     
+    static final String BUTTON_ID = "doubleUse";
+    
     static final String GO_HOME =              
             "history.pushState(null, null, 'init');\n" +
             "window.addEventListener('popstate', function(event) {\n" +
@@ -217,7 +219,8 @@ public class KeyProviderInitServlet extends HttpServlet {
                        (KeyProviderService.useW3cPaymentRequest ?
                        "function paymentRequestError(msg) {\n" +
                        "  console.info('Payment request error:' + msg);\n" +
-                       "  document.getElementById('doubleUse').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
+                       "  document.getElementById('" + BUTTON_ID + 
+                       "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
                          "msg + '</div>';\n" +
                        "}\n\n" +
                        "function executePaymentRequest(invocationUrl) {\n" +
@@ -250,6 +253,9 @@ public class KeyProviderInitServlet extends HttpServlet {
                        "}\n\n" +
                        "function enroll() {\n" +
                        "  if (window.PaymentRequest) {\n" +
+                       "    var element = document.getElementById('" + BUTTON_ID + "');\n" +
+                       "    element.innerHTML = '<i>Working &#x1f680;</i>';\n" +
+                       "    element.onclick = '';\n" +
                        "    var formData = new URLSearchParams();\n" +
                        "    formData.append('" + USERNAME_SESSION_ATTR +
                          "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
@@ -281,7 +287,7 @@ public class KeyProviderInitServlet extends HttpServlet {
                        "</table></div>" + 
                        "<div style=\"text-align:center\">This name will be printed on your virtual payment cards.</div>" + 
                        "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
-                         "<div id=\"doubleUse\" class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
+                         "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
                          "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not already " +
                            "installed Saturn, this is the time to do it!</div>" +
                          "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
