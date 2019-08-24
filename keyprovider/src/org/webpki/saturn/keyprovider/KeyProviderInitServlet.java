@@ -48,13 +48,20 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     static final int NAME_MAX_LENGTH                   = 50;  // Reflected in the DB
 
-    static final String INIT_TAG = "init";     // Note: This is currently also a part of the KeyGen2 client!
+    static final String INIT_TAG  = "init";     // Note: This is currently also a part of the KeyGen2 client!
     static final String ABORT_TAG = "abort";
     static final String PARAM_TAG = "msg";
     static final String ERROR_TAG = "err";
     
-    static final String BUTTON_ID = "doubleUse";
+    static final String BUTTON_ID = "gokg2go";
     
+    static final String DEFAULT_USER_NAME_HTML = "Luke Skywalker &#129412;";
+    
+    static final String ANONYMOUS_JAVA         = "Anonymous " + 
+                        new String(Character.toChars(Integer.parseInt("1f47d", 16)));
+    
+    static final int MINIMUM_CHROME_VERSION    = 75;
+
     static final String GO_HOME =              
             "history.pushState(null, null, 'init');\n" +
             "window.addEventListener('popstate', function(event) {\n" +
@@ -146,13 +153,6 @@ public class KeyProviderInitServlet extends HttpServlet {
 
             "</style>";
 
-    static final String DEFAULT_USER_NAME_HTML = "Luke Skywalker &#129412;";
-    
-    static final String ANONYMOUS_JAVA         = "Anonymous " + 
-                        new String(Character.toChars(Integer.parseInt("1f47d", 16)));
-    
-    static final int MINIMUM_CHROME_VERSION    = 75;
-
     static String getHTML(String javascript, String bodyscript, String box) {
         StringBuilder s = new StringBuilder(HTML_INIT);
         if (javascript != null) {
@@ -196,7 +196,8 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String userAgent = request.getHeader("User-Agent");
+ logger.info("GET");
+       String userAgent = request.getHeader("User-Agent");
         boolean notOk = true;
         if (userAgent.contains("Android ")) {
             int i = userAgent.indexOf(" Chrome/");
@@ -225,50 +226,38 @@ public class KeyProviderInitServlet extends HttpServlet {
             "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
               "msg + '</div>';\n" +
             "}\n\n" +
-            "function executePaymentRequest(invocationUrl) {\n" +
-            "  const details = {\n" +
-            "    total: {\n" +
-            "      label: 'total', \n" +
-            "      amount: {\n" +
-            "        currency: 'USD',\n" +
-            "        value: '1.00'\n" +
-            "      }\n" +
-            "    }\n" +
-            "  };\n\n" +
-            "  const supportedInstruments = [{\n" +
-            "    supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
-//            "    supportedMethods: 'weird-pay',\n" +
-            "    data: {url: invocationUrl}\n" +
-//            "    supportedMethods: 'basic-card',\n" +
-//            "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
-            "  }];\n\n" +
-            "  try {\n" +
-            "    let request = new PaymentRequest(supportedInstruments, details);\n" +
-            "    request.show().then(function(response) {\n" +
-            "      response.complete('success');\n" +
-            "      console.info('Success!');\n" +
-            "      document.location.href = response.details.goto;\n" +
-            "    }).catch(error => paymentRequestError(error.message));\n" +
-            "  } catch (e) {\n" +
-            "    paymentRequestError(e.message);\n" +
-            "  }\n" +
-            "}\n\n" +
-            "function enroll() {\n" +
+
+            "async function enroll() {\n" +
             "  if (window.PaymentRequest) {\n" +
-            "    var element = document.getElementById('" + BUTTON_ID + "');\n" +
-            "    element.innerHTML = '<i>Working &#x1f680;</i>';\n" +
-            "    element.onclick = '';\n" +
+            "    document.getElementById('" + BUTTON_ID + "').outerHTML = " +
+              "'<img id=\"" + BUTTON_ID + "\" src=\"waiting.gif\">';\n" +
             "    var formData = new URLSearchParams();\n" +
             "    formData.append('" + USERNAME_SESSION_ATTR +
               "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
             "    formData.append('" + CHECK_SESSION_ATTR + "', 1);\n" +
-            "    fetch('init', {\n" +
-            "      method: 'POST',\n" +
-            "      body: formData\n" +
-            "    }).then(response => response.text())\n" +
-            "      .then(response => executePaymentRequest(response))\n" +
-            "    .catch(error => console.error('Error:', error));\n" +
-            "    console.log('Mobile application is supposed to start here');\n" +
+            "    try {\n" +
+            "      const httpResponse = await fetch('init', {\n" +
+            "        method: 'POST',\n" +
+            "        body: formData\n" +
+            "      });\n" +
+            "      if (httpResponse.ok) {\n" +
+            "        const invocationUrl = await httpResponse.text();\n" +
+            "        const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
+            "        const supportedInstruments = [{\n" +
+            "          supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
+//            "    supportedMethods: 'weird-pay',\n" +
+            "          data: {url: invocationUrl}\n" +
+//            "          supportedMethods: 'basic-card',\n" +
+//            "          data: {supportedNetworks: ['cartebancaire']}\n" +
+            "        }];\n" +
+            "        const payRequest = new PaymentRequest(supportedInstruments, details);\n" +
+            "        const payResponse = await payRequest.show();\n" +
+            "        payResponse.complete('success');\n" +
+            "      }\n" +
+            "    } catch (err) {\n" +
+            "      console.error(err);\n" +
+            "      paymentRequestError(err.message);\n" +
+            "    }\n" +   
             "  } else {\n" +
             "    document.forms.shoot.submit();\n" +
             "  }\n" +
@@ -325,13 +314,15 @@ public class KeyProviderInitServlet extends HttpServlet {
                    getHTML(GO_HOME,
                 "onload=\"document.location.href = '" + 
                     getInvocationUrl(MobileProxyParameters.SCHEME_URLHANDLER, session) + 
-                    "#Intent;scheme=webpkiproxy;package=" +  MobileProxyParameters.ANDROID_PACKAGE_NAME +
+                    "#Intent;scheme=webpkiproxy;package=" +  
+                    MobileProxyParameters.ANDROID_PACKAGE_NAME +
                     ";end';\"", 
                 "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
                 "<div style=\"padding-top:15pt\">If this is all you get there is " +
                 "something wrong with the installation.</div>" +
                 "</div>"));
         } else {
+            logger.info("POST session=" + session.getId());
             output(response, 
                    getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
                    session));

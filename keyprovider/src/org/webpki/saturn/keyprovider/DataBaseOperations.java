@@ -63,12 +63,12 @@ public class DataBaseOperations {
     throws SQLException, IOException {
         try {
 /*
-CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
-                                               IN p_UserId INT, 
-                                               IN p_AccountType INT,
-                                               IN p_MethodUri VARCHAR(50),
-                                               IN p_S256PayReq BINARY(32),
-                                               IN p_S256BalReq BINARY(32))
+            CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
+                                                           IN p_UserId INT, 
+                                                           IN p_AccountType INT,
+                                                           IN p_MethodUri VARCHAR(50),
+                                                           IN p_S256PayReq BINARY(32),
+                                                           IN p_S256BalReq BINARY(32))
 */
             String credentialId;
             try (Connection connection = KeyProviderService.jdbcDataSource.getConnection();

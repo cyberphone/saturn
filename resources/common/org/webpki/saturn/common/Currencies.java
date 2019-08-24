@@ -48,13 +48,17 @@ public enum Currencies implements Serializable {
 
     static final Pattern ZERO_FRACTION_PATTERN = Pattern.compile("[0-9]*\\.[0]+");
 
+    public String plainAmountString(BigDecimal amount) {
+        return amount.setScale(decimals).toPlainString();
+    }
+
     public String amountToDisplayString(BigDecimal amount, boolean skipTrailingZeroFraction) throws IOException {
         String sign = "";
         if (amount.signum() < 0) {
             amount = amount.negate();
             sign = "-";
         }
-        String amountString = amount.setScale(decimals).toPlainString();
+        String amountString = plainAmountString(amount);
         int dp = amountString.indexOf('.');
         StringBuilder amountString2 = new StringBuilder();
         for (int i = 0; i < dp; i++) {

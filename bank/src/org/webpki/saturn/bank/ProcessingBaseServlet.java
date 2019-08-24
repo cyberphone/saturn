@@ -98,6 +98,12 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     abstract JSONObjectWriter processCall(UrlHolder urlHolder, 
                                           JSONObjectReader providerRequest,
                                           Connection connection) throws Exception;
+    
+    static class NormalException extends Exception {
+        NormalException(String message) {
+            super(message);
+        }
+    }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = null;
@@ -151,7 +157,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             BankService.rejectedTransactions++;
             String message = (urlHolder == null ? "" : "From" + urlHolder.getCallerAddress() +
                               (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl()) + "\n") + e.getMessage();
-            logger.log(Level.SEVERE, message, e);
+            if (!(e instanceof NormalException)) {
+                logger.log(Level.SEVERE, message, e);
+            }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = response.getWriter();
             writer.print(message);

@@ -176,14 +176,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             if (result != 0) {
                 if (result == 1) {
                     logger.severe("No such account ID: " + accountId);
-                    throw new IOException("No such user account ID");
+                    throw new NormalException("No such user account ID");
                 }
                 if (result == 2) {
                     logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
-                    throw new IOException("Wrong payment method");
+                    throw new NormalException("Wrong payment method");
                 }
                 logger.severe("Wrong public key for account ID: " + accountId);
-                throw new IOException("Wrong user public key");
+                throw new NormalException("Wrong user public key");
             } else {
                 userName = stmt.getString(2);
             }

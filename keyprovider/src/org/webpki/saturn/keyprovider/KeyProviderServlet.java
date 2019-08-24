@@ -93,7 +93,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     static final int MAX_CARD_NAME_LENGTH = 30;  // Sorry :(
     static final int MAX_CARD_NAME_BIG    = 20;
 
-    static Logger log = Logger.getLogger(KeyProviderServlet.class.getCanonicalName());
+    static Logger logger = Logger.getLogger(KeyProviderServlet.class.getCanonicalName());
     
     static String success_image_and_message;
     
@@ -111,7 +111,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     void keygen2JSONBody(HttpServletResponse response, JSONEncoder object) throws IOException {
         byte[] jsonData = object.serializeJSONDocument(JSONOutputFormats.PRETTY_PRINT);
         if (KeyProviderService.logging) {
-            log.info("Sent message\n" + new String(jsonData, "UTF-8"));
+            logger.info("Sent message\n" + new String(jsonData, "UTF-8"));
         }
         response.setContentType(JSON_CONTENT_TYPE);
         response.setHeader("Pragma", "No-Cache");
@@ -127,7 +127,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
            throws IOException, ServletException {
-        executeRequest(request, response, false);
+logger.info("POST session=" + request.getSession(false).getId());
+       executeRequest(request, response, false);
     }
 
     void executeRequest(HttpServletRequest request, HttpServletResponse response, boolean init)
@@ -164,7 +165,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 throw new IOException("Wrong \"Content-Type\": " + request.getContentType());
             }
             if (KeyProviderService.logging) {
-                log.info("Received message:\n" + new String(jsonData, "UTF-8"));
+                logger.info("Received message:\n" + new String(jsonData, "UTF-8"));
             }
             JSONDecoder jsonObject = KeyProviderService.keygen2JSONCache.parse(jsonData);
             switch (keygen2State.getProtocolPhase()) {
@@ -186,7 +187,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     ProvisioningInitializationResponseDecoder provisioningInitResponse = (ProvisioningInitializationResponseDecoder) jsonObject;
                     keygen2State.update(provisioningInitResponse);
 
-                    log.info("Device Certificate=" +
+                    logger.info("Device Certificate=" +
                             certificateData(keygen2State.getDeviceCertificate()));
 
                     ////////////////////////////////////////////////////////////////////////
@@ -222,7 +223,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                   matchingCredential.getServerSessionId(),
                                                   endEntityCertificate,
                                                   KeyProviderService.keyManagementKey.getPublicKey());
-                          log.info("Deleting key=" + certificateData(endEntityCertificate));
+                          logger.info("Deleting key=" + certificateData(endEntityCertificate));
                         }
                     }
 
@@ -395,7 +396,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     ProvisioningFinalizationResponseDecoder provisioningFinalResponse =
                         (ProvisioningFinalizationResponseDecoder) jsonObject;
                     keygen2State.update(provisioningFinalResponse);
-                    log.info("Successful KeyGen2 run");
+                    logger.info("Successful KeyGen2 run");
 
                     ////////////////////////////////////////////////////////////////////////
                     // We are done, return an HTTP redirect taking 
@@ -411,7 +412,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             if (session != null) {
                 session.invalidate();
             }
-            log.log(Level.SEVERE, "KeyGen2 failure", e);
+            logger.log(Level.SEVERE, "KeyGen2 failure", e);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             PrintWriter printerWriter = new PrintWriter(baos);
             e.printStackTrace(printerWriter);
@@ -432,7 +433,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
            throws IOException, ServletException {
-        if (request.getParameter(KeyProviderInitServlet.INIT_TAG) != null) {
+logger.info("GET session=" + request.getSession(false).getId() + " Q=" + request.getQueryString());
+       if (request.getParameter(KeyProviderInitServlet.INIT_TAG) != null) {
             executeRequest(request, response, true);
             return;
         }
@@ -446,7 +448,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
         } else if (foundData(request, result, KeyProviderInitServlet.PARAM_TAG)) {
             html.append(result);
         } else if (foundData(request, result, KeyProviderInitServlet.ABORT_TAG)) {
-            log.info("KeyGen2 run aborted by the user");
+            logger.info("KeyGen2 run aborted by the user");
             html.append("Aborted by the user!");
         } else {
             HttpSession session = request.getSession(false);

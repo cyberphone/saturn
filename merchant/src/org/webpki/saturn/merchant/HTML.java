@@ -51,6 +51,10 @@ public class HTML implements MerchantProperties {
     static final String FONT_ARIAL = "Arial,'Liberation Sans',Verdana,'Bitstream Vera Sans','DejaVu Sans'";
     
     static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" title=\"For showing context\" style=\"width:30pt;position:absolute;right:10pt;top:10pt\"";
+
+    static final String SATURN_PAY_BUTTON = "SaturnPay";
+    
+    static final BigDecimal HUNDRED = new BigDecimal(100);
     
     static String getHTML(String javascript, String bodyscript, String box) {
         StringBuilder s = new StringBuilder(
@@ -210,10 +214,8 @@ public class HTML implements MerchantProperties {
     }
 
     private static String price(long priceX100) throws IOException {
-        BigDecimal amount = new BigDecimal(priceX100);
-        amount.setScale(MerchantService.currency.getDecimals());
-        amount = amount.divide(new BigDecimal(100));
-        return MerchantService.currency.amountToDisplayString(amount, false);
+        return MerchantService.currency.amountToDisplayString(
+                new BigDecimal(priceX100).divide(HUNDRED), false);
     }
     
     static void merchantPage(HttpServletResponse response,
@@ -650,7 +652,8 @@ public class HTML implements MerchantProperties {
                     "<tr><td style=\"padding-bottom:10pt;text-align:center;font-weight:bolder;font-size:10pt;font-family:" +
                     FONT_ARIAL + "\">Select Payment Method</td></tr>")
             .append(MerchantService.desktopWallet || android ?
-                      "<tr><td><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"goSaturnGo()\"></td></tr>" 
+                      "<tr><td id=\"" + SATURN_PAY_BUTTON + 
+                      "\"><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"goSaturnGo()\"></td></tr>" 
                                                                 :
                       "")
             .append(MerchantService.desktopWallet || !android ?
@@ -685,8 +688,10 @@ public class HTML implements MerchantProperties {
                 "    total: {\n" +
                 "      label: 'total', \n" +
                 "      amount: {\n" +
-                "        currency: 'USD',\n" +
-                "        value: '1.00'\n" +
+                "        currency: '" + MerchantService.currency.toString() + "',\n" +
+                "        value: '" + MerchantService.currency.plainAmountString(
+                           new BigDecimal(savedShoppingCart.roundedPaymentAmount).divide(HUNDRED)) +
+                               "'\n" +
                 "      }\n" +
                 "    }\n" +
                 "  };\n\n" +
@@ -719,6 +724,7 @@ public class HTML implements MerchantProperties {
                 "}\n\n" +
                 "let w3creq = buildPaymentRequest();\n\n" +
                 "function goSaturnGo() {\n" +
+                "  document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML='<img src=\"images/waiting.gif\">';\n" +
                 "  if (w3creq) {\n" +
                 "    try {\n" +
                 "      w3creq.show().then(function(response) {\n" +
