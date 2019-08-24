@@ -32,7 +32,8 @@
     <servlet-mapping>
         <servlet-name>PaymentAppMethodServlet</servlet-name>
         <url-pattern>/method</url-pattern>
-    </servlet-mapping>
+        <url-pattern>/app-manifest.json</url-pattern>
+   </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>PaymentManifestServlet</servlet-name>

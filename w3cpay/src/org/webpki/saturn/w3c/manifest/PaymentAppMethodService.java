@@ -43,6 +43,8 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
     static final String HOST_PATH                    = "host_path";
 
     static byte[] paymentManifest;
+
+    static byte[] appManifest;
     
     byte[] getBinary(String name) throws IOException {
         return ArrayUtil.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name));
@@ -60,7 +62,9 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
 
             JSONObjectWriter temp = new JSONObjectWriter();
             temp.setArray("default_applications")
-                .setString(getPropertyString(HOST_PATH) + "/payment-manifest.json");
+                .setString(getPropertyString(HOST_PATH) + "/app-manifest.json");
+            paymentManifest = temp.serializeToBytes(JSONOutputFormats.PRETTY_PRINT);
+            temp = new JSONObjectWriter();
             JSONObjectWriter oneApp = new JSONObjectWriter();
             oneApp.setString("platform", "play")
                   .setString("id", "org.webpki.mobile.android")
@@ -77,8 +81,7 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
             temp.setArray("related_applications")
                 .setObject(oneApp.setString("url", 
                                             "https://play.google.com/store/apps/details?id=org.webpki.mobile.android"));
-            temp.setString("supported_origins", "*");
-            paymentManifest = temp.serializeToBytes(JSONOutputFormats.NORMALIZED);
+             appManifest = temp.serializeToBytes(JSONOutputFormats.PRETTY_PRINT);
             
             logger.info("W3C/Android Payment App Method initiated\nSubject=" +
                     CertificateUtil.getCertificateFromBlob(certificate).getSubjectDN());
