@@ -222,6 +222,8 @@ public class KeyProviderInitServlet extends HttpServlet {
             (KeyProviderService.useW3cPaymentRequest ?
             "function paymentRequestError(msg) {\n" +
             "  console.info('Payment request error:' + msg);\n" +
+            "  if (msg.indexOf('" + KeyProviderService.w3cPaymentRequestMethod + 
+              "') >= 0) msg = 'App is installed?';\n" +
             "  document.getElementById('" + BUTTON_ID + 
             "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
               "msg + '</div>';\n" +
@@ -231,6 +233,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  if (window.PaymentRequest) {\n" +
             "    document.getElementById('" + BUTTON_ID + "').outerHTML = " +
               "'<img id=\"" + BUTTON_ID + "\" src=\"waiting.gif\">';\n" +
+            // We need a fresh session and associated enrollment URL which the fetch below offers
             "    var formData = new URLSearchParams();\n" +
             "    formData.append('" + USERNAME_SESSION_ATTR +
               "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
@@ -242,11 +245,14 @@ public class KeyProviderInitServlet extends HttpServlet {
             "      });\n" +
             "      if (httpResponse.ok) {\n" +
             "        const invocationUrl = await httpResponse.text();\n" +
+            // Success! Now we hook into the W3C PaymentRequest
             "        const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
             "        const supportedInstruments = [{\n" +
             "          supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
+// Optional test data
 //            "    supportedMethods: 'weird-pay',\n" +
             "          data: {url: invocationUrl}\n" +
+// Optional test data
 //            "          supportedMethods: 'basic-card',\n" +
 //            "          data: {supportedNetworks: ['cartebancaire']}\n" +
             "        }];\n" +
@@ -257,8 +263,9 @@ public class KeyProviderInitServlet extends HttpServlet {
             "    } catch (err) {\n" +
             "      console.error(err);\n" +
             "      paymentRequestError(err.message);\n" +
-            "    }\n" +   
+            "    }\n" +
             "  } else {\n" +
+            // The browser does not support PaymentRequest, fallback to URL handler
             "    document.forms.shoot.submit();\n" +
             "  }\n" +
             "}"
