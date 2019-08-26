@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
@@ -53,12 +54,14 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final String PARAM_TAG = "msg";
     static final String ERROR_TAG = "err";
     
-    static final String BUTTON_ID = "gokg2go";
+    static final String BUTTON_ID = "gokg2";
     
-    static final String DEFAULT_USER_NAME_HTML = "Luke Skywalker &#129412;";
+    static final String DEFAULT_USER_NAME_HTML = "Luke Skywalker &#x1f984;";    // Unicorn emoji
+    
+    static final String BUTTON_TEXT_HTML       = "Start Enrollment &#x1f680;";  // Rocket emoji
     
     static final String ANONYMOUS_JAVA         = "Anonymous " + 
-                        new String(Character.toChars(Integer.parseInt("1f47d", 16)));
+                 new String(Character.toChars(Integer.parseInt("1f47d", 16)));  // E.T. emoji
     
     static final int MINIMUM_CHROME_VERSION    = 75;
 
@@ -176,13 +179,15 @@ public class KeyProviderInitServlet extends HttpServlet {
         response.setContentType("text/html; charset=utf-8");
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
-        response.getOutputStream().write(html.getBytes("UTF-8"));
+        byte[] data = html.getBytes("utf-8");
+        response.setContentLength(data.length);
+        ServletOutputStream os = response.getOutputStream();
+        response.getOutputStream().write(data);
     }
     
     static String getInvocationUrl(String scheme, HttpSession session) throws IOException {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // The following is the actual contract between an issuing server and a KeyGen2 client.
-        // The "cookie" element is optional while the "url" argument is mandatory.
         // The "init" argument bootstraps the protocol via an HTTP GET
         ////////////////////////////////////////////////////////////////////////////////////////////
         String urlEncoded = URLEncoder.encode(KeyProviderService.keygen2RunUrl, "utf-8");
@@ -212,9 +217,10 @@ public class KeyProviderInitServlet extends HttpServlet {
             output(response, 
                     getHTML(null,
                             null,
-                            "<div class=\"label\">This proof-of-concept system only supports " +
-                              "Android and using the \"Chrome\" browser (min version: " + 
-                              MINIMUM_CHROME_VERSION + ")</div>"));
+                "<div class=\"label\">This proof-of-concept system only supports " +
+                  "Android and using the \"Chrome\" browser (min version: " + 
+                  MINIMUM_CHROME_VERSION + ")" +
+                "</div>"));
             return;
         }
         output(response, 
@@ -230,10 +236,24 @@ public class KeyProviderInitServlet extends HttpServlet {
             "}\n\n" +
 
             "async function enroll() {\n" +
+            //////////////////////////////////////////////////////////////////////
+            // PaymentRequest for key enrollment?  Right, there is currently no //
+            // better way combining the Web and Android applications. You get:  //
+            //  - Return value to the invoking Web page                         //
+            //  - Invoking Web page security context to the App                 //
+            //  - UI wise almost perfect Web2App integration                    //
+            //  - Security beating URL handlers without adding vulnerabilities  //
+            //////////////////////////////////////////////////////////////////////
             "  if (window.PaymentRequest) {\n" +
+            // It takes a second or two to get PaymentRequest up and running.
+            // Show that to the user.
             "    document.getElementById('" + BUTTON_ID + "').outerHTML = " +
               "'<img id=\"" + BUTTON_ID + "\" src=\"waiting.gif\">';\n" +
-            // We need a fresh session and associated enrollment URL which the fetch below offers
+            // This code may seem strange but the Web application does not create
+            // an HttpSession so we do this immediately after the user hit the
+            // enroll button.  Using fetch this becomes invisible UI wise.
+            // Read current FORM data as well and add that to the HttpSession
+            // to be created on the server.
             "    var formData = new URLSearchParams();\n" +
             "    formData.append('" + USERNAME_SESSION_ATTR +
               "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
@@ -245,7 +265,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "      });\n" +
             "      if (httpResponse.ok) {\n" +
             "        const invocationUrl = await httpResponse.text();\n" +
-            // Success! Now we hook into the W3C PaymentRequest
+            // Success! Now we hook into the W3C PaymentRequest using "dummy" payment data
             "        const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
             "        const supportedInstruments = [{\n" +
             "          supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
@@ -254,7 +274,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "          data: {url: invocationUrl}\n" +
 // Optional test data
 //            "          supportedMethods: 'basic-card',\n" +
-//            "          data: {supportedNetworks: ['cartebancaire']}\n" +
+//            "          data: {supportedNetworks: ['visa', 'mastercard']}\n" +
             "        }];\n" +
             "        const payRequest = new PaymentRequest(supportedInstruments, details);\n" +
             "        const payResponse = await payRequest.show();\n" +
@@ -265,7 +285,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "      paymentRequestError(err.message);\n" +
             "    }\n" +
             "  } else {\n" +
-            // The browser does not support PaymentRequest, fallback to URL handler
+            // The browser does not support PaymentRequest, fallback to the awkward URL handler
             "    document.forms.shoot.submit();\n" +
             "  }\n" +
             "}"
@@ -275,26 +295,36 @@ public class KeyProviderInitServlet extends HttpServlet {
             "}"),
             null,
             "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
-            "<div>This proof-of-concept system provisions secure payment credentials<br>" + 
-            "to be used in the Android version of the Saturn &quot;Wallet&quot;.</div>" + 
-            "<div style=\"display:flex;justify-content:center;padding-top:15pt\"><table>" + 
-            "     <tr><td>Your name (real or made up):</td></tr>" + 
-            "     <tr><td><input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
-            "\" value=\"" + DEFAULT_USER_NAME_HTML + "\" size=\"30\" maxlength=\"50\" " + 
-            "style=\"background-color:#def7fc\"></td></tr>" + 
-            "</table></div>" + 
-            "<div style=\"text-align:center\">This name will be printed on your virtual payment cards.</div>" + 
+            "<div>" +
+              "This proof-of-concept system provisions secure payment credentials<br>" + 
+              "to be used in the Android version of the Saturn &quot;Wallet&quot;." +
+            "</div>" + 
             "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
-              "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"enroll()\">Start Enrollment</div></div>" + 
-              "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not already " +
-                "installed Saturn, this is the time to do it!</div>" +
-              "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
+              "<table>" + 
+                "<tr><td>Your name (real or made up):</td></tr>" + 
+                "<tr><td><input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
+                  "\" value=\"" + DEFAULT_USER_NAME_HTML + 
+                  "\" size=\"30\" maxlength=\"50\" " + 
+                  "style=\"background-color:#def7fc\"></td></tr>" + 
+              "</table>" +
+            "</div>" + 
+            "<div style=\"text-align:center\">" +
+              "This name will be printed on your virtual payment cards." +
+            "</div>" + 
+            "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
+              "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"enroll()\">" +
+                BUTTON_TEXT_HTML + 
+              "</div>" +
+            "</div>" + 
+            "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have yet " +
+              "installed WebPKI, this is the time to do it!</div>" +
+            "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
               "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
                 "title=\"Android\" onclick=\"document.location.href = " +
                 "'https://play.google.com/store/apps/details?id=org.webpki.mobile.android'\">" +
             "</div>" + 
             "</form>" + 
-            "</div>" + 
+            "</div>" + // Main window end tag
             "<div class=\"sitefooter\">Note: in a real configuration you would also need to " +
             "authenticate as a part of the enrollment."));
     }
