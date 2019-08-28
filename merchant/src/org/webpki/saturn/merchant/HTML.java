@@ -292,7 +292,7 @@ public class HTML implements MerchantProperties {
             page_data.append(productEntry(temp_string, ShoppingServlet.products.get(sku), sku, savedShoppingCart, q++));
         }
         page_data.append(
-            "</table></tr></td><tr><td style=\"padding-top:10pt\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\"><tr><th>Total</th><td style=\"text-align:right\" id=\"total\">")
+            "</table></td></tr><tr><td style=\"padding-top:10pt\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\"><tr><th>Total</th><td style=\"text-align:right\" id=\"total\">")
         .append(price(savedShoppingCart.total))
         .append("</td></tr>" +
             "</table></td></tr>" +
@@ -695,48 +695,55 @@ public class HTML implements MerchantProperties {
                 "      }\n" +
                 "    }\n" +
                 "  };\n\n" +
+//                (true ? 
                 (android ? 
                 "  const supportedInstruments = [{\n" +
                 "    supportedMethods: '" + MerchantService.w3cPaymentRequestMethod + "',\n" +
                 "    data: {url: '" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
                                                                             request.getSession(false).getId(),
                                                                             null) + "'}\n" +
+//                "    supportedMethods: 'weird-pay',\n" +
+//                "    supportedMethods: 'basic-card',\n" +
+//                "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
                 "  }];\n\n"
                             : 
                 "  const supportedInstruments = [{\n" +
                 "    supportedMethods: 'basic-card',\n" +
                 "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
                 "  }];\n\n") +
+
                 "  let request = null;\n\n" +
                 "  try {\n" +
                 "    request = new PaymentRequest(supportedInstruments, details);\n" +
-                "    if (request.canMakePayment) {\n" +
-                "      request.canMakePayment().then(function(result) {\n" +
-                "        console.info(result ? 'Can make payment' : 'Cannot make payment');\n" +
-                "      }).catch(function(err) {\n" +
-                "        console.info(err);\n" +
-                "      });\n" +
-                "    }\n" +
                 "  } catch (e) {\n" +
                 "    console.info('Developer mistake:' + e.message);\n" +
                 "  }\n" +
                 "  return request;\n" +
                 "}\n\n" +
                 "let w3creq = buildPaymentRequest();\n\n" +
-                "function goSaturnGo() {\n" +
-                "  document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML='<img src=\"images/waiting.gif\">';\n" +
+                "async function goSaturnGo() {\n" +
+                "  document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = '<img src=\"images/waiting.gif\">';\n" +
                 "  if (w3creq) {\n" +
                 "    try {\n" +
-                "      w3creq.show().then(function(response) {\n" +
-                "        response.complete('success');\n" +
-                "        console.info('Success!');\n" +
-                "        document.location.href = response.details.goto;\n" +
-                "      }).catch(function(err) {\n" +
-                "        console.info(err.message);\n" +
-                "        document.forms.restore.submit();\n" +
-                "      });\n" +
+                "      const canMakePayment = await w3creq.canMakePayment();\n" +
+                "      if (canMakePayment) {\n" +
+                "        const payResponse = await w3creq.show();\n" +
+                "        payResponse.complete('success');\n" +
+                // Note that success does not necessarily mean that the payment succeeded,
+                // it just means that result is a url to be redirected to.
+                "        document.location.href = payResponse.details.goto;\n" +
+                "      } else {\n" +
+                "        console.info('Cannot make payment');\n" +
+                "        document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = " +
+                  "'<div>In order to use this application you need to install<br>" +
+                  "the Android app and enroll payment credentials</div><div style=\"text-align:center;padding:10pt\">" +
+                  fancyButton("OK - Let\\'s do that!", "Enroll etc", "document.location.href = \\'" + 
+                  MerchantService.noMatchingMethodsUrl + "\\'") + 
+                  "</div>';\n" +
+                "      }\n" +
                 "    } catch (e) {\n" +
-                "      console.info('Developer mistake:' + e.message);\n" +
+                "      console.info('Cancel or error:' + e.message);\n" +
+                "      document.forms.restore.submit();\n" +
                 "    }\n" +
                 "  } else {\n" +
                 "    document.forms.shoot.submit();\n" +
