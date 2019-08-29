@@ -42,7 +42,11 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
 
     static final String ANDROID_CANCEL                = "qric";
     static final String QR_SUCCESS_URL                = "local";
-    
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // The following is the actual contract between an issuing server and a Saturn client.
+    // The PUP_INIT_URL argument bootstraps the protocol via an HTTP GET
+    ////////////////////////////////////////////////////////////////////////////////////////////
     static String getInvocationUrl(String scheme, String httpSessionId, String qrSessionId) throws IOException {
         String encodedUrl = URLEncoder.encode(HomeServlet.merchantBaseUrl, "utf-8");
         String cancelUrl = encodedUrl + "%2Fandroidplugin%3F" + ANDROID_CANCEL + "%3D";
@@ -50,11 +54,11 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             cancelUrl += qrSessionId;
         }
         return scheme + "://" + MobileProxyParameters.HOST_SATURN +
-               "?cookie=JSESSIONID%3D" + httpSessionId +
-               "&url=" + encodedUrl + "%2Fauthorize" + 
-               "&ver=" + MerchantService.grantedVersions +
-               "&init=" + encodedUrl + "%2Fandroidplugin" +
-               "&cncl=" + cancelUrl;
+               "?" + MobileProxyParameters.PUP_COOKIE     + "=" + "JSESSIONID%3D" + httpSessionId +
+               "&" + MobileProxyParameters.PUP_INIT_URL   + "=" + encodedUrl + "%2Fandroidplugin" +
+               "&" + MobileProxyParameters.PUP_MAIN_URL   + "=" + encodedUrl + "%2Fauthorize" + 
+               "&" + MobileProxyParameters.PUP_CANCEL_URL + "=" + cancelUrl +
+               "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + MerchantService.grantedVersions;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////

@@ -730,7 +730,8 @@ public class HTML implements MerchantProperties {
                 "        w3cPayRes.complete('success');\n" +
                 // Note that success does not necessarily mean that the payment succeeded,
                 // it just means that the result is a URL to be redirected to.
-                "        document.location.href = w3cPayRes.details.goto;\n" +
+                "        document.location.href = w3cPayRes.details." + 
+                  MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
                 "      } else {\n" +
                 "        console.info('Cannot make payment');\n" +
                 "        document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = " +

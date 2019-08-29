@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
@@ -181,23 +180,22 @@ public class KeyProviderInitServlet extends HttpServlet {
         response.setDateHeader("EXPIRES", 0);
         byte[] data = html.getBytes("utf-8");
         response.setContentLength(data.length);
-        ServletOutputStream os = response.getOutputStream();
         response.getOutputStream().write(data);
     }
     
     static String getInvocationUrl(String scheme, HttpSession session) throws IOException {
         ////////////////////////////////////////////////////////////////////////////////////////////
         // The following is the actual contract between an issuing server and a KeyGen2 client.
-        // The "init" argument bootstraps the protocol via an HTTP GET
+        // The PUP_INIT_URL argument bootstraps the protocol via an HTTP GET
         ////////////////////////////////////////////////////////////////////////////////////////////
         String urlEncoded = URLEncoder.encode(KeyProviderService.keygen2RunUrl, "utf-8");
         return scheme + "://" + MobileProxyParameters.HOST_KEYGEN2 + 
-               "?cookie=JSESSIONID%3D" + session.getId() +
-               "&url=" + urlEncoded +
-               "&ver=" + KeyProviderService.grantedVersions +
-               "&init=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
-               "&cncl=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue";
-    }
+               "?" + MobileProxyParameters.PUP_COOKIE     + "=" + "JSESSIONID%3D" + session.getId() +
+               "&" + MobileProxyParameters.PUP_INIT_URL   + "=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
+               "&" + MobileProxyParameters.PUP_MAIN_URL   + "=" + urlEncoded +
+               "&" + MobileProxyParameters.PUP_CANCEL_URL + "=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue" +
+               "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + KeyProviderService.grantedVersions;
+   }
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -280,8 +278,9 @@ public class KeyProviderInitServlet extends HttpServlet {
             "        const payResponse = await payRequest.show();\n" +
             "        payResponse.complete('success');\n" +
             // Note that success does not necessarily mean that the enrollment succeeded,
-            // it just means that result is a URL to be redirected to.
-            "        document.location.href = payResponse.details.gotoUrl;\n" +
+            // it just means that the result is a URL to be redirected to.
+            "        document.location.href = payResponse.details." +
+              MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
             "      }\n" +
             "    } catch (err) {\n" +
             "      console.error(err);\n" +
