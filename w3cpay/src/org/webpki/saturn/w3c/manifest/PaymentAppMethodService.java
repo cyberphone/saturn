@@ -32,6 +32,8 @@ import org.webpki.json.JSONOutputFormats;
 
 import org.webpki.util.ArrayUtil;
 
+import org.webpki.net.MobileProxyParameters;
+
 import org.webpki.webutil.InitPropertyReader;
 
 public class PaymentAppMethodService extends InitPropertyReader implements ServletContextListener {
@@ -67,7 +69,7 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
             temp = new JSONObjectWriter();
             JSONObjectWriter oneApp = new JSONObjectWriter();
             oneApp.setString("platform", "play")
-                  .setString("id", "org.webpki.mobile.android")
+                  .setString("id", MobileProxyParameters.ANDROID_PACKAGE_NAME)
                   .setString("min_version", "1")
                   .setArray("fingerprints")
                     .setObject()
@@ -80,7 +82,8 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
                                                          ':'));
             temp.setArray("related_applications")
                 .setObject(oneApp.setString("url", 
-                                            "https://play.google.com/store/apps/details?id=org.webpki.mobile.android"));
+                                            "https://play.google.com/store/apps/details?id=" +
+                                                    MobileProxyParameters.ANDROID_PACKAGE_NAME));
              appManifest = temp.serializeToBytes(JSONOutputFormats.PRETTY_PRINT);
             
             logger.info("W3C/Android Payment App Method initiated\nSubject=" +

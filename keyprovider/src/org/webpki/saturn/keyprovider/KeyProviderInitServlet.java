@@ -323,7 +323,8 @@ public class KeyProviderInitServlet extends HttpServlet {
             "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
               "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
                 "title=\"Android\" onclick=\"document.location.href = " +
-                "'https://play.google.com/store/apps/details?id=org.webpki.mobile.android'\">" +
+                "'https://play.google.com/store/apps/details?id=" +
+                MobileProxyParameters.ANDROID_PACKAGE_NAME + "'\">" +
             "</div>" + 
             "</form>" + 
             "</div>" + // Main window end tag
