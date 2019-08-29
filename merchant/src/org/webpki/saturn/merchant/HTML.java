@@ -680,7 +680,7 @@ public class HTML implements MerchantProperties {
                 "  }, 1000);\n" +
                 "}\n\n" +
                 (MerchantService.useW3cPaymentRequest ?
-                "function buildPaymentRequest() {\n" +
+                "function buildW3cPaymentRequest() {\n" +
                 "  if (!window.PaymentRequest) {\n" +
                 "    return null;\n" +
                 "  }\n\n" +
@@ -720,18 +720,17 @@ public class HTML implements MerchantProperties {
                 "  }\n" +
                 "  return request;\n" +
                 "}\n\n" +
-                "let w3creq = buildPaymentRequest();\n\n" +
+                "let w3cPayReq = buildW3cPaymentRequest();\n\n" +
                 "async function goSaturnGo() {\n" +
                 "  document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = '<img src=\"images/waiting.gif\">';\n" +
-                "  if (w3creq) {\n" +
+                "  if (w3cPayReq) {\n" +
                 "    try {\n" +
-                "      const canMakePayment = await w3creq.canMakePayment();\n" +
-                "      if (canMakePayment) {\n" +
-                "        const payResponse = await w3creq.show();\n" +
-                "        payResponse.complete('success');\n" +
+                "      if (await w3cPayReq.canMakePayment()) {\n" +
+                "        const w3cPayRes = await w3cPayReq.show();\n" +
+                "        w3cPayRes.complete('success');\n" +
                 // Note that success does not necessarily mean that the payment succeeded,
-                // it just means that result is a url to be redirected to.
-                "        document.location.href = payResponse.details.goto;\n" +
+                // it just means that the result is a URL to be redirected to.
+                "        document.location.href = w3cPayRes.details.goto;\n" +
                 "      } else {\n" +
                 "        console.info('Cannot make payment');\n" +
                 "        document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = " +

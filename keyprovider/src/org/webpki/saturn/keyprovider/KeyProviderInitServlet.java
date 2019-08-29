@@ -280,8 +280,8 @@ public class KeyProviderInitServlet extends HttpServlet {
             "        const payResponse = await payRequest.show();\n" +
             "        payResponse.complete('success');\n" +
             // Note that success does not necessarily mean that the enrollment succeeded,
-            // it just means that result is a url to be redirected to.
-            "        document.location.href = payResponse.details.goto;\n" +
+            // it just means that result is a URL to be redirected to.
+            "        document.location.href = payResponse.details.gotoUrl;\n" +
             "      }\n" +
             "    } catch (err) {\n" +
             "      console.error(err);\n" +
