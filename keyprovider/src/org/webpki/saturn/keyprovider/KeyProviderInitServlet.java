@@ -258,7 +258,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "        method: 'POST',\n" +
             "        body: formData\n" +
             "      });\n" +
-            "      if (httpResponse.ok) {\n" +
+            "      if (httpResponse.status == 200) {\n" +
             "        const invocationUrl = await httpResponse.text();\n" +
             // Success! Now we hook into the W3C PaymentRequest using "dummy" payment data
             "        const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
@@ -282,6 +282,8 @@ public class KeyProviderInitServlet extends HttpServlet {
             "        } else {\n" +
             "          paymentRequestError('App does not seem to be installed');\n" +
             "        }\n" +
+            "      } else {\n" +
+            "        paymentRequestError('Server error, try again');\n" +
             "      }\n" +
             "    } catch (err) {\n" +
             "      console.error(err);\n" +
