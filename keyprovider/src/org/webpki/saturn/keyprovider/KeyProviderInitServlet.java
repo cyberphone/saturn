@@ -226,8 +226,6 @@ public class KeyProviderInitServlet extends HttpServlet {
             (KeyProviderService.useW3cPaymentRequest ?
             "function paymentRequestError(msg) {\n" +
             "  console.info('Payment request error:' + msg);\n" +
-            "  if (msg.indexOf('" + KeyProviderService.w3cPaymentRequestMethod + 
-              "') >= 0) msg = 'App is installed?';\n" +
             "  document.getElementById('" + BUTTON_ID + 
             "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
               "msg + '</div>';\n" +
@@ -275,12 +273,16 @@ public class KeyProviderInitServlet extends HttpServlet {
 //            "          data: {supportedNetworks: ['visa', 'mastercard']}\n" +
             "        }];\n" +
             "        const payRequest = new PaymentRequest(supportedInstruments, details);\n" +
-            "        const payResponse = await payRequest.show();\n" +
-            "        payResponse.complete('success');\n" +
+            "        if (await payRequest.canMakePayment()) {\n" +
+            "          const payResponse = await payRequest.show();\n" +
+            "          payResponse.complete('success');\n" +
             // Note that success does not necessarily mean that the enrollment succeeded,
             // it just means that the result is a URL to be redirected to.
-            "        document.location.href = payResponse.details." +
+            "          document.location.href = payResponse.details." +
               MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
+            "        } else {\n" +
+            "          paymentRequestError('App does not seem to be installed');\n" +
+            "        }\n" +
             "      }\n" +
             "    } catch (err) {\n" +
             "      console.error(err);\n" +
