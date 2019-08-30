@@ -199,8 +199,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
- logger.info("GET");
-       String userAgent = request.getHeader("User-Agent");
+        String userAgent = request.getHeader("User-Agent");
         boolean notOk = true;
         if (userAgent.contains("Android ")) {
             int i = userAgent.indexOf(" Chrome/");
@@ -364,10 +363,9 @@ public class KeyProviderInitServlet extends HttpServlet {
                 "something wrong with the installation.</div>" +
                 "</div>"));
         } else {
-            logger.info("POST session=" + session.getId());
-            output(response, 
-                   getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
-                   session));
+            String invocationUrl = getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, session);
+            logger.info("POST return=" + invocationUrl);
+            output(response, invocationUrl);
         }
     }
 }
