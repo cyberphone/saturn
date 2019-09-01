@@ -55,7 +55,7 @@ public class HTML implements MerchantProperties {
     static final String SATURN_PAY_BUTTON = "SaturnPay";
     
     static final BigDecimal HUNDRED = new BigDecimal(100);
-    
+
     static String getHTML(String javascript, String bodyscript, String box) {
         StringBuilder s = new StringBuilder(
             "<!DOCTYPE html>"+
@@ -100,10 +100,13 @@ public class HTML implements MerchantProperties {
         servletOutputStream.flush();
     }
 
-    static void homePage(HttpServletResponse response,
-                         boolean debugMode,
-                         boolean refundMode) throws IOException, ServletException {
-        HTML.output(response, HTML.getHTML(null, null,
+    static void homePage(HttpServletResponse response) throws IOException, ServletException {
+        HTML.output(response, HTML.getHTML(
+                "function invoke(relativeUrl) {\n" +
+                "  document.forms.shoot." + HomeServlet.GOTO_URL + ".value = relativeUrl;\n" +
+                "  document.forms.shoot.submit();\n" +
+                "}"
+                , null,
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table class=\"tighttable\" style=\"max-width:600px;\" cellpadding=\"4\">" +
                    "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">Saturn - Web Payment Demo<br>&nbsp;</td></tr>" +
@@ -127,19 +130,20 @@ public class HTML implements MerchantProperties {
                    " the <a href=\"android\">Android</a>") +
                    " version of the Wallet software.</td></tr>" +
                    "<tr><td align=\"center\"><table cellspacing=\"0\">" +
-                   "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "shop" + 
-                   "\">Go To Merchant</a>&nbsp;&nbsp;</td><td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td></tr>" +
-                   "<tr><td style=\"text-align:left;padding-bottom:5pt\"><a href=\"" + "gasstation" + 
-                   "\">Gas Station</a></td><td style=\"text-align:left;padding-bottom:5pt\">Another Payment Scenario</td></tr>" +
-                   "<form name=\"options\" method=\"POST\">" +
+                   "<tr><td style=\"text-align:left;padding-bottom:5pt\">" +
+                     "<a href=\"javascript:invoke('shop')\">Go To Merchant</a>&nbsp;&nbsp;</td>" +
+                     "<td style=\"text-align:left;padding-bottom:5pt\">Shop Till You Drop!</td>" +
+                   "</tr>" +
+                   "<tr><td style=\"text-align:left;padding-bottom:5pt\">" +
+                     "<a href=\"javascript:invoke('gasstation')\">Gas Station</a></td>" +
+                     "<td style=\"text-align:left;padding-bottom:5pt\">Another Payment Scenario</td>" +
+                   "</tr>" +
+                   "<form name=\"shoot\" method=\"POST\">" +
+                   "<input type=\"hidden\" name=\"" + HomeServlet.GOTO_URL +"\">" +
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
-                   DEBUG_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
-                   (debugMode ? " checked" : "") +
-                   "></td><td>Debug (JSON Message Dump) Option</td></tr>" +
+                   DEBUG_MODE_SESSION_ATTR + "\"></td><td>Debug (JSON Message Dump) Option</td></tr>" +
                    "<tr><td style=\"text-align:center\"><input type=\"checkbox\" name=\"" +
-                   REFUND_MODE_SESSION_ATTR + "\" onchange=\"document.forms.options.submit()\"" +
-                   (refundMode ? " checked" : "") +
-                   "></td><td>Refund Option</td></tr>" +
+                   REFUND_MODE_SESSION_ATTR + "\"></td><td>Refund Option</td></tr>" +
                    "</form>" +
                    "<tr><td style=\"text-align:center;padding-top:15pt;padding-bottom:5pt\" colspan=\"2\"><b>Documentation</b></td></tr>" +
                    "<tr style=\"text-align:left\"><td><a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/\">Saturn Home</a></td><td>Presentation Etc.</td></tr>" +
@@ -679,7 +683,7 @@ public class HTML implements MerchantProperties {
                 "    document.getElementById('notimplemented').style.visibility = 'hidden';\n" +
                 "  }, 1000);\n" +
                 "}\n\n" +
-                (MerchantService.useW3cPaymentRequest ?
+                (MerchantService.useW3cPaymentRequest && android?
                 "function buildW3cPaymentRequest() {\n" +
                 "  if (!window.PaymentRequest) {\n" +
                 "    return null;\n" +
@@ -695,8 +699,7 @@ public class HTML implements MerchantProperties {
                 "      }\n" +
                 "    }\n" +
                 "  };\n\n" +
-//                (true ? 
-                (android ? 
+ 
                 "  const supportedInstruments = [{\n" +
                 "    supportedMethods: '" + MerchantService.w3cPaymentRequestMethod + "',\n" +
                 "    data: {url: '" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
@@ -705,12 +708,7 @@ public class HTML implements MerchantProperties {
 //                "    supportedMethods: 'weird-pay',\n" +
 //                "    supportedMethods: 'basic-card',\n" +
 //                "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
-                "  }];\n\n"
-                            : 
-                "  const supportedInstruments = [{\n" +
-                "    supportedMethods: 'basic-card',\n" +
-                "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +
-                "  }];\n\n") +
+                "  }];\n\n" +
 
                 "  let request = null;\n\n" +
                 "  try {\n" +

@@ -19,6 +19,7 @@ package org.webpki.saturn.merchant;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +33,8 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     static final int MINIMUM_CHROME_VERSION = 75;
     
+    static final String GOTO_URL = "gotoUrl";
+
     static String merchantBaseUrl;  // For QR and Android only
     
     boolean isTapConnect() {
@@ -91,23 +94,17 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         merchantBaseUrl = ServletUtil.getContextURL(request);
         HttpSession session = request.getSession(false);
-        if (session != null && session.getAttribute(WALLET_REQUEST_SESSION_ATTR) != null) {
+        if (session != null) {
             session.invalidate();
         }
-        session = request.getSession(true);
-        if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
-            session.removeAttribute(GAS_STATION_SESSION_ATTR);
-        }
-        session.setAttribute(TAP_CONNECT_MODE_SESSION_ATTR, isTapConnect());
-        HTML.homePage(response,
-                      checkBoxGet(session, DEBUG_MODE_SESSION_ATTR),
-                      checkBoxGet(session, REFUND_MODE_SESSION_ATTR));
+        HTML.homePage(response);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(true);
         checkBoxSet(session, request, DEBUG_MODE_SESSION_ATTR);
         checkBoxSet(session, request, REFUND_MODE_SESSION_ATTR);
-        response.sendRedirect("home");
+        session.setAttribute(TAP_CONNECT_MODE_SESSION_ATTR, isTapConnect());
+        response.sendRedirect(request.getParameter(GOTO_URL));
     }
 }
