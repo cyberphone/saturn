@@ -365,6 +365,14 @@ public class KeyProviderInitServlet extends HttpServlet {
                 "something wrong with the installation.</div>" +
                 "</div>"));
         } else {
+/*
+            // This code makes the PaymentRequest "gesture" requirement open
+            // Chrome's payment dialog which is very confusing for users.
+            try {
+                Thread.sleep(10000);
+            } catch (InterruptedException e) {
+            }
+*/
             String invocationUrl = getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, session);
             logger.info("POST return=" + invocationUrl);
             output(response, invocationUrl);
