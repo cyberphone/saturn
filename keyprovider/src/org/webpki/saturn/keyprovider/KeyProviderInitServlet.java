@@ -285,8 +285,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "          payResponse.complete('success');\n" +
             //==================================================================//
             // Note that success does not necessarily mean that the enrollment  //
-            // succeeded, it just means that the result is a URL to be          //
-            // redirected to.                                                   //
+            // succeeded, it just means that the result is a redirect URL.      //                                                   //
             //==================================================================//
             "          document.location.href = payResponse.details." +
               MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
