@@ -283,8 +283,11 @@ public class KeyProviderInitServlet extends HttpServlet {
             "        if (await payRequest.canMakePayment()) {\n" +
             "          const payResponse = await payRequest.show();\n" +
             "          payResponse.complete('success');\n" +
-            // Note that success does not necessarily mean that the enrollment succeeded,
-            // it just means that the result is a URL to be redirected to.
+            //==================================================================//
+            // Note that success does not necessarily mean that the enrollment  //
+            // succeeded, it just means that the result is a URL to be          //
+            // redirected to.                                                   //
+            //==================================================================//
             "          document.location.href = payResponse.details." +
               MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
             "        } else {\n" +
