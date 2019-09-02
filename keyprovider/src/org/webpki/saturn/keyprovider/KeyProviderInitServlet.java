@@ -248,7 +248,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "    document.getElementById('" + BUTTON_ID + "').outerHTML = " +
               "'<img id=\"" + BUTTON_ID + "\" src=\"waiting.gif\">';\n" +
             //==================================================================//
-            // This following code may seem strange but the Web application     //
+            // The following code may seem strange but the Web application      //
             // does not create an HttpSession so we do this immediately after   //
             // the user hit the "Enroll" button.  Using fetch() this becomes    //
             // invisible UI wise. The POST provides the current FORM data which //
