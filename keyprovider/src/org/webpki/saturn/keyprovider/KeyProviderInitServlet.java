@@ -237,18 +237,23 @@ public class KeyProviderInitServlet extends HttpServlet {
             //  - Return value to the invoking Web page                         //
             //  - Invoking Web page security context to the App                 //
             //  - UI wise almost perfect Web2App integration                    //
+            //  - Away from having to select browser for App invoked pages      //
             //  - Security beating URL handlers without adding vulnerabilities  //
             //////////////////////////////////////////////////////////////////////
             "  if (window.PaymentRequest) {\n" +
-            // It takes a second or two to get PaymentRequest up and running.
-            // Show that to the user.
+            //==================================================================//
+            // It may take a second or two to get PaymentRequest up and         //
+            // running.  Indicate that to the user.                             //
+            //==================================================================//
             "    document.getElementById('" + BUTTON_ID + "').outerHTML = " +
               "'<img id=\"" + BUTTON_ID + "\" src=\"waiting.gif\">';\n" +
-            // This code may seem strange but the Web application does not create
-            // an HttpSession so we do this immediately after the user hit the
-            // enroll button.  Using fetch this becomes invisible UI wise.
-            // Read current FORM data as well and add that to the HttpSession
-            // to be created on the server.
+            //==================================================================//
+            // This following code may seem strange but the Web application     //
+            // does not create an HttpSession so we do this immediately after   //
+            // the user hit the "Enroll" button.  Using fetch() this becomes    //
+            // invisible UI wise. The POST provides the current FORM data which //
+            // is added to the HttpSession to be created on the server.         //
+            //==================================================================//
             "    var formData = new URLSearchParams();\n" +
             "    formData.append('" + USERNAME_SESSION_ATTR +
               "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
@@ -260,7 +265,10 @@ public class KeyProviderInitServlet extends HttpServlet {
             "      });\n" +
             "      if (httpResponse.status == 200) {\n" +
             "        const invocationUrl = await httpResponse.text();\n" +
-            // Success! Now we hook into the W3C PaymentRequest using "dummy" payment data
+            //==================================================================//
+            // Success! Now we can now hook into the W3C PaymentRequest using   //
+            // "dummy" payment data.                                            //
+            //==================================================================//
             "        const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
             "        const supportedInstruments = [{\n" +
             "          supportedMethods: '" + KeyProviderService.w3cPaymentRequestMethod + "',\n" +
