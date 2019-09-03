@@ -35,6 +35,12 @@
     </context-param>
 
     <context-param>
+        <description>Home of Merchant</description>
+        <param-name>merchant_base_url</param-name>
+        <param-value>@merchant-base-url@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Other Network Key (May be zero length)</description>
         <param-name>othernetwork_key</param-name>
         <param-value>@othernetwork-key@</param-value>

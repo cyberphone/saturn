@@ -48,7 +48,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
     // The PUP_INIT_URL argument bootstraps the protocol via an HTTP GET
     ////////////////////////////////////////////////////////////////////////////////////////////
     static String getInvocationUrl(String scheme, String httpSessionId, String qrSessionId) throws IOException {
-        String encodedUrl = URLEncoder.encode(HomeServlet.merchantBaseUrl, "utf-8");
+        String encodedUrl = URLEncoder.encode(MerchantService.merchantBaseUrl, "utf-8");
         String cancelUrl = encodedUrl + "%2Fandroidplugin%3F" + ANDROID_CANCEL + "%3D";
         if (qrSessionId != null) {
             cancelUrl += qrSessionId;
@@ -96,7 +96,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
                 }
                 // When user clicks "Cancel" in App mode we must return to
                 // the shop using a POST operation
-                HTML.autoPost(response, HomeServlet.merchantBaseUrl + "/shop");
+                HTML.autoPost(response, MerchantService.merchantBaseUrl + "/shop");
             } else {
                 // When user clicks "Cancel" in QR mode we must cancel the operation
                 // at the merchant side and return a suitable page to the QR client
@@ -136,7 +136,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {
                 logger.severe("QR session not found");
-                response.sendRedirect(HomeServlet.merchantBaseUrl);
+                response.sendRedirect(MerchantService.merchantBaseUrl);
             } else {
                 Synchronizer synchronizer = QRSessions.getSynchronizer(id);
                 if (synchronizer != null) {

@@ -119,8 +119,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             PayerAuthorization payerAuthorization = new PayerAuthorization(walletResponse);
 
             @SuppressWarnings("unchecked")
-            JSONObjectWriter rawPaymentRequest = ((LinkedHashMap<String,JSONObjectWriter>) session.getAttribute(WALLET_REQUEST_SESSION_ATTR))
-                .get(payerAuthorization.getPaymentMethod().getPaymentMethodUri());
+            JSONObjectWriter rawPaymentRequest = 
+                ((LinkedHashMap<String,JSONObjectWriter>) session.getAttribute(WALLET_REQUEST_SESSION_ATTR))
+                    .get(payerAuthorization.getPaymentMethod().getPaymentMethodUri());
             if (rawPaymentRequest == null) {
                 throw new IOException("Missing: " + payerAuthorization.getPaymentMethod().getPaymentMethodUri());
             }
@@ -147,7 +148,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 // Normal return                                                                       //
                 /////////////////////////////////////////////////////////////////////////////////////////
                 response.sendRedirect(qrId == null ? 
-                        HomeServlet.merchantBaseUrl + "/result" : SATURN_LOCAL_SUCCESS_URI);
+                        MerchantService.merchantBaseUrl + "/result" : SATURN_LOCAL_SUCCESS_URI);
             }
 
         } catch (Exception e) {

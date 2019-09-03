@@ -71,6 +71,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String MERCHANT_ID                  = "merchant_id";
 
+    static final String MERCHANT_BASE_URL            = "merchant_base_url";
+
     static final String OTHERNETWORK_KEY             = "othernetwork_key";
 
     static final String OTHERNETWORK_ID              = "othernetwork_id";
@@ -177,6 +179,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static boolean desktopWallet;
 
+    static String merchantBaseUrl;
+
     static String getReferenceId() {
         return "#" + (referenceId++);
     }
@@ -228,6 +232,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             localInstallation = getPropertyBoolean(LOCAL_INSTALLATION);
 
             desktopWallet = getPropertyBoolean(DESKTOP_WALLET);
+            
+            merchantBaseUrl = getPropertyString(MERCHANT_BASE_URL);
 
             // Should be common for all payment networks...
             merchantCommonName = getPropertyString(MERCHANT_CN);

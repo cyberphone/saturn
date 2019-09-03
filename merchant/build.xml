@@ -101,6 +101,7 @@
       <replacefilter token="@merchant-key@" value="${@merchantkey}.p12"/>
       <replacefilter token="@merchant-cn@" value="${@merchantcn}"/>
       <replacefilter token="@merchant-id@" value="${@merchantid}"/>
+      <replacefilter token="@merchant-base-url@" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="@othernetwork-key@" value="${other.key}"/>
       <replacefilter token="@othernetwork-id@" value="${@othernetworkid}"/>
       <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>

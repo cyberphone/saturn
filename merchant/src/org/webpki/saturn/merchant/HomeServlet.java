@@ -25,8 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.webutil.ServletUtil;
-
 public class HomeServlet extends HttpServlet implements MerchantProperties {
 
     private static final long serialVersionUID = 1L;
@@ -35,8 +33,6 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
     
     static final String GOTO_URL = "gotoUrl";
 
-    static String merchantBaseUrl;  // For QR and Android only
-    
     boolean isTapConnect() {
         return false;
     }
@@ -92,7 +88,6 @@ public class HomeServlet extends HttpServlet implements MerchantProperties {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        merchantBaseUrl = ServletUtil.getContextURL(request);
         HttpSession session = request.getSession(false);
         if (session != null) {
             session.invalidate();

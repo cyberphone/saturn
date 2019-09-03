@@ -78,7 +78,7 @@ public class QRDisplayServlet extends HttpServlet implements MerchantProperties 
         String id = QRSessions.createSession(session);
         session.setAttribute(QR_SESSION_ID_ATTR, id);
         response.setHeader("Cache-Control", "no-cache, max-age=0, must-revalidate, no-store");
-        String url = "webpki.org=" + URLEncoder.encode(HomeServlet.merchantBaseUrl +
+        String url = "webpki.org=" + URLEncoder.encode(MerchantService.merchantBaseUrl +
                                                          "/androidplugin?" + QRSessions.QR_SESSION_ID  + "=" + id,
                                                        "UTF-8");
         logger.info("URL=" + url + " SID=" + session.getId());
