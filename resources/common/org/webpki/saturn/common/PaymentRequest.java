@@ -22,11 +22,8 @@ import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
 
-import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONAsymKeySigner;
-import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.ISODateTime;
 
@@ -41,8 +38,7 @@ public class PaymentRequest implements BaseProperties {
                                           NonDirectPayments optionalNonDirectPayment,
                                           String referenceId,
                                           GregorianCalendar timeStamp,
-                                          GregorianCalendar expires,
-                                          JSONAsymKeySigner signer) throws IOException {
+                                          GregorianCalendar expires) throws IOException {
         return new JSONObjectWriter()
             .setObject(PAYEE_JSON, payee.writeObject())
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
@@ -52,8 +48,7 @@ public class PaymentRequest implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.UTC_NO_SUBSECONDS)
             .setDateTime(EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
-            .setSignature(signer);
+            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION));
     }
 
     public PaymentRequest(JSONObjectReader rd) throws IOException {
@@ -68,7 +63,6 @@ public class PaymentRequest implements BaseProperties {
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
         rd.checkForUnread();
     }
 
@@ -110,11 +104,6 @@ public class PaymentRequest implements BaseProperties {
     Software software;
     public Software getSoftware() {
         return software;
-    }
-
-    JSONSignatureDecoder signatureDecoder;
-    public JSONSignatureDecoder getSignatureDecoder() {
-        return signatureDecoder;
     }
 
     JSONObjectReader root;

@@ -60,6 +60,7 @@ public interface BaseProperties {
     String BACKEND_METHOD_SPECIFIC_JSON     = "backendMethodSpecific";      // Holding a payment backend method specific object
     String PAYMENT_METHODS_JSON             = "paymentMethods";             // List of accepted payment methods (URIs)
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URI)
+    String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User authorization signature
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_ID_JSON                  = "accountId";                  // Account identifier or PAN
     String ACCOUNT_REFERENCE_JSON           = "accountReference";           // Account/Card number for payee (like ************5678)

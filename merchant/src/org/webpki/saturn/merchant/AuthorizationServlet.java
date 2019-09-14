@@ -38,6 +38,7 @@ import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.HttpSupport;
+import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
@@ -124,6 +125,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             throw new IOException("No matching account type: " + clientPaymentMethodUri);
         }
 
+        // Valid method. Find proper to request key
+        ServerAsymKeySigner signer = null;
+        for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
+            for (String paymentMethodUri : paymentNetwork.acceptedPaymentMethodUris) {
+                if (paymentMethodUri.equals(clientPaymentMethodUri)) {
+                    signer = paymentNetwork.signer;
+                    break;
+                }
+            }
+        }
+
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
             AuthorizationRequest.encode(MerchantService.testMode,
@@ -135,10 +147,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         paymentRequest,
                                         paymentBackendMethodEncoder,
                                         MerchantService.getReferenceId(),
-                                        MerchantService.paymentNetworks.get(paymentRequest
-                                                                                .getSignatureDecoder()
-                                                                                    .getPublicKey())
-                                                                                        .signer);
+                                        signer);
 
         // Call Payer bank
         JSONObjectReader resultMessage = MerchantService.externalCalls.postJsonData(urlHolder,

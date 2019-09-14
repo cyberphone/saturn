@@ -57,7 +57,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         String currentReferenceId = MerchantService.getReferenceId();
         LinkedHashMap<String,JSONObjectWriter> requests = new LinkedHashMap<String,JSONObjectWriter>();
 
-        // Create a signed payment request for each payment network
+        // Create a payment request for each payment network
         for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
             JSONObjectWriter paymentRequest =
                 PaymentRequest.encode(new Payee(optionalNonDirectPayment == null ? 
@@ -70,15 +70,14 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                                       optionalNonDirectPayment,
                                       currentReferenceId,
                                       timeStamp,
-                                      expires,
-                                      paymentNetwork.signer);
-            for (String accountType : paymentNetwork.acceptedAccountTypes) {
+                                      expires);
+            for (String accountType : paymentNetwork.acceptedPaymentMethodUris) {
                 if (requests.put(accountType, paymentRequest) != null) {
                     throw new IOException("Duplicate: " + accountType);
                 }
             }
             paymentNetworksArray.setObject()
-                .setStringArray(PAYMENT_METHODS_JSON, paymentNetwork.acceptedAccountTypes)
+                .setStringArray(PAYMENT_METHODS_JSON, paymentNetwork.acceptedPaymentMethodUris)
                 .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         }
         if (MerchantService.noMatchingMethodsUrl != null) {

@@ -22,11 +22,11 @@ public class PaymentNetwork {
     
     ServerAsymKeySigner signer;
     String merchantId;
-    String[] acceptedAccountTypes;
+    String[] acceptedPaymentMethodUris;
 
-    PaymentNetwork(ServerAsymKeySigner signer, String merchantId, String[] acceptedAccountTypes) {
+    PaymentNetwork(ServerAsymKeySigner signer, String merchantId, String[] acceptedPaymentMethodUris) {
         this.signer = signer;
         this.merchantId = merchantId;
-        this.acceptedAccountTypes = acceptedAccountTypes;
+        this.acceptedPaymentMethodUris = acceptedPaymentMethodUris;
     }
 }

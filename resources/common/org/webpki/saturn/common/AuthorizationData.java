@@ -69,7 +69,7 @@ public class AuthorizationData implements BaseProperties {
         }
         return wr.setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
                  .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
-                 .setSignature (signer);
+                 .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
@@ -125,7 +125,8 @@ public class AuthorizationData implements BaseProperties {
         }
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        publicKey = rd.getSignature(new JSONCryptoHelper.Options()).getPublicKey();
+        publicKey = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, 
+                                    new JSONCryptoHelper.Options()).getPublicKey();
         rd.checkForUnread();
     }
 

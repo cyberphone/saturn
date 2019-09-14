@@ -1,21 +1,21 @@
 {
   "requestHash": {
     "algorithm": "S256",
-    "value": "EfvMIRlZUN1AhTtL0BrSrdIMANZ0iFSwKo89XZah9Uw"
+    "value": "gm2hysWXL2zfMGRUqLSaAyB65uaX0O-cQj0pIe6NVIY"
   },
-  "domainName": "localhost",
+  "domainName": "192.168.1.79",
   "paymentMethod": "https://bankdirect.net",
   "accountId": "8645-7800239403",
   "encryptionParameters": {
     "algorithm": "A256GCM",
-    "key": "o99u5xCNrWTwLZ_rKSoiTowNcnkpamRjiHK9g2YRbj4"
+    "key": "9HuXWAouOsNC0nUMjQKMGCV0_H0CC-wWSuW47tOfFV0"
   },
-  "timeStamp": "2019-05-19T08:24:55+02:00",
+  "timeStamp": "2019-09-14T15:48:14+02:00",
   "software": {
     "name": "WebPKI.org - Wallet",
     "version": "1.00"
   },
-  "signature": {
+  "authorizationSignature": {
     "algorithm": "ES256",
     "publicKey": {
       "kty": "EC",
@@ -23,6 +23,6 @@
       "x": "rQ4WXMB6_wQKHSiY_mbJ4QkGpfWLssF7hvIiiFpDEx8",
       "y": "Fh2rl0LGTtvaomOuhuRNo9Drz9o0--WXV2ITvdVQFRY"
     },
-    "value": "74Lv2HxEIjLMZIGXxeuu73cwi_uu9HjAkwB0vdcnOcChHqbNlE_YcLdLfUD1Bqb4In6eUdxp4gnKsLkn8qMjTw"
+    "value": "XAKy1DZbJWPm6pMxvoc2DmociECTiIslNvNNZnASfb332Ni0_2CO78Ti0fu0DexEYuV_y08qLsKPnblnfOKCTg"
   }
 }

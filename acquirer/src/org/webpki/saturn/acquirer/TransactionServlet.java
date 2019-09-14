@@ -64,7 +64,6 @@ public class TransactionServlet extends ProcessingBaseServlet {
             throw new IOException("Unknown merchant Id: " + payee.getId());
         }
         payeeCoreProperties.verify(payee, transactionRequest.getSignatureDecoder());
-        payeeCoreProperties.verify(payee, paymentRequest.getSignatureDecoder());
 
         SupercardAccountDataDecoder accountData = getAccountData(transactionRequest.getAuthorizationResponse());
         boolean testMode = transactionRequest.getTestMode();

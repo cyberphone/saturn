@@ -209,12 +209,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
-    PaymentNetwork addPaymentNetwork(String keyIdProperty, String merchantIdProperty, String[] acceptedAccountTypes) throws IOException {
+    PaymentNetwork addPaymentNetwork(String keyIdProperty, 
+                                     String merchantIdProperty,
+                                     String[] acceptedPaymentMethodUris) throws IOException {
         KeyStoreEnumerator kse = new KeyStoreEnumerator(getResource(keyIdProperty),
                                                         getPropertyString(KEYSTORE_PASSWORD));
         PaymentNetwork paymentNetwork = new PaymentNetwork(new ServerAsymKeySigner(kse),
                                                            getPropertyString(merchantIdProperty),
-                                                           acceptedAccountTypes);
+                                                           acceptedPaymentMethodUris);
         paymentNetworks.put(kse.getPublicKey(), paymentNetwork);
         return paymentNetwork;
     }

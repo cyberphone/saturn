@@ -121,10 +121,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Verify that the authority objects were signed by a genuine payment partner
         providerAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
 
-        // Verify Payee signature keys.  They may be one generation back as well
+        // Verify Payee signature key.  It may be one generation back as well
         PayeeCoreProperties payeeCoreProperties = payeeAuthority.getPayeeCoreProperties();
         payeeCoreProperties.verify(paymentRequest.getPayee(), authorizationRequest.getSignatureDecoder());
-        payeeCoreProperties.verify(paymentRequest.getPayee(), paymentRequest.getSignatureDecoder());
 
         // Optionally verify the claimed Payee account
         byte[] accountHash = paymentMethodSpecific.getAccountHash();
