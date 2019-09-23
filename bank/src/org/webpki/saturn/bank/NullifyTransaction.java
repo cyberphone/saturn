@@ -21,7 +21,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
-// Add an amount to the account using a stored procedure                                      //
+// Restore the account after a failed inter-banking request                                   //
 ////////////////////////////////////////////////////////////////////////////////////////////////
 
 public class NullifyTransaction {
