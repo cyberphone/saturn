@@ -108,6 +108,7 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                 ibRequest.verifyCallerAuthenticity(BankService.paymentRoot);
                 ibResponse = IBResponse.encode("CT" + creditTransferId++, 
                                                ibRequest.getTestMode());
+                BankService.successfulTransactions++;
                 break;
 
             default:

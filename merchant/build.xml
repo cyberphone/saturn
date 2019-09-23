@@ -72,6 +72,7 @@
            srcdir="${src.dir}:${@common.src.dir}:${@methods.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
+      <include name="org/webpki/saturn/merchant/*.java"/>
       <classpath>
         <fileset dir="${@webpki.lib.dir}">
            <include name="${@webpki-libext.jar}"/>
