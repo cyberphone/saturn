@@ -63,10 +63,12 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
     ////////////////////////////////////////////////////////////////////////////////////////
     // Private and secret keys would in a HSM implementation be represented as handles
     ////////////////////////////////////////////////////////////////////////////////////////
-    LinkedHashMap<PublicKey,PrivateKey> keyManagementKeys = new LinkedHashMap<PublicKey,PrivateKey> ();
+    LinkedHashMap<PublicKey,PrivateKey> keyManagementKeys =
+            new LinkedHashMap<PublicKey,PrivateKey> ();
     
     public KeyGen2SoftHSM (KeyStoreEnumerator keyStoreEnumerator) throws IOException {
-        keyManagementKeys.put (keyStoreEnumerator.getPublicKey(), keyStoreEnumerator.getPrivateKey());
+        keyManagementKeys.put (keyStoreEnumerator.getPublicKey(), 
+                               keyStoreEnumerator.getPrivateKey());
     }
     
     ECPrivateKey serverEcPrivateKey;
@@ -74,10 +76,12 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
     byte[] sessionKey;
   
     @Override
-    public ECPublicKey generateEphemeralKey (KeyAlgorithms ephemeralKeyAlgorithm) throws IOException {
+    public ECPublicKey generateEphemeralKey(KeyAlgorithms ephemeralKeyAlgorithm)
+    throws IOException {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance ("EC", "BC");
-            ECGenParameterSpec eccgen = new ECGenParameterSpec (ephemeralKeyAlgorithm.getJceName ());
+            ECGenParameterSpec eccgen = 
+                    new ECGenParameterSpec(ephemeralKeyAlgorithm.getJceName ());
             generator.initialize (eccgen, new SecureRandom ());
             KeyPair kp = generator.generateKeyPair();
             serverEcPrivateKey = (ECPrivateKey) kp.getPrivate ();
@@ -110,7 +114,9 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
   
             // Verify that attestation was signed by the device key
             if (!new SignatureWrapper (devicePublicKey instanceof RSAPublicKey ?
-                                            AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256, 
+                                            AsymSignatureAlgorithms.RSA_SHA256 
+                                                                               :
+                                            AsymSignatureAlgorithms.ECDSA_SHA256, 
                                        devicePublicKey)
                       .update (attestationArguments)
                       .verify (sessionAttestation)) {
@@ -139,7 +145,9 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
             Cipher crypt = Cipher.getInstance ("AES/CBC/PKCS5Padding");
             byte[] iv = new byte[16];
             new SecureRandom ().nextBytes (iv);
-            crypt.init (Cipher.ENCRYPT_MODE, new SecretKeySpec (key, "AES"), new IvParameterSpec (iv));
+            crypt.init (Cipher.ENCRYPT_MODE,
+                        new SecretKeySpec (key, "AES"), 
+                        new IvParameterSpec (iv));
             return ArrayUtil.add (iv, crypt.doFinal (data));
         } catch (GeneralSecurityException e) {
             throw new IOException (e);
@@ -158,7 +166,9 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
             throws IOException {
         try {
             return new SignatureWrapper (keyManagementKey instanceof RSAPublicKey ?
-                                               AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256,
+                                               AsymSignatureAlgorithms.RSA_SHA256 
+                                                                                  :
+                                               AsymSignatureAlgorithms.ECDSA_SHA256,
                                          keyManagementKeys.get (keyManagementKey))
                 .update (data)
                 .sign ();
