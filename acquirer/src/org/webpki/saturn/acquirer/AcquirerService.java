@@ -213,30 +213,29 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 optionalProviderExtensions = JSONParser.parse(extensions);
             }
 
-            authorityObjectManager =
-                new AuthorityObjectManager(providerAuthorityUrl = acquirerBaseUrl + "/authority",
-                                           acquirerBaseUrl,
-                                           acquirerBaseUrl + "/service",
-                                           new ProviderAuthority.PaymentMethodDeclarations()
-                                           .add(new ProviderAuthority
-                                                   .PaymentMethodDeclaration(
-                                                           PaymentMethods.SUPER_CARD.getPaymentMethodUri())
-                                               .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
-                                           optionalProviderExtensions,
-                                           new SignatureProfiles[]{SignatureProfiles.P256_ES256},
-                                           new ProviderAuthority.EncryptionParameter[]{
-                    new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                            decryptionKeys.get(0).getPublicKey() instanceof RSAKey ?
-                        KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
-                                                              decryptionKeys.get(0).getPublicKey())},
-                                           null,
-                                           acquirerKey,
+            authorityObjectManager = new AuthorityObjectManager(
+                providerAuthorityUrl = acquirerBaseUrl + "/authority",
+                acquirerBaseUrl,
+                acquirerBaseUrl + "/service",
+                new ProviderAuthority.PaymentMethodDeclarations()
+                    .add(new ProviderAuthority.PaymentMethodDeclaration(
+                                       PaymentMethods.SUPER_CARD.getPaymentMethodUri())
+                                .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
+                optionalProviderExtensions,
+                new SignatureProfiles[]{SignatureProfiles.P256_ES256},
+                new ProviderAuthority.EncryptionParameter[]{
+                    new ProviderAuthority.EncryptionParameter(
+                            DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                            decryptionKeys.get(0).getKeyEncryptionAlgorithm(), 
+                            decryptionKeys.get(0).getPublicKey())},
+                null,
+                acquirerKey,
 
-                                           merchantAccountDb, 
-                                           new ServerAsymKeySigner(acquirercreds),
+                merchantAccountDb, 
+                new ServerAsymKeySigner(acquirercreds),
 
-                                           PROVIDER_EXPIRATION_TIME,
-                                           logging);
+                PROVIDER_EXPIRATION_TIME,
+                logging);
 
             dynamicServlet(sce,
                            KnownExtensions.REFUND_REQUEST,
