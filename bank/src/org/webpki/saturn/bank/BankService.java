@@ -223,9 +223,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load (null, null);
-        keyStore.setCertificateEntry ("mykey",
-                                      CertificateUtil.getCertificateFromBlob (
-                                           ArrayUtil.getByteArrayFromInputStream (getResource(name))));        
+        keyStore.setCertificateEntry("mykey",
+                                     CertificateUtil.getCertificateFromBlob(
+                                         ArrayUtil.getByteArrayFromInputStream(getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
@@ -338,10 +338,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                            optionalProviderExtensions,
                                            new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                                            new ProviderAuthority.EncryptionParameter[]{
-                    new ProviderAuthority.EncryptionParameter(DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
-                            decryptionKeys.get(0).getPublicKey() instanceof RSAKey ?
-                        KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID, 
-                                                              decryptionKeys.get(0).getPublicKey())},
+                                           new ProviderAuthority.EncryptionParameter(
+                                                   DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                                                   decryptionKeys.get(0).getKeyEncryptionAlgorithm(), 
+                                                   decryptionKeys.get(0).getPublicKey())},
                                            hostingProvider,
                                            bankKey,
 
