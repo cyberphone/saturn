@@ -6,6 +6,7 @@
   <property name="packimage_dir" value="packaged-images"/>
   <property name="temp.dir" value=".tmp"/>
   <property file="../resources/common.properties"/>
+  <property file="../resources/android.properties"/>
   <property file="../resources/accounts.properties"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/keyprovider"/>
   <property name="logging" value="false"/>

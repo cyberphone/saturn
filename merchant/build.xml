@@ -8,6 +8,7 @@
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/merchant"/>
 
   <property file="../resources/common.properties"/>
+  <property file="../resources/android.properties"/>
   <property file="../resources/merchants.properties"/>
   
   <property name="application" value="webpay-merchant.war"/>
