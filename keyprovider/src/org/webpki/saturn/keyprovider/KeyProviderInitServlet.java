@@ -44,7 +44,7 @@ public class KeyProviderInitServlet extends HttpServlet {
 
     static final String KEYGEN2_SESSION_ATTR           = "keygen2";
     static final String USERNAME_SESSION_ATTR          = "userName";
-    static final String CHECK_SESSION_ATTR             = "check";
+    static final String W3C_PAYMENT_REQUEST_MODE_PARM  = "w3cmode";  // POST is used in two ways...
     
     static final int NAME_MAX_LENGTH                   = 50;  // Reflected in the DB
 
@@ -257,7 +257,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "    var formData = new URLSearchParams();\n" +
             "    formData.append('" + USERNAME_SESSION_ATTR +
               "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
-            "    formData.append('" + CHECK_SESSION_ATTR + "', 1);\n" +
+            "    formData.append('" + W3C_PAYMENT_REQUEST_MODE_PARM + "', 1);\n" +
             "    try {\n" +
             "      const httpResponse = await fetch('init', {\n" +
             "        method: 'POST',\n" +
@@ -362,7 +362,7 @@ public class KeyProviderInitServlet extends HttpServlet {
                                 KeyProviderService.serverCertificate,
                                 null));
         session.setAttribute(USERNAME_SESSION_ATTR, userName);
-        if (request.getParameter(CHECK_SESSION_ATTR) == null) {
+        if (request.getParameter(W3C_PAYMENT_REQUEST_MODE_PARM) == null) {
             output(response,
                    getHTML(GO_HOME,
                 "onload=\"document.location.href = '" + 
