@@ -263,7 +263,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "        method: 'POST',\n" +
             "        body: formData\n" +
             "      });\n" +
-            "      if (httpResponse.status == 200) {\n" +
+            "      if (httpResponse.status == " + HttpServletResponse.SC_OK + ") {\n" +
             "        const invocationUrl = await httpResponse.text();\n" +
             //==================================================================//
             // Success! Now we can now hook into the W3C PaymentRequest using   //
