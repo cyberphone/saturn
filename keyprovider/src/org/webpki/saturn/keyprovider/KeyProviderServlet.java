@@ -170,7 +170,8 @@ logger.info("POST session=" + request.getSession(false).getId());
             JSONDecoder jsonObject = KeyProviderService.keygen2JSONCache.parse(jsonData);
             switch (keygen2State.getProtocolPhase()) {
                 case INVOCATION:
-                    InvocationResponseDecoder invocationResponse = (InvocationResponseDecoder) jsonObject;
+                    InvocationResponseDecoder invocationResponse = 
+                        (InvocationResponseDecoder) jsonObject;
                     keygen2State.update(invocationResponse);
 
                     // Now we really start doing something
@@ -184,7 +185,8 @@ logger.info("POST session=" + request.getSession(false).getId());
                     return;
 
                 case PROVISIONING_INITIALIZATION:
-                    ProvisioningInitializationResponseDecoder provisioningInitResponse = (ProvisioningInitializationResponseDecoder) jsonObject;
+                    ProvisioningInitializationResponseDecoder provisioningInitResponse = 
+                        (ProvisioningInitializationResponseDecoder) jsonObject;
                     keygen2State.update(provisioningInitResponse);
 
                     logger.info("Device Certificate=" +
@@ -306,53 +308,54 @@ logger.info("POST session=" + request.getSession(false).getId());
                         Hashtable<String,String> issuer = new Hashtable<String,String>();
                         issuer.put("CN", "Saturn SKS Carrier Certificate");
                         long startTime = System.currentTimeMillis();
-                        key.setCertificatePath(new X509Certificate[]{new CA().
-                                 createCert(certSpec,
-                                            new DistinguishedName(issuer),
-                                            BigInteger.ONE,
-                                            new Date(startTime),
-                                            new Date(startTime + (20 * 365 * 24 * 3600 * 1000l)),
-                                            AsymSignatureAlgorithms.ECDSA_SHA256,
-                                            new AsymKeySignerInterface() {
+                        key.setCertificatePath(new X509Certificate[]{new CA().createCert(
+                            certSpec,
+                            new DistinguishedName(issuer),
+                            BigInteger.ONE,
+                            new Date(startTime),
+                            new Date(startTime + (20 * 365 * 24 * 3600 * 1000l)),
+                            AsymSignatureAlgorithms.ECDSA_SHA256,
+                            new AsymKeySignerInterface() {
 
-                                                @Override
-                                                public PublicKey getPublicKey() throws IOException {
-                                                    return KeyProviderService
-                                                               .carrierCaKeyPair.getPublic();
-                                                }
+                                @Override
+                                public PublicKey getPublicKey() throws IOException {
+                                    return KeyProviderService
+                                               .carrierCaKeyPair.getPublic();
+                                }
 
-                                                @Override
-                                                public byte[] signData(
-                                                        byte[] data,
-                                                        AsymSignatureAlgorithms algorithm)
-                                                        throws IOException {
-                                                    try {
-                                                        return new SignatureWrapper(algorithm,
-                                                                                    KeyProviderService
-                                                                         .carrierCaKeyPair.getPrivate())
-                                                            .setEcdsaSignatureEncoding(true)
-                                                            .update(data)
-                                                            .sign();
-                                                    } catch (GeneralSecurityException e) {
-                                                        throw new IOException(e);
-                                                    }
-                                                }
-                                            },
-                                            key.getPublicKey())});
+                                @Override
+                                public byte[] signData(
+                                        byte[] data,
+                                        AsymSignatureAlgorithms algorithm)
+                                        throws IOException {
+                                    try {
+                                        return new SignatureWrapper(algorithm,
+                                                                    KeyProviderService
+                                                         .carrierCaKeyPair.getPrivate())
+                                            .setEcdsaSignatureEncoding(true)
+                                            .update(data)
+                                            .sign();
+                                    } catch (GeneralSecurityException e) {
+                                        throw new IOException(e);
+                                    }
+                                }
+                            },
+                            key.getPublicKey())});
 
                         // 3. Add card data blob to the key entry
                         key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
-                                CardDataEncoder.encode(credentialTemplate.paymentMethod,
-                                                       credentialId, 
-                                                       credentialTemplate.authorityUrl, 
-                                                       credentialTemplate.signatureAlgorithm, 
-                                                       credentialTemplate.dataEncryptionAlgorithm, 
-                                                       credentialTemplate.keyEncryptionAlgorithm, 
-                                                       credentialTemplate.encryptionKey,
-                                                       null,
-                                                       null,
-                                                       credentialTemplate.tempBalanceFix)
-                                                           .serializeToBytes(JSONOutputFormats.NORMALIZED));
+                            CardDataEncoder.encode(
+                                    credentialTemplate.paymentMethod,
+                                    credentialId, 
+                                    credentialTemplate.authorityUrl, 
+                                    credentialTemplate.signatureAlgorithm, 
+                                    credentialTemplate.dataEncryptionAlgorithm, 
+                                    credentialTemplate.keyEncryptionAlgorithm, 
+                                    credentialTemplate.encryptionKey,
+                                    null,
+                                    null,
+                                    credentialTemplate.tempBalanceFix)
+                                        .serializeToBytes(JSONOutputFormats.NORMALIZED));
 
                         // 4. Add personalized card image
                         key.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
