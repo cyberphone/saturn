@@ -2,6 +2,7 @@
 
   <!-- set properties for this build -->
   <property file="../resources/common.properties"/>
+  <property file="../resources/w3c.properties"/>
   <property name="src.dir" value="src"/>
   <property name="temp.dir" value=".tmp"/>
   <property name="dist.dir" value="dist"/>
