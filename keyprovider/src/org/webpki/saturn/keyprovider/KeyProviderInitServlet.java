@@ -331,8 +331,8 @@ public class KeyProviderInitServlet extends HttpServlet {
                 BUTTON_TEXT_HTML + 
               "</div>" +
             "</div>" + 
-            "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have yet " +
-              "installed WebPKI, this is the time to do it!</div>" +
+            "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not " +
+              "installed WebPKI, now is the time to do it!</div>" +
             "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
               "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
                 "title=\"Android\" onclick=\"document.location.href = " +
