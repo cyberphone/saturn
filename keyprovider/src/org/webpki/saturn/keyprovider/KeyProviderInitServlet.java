@@ -133,7 +133,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  border-style:solid;" + 
             "  border-color:#a9a9a9;" + 
             "  position:absolute;" + 
-            "  z-index:5;" + 
+            "  z-index:-5;" + 
             "  left:0px;" + 
             "  bottom:0px;" + 
             "  right:0px;" + 
