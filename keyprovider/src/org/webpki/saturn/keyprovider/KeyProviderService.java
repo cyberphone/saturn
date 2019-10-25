@@ -276,10 +276,13 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             useW3cPaymentRequest = getPropertyBoolean(USE_W3C_PAYMENT_REQUEST);
             w3cPaymentRequestUri = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
 
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Database
+            ////////////////////////////////////////////////////////////////////////////////////////////
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
             jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
-            
+
             initDataBaseEnums(jdbcDataSource.getConnection());
 
             logger.info("Saturn KeyProvider-server initiated: " + serverCertificate.getSubjectX500Principal().getName());
