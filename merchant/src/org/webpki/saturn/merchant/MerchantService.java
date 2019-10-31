@@ -165,7 +165,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static boolean useW3cPaymentRequest;
     
-    static String w3cPaymentRequestMethod;
+    static String w3cPaymentRequestUrl;
     
     static ExternalCalls externalCalls;
     
@@ -271,7 +271,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             useW3cPaymentRequest = getPropertyBoolean(USE_W3C_PAYMENT_REQUEST);
 
-            w3cPaymentRequestMethod = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
+            w3cPaymentRequestUrl = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
 
             payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
 

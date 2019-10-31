@@ -168,7 +168,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static boolean useW3cPaymentRequest;
 
-    static String w3cPaymentRequestUri;
+    static String w3cPaymentRequestUrl;
 
     static String successMessage;
 
@@ -274,7 +274,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // W3C PaymentRequest
             ////////////////////////////////////////////////////////////////////////////////////////////
             useW3cPaymentRequest = getPropertyBoolean(USE_W3C_PAYMENT_REQUEST);
-            w3cPaymentRequestUri = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
+            w3cPaymentRequestUrl = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Database

@@ -271,7 +271,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             //==================================================================//
             "        const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
             "        const supportedInstruments = [{\n" +
-            "          supportedMethods: '" + KeyProviderService.w3cPaymentRequestUri + "',\n" +
+            "          supportedMethods: '" + KeyProviderService.w3cPaymentRequestUrl + "',\n" +
 // Test data
 //            "          supportedMethods: 'weird-pay',\n" +
             "          data: {url: invocationUrl}\n" +
