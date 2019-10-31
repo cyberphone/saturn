@@ -100,6 +100,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                                           Connection connection) throws Exception;
     
     static class NormalException extends Exception {
+
+        private static final long serialVersionUID = 1L;
+
         NormalException(String message) {
             super(message);
         }
