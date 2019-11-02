@@ -51,7 +51,7 @@ public class ExternalCalls {
         this.portMapper = portMapper;
     }
 
-    static final int TIMEOUT_FOR_REQUEST           = 5000;
+    static final int TIMEOUT_FOR_REQUEST           = 10000;
     
     // Authority object caches
 
