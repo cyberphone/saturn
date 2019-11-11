@@ -51,17 +51,10 @@ import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.KeyEncryptionAlgorithms;
-
-import org.webpki.keygen2.CredentialDiscoveryResponseDecoder;
-import org.webpki.keygen2.InvocationResponseDecoder;
-import org.webpki.keygen2.KeyCreationResponseDecoder;
-import org.webpki.keygen2.ProvisioningFinalizationResponseDecoder;
-import org.webpki.keygen2.ProvisioningInitializationResponseDecoder;
 
 import org.webpki.util.ArrayUtil;
 
@@ -98,8 +91,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static Integer serverPortMapping;
 
-    static JSONDecoderCache keygen2JSONCache;
-    
     static X509Certificate serverCertificate;
 
     static KeyPair carrierCaKeyPair;
@@ -198,15 +189,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     public void contextInitialized(ServletContextEvent sce) {
         initProperties (sce);
         try {
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            // KeyGen2
-            ////////////////////////////////////////////////////////////////////////////////////////////
-            keygen2JSONCache = new JSONDecoderCache();
-            keygen2JSONCache.addToCache(InvocationResponseDecoder.class);
-            keygen2JSONCache.addToCache(ProvisioningInitializationResponseDecoder.class);
-            keygen2JSONCache.addToCache(CredentialDiscoveryResponseDecoder.class);
-            keygen2JSONCache.addToCache(KeyCreationResponseDecoder.class);
-            keygen2JSONCache.addToCache(ProvisioningFinalizationResponseDecoder.class);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials

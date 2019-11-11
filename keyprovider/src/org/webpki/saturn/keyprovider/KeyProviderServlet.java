@@ -167,7 +167,7 @@ logger.info("POST session=" + request.getSession(false).getId());
             if (KeyProviderService.logging) {
                 logger.info("Received message:\n" + new String(jsonData, "UTF-8"));
             }
-            JSONDecoder jsonObject = KeyProviderService.keygen2JSONCache.parse(jsonData);
+            JSONDecoder jsonObject = ServerState.parseReceivedMessage(jsonData);
             switch (keygen2State.getProtocolPhase()) {
                 case INVOCATION:
                     InvocationResponseDecoder invocationResponse = 
