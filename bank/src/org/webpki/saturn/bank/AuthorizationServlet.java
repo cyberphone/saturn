@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -123,7 +123,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Verify Payee signature key.  It may be one generation back as well
         PayeeCoreProperties payeeCoreProperties = payeeAuthority.getPayeeCoreProperties();
-        payeeCoreProperties.verify(paymentRequest.getPayee(), authorizationRequest.getSignatureDecoder());
+        payeeCoreProperties.verify(authorizationRequest.getSignatureDecoder());
 
         // Optionally verify the claimed Payee account
         byte[] accountHash = paymentMethodSpecific.getAccountHash();
@@ -253,7 +253,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                accountId,
                                                                transactionType,
                                                                paymentMethodSpecific.getPayeeAccount(),
-                                                               paymentRequest.getPayee().getCommonName(),
+                                                               paymentRequest.getPayeeCommonName(),
                                                                paymentRequest.getReferenceId(),
                                                                null,
                                                                false,
@@ -292,7 +292,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                           null,
                                           amount,
                                           paymentRequest.getCurrency().toString(),
-                                          paymentRequest.getPayee().getCommonName(),
+                                          paymentRequest.getPayeeCommonName(),
                                           paymentRequest.getReferenceId(),
                                           paymentMethodSpecific.getPayeeAccount(),
                                           testMode, 

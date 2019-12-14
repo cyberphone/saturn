@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.AuthorizationResponse;
-import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
@@ -55,12 +54,16 @@ public class RefundServlet extends ProcessingBaseServlet {
         refundRequest.verifyPayerBank(BankService.paymentRoot);
         
         // Verify that the payee (merchant) is one of our customers
-        Payee payee = refundRequest.getPayee();
-        PayeeCoreProperties payeeCoreProperties = BankService.merchantAccountDb.get(payee.getId());
+        String payeeAuthorityUrl = refundRequest
+                .getAuthorizationResponse()
+                    .getAuthorizationRequest()
+                        .getAuthorityUrl();
+        PayeeCoreProperties payeeCoreProperties = 
+                BankService.merchantAccountDb.get(payeeAuthorityUrl);
         if (payeeCoreProperties == null) {
-            throw new IOException("Unknown merchant Id: " + payee.getId());
+            throw new IOException("Unknown merchant: " + payeeAuthorityUrl);
         }
-        payeeCoreProperties.verify(payee, refundRequest.getSignatureDecoder());
+        payeeCoreProperties.verify(refundRequest.getSignatureDecoder());
 
         // Get payer account data.
         AuthorizationResponse.AccountDataDecoder accountData = 
@@ -83,7 +86,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                                   null,
                                   refundRequest.getAmount(),
                                   paymentRequest.getCurrency().toString(),
-                                  paymentRequest.getPayee().getCommonName(),
+                                  paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
                                   refundRequest.getPayeeSourceAccount(),
                                   testMode,

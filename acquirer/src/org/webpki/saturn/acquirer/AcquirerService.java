@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ import java.security.KeyStore;
 import java.security.interfaces.RSAKey;
 
 import java.util.GregorianCalendar;
-import java.util.TreeMap;
-import java.util.SortedMap;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -95,8 +94,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys = 
             new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
 
-    static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
-            new TreeMap<String,PayeeCoreProperties>();
+    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
+            new LinkedHashMap<String,PayeeCoreProperties>();
 
     static JSONX509Verifier paymentRoot;
 
@@ -199,7 +198,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                                        acquirerBaseUrl + "/payees/",
                                                                        knownPayeeMethods,
                                                                        false);
-                merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
+                merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -219,7 +218,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 acquirerBaseUrl + "/service",
                 new ProviderAuthority.PaymentMethodDeclarations()
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
-                                       PaymentMethods.SUPER_CARD.getPaymentMethodUri())
+                                       PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
                                 .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
                 optionalProviderExtensions,
                 new SignatureProfiles[]{SignatureProfiles.P256_ES256},
@@ -231,7 +230,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 null,
                 acquirerKey,
 
-                merchantAccountDb, 
+                merchantAccountDb.values(), 
                 new ServerAsymKeySigner(acquirercreds),
 
                 PROVIDER_EXPIRATION_TIME,

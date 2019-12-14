@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -32,7 +32,8 @@ public class PaymentRequest implements BaseProperties {
     public static final String SOFTWARE_NAME    = "WebPKI.org - Payee";
     public static final String SOFTWARE_VERSION = "1.00";
 
-    public static JSONObjectWriter encode(Payee payee,
+    public static JSONObjectWriter encode(String payeeCommonName,
+                                          String payeeHomePage,
                                           BigDecimal amount,
                                           Currencies currency,
                                           NonDirectPayments optionalNonDirectPayment,
@@ -40,7 +41,9 @@ public class PaymentRequest implements BaseProperties {
                                           GregorianCalendar timeStamp,
                                           GregorianCalendar expires) throws IOException {
         return new JSONObjectWriter()
-            .setObject(PAYEE_JSON, payee.writeObject())
+            .setObject(PAYEE_JSON, new JSONObjectWriter()
+                                   .setString(COMMON_NAME_JSON, payeeCommonName)
+                                   .setString(HOME_PAGE_JSON, payeeHomePage))
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
             .setDynamic((wr) -> optionalNonDirectPayment == null ?
@@ -53,7 +56,9 @@ public class PaymentRequest implements BaseProperties {
 
     public PaymentRequest(JSONObjectReader rd) throws IOException {
         root = rd;
-        payee = new Payee(rd.getObject(PAYEE_JSON));
+        JSONObjectReader payee = rd.getObject(PAYEE_JSON);
+        payeeCommonName = payee.getString(COMMON_NAME_JSON);
+        payeeHomePage = payee.getString(HOME_PAGE_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         if (rd.hasProperty(NON_DIRECT_PAYMENT_JSON)) {
             nonDirectPayment = NonDirectPayments.fromType(rd.getString(NON_DIRECT_PAYMENT_JSON));
@@ -71,9 +76,14 @@ public class PaymentRequest implements BaseProperties {
         return expires;
     }
 
-    Payee payee;
-    public Payee getPayee() {
-        return payee;
+    String payeeCommonName;
+    public String getPayeeCommonName() {
+        return payeeCommonName;
+    }
+
+    String payeeHomePage;
+    public String getPayeeHomePage() {
+        return payeeHomePage;
     }
 
     BigDecimal amount;
@@ -110,14 +120,5 @@ public class PaymentRequest implements BaseProperties {
 
     public byte[] getRequestHash() throws IOException {
         return RequestHash.getRequestHash(new JSONObjectWriter(root));
-    }
-
-    public void consistencyCheck(PaymentRequest paymentRequest) throws IOException {
-        if (paymentRequest.currency != currency ||
-            !paymentRequest.amount.equals(amount) ||
-            paymentRequest.nonDirectPayment != nonDirectPayment ||
-            !paymentRequest.referenceId.equals(referenceId)) {
-            throw new IOException("Inconsistent \"" + PAYMENT_REQUEST_JSON + "\" objects");
-        }
     }
 }

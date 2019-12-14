@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -38,7 +38,6 @@ import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
@@ -112,9 +111,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
  
         TransactionOperation transactionOperation = new TransactionOperation();
-        String clientPaymentMethodUri = payerAuthorization.getPaymentMethod().getPaymentMethodUri();
+        String clientPaymentMethodUrl = payerAuthorization.getPaymentMethod().getPaymentMethodUrl();
         AuthorizationRequest.PaymentBackendMethodEncoder paymentBackendMethodEncoder = null;
-        for (String paymentMethod : providerAuthority.getPaymentBackendMethods(clientPaymentMethodUri)) {
+        for (String paymentMethod : providerAuthority.getPaymentBackendMethods(clientPaymentMethodUrl)) {
             if (paymentMethod.equals(MERCHANT_PAYMENT_BACKEND_METHOD)) {
                 paymentBackendMethodEncoder = payeeAuthority.getPayeeCoreProperties().getAccountHashes() == null ?
                         MerchantService.sepaPlainAccount : MerchantService.sepaVerifiableAccount;
@@ -122,19 +121,11 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             }
         }
         if (paymentBackendMethodEncoder == null) {
-            throw new IOException("No matching account type: " + clientPaymentMethodUri);
+            throw new IOException("No matching paymemt method: " + clientPaymentMethodUrl);
         }
 
-        // Valid method. Find proper to request key
-        ServerAsymKeySigner signer = null;
-        for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
-            for (String paymentMethodUri : paymentNetwork.acceptedPaymentMethodUris) {
-                if (paymentMethodUri.equals(clientPaymentMethodUri)) {
-                    signer = paymentNetwork.signer;
-                    break;
-                }
-            }
-        }
+        // Valid method. Find proper to request key and local id
+        PaymentNetwork paymentNetwork = MerchantService.paymentNetworks.get(clientPaymentMethodUrl);
 
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
@@ -147,7 +138,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         paymentRequest,
                                         paymentBackendMethodEncoder,
                                         MerchantService.getReferenceId(),
-                                        signer);
+                                        paymentNetwork.signer);
 
         // Call Payer bank
         JSONObjectReader resultMessage = MerchantService.externalCalls.postJsonData(urlHolder,
@@ -155,7 +146,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                                                     authorizationRequest);
 
         if (debug) {
-            debugData.authorizationRequest = makeReader(authorizationRequest);
+            debugData.authorizationRequest = new JSONObjectReader(authorizationRequest);
             debugData.payeeAuthority = payeeAuthority.getRoot();
             debugData.payeeProviderAuthority = ownProviderAuthority.getRoot();
             debugData.authorizationResponse = resultMessage;
@@ -242,16 +233,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                       transactionOperation.urlToCall,
                                       actualAmount,
                                       MerchantService.getReferenceId(),
-                                      MerchantService.paymentNetworks.get(transactionOperation.authorizationResponse
-                                                                              .getAuthorizationRequest()
-                                                                                  .getSignatureDecoder()
-                                                                                      .getPublicKey()).signer);
+                                      MerchantService.paymentNetworks.get(
+                                              transactionOperation.authorizationResponse
+                                                  .getAuthorizationRequest()
+                                                      .getPaymentMethod()
+                                                          .getPaymentMethodUrl()).signer);
         // Acquirer or Hybrid call
         JSONObjectReader response =
             MerchantService.externalCalls.postJsonData(urlHolder, transactionOperation.urlToCall, transactionRequest);
 
         if (debugData != null) {
-            debugData.transactionRequest = makeReader(transactionRequest);
+            debugData.transactionRequest = new JSONObjectReader(transactionRequest);
             debugData.transactionResponse = response;
         }
         

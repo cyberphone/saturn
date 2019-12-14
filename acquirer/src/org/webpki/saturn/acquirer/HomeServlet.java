@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -65,16 +65,15 @@ public class HomeServlet extends HttpServlet {
             html.append("</td></tr>" +
                 "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : AcquirerService.merchantAccountDb.values()) {
-                String id = payeeCoreProperties.getDecoratedPayee().getId();
-                authorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
+                String payeeAuthorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
                 html.append("<tr><td style=\"text-align:right\">")
-                 .append(id)
+                 .append(payeeCoreProperties.getPayeeId())
                  .append("</td><td>")
-                 .append(payeeCoreProperties.getDecoratedPayee().getCommonName())
+                 .append(payeeCoreProperties.getCommonName())
                  .append("</td><td><a href=\"")
-                 .append(authorityUrl)
+                 .append(payeeAuthorityUrl)
                  .append("\" target=\"_blank\">")
-                 .append(authorityUrl)
+                 .append(payeeAuthorityUrl)
                  .append("</a></td></tr>");
             }
             html.append("</table></td></tr>");

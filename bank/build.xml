@@ -42,7 +42,7 @@
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-      <echo message="both tomcat [-Dpayeebank=0] [-Dhostingoption=0]"/>
+      <echo message="both tomcat [-Dlogging=true] [-Dpayeebank=0] [-Dhostingoption=0]"/>
   </target>
 
   <target name="_init" unless="app_path">

@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -21,12 +21,11 @@ import org.webpki.saturn.common.ServerAsymKeySigner;
 public class PaymentNetwork {
     
     ServerAsymKeySigner signer;
-    String merchantId;
-    String[] acceptedPaymentMethodUris;
-
-    PaymentNetwork(ServerAsymKeySigner signer, String merchantId, String[] acceptedPaymentMethodUris) {
+    String paymentMethodUrl;
+    
+    PaymentNetwork(ServerAsymKeySigner signer,
+                   String paymentMethodUrl) {
         this.signer = signer;
-        this.merchantId = merchantId;
-        this.acceptedPaymentMethodUris = acceptedPaymentMethodUris;
+        this.paymentMethodUrl = paymentMethodUrl;
     }
 }

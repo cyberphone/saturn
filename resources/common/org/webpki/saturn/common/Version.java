@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,6 +17,6 @@
 package org.webpki.saturn.common;
 
 public class Version {
-    public final static String PROTOCOL = "0.60";
-    public final static String DATE     = "2019-09-17";
+    public final static String PROTOCOL = "0.61";
+    public final static String DATE     = "2019-12-13";
 }

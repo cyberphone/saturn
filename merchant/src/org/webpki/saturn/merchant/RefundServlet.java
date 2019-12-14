@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
             logger.info("Trying to refund Amount=" + resultData.amount.toString() +
                           " " + resultData.currency.toString() + 
                         ", Account=" + resultData.accountReference + 
-                        ", Method=" + resultData.paymentMethod.getPaymentMethodUri());
+                        ", Method=" + resultData.paymentMethod.getPaymentMethodUrl());
 
             PayeeAuthority payeeAuthority = 
                 MerchantService.externalCalls.getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
@@ -90,9 +90,10 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                                      resultData.amount,
                                      DEMO_SOURCE_ACCOUNT ,
                                      MerchantService.getReferenceId(),
-                                     MerchantService.paymentNetworks.get(authorizationRequest
-                                                                             .getSignatureDecoder()
-                                                                                 .getPublicKey()).signer);
+                                     MerchantService.paymentNetworks.get(
+                                             authorizationRequest
+                                                 .getPaymentMethod()
+                                                     .getPaymentMethodUrl()).signer);
         
             JSONObjectReader refundResponseData =
                 MerchantService.externalCalls.postJsonData(urlHolder, refundUrl, refundRequestData);

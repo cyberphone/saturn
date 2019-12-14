@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -67,15 +67,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static final String MERCHANT_KEY                 = "merchant_key";
     
-    static final String MERCHANT_CN                  = "merchant_cn";
+    static final String MERCHANT_COMMON_NAME         = "merchant_common_name";
 
-    static final String MERCHANT_ID                  = "merchant_id";
+    static final String MERCHANT_HOME_PAGE           = "merchant_home_page";
 
     static final String MERCHANT_BASE_URL            = "merchant_base_url";
-
-    static final String OTHERNETWORK_KEY             = "othernetwork_key";
-
-    static final String OTHERNETWORK_ID              = "othernetwork_id";
 
     static final String KEYSTORE_PASSWORD            = "key_password";
 
@@ -127,9 +123,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static JSONX509Verifier acquirerRoot;
     
-    static LinkedHashMap<PublicKey,PaymentNetwork> paymentNetworks = new LinkedHashMap<PublicKey,PaymentNetwork>();
+    static LinkedHashMap<String,PaymentNetwork> paymentNetworks = new LinkedHashMap<String,PaymentNetwork>();
     
     static String merchantCommonName;
+    
+    static String merchantHomePage;
     
     static String payeeAcquirerAuthorityUrl;
     
@@ -153,8 +151,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static JSONObjectWriter protectedAccountData;
 
-    static PaymentNetwork primaryMerchant;
-    
     static AuthorizationRequest.PaymentBackendMethodEncoder sepaVerifiableAccount;
 
     static AuthorizationRequest.PaymentBackendMethodEncoder sepaPlainAccount;
@@ -209,16 +205,13 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
-    PaymentNetwork addPaymentNetwork(String keyIdProperty, 
-                                     String merchantIdProperty,
-                                     String[] acceptedPaymentMethodUris) throws IOException {
+    void addPaymentNetwork(String keyIdProperty, 
+                           String paymentMethodUrl) throws IOException {
         KeyStoreEnumerator kse = new KeyStoreEnumerator(getResource(keyIdProperty),
                                                         getPropertyString(KEYSTORE_PASSWORD));
         PaymentNetwork paymentNetwork = new PaymentNetwork(new ServerAsymKeySigner(kse),
-                                                           getPropertyString(merchantIdProperty),
-                                                           acceptedPaymentMethodUris);
-        paymentNetworks.put(kse.getPublicKey(), paymentNetwork);
-        return paymentNetwork;
+                                                           paymentMethodUrl);
+        paymentNetworks.put(paymentMethodUrl, paymentNetwork);
     }
 
     @Override
@@ -238,21 +231,19 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             merchantBaseUrl = getPropertyString(MERCHANT_BASE_URL);
 
             // Should be common for all payment networks...
-            merchantCommonName = getPropertyString(MERCHANT_CN);
-
-            // An optional payment network (for client testing purposes)
-            if (getPropertyString(OTHERNETWORK_KEY).length () > 0) {
-                addPaymentNetwork(OTHERNETWORK_KEY, OTHERNETWORK_ID, new String[]{"http://othernetworkpay"});
-            }
+            merchantCommonName = getPropertyString(MERCHANT_COMMON_NAME);
+            merchantHomePage = getPropertyString(MERCHANT_HOME_PAGE);
 
             // The standard payment network supported by the Saturn demo
             Vector<String> acceptedAccountTypes = new Vector<String>();
             for (PaymentMethods card : PaymentMethods.values()) {
                 if (card != PaymentMethods.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
-                    acceptedAccountTypes.add(card.getPaymentMethodUri());
+                    acceptedAccountTypes.add(card.getPaymentMethodUrl());
                 }
             }
-            primaryMerchant = addPaymentNetwork(MERCHANT_KEY, MERCHANT_ID, acceptedAccountTypes.toArray(new String[0]));
+            for (String paymentMethod : acceptedAccountTypes) {
+                addPaymentNetwork(MERCHANT_KEY, paymentMethod);
+            }
 
             JSONDecoderCache sepaAccount = new JSONDecoderCache();
             sepaAccount.addToCache(SEPAPaymentBackendMethodDecoder.class);
@@ -281,7 +272,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             if (noMatching.length() != 0) {
                 noMatchingMethodsUrl = noMatching;
             }
-
+            
             new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
 
             new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));

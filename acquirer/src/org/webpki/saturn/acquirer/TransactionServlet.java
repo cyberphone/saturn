@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -30,7 +30,6 @@ import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.PayeeCoreProperties;
-import org.webpki.saturn.common.Payee;
 
 import com.supercard.SupercardAccountDataDecoder;
 
@@ -58,12 +57,15 @@ public class TransactionServlet extends ProcessingBaseServlet {
         transactionRequest.verifyPayerBank(AcquirerService.paymentRoot);
 
         // Verify that the payee (merchant) is one of our customers
-        Payee payee = transactionRequest.getPayee();
-        PayeeCoreProperties payeeCoreProperties = AcquirerService.merchantAccountDb.get(payee.getId());
+        String payeeAuthorityUrl = transactionRequest
+                .getAuthorizationResponse()
+                    .getAuthorizationRequest()
+                        .getAuthorityUrl();
+        PayeeCoreProperties payeeCoreProperties = AcquirerService.merchantAccountDb.get(payeeAuthorityUrl);
         if (payeeCoreProperties == null) {
-            throw new IOException("Unknown merchant Id: " + payee.getId());
+            throw new IOException("Unknown merchant: " + payeeAuthorityUrl);
         }
-        payeeCoreProperties.verify(payee, transactionRequest.getSignatureDecoder());
+        payeeCoreProperties.verify(transactionRequest.getSignatureDecoder());
 
         SupercardAccountDataDecoder accountData = getAccountData(transactionRequest.getAuthorizationResponse());
         boolean testMode = transactionRequest.getTestMode();
@@ -83,7 +85,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                                   transactionRequest.getAuthorizationResponse().getReferenceId(),
                                   transactionRequest.getAmount(),
                                   paymentRequest.getCurrency().toString(),
-                                  paymentRequest.getPayee().getCommonName(),
+                                  paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
                                   paymentMethodSpecific.getPayeeAccount(),
                                   testMode,

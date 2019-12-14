@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -31,8 +31,7 @@ import java.security.cert.X509Certificate;
 
 import java.security.interfaces.RSAKey;
 
-import java.util.TreeMap;
-import java.util.SortedMap;
+import java.util.LinkedHashMap;
 import java.util.Vector;
 import java.util.GregorianCalendar;
 
@@ -121,8 +120,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys =
             new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
     
-     static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
-            new TreeMap<String,PayeeCoreProperties>();
+     static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
+            new LinkedHashMap<String,PayeeCoreProperties>();
     
     static String bankCommonName;
 
@@ -138,7 +137,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static String providerAuthorityUrl;
     
-    static String payerInterbankUrl;  // Static since we do not have a card or SEPA database and associated URL's
+    // Static since we do not have a card or SEPA database and associated URL's
+    static String payerInterbankUrl;
 
     static String payeeInterbankUrl;  //     -"-
 
@@ -201,7 +201,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
         return this.getClass().getResourceAsStream(getPropertyString(name));
     }
 
-    void addDecryptioKey(KeyStoreEnumerator keyStoreEnumerator, KeyEncryptionAlgorithms keyEncryptionAlgorithm) {
+    void addDecryptioKey(KeyStoreEnumerator keyStoreEnumerator, 
+                         KeyEncryptionAlgorithms keyEncryptionAlgorithm) {
         decryptionKeys.add(new JSONDecryptionDecoder.DecryptionKeyHolder(
                 keyStoreEnumerator.getPublicKey(),
                 keyStoreEnumerator.getPrivateKey(),
@@ -210,13 +211,17 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     }
 
     void addDecryptionKey(String name) throws IOException {
-        KeyStoreEnumerator keyStoreEnumerator = new KeyStoreEnumerator(getResource(name),
-                                                                       getPropertyString(KEYSTORE_PASSWORD));
+        KeyStoreEnumerator keyStoreEnumerator = 
+                new KeyStoreEnumerator(getResource(name),
+                                       getPropertyString(KEYSTORE_PASSWORD));
         if (keyStoreEnumerator.getPublicKey() instanceof RSAKey) {
-            addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID);
+            addDecryptioKey(keyStoreEnumerator, 
+                            KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID);
         } else {
-            addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
-            addDecryptioKey(keyStoreEnumerator, KeyEncryptionAlgorithms.JOSE_ECDH_ES_A128KW_ALG_ID);
+            addDecryptioKey(keyStoreEnumerator, 
+                            KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID);
+            addDecryptioKey(keyStoreEnumerator,
+                            KeyEncryptionAlgorithms.JOSE_ECDH_ES_A128KW_ALG_ID);
         }
     }
 
@@ -274,8 +279,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             bankCommonName = getPropertyString(BANK_NAME);
 
-            KeyStoreEnumerator bankcreds = new KeyStoreEnumerator(getResource(BANK_EECERT),
-                                                                  getPropertyString(KEYSTORE_PASSWORD));
+            KeyStoreEnumerator bankcreds =
+                    new KeyStoreEnumerator(getResource(BANK_EECERT),
+                                                       getPropertyString(KEYSTORE_PASSWORD));
             bankCertificatePath = bankcreds.getCertificatePath();
             bankKey = new ServerX509Signer(bankcreds);
             
@@ -283,9 +289,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             String hostingProviderKeyName = getPropertyString(HOSTING_PROVIDER_KEY);
             if (!hostingProviderKeyName.isEmpty()) {
                 hostingProvider = 
-                    new HostingProvider("https://hosting.com",
-                                        new KeyStoreEnumerator(getResource(HOSTING_PROVIDER_KEY),
-                                                               getPropertyString(KEYSTORE_PASSWORD)).getPublicKey());
+                    new HostingProvider(
+                            "https://hosting.com",
+                            new KeyStoreEnumerator(
+                                    getResource(HOSTING_PROVIDER_KEY),
+                                    getPropertyString(KEYSTORE_PASSWORD)).getPublicKey());
             }
 
             paymentRoot = getRoot(PAYMENT_ROOT);
@@ -294,6 +302,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             
             String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
+            Vector<PayeeCoreProperties> payees = new Vector<PayeeCoreProperties>();
+            
             boolean accountValidation = getPropertyBoolean(ACCOUNT_VALIDATION);
             if (hostingProvider == null) {
                 JSONArrayReader accounts = 
@@ -301,11 +311,13 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                         .getByteArrayFromInputStream(getResource(MERCHANT_ACCOUNT_DB)))
                             .getJSONArrayReader();
                 while (accounts.hasMore()) {
-                    PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
-                                                                           bankBaseUrl + "/payees/",
-                                                                           knownPayeeMethods,
-                                                                           accountValidation);
-                    merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
+                    PayeeCoreProperties account = 
+                            PayeeCoreProperties.init(accounts.getObject(),
+                                                     bankBaseUrl + "/payees/",
+                                                     knownPayeeMethods,
+                                                     accountValidation);
+                    merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
+                    payees.add(account);
                 }
             }
 
@@ -315,7 +327,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             testReferenceId = 10000;
             
             String extensions =
-                new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
+                new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), 
+                           "UTF-8").trim();
 
             if (!extensions.isEmpty()) {
                 extensions = extensions.replace("${host}", bankBaseUrl);
@@ -328,10 +341,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 serviceUrl = bankBaseUrl + "/service",
                 new ProviderAuthority.PaymentMethodDeclarations()
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
-                            PaymentMethods.BANK_DIRECT.getPaymentMethodUri())
+                            PaymentMethods.BANK_DIRECT.getPaymentMethodUrl())
                                 .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class))
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
-                            PaymentMethods.SUPER_CARD.getPaymentMethodUri())
+                            PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
                                 .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
                 optionalProviderExtensions,
                 new SignatureProfiles[]{SignatureProfiles.P256_ES256},
@@ -343,7 +356,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 hostingProvider,
                 bankKey,
 
-                merchantAccountDb,
+                payees,
                 hostingProvider == null ? new ServerAsymKeySigner(bankcreds) : null,
 
                 PROVIDER_EXPIRATION_TIME,
@@ -358,10 +371,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                            RefundServlet.class,
                            "Refund Servlet");
             
-            externalCalls = new ExternalCalls(logging,
-                                              logger,
-                                              getPropertyString(SERVER_PORT_MAP).length () > 0 ?
-                                                               getPropertyInt(SERVER_PORT_MAP) : null);
+            externalCalls = 
+                    new ExternalCalls(logging,
+                                      logger,
+                                      getPropertyString(SERVER_PORT_MAP).length () > 0 ?
+                                                       getPropertyInt(SERVER_PORT_MAP) : null);
             
             String userDataBase = getPropertyString(USER_ACCOUNT_DB);
             if (!userDataBase.isEmpty()) {

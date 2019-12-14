@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
 import java.util.GregorianCalendar;
-import java.util.TreeMap;
-import java.util.SortedMap;
-import java.util.Comparator;
+import java.util.LinkedHashMap;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -70,15 +68,8 @@ public class HostingService extends InitPropertyReader implements ServletContext
 
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
-    static SortedMap<String,PayeeCoreProperties> merchantAccountDb =
-        new TreeMap<String,PayeeCoreProperties>(new Comparator<String>() {
-            @Override
-            public int compare(String arg0, String arg1) {
-                if (arg0.length() > arg1.length()) {
-                    return 1;
-                }
-                return arg0.compareTo(arg1);
-            }});
+    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
+        new LinkedHashMap<String,PayeeCoreProperties>();
 
     static String providerAuthorityUrl;
     
@@ -100,7 +91,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
         keyStore.load (null, null);
         keyStore.setCertificateEntry ("mykey",
                                       CertificateUtil.getCertificateFromBlob (
-                                           ArrayUtil.getByteArrayFromInputStream (getResource(name))));        
+                                           ArrayUtil.getByteArrayFromInputStream(getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
@@ -126,14 +117,20 @@ public class HostingService extends InitPropertyReader implements ServletContext
             JSONArrayReader accounts = JSONParser.parse(
                     ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
+
             while (accounts.hasMore()) {
-                PayeeCoreProperties account = new PayeeCoreProperties(accounts.getObject());
-                merchantAccountDb.put(account.getDecoratedPayee().getId(), account);
+                PayeeCoreProperties account = 
+                        PayeeCoreProperties.init(accounts.getObject(),
+                                                 getPropertyString(HOSTING_BASE_URL) + "/payees/",
+                                                 null,
+                                                 false);
+                merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
             }
 
             authorityObjectManager =
-                new AuthorityObjectManager(providerAuthorityUrl = getPropertyString(PROVIDER_BASE_URL) + "/authority",
-                                           getPropertyString(HOSTING_BASE_URL),
+                new AuthorityObjectManager(providerAuthorityUrl = 
+                                               getPropertyString(PROVIDER_BASE_URL) + "/authority",
+                                           null,
                                            null,
                                            null,
                                            null,
@@ -142,10 +139,11 @@ public class HostingService extends InitPropertyReader implements ServletContext
                                            null,
                                            null,
 
-                                           merchantAccountDb, 
-                                           payeeAuthorityBaseUrl = getPropertyString(HOSTING_BASE_URL) + "/payees/",
-                                           new ServerAsymKeySigner(new KeyStoreEnumerator(getResource(HOSTING_KEY),
-                                                                                          getPropertyString(KEYSTORE_PASSWORD))),
+                                           merchantAccountDb.values(), 
+                                           new ServerAsymKeySigner(
+                                               new KeyStoreEnumerator(
+                                                   getResource(HOSTING_KEY),
+                                                   getPropertyString(KEYSTORE_PASSWORD))),
 
                                            PROVIDER_EXPIRATION_TIME,
                                            logging);

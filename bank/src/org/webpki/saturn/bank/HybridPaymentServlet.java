@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -72,8 +72,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         PayeeAuthority payeeAuthority =
             BankService.externalCalls.getPayeeAuthority(urlHolder,
                                                         authorizationRequest.getAuthorityUrl());
-        payeeAuthority.getPayeeCoreProperties().verify(paymentRequest.getPayee(), 
-                                                       transactionRequest.getSignatureDecoder());
+        payeeAuthority.getPayeeCoreProperties().verify(transactionRequest.getSignatureDecoder());
         
         // Get payer account data.  Note: this may also be derived from a transaction DB
         AuthorizationData authorizationData = 
@@ -92,7 +91,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                             authorizationData.getAccountId(),
                                             TransactionTypes.TRANSACT,
                                             paymentMethodSpecific.getPayeeAccount(),
-                                            paymentRequest.getPayee().getCommonName(),
+                                            paymentRequest.getPayeeCommonName(),
                                             paymentRequest.getReferenceId(),
                                             decodeReferenceId(transactionRequest
                                                     .getAuthorizationResponse().getReferenceId()),
@@ -120,7 +119,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                   null,
                                   transactionRequest.getAmount(),
                                   paymentRequest.getCurrency().toString(),
-                                  paymentRequest.getPayee().getCommonName(),
+                                  paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
                                   paymentMethodSpecific.getPayeeAccount(),
                                   testMode, 

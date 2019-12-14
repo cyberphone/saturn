@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.TreeMap;
-import java.util.SortedMap;
+import java.util.Collection;
+import java.util.HashMap;
 
 import java.util.logging.Logger;
 
@@ -30,7 +30,7 @@ public class AuthorityObjectManager extends Thread {
 
     private static final Logger logger = Logger.getLogger(AuthorityObjectManager.class.getCanonicalName());
 
-    TreeMap<String,byte[]> payeeAuthorityBlobs = new TreeMap<String,byte[]>();
+    HashMap<String,byte[]> payeeAuthorityBlobs = new HashMap<String,byte[]>();
 
     String providerAuthorityUrl;
     String providerHomePage;
@@ -41,7 +41,7 @@ public class AuthorityObjectManager extends Thread {
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
     HostingProvider optionalHostingProvider; 
 
-    SortedMap<String,PayeeCoreProperties> payees;
+    Collection<PayeeCoreProperties> payees;
 
     int expiryTimeInSeconds;
     long renewCycle;
@@ -72,8 +72,7 @@ public class AuthorityObjectManager extends Thread {
         }
 
         if (attestationSigner != null) {
-            for (String id : payees.keySet()) {
-                PayeeCoreProperties payeeCoreProperties = payees.get(id);
+            for (PayeeCoreProperties payeeCoreProperties : payees) {
                 synchronized(this) {
                     payeeAuthorityBlobs.put(payeeCoreProperties.urlSafeId, 
                                             PayeeAuthority.encode(payeeCoreProperties.payeeAuthorityUrl,
@@ -83,7 +82,8 @@ public class AuthorityObjectManager extends Thread {
                                                                   attestationSigner).serializeToBytes(JSONOutputFormats.NORMALIZED));
                 }
                 if (logging) {
-                    logger.info("Updated \"" + Messages.PAYEE_AUTHORITY.toString() + "\" with id:" + id);
+                    logger.info("Updated \"" + Messages.PAYEE_AUTHORITY.toString() + 
+                                "\" with id: " + payeeCoreProperties.getPayeeId());
                 }
             }
         }
@@ -103,7 +103,7 @@ public class AuthorityObjectManager extends Thread {
                                   ServerX509Signer providerSigner,
                                     
                                   // PayeeAuthority (may be null)
-                                  SortedMap<String,PayeeCoreProperties> payees, // Zero-length list is allowed
+                                  Collection<PayeeCoreProperties> payees, // Zero-length list is allowed
                                   ServerAsymKeySigner attestationSigner,
 
                                   int expiryTimeInSeconds /* Both */,

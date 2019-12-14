@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -119,11 +119,11 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider") +
                             tableRow(rd, HOSTING_PROVIDER_JSON, "Holds core data of a payee hosting provider", true)
                                : 
-                            tableRow(rd, AUTHORITY_URL_JSON, "The address of this object") +
+                            tableRow(rd, AUTHORITY_URL_JSON, "The address of this object (payee \"identity\")") +
                             tableRow(rd, HOME_PAGE_JSON, "Payee public home page") +
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of the issuing provider's authority object") +
                             tableRow(rd, COMMON_NAME_JSON, "Payee common name") +
-                            tableRow(rd, ID_JSON, "Local payee id used by the payee provider") +
+                            tableRow(rd, LOCAL_PAYEE_ID_JSON, "Local payee id used by the payee provider") +
                             tableRow(rd, ACCOUNT_VERIFIER_JSON, "For verifying claimed payee account", true) +
                             tableRow(rd, SIGNATURE_PARAMETERS_JSON, "Holds one or more payee signature keys and associated algorithms")
                             )

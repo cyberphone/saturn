@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -58,10 +58,6 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
-    static JSONObjectReader makeReader(JSONObjectWriter writer) throws IOException {
-        return JSONParser.parse(writer.serializeToString(JSONOutputFormats.NORMALIZED));
-    }
-    
     static String getHybridModeUrl(ProviderAuthority providerAuthority) throws IOException {
         JSONObjectReader extensions = providerAuthority.getExtensions();
         if (extensions != null) {
@@ -117,16 +113,17 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
             // Decode the user's authorization.  The encrypted data is only parsed for correctness
             PayerAuthorization payerAuthorization = new PayerAuthorization(walletResponse);
-
-            @SuppressWarnings("unchecked")
-            JSONObjectWriter rawPaymentRequest = 
-                ((LinkedHashMap<String,JSONObjectWriter>) session.getAttribute(WALLET_REQUEST_SESSION_ATTR))
-                    .get(payerAuthorization.getPaymentMethod().getPaymentMethodUri());
-            if (rawPaymentRequest == null) {
-                throw new IOException("Missing: " + payerAuthorization.getPaymentMethod().getPaymentMethodUri());
+            
+            // Check that we got a valid payment method
+            if (!MerchantService.paymentNetworks.containsKey(
+                    payerAuthorization.getPaymentMethod().getPaymentMethodUrl())) {
+                throw new IOException("Unexpected: " + payerAuthorization.getPaymentMethod().getPaymentMethodUrl());
             }
+
+            // Restore PaymentRequest
             PaymentRequest paymentRequest =
-                new PaymentRequest(JSONParser.parse(rawPaymentRequest.serializeToString(JSONOutputFormats.NORMALIZED)));
+                new PaymentRequest(new JSONObjectReader((JSONObjectWriter) 
+                        session.getAttribute(WALLET_REQUEST_SESSION_ATTR)).getObject(PAYMENT_REQUEST_JSON));
             
             // The actual processing is here
             if (processCall(walletResponse,

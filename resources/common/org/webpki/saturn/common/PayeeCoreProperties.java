@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -39,11 +39,14 @@ import org.webpki.util.Base64URL;
 
 public class PayeeCoreProperties implements BaseProperties {
     
-    static final String PAYEE_ACCOUNTS_JSON = "payeeAccounts";  // Only for "init" not part of Saturn vocabulary
+    // Only for "init" not part of Saturn vocabulary
+    static final String PAYEE_ACCOUNTS_JSON = "payeeAccounts";
 
     Vector<byte[]> optionalAccountHashes;
     SignatureParameter[] signatureParameters;
-    DecoratedPayee decoratedPayee;
+    String payeeId;
+    String payeeHomePage;
+    String payeeCommonName;
     String urlSafeId;
     String payeeAuthorityUrl;
 
@@ -59,7 +62,9 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
-        decoratedPayee = new DecoratedPayee(rd);
+        payeeId = rd.getString(LOCAL_PAYEE_ID_JSON);
+        payeeCommonName = rd.getString(COMMON_NAME_JSON);
+        payeeHomePage = rd.getString(HOME_PAGE_JSON);
         if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
             optionalAccountHashes = new Vector<byte[]>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
@@ -87,21 +92,29 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public static PayeeCoreProperties init(JSONObjectReader rd,
                                            String payeeBaseAuthorityUrl,
+
+                                           // Only of interest if addVerifier = true
                                            JSONDecoderCache knownPaymentMethods,
+
                                            boolean addVerifier) throws IOException {
-        JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
         Vector<byte[]> optionalAccountHashes = new Vector<byte[]>();
-        do {
-            AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodDecoder =
-                    (AuthorizationRequest.PaymentBackendMethodDecoder)knownPaymentMethods.parse(payeeAccounts.getObject());
-            byte[] accountHash = paymentMethodDecoder.getAccountHash();
-            if (accountHash != null && addVerifier) {
-                optionalAccountHashes.add(accountHash);
-            }
-        } while (payeeAccounts.hasMore());
+        if (addVerifier) {
+            JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
+            do {
+                AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodDecoder =
+                    (AuthorizationRequest
+                            .PaymentBackendMethodDecoder)knownPaymentMethods
+                                .parse(payeeAccounts.getObject());
+                byte[] accountHash = paymentMethodDecoder.getAccountHash();
+                if (accountHash != null) {
+                    optionalAccountHashes.add(accountHash);
+                }
+            } while (payeeAccounts.hasMore());
+        }
         PayeeCoreProperties payeeCoreProperties = new PayeeCoreProperties(rd);
-        payeeCoreProperties.optionalAccountHashes = optionalAccountHashes.isEmpty() ? null : optionalAccountHashes;
-        String urlSafeId = payeeCoreProperties.decoratedPayee.id;
+        payeeCoreProperties.optionalAccountHashes = 
+                optionalAccountHashes.isEmpty() ? null : optionalAccountHashes;
+        String urlSafeId = payeeCoreProperties.payeeId;
         if (!URLEncoder.encode(urlSafeId, "utf-8").equals(urlSafeId)) {
             urlSafeId = Base64URL.encode(urlSafeId.getBytes("utf-8"));
         }
@@ -110,8 +123,12 @@ public class PayeeCoreProperties implements BaseProperties {
         return payeeCoreProperties;
     }
 
-    public DecoratedPayee getDecoratedPayee() {
-        return decoratedPayee;
+    public String getPayeeId() {
+        return payeeId;
+    }
+
+    public String getCommonName() {
+        return payeeCommonName;
     }
 
     public SignatureParameter[] getSignatureParameters() {
@@ -127,7 +144,9 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        decoratedPayee.writeObject(wr);
+        wr.setString(LOCAL_PAYEE_ID_JSON, payeeId)
+          .setString(COMMON_NAME_JSON, payeeCommonName)
+          .setString(HOME_PAGE_JSON, payeeHomePage);
         if (optionalAccountHashes != null) {
             wr.setObject(ACCOUNT_VERIFIER_JSON)
                   .setString(JSONCryptoHelper.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
@@ -139,25 +158,24 @@ public class PayeeCoreProperties implements BaseProperties {
                                             signatureParameter
                                                 .signatureAlgorithm
                                                     .getAlgorithmId(AlgorithmPreferences.JOSE))
-                                 .setPublicKey(signatureParameter.publicKey, AlgorithmPreferences.JOSE);
+                                 .setPublicKey(signatureParameter.publicKey, 
+                                               AlgorithmPreferences.JOSE);
         }
         return wr;
     }
 
-    public void verify(Payee payee, JSONSignatureDecoder signatureDecoder) throws IOException {
-        if (!this.decoratedPayee.id.equals(payee.id)) {
-            throw new IOException("Payee ID mismatch " + this.decoratedPayee.id + " " + payee.id);
-        }
+    public void verify(JSONSignatureDecoder signatureDecoder) throws IOException {
         boolean publicKeyMismatch = true;
         for (SignatureParameter signatureParameter : signatureParameters) {
             if (signatureParameter.publicKey.equals(signatureDecoder.getPublicKey())) {
                 publicKeyMismatch = false;
-                if (signatureParameter.signatureAlgorithm == (AsymSignatureAlgorithms)signatureDecoder.getAlgorithm()) {
+                if (signatureParameter.signatureAlgorithm == 
+                        (AsymSignatureAlgorithms)signatureDecoder.getAlgorithm()) {
                     return;
                 }
             }
         }
         throw new IOException((publicKeyMismatch ? "Public key" : "Signature algorithm") + 
-                              " mismatch for payee ID: " + payee.id);
+                              " mismatch for payee: " + payeeId);
     }
 }

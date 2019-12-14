@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -76,7 +76,6 @@ import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.CryptoRandom;
 
-import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -178,7 +177,6 @@ public class Wallet {
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey encryptionKey;
-        PaymentRequest paymentRequest;
         BigDecimal tempBalanceFix;
         
         Account(String paymentMethod,
@@ -187,7 +185,6 @@ public class Wallet {
                 ImageIcon cardIcon,
                 AsymSignatureAlgorithms signatureAlgorithm,
                 String authorityUrl,
-                PaymentRequest paymentRequest,
                 BigDecimal tempBalanceFix) {
             this.paymentMethod = paymentMethod;
             this.accountId = accountId;
@@ -195,7 +192,6 @@ public class Wallet {
             this.cardIcon = cardIcon;
             this.signatureAlgorithm = signatureAlgorithm;
             this.authorityUrl = authorityUrl;
-            this.paymentRequest = paymentRequest;
             this.tempBalanceFix = tempBalanceFix;
         }
     }
@@ -300,6 +296,7 @@ public class Wallet {
         int fontSize;
         JTextField amountField;
         JTextField payeeField;
+        PaymentRequest paymentRequest;
         String amountString;
         String payeeCommonName;
         JPasswordField pinText;
@@ -452,7 +449,7 @@ public class Wallet {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<Integer,Account>();
                 for (int i = 0; i < 2; i++) {
                     cards.put(i, new Account("n/a", DUMMY_BALANCE,
-                                             true, dummyCardIcon, null, null, null, new BigDecimal("1.00")));
+                                             true, dummyCardIcon, null, null, new BigDecimal("1.00")));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
             }
@@ -887,10 +884,9 @@ public class Wallet {
                 }
             }, TIMEOUT_FOR_REQUEST);
             try {
-                JSONObjectReader invokeMessage = stdin.readJSONObject();
+                final JSONObjectReader invokeMessage = 
+                        Messages.PAYMENT_CLIENT_REQUEST.parseBaseMessage(stdin.readJSONObject());
                 logger.info("Received from browser:\n" + invokeMessage);
-                Messages.PAYMENT_CLIENT_REQUEST.parseBaseMessage(invokeMessage);
-                final JSONArrayReader paymentNetworks = invokeMessage.getArray(BaseProperties.PAYMENT_NETWORKS_JSON);
                 timer.cancel();
                 if (running) {
                     // Swing is rather poor for multi-threading...
@@ -899,46 +895,36 @@ public class Wallet {
                         public void run() {
                             running = false;
                             try {
-                                PaymentRequest comparePaymentRequest = null;
-                                do {
-                                    JSONObjectReader paymentNetwork = paymentNetworks.getObject();
-                                    String[] paymentMethods = paymentNetwork.getStringArray(BaseProperties.PAYMENT_METHODS_JSON);
-                                    PaymentRequest paymentRequest = new PaymentRequest(paymentNetwork.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
-                                    if (comparePaymentRequest == null) {
-                                        comparePaymentRequest = paymentRequest;
-                                    } else {
-                                        comparePaymentRequest.consistencyCheck(paymentRequest);
-                                    }
-                                    // Primary information to the user...
-                                    amountString = paymentRequest.getCurrency()
-                                        .amountToDisplayString(paymentRequest.getAmount(), false);
-                                    payeeCommonName = paymentRequest.getPayee().getCommonName();
-    
-                                    // Enumerate keys but only go for those who are intended for Saturn
-                                    EnumeratedKey ek = new EnumeratedKey();
-                                    while ((ek = sks.enumerateKeys(ek.getKeyHandle())) != null) {
-                                        Extension ext = null;
-                                        try {
-                                            ext = sks.getExtension(ek.getKeyHandle(),
-                                                                   BaseProperties.SATURN_WEB_PAY_CONTEXT_URI);
-                                        } catch (SKSException e) {
+                                String[] paymentMethods = invokeMessage.getStringArray(BaseProperties.PAYMENT_METHODS_JSON);
+                                paymentRequest = new PaymentRequest(invokeMessage.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
+                                // Primary information to the user...
+                                amountString = paymentRequest.getCurrency()
+                                    .amountToDisplayString(paymentRequest.getAmount(), false);
+                                payeeCommonName = paymentRequest.getPayeeCommonName();
 
-                                            // We found a key which isn't for Saturn but there may be more keys so we continue
-                                            if (e.getError() == SKSException.ERROR_OPTION) {
-                                                continue;
-                                            }
-                                            // Hard errors are hard errors...
-                                            throw new Exception(e);
+                                // Enumerate keys but only go for those who are intended for Saturn
+                                EnumeratedKey ek = new EnumeratedKey();
+                                while ((ek = sks.enumerateKeys(ek.getKeyHandle())) != null) {
+                                    Extension ext = null;
+                                    try {
+                                        ext = sks.getExtension(ek.getKeyHandle(),
+                                                               BaseProperties.SATURN_WEB_PAY_CONTEXT_URI);
+                                    } catch (SKSException e) {
+
+                                        // We found a key which isn't for Saturn but there may be more keys so we continue
+                                        if (e.getError() == SKSException.ERROR_OPTION) {
+                                            continue;
                                         }
-    
-                                        // This key had the attribute signifying that it is a Saturn payment credential
-                                        // but it might still not match the Payee's list of supported account types.
-                                        collectPotentialCard(ek.getKeyHandle(),
-                                                             new CardDataDecoder(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
-                                                             paymentRequest,
-                                                             paymentMethods);
+                                        // Hard errors are hard errors...
+                                        throw new Exception(e);
                                     }
-                                } while (paymentNetworks.hasMore());
+
+                                    // This key had the attribute signifying that it is a Saturn payment credential
+                                    // but it might still not match the Payee's list of supported account types.
+                                    collectPotentialCard(ek.getKeyHandle(),
+                                                         new CardDataDecoder(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
+                                                         paymentMethods);
+                                }
                             } catch (Exception e) {
                                 sksProblem(e);
                             }
@@ -997,7 +983,7 @@ public class Wallet {
 
         void collectPotentialCard(int keyHandle,
                                   CardDataDecoder cardProperties,
-                                  PaymentRequest paymentRequest, String[] paymentMethods) throws IOException {
+                                  String[] paymentMethods) throws IOException {
             String paymentMethod = cardProperties.getPaymentMethod();
             for (String acceptedPaymentMethod : paymentMethods) {
                 if (acceptedPaymentMethod.equals(paymentMethod)) {
@@ -1010,7 +996,6 @@ public class Wallet {
                                                  false),
                                     cardProperties.getSignatureAlgorithm(),
                                     cardProperties.getAuthorityUrl(),
-                                    paymentRequest,
                                     cardProperties.getTempBalanceFix());
                     card.optionalKeyId = cardProperties.getOptionalKeyId();
                     card.keyEncryptionAlgorithm = cardProperties.getKeyEncryptionAlgorithm();
@@ -1042,7 +1027,7 @@ public class Wallet {
                     // understood by the issuing Payment Provider (bank).
                     dataEncryptionKey = CryptoRandom.generateRandom(selectedCard.dataEncryptionAlgorithm.getKeyLength());
                     JSONObjectWriter authorizationData = AuthorizationData.encode(
-                        selectedCard.paymentRequest,
+                        paymentRequest,
                         domainName,
                         selectedCard.paymentMethod,
                         selectedCard.accountId,

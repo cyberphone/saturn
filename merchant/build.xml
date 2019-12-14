@@ -42,7 +42,7 @@
     
     <property name="logging" value="false"/>
     <property name="var.slow.operation" value="false"/>
-    <condition property="payee_provider.path" value="${@hostingpath}" else="${@payeebankpath}">
+    <condition property="payee_provider.url" value="${@hostinghost}/${@hostingpath}" else="${@payeebankhost}/${@payeebankpath}">
       <isset property="hostingoption"/>
     </condition>
     <property name="server.port.map" value=""/>
@@ -101,16 +101,17 @@
       <replacefilter token="@desktop-wallet@" value="${desktop.wallet}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
+      <!-- This is a bit simplified. 
+           In a real setup you would probably have a different merchantid and key
+           in each payment method -->
       <replacefilter token="@merchant-key@" value="${@merchantkey}.p12"/>
-      <replacefilter token="@merchant-cn@" value="${@merchantcn}"/>
-      <replacefilter token="@merchant-id@" value="${@merchantid}"/>
+      <replacefilter token="@merchant-common-name@" value="${@merchantCommonName}"/>
+      <replacefilter token="@merchant-home-page@" value="${@merchantHomePage}"/>
       <replacefilter token="@merchant-base-url@" value="${@merchanthost}/${@merchantpath}"/>
-      <replacefilter token="@othernetwork-key@" value="${other.key}"/>
-      <replacefilter token="@othernetwork-id@" value="${@othernetworkid}"/>
       <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
       <replacefilter token="@acquirer-root@" value="${@acquirerroot}.cer"/>
-      <replacefilter token="@payee-acquirer-authority-url@" value="${@acquirerhost}/${@acquirerpath}/payees/${@merchantid}"/>
-      <replacefilter token="@payee-provider-authority-url@" value="${@payeebankhost}/${@payeebankpath}/payees/${@merchantid}"/>
+      <replacefilter token="@payee-acquirer-authority-url@" value="${@acquirerhost}/${@acquirerpath}/payees/${@merchantId}"/>
+      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.url}/payees/${@merchantId}"/>
       <replacefilter token="@no-matching-methods-url@" value="${@keyprovhost}/${@keyprovpath}"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusual.card}"/>

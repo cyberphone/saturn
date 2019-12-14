@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -26,12 +26,12 @@ public enum PaymentMethods implements Serializable {
     UNUSUAL_CARD (false, "https://unusualcard.com", "UnusualCard");
 
     boolean cardPayment;      // True => card processor model, false = > 3 or 4 corner distributed model
-    String paymentMethodUri;  // Method URI
+    String paymentMethodUrl;  // Method URL
     String commonName;        // What it is usually called
     
-    PaymentMethods (boolean cardPayment, String paymentMethodUri, String commonName) {
+    PaymentMethods (boolean cardPayment, String paymentMethodUrl, String commonName) {
         this.cardPayment = cardPayment;
-        this.paymentMethodUri = paymentMethodUri;
+        this.paymentMethodUrl = paymentMethodUrl;
         this.commonName = commonName;
     }
 
@@ -39,20 +39,20 @@ public enum PaymentMethods implements Serializable {
         return cardPayment;
     }
 
-    public String getPaymentMethodUri() {
-        return paymentMethodUri;
+    public String getPaymentMethodUrl() {
+        return paymentMethodUrl;
     }
 
     public String getCommonName() {
         return commonName;
     }
 
-    public static PaymentMethods fromTypeUri(String paymentMethodUri) throws IOException {
+    public static PaymentMethods fromTypeUri(String paymentMethodUrl) throws IOException {
         for (PaymentMethods accountType : PaymentMethods.values()) {
-            if (accountType.paymentMethodUri.equals(paymentMethodUri)) {
+            if (accountType.paymentMethodUrl.equals(paymentMethodUrl)) {
                 return accountType;
             }
         }
-        throw new IOException("No such payment method: " + paymentMethodUri);
+        throw new IOException("No such payment method: " + paymentMethodUrl);
     }
 }

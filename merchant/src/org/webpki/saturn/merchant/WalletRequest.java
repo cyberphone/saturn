@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2018 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,16 +22,14 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
 
 import javax.servlet.http.HttpSession;
 
-import org.webpki.json.JSONArrayWriter;
+import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.NonDirectPayments;
-import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.TimeUtil;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
@@ -51,44 +49,36 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         }
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         requestObject = Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage();
-        JSONArrayWriter paymentNetworksArray = requestObject.setArray(PAYMENT_NETWORKS_JSON);
         GregorianCalendar timeStamp = new GregorianCalendar();
         GregorianCalendar expires = TimeUtil.inMinutes(30);
         String currentReferenceId = MerchantService.getReferenceId();
-        LinkedHashMap<String,JSONObjectWriter> requests = new LinkedHashMap<String,JSONObjectWriter>();
 
-        // Create a payment request for each payment network
-        for (PaymentNetwork paymentNetwork : MerchantService.paymentNetworks.values()) {
-            JSONObjectWriter paymentRequest =
-                PaymentRequest.encode(new Payee(optionalNonDirectPayment == null ? 
-                        // We cheated a bit and only defined a single merchant...
-                                              MerchantService.merchantCommonName : "Gas Station", 
-                                                paymentNetwork.merchantId),
-                                      new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
-                                                     MerchantService.currency.getDecimals()),
-                                      MerchantService.currency,
-                                      optionalNonDirectPayment,
-                                      currentReferenceId,
-                                      timeStamp,
-                                      expires);
-            for (String accountType : paymentNetwork.acceptedPaymentMethodUris) {
-                if (requests.put(accountType, paymentRequest) != null) {
-                    throw new IOException("Duplicate: " + accountType);
-                }
-            }
-            paymentNetworksArray.setObject()
-                .setStringArray(PAYMENT_METHODS_JSON, paymentNetwork.acceptedPaymentMethodUris)
-                .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
-        }
+        // Create a payment request
+        JSONObjectWriter paymentRequest =
+            PaymentRequest.encode(optionalNonDirectPayment == null ? 
+                    // We cheated a bit and only defined a single merchant...
+                                          MerchantService.merchantCommonName : "Planet Gas", 
+                                  MerchantService.merchantHomePage,
+                                  new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
+                                                 MerchantService.currency.getDecimals()),
+                                  MerchantService.currency,
+                                  optionalNonDirectPayment,
+                                  currentReferenceId,
+                                  timeStamp,
+                                  expires);
+
+         requestObject.setStringArray(PAYMENT_METHODS_JSON,
+                                      MerchantService.paymentNetworks.keySet().toArray(new String[0]))
+                      .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         if (MerchantService.noMatchingMethodsUrl != null) {
             requestObject.setString(NO_MATCHING_METHODS_URL_JSON, MerchantService.noMatchingMethodsUrl);
         }
         
         if (debugMode) {
-            debugData.InvokeWallet = ProcessingBaseServlet.makeReader(requestObject);
+            debugData.InvokeWallet = new JSONObjectReader(requestObject);
         }
 
         // Must keep
-        session.setAttribute(WALLET_REQUEST_SESSION_ATTR, requests);
+        session.setAttribute(WALLET_REQUEST_SESSION_ATTR, requestObject);
     }
 }

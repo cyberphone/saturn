@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -174,7 +174,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
-            .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUri())
+            .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
             .setObject(BACKEND_METHOD_SPECIFIC_JSON, paymentMethodSpecific.writeObject())
@@ -193,7 +193,7 @@ public class AuthorizationRequest implements BaseProperties {
         if (!ArrayUtil.compare(authorizationData.requestHash, paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }
-        if (!authorizationData.paymentMethod.equals(paymentMethod.paymentMethodUri)) {
+        if (!authorizationData.paymentMethod.equals(paymentMethod.paymentMethodUrl)) {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
         return authorizationData;

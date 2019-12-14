@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class RefundRequest implements BaseProperties {
         if (cardNetwork != null &&
             authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ cardNetwork) {
             throw new IOException("Incompatible payment method: " + 
-                authorizationResponse.authorizationRequest.paymentMethod.getPaymentMethodUri());
+                authorizationResponse.authorizationRequest.paymentMethod.getPaymentMethodUrl());
         }
         rd.checkForUnread();
     }
@@ -82,10 +82,6 @@ public class RefundRequest implements BaseProperties {
 
     public boolean getTestMode() {
         return authorizationResponse.authorizationRequest.testMode;
-    }
-
-    public Payee getPayee() {
-        return authorizationResponse.authorizationRequest.paymentRequest.payee;
     }
 
     public PaymentRequest getPaymentRequest() {

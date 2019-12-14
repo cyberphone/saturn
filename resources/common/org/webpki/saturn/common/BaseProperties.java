@@ -1,5 +1,5 @@
 /*
- *  Copyright 2015-2019 WebPKI.org (http://webpki.org).
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ public interface BaseProperties {
 
     String USER_RESPONSE_ITEMS_JSON         = "userResponseItems";          // Result of ProviderUserResponse 
 
-    String PAYMENT_NETWORKS_JSON            = "paymentNetworks";            // Main request data for Payer
     String NO_MATCHING_METHODS_URL_JSON     = "noMatchingMethodsUrl";       // Optional tip by Payee to Payer in case nothing matches
     String PAYMENT_REQUEST_JSON             = "paymentRequest";
     String HTTP_VERSION_JSON                = "httpVersion";                // For per partner being able to use HTTP/2 and further
@@ -52,6 +51,7 @@ public interface BaseProperties {
     String LOG_DATA_JSON                    = "logData";                    // Insertion of external log data
     String REFERENCE_ID_JSON                = "referenceId";                // Unique reference in a message
     String PAYEE_JSON                       = "payee";                      // Payee object
+    String LOCAL_PAYEE_ID_JSON              = "localPayeeId";               // Provider's local ID of Payee
     String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
     String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Encrypted Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider authority object
