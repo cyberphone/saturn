@@ -126,7 +126,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             keyAlgorithm = 
                     KeyAlgorithms.getKeyAlgorithmFromId(rd.getString("signatureKeyAlgorithm"), 
                                                         AlgorithmPreferences.JOSE);
-            PaymentMethods.fromTypeUri(paymentMethod = rd.getString("paymentMethod"));
+            PaymentMethods.fromTypeUrl(paymentMethod = rd.getString("paymentMethod"));
             cardFormatted = rd.getBoolean("cardFormatted");
             if (rd.hasProperty("serverSetPIN")) {
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");

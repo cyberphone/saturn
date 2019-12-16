@@ -58,11 +58,12 @@ public interface BaseProperties {
     String HOSTING_PROVIDER_JSON            = "hostingProvider";            // Optional object in ProviderAuthority
     String HOME_PAGE_JSON                   = "homePage";                   // URL to the public Web of the entity
     String BACKEND_METHOD_SPECIFIC_JSON     = "backendMethodSpecific";      // Holding a payment backend method specific object
-    String PAYMENT_METHODS_JSON             = "paymentMethods";             // List of accepted payment methods (URIs)
-    String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URI)
+    String PAYMENT_METHODS_JSON             = "paymentMethods";             // List of accepted payment methods (URLs)
+    String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)
     String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User authorization signature
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_ID_JSON                  = "accountId";                  // Account identifier or PAN
+    String CREDENTIAL_ID_JSON               = "credentialId";               // Each virtual card has a unique ID
     String ACCOUNT_REFERENCE_JSON           = "accountReference";           // Account/Card number for payee (like ************5678)
     String ENCRYPTED_ACCOUNT_DATA_JSON      = "encryptedAccountData";       // Account data that (only) an acquirer needs
     String PAYEE_SOURCE_ACCOUNT_JSON        = "payeeSourceAccount";         // For refunds

@@ -39,33 +39,39 @@ public class CardDataDecoder {
     // Since deployed card data should preferably remain useful even if the Saturn protocol
     // changes, multiple versions may need to be supported by client software.
     static final String VERSION_JSON   = "version";
-    static final String ACTUAL_VERSION = "1";
+    static final String ACTUAL_VERSION = "2";
     
     static final String ACCOUNT_STATUS_KEY_HASH = "accountStatusKeyHash";
     static final String TEMPORARY_BALANCE_FIX   = "temp.bal.fix";
-
-    public CardDataDecoder(byte[] cardDataBlob) throws IOException {
+    
+    public CardDataDecoder(byte[] cardDataBlob, String expectedVersion) throws IOException {
         JSONObjectReader rd = JSONParser.parse(cardDataBlob);
         version = rd.getString(VERSION_JSON);
-        if (!version.equals(ACTUAL_VERSION)) {
-            throw new IOException("Unknown CardData version: " + version);
+        if (version.equals(expectedVersion)) {
+            recognized = true;
+            paymentMethod= rd.getString(BaseProperties.PAYMENT_METHOD_JSON);
+            accountId = rd.getString(BaseProperties.ACCOUNT_ID_JSON);
+            credentialId = rd.getString(BaseProperties.CREDENTIAL_ID_JSON);
+            authorityUrl = rd.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON);
+            signatureAlgorithm = AsymSignatureAlgorithms
+                    .getAlgorithmFromId(rd.getString(BaseProperties.SIGNATURE_ALGORITHM_JSON),
+                                                     AlgorithmPreferences.JOSE);
+            JSONObjectReader ep = rd.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
+            dataEncryptionAlgorithm = DataEncryptionAlgorithms
+                    .getAlgorithmFromId(ep.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
+            keyEncryptionAlgorithm = KeyEncryptionAlgorithms
+                    .getAlgorithmFromId(ep.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
+            encryptionKey = ep.getPublicKey();
+            optionalKeyId = ep.getStringConditional(JSONCryptoHelper.KEY_ID_JSON);
+            optionalAccountStatusKeyHash = rd.getBinaryConditional(ACCOUNT_STATUS_KEY_HASH);
+            tempBalanceFix = rd.getMoney(TEMPORARY_BALANCE_FIX, 2);
+            rd.checkForUnread();
         }
-        paymentMethod= rd.getString(BaseProperties.PAYMENT_METHOD_JSON);
-        accountId = rd.getString(BaseProperties.ACCOUNT_ID_JSON);
-        authorityUrl = rd.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON);
-        signatureAlgorithm = AsymSignatureAlgorithms
-                .getAlgorithmFromId(rd.getString(BaseProperties.SIGNATURE_ALGORITHM_JSON),
-                                                 AlgorithmPreferences.JOSE);
-        JSONObjectReader ep = rd.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
-        dataEncryptionAlgorithm = DataEncryptionAlgorithms
-                .getAlgorithmFromId(ep.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
-        keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-                .getAlgorithmFromId(ep.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
-        encryptionKey = ep.getPublicKey();
-        optionalKeyId = ep.getStringConditional(JSONCryptoHelper.KEY_ID_JSON);
-        optionalAccountStatusKeyHash = rd.getBinaryConditional(ACCOUNT_STATUS_KEY_HASH);
-        tempBalanceFix = rd.getMoney(TEMPORARY_BALANCE_FIX, 2);
-        rd.checkForUnread();
+    }
+
+    boolean recognized;
+    public boolean isRecognized() {
+        return recognized;
     }
 
     String version;
@@ -81,6 +87,11 @@ public class CardDataDecoder {
     String accountId;
     public String getAccountId() {
         return accountId;
+    }
+
+    String credentialId;
+    public String getCredentialId() {
+        return credentialId;
     }
 
     String authorityUrl;

@@ -26,6 +26,7 @@ import java.sql.Connection;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -51,16 +52,17 @@ public class InterbankingServlet extends ProcessingBaseServlet {
             case CREDIT_CARD_TRANSACT:
                 ibRequest.verifyCallerAuthenticity(BankService.acquirerRoot);
                 // The following call will throw exceptions on errors
-                WithDrawFromAccount withDrawFromAccount = 
-                        new WithDrawFromAccount(ibRequest.getAmount(),
-                                                ibRequest.getAccount(),
-                                                TransactionTypes.TRANSACT,
-                                                ibRequest.getPayeeAccount(),
-                                                ibRequest.getPayeeName(),
-                                                ibRequest.getPayeeReference(),
-                                                decodeReferenceId(ibRequest.getTransactionReference()),
-                                                true,
-                                                connection);
+                int transactionId = 
+                        DataBaseOperations.externalWithDraw(ibRequest.getAmount(),
+                                                            ibRequest.getAccount(),
+                                                            TransactionTypes.TRANSACT,
+                                                            ibRequest.getPayeeAccount(),
+                                                            ibRequest.getPayeeName(),
+                                                            ibRequest.getPayeeReference(),
+                                                            decodeReferenceId(ibRequest
+                                                                    .getTransactionReference()),
+                                                            true,
+                                                            connection);
                 try {
                     IBResponse ibResponse1 = 
                             IBRequest.perform(BankService.payeeInterbankUrl,
@@ -74,10 +76,10 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                                               ibRequest.getPayeeAccount(),
                                               ibRequest.getTestMode(), 
                                               BankService.bankKey);
-                    ibResponse = IBResponse.encode(formatReferenceId(withDrawFromAccount.getTransactionId()), 
+                    ibResponse = IBResponse.encode(formatReferenceId(transactionId), 
                                                    ibRequest.getTestMode());
                 } catch (Exception e) {
-                    new NullifyTransaction(withDrawFromAccount.getTransactionId(), connection);
+                    DataBaseOperations.nullifyTransaction(transactionId, connection);
                     throw e;
                 }
                 break;
@@ -95,10 +97,11 @@ public class InterbankingServlet extends ProcessingBaseServlet {
                                                                 ibRequest.getPayeeReference(),
                                                                 connection);
                 try {
-                    ibResponse = IBResponse.encode(formatReferenceId(creditAccount.getTransactionId()), 
-                                                   ibRequest.getTestMode());
+                    ibResponse = 
+                            IBResponse.encode(formatReferenceId(creditAccount.getTransactionId()), 
+                                              ibRequest.getTestMode());
                 } catch (Exception e) {
-                    new NullifyTransaction(creditAccount.getTransactionId(), connection);
+                    DataBaseOperations.nullifyTransaction(creditAccount.getTransactionId(), connection);
                     throw e;
                 }
                 break;

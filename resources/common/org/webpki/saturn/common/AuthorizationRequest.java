@@ -86,7 +86,7 @@ public class AuthorizationRequest implements BaseProperties {
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-        paymentMethod = PaymentMethods.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
+        paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = 
                 rd.getObject(ENCRYPTED_AUTHORIZATION_JSON)

@@ -47,7 +47,7 @@ public enum PaymentMethods implements Serializable {
         return commonName;
     }
 
-    public static PaymentMethods fromTypeUri(String paymentMethodUrl) throws IOException {
+    public static PaymentMethods fromTypeUrl(String paymentMethodUrl) throws IOException {
         for (PaymentMethods accountType : PaymentMethods.values()) {
             if (accountType.paymentMethodUrl.equals(paymentMethodUrl)) {
                 return accountType;

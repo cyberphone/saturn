@@ -26,16 +26,14 @@ import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 
 import java.sql.Connection;
-import java.sql.CallableStatement;
 
 import java.util.Locale;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.crypto.HashAlgorithms;
-
 import org.webpki.saturn.common.PayeeCoreProperties;
+import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
@@ -49,6 +47,7 @@ import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ArrayUtil;
+
 import org.webpki.util.ISODateTime;
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -155,38 +154,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Verify that the there is a matching Payer account
         String accountId = authorizationData.getAccountId();
         String authorizedPaymentMethod = authorizationData.getPaymentMethod();
-/*
-        CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
-                                               OUT p_Name VARCHAR(50),
-                                               IN p_CredentialId VARCHAR(30),
-                                               IN p_MethodUri VARCHAR(50),
-                                               IN p_S256PayReq BINARY(32))
-*/
-        String userName;
-        try (CallableStatement stmt = 
-                connection.prepareCall("{call AuthenticatePayReqSP(?, ?, ?, ?, ?)}");) {
-            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
-            stmt.registerOutParameter(2, java.sql.Types.VARCHAR);
-            stmt.setString(3, accountId);
-            stmt.setString(4, authorizedPaymentMethod);
-            stmt.setBytes(5, HashAlgorithms.SHA256.digest(authorizationData.getPublicKey().getEncoded()));
-            stmt.execute();
-            int result = stmt.getInt(1);            
-            if (result != 0) {
-                if (result == 1) {
-                    logger.severe("No such account ID: " + accountId);
-                    throw new NormalException("No such user account ID");
-                }
-                if (result == 2) {
-                    logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
-                    throw new NormalException("Wrong payment method");
-                }
-                logger.severe("Wrong public key for account ID: " + accountId);
-                throw new NormalException("Wrong user public key");
-            } else {
-                userName = stmt.getString(2);
-            }
-        }
+        String userName = DataBaseOperations.authenticateAuthorization(accountId, 
+                                                                       authorizedPaymentMethod,
+                                                                       authorizationData.getPublicKey(), 
+                                                                       connection);
 
         // We don't accept requests that are old or ahead of time
         long diff = System.currentTimeMillis() - authorizationData.getTimeStamp().getTimeInMillis();
@@ -249,18 +220,16 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             transactionId = BankService.testReferenceId++;
         } else {
             // Here we actually update things...
-            WithDrawFromAccount wdfa = new WithDrawFromAccount(amount,
-                                                               accountId,
-                                                               transactionType,
-                                                               paymentMethodSpecific.getPayeeAccount(),
-                                                               paymentRequest.getPayeeCommonName(),
-                                                               paymentRequest.getReferenceId(),
-                                                               null,
-                                                               false,
-                                                               connection);
-            if (wdfa.getResult() == 0) {
-                transactionId = wdfa.getTransactionId();
-            } else {
+            transactionId = DataBaseOperations.externalWithDraw(amount,
+                                                                accountId,
+                                                                transactionType,
+                                                                paymentMethodSpecific.getPayeeAccount(),
+                                                                paymentRequest.getPayeeCommonName(),
+                                                                paymentRequest.getReferenceId(),
+                                                                null,
+                                                                false,
+                                                                connection);
+            if (transactionId == 0) {
                 return createProviderUserResponse("Your request for " + 
                                                   amountInHtml(paymentRequest, amount) +
                         " appears to be slightly out of your current capabilities..." +
@@ -301,7 +270,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 } catch (Exception e) {
                     // Since the external operation failed we must restore the account
                     // with the amount involved.
-                    new NullifyTransaction(transactionId, connection);
+                    DataBaseOperations.nullifyTransaction(transactionId, connection);
                     throw e;
                 }
             }

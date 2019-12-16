@@ -99,14 +99,6 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                                           JSONObjectReader providerRequest,
                                           Connection connection) throws Exception;
     
-    static class NormalException extends Exception {
-
-        private static final long serialVersionUID = 1L;
-
-        NormalException(String message) {
-            super(message);
-        }
-    }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = null;

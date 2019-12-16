@@ -42,7 +42,7 @@ public class PayerAuthorization implements BaseProperties {
         }
         ea.getEncryptionObject(options).require(true);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
-        paymentMethod = PaymentMethods.fromTypeUri(rd.getString(PAYMENT_METHOD_JSON));
+        paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         rd.checkForUnread();
     }
     

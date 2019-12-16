@@ -46,7 +46,6 @@ import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequest;
 
@@ -165,8 +164,8 @@ public class InitTestPage implements BaseProperties {
             .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
                 .setStringArray(PAYMENT_METHODS_JSON,
                                 new String[]{"https://nosuchcard.com",
-                                    PaymentMethods.SUPER_CARD.getPaymentMethodUri(),
-                                    PaymentMethods.BANK_DIRECT.getPaymentMethodUri()})
+                                    PaymentMethods.SUPER_CARD.getPaymentMethodUrl(),
+                                    PaymentMethods.BANK_DIRECT.getPaymentMethodUrl()})
                 .setObject(PAYMENT_REQUEST_JSON, standardRequest))));
 
         // The normal request is cloned and modified for testing error handling
@@ -176,7 +175,7 @@ public class InitTestPage implements BaseProperties {
               "scrollMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"");
         for (PaymentMethods paymentMethod : PaymentMethods.values()) {
             write(", \"");
-            write(paymentMethod.getPaymentMethodUri());
+            write(paymentMethod.getPaymentMethodUrl());
             write("\"");
         }
 

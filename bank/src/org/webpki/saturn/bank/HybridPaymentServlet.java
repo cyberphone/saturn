@@ -34,6 +34,7 @@ import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
@@ -86,18 +87,18 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
             transactionId = BankService.testReferenceId++;
         } else {
             // The following call will throw exceptions on errors
-            WithDrawFromAccount wdfa = 
-                    new WithDrawFromAccount(transactionRequest.getAmount(),
-                                            authorizationData.getAccountId(),
-                                            TransactionTypes.TRANSACT,
-                                            paymentMethodSpecific.getPayeeAccount(),
-                                            paymentRequest.getPayeeCommonName(),
-                                            paymentRequest.getReferenceId(),
-                                            decodeReferenceId(transactionRequest
-                                                    .getAuthorizationResponse().getReferenceId()),
-                                            true,
-                                            connection);
-            transactionId = wdfa.getTransactionId();
+            transactionId = 
+                    DataBaseOperations.externalWithDraw(transactionRequest.getAmount(),
+                                                        authorizationData.getAccountId(),
+                                                        TransactionTypes.TRANSACT,
+                                                        paymentMethodSpecific.getPayeeAccount(),
+                                                        paymentRequest.getPayeeCommonName(),
+                                                        paymentRequest.getReferenceId(),
+                                                        decodeReferenceId(transactionRequest
+                                                                .getAuthorizationResponse()
+                                                                    .getReferenceId()),
+                                                        true,
+                                                        connection);
         }
         //#################################################
         //# Payment backend networking take place here... #
@@ -126,7 +127,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                   BankService.bankKey);
             optionalLogData = ibResponse.getOurReference();
         } catch (Exception e) {
-            new NullifyTransaction(transactionId, connection);
+            DataBaseOperations.nullifyTransaction(transactionId, connection);
             throw e;
         }
         // It appears that we succeeded

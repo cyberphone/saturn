@@ -57,7 +57,7 @@ public class DataBaseOperations {
 
     public static String createAccountAndCredential(int userId,
                                                     int accountType,
-                                                    String methodUri,
+                                                    String methodUrl,
                                                     PublicKey payReq,
                                                     PublicKey optionalBalReq) 
     throws SQLException, IOException {
@@ -66,7 +66,7 @@ public class DataBaseOperations {
             CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
                                                            IN p_UserId INT, 
                                                            IN p_AccountType INT,
-                                                           IN p_MethodUri VARCHAR(50),
+                                                           IN p_MethodUrl VARCHAR(50),
                                                            IN p_S256PayReq BINARY(32),
                                                            IN p_S256BalReq BINARY(32))
 */
@@ -77,7 +77,7 @@ public class DataBaseOperations {
                 stmt.registerOutParameter(1, java.sql.Types.VARCHAR);
                 stmt.setInt(2, userId);
                 stmt.setInt(3, accountType);
-                stmt.setString(4, methodUri);
+                stmt.setString(4, methodUrl);
                 stmt.setBytes(5, s256(payReq));
                 stmt.setBytes(6, s256(optionalBalReq));
                 stmt.execute();

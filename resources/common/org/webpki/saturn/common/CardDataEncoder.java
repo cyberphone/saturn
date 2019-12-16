@@ -37,6 +37,7 @@ public class CardDataEncoder {
      
     public static JSONObjectWriter encode(String paymentMethod,
                                           String accountId,
+                                          String credentialId,
                                           String authorityUrl,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
@@ -49,6 +50,7 @@ public class CardDataEncoder {
             .setString(CardDataDecoder.VERSION_JSON, CardDataDecoder.ACTUAL_VERSION)
             .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentMethod)
             .setString(BaseProperties.ACCOUNT_ID_JSON, accountId)
+            .setString(BaseProperties.CREDENTIAL_ID_JSON, credentialId)
             .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, authorityUrl)
             .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
                     signatureAlgorithm.getAlgorithmId(AlgorithmPreferences.JOSE))

@@ -158,7 +158,7 @@ public class InitWallet {
         surrogateKey.setCertificatePath(certPath);
         surrogateKey.setPrivateKey(new KeyPair(keyPair.getPublic(), keyPair.getPrivate()));
         JSONObjectWriter ow =
-             CardDataEncoder.encode(paymentMethod.getPaymentMethodUri(), 
+             CardDataEncoder.encode(paymentMethod.getPaymentMethodUrl(), 
                                     accountId, 
                                     authorityUrl,
                                     rsa_flag ?

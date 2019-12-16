@@ -193,7 +193,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     }
 
     void initDataBaseEnums(Connection connection) throws Exception {
-        TransactionTypes.init(connection);
+        DataBaseOperations.initiateStaticTypes(connection);
         connection.close();
     }
 
