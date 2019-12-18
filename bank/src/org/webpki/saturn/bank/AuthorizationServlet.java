@@ -47,7 +47,6 @@ import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ArrayUtil;
-
 import org.webpki.util.ISODateTime;
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -149,15 +148,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Decrypt and validate the encrypted Payer authorization
-        AuthorizationData authorizationData = authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
+        AuthorizationData authorizationData = 
+                authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
         // Verify that the there is a matching Payer account
         String accountId = authorizationData.getAccountId();
-        String authorizedPaymentMethod = authorizationData.getPaymentMethod();
-        String userName = DataBaseOperations.authenticateAuthorization(accountId, 
-                                                                       authorizedPaymentMethod,
-                                                                       authorizationData.getPublicKey(), 
-                                                                       connection);
+        String userName = DataBaseOperations.authenticateAuthorization(
+                                            authorizationData.getCredentialId(),
+                                            accountId, 
+                                            authorizationRequest.getPaymentMethod(),
+                                            authorizationData.getPublicKey(), 
+                                            connection);
 
         // We don't accept requests that are old or ahead of time
         long diff = System.currentTimeMillis() - authorizationData.getTimeStamp().getTimeInMillis();
@@ -291,7 +292,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     ", Transaction Type=" + transactionType.toString() + 
                     ", Transaction ID=" + transactionId + 
                     ", Account ID=" + accountId + 
-                    ", Payment Method=" + authorizedPaymentMethod + 
+                    ", Payment Method=" + authorizationData.getPaymentMethod() + 
                     ", Client IP=" + clientIpAddress +
                     ", Method Specific=" + paymentMethodSpecific.logLine());
 

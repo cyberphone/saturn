@@ -44,6 +44,7 @@ public class AuthorizationData implements BaseProperties {
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
                                           String paymentMethod,
+                                          String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
@@ -56,6 +57,7 @@ public class AuthorizationData implements BaseProperties {
                 .setBinary(JSONCryptoHelper.VALUE_JSON, paymentRequest.getRequestHash()))
             .setString(DOMAIN_NAME_JSON, domainName)
             .setString(PAYMENT_METHOD_JSON, paymentMethod)
+            .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setObject(ENCRYPTION_PARAMETERS_JSON, 
                        new JSONObjectWriter()
@@ -75,6 +77,7 @@ public class AuthorizationData implements BaseProperties {
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
                                           String paymentMethod,
+                                          String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
@@ -84,6 +87,7 @@ public class AuthorizationData implements BaseProperties {
         return encode(paymentRequest,
                       domainName,
                       paymentMethod,
+                      credentialId,
                       accountId,
                       dataEncryptionKey,
                       dataEncryptionAlgorithm,
@@ -109,6 +113,7 @@ public class AuthorizationData implements BaseProperties {
         requestHash = RequestHash.parse(rd);
         domainName = rd.getString(DOMAIN_NAME_JSON);
         paymentMethod = rd.getString(PAYMENT_METHOD_JSON);
+        credentialId = rd.getString(CREDENTIAL_ID_JSON);
         accountId = rd.getString(ACCOUNT_ID_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
@@ -158,6 +163,11 @@ public class AuthorizationData implements BaseProperties {
     String paymentMethod;
     public String getPaymentMethod() {
         return paymentMethod;
+    }
+
+    String credentialId;
+    public String getCredentialId() {
+        return credentialId;
     }
 
     String accountId;

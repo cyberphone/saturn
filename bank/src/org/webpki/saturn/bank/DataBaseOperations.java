@@ -53,36 +53,43 @@ public class DataBaseOperations {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Authenticate user authorization using a stored procedure                                   //
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    static String authenticateAuthorization(String accountId,
-                                            String authorizedPaymentMethod,
-                                            PublicKey publicKey,
+    static String authenticateAuthorization(String credentialId,
+                                            String accountId,
+                                            PaymentMethods paymentMethod,
+                                            PublicKey authorizationKey,
                                             Connection connection) 
     throws SQLException, IOException, NormalException {
 /*
         CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
-                                               OUT p_Name VARCHAR(50),
-                                               IN p_CredentialId VARCHAR(30),
-                                               IN p_MethodUrl VARCHAR(50),
+                                               OUT p_UserName VARCHAR(50),
+                                               IN p_CredentialId INT,
+                                               IN p_AccountId VARCHAR(30),
+                                               IN p_PaymentMethodId INT,
                                                IN p_S256PayReq BINARY(32))
 */
         try (CallableStatement stmt = 
-                connection.prepareCall("{call AuthenticatePayReqSP(?, ?, ?, ?, ?)}");) {
+                connection.prepareCall("{call AuthenticatePayReqSP(?,?,?,?,?,?,?)}");) {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             stmt.registerOutParameter(2, java.sql.Types.VARCHAR);
-            stmt.setString(3, accountId);
-            stmt.setString(4, authorizedPaymentMethod);
-            stmt.setBytes(5, HashAlgorithms.SHA256.digest(publicKey.getEncoded()));
+            stmt.setInt(3, Integer.parseInt(credentialId));
+            stmt.setString(4, accountId);
+            stmt.setInt(5, paymentMethod2DbInt.get(paymentMethod));
+            stmt.setBytes(6, s256(authorizationKey));
             stmt.execute();
             switch (stmt.getInt(1)) {
                 case 0:
                     return stmt.getString(2);
 
                 case 1:
-                    logger.severe("No such account ID: " + accountId);
-                    throw new NormalException("No such user account ID");
+                    logger.severe("No such credential ID: " + credentialId);
+                    throw new NormalException("No such user credential");
 
                 case 2:
-                    logger.severe("Wrong payment method: " + authorizedPaymentMethod + " for account ID: " + accountId);
+                    logger.severe("No such account ID: " + accountId);
+                    throw new NormalException("No such user account");
+
+                case 3:
+                    logger.severe("Wrong payment method: " + paymentMethod.toString() + " for account ID: " + accountId);
                     throw new NormalException("Wrong payment method");
 
                 default:
@@ -96,7 +103,7 @@ public class DataBaseOperations {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Withdraw an amount from the account using a stored procedure                               //
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    static int externalWithDraw(BigDecimal amount, 
+    static int externalWithDraw(BigDecimal amount,
                                 String accountId,
                                 TransactionTypes transactionType,
                                 String payeeAccount,
@@ -111,13 +118,13 @@ public class DataBaseOperations {
                                              IN p_PayeeAccount VARCHAR(50),
                                              IN p_OptionalPayeeName VARCHAR(50),
                                              IN p_OptionalPayeeReference VARCHAR(50),
-                                             IN p_TransactionType INT,
+                                             IN p_TransactionTypeId INT,
                                              IN p_OptionalReservationId INT,
                                              IN p_Amount DECIMAL(8,2),
-                                             IN p_CredentialId VARCHAR(30))
+                                             IN p_AccountId VARCHAR(30))
 */
         try (CallableStatement stmt = 
-                connection.prepareCall("{call ExternalWithDrawSP(?, ?, ?, ?, ?, ?, ?, ?, ?)}");) {
+                connection.prepareCall("{call ExternalWithDrawSP(?,?,?,?,?,?,?,?,?)}");) {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             stmt.registerOutParameter(2, java.sql.Types.INTEGER);
             stmt.setString(3, payeeAccount);
@@ -137,9 +144,6 @@ public class DataBaseOperations {
                 case 0:
                     return stmt.getInt(2);
                  
-                case 1:
-                    throw new SQLException("Unknown account/credential: " + accountId);
-                    
                 case 4:
                     if (throwOnOutOfFounds) {
                         throw new SQLException("Out of funds");
@@ -162,7 +166,7 @@ public class DataBaseOperations {
         CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, 
                                                IN p_FailedTransactionId INT)
 */
-        try (CallableStatement stmt = connection.prepareCall("{call NullifyTransactionSP(?, ?)}");) {
+        try (CallableStatement stmt = connection.prepareCall("{call NullifyTransactionSP(?,?)}");) {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             stmt.setInt(2, failedTransactionId);
             stmt.execute();
@@ -190,18 +194,22 @@ public class DataBaseOperations {
         }
     }
 
+    private static byte[] s256(PublicKey publicKey) throws IOException {
+        return publicKey == null ? null : HashAlgorithms.SHA256.digest(publicKey.getEncoded());
+    }
+    
     // Run once to set up constants to match the database
     static void initiateStaticTypes(Connection connection) throws SQLException {
         for (TransactionTypes transactionType : TransactionTypes.values()) {
             transactionType2DbInt.put(transactionType,
                     init(connection, 
-                         "GetTransactionTypeSP",
+                         "GetTransactionTypeId",
                          transactionType.toString()));
         }
         for (PaymentMethods paymentMethod : PaymentMethods.values()) {
             paymentMethod2DbInt.put(paymentMethod,  
                     init(connection, 
-                         "GetPaymentMethodSP", 
+                         "GetPaymentMethodId", 
                          paymentMethod.getPaymentMethodUrl()));
         }
     }
