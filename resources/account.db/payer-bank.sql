@@ -1,3 +1,20 @@
+/*
+ *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 -- SQL Script for MySQL 5.7
 --
 -- root privileges are required!!!
@@ -54,7 +71,7 @@ CREATE TABLE ACCOUNT_TYPES
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Type ID
 
-    SymbolicName VARCHAR(20)  NOT NULL,                                  -- As as symbolic name
+    Name        VARCHAR(20)   NOT NULL,                                  -- As as symbolic name
 
     Description VARCHAR(50)   NOT NULL  UNIQUE,                          -- Description
 
@@ -70,8 +87,10 @@ CREATE TABLE ACCOUNT_TYPES
 
 CREATE TABLE ACCOUNTS
   (
-    Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Account ID
+    Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique (internal) Account ID
 
+-- One could imagine a more flexible arrangement supporting multiple owners
+-- but this seems to be out of scope for a proof-of-concept design.
     UserId      INT           NOT NULL,                                  -- User (account holder) reference
 
     AccountTypeId INT         NOT NULL,                                  -- Account Type reference
@@ -96,7 +115,7 @@ CREATE TABLE PAYMENT_METHODS
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Payment Method ID
 
-    MethodUrl   VARCHAR(50)   NOT NULL  UNIQUE,                          -- Payment method
+    Name        VARCHAR(50)   NOT NULL  UNIQUE,                          -- Payment method (URL)
 
     Format      VARCHAR(80)   NOT NULL,                                  -- Account syntax
 
@@ -115,14 +134,14 @@ CREATE TABLE CREDENTIALS
 
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Credential ID
 
--- Note: an AccountName is an external representation of an Account ID
+-- Note: an AccountId is an external representation of an InternalAccountId
 -- like an IBAN or Card Number.  Their contents are (database-wise)
 -- independent of the actual Account IDs.  This means that a bank
 -- account may serve as a Card account as well as SEPA account
 
-    AccountName VARCHAR(30)   NOT NULL,                                  -- May be shared with other users 
+    AccountId VARCHAR(30)     NOT NULL,                                  -- May be shared with other users 
 
-    AccountId   INT           NOT NULL,                                  -- Account Reference
+    InternalAccountId INT     NOT NULL,                                  -- Account Reference
 
     PaymentMethodId INT       NOT NULL,                                  -- Payment Method reference
 
@@ -138,8 +157,10 @@ CREATE TABLE CREDENTIALS
 
     PRIMARY KEY (Id),
     FOREIGN KEY (PaymentMethodId) REFERENCES PAYMENT_METHODS(Id),
-    FOREIGN KEY (AccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
-  );
+    FOREIGN KEY (InternalAccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
+  ) AUTO_INCREMENT=100000000;
+  
+CREATE INDEX SpeedUpAccountId ON CREDENTIALS (AccountId);
 
 
 /*=============================================*/
@@ -150,7 +171,7 @@ CREATE TABLE TRANSACTION_TYPES
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Transaction Type ID
 
-    SymbolicName VARCHAR(20)  NOT NULL,                                  -- As as symbolic name
+    Name        VARCHAR(20)   NOT NULL,                                  -- As as symbolic name
 
     Description VARCHAR(80)   NOT NULL,                                  -- A bit more on the topic
 
@@ -166,7 +187,7 @@ CREATE TABLE TRANSACTIONS
   (
     Id          INT           NOT NULL  UNIQUE,                          -- Unique Transaction ID
 
-    AccountId   INT           NOT NULL,                                  -- Referring to an Account
+    InternalAccountId INT     NOT NULL,                                  -- Referring to an Account
 
     CredentialId INT,                                                    /* Optional Credential reference
                                                                             linked to the Account ID */
@@ -175,7 +196,7 @@ CREATE TABLE TRANSACTIONS
                                                                             linked to a previous
                                                                             Transaction ID */
 
-    TransactionTypeId INT       NOT NULL,                                -- Transaction Type reference
+    TransactionTypeId INT     NOT NULL,                                  -- Transaction Type reference
 
     Amount      DECIMAL(8,2)  NOT NULL,                                  -- The Amount involved
 
@@ -192,7 +213,7 @@ CREATE TABLE TRANSACTIONS
 
     PRIMARY KEY (Id),
     FOREIGN KEY (TransactionTypeId) REFERENCES TRANSACTION_TYPES(Id),
-    FOREIGN KEY (AccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
+    FOREIGN KEY (InternalAccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
   );
 
 
@@ -235,80 +256,80 @@ CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
   END
 //
 
-CREATE PROCEDURE CreateAccountTypeSP (IN p_SymbolicName VARCHAR(20),
+CREATE PROCEDURE CreateAccountTypeSP (IN p_AccountTypeName VARCHAR(20),
                                       IN p_Description VARCHAR(50),
                                       IN p_CappedAt DECIMAL(8,2))
   BEGIN
-    INSERT INTO ACCOUNT_TYPES(SymbolicName, Description, CappedAt)
-        VALUES(p_SymbolicName, p_Description, p_CappedAt);
+    INSERT INTO ACCOUNT_TYPES(Name, Description, CappedAt)
+        VALUES(p_AccountTypeName, p_Description, p_CappedAt);
   END
 //
 
 CREATE PROCEDURE CreatePaymentMethodSP (IN p_MethodUrl VARCHAR(50),
                                         IN p_Format VARCHAR(80))
   BEGIN
-    INSERT INTO PAYMENT_METHODS(MethodUrl, Format)
+    INSERT INTO PAYMENT_METHODS(Name, Format)
         VALUES(p_MethodUrl, p_Format);
   END
 //
 
-CREATE PROCEDURE CreateTransactionTypeSP (IN p_SymbolicName VARCHAR(20),
+CREATE PROCEDURE CreateTransactionTypeSP (IN p_TransactionTypeName VARCHAR(20),
                                           IN p_Description VARCHAR(80))
   BEGIN
-    INSERT INTO TRANSACTION_TYPES(SymbolicName, Description)
-        VALUES(p_SymbolicName, p_Description);
+    INSERT INTO TRANSACTION_TYPES(Name, Description)
+        VALUES(p_TransactionTypeName, p_Description);
   END
 //
 
-CREATE FUNCTION GetTransactionTypeSP (p_SymbolicName VARCHAR(20)) RETURNS INT
+CREATE FUNCTION GetTransactionTypeId (p_TransactionTypeName VARCHAR(20)) RETURNS INT
 DETERMINISTIC
   BEGIN
     DECLARE v_Id INT;
 
     SELECT TRANSACTION_TYPES.Id INTO v_Id FROM TRANSACTION_TYPES
-        WHERE TRANSACTION_TYPES.SymbolicName = p_SymbolicName;
+        WHERE TRANSACTION_TYPES.Name = p_TransactionTypeName;
     RETURN v_Id;
   END
 //
 
-CREATE FUNCTION GetPaymentMethodSP (p_PaymentMetodUrl VARCHAR(50)) RETURNS INT
+CREATE FUNCTION GetPaymentMethodId (p_PaymentMetodUrl VARCHAR(50)) RETURNS INT
 DETERMINISTIC
   BEGIN
     DECLARE v_Id INT;
 
     SELECT PAYMENT_METHODS.Id INTO v_Id FROM PAYMENT_METHODS
-        WHERE PAYMENT_METHODS.MethodUrl = p_PaymentMetodUrl;
+        WHERE PAYMENT_METHODS.Name = p_PaymentMetodUrl;
     RETURN v_Id;
   END
 //
 
-CREATE FUNCTION GetAccountTypeSP (p_SymbolicName VARCHAR(20)) RETURNS INT
+CREATE FUNCTION GetAccountTypeId (p_AccountTypeName VARCHAR(20)) RETURNS INT
 DETERMINISTIC
   BEGIN
     DECLARE v_Id INT;
 
     SELECT ACCOUNT_TYPES.Id INTO v_Id FROM ACCOUNT_TYPES
-        WHERE ACCOUNT_TYPES.SymbolicName = p_SymbolicName;
+        WHERE ACCOUNT_TYPES.Name = p_AccountTypeName;
     RETURN v_Id;
   END
 //
 
-CREATE FUNCTION FRENCH_IBAN (p_AccountId INT(11)) RETURNS VARCHAR(30)
+CREATE FUNCTION FRENCH_IBAN (p_InternalAccountId INT) RETURNS VARCHAR(30)
 DETERMINISTIC
   BEGIN
 
 -- https://fr.wikipedia.org/wiki/Cl%C3%A9_RIB
 -- Hard coded financial institution and branch office (LCL)
 
-    set @chk = LPAD(CONVERT(97 - (2836843 + 3 * p_AccountId) % 97, CHAR), 2, '0');
-    set @bban = CONCAT('3000211111', LPAD(CONVERT(p_AccountId, DECIMAL(11)), 11, '0'), @chk);
+    set @chk = LPAD(CONVERT(97 - (2836843 + 3 * p_InternalAccountId) % 97, CHAR), 2, '0');
+    set @bban = CONCAT('3000211111', LPAD(CONVERT(p_InternalAccountId, DECIMAL(11)), 11, '0'), @chk);
     set @key = LPAD(CONVERT(98 - (CONVERT(CONCAT(@bban, '152700'), DECIMAL(30)) % 97), CHAR), 2, '0');
     RETURN CONCAT('FR', @key, @bban);
   END
 //
 
 CREATE FUNCTION CREDIT_CARD (p_IIN VARCHAR(8),
-                             p_AccountId INT(11),
+                             p_InternalAccountId INT,
                              p_AccountDigits INT) RETURNS VARCHAR(30)
 DETERMINISTIC
   BEGIN
@@ -319,7 +340,7 @@ DETERMINISTIC
     DECLARE i, s, r, weight INT;
     DECLARE baseNumber VARCHAR(16);
  
-    SET baseNumber = CONCAT(p_IIN, LPAD(CONVERT(p_AccountId, DECIMAL(11)), p_AccountDigits, '0'));
+    SET baseNumber = CONCAT(p_IIN, LPAD(CONVERT(p_InternalAccountId, DECIMAL(11)), p_AccountDigits, '0'));
     SET weight = 2;
     SET s = 0;
     SET i = LENGTH(baseNumber);
@@ -334,112 +355,121 @@ DETERMINISTIC
   END 
 //
 
-CREATE PROCEDURE CreateAccountSP (OUT p_AccountId INT(11),
+CREATE PROCEDURE CreateAccountSP (OUT p_InternalAccountId INT,
                                   IN p_UserId INT, 
-                                  IN p_AccountType INT)
+                                  IN p_AccountTypeId INT)
   BEGIN
     INSERT INTO ACCOUNTS(UserId, AccountTypeId, Balance)
-        SELECT p_UserId, p_AccountType, ACCOUNT_TYPES.CappedAt 
-        FROM ACCOUNT_TYPES WHERE Id = p_AccountType;
-    SET p_AccountId = LAST_INSERT_ID();
+        SELECT p_UserId, p_AccountTypeId, ACCOUNT_TYPES.CappedAt 
+        FROM ACCOUNT_TYPES WHERE Id = p_AccountTypeId;
+    SET p_InternalAccountId = LAST_INSERT_ID();
   END
 //
 
 CREATE PROCEDURE CreateDemoCredentialSP (OUT p_CredentialId INT,
-                                         OUT p_AccountName VARCHAR(30),
-                                         IN p_AccountId INT(11), 
-                                         IN p_MethodUrl VARCHAR(50),
+                                         OUT p_AccountId VARCHAR(30),
+                                         IN p_InternalAccountId INT, 
+                                         IN p_PaymentMethodUrl VARCHAR(50),
                                          IN p_S256PayReq BINARY(32),
                                          IN p_S256BalReq BINARY(32))
   BEGIN
-    SELECT Id, Format INTO @paymentmethodid, @format FROM PAYMENT_METHODS
-        WHERE PAYMENT_METHODS.MethodUrl = p_MethodUrl;
-    SET @sql = CONCAT('SET @accountname = ', @format);
+    SELECT Id, Format INTO @paymentMethodId, @format FROM PAYMENT_METHODS
+        WHERE PAYMENT_METHODS.Name = p_PaymentMethodUrl;
+    SET @accountNumber = p_InternalAccountId;
+    SET @sql = CONCAT('SET @accountId = ', @format);
     PREPARE stmt FROM @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-    INSERT INTO CREDENTIALS(AccountId, 
-                            AccountName,
+    INSERT INTO CREDENTIALS(InternalAccountId, 
+                            AccountId,
                             S256PayReq,
                             S256BalReq,
                             PaymentMethodId) 
-        VALUES(p_AccountId,
-               @accountname,
+        VALUES(p_InternalAccountId,
+               @accountId,
                p_S256PayReq,
                p_S256BalReq,
-               @paymentmethodid);
+               @paymentMethodId);
     SET p_CredentialId = LAST_INSERT_ID();
-    SET p_AccountName = @accountname; 
+    SET p_AccountId = @accountId; 
   END
 //
 
-CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
+CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
+                                               OUT p_CredentialId INT,
                                                IN p_UserId INT, 
-                                               IN p_AccountType INT,
-                                               IN p_MethodUrl VARCHAR(50),
+                                               IN p_AccountTypeName VARCHAR(20),
+                                               IN p_PaymentMethodUrl VARCHAR(50),
                                                IN p_S256PayReq BINARY(32),
                                                IN p_S256BalReq BINARY(32))
   BEGIN
-    CALL CreateAccountSP(@accountId, p_UserId, p_AccountType);
-    SELECT Id, Format INTO @credentialType, @format FROM PAYMENT_METHODS
-        WHERE PAYMENT_METHODS.MethodUrl = p_MethodUrl;
-    SET @sql = CONCAT('SET @credentialId = ', @format);
+    CALL CreateAccountSP(@accountNumber, p_UserId, GetAccountTypeId(p_AccountTypeName));
+    SELECT Id, Format INTO @paymentMethodId, @format FROM PAYMENT_METHODS
+        WHERE PAYMENT_METHODS.Name = p_PaymentMethodUrl;
+    SET @sql = CONCAT('SET @accountId = ', @format);
     PREPARE stmt FROM @sql;
     EXECUTE stmt;
     DEALLOCATE PREPARE stmt;
-    INSERT INTO CREDENTIALS(Id, AccountId, PaymentMethodId, S256PayReq, S256BalReq) 
-        VALUES(@credentialId, @accountId, @credentialType, p_S256PayReq, p_S256BalReq);
-    SET p_CredentialId = @credentialId;
+    INSERT INTO CREDENTIALS(InternalAccountId,
+                            AccountId,
+                            PaymentMethodId,
+                            S256PayReq, 
+                            S256BalReq) 
+        VALUES(@accountNumber, 
+               @accountId,
+               @paymentMethodId,
+               p_S256PayReq,
+               p_S256BalReq);
+    SET p_CredentialId = LAST_INSERT_ID();
+    SET p_AccountId = @accountId;
   END
 //
 
 CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
-                                       OUT p_Name VARCHAR(50),
-                                       IN p_CredentialId VARCHAR(30),
-                                       IN p_MethodUrl VARCHAR(50),
+                                       OUT p_UserName VARCHAR(50),
+                                       OUT p_InternalAccountId INT,
+                                       IN p_CredentialId INT,
+                                       IN p_AccountId VARCHAR(30),
+                                       IN p_PaymentMethodId INT,
                                        IN p_S256PayReq BINARY(32))
   BEGIN
     DECLARE v_UserId INT;
+    DECLARE v_AccountId VARCHAR(30);
+    DECLARE v_S256PayReq BINARY(32);
+    DECLARE v_PaymentMethodId INT;
     
-    SELECT ACCOUNTS.UserId INTO v_UserId FROM ACCOUNTS 
-        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
-        INNER JOIN PAYMENT_METHODS ON PAYMENT_METHODS.Id = CREDENTIALS.PaymentMethodId
-            WHERE CREDENTIALS.Id = p_CredentialId AND
-                  PAYMENT_METHODS.MethodUrl = p_MethodUrl AND
-                  CREDENTIALS.S256PayReq = p_S256PayReq
-            LIMIT 1;
-    IF v_UserId IS NULL THEN   -- Failed => Find reason
-      IF EXISTS (SELECT * FROM CREDENTIALS WHERE CREDENTIALS.Id = p_CredentialId) THEN
-        IF EXISTS (SELECT * FROM ACCOUNTS 
-            INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
-            INNER JOIN PAYMENT_METHODS ON PAYMENT_METHODS.Id = CREDENTIALS.PaymentMethodId
-                WHERE CREDENTIALS.Id = p_CredentialId AND
-                      PAYMENT_METHODS.MethodUrl = p_MethodUrl) THEN
-          SET p_Error = 3;       -- Key does not match account
-        ELSE
-          SET p_Error = 2;       -- Method does not match account type
-        END IF;
-      ELSE
-        SET p_Error = 1;         -- No such account
-      END IF;
+    SELECT AccountId, S256PayReq, InternalAccountId, PaymentMethodId 
+        INTO v_AccountId, v_S256PayReq, p_InternalAccountId, v_PaymentMethodId
+        FROM CREDENTIALS WHERE CREDENTIALS.Id = p_CredentialId;
+    IF v_AccountId IS NULL THEN
+      SET p_Error = 1;    -- No such credential
+    ELSEIF v_AccountId <> p_AccountId THEN
+      SET p_Error = 2;    -- Non-matching account
+    ELSEIF v_S256PayReq <> p_S256PayReq THEN
+      SET p_Error = 3;    -- Non-matching key
+    ELSEIF v_PaymentMethodId <> p_PaymentMethodId THEN
+      SET p_Error = 4;    -- Non-matching payment method
     ELSE                       
-      SET p_Error = 0;          -- Success => Update access info
+      SET p_Error = 0;    -- Success => Update access info
+      SELECT USERS.Id, USERS.Name INTO v_UserId, p_UserName FROM USERS
+        INNER JOIN ACCOUNTS ON USERS.Id = ACCOUNTS.UserId
+            WHERE ACCOUNTS.Id = p_InternalAccountId
+            LIMIT 1;
       UPDATE USERS SET LastAccess = CURRENT_TIMESTAMP, AccessCount = AccessCount + 1
           WHERE USERS.Id = v_UserId;
-      SELECT Name INTO p_Name FROM USERS WHERE USERS.Id = v_UserId;
     END IF;
   END
 //
 
 CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Error INT,
                                        OUT p_Balance DECIMAL(8,2),
-                                       IN p_CredentialId VARCHAR(30),
+                                       IN p_CredentialId INT,
                                        IN p_S256BalReq BINARY(32))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
 
     SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS 
-        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
+        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.InternalAccountId
             WHERE CREDENTIALS.Id = p_CredentialId AND
                   CREDENTIALS.S256BalReq = p_S256BalReq
             LIMIT 1;
@@ -461,46 +491,40 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                      IN p_PayeeAccount VARCHAR(50),
                                      IN p_OptionalPayeeName VARCHAR(50),
                                      IN p_OptionalPayeeReference VARCHAR(50),
-                                     IN p_TransactionType INT,
+                                     IN p_TransactionTypeId INT,
                                      IN p_OptionalReservationId INT,
                                      IN p_Amount DECIMAL(8,2),
-                                     IN p_CredentialId VARCHAR(30))
+                                     IN p_CredentialId INT,
+                                     IN p_InternalAccountId INT)
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
     DECLARE v_NewBalance DECIMAL(8,2);
     DECLARE v_PreviousAmount DECIMAL(8,2);
-    DECLARE v_AccountId INT(11);
 
     SET p_Error = 0;
     START TRANSACTION;
     -- Lock the actual account record for updates
-    SELECT ACCOUNTS.Balance, ACCOUNTS.Id INTO v_Balance, v_AccountId FROM ACCOUNTS
-        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
-        WHERE CREDENTIALS.Id = p_CredentialId
+    SELECT Balance INTO v_Balance FROM ACCOUNTS
+        WHERE ACCOUNTS.Id = p_InternalAccountId
         LIMIT 1
         FOR UPDATE;
-    IF v_AccountId IS NULL THEN    -- Failed
+    IF v_Balance IS NULL THEN      -- Failed
       SET p_Error = 1;             -- No such account
     ELSE
       SET v_NewBalance = v_Balance - p_Amount;
       IF p_OptionalReservationId IS NOT NULL THEN
         SELECT TRANSACTIONS.Amount INTO v_PreviousAmount FROM TRANSACTIONS
-            INNER JOIN ACCOUNTS ON ACCOUNTS.Id = TRANSACTIONS.AccountId
-            INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
-            WHERE TRANSACTIONS.Id = p_OptionalReservationId AND
-                  TRANSACTIONS.TransactionTypeId = 2 AND
-                  ACCOUNTS.Id = v_AccountId AND
-                  CREDENTIALS.Id = p_CredentialId
+            WHERE TRANSACTIONS.InternalAccountId = p_InternalAccountId AND
+                  TRANSACTIONS.Id = p_OptionalReservationId AND
+                  TRANSACTIONS.TransactionTypeId = 2
             LIMIT 1;
         IF v_PreviousAmount IS NULL THEN
           SET p_Error = 5;         -- Reservation not found
+        ELSEIF EXISTS (SELECT * FROM TRANSACTIONS
+            WHERE TRANSACTIONS.ReservationId = p_OptionalReservationId) THEN
+          SET p_Error = 6;         -- Reservation already used
         ELSE
-          IF EXISTS (SELECT * FROM TRANSACTIONS
-              WHERE TRANSACTIONS.ReservationId = p_OptionalReservationId) THEN
-            SET p_Error = 6;         -- Reservation already used
-          ELSE
-            SET v_NewBalance = v_NewBalance - v_PreviousAmount;
-          END IF;
+          SET v_NewBalance = v_NewBalance - v_PreviousAmount;
         END IF;
       END IF;
       IF p_Error = 0 THEN
@@ -508,11 +532,11 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
           SET p_Error = 4;           -- Out of funds
         ELSE                       -- Success => Withdraw the specified amount
           UPDATE ACCOUNTS SET Balance = v_NewBalance
-              WHERE ACCOUNTS.Id = v_AccountId;
+              WHERE ACCOUNTS.Id = p_InternalAccountId;
           SET p_TransactionId = GetNextTransactionIdSP();
           INSERT INTO TRANSACTIONS(Id,
                                    TransactionTypeId, 
-                                   AccountId,
+                                   InternalAccountId,
                                    Amount,
                                    Balance,
                                    CredentialId,
@@ -521,8 +545,8 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                    PayeeReference,
                                    ReservationId)
                VALUES(p_TransactionId,
-                      p_TransactionType,
-                      v_AccountId,
+                      p_TransactionTypeId,
+                      p_InternalAccountId,
                       -p_Amount,
                       v_NewBalance,
                       p_CredentialId,
@@ -539,96 +563,46 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
   END
 //
 
-CREATE PROCEDURE InternalWithDrawSP (OUT p_Error INT,
-                                     OUT p_TransactionId INT,
-                                     IN p_PayeeAccount VARCHAR(50),
-                                     IN p_OptionalPayeeName VARCHAR(50),
-                                     IN p_OptionalPayeeReference VARCHAR(50),
-                                     IN p_TransactionType INT,
-                                     IN p_Amount DECIMAL(8,2),
-                                     IN p_AccountId INT)
-  BEGIN
-    DECLARE v_Balance DECIMAL(8,2);
-
-    SET p_Error = 0;
-    START TRANSACTION;
-    SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS
-        WHERE ACCOUNTS.Id = p_AccountId
-        LIMIT 1
-        FOR UPDATE;
-    IF v_Balance IS NULL THEN    -- Failed
-      SET p_Error = 1;             -- No such account
-    ELSE
-      IF p_Amount > v_Balance THEN
-        SET p_Error = 4;           -- Out of funds
-      ELSE                       -- Success => Withdraw the specified amount
-        UPDATE ACCOUNTS SET Balance = Balance - p_Amount
-            WHERE ACCOUNTS.Id = v_AccountId;
-        SET p_TransactionId = GetNextTransactionIdSP();
-        INSERT INTO TRANSACTIONS(Id,
-                                 TransactionTypeId, 
-                                 AccountId,
-                                 Amount,
-                                 CredentialId,
-                                 PayeeAccount,
-                                 PayeeName,
-                                 PayeeReference)
-             VALUES(p_TransactionId,
-                    p_TransactionType,
-                    p_AccountId,
-                    p_Amount,
-                    p_CredentialId,
-                    p_PayeeAccount,
-                    p_OptionalPayeeName,
-                    p_OptionalPayeeReference);
-      END IF;
-    END IF;
-    COMMIT;
-  END
-//
-
 CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
                                   OUT p_TransactionId INT,
                                   IN p_PayeeAccount VARCHAR(50),
                                   IN p_OptionalPayeeName VARCHAR(50),
                                   IN p_OptionalPayeeReference VARCHAR(50),
                                   IN p_Amount DECIMAL(8,2),
-                                  IN p_CredentialId VARCHAR(30))
+                                  IN p_AccountId VARCHAR(30))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
     DECLARE v_NewBalance DECIMAL(8,2);
     DECLARE v_PreviousAmount DECIMAL(8,2);
-    DECLARE v_AccountId INT(11);
+    DECLARE v_InternalAccountId INT;
 
     SET p_Error = 0;
     START TRANSACTION;
-    SELECT ACCOUNTS.Balance, ACCOUNTS.Id INTO v_Balance, v_AccountId FROM ACCOUNTS
-        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.AccountId
-        WHERE CREDENTIALS.Id = p_CredentialId
+    SELECT ACCOUNTS.Balance, ACCOUNTS.Id INTO v_Balance, v_InternalAccountId FROM ACCOUNTS
+        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.InternalAccountId
+        WHERE CREDENTIALS.AccountId = p_AccountId
         LIMIT 1
         FOR UPDATE;
-    IF v_AccountId IS NULL THEN    -- Failed
+    IF v_InternalAccountId IS NULL THEN    -- Failed
       SET p_Error = 1;             -- No such account
     ELSE
       SET v_NewBalance = v_Balance + p_Amount;
       UPDATE ACCOUNTS SET Balance = v_NewBalance
-          WHERE ACCOUNTS.Id = v_AccountId;
+          WHERE ACCOUNTS.Id = v_InternalAccountId;
       SET p_TransactionId = GetNextTransactionIdSP();
       INSERT INTO TRANSACTIONS(Id,
                                TransactionTypeId, 
-                               AccountId,
+                               InternalAccountId,
                                Amount,
                                Balance,
-                               CredentialId,
                                PayeeAccount,
                                PayeeName,
                                PayeeReference)
            VALUES(p_TransactionId,
                   5,
-                  v_AccountId,
+                  v_InternalAccountId,
                   p_Amount,
                   v_NewBalance,
-                  p_CredentialId,
                   p_PayeeAccount,
                   p_OptionalPayeeName,
                   p_OptionalPayeeReference);
@@ -646,42 +620,49 @@ CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, IN p_FailedTransactionId
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
     DECLARE v_Amount DECIMAL(8,2);
+    DECLARE v_PrevAmount DECIMAL(8,2);
     DECLARE v_NewBalance DECIMAL(8,2);
-    DECLARE v_AccountId INT(11);
+    DECLARE v_InternalAccountId INT;
+    DECLARE v_OptionalReservationId INT;
 
     SET p_Error = 0;
     START TRANSACTION;
     SELECT ACCOUNTS.Balance, 
            ACCOUNTS.Id,
-           TRANSACTIONS.Amount
+           TRANSACTIONS.Amount,
+           TRANSACTIONS.ReservationId
         INTO 
            v_Balance, 
-           v_AccountId,
-           v_Amount
-        FROM ACCOUNTS INNER JOIN TRANSACTIONS ON ACCOUNTS.Id = TRANSACTIONS.AccountId
+           v_InternalAccountId,
+           v_Amount,
+           v_OptionalReservationId
+        FROM ACCOUNTS INNER JOIN TRANSACTIONS ON ACCOUNTS.Id = TRANSACTIONS.InternalAccountId
         WHERE TRANSACTIONS.Id = p_FailedTransactionId
         LIMIT 1
         FOR UPDATE;
-    IF v_AccountId IS NULL THEN    -- Failed
+    IF v_InternalAccountId IS NULL THEN    -- Failed
       SET p_Error = 1;             -- No such account
     ELSE
       SET v_NewBalance = v_Balance - v_Amount;
-      UPDATE ACCOUNTS SET Balance = v_NewBalance WHERE ACCOUNTS.Id = v_AccountId;
+      IF v_OptionalReservationId IS NOT NULL THEN
+        SELECT TRANSACTIONS.Amount INTO v_PrevAmount FROM TRANSACTIONS
+            WHERE TRANSACTIONS.Id = v_OptionalReservationId;
+        SET v_NewBalance = v_NewBalance + v_PrevAmount;
+      END IF;
+      UPDATE ACCOUNTS SET Balance = v_NewBalance WHERE ACCOUNTS.Id = v_InternalAccountId;
       INSERT INTO TRANSACTIONS(Id,
                                TransactionTypeId, 
-                               AccountId,
+                               InternalAccountId,
                                Amount,
                                Balance,
-                               CredentialId,
                                PayeeAccount,
                                ReservationId)
            VALUES(GetNextTransactionIdSP(),
                   6,
-                  v_AccountId,
-                  -v_Amount,
+                  v_InternalAccountId,
+                  v_Amount,
                   v_NewBalance,
-                  "",
-                  "",
+                  "Payee100",
                   p_FailedTransactionId);
     END IF;
     COMMIT;
@@ -698,7 +679,7 @@ CREATE PROCEDURE RestoreUserAccountsSP(IN p_UserId INT)
         SET Balance = ACCOUNT_TYPES.CappedAt
         WHERE ACCOUNTS.UserId = p_UserId;
     DELETE target FROM TRANSACTIONS AS target
-        INNER JOIN ACCOUNTS ON ACCOUNTS.Id = target.AccountId
+        INNER JOIN ACCOUNTS ON ACCOUNTS.Id = target.InternalAccountId
         WHERE ACCOUNTS.UserId = p_UserId;
     SET SQL_SAFE_UPDATES = 1;
   END;
@@ -733,6 +714,43 @@ CREATE PROCEDURE RestoreAccountsSP (IN p_Unconditionally BOOLEAN)
   END
 //
 
+-- Test code only called by this script
+CREATE PROCEDURE ASSERT_TRUE (IN p_DidIt BOOLEAN, IN p_Message VARCHAR(100))
+  BEGIN
+    IF p_DidIt = FALSE THEN
+      SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = p_Message, MYSQL_ERRNO = 1001;
+    END IF;
+  END
+//
+
+-- Test code only called by this script
+CREATE PROCEDURE ASSERT_TRANSACTION(IN p_Error INT,
+                                    IN p_TransactionId INT,
+                                    IN p_OptionalReference INT,
+                                    IN p_ResultBalance DECIMAL(8,2),
+                                    IN p_TransactionTypeName VARCHAR(30))
+  BEGIN
+    CALL ASSERT_TRUE(p_Error = 0, "Transaction error");
+    SELECT TRANSACTIONS.Amount, 
+           TRANSACTIONS.Balance, 
+           TRANSACTIONS.TransactionTypeId,
+           TRANSACTIONS.ReservationId,
+           ACCOUNTS.Balance
+        INTO @tramount,
+             @trbalance, 
+             @trtypid,
+             @trreserve,
+             @acbalance FROM
+        TRANSACTIONS INNER JOIN ACCOUNTS ON TRANSACTIONS.InternalAccountId = ACCOUNTS.Id
+        WHERE TRANSACTIONS.Id = p_TransactionId;
+    CALL ASSERT_TRUE(GetTransactionTypeId(p_TransactionTypeName) = @trtypid, "Transaction type");
+    CALL ASSERT_TRUE(IFNULL(@trreserve, 0) = IFNULL(p_OptionalReference, 0), "Transaction reference");
+    CALL ASSERT_TRUE(@trbalance = p_ResultBalance, "Transaction balance");
+    CALL ASSERT_TRUE(@acbalance = p_ResultBalance, "Account balance");
+  END
+//
+
 DELIMITER ;
 
 -- Account Types:
@@ -741,25 +759,26 @@ CALL CreateAccountTypeSP("CREDIT_CARD_ACCOUNT",
                          "Credit Card Account (loan)",
                          2390.00);
 
+SET @sepaAccountBalance = 5543.00;
 CALL CreateAccountTypeSP("STANDARD_ACCOUNT",
                          "SEPA Primary Account", 
                          5543.00);
 
 CALL CreateAccountTypeSP("NEW_USER_ACCOUNT",
                          "Low Value Account for New Users", 
-                         120.00);
+                         @sepaAccountBalance);
 
 
 -- Payment Methods:
 
 CALL CreatePaymentMethodSP("https://supercard.com",     -- VISA
-                           "CREDIT_CARD('453256', @accountId, 9)");
+                           "CREDIT_CARD('453256', @accountNumber, 9)");
 
 CALL CreatePaymentMethodSP("https://bankdirect.net",    -- LCL 
-                           "FRENCH_IBAN(@accountId)");
+                           "FRENCH_IBAN(@accountNumber)");
 
 CALL CreatePaymentMethodSP("https://unusualcard.com",   -- DISCOVER
-                           "CREDIT_CARD('601103', @accountId, 9)");
+                           "CREDIT_CARD('601103', @accountNumber, 9)");
 
 
 -- Transaction Types:
@@ -779,66 +798,225 @@ CALL CreateTransactionTypeSP("TRANSACT",
 CALL CreateTransactionTypeSP("CREDIT_ACCOUNT",
                              "Money sent to the account");
 
+-- Internal (database) use only
 CALL CreateTransactionTypeSP("*FAILED*",
                              "Referenced transaction failed and was nullified");
 
--- Demo data
+-- Demo and test data
 
 CALL CreateUserSP(@userid, "Luke Skywalker");
 
-CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("CREDIT_CARD_ACCOUNT"));
+CALL CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("CREDIT_CARD_ACCOUNT"));
 
 CALL CreateDemoCredentialSP(@credentialid,
-                            @accountname,
-                            @accountid, 
+                            @accountId,
+                            @internalAccountId, 
                             "https://supercard.com",
                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
                             NULL);
-SELECT @credentialid, @accountname, @accountid;
+SELECT @credentialid, @accountId, @internalAccountId;
 
-CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("STANDARD_ACCOUNT"));
+CALL CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("STANDARD_ACCOUNT"));
 
 CALL CreateDemoCredentialSP(@credentialid,
-                            @accountname,
-                            @accountid, 
+                            @accountId,
+                            @internalAccountId, 
                             "https://bankdirect.net",
                             x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
-SELECT @credentialid, @accountname, @accountid;
+SELECT @credentialid, @accountId, @internalAccountId;
 
-CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("NEW_USER_ACCOUNT"));
+CALL CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("NEW_USER_ACCOUNT"));
 
 CALL CreateDemoCredentialSP(@credentialid,
-                            @accountname,
-                            @accountid, 
+                            @accountId,
+                            @internalAccountId, 
                             "https://unusualcard.com",
                             x'19aed933edacc289d0d63fba788cf424612d346754d110863cd043b52abecd53',
                             NULL);
-SELECT @credentialid, @accountname, @accountid;
+SELECT @credentialid, @accountId, @internalAccountId;
                             
-/*
 CALL CreateUserSP(@userid, "Chewbacca");
 
-CALL CreateAccountSP(@accountid, @userid, GetAccountTypeSP("CREDIT_CARD_ACCOUNT"));
-
-CALL CreateDemoCredentialSP(@accountid, 
-                            "6875056745552108",
-                            "https://supercard.com",  
-                            x'f3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a', 
-                            NULL);
-
-CALL CreateAccountAndCredentialSP(@credid,
+CALL CreateAccountAndCredentialSP(@accountId,
+                                  @credentialid,
                                   @userid,
-                                  GetAccountTypeSP("CREDIT_CARD_ACCOUNT"),
+                                  "CREDIT_CARD_ACCOUNT",
                                   "https://supercard.com",  
                                   x'f3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a', 
                                   NULL);
+SELECT @credentialid, @accountId;
 
-CALL CreateAccountAndCredentialSP(@credid,
+CALL CreateAccountAndCredentialSP(@accountId,
+                                  @credentialid,
                                   @userid,
-                                  GetAccountTypeSP("STANDARD_ACCOUNT"),
+                                  "STANDARD_ACCOUNT",
                                   "https://bankdirect.net",
                                   x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
                                   x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
-*/
-                                                        
+SELECT @credentialid, @accountId;
+
+CALL AuthenticatePayReqSP(@error,
+                          @userName,
+                          @internalAccountId,
+                          @credentialId + 1,
+                          "FR7630002111110020050012733",
+                          GetPaymentMethodId("https://bankdirect.net"),
+                          x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd');
+CALL ASSERT_TRUE(@error = 1, "Auth");
+
+CALL AuthenticatePayReqSP(@error,
+                          @userName,
+                          @internalAccountId,
+                          @credentialId,
+                          "FR7630002111110020050012734",
+                          GetPaymentMethodId("https://bankdirect.net"),
+                          x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd');
+CALL ASSERT_TRUE(@error = 2, "Auth");
+
+CALL AuthenticatePayReqSP(@error,
+                          @userName,
+                          @internalAccountId,
+                          @credentialId,
+                          "FR7630002111110020050012733",
+                          GetPaymentMethodId("https://bankdirect.net"),
+                          x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cade');
+CALL ASSERT_TRUE(@error = 3, "Auth");
+
+CALL AuthenticatePayReqSP(@error,
+                          @userName,
+                          @internalAccountId,
+                          @credentialId,
+                          "FR7630002111110020050012733",
+                          GetPaymentMethodId("https://supercard.com"),
+                          x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd');
+CALL ASSERT_TRUE(@error = 4, "Auth");
+
+CALL AuthenticatePayReqSP(@error,
+                          @userName,
+                          @internalAccountId,
+                          @credentialId,
+                          "FR7630002111110020050012733",
+                          GetPaymentMethodId("https://bankdirect.net"),
+                          x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd');
+CALL ASSERT_TRUE(@error = 0, "Auth");
+CALL ASSERT_TRUE(@userName = "Chewbacca", "UserName");
+CALL ASSERT_TRUE(@internalAccountId = 200500127, "Internal account id");
+
+CALL AuthenticateBalReqSP(@error,
+                          @balance,
+                          @credentialId,
+                          x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
+CALL ASSERT_TRUE(@error = 0, "Auth balance");
+CALL ASSERT_TRUE(@balance = @sepaAccountBalance, "Check balance"); 
+
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("DIRECT_DEBIT"),
+                        NULL,
+                        @sepaAccountBalance + 1.00,
+                        @credentialId,
+                        @internalAccountId);
+CALL ASSERT_TRUE(@error = 4, "No funds");
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("TRANSACT"),
+                        555555555,
+                        100.25,
+                        @credentialId,
+                        @internalAccountId);
+CALL ASSERT_TRUE(@error = 5, "No reservation found");
+
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("DIRECT_DEBIT"),
+                        NULL,
+                        100.25,
+                        @credentialId,
+                        @internalAccountId);
+CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance - 100.25, "DIRECT_DEBIT");
+
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("RESERVE"),
+                        NULL,
+                        200.00,
+                        @credentialId,
+                        @internalAccountId);
+CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance - 300.25, "RESERVE");
+
+SET @reftrans = @transactionId;
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("TRANSACT"),
+                        @reftrans,
+                        100.00,
+                        @credentialId,
+                        @internalAccountId);
+CALL ASSERT_TRANSACTION(@error, @transactionId, @reftrans, @sepaAccountBalance - 200.25, "TRANSACT");
+
+CALL CreditAccountSP(@error,
+                     @transactionId,
+                     "Payee100",
+                     "Demo Merchant",
+                     "#1064",
+                     200.25,
+                     @accountId);
+CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance, "CREDIT_ACCOUNT");
+
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("DIRECT_DEBIT"),
+                        NULL,
+                        500.00,
+                        @credentialId,
+                        @internalAccountId);
+CALL NullifyTransactionSP(@error, @transactionId);
+CALL ASSERT_TRANSACTION(@error, @transactionId + 1, @transactionId, @sepaAccountBalance, "*FAILED*");
+
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("RESERVE"),
+                        NULL,
+                        200.00,
+                        @credentialId,
+                        @internalAccountId);
+CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance - 200.00, "RESERVE");
+
+SET @reftrans = @transactionId;
+CALL ExternalWithDrawSP(@error,
+                        @transactionId,
+                        "Payee100",
+                        "Demo Merchant",
+                        "#1064",
+                        GetTransactionTypeId("TRANSACT"),
+                        @reftrans,
+                        100.00,
+                        @credentialId,
+                        @internalAccountId);
+CALL ASSERT_TRANSACTION(@error, @transactionId, @reftrans, @sepaAccountBalance - 100.00, "TRANSACT");
+
+CALL NullifyTransactionSP(@error, @transactionId);
+SELECT * from TRANSACTIONS;
+CALL ASSERT_TRANSACTION(@error, @transactionId + 1, @transactionId, @sepaAccountBalance - 200.00, "*FAILED*");
