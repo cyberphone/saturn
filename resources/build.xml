@@ -79,10 +79,6 @@
           <pathelement location="${temp.dir}"/>
         </classpath>
         <arg value="${testpage}"/>
-        <arg value="${@merchantkey}.p12"/>
-        <arg value="${@keypassword}"/>
-        <arg value="${@merchantcn}"/>
-        <arg value="${@merchantid}"/>
         <arg value="${@w2nb.webwallet}"/>
     </java>
   </target>
@@ -297,6 +293,7 @@
         <arg value="${client.key.core}"/>
         <arg value="${kg2.pin}"/>
         <arg value="${card.type}"/>
+        <arg value="${card.credential}"/>
         <arg value="${card.number}"/>
         <arg value="${card.balance}"/>
         <arg value="${bank.host}/${bankpath}/authority"/>
@@ -324,7 +321,8 @@
        <param name="client.key.core" value="${@clientkey_super}"/>
        <param name="kg2.pin" value="@"/>
        <param name="card.type" value="SUPER_CARD"/>
-       <param name="card.number" value="${@account_id_super}"/>
+       <param name="card.credential" value="100000000"/>
+       <param name="card.number" value="4532562005001233"/>
        <param name="card.balance" value="2390.00"/>
        <param name="card.image" value="supercard.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>
@@ -336,7 +334,8 @@
        <param name="client.key.core" value="${@clientkey_bankdir}"/>
        <param name="kg2.pin" value="@"/>
        <param name="card.type" value="BANK_DIRECT"/>
-       <param name="card.number" value="${@account_id_bankdir}"/>
+       <param name="card.credential" value="100000001"/>
+       <param name="card.number" value="FR7630002111110020050012442"/>
        <param name="card.balance" value="5543.00"/>
        <param name="card.image" value="bankdirect.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>
@@ -348,7 +347,8 @@
        <param name="client.key.core" value="${@clientkey_unusual}"/>
        <param name="kg2.pin" value="Money-77"/>
        <param name="card.type" value="UNUSUAL_CARD"/>
-       <param name="card.number" value="${@account_id_unusual}"/>
+       <param name="card.credential" value="100000002"/>
+       <param name="card.number" value="6011032005001257"/>
        <param name="card.balance" value="120.00"/>
        <param name="card.image" value="unusualcard.png"/>
        <param name="bankpath" value="${@payeebankpath}"/>

@@ -21,7 +21,6 @@ import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-import java.security.PublicKey;
 
 import java.util.LinkedHashMap;
 import java.util.Vector;
@@ -36,23 +35,17 @@ import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
-import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecoderCache;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
-import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
-import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
 
@@ -105,12 +98,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String SEPA_ACCOUNT                 = "sepa-account.json";
 
-    static final String USER_AUTHZ_SAMPLE            = "user-authorization.json";
-
-    static final String USER_CHALL_AUTHZ_SAMPLE      = "user-challenged-authorization.json";
-
-    static final String PROV_USER_RESPONSE_SAMPLE    = "provider-user-response.json";
-
     static final String VERSION_CHECK                = "android_webpki_versions";
 
     static final String BOUNCYCASTLE_FIRST           = "bouncycastle_first";
@@ -140,17 +127,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     // Web2Native Bridge constants
     static String w2nbWalletName;
     
-    // Debug mode samples
-    static JSONObjectReader userAuthzSample;
-
-    static JSONObjectReader userChallAuthzSample;
-
-    static EncryptedMessage encryptedMessageSample;
-
-    static JSONObjectReader providerUserResponseSample;
-
-    static JSONObjectWriter protectedAccountData;
-
+    // Merchant account data
     static AuthorizationRequest.PaymentBackendMethodEncoder sepaVerifiableAccount;
 
     static AuthorizationRequest.PaymentBackendMethodEncoder sepaPlainAccount;
@@ -214,6 +191,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         paymentNetworks.put(paymentMethodUrl, paymentNetwork);
     }
 
+
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
     }
@@ -273,19 +251,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                 noMatchingMethodsUrl = noMatching;
             }
             
-            new AuthorizationData(userAuthzSample = readJSONFile(USER_AUTHZ_SAMPLE));
-
-            new AuthorizationData(userChallAuthzSample = readJSONFile(USER_CHALL_AUTHZ_SAMPLE));
-
-            new ProviderUserResponse(providerUserResponseSample = readJSONFile(PROV_USER_RESPONSE_SAMPLE));
-            
-            encryptedMessageSample = new EncryptedMessage(JSONParser.parse(
-                providerUserResponseSample.getObject(BaseProperties.ENCRYPTED_MESSAGE_JSON)
-                    .getEncryptionObject(new JSONCryptoHelper.Options())
-                        .getDecryptedData(
-                    userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
-                        .getBinary(BaseProperties.KEY_JSON))));
-
             if (getPropertyString(TEST_MODE).length () > 0) {
                 testMode = getPropertyBoolean(TEST_MODE);
             }

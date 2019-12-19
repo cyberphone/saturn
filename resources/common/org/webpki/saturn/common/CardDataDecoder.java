@@ -44,7 +44,7 @@ public class CardDataDecoder {
     static final String ACCOUNT_STATUS_KEY_HASH = "accountStatusKeyHash";
     static final String TEMPORARY_BALANCE_FIX   = "temp.bal.fix";
     
-    public CardDataDecoder(byte[] cardDataBlob, String expectedVersion) throws IOException {
+    public CardDataDecoder(String expectedVersion, byte[] cardDataBlob) throws IOException {
         JSONObjectReader rd = JSONParser.parse(cardDataBlob);
         version = rd.getString(VERSION_JSON);
         if (version.equals(expectedVersion)) {

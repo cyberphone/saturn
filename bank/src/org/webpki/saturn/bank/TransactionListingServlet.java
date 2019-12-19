@@ -48,30 +48,31 @@ public class TransactionListingServlet extends HttpServlet {
             "LASTTRANS.Amount AS `Amount`, " +
             "LASTTRANS.Balance AS `Balance`, " +
             "ACCOUNTS.Id AS `Account`, " +
-            "LASTTRANS.CredentialId AS `Ext Account Id`, " +
+            "IFNULL((SELECT AccountId FROM CREDENTIALS WHERE " +
+               "CREDENTIALS.Id = LASTTRANS.CredentialId),'') AS `Ext Account Id`, " +
             "USERS.Name As `Account Holder`, " +
             "LASTTRANS.PayeeAccount AS `Payee Account`, " +
             "COALESCE(LASTTRANS.PayeeName,'') AS `Payee Name`, " +
             "COALESCE(LASTTRANS.PayeeReference,'') AS `Payee Ref`, " +
             "LASTTRANS.TId AS `Trans Id`, " +
             "COALESCE(LASTTRANS.ReservationId,'') AS `Res Id`, " +
-            "TRANSACTION_TYPES.SymbolicName AS `Type` " +
+            "TRANSACTION_TYPES.Name AS `Type` " +
             "FROM (SELECT MAX(Id) AS TId, " +
                     "Created, " + 
                     "Amount, " +
-                    "TransactionType, " +
+                    "TransactionTypeId, " +
                     "Balance, " +
                     "PayeeAccount, " +
                     "PayeeName, " +
                     "PayeeReference, " +
-                    "AccountId, " +
+                    "InternalAccountId, " +
                     "ReservationId, " +
                     "CredentialId FROM TRANSACTIONS " +
                 "GROUP BY Id DESC LIMIT " + MAX_ROWS + ") AS LASTTRANS  " +
             "INNER JOIN ACCOUNTS ON " +
-            "LASTTRANS.AccountId = ACCOUNTS.Id " +
+            "LASTTRANS.InternalAccountId = ACCOUNTS.Id " +
             "INNER JOIN TRANSACTION_TYPES ON " +
-            "LASTTRANS.TransactionType = TRANSACTION_TYPES.Id " +
+            "LASTTRANS.TransactionTypeId = TRANSACTION_TYPES.Id " +
             "INNER JOIN USERS ON " +
             "ACCOUNTS.UserId = USERS.Id " +
             "ORDER BY LASTTRANS.TId DESC";

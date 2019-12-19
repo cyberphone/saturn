@@ -16,9 +16,32 @@
  */
 package org.webpki.saturn.merchant;
 
+import java.io.IOException;
 import java.io.Serializable;
 
+import java.math.BigDecimal;
+
+import java.security.KeyPair;
+
+import org.webpki.json.DataEncryptionAlgorithms;
+import org.webpki.json.JSONAsymKeySigner;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONParser;
+
+import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.Currencies;
+import org.webpki.saturn.common.EncryptedMessage;
+import org.webpki.saturn.common.PaymentMethods;
+import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.UserChallengeItem;
+import org.webpki.saturn.common.UserResponseItem;
+
+import org.webpki.util.ArrayUtil;
+import org.webpki.util.ISODateTime;
 
 public class DebugData implements Serializable {
 
@@ -68,4 +91,91 @@ public class DebugData implements Serializable {
     public JSONObjectReader refundRequest;
 
     public JSONObjectReader refundResponse;
+    
+    // Debug mode samples
+    static JSONObjectReader userAuthzSample;
+
+    static JSONObjectReader userChallAuthzSample;
+
+    static EncryptedMessage encryptedMessageSample;
+
+    static JSONObjectReader providerUserResponseSample;
+    
+    static KeyPair keyPair;
+    
+    static UserResponseItem[] userResponseItems;
+    
+    static final byte[] WALLET_SESSION_ENCRYPTION_KEY = 
+        { (byte) 0xF4, (byte) 0xC7, (byte) 0x4F, (byte) 0x33,
+          (byte) 0x98, (byte) 0xC4, (byte) 0x9C, (byte) 0xF4,
+          (byte) 0x6D, (byte) 0x93, (byte) 0xEC, (byte) 0x98,
+          (byte) 0x18, (byte) 0x83, (byte) 0x26, (byte) 0x61,
+          (byte) 0xA4, (byte) 0x0B, (byte) 0xAE, (byte) 0x4D,
+          (byte) 0x20, (byte) 0x4D, (byte) 0x75, (byte) 0x50,
+          (byte) 0x36, (byte) 0x14, (byte) 0x10, (byte) 0x20,
+          (byte) 0x74, (byte) 0x34, (byte) 0x69, (byte) 0x09 };
+    
+    static JSONObjectReader createUserAuthorizationSample() throws IOException {
+        JSONObjectWriter paymentRequest = 
+            PaymentRequest.encode("Demo Merchant",
+                                  "https://demomerchant.com",
+                                  new BigDecimal("100.00"),
+                                  Currencies.EUR,
+                                  null,
+                                  "#100006878", 
+                                  ISODateTime.parseDateTime("2019-12-20T10:45:08Z",
+                                                            ISODateTime.COMPLETE),
+                                  ISODateTime.parseDateTime("2019-12-20T11:15:08Z", 
+                                                            ISODateTime.COMPLETE));
+        return new JSONObjectReader(AuthorizationData.encode(
+                                 new PaymentRequest(new JSONObjectReader(paymentRequest)), 
+                                 "demomerchant.com", 
+                                 PaymentMethods.BANK_DIRECT.getPaymentMethodUrl(),
+                                 "54674448", 
+                                 "FR7630002111110020050012733", 
+                                 WALLET_SESSION_ENCRYPTION_KEY, 
+                                 DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
+                                 userResponseItems,
+                                 ISODateTime.parseDateTime("2019-12-20T10:46:17Z",
+                                                           ISODateTime.COMPLETE),
+                                 new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));
+    }
+
+    static {
+        try {
+            keyPair = JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(
+                    DebugData.class.getResourceAsStream("sampleauthorizationkey.jwk"))).getKeyPair();
+            userAuthzSample = createUserAuthorizationSample();
+            
+            userResponseItems = new UserResponseItem[]{new UserResponseItem("mother", "garbo")};
+            
+            userChallAuthzSample = createUserAuthorizationSample();
+            
+            AuthorizationData authorizationData = new AuthorizationData(userAuthzSample);
+            
+            providerUserResponseSample = new JSONObjectReader(ProviderUserResponse.encode(
+                    "My Bank",
+                    "Transaction requests exceeding " +
+                      "<span style=\"font-weight:bold;white-space:nowrap\">€&#x2009;1,000</span>" +
+                      " require additional user authentication to " +
+                      "be performed. Please enter your " +
+                      "<span style=\"color:blue\">mother's maiden name</span>.",
+                    new UserChallengeItem[] {
+                        new UserChallengeItem("mother",
+                                              UserChallengeItem.TYPE.ALPHANUMERIC,
+                                              20,
+                                              null)},
+                    authorizationData.getDataEncryptionKey(),
+                    authorizationData.getDataEncryptionAlgorithm()));
+
+            encryptedMessageSample = new EncryptedMessage(JSONParser.parse(
+                providerUserResponseSample.getObject(BaseProperties.ENCRYPTED_MESSAGE_JSON)
+                    .getEncryptionObject(new JSONCryptoHelper.Options())
+                        .getDecryptedData(
+                    userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
+                        .getBinary(BaseProperties.KEY_JSON))));            
+        } catch (Exception e) {
+            new RuntimeException(e);
+        }
+    }
 }

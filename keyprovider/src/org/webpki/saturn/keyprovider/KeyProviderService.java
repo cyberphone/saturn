@@ -30,8 +30,6 @@ import java.security.cert.X509Certificate;
 
 import java.security.spec.ECGenParameterSpec;
 
-import java.sql.Connection;
-
 import java.util.Vector;
 
 import java.util.logging.Level;
@@ -104,7 +102,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     class CredentialTemplate {
 
         AsymSignatureAlgorithms signatureAlgorithm;
-        AccountTypes accountType;
+        String accountType;
         KeyAlgorithms keyAlgorithm;
         String paymentMethod;
         boolean cardFormatted;
@@ -122,7 +120,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             signatureAlgorithm =
                     AsymSignatureAlgorithms.getAlgorithmFromId(rd.getString("signatureAlgorithm"),
                                                                AlgorithmPreferences.JOSE);
-            accountType = AccountTypes.valueOf(rd.getString("accountType"));
+            accountType = rd.getString("accountType");
             keyAlgorithm = 
                     KeyAlgorithms.getKeyAlgorithmFromId(rd.getString("signatureKeyAlgorithm"), 
                                                         AlgorithmPreferences.JOSE);
@@ -174,11 +172,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     String getResourceAsString(String propertyName) throws IOException {
         return new String(ArrayUtil.getByteArrayFromInputStream(getResource(getPropertyString(propertyName))),
                           "UTF-8");
-    }
-
-    void initDataBaseEnums(Connection connection) throws Exception {
-        AccountTypes.init(connection);
-        connection.close();
     }
 
     @Override
@@ -264,8 +257,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
             jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
-
-            initDataBaseEnums(jdbcDataSource.getConnection());
 
             logger.info("Saturn KeyProvider-server initiated: " + serverCertificate.getSubjectX500Principal().getName());
         } catch (Exception e) {

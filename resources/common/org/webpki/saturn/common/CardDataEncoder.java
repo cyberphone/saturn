@@ -36,8 +36,8 @@ import org.webpki.json.JSONObjectWriter;
 public class CardDataEncoder {
      
     public static JSONObjectWriter encode(String paymentMethod,
-                                          String accountId,
                                           String credentialId,
+                                          String accountId,
                                           String authorityUrl,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,

@@ -45,7 +45,6 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.KeyStoreEnumerator;
-import org.webpki.saturn.common.Payee;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ServerX509Signer;
 
@@ -127,18 +126,18 @@ public class JCSPaper implements BaseProperties {
            "<ul><li>&quot;Freezing&quot; the data and put it in a specific signature container. " + 
            RFC7515() + " (JSON Web Signature) represents such a specification.</li>" +
            "<li>Canonicalize the data and add a signature to it.</li></ul>" +
-           "This document briefly outlines an example of the latter called " + JCS() + " (JSON Cleartext Signature). " +
-           "<p>Due to the fact that there is currently no generally accepted canonicalization method for JSON, JCS builds on " +
+           "This document briefly outlines an example of the latter called " + JSF() + " (JSON Signature Format). " +
+           "<p>Due to the fact that there is currently no generally accepted canonicalization method for JSON, JSF builds on " +
            "a much simpler concept (&quot;Predictable Serialization&quot;) " +
            "which did not become fully practical until " + ECMASCRIPT() + " V6 was launched. " +
            "ECMAScript in short says that JSON (and JavaScript) property order <i>must " +
            "be respected</i> during parsing and serialization which eliminates canonicalization entirely " +
            "and enables the creation of &quot;Crypto&nbsp;Safe&quot; JSON objects that can travel securely " +
            "through different systems without getting corrupted.</p>" +
-           "<p>There is also a JSON encryption scheme, " + JEF() + " (JSON Encryption Format), using the same syntax as JCS.</p>" +
+           "<p>There is also a JSON encryption scheme, " + JEF() + " (JSON Encryption Format), using the same syntax as JSF.</p>" +
            "</div><div class=\"header\">Background<br></div>" +
            "<div class=\"text\">" +
-           "Although JCS is not tied to any specific application, it grew from the needs of the " +
+           "Although JSF is not tied to any specific application, it grew from the needs of the " +
            "payment industry where &quot;Stacked&quot; signed messages begin to play an important role. " +
            "Below is a (fictitious) example of such a scheme, where one message embeds another (inner) message:" +
            "</div><div class=\"text\" style=\"text-align:center\">" +
@@ -150,17 +149,19 @@ public class JCSPaper implements BaseProperties {
                 "<tr><td style=\"" + STYLE_KEY + "\">X.509 Certificate Path</td></tr>" +
                 "<tr><td style=\"" + STYLE_SIGNATURE + "\">Signature</td></tr>" +
            "</table></div><div class=\"text\">" +
-           "This scheme could be expressed in JCS like the following (note that the <code>@context</code> and <code>@qualifier</code> properties " +
-           "<i>are not a part of JCS</i>, but serve as a possible way to assign a type to a JSON object):" +
+           "This scheme could be expressed in JSF like the following (note that the <code>@context</code> and <code>@qualifier</code> properties " +
+           "<i>are not a part of JSF</i>, but serve as a possible way to assign a type to a JSON object):" +
            "</div><div class=\"json\">");
         JSONObjectWriter paymentRequest = new JSONObjectWriter();
         paymentRequest.setString(JSONDecoderCache.CONTEXT_JSON, CONTEXT);
         paymentRequest.setString(JSONDecoderCache.QUALIFIER_JSON, PAYMENT_REQUEST);
-        paymentRequest.setObject(PAYEE_JSON, new Payee("Demo Merchant", "1209000").writeObject());
+        paymentRequest.setObject(PAYEE_JSON, new JSONObjectWriter()
+            .setString(COMMON_NAME_JSON, "Demo Merchant")
+            .setString(HOME_PAGE_JSON, "https://demomerchant.com"));
         paymentRequest.setString(AMOUNT_JSON, "235.50");
         paymentRequest.setString(CURRENCY_JSON, "USD");
         paymentRequest.setString(REFERENCE_ID_JSON, "05630753");
-        paymentRequest.setString(TIME_STAMP_JSON, "2016-08-05T10:07:00Z");
+        paymentRequest.setString(TIME_STAMP_JSON, "2019-08-05T10:07:00Z");
         JSONObjectWriter josePaymentRequest = new JSONObjectWriter(JSONParser.parse(paymentRequest.toString()));
         paymentRequest.setSignature(paymentRequestSigner);
         JSONObjectReader joseHeader = JSONParser.parse(paymentRequest.toString())
@@ -189,10 +190,10 @@ public class JCSPaper implements BaseProperties {
         write(writer.serializeToBytes(JSONOutputFormats.PRETTY_HTML));
         write("</div><div class=\"text\">" +
               "The example above would if converted to " + RFC7515() + " be slightly more convoluted " +
-               "since data must be Base64-encoded (which was a core rationale for developing JCS). " +
+               "since data must be Base64-encoded (which was a core rationale for developing JSF). " +
               "Some protocols using " + RFC7515() +
               " even add an <i>extra outer object and property</i> to make the message type readable. This is " +
-              "unessesary using JCS because it only manifests itself as a property " +
+              "unessesary using JSF because it only manifests itself as a property " +
               "among other properties in a message. " +
               "Anyway, here is the sample message using " +  RFC7515() + " notation:" +
               "</div><div class=\"json\">");
@@ -209,12 +210,12 @@ public class JCSPaper implements BaseProperties {
         checkJws (verifier);
         checkJws(JSONParser.parse(verifier.getBinary(JOSE_PAYLOAD)).getObject(PAYMENT_REQUEST_JSON));
         write(joseWriter.serializeToBytes(JSONOutputFormats.PRETTY_HTML));
-        System.out.println("JCS=" + writer.serializeToBytes(JSONOutputFormats.NORMALIZED).length +
+        System.out.println("JSF=" + writer.serializeToBytes(JSONOutputFormats.NORMALIZED).length +
                            " JWS=" + joseWriter.serializeToBytes(JSONOutputFormats.NORMALIZED).length);
         write("</div><div id=\"jsmode\" class=\"header\" style=\"margin-top:20pt\">JavaScript Usage<br></div>" +
            "<div class=\"text\">"+
-              "Since " + JCS() + " is compatible with " + ECMASCRIPT() + " (JavaScript), you can also use " +
-               " JCS signatures in browsers. The following shows how the <code>" + PAYMENT_REQUEST +
+              "Since " + JSF() + " is compatible with " + ECMASCRIPT() + " (JavaScript), you can also use " +
+               " JSF signatures in browsers. The following shows how the <code>" + PAYMENT_REQUEST +
                "</code> message could be featured inside of an HTML5 document:" +
         
              "</div><div class=\"json\">");
@@ -229,9 +230,9 @@ public class JCSPaper implements BaseProperties {
               "<div class=\"text\" style=\"margin-bottom:15pt\">"+
                    "Although just an example, " + YASMIN() +
                    " represents a workable way for using" +
-                    " JCS signatures in Web applications." +
+                    " JSF signatures in Web applications." +
               "</div>" +
-              "V0.91, A.Rundgren, 2017-07-08" +
+              "V0.92, A.Rundgren, 2019-12-20" +
               "</body></html>");
         fos.close();
     }
@@ -252,8 +253,8 @@ public class JCSPaper implements BaseProperties {
          return link("ECMAScript", "http://www.ecma-international.org/ecma-262/6.0/ECMA-262.pdf");
     }
 
-    static String JCS() {
-        return link("JCS", "https://cyberphone.github.io/doc/security/jcs.html");
+    static String JSF() {
+        return link("JSF", "https://cyberphone.github.io/doc/security/jsf.html");
     }
 
     static String JEF() {

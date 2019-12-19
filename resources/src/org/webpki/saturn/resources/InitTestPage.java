@@ -19,25 +19,20 @@
 
 package org.webpki.saturn.resources;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-
 import java.io.IOException;
 
 import java.math.BigDecimal;
 
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
-
 import java.security.interfaces.RSAPublicKey;
 
 import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CustomCryptoProvider;
-
 import org.webpki.crypto.DeterministicSignatureWrapper;
 
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
@@ -111,29 +106,26 @@ public class InitTestPage implements BaseProperties {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 6) {
+        if (args.length != 2) {
             System.out.println("\nUsage: " +
                                InitTestPage.class.getCanonicalName() +
-                               "testpage merchantCertFile certFilePassword merchantCn merchantId w2nbName");
+                               "testpage w2nbName");
             System.exit(-3);
         }
         CustomCryptoProvider.forcedLoad(true);
         
         fos = new FileOutputStream(args[0]);
-        
-        // Read key/certificate to be imported and create signer
-        BotchedAsymKeySigner signer = new BotchedAsymKeySigner(new KeyStoreEnumerator (new FileInputStream(args[1]), args[2]));
 
-        // Create signed payment request
-        JSONObjectWriter standardRequest = 
-            PaymentRequest.encode(new Payee(args[3], args[4]),
+        // Create payment request
+        JSONObjectWriter paymentRequest = 
+            PaymentRequest.encode("Demo Merchant",
+                                  "https://demomerchant.com",
                                   new BigDecimal("306.25"),
                                   Currencies.USD,
                                   null,
                                   "#6100004",
                                   ISODateTime.parseDateTime("2016-12-27T09:45:23Z", ISODateTime.UTC_NO_SUBSECONDS),
-                                  ISODateTime.parseDateTime("2030-09-14T00:00:00Z", ISODateTime.UTC_NO_SUBSECONDS),
-                                  signer);
+                                  ISODateTime.parseDateTime("2030-09-14T00:00:00Z", ISODateTime.UTC_NO_SUBSECONDS));
         // Header
         write("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Payment Agent (Wallet) Tester</title>"
               + "</head>\n<body onload=\"getTargetDimensions()\"><script>\n\n" +
@@ -160,19 +152,20 @@ public class InitTestPage implements BaseProperties {
               "var normalRequest = ");
 
         // The payment request is wrapped in an unsigned wallet invocation message
+        // Create a payment request
+        
         write(Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage()
-            .setArray(PAYMENT_NETWORKS_JSON, new JSONArrayWriter().setObject(new JSONObjectWriter()
                 .setStringArray(PAYMENT_METHODS_JSON,
                                 new String[]{"https://nosuchcard.com",
                                     PaymentMethods.SUPER_CARD.getPaymentMethodUrl(),
                                     PaymentMethods.BANK_DIRECT.getPaymentMethodUrl()})
-                .setObject(PAYMENT_REQUEST_JSON, standardRequest))));
+                .setObject(PAYMENT_REQUEST_JSON, paymentRequest));
 
         // The normal request is cloned and modified for testing error handling
         write(";\n\n" +
               "// All our cards/accounts should match during the discovery phase...\n" +
               "var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-              "scrollMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"");
+              "scrollMatchingRequest."  + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"");
         for (PaymentMethods paymentMethod : PaymentMethods.values()) {
             write(", \"");
             write(paymentMethod.getPaymentMethodUrl());
@@ -182,11 +175,11 @@ public class InitTestPage implements BaseProperties {
         write("];\n\n" +
                 "// No card/account should match during the discovery phase...\n" +
                 "var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-                "nonMatchingRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"];\n\n");
+                "nonMatchingRequest." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"];\n\n");
 
         write("// Note the modified \"" + PAYEE_JSON + "\" property...\n" +
               "var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-              "badSignatureRequest." + PAYMENT_NETWORKS_JSON + "[0]." + PAYMENT_REQUEST_JSON + "." +  PAYEE_JSON + "." + COMMON_NAME_JSON + "= \"DEmo Merchant\";\n\n");
+              "badSignatureRequest." + PAYMENT_REQUEST_JSON + "." +  PAYEE_JSON + "." + COMMON_NAME_JSON + "= \"DEmo Merchant\";\n\n");
 
         write("var badMessageRequest = {\"hi\":\"there!\"};\n\n" +
 
@@ -215,7 +208,7 @@ public class InitTestPage implements BaseProperties {
               "    return;\n" +
               "  }\n" +
               "  navigator.nativeConnect(\"");
-        write(args[5]);
+        write(args[1]);
         write("\",\n" +
               "                          document.getElementById(\"positionWallet\").checked ?\n" +
               "                            ");

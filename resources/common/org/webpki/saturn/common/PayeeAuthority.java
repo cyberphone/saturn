@@ -40,7 +40,7 @@ public class PayeeAuthority implements BaseProperties {
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setSignature(ATTESTATION_JSON, attestSigner);
+            .setSignature(ATTESTATION_SIGNATURE_JSON, attestSigner);
     }
 
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
@@ -55,7 +55,7 @@ public class PayeeAuthority implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         expiresInMillis = expires.getTimeInMillis();
-        attestationKey = rd.getSignature(ATTESTATION_JSON, new JSONCryptoHelper.Options()).getPublicKey();
+        attestationKey = rd.getSignature(ATTESTATION_SIGNATURE_JSON, new JSONCryptoHelper.Options()).getPublicKey();
         rd.checkForUnread();
     }
 

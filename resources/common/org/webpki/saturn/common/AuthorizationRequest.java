@@ -97,7 +97,7 @@ public class AuthorizationRequest implements BaseProperties {
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
+        signatureDecoder = rd.getSignature(REQUEST_SIGNATURE_JSON, new JSONCryptoHelper.Options());
         rd.checkForUnread();
     }
 
@@ -182,7 +182,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, PaymentRequest.SOFTWARE_VERSION))
-            .setSignature(signer);
+            .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 
     public AuthorizationData getDecryptedAuthorizationData(

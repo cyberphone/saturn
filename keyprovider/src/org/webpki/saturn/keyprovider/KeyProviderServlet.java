@@ -127,8 +127,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
            throws IOException, ServletException {
-logger.info("POST session=" + request.getSession(false).getId());
-       executeRequest(request, response, false);
+        executeRequest(request, response, false);
     }
 
     void executeRequest(HttpServletRequest request, HttpServletResponse response, boolean init)
@@ -292,11 +291,11 @@ logger.info("POST session=" + request.getSession(false).getId());
                                 (KeyProviderService.CredentialTemplate)key.getUserObject();
 
                         // 1. Create an account and get an ID for accessing it
-                        String credentialId = // A credentialId uniquely points to an account 
+                        DataBaseOperations.AccountAndCredential accountAndCredential = 
                                 DataBaseOperations
                                     .createAccountAndCredential(userId, 
                                                                 credentialTemplate
-                                                                    .accountType.getIntValue(),
+                                                                    .accountType,
                                                                 credentialTemplate.paymentMethod,
                                                                 key.getPublicKey(),
                                                                 null);
@@ -304,14 +303,14 @@ logger.info("POST session=" + request.getSession(false).getId());
                         // 2. Create a "carrier" certificate for the signature key (SKS need that)
                         CertSpec certSpec = new CertSpec();
                         certSpec.setKeyUsageBit(KeyUsageBits.DIGITAL_SIGNATURE);
-                        certSpec.setSubject("CN=" + userName + ", serialNumber=" + credentialId);
+                        certSpec.setSubject("CN=" + userName + ", serialNumber=" + accountAndCredential.accountId);
                         Hashtable<String,String> issuer = new Hashtable<String,String>();
                         issuer.put("CN", "Saturn SKS Carrier Certificate");
                         long startTime = System.currentTimeMillis();
                         key.setCertificatePath(new X509Certificate[]{new CA().createCert(
                             certSpec,
                             new DistinguishedName(issuer),
-                            BigInteger.ONE,
+                            new BigInteger(accountAndCredential.credentialId),
                             new Date(startTime),
                             new Date(startTime + (20 * 365 * 24 * 3600 * 1000l)),
                             AsymSignatureAlgorithms.ECDSA_SHA256,
@@ -346,7 +345,8 @@ logger.info("POST session=" + request.getSession(false).getId());
                         key.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                             CardDataEncoder.encode(
                                     credentialTemplate.paymentMethod,
-                                    credentialId, 
+                                    accountAndCredential.credentialId,
+                                    accountAndCredential.accountId,
                                     credentialTemplate.authorityUrl, 
                                     credentialTemplate.signatureAlgorithm, 
                                     credentialTemplate.dataEncryptionAlgorithm, 
@@ -379,9 +379,9 @@ logger.info("POST session=" + request.getSession(false).getId());
                                 return cardImage
                                     .replace(CardImageData.STANDARD_NAME, cardUserName)
                                     .replace(CardImageData.STANDARD_ACCOUNT, credentialTemplate.cardFormatted ?
-                                        AuthorizationData.formatCardNumber(credentialId) 
+                                        AuthorizationData.formatCardNumber(accountAndCredential.accountId) 
                                                         :
-                                        credentialId).getBytes("utf-8");
+                                            accountAndCredential.accountId).getBytes("utf-8");
                             }
 
                             @Override
@@ -436,7 +436,6 @@ logger.info("POST session=" + request.getSession(false).getId());
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
            throws IOException, ServletException {
-logger.info("GET session=" + request.getSession(false).getId() + " Q=" + request.getQueryString());
        if (request.getParameter(KeyProviderInitServlet.INIT_TAG) != null) {
             executeRequest(request, response, true);
             return;
@@ -468,5 +467,4 @@ logger.info("GET session=" + request.getSession(false).getId() + " Q=" + request
                                  null,
                                  html.append("</div>").toString()));
     }
-
 }

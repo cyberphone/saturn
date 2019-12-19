@@ -31,59 +31,69 @@ import org.webpki.crypto.HashAlgorithms;
 
 public class DataBaseOperations {
 
-    static Logger logger = Logger.getLogger(KeyProviderService.class.getCanonicalName());
+    static Logger logger = Logger.getLogger(DataBaseOperations.class.getCanonicalName());
     
-    public static int createUser(String userName) throws SQLException {
+    static int createUser(String userName) throws SQLException {
         try {
 /*
-            CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
-                                           IN p_Name VARCHAR(50))
+        CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
+                                       IN p_UserName VARCHAR(50))
+          BEGIN
+            INSERT INTO USERS(Name) VALUES(p_UserName);
+            SET p_UserId = LAST_INSERT_ID();
+          END
 */
-            int userId;
             try (Connection connection = KeyProviderService.jdbcDataSource.getConnection();
                  CallableStatement stmt = 
                     connection.prepareCall("{call CreateUserSP(?,?)}");) {
                 stmt.registerOutParameter(1, java.sql.Types.INTEGER);
                 stmt.setString(2, userName);
                 stmt.execute();
-                userId = stmt.getInt(1);
+                return stmt.getInt(1);
             }
-            return userId;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database problem", e);
             throw e;
         }            
     }
+    
+    static class AccountAndCredential {
+        String accountId;
+        String credentialId;
+    }
 
-    public static String createAccountAndCredential(int userId,
-                                                    int accountType,
-                                                    String methodUrl,
-                                                    PublicKey payReq,
-                                                    PublicKey optionalBalReq) 
+    static AccountAndCredential createAccountAndCredential(int userId,
+                                                           String accountType,
+                                                           String paymentMethodUrl,
+                                                           PublicKey payReq,
+                                                           PublicKey optionalBalReq) 
     throws SQLException, IOException {
         try {
 /*
-            CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_CredentialId VARCHAR(30),
-                                                           IN p_UserId INT, 
-                                                           IN p_AccountType INT,
-                                                           IN p_MethodUrl VARCHAR(50),
-                                                           IN p_S256PayReq BINARY(32),
-                                                           IN p_S256BalReq BINARY(32))
+        CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
+                                                       OUT p_CredentialId INT,
+                                                       IN p_UserId INT, 
+                                                       IN p_AccountTypeName VARCHAR(20),
+                                                       IN p_PaymentMethodUrl VARCHAR(50),
+                                                       IN p_S256PayReq BINARY(32),
+                                                       IN p_S256BalReq BINARY(32))
 */
-            String credentialId;
             try (Connection connection = KeyProviderService.jdbcDataSource.getConnection();
                  CallableStatement stmt = 
-                    connection.prepareCall("{call CreateAccountAndCredentialSP(?,?,?,?,?,?)}");) {
+                    connection.prepareCall("{call CreateAccountAndCredentialSP(?,?,?,?,?,?,?)}");) {
                 stmt.registerOutParameter(1, java.sql.Types.VARCHAR);
-                stmt.setInt(2, userId);
-                stmt.setInt(3, accountType);
-                stmt.setString(4, methodUrl);
-                stmt.setBytes(5, s256(payReq));
-                stmt.setBytes(6, s256(optionalBalReq));
+                stmt.registerOutParameter(2, java.sql.Types.INTEGER);
+                stmt.setInt(3, userId);
+                stmt.setString(4, accountType);
+                stmt.setString(5, paymentMethodUrl);
+                stmt.setBytes(6, s256(payReq));
+                stmt.setBytes(7, s256(optionalBalReq));
                 stmt.execute();
-                credentialId = stmt.getString(1);
+                AccountAndCredential accountAndCredential = new AccountAndCredential();
+                accountAndCredential.accountId = stmt.getString(1);
+                accountAndCredential.credentialId = String.valueOf(stmt.getString(2));
+                return accountAndCredential;
             }
-            return credentialId;
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database problem", e);
             throw e;

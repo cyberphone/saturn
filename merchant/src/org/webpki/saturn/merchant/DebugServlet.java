@@ -309,7 +309,7 @@ class DebugPrintout implements BaseProperties {
             HTML.FONT_ARIAL + "\">" + UNENCRYPTED_AUTHZ + "</p>" +
             "The following printout shows a sample of <i>internal</i> <b>Wallet</b> user authorization data <i>before</i> it is encrypted:");
 
-        fancyBox(MerchantService.userAuthzSample);
+        fancyBox(DebugData.userAuthzSample);
         descriptionStdMargin("Explanations:<p>" +
             keyWord(REQUEST_HASH_JSON) + " holds the hash of the " +
             keyWord(PAYMENT_REQUEST_JSON) + " object.</p><p>" +
@@ -326,7 +326,7 @@ class DebugPrintout implements BaseProperties {
             "In the case the <b>User&nbsp;Bank</b> requires additional authentication data from the user it will not " +
             "return an " +
             keyWord(Messages.AUTHORIZATION_RESPONSE) + " message, but the following:");
-        fancyBox(MerchantService.providerUserResponseSample);
+        fancyBox(DebugData.providerUserResponseSample);
         descriptionStdMargin("Note that the <b>Merchant</b> is supposed to transfer the " +
             keyWord(Messages.PROVIDER_USER_RESPONSE) +
             " to the already open <b>Wallet</b> and be prepared for receiving a renewed " +
@@ -340,7 +340,7 @@ class DebugPrintout implements BaseProperties {
             keyWord(ENCRYPTION_PARAMETERS_JSON) +
             " the <b>Wallet</b> included in the <i>preceding</i> " +
             "user authentication object:");
-        fancyBox(MerchantService.encryptedMessageSample.getRoot());
+        fancyBox(DebugData.encryptedMessageSample.getRoot());
         descriptionStdMargin("<p>Note that if there are no " +
             keyWord(USER_CHALLENGE_ITEMS_JSON) +
             " elements, there is only a text message to the user like &quot;Out of funds&quot; " +
@@ -354,11 +354,11 @@ class DebugPrintout implements BaseProperties {
             " .button {border-radius:3pt;background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);width:6em;text-align:center;border-width:1px;border-style:solid;border-color:#a9a9a9;padding:2pt}" +
             "</style>" +
             "<div style=\"background-color:green;color:white;font-size:larger;text-align:center;padding:5pt\">Requester: " +
-            MerchantService.encryptedMessageSample.getRequester() +        
+            DebugData.encryptedMessageSample.getRequester() +        
             "</div><div style=\"margin:10pt 10pt 0pt 10pt\">" +
-            MerchantService.encryptedMessageSample.getText() +
+            DebugData.encryptedMessageSample.getText() +
             "</div><div style=\"margin:5pt 10pt 0pt 10pt;width:" + 
-            MerchantService.encryptedMessageSample.getOptionalUserChallengeItems()[0].getOptionalLength() +
+            DebugData.encryptedMessageSample.getOptionalUserChallengeItems()[0].getOptionalLength() +
             "em;background-color:white;border-width:1px;padding:1pt 0pt 2pt 4pt;border-style:solid;border-color:#a9a9a9;margin-top:3pt\">"+
             "\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf\u2009\u25cf</div>" +
             "<table style=\"margin-left:auto;margin-right:auto;margin-top:12pt;margin-bottom:12pt\"><tr><td><div class=\"button\">Cancel</div></td><td style=\"width:4em\"></td><td><div class=\"button\">Submit!</div></tr></table>" +
@@ -367,7 +367,7 @@ class DebugPrintout implements BaseProperties {
             "now also contains a matching " +
             keyWord(USER_RESPONSE_ITEMS_JSON) +
             " list:");
-        fancyBox(MerchantService.userChallAuthzSample);
+        fancyBox(DebugData.userChallAuthzSample);
         descriptionStdMargin("<p>This object is returned to the <b>Merchant</b> in a " +
             keyWord(Messages.PAYER_AUTHORIZATION) + " message, effectively resuming operation at <a href=\"#3\">step&nbsp;3</a>.</p><p>This process may be repeated " +
             "until <b>User&nbsp;Bank</b> is satisfied or blocks further attempts.</p>");
@@ -434,7 +434,7 @@ class DebugPrintout implements BaseProperties {
                 ".</li>" +
                 "<li>Verifying that the " +
                 keyWord(JSONCryptoHelper.PUBLIC_KEY_JSON) + " in the " +
-                keyWord(JSONObjectWriter.SIGNATURE_DEFAULT_LABEL_JSON) +
+                keyWord(ATTESTATION_SIGNATURE_JSON) +
                 " object of the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
                 " object and the public key of the first (=signature) certificate in the " +

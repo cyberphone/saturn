@@ -80,10 +80,10 @@ import org.webpki.util.DebugFormatter;
 public class InitWallet {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 11) {
+        if (args.length != 12) {
             System.out.println("\nUsage: " +
                                InitWallet.class.getCanonicalName() +
-                               "sksFile clientKeyCore kg2Pin accountType accountId balance" +
+                               "sksFile clientKeyCore kg2Pin accountType credentialId accountId balance" +
                                " authorityUrl keyEncryptionKey imageFile dataEncrytionAlgorithm keyEncrytionAlgorithm");
             System.exit(-3);
         }
@@ -92,13 +92,14 @@ public class InitWallet {
         String clientKeyCore = args[1];
         String kg2Pin = args[2];
         PaymentMethods paymentMethod = PaymentMethods.valueOf(args[3]);
-        String accountId = args[4];
-        String balance = args[5];
-        String authorityUrl = args[6];
-        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[7])).getPublicKey();
-        String imageFile = args[8];
-        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[9]);
-        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[10]);
+        String credentialId = args[4];
+        String accountId = args[5];
+        String balance = args[6];
+        String authorityUrl = args[7];
+        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
+        String imageFile = args[9];
+        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[10]);
+        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[11]);
   
         // Read importedKey/certificate to be imported
         JSONObjectReader privateKeyJWK = JSONParser.parse(ArrayUtil.readFile(clientKeyCore + ".jwk"));
@@ -158,7 +159,8 @@ public class InitWallet {
         surrogateKey.setCertificatePath(certPath);
         surrogateKey.setPrivateKey(new KeyPair(keyPair.getPublic(), keyPair.getPrivate()));
         JSONObjectWriter ow =
-             CardDataEncoder.encode(paymentMethod.getPaymentMethodUrl(), 
+             CardDataEncoder.encode(paymentMethod.getPaymentMethodUrl(),
+                                    credentialId,
                                     accountId, 
                                     authorityUrl,
                                     rsa_flag ?

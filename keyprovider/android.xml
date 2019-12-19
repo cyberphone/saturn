@@ -24,7 +24,6 @@
             <include name="**/Currencies.java"/>
             <include name="**/Messages.java"/>
             <include name="**/EncryptedMessage.java"/>
-            <include name="**/Payee.java"/>
             <include name="**/PayerAuthorizationEncoder.java"/>
             <include name="**/PaymentRequest.java"/>
             <include name="**/ProviderUserResponseDecoder.java"/>

@@ -18,7 +18,7 @@ package org.webpki.saturn.common;
 
 public interface BaseProperties {
 
-    String ATTESTATION_JSON                 = "attestation";                // Used for Authority Object signatures
+    String ATTESTATION_SIGNATURE_JSON       = "attestationSignature";       // Used for Authority Object signatures
 
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
     String NAME_JSON                        = "name";
@@ -60,7 +60,8 @@ public interface BaseProperties {
     String BACKEND_METHOD_SPECIFIC_JSON     = "backendMethodSpecific";      // Holding a payment backend method specific object
     String PAYMENT_METHODS_JSON             = "paymentMethods";             // List of accepted payment methods (URLs)
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)
-    String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User authorization signature
+    String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User and bank authorization signature
+    String REQUEST_SIGNATURE_JSON           = "requestSignature";           // Payee signature
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_ID_JSON                  = "accountId";                  // Account identifier or PAN
     String CREDENTIAL_ID_JSON               = "credentialId";               // Each virtual card has a unique ID

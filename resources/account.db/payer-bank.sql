@@ -249,9 +249,9 @@ CREATE FUNCTION GetNextTransactionIdSP () RETURNS INT
 //
 
 CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
-                               IN p_Name VARCHAR(50))
+                               IN p_UserName VARCHAR(50))
   BEGIN
-    INSERT INTO USERS(Name) VALUES(p_Name);
+    INSERT INTO USERS(Name) VALUES(p_UserName);
     SET p_UserId = LAST_INSERT_ID();
   END
 //

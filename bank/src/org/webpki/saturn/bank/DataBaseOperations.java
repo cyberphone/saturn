@@ -68,7 +68,7 @@ public class DataBaseOperations {
                                                IN p_S256PayReq BINARY(32))
 */
         try (CallableStatement stmt = 
-                connection.prepareCall("{call AuthenticatePayReqSP(?,?,?,?,?,?,?)}");) {
+                connection.prepareCall("{call AuthenticatePayReqSP(?,?,?,?,?,?)}");) {
             stmt.registerOutParameter(1, java.sql.Types.INTEGER);
             stmt.registerOutParameter(2, java.sql.Types.VARCHAR);
             stmt.setInt(3, Integer.parseInt(credentialId));

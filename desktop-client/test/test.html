@@ -24,47 +24,35 @@ var nativePort = null;
 var normalRequest = {
   "@context": "https://webpki.github.io/saturn/v3",
   "@qualifier": "PaymentClientRequest",
-  paymentNetworks: [{
-    paymentMethods: ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net"],
-    paymentRequest: {
-      payee: {
-        commonName: "Demo Merchant",
-        id: "86344"
-      },
-      amount: "306.25",
-      currency: "USD",
-      referenceId: "#6100004",
-      timeStamp: "2016-12-27T09:45:23Z",
-      expires: "2030-09-14T00:00:00Z",
-      software: {
-        name: "WebPKI.org - Payee",
-        version: "1.00"
-      },
-      signature: {
-        algorithm: "ES256",
-        publicKey: {
-          kty: "EC",
-          crv: "P-256",
-          x: "rZ344aiTaOATmLBOdfYThvnQu_zyB1aJZrbbbks2P9I",
-          y: "lKOvfJdgN8WqEbXMDYPRSMsPicm0Tk10pmer9LxvxLg"
-        },
-        value: "yyjgmZucdxX9CoDY5Hp3B5cWy7-Rfdcul1ZuocBmlXxxtB7kxbairGsoG3EolRu_OJGJj24i2rG1huNBIzbDOw"
-      }
+  paymentMethods: ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net"],
+  paymentRequest: {
+    payee: {
+      commonName: "Demo Merchant",
+      homePage: "https://demomerchant.com"
+    },
+    amount: "306.25",
+    currency: "USD",
+    referenceId: "#6100004",
+    timeStamp: "2016-12-27T09:45:23Z",
+    expires: "2030-09-14T00:00:00Z",
+    software: {
+      name: "WebPKI.org - Payee",
+      version: "1.00"
     }
-  }]
+  }
 };
 
 // All our cards/accounts should match during the discovery phase...
 var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-scrollMatchingRequest.paymentNetworks[0].paymentMethods = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
+scrollMatchingRequest.paymentMethods = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
 
 // No card/account should match during the discovery phase...
 var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-nonMatchingRequest.paymentNetworks[0].paymentMethods = ["https://nosuchcard.com"];
+nonMatchingRequest.paymentMethods = ["https://nosuchcard.com"];
 
 // Note the modified "payee" property...
 var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-badSignatureRequest.paymentNetworks[0].paymentRequest.payee.commonName= "DEmo Merchant";
+badSignatureRequest.paymentRequest.payee.commonName= "DEmo Merchant";
 
 var badMessageRequest = {"hi":"there!"};
 

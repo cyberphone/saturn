@@ -169,6 +169,7 @@ public class Wallet {
     static class Account {
         String paymentMethod;
         String accountId;
+        String credentialId;
         boolean cardFormatAccountId;
         ImageIcon cardIcon;
         AsymSignatureAlgorithms signatureAlgorithm;
@@ -180,6 +181,7 @@ public class Wallet {
         BigDecimal tempBalanceFix;
         
         Account(String paymentMethod,
+                String credentialId,
                 String accountId,
                 boolean cardFormatAccountId,
                 ImageIcon cardIcon,
@@ -187,6 +189,7 @@ public class Wallet {
                 String authorityUrl,
                 BigDecimal tempBalanceFix) {
             this.paymentMethod = paymentMethod;
+            this.credentialId = credentialId;
             this.accountId = accountId;
             this.cardFormatAccountId = cardFormatAccountId;
             this.cardIcon = cardIcon;
@@ -448,7 +451,7 @@ public class Wallet {
             } else {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<Integer,Account>();
                 for (int i = 0; i < 2; i++) {
-                    cards.put(i, new Account("n/a", DUMMY_BALANCE,
+                    cards.put(i, new Account("n/a", "n/a", DUMMY_BALANCE,
                                              true, dummyCardIcon, null, null, new BigDecimal("1.00")));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
@@ -922,7 +925,8 @@ public class Wallet {
                                     // This key had the attribute signifying that it is a Saturn payment credential
                                     // but it might still not match the Payee's list of supported account types.
                                     collectPotentialCard(ek.getKeyHandle(),
-                                                         new CardDataDecoder(ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
+                                                         new CardDataDecoder("2", 
+                                                                             ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
                                                          paymentMethods);
                                 }
                             } catch (Exception e) {
@@ -989,6 +993,7 @@ public class Wallet {
                 if (acceptedPaymentMethod.equals(paymentMethod)) {
                     Account card =
                         new Account(paymentMethod,
+                                    cardProperties.getCredentialId(),
                                     cardProperties.getAccountId(),
                                     true,
                                     getImageIcon(sks.getExtension(keyHandle, 
@@ -1030,6 +1035,7 @@ public class Wallet {
                         paymentRequest,
                         domainName,
                         selectedCard.paymentMethod,
+                        selectedCard.credentialId,
                         selectedCard.accountId,
                         dataEncryptionKey,
                         selectedCard.dataEncryptionAlgorithm,

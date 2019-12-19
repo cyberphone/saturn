@@ -85,7 +85,7 @@ public class AuthorizationResponse implements BaseProperties {
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
+        signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, new JSONCryptoHelper.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
@@ -143,7 +143,7 @@ public class AuthorizationResponse implements BaseProperties {
             .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
-            .setSignature(signer);
+            .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 
     public AccountDataDecoder getProtectedAccountData(JSONDecoderCache knownAccountTypes, 
