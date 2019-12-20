@@ -266,11 +266,11 @@ CREATE PROCEDURE _CreateAccountTypeSP (IN p_AccountTypeName VARCHAR(20),
   END
 //
 
-CREATE PROCEDURE _CreatePaymentMethodSP (IN p_MethodUrl VARCHAR(50),
+CREATE PROCEDURE _CreatePaymentMethodSP (IN p_PaymentMethodUrl VARCHAR(50),
                                          IN p_Format VARCHAR(80))
   BEGIN
     INSERT INTO PAYMENT_METHODS(Name, Format)
-        VALUES(p_MethodUrl, p_Format);
+        VALUES(p_PaymentMethodUrl, p_Format);
   END
 //
 

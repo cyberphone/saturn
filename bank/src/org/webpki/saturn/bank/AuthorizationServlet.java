@@ -299,7 +299,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     ", Transaction Type=" + transactionType.toString() + 
                     ", Transaction ID=" + transactionId + 
                     ", Account ID=" + accountId + 
-                    ", Payment Method=" + authorizationData.getPaymentMethod() + 
+                    ", Payment Method=" + authorizationData.getPaymentMethodUrl() + 
                     ", Client IP=" + clientIpAddress +
                     ", Method Specific=" + paymentMethodSpecific.logLine());
 

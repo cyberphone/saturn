@@ -193,7 +193,7 @@ public class AuthorizationRequest implements BaseProperties {
         if (!ArrayUtil.compare(authorizationData.requestHash, paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }
-        if (!authorizationData.paymentMethod.equals(paymentMethod.paymentMethodUrl)) {
+        if (!authorizationData.paymentMethodUrl.equals(paymentMethod.paymentMethodUrl)) {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
         return authorizationData;

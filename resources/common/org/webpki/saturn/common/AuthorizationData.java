@@ -43,7 +43,7 @@ public class AuthorizationData implements BaseProperties {
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
-                                          String paymentMethod,
+                                          String paymentMethodUrl,
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
@@ -56,7 +56,7 @@ public class AuthorizationData implements BaseProperties {
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
                 .setBinary(JSONCryptoHelper.VALUE_JSON, paymentRequest.getRequestHash()))
             .setString(DOMAIN_NAME_JSON, domainName)
-            .setString(PAYMENT_METHOD_JSON, paymentMethod)
+            .setString(PAYMENT_METHOD_JSON, paymentMethodUrl)
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setObject(ENCRYPTION_PARAMETERS_JSON, 
@@ -112,7 +112,7 @@ public class AuthorizationData implements BaseProperties {
     public AuthorizationData(JSONObjectReader rd) throws IOException {
         requestHash = RequestHash.parse(rd);
         domainName = rd.getString(DOMAIN_NAME_JSON);
-        paymentMethod = rd.getString(PAYMENT_METHOD_JSON);
+        paymentMethodUrl = rd.getString(PAYMENT_METHOD_JSON);
         credentialId = rd.getString(CREDENTIAL_ID_JSON);
         accountId = rd.getString(ACCOUNT_ID_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
@@ -160,9 +160,9 @@ public class AuthorizationData implements BaseProperties {
         return domainName;
     }
 
-    String paymentMethod;
-    public String getPaymentMethod() {
-        return paymentMethod;
+    String paymentMethodUrl;
+    public String getPaymentMethodUrl() {
+        return paymentMethodUrl;
     }
 
     String credentialId;
