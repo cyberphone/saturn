@@ -168,8 +168,8 @@ public class Wallet {
 
     static class Account {
         String paymentMethod;
-        String accountId;
         String credentialId;
+        String accountId;
         boolean cardFormatAccountId;
         ImageIcon cardIcon;
         AsymSignatureAlgorithms signatureAlgorithm;

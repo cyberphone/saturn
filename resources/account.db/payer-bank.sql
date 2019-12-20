@@ -71,7 +71,7 @@ CREATE TABLE ACCOUNT_TYPES
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Type ID
 
-    Name        VARCHAR(20)   NOT NULL,                                  -- As as symbolic name
+    Name        VARCHAR(20)   NOT NULL,                                  -- As a symbolic name
 
     Description VARCHAR(50)   NOT NULL  UNIQUE,                          -- Description
 
@@ -171,7 +171,7 @@ CREATE TABLE TRANSACTION_TYPES
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Transaction Type ID
 
-    Name        VARCHAR(20)   NOT NULL,                                  -- As as symbolic name
+    Name        VARCHAR(20)   NOT NULL,                                  -- As a symbolic name
 
     Description VARCHAR(80)   NOT NULL,                                  -- A bit more on the topic
 
@@ -241,8 +241,9 @@ DELIMITER //
 -- before the transaction is performed.  There are pros and cons with all such
 -- schemes. This one leave "holes" in the sequence for failed transactions.
 
-CREATE FUNCTION GetNextTransactionIdSP () RETURNS INT
+CREATE FUNCTION _GetNextTransactionIdSP () RETURNS INT
   BEGIN
+     -- MySQL "magic" directly from the user manual:
      UPDATE TRANSACTION_COUNTER SET Next = LAST_INSERT_ID(Next + 1) LIMIT 1;
      RETURN LAST_INSERT_ID();
   END
@@ -256,25 +257,25 @@ CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
   END
 //
 
-CREATE PROCEDURE CreateAccountTypeSP (IN p_AccountTypeName VARCHAR(20),
-                                      IN p_Description VARCHAR(50),
-                                      IN p_CappedAt DECIMAL(8,2))
+CREATE PROCEDURE _CreateAccountTypeSP (IN p_AccountTypeName VARCHAR(20),
+                                       IN p_Description VARCHAR(50),
+                                       IN p_CappedAt DECIMAL(8,2))
   BEGIN
     INSERT INTO ACCOUNT_TYPES(Name, Description, CappedAt)
         VALUES(p_AccountTypeName, p_Description, p_CappedAt);
   END
 //
 
-CREATE PROCEDURE CreatePaymentMethodSP (IN p_MethodUrl VARCHAR(50),
-                                        IN p_Format VARCHAR(80))
+CREATE PROCEDURE _CreatePaymentMethodSP (IN p_MethodUrl VARCHAR(50),
+                                         IN p_Format VARCHAR(80))
   BEGIN
     INSERT INTO PAYMENT_METHODS(Name, Format)
         VALUES(p_MethodUrl, p_Format);
   END
 //
 
-CREATE PROCEDURE CreateTransactionTypeSP (IN p_TransactionTypeName VARCHAR(20),
-                                          IN p_Description VARCHAR(80))
+CREATE PROCEDURE _CreateTransactionTypeSP (IN p_TransactionTypeName VARCHAR(20),
+                                           IN p_Description VARCHAR(80))
   BEGIN
     INSERT INTO TRANSACTION_TYPES(Name, Description)
         VALUES(p_TransactionTypeName, p_Description);
@@ -299,7 +300,7 @@ DETERMINISTIC
 
     SELECT PAYMENT_METHODS.Id INTO v_Id FROM PAYMENT_METHODS
         WHERE PAYMENT_METHODS.Name = p_PaymentMetodUrl;
-    RETURN v_Id;
+    RETURN IFNULL(v_Id, 0);
   END
 //
 
@@ -355,9 +356,9 @@ DETERMINISTIC
   END 
 //
 
-CREATE PROCEDURE CreateAccountSP (OUT p_InternalAccountId INT,
-                                  IN p_UserId INT, 
-                                  IN p_AccountTypeId INT)
+CREATE PROCEDURE _CreateAccountSP (OUT p_InternalAccountId INT,
+                                   IN p_UserId INT, 
+                                   IN p_AccountTypeId INT)
   BEGIN
     INSERT INTO ACCOUNTS(UserId, AccountTypeId, Balance)
         SELECT p_UserId, p_AccountTypeId, ACCOUNT_TYPES.CappedAt 
@@ -366,12 +367,12 @@ CREATE PROCEDURE CreateAccountSP (OUT p_InternalAccountId INT,
   END
 //
 
-CREATE PROCEDURE CreateDemoCredentialSP (OUT p_CredentialId INT,
-                                         OUT p_AccountId VARCHAR(30),
-                                         IN p_InternalAccountId INT, 
-                                         IN p_PaymentMethodUrl VARCHAR(50),
-                                         IN p_S256PayReq BINARY(32),
-                                         IN p_S256BalReq BINARY(32))
+CREATE PROCEDURE _CreateDemoCredentialSP (OUT p_CredentialId INT,
+                                          OUT p_AccountId VARCHAR(30),
+                                          IN p_InternalAccountId INT, 
+                                          IN p_PaymentMethodUrl VARCHAR(50),
+                                          IN p_S256PayReq BINARY(32),
+                                          IN p_S256BalReq BINARY(32))
   BEGIN
     SELECT Id, Format INTO @paymentMethodId, @format FROM PAYMENT_METHODS
         WHERE PAYMENT_METHODS.Name = p_PaymentMethodUrl;
@@ -403,7 +404,7 @@ CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
                                                IN p_S256PayReq BINARY(32),
                                                IN p_S256BalReq BINARY(32))
   BEGIN
-    CALL CreateAccountSP(@accountNumber, p_UserId, GetAccountTypeId(p_AccountTypeName));
+    CALL _CreateAccountSP(@accountNumber, p_UserId, GetAccountTypeId(p_AccountTypeName));
     SELECT Id, Format INTO @paymentMethodId, @format FROM PAYMENT_METHODS
         WHERE PAYMENT_METHODS.Name = p_PaymentMethodUrl;
     SET @sql = CONCAT('SET @accountId = ', @format);
@@ -427,6 +428,9 @@ CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
 
 CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
                                        OUT p_UserName VARCHAR(50),
+
+-- Note: the assumption is that the following variables are non-NULL otherwise
+-- you may get wrong answer due to the (weird) way SQL deals with comparing NULL!
                                        IN p_CredentialId INT,
                                        IN p_AccountId VARCHAR(30),
                                        IN p_PaymentMethodId INT,
@@ -447,7 +451,7 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
       SET p_Error = 2;    -- Non-matching account
     ELSEIF v_S256PayReq <> p_S256PayReq THEN
       SET p_Error = 3;    -- Non-matching key
-    ELSEIF v_PaymentMethodId <> IFNULL(p_PaymentMethodId,0) THEN
+    ELSEIF v_PaymentMethodId <> p_PaymentMethodId THEN
       SET p_Error = 4;    -- Non-matching payment method
     ELSE                       
       SET p_Error = 0;    -- Success => Update access info
@@ -463,6 +467,9 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
 
 CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Error INT,
                                        OUT p_Balance DECIMAL(8,2),
+
+-- Note: the assumption is that the following variables are non-NULL otherwise
+-- you may get wrong answer due to the (weird) way SQL deals with comparing NULL!
                                        IN p_CredentialId INT,
                                        IN p_S256BalReq BINARY(32))
   BEGIN
@@ -537,7 +544,7 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
         ELSE                       -- Success => Withdraw the specified amount
           UPDATE ACCOUNTS SET Balance = v_NewBalance
               WHERE ACCOUNTS.Id = v_InternalAccountId;
-          SET p_TransactionId = GetNextTransactionIdSP();
+          SET p_TransactionId = _GetNextTransactionIdSP();
           INSERT INTO TRANSACTIONS(Id,
                                    TransactionTypeId, 
                                    InternalAccountId,
@@ -593,7 +600,7 @@ CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
       SET v_NewBalance = v_Balance + p_Amount;
       UPDATE ACCOUNTS SET Balance = v_NewBalance
           WHERE ACCOUNTS.Id = v_InternalAccountId;
-      SET p_TransactionId = GetNextTransactionIdSP();
+      SET p_TransactionId = _GetNextTransactionIdSP();
       INSERT INTO TRANSACTIONS(Id,
                                TransactionTypeId, 
                                InternalAccountId,
@@ -620,7 +627,8 @@ CREATE PROCEDURE CreditAccountSP (OUT p_Error INT,
 -- Therefore we rather do a "cleanup" of our internal data in case an external
 -- operation failed.
 
-CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, IN p_FailedTransactionId INT)
+CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, 
+                                       IN p_FailedTransactionId INT)
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
     DECLARE v_Amount DECIMAL(8,2);
@@ -661,7 +669,7 @@ CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, IN p_FailedTransactionId
                                Balance,
                                PayeeAccount,
                                ReservationId)
-           VALUES(GetNextTransactionIdSP(),
+           VALUES(_GetNextTransactionIdSP(),
                   6,
                   v_InternalAccountId,
                   v_Amount,
@@ -675,7 +683,7 @@ CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT, IN p_FailedTransactionId
 
 -- For the PoC demo only, see "RestoreAccountsSP".
 
-CREATE PROCEDURE RestoreUserAccountsSP(IN p_UserId INT)
+CREATE PROCEDURE _RestoreUserAccountsSP(IN p_UserId INT)
   BEGIN
     UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = p_UserId;
     SET SQL_SAFE_UPDATES = 0;
@@ -711,7 +719,7 @@ CREATE PROCEDURE RestoreAccountsSP (IN p_Unconditionally BOOLEAN)
       SELECT USERS.LastAccess INTO v_LastAccess FROM USERS WHERE USERS.Id = v_UserId;
       IF p_Unconditionally OR (IFNULL(v_LastAccess, FALSE) AND 
                               (v_LastAccess < (NOW() - INTERVAL 30 MINUTE))) THEN
-        CALL RestoreUserAccountsSP(v_UserId);
+        CALL _RestoreUserAccountsSP(v_UserId);
       END IF;
     END LOOP;
     CLOSE v_UserId_cursor;
@@ -719,7 +727,8 @@ CREATE PROCEDURE RestoreAccountsSP (IN p_Unconditionally BOOLEAN)
 //
 
 -- Test code only called by this script
-CREATE PROCEDURE ASSERT_TRUE (IN p_DidIt BOOLEAN, IN p_Message VARCHAR(100))
+CREATE PROCEDURE ASSERT_TRUE (IN p_DidIt BOOLEAN,
+                              IN p_Message VARCHAR(100))
   BEGIN
     IF p_DidIt = FALSE THEN
       SIGNAL SQLSTATE '45000'
@@ -759,85 +768,85 @@ DELIMITER ;
 
 -- Account Types:
 
-CALL CreateAccountTypeSP("CREDIT_CARD_ACCOUNT",
-                         "Credit Card Account (loan)",
-                         2390.00);
+CALL _CreateAccountTypeSP("CREDIT_CARD_ACCOUNT",
+                          "Credit Card Account (loan)",
+                          2390.00);
 
 SET @sepaAccountBalance = 5543.00;
-CALL CreateAccountTypeSP("STANDARD_ACCOUNT",
-                         "SEPA Primary Account", 
-                         5543.00);
+CALL _CreateAccountTypeSP("STANDARD_ACCOUNT",
+                          "SEPA Primary Account", 
+                          5543.00);
 
-CALL CreateAccountTypeSP("NEW_USER_ACCOUNT",
-                         "Low Value Account for New Users", 
-                         @sepaAccountBalance);
+CALL _CreateAccountTypeSP("NEW_USER_ACCOUNT",
+                          "Low Value Account for New Users", 
+                          @sepaAccountBalance);
 
 
 -- Payment Methods:
 
-CALL CreatePaymentMethodSP("https://supercard.com",     -- VISA
-                           "CREDIT_CARD('453256', @accountNumber, 9)");
+CALL _CreatePaymentMethodSP("https://supercard.com",     -- VISA
+                            "CREDIT_CARD('453256', @accountNumber, 9)");
 
-CALL CreatePaymentMethodSP("https://bankdirect.net",    -- LCL 
-                           "FRENCH_IBAN(@accountNumber)");
+CALL _CreatePaymentMethodSP("https://bankdirect.net",    -- LCL 
+                            "FRENCH_IBAN(@accountNumber)");
 
-CALL CreatePaymentMethodSP("https://unusualcard.com",   -- DISCOVER
-                           "CREDIT_CARD('601103', @accountNumber, 9)");
+CALL _CreatePaymentMethodSP("https://unusualcard.com",   -- DISCOVER
+                            "CREDIT_CARD('601103', @accountNumber, 9)");
 
 
 -- Transaction Types:
 
-CALL CreateTransactionTypeSP("DIRECT_DEBIT",
-                             "Single step payment operation");
+CALL _CreateTransactionTypeSP("DIRECT_DEBIT",
+                              "Single step payment operation");
 
-CALL CreateTransactionTypeSP("RESERVE",
-                             "Phase one of a two-step payment operation");
+CALL _CreateTransactionTypeSP("RESERVE",
+                              "Phase one of a two-step payment operation");
 
-CALL CreateTransactionTypeSP("RESERVE_MULTI",
-                             "Phase one of an open multi-step payment operation");
+CALL _CreateTransactionTypeSP("RESERVE_MULTI",
+                              "Phase one of an open multi-step payment operation");
 
-CALL CreateTransactionTypeSP("TRANSACT",
-                             "Phase two or more of a multi-step payment operation");
+CALL _CreateTransactionTypeSP("TRANSACT",
+                              "Phase two or more of a multi-step payment operation");
 
-CALL CreateTransactionTypeSP("CREDIT_ACCOUNT",
-                             "Money sent to the account");
+CALL _CreateTransactionTypeSP("CREDIT_ACCOUNT",
+                              "Money sent to the account");
 
 -- Internal (database) use only
-CALL CreateTransactionTypeSP("*FAILED*",
-                             "Referenced transaction failed and was nullified");
+CALL _CreateTransactionTypeSP("*FAILED*",
+                              "Referenced transaction failed and was nullified");
 
 -- Demo and test data
 
 CALL CreateUserSP(@userid, "Luke Skywalker");
 
-CALL CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("CREDIT_CARD_ACCOUNT"));
+CALL _CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("CREDIT_CARD_ACCOUNT"));
 
-CALL CreateDemoCredentialSP(@credentialid,
-                            @accountId,
-                            @internalAccountId, 
-                            "https://supercard.com",
-                            x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
-                            NULL);
+CALL _CreateDemoCredentialSP(@credentialid,
+                             @accountId,
+                             @internalAccountId, 
+                             "https://supercard.com",
+                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
+                             NULL);
 SELECT @credentialid, @accountId, @internalAccountId;
 
-CALL CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("STANDARD_ACCOUNT"));
+CALL _CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("STANDARD_ACCOUNT"));
 
-CALL CreateDemoCredentialSP(@credentialid,
-                            @accountId,
-                            @internalAccountId, 
-                            "https://bankdirect.net",
-                            x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
-                            x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
+CALL _CreateDemoCredentialSP(@credentialid,
+                             @accountId,
+                             @internalAccountId, 
+                             "https://bankdirect.net",
+                             x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
+                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
 SELECT @credentialid, @accountId, @internalAccountId;
 
-CALL CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("NEW_USER_ACCOUNT"));
+CALL _CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("NEW_USER_ACCOUNT"));
 
-CALL CreateDemoCredentialSP(@credentialid,
-                            @accountId,
-                            @internalAccountId, 
-                            "https://unusualcard.com",
-                            x'19aed933edacc289d0d63fba788cf424612d346754d110863cd043b52abecd53',
-                            NULL);
+CALL _CreateDemoCredentialSP(@credentialid,
+                             @accountId,
+                             @internalAccountId, 
+                             "https://unusualcard.com",
+                             x'19aed933edacc289d0d63fba788cf424612d346754d110863cd043b52abecd53',
+                             NULL);
 SELECT @credentialid, @accountId, @internalAccountId;
                             
 CALL CreateUserSP(@userid, "Chewbacca");

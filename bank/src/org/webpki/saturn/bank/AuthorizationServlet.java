@@ -70,7 +70,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             throw new IOException("Unexpected \"" + RECEPIENT_URL_JSON + "\" : " + authorizationRequest.getRecepientUrl());
         }
 
-        // Verify that we understand the payment method
+        // Verify that we understand the backend payment method
         AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
             authorizationRequest.getPaymentBackendMethodSpecific(BankService.knownPayeeMethods);
 
@@ -112,7 +112,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 throw new IOException("Payee attestation key mismatch");
             }
             
-            // Edge case?  Yes, but it could happen
+            // Edge case?  Yes, but it could happen during key update
+            // Note: in case of a key update you MUST update the authority object server
+            // *before* using the key for message signing.
+            // Note: old Payee keys MUST be published as well, otherwise messages may
+            // be rejected.  There is no such need for Providers since they use certificates
+            // which permits key updates without breaking things. Possible root CA updates
+            // MUST be communicated in advance to all parties before taking it in active use.
             nonCached = !nonCached;
         }
 
@@ -221,21 +227,22 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             transactionId = BankService.testReferenceId++;
         } else {
             // Here we actually update things...
-            transactionId = DataBaseOperations.externalWithDraw(amount,
-                                                                accountId,
-                                                                transactionType,
-                                                                paymentMethodSpecific.getPayeeAccount(),
-                                                                paymentRequest.getPayeeCommonName(),
-                                                                paymentRequest.getReferenceId(),
-                                                                null,
-                                                                false,
-                                                                connection);
+            transactionId = 
+                    DataBaseOperations.externalWithDraw(amount,
+                                                        accountId,
+                                                        transactionType,
+                                                        paymentMethodSpecific.getPayeeAccount(),
+                                                        paymentRequest.getPayeeCommonName(),
+                                                        paymentRequest.getReferenceId(),
+                                                        null,
+                                                        false,
+                                                        connection);
             if (transactionId == 0) {
                 return createProviderUserResponse("Your request for " + 
                                                   amountInHtml(paymentRequest, amount) +
-                        " appears to be slightly out of your current capabilities..." +
-                        "<br>&nbsp;<br>Since <i>this is a demo</i> your account will be restored " +
-                        "in <span style=\"color:red\">30 minutes</span>&nbsp;&#x1f642;",
+                    " appears to be slightly out of your current capabilities..." +
+                    "<br>&nbsp;<br>Since <i>this is a demo</i> your account will be restored " +
+                    "in <span style=\"color:red\">30 minutes</span>&nbsp;&#x1f642;",
                                                   null,
                                                   authorizationData);
             }

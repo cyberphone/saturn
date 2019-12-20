@@ -136,7 +136,7 @@ public class DebugData implements Serializable {
                                  WALLET_SESSION_ENCRYPTION_KEY, 
                                  DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
                                  userResponseItems,
-                                 ISODateTime.parseDateTime("2019-12-20T10:46:17Z",
+                                 ISODateTime.parseDateTime("2019-12-20T11:46:17+01:00",
                                                            ISODateTime.COMPLETE),
                                  new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));
     }
