@@ -6,6 +6,8 @@
   <property name="temp.dir" value=".tmp"/>
   <property name="w2nb.dir" value="../desktop-client/w2nb"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/merchant"/>
+  
+  <property name="saturn.doc" location="../../doc/saturn"/>
 
   <property file="../resources/common.properties"/>
   <property file="../resources/android.properties"/>
@@ -151,10 +153,34 @@
       <fileset dir="web"/>
     </war>
   </target>
-
+  
   <target name="tomcat" depends="_init">
     <antcall target="build"/>
     <copy file="${dist.dir}/${application}" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
   </target>
-   
+  
+  <target name="_moddoc">
+    <replace file="${saturn.doc}/${fix.file}">
+      <replacefilter token=" onclick=&quot;document.location.href='home'&quot;" value=""/>
+      <replacefilter token="cursor:pointer;" value=""/>
+      <replacefilter token="style.css" value="debug.css"/>
+    </replace>
+  </target>
+
+  <target name="fixdocs">
+    <copy file="web/style.css" tofile="${saturn.doc}/debug.css" overwrite="true" preservelastmodified="true"/>
+    <antcall target="_moddoc">
+      <param name="fix.file" value="hybrid-payment.html"/>
+    </antcall>
+    <antcall target="_moddoc">
+      <param name="fix.file" value="bank2bank-payment.html"/>
+    </antcall>
+    <antcall target="_moddoc">
+      <param name="fix.file" value="card-payment.html"/>
+    </antcall>
+    <antcall target="_moddoc">
+      <param name="fix.file" value="bank2bank-payment-refunded.html"/>
+    </antcall>
+  </target>
+
 </project>
