@@ -18,13 +18,10 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-
 import java.util.LinkedHashMap;
 import java.util.Vector;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,23 +31,18 @@ import javax.servlet.ServletContextListener;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecoderCache;
-
 import org.webpki.util.ArrayUtil;
-
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
-
 import org.webpki.webutil.InitPropertyReader;
-
 import org.payments.sepa.SEPAPaymentBackendMethodEncoder;
 import org.payments.sepa.SEPAPaymentBackendMethodDecoder;
 
@@ -131,6 +123,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static AuthorizationRequest.PaymentBackendMethodEncoder sepaVerifiableAccount;
 
     static AuthorizationRequest.PaymentBackendMethodEncoder sepaPlainAccount;
+
+    static String sepaPaymentBackendMethod;
 
     static Boolean testMode;
 
@@ -227,6 +221,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             sepaAccount.addToCache(SEPAPaymentBackendMethodDecoder.class);
             SEPAPaymentBackendMethodDecoder sepaAccountDecoder = 
                     (SEPAPaymentBackendMethodDecoder)sepaAccount.parse(readJSONFile(SEPA_ACCOUNT));
+            sepaPaymentBackendMethod = sepaAccountDecoder.getContext();
             sepaVerifiableAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder);
             sepaPlainAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder.getPayeeAccount());
 

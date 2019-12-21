@@ -57,8 +57,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String MERCHANT_PAYMENT_BACKEND_METHOD = "https://sepa.payments.org/saturn/v3#bpm";
-
     @Override
     boolean processCall(JSONObjectReader walletResponse,
                         PaymentRequest paymentRequest, 
@@ -114,7 +112,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         String clientPaymentMethodUrl = payerAuthorization.getPaymentMethod().getPaymentMethodUrl();
         AuthorizationRequest.PaymentBackendMethodEncoder paymentBackendMethodEncoder = null;
         for (String paymentMethod : providerAuthority.getPaymentBackendMethods(clientPaymentMethodUrl)) {
-            if (paymentMethod.equals(MERCHANT_PAYMENT_BACKEND_METHOD)) {
+            if (paymentMethod.equals(MerchantService.sepaPaymentBackendMethod)) {
                 paymentBackendMethodEncoder = payeeAuthority.getPayeeCoreProperties().getAccountHashes() == null ?
                         MerchantService.sepaPlainAccount : MerchantService.sepaVerifiableAccount;
                 break;
