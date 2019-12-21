@@ -25,7 +25,7 @@ import org.webpki.saturn.common.BaseProperties;
 
 public final class SEPAPaymentBackendMethodEncoder extends AuthorizationRequest.PaymentBackendMethodEncoder {
 
-    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#bpm";
+    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#pbm";
 
     static final String PAYEE_IBAN_JSON = "payeeIban";
 
