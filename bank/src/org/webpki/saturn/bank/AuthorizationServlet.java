@@ -43,10 +43,8 @@ import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.NonDirectPayments;
-import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.UserResponseItem;
 
-import org.webpki.util.ArrayUtil;
 import org.webpki.util.ISODateTime;
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -130,28 +128,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(authorizationRequest.getSignatureDecoder());
 
         // Optionally verify the claimed Payee account
-        byte[] accountHash = paymentMethodSpecific.getAccountHash();
-        if (payeeCoreProperties.getAccountHashes() == null) {
-            if (accountHash != null) {
-                throw new IOException("Missing \"" + ACCOUNT_VERIFIER_JSON + 
-                                      "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
-            }
-        } else {
-            if (accountHash == null) {
-                throw new IOException("Missing verifiable payee account");
-            }
-            boolean notFound = true;
-            for (byte[] hash : payeeCoreProperties.getAccountHashes()) {
-                if (ArrayUtil.compare(accountHash, hash)) {
-                    notFound = false;
-                    break;
-                }
-            }
-            if (notFound) {
-                throw new IOException("Payee account does not match \"" + ACCOUNT_VERIFIER_JSON + 
-                                      "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
-            }
-        }
+        payeeCoreProperties.verifyAccount(paymentMethodSpecific);
 
         // Decrypt and validate the encrypted Payer authorization
         AuthorizationData authorizationData = 

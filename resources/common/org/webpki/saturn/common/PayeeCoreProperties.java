@@ -35,6 +35,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
+import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64URL;
 
 public class PayeeCoreProperties implements BaseProperties {
@@ -177,5 +178,32 @@ public class PayeeCoreProperties implements BaseProperties {
         }
         throw new IOException((publicKeyMismatch ? "Public key" : "Signature algorithm") + 
                               " mismatch for payee: " + payeeId);
+    }
+
+    public void verifyAccount(
+            AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific)
+    throws IOException {
+        byte[] accountHash = paymentMethodSpecific.getAccountHash();
+        if (getAccountHashes() == null) {
+            if (accountHash != null) {
+                throw new IOException("Missing \"" + ACCOUNT_VERIFIER_JSON + 
+                                      "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
+            }
+        } else {
+            if (accountHash == null) {
+                throw new IOException("Missing verifiable payee account");
+            }
+            boolean notFound = true;
+            for (byte[] hash : getAccountHashes()) {
+                if (ArrayUtil.compare(accountHash, hash)) {
+                    notFound = false;
+                    break;
+                }
+            }
+            if (notFound) {
+                throw new IOException("Payee account does not match \"" + ACCOUNT_VERIFIER_JSON + 
+                                      "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
+            }
+        }
     }
 }
