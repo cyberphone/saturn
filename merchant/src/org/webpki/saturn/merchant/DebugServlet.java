@@ -258,7 +258,7 @@ class DebugPrintout implements BaseProperties {
                 " which means that there is a <i>reservation phase</i> involving the user, " +
                 "followed by an actual payment operation for a usually considerably lower " +
                 keyWord(AMOUNT_JSON) + ". This mode should preferably be indicated " +
-                "in the <b>Wallet</b> user interface.  See <a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/ui-demo/personalpaymentterminal.html\">[UIDEMO]</a>.");
+                "in the <b>Wallet</b> user interface.  See <a target=\"_blank\" href=\"https://cyberphone.github.io/doc/saturn/ui-demo\">[UIDEMO]</a>.");
         }
         
         description(point.sub() +
