@@ -114,14 +114,14 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantPropert
             }
             // Here we assume that we are being called from the Android client trying
             // to retrieve the payment request
-            logger.info(request.getRequestURL().toString());
+//            logger.info(request.getRequestURL().toString());
             HttpSession session = request.getSession(false);
             if (session == null) {
                 logger.info("nosession");
                 ErrorServlet.sessionTimeout(response);
                 return;
             }
-            logger.info(session.getId());
+//            logger.info(session.getId());
             if (session.getAttribute(RESULT_DATA_SESSION_ATTR) != null) {
                 ErrorServlet.systemFail(response, "Session already used");
             }

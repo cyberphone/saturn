@@ -688,17 +688,36 @@ public class HTML implements MerchantProperties {
                 "  if (!window.PaymentRequest) {\n" +
                 "    return null;\n" +
                 "  }\n\n" +
-                "  const details = {\n" +
-                "    total: {\n" +
-                "      label: 'total', \n" +
-                "      amount: {\n" +
-                "        currency: '" + MerchantService.currency.toString() + "',\n" +
-                "        value: '" + MerchantService.currency.plainAmountString(
-                           new BigDecimal(savedShoppingCart.roundedPaymentAmount).divide(HUNDRED)) +
-                               "'\n" +
-                "      }\n" +
-                "    }\n" +
-                "  };\n\n" +
+
+                // The following may look strange but Saturn builds on an "omnichannel" concept
+                // using a JSON based API rather than JavaScript.  That is, Saturn only uses the
+                // PaymentRequest API as a "bridge" between the Web and the native world.  When
+                // Saturn is invoked from another channel like QR, the very same JSON API is used.
+                
+                // On the Web the "url" parameter in "supportedMethods" holds a "bootstrap" URL
+                // for OOB communication with the Merchant application. Using QR you get the URL
+                // from the QR code (including data about which native application to start).
+
+                // After collecting the bootstrap URL the rest is almost independent of how the
+                // payment authorization was initiated, making the wallet code more manageable.
+
+                // In retrospect this appears to be a pretty good idea since it has proved to be
+                // unrealistic standardizing the input or output from payment applications.  If
+                // you take a peek into Google Pay for Android you will find that "amount" and
+                // "currency" are insufficient. For more advanced designs like Saturn which also
+                // tags request type (like Gas Station which changes the UI), they may therefore
+                // equally well be ignored.
+                
+                // The "supportedInstruments" is also a bit of a misnomer; in reality it is more
+                // likely to represent specific "wallet" or payment authorization schemes.
+                // Recent (2019) W3C activities mentions "skipping the list" (in the browser),
+                // which also supports his notion.  Dealing with lots of quite different payment
+                // authorization schemes in a single page is also bound to create unnecessary
+                // difficult code.
+                
+                // As a consequence we give PaymentRequest some fictitious data to keep it happy,
+                // while doing the interesting stuff "behind the curtain" :-)
+                "  const details = {total:{label:'total',amount:{currency:'EUR',value:'1.00'}}};\n\n" +
  
                 "  const supportedInstruments = [{\n" +
                 "    supportedMethods: '" + MerchantService.w3cPaymentRequestUrl + "',\n" +
