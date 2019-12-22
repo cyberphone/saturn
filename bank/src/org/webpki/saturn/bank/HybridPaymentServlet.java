@@ -65,17 +65,20 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         // Although we have already verified the Payee (merchant) during the authorization phase
         // we should do it for this round as well...
         AuthorizationRequest authorizationRequest = authorizationResponse.getAuthorizationRequest();
+        PayeeAuthority payeeAuthority =
+                BankService.externalCalls.getPayeeAuthority(urlHolder,
+                                                            authorizationRequest.getAuthorityUrl());
+            payeeAuthority.getPayeeCoreProperties().verify(transactionRequest.getSignatureDecoder());
 
-        // Verify that we understand the payment method
+        // Get the payment method (we already know that it is OK since it was dealt with in
+        // the initial call).
         AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
             authorizationRequest.getPaymentBackendMethodSpecific(BankService.knownPayeeMethods);
-        PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
-        PayeeAuthority payeeAuthority =
-            BankService.externalCalls.getPayeeAuthority(urlHolder,
-                                                        authorizationRequest.getAuthorityUrl());
-        payeeAuthority.getPayeeCoreProperties().verify(transactionRequest.getSignatureDecoder());
         
-        // Get payer account data.  Note: this may also be derived from a transaction DB
+        // Get payer account data.  Note: transaction request contains ALL required data, the
+        // backend system only needs to understand the concept of reserving funds and supply
+        // an identifier to the requesting party which is subsequently referred to here.
+        PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
         AuthorizationData authorizationData = 
             authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
 
