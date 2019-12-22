@@ -42,7 +42,7 @@ public class RefundRequest implements BaseProperties {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
+        signatureDecoder = rd.getSignature(REQUEST_SIGNATURE_JSON, new JSONCryptoHelper.Options());
         if (cardNetwork != null &&
             authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ cardNetwork) {
             throw new IOException("Incompatible payment method: " + 
@@ -115,7 +115,7 @@ public class RefundRequest implements BaseProperties {
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 
                                                       PaymentRequest.SOFTWARE_VERSION))
-            .setSignature(signer);
+            .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 
     public void verifyPayerBank(JSONX509Verifier paymentRoot) throws IOException {

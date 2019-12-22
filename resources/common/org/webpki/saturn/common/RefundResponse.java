@@ -37,7 +37,7 @@ public class RefundResponse implements BaseProperties {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
+        signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, new JSONCryptoHelper.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
     }
@@ -80,6 +80,6 @@ public class RefundResponse implements BaseProperties {
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(TransactionResponse.SOFTWARE_NAME,
                                                       TransactionResponse.SOFTWARE_VERSION))
-            .setSignature(signer);
+            .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 }
