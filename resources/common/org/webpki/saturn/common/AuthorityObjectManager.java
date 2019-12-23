@@ -18,8 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import java.util.logging.Logger;
 
@@ -41,7 +41,7 @@ public class AuthorityObjectManager extends Thread {
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
     HostingProvider optionalHostingProvider; 
 
-    Collection<PayeeCoreProperties> payees;
+    List<PayeeCoreProperties> payees;
 
     int expiryTimeInSeconds;
     long renewCycle;
@@ -103,7 +103,7 @@ public class AuthorityObjectManager extends Thread {
                                   ServerX509Signer providerSigner,
                                     
                                   // PayeeAuthority (may be null)
-                                  Collection<PayeeCoreProperties> payees, // Zero-length list is allowed
+                                  List<PayeeCoreProperties> payees, // Zero-length list is allowed
                                   ServerAsymKeySigner attestationSigner,
 
                                   int expiryTimeInSeconds /* Both */,
