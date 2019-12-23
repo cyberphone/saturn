@@ -30,7 +30,7 @@ import java.security.cert.X509Certificate;
 
 import java.security.spec.ECGenParameterSpec;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -149,7 +149,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         }
     }
 
-    static Vector<CredentialTemplate> credentialTemplates = new Vector<CredentialTemplate>();
+    static ArrayList<CredentialTemplate> credentialTemplates = new ArrayList<CredentialTemplate>();
 
     static String saturnLogotype;
 

@@ -27,7 +27,7 @@ import java.security.interfaces.RSAKey;
 
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -91,8 +91,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
-    static Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys = 
-            new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
+    static ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys = 
+            new ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder>();
 
     static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
             new LinkedHashMap<String,PayeeCoreProperties>();

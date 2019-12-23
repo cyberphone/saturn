@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoder;
@@ -147,7 +147,7 @@ public class AuthorizationResponse implements BaseProperties {
     }
 
     public AccountDataDecoder getProtectedAccountData(JSONDecoderCache knownAccountTypes, 
-                                                      Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
+                                                      ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
          return (AccountDataDecoder) knownAccountTypes.parse(encryptedAccountData.getDecryptedData(decryptionKeys));
     }

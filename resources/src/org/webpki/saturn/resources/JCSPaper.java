@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
@@ -282,11 +282,11 @@ public class JCSPaper implements BaseProperties {
             publicKey = JSONParser.parse(josePK.toString()).getPublicKey();
         } else {
             JSONArrayReader ar = protectedHeader.getArray(JOSE_X5C);
-            Vector<X509Certificate> certs = new Vector<X509Certificate>();
+            ArrayList<X509Certificate> certs = new ArrayList<X509Certificate>();
             while (ar.hasMore()) {
                 certs.add(CertificateUtil.getCertificateFromBlob(new Base64().getBinaryFromBase64String(ar.getString())));
             }
-            publicKey = certs.firstElement().getPublicKey();
+            publicKey = certs.get(0).getPublicKey();
         }
         protectedHeader.checkForUnread();
         if (!new SignatureWrapper(AsymSignatureAlgorithms.ECDSA_SHA256, publicKey)

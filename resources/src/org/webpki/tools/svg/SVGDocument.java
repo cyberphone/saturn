@@ -16,11 +16,11 @@
  */
 package org.webpki.tools.svg;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public abstract class SVGDocument {
 
-    static Vector<SVGObject> svgObjects = new Vector<SVGObject>();
+    static ArrayList<SVGObject> svgObjects = new ArrayList<SVGObject>();
     
     double currentMaxX;
     double currentMaxY;

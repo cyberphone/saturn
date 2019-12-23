@@ -32,7 +32,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.RSAKey;
 
 import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import java.util.logging.Level;
@@ -117,8 +117,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
-    static Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys =
-            new Vector<JSONDecryptionDecoder.DecryptionKeyHolder>();
+    static ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys =
+            new ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder>();
     
      static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
             new LinkedHashMap<String,PayeeCoreProperties>();
@@ -302,7 +302,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             
             String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
-            Vector<PayeeCoreProperties> payees = new Vector<PayeeCoreProperties>();
+            ArrayList<PayeeCoreProperties> payees = new ArrayList<PayeeCoreProperties>();
             
             boolean accountValidation = getPropertyBoolean(ACCOUNT_VALIDATION);
             if (hostingProvider == null) {

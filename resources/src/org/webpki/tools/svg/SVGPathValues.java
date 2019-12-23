@@ -16,7 +16,7 @@
  */
 package org.webpki.tools.svg;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 public class SVGPathValues extends SVGValue {
 
@@ -81,7 +81,7 @@ public class SVGPathValues extends SVGValue {
 
     class SubCommand implements Cloneable {
         char command;
-        Vector<Coordinate> coordinates = new Vector<Coordinate>();
+        ArrayList<Coordinate> coordinates = new ArrayList<Coordinate>();
         
         SubCommand (char command) {
             this.command = command;
@@ -106,7 +106,7 @@ public class SVGPathValues extends SVGValue {
         }
     }
 
-    Vector<SubCommand> commands = new Vector<SubCommand>();
+    ArrayList<SubCommand> commands = new ArrayList<SubCommand>();
     
     @Override
     public String getStringRepresentation() {

@@ -22,7 +22,7 @@ import java.net.URLEncoder;
 
 import java.security.PublicKey;
 
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
@@ -43,7 +43,7 @@ public class PayeeCoreProperties implements BaseProperties {
     // Only for "init" not part of Saturn vocabulary
     static final String PAYEE_ACCOUNTS_JSON = "payeeAccounts";
 
-    Vector<byte[]> optionalAccountHashes;
+    ArrayList<byte[]> optionalAccountHashes;
     SignatureParameter[] signatureParameters;
     String payeeId;
     String payeeHomePage;
@@ -67,7 +67,7 @@ public class PayeeCoreProperties implements BaseProperties {
         payeeCommonName = rd.getString(COMMON_NAME_JSON);
         payeeHomePage = rd.getString(HOME_PAGE_JSON);
         if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
-            optionalAccountHashes = new Vector<byte[]>();
+            optionalAccountHashes = new ArrayList<byte[]>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
             if (!accountVerifier.getString(JSONCryptoHelper.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
                 throw new IOException("Unexpected hash algorithm");
@@ -77,7 +77,7 @@ public class PayeeCoreProperties implements BaseProperties {
                 optionalAccountHashes.add(accountHashes.getBinary());
             } while (accountHashes.hasMore());
         }
-        Vector<SignatureParameter> parameterArray = new Vector<SignatureParameter>();
+        ArrayList<SignatureParameter> parameterArray = new ArrayList<SignatureParameter>();
         JSONArrayReader jsonParameterArray = rd.getArray(SIGNATURE_PARAMETERS_JSON);
         do {
             JSONObjectReader signatureParameter = jsonParameterArray.getObject();
@@ -98,7 +98,7 @@ public class PayeeCoreProperties implements BaseProperties {
                                            JSONDecoderCache knownPaymentMethods,
 
                                            boolean addVerifier) throws IOException {
-        Vector<byte[]> optionalAccountHashes = new Vector<byte[]>();
+        ArrayList<byte[]> optionalAccountHashes = new ArrayList<byte[]>();
         if (addVerifier) {
             JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
             do {
@@ -136,7 +136,7 @@ public class PayeeCoreProperties implements BaseProperties {
         return signatureParameters;
     }
 
-    public Vector<byte[]> getAccountHashes() {
+    public ArrayList<byte[]> getAccountHashes() {
         return optionalAccountHashes;
     }
 

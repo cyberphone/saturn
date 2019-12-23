@@ -17,7 +17,7 @@
 package org.webpki.tools.svg;
 
 import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.ArrayList;
 
 public abstract class SVGObject {
     
@@ -39,9 +39,9 @@ public abstract class SVGObject {
 
     private LinkedHashMap<SVGAttributes,SVGValue> _attributes = new LinkedHashMap<SVGAttributes,SVGValue>();
     
-    Vector<SVGObject> beforeDependencyElements = new Vector<SVGObject>();
+    ArrayList<SVGObject> beforeDependencyElements = new ArrayList<SVGObject>();
 
-    Vector<SVGObject> afterDependencyElements = new Vector<SVGObject>();
+    ArrayList<SVGObject> afterDependencyElements = new ArrayList<SVGObject>();
     
     boolean invisible;
     

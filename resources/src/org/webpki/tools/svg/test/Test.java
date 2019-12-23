@@ -16,8 +16,6 @@
  */
 package org.webpki.tools.svg.test;
 
-import java.io.IOException;
-
 import org.webpki.tools.svg.SVGAddDouble;
 import org.webpki.tools.svg.SVGAddOffset;
 import org.webpki.tools.svg.SVGAnchor;

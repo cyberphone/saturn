@@ -52,7 +52,7 @@ import java.security.PublicKey;
 import java.util.LinkedHashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -785,7 +785,7 @@ public class Wallet {
                     dialog.setVisible(false);
                     windowAdapter.windowClosing(null);
                     if (hasSubmit) {
-                        Vector<UserResponseItem> results = new Vector<UserResponseItem>();
+                        ArrayList<UserResponseItem> results = new ArrayList<UserResponseItem>();
                         for (String id : challengeTextFields.keySet()) {
                             JTextField inputText = challengeTextFields.get(id);
                             results.add(new UserResponseItem(id, inputText instanceof JPasswordField ?

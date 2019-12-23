@@ -20,8 +20,6 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
-import java.util.LinkedHashMap;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +32,6 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.webutil.ServletUtil;

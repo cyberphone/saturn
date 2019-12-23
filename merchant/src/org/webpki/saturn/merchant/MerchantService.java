@@ -21,7 +21,7 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -207,7 +207,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             merchantHomePage = getPropertyString(MERCHANT_HOME_PAGE);
 
             // The standard payment network supported by the Saturn demo
-            Vector<String> acceptedAccountTypes = new Vector<String>();
+            ArrayList<String> acceptedAccountTypes = new ArrayList<String>();
             for (PaymentMethods card : PaymentMethods.values()) {
                 if (card != PaymentMethods.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
                     acceptedAccountTypes.add(card.getPaymentMethodUrl());

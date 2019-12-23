@@ -27,13 +27,13 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
 import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.webpki.crypto.KeyStoreReader;
 
 public class KeyStoreEnumerator {
 
-    Vector<X509Certificate> certificatePath = new Vector<X509Certificate>();
+    ArrayList<X509Certificate> certificatePath = new ArrayList<X509Certificate>();
     PrivateKey privateKey = null;
     String keyId;
     
@@ -60,7 +60,7 @@ public class KeyStoreEnumerator {
     }
 
     public PublicKey getPublicKey() {
-        return certificatePath.firstElement().getPublicKey();
+        return certificatePath.get(0).getPublicKey();
     }
 
     public X509Certificate[] getCertificatePath() {

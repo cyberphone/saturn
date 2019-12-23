@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.webpki.crypto.HashAlgorithms;
 
@@ -186,7 +186,7 @@ public class AuthorizationRequest implements BaseProperties {
     }
 
     public AuthorizationData getDecryptedAuthorizationData(
-            Vector<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
+            ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
             new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));

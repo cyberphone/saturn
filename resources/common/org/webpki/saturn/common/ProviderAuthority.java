@@ -22,7 +22,7 @@ import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
@@ -68,7 +68,7 @@ public class ProviderAuthority implements BaseProperties {
 
     public static class PaymentMethodDeclaration {
         String clientPaymentMethod;
-        Vector<String> backendPaymentMethods = new Vector<String>();
+        ArrayList<String> backendPaymentMethods = new ArrayList<String>();
         
         public PaymentMethodDeclaration(String clientPaymentMethod) {
             this.clientPaymentMethod = clientPaymentMethod;
@@ -187,7 +187,7 @@ public class ProviderAuthority implements BaseProperties {
 
         // Signature profiles tell other parties what kind of signatures that are accepted
         // Additional signature profiles can be introduced without breaking existing applications
-        Vector<SignatureProfiles> profileArray = new Vector<SignatureProfiles>();
+        ArrayList<SignatureProfiles> profileArray = new ArrayList<SignatureProfiles>();
         JSONArrayReader jsonProfileArray = rd.getArray(SIGNATURE_PROFILES_JSON);
         do {
             SignatureProfiles signatureProfile = SignatureProfiles.getProfileFromString(jsonProfileArray.getString());
@@ -202,7 +202,7 @@ public class ProviderAuthority implements BaseProperties {
 
         // Encryption parameters tell other parties what kind of encryption keys you have
         // Additional algorithms can be introduced without breaking existing applications
-        Vector<EncryptionParameter> parameterArray = new Vector<EncryptionParameter>();
+        ArrayList<EncryptionParameter> parameterArray = new ArrayList<EncryptionParameter>();
         JSONArrayReader jsonParameterArray = rd.getArray(ENCRYPTION_PARAMETERS_JSON);
         do {
             JSONObjectReader encryptionParameter = jsonParameterArray.getObject();

@@ -17,8 +17,8 @@
 package org.webpki.tools.svg;
 
 import java.io.IOException;
+
 import java.util.LinkedHashMap;
-import java.util.Vector;
 
 import org.webpki.tools.svg.SVGPathValues.SubCommand;
 import org.webpki.xml.DOMAttributeReaderHelper;
