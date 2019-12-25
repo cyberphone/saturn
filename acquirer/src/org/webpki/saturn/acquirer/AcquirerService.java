@@ -25,9 +25,9 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.interfaces.RSAKey;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -193,15 +193,12 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                        ).getJSONArrayReader();
             String acquirerBaseUrl = getPropertyString(ACQUIRER_BASE_URL);
 
-            ArrayList<PayeeCoreProperties> payees = new ArrayList<PayeeCoreProperties>();
-
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
                                                                        acquirerBaseUrl + "/payees/",
                                                                        knownPayeeMethods,
                                                                        false);
                 merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
-                payees.add(account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -233,7 +230,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 null,
                 acquirerKey,
 
-                payees, 
+                merchantAccountDb.values(), 
                 new ServerAsymKeySigner(acquirercreds),
 
                 PROVIDER_EXPIRATION_TIME,

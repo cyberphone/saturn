@@ -302,8 +302,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             
             String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
-            ArrayList<PayeeCoreProperties> payees = new ArrayList<PayeeCoreProperties>();
-            
             boolean accountValidation = getPropertyBoolean(ACCOUNT_VALIDATION);
             if (hostingProvider == null) {
                 JSONArrayReader accounts = 
@@ -317,7 +315,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                                      knownPayeeMethods,
                                                      accountValidation);
                     merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
-                    payees.add(account);
                 }
             }
 
@@ -356,7 +353,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 hostingProvider,
                 bankKey,
 
-                payees,
+                merchantAccountDb.values(),
                 hostingProvider == null ? new ServerAsymKeySigner(bankcreds) : null,
 
                 PROVIDER_EXPIRATION_TIME,
