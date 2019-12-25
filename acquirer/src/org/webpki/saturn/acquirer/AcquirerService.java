@@ -193,12 +193,15 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                        ).getJSONArrayReader();
             String acquirerBaseUrl = getPropertyString(ACQUIRER_BASE_URL);
 
+            ArrayList<PayeeCoreProperties> payees = new ArrayList<PayeeCoreProperties>();
+
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
                                                                        acquirerBaseUrl + "/payees/",
                                                                        knownPayeeMethods,
                                                                        false);
                 merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
+                payees.add(account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -230,7 +233,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 null,
                 acquirerKey,
 
-                merchantAccountDb.values(), 
+                payees, 
                 new ServerAsymKeySigner(acquirercreds),
 
                 PROVIDER_EXPIRATION_TIME,
