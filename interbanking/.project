@@ -24,7 +24,7 @@
     <variableList>
         <variable>
             <name>copy_PARENT</name>
-            <value>$%7BPARENT-1-ECLIPSE_HOME%7D/github.repositories/saturn</value>
+            <value>$%7BPARENT-1-PROJECT_LOC%7D</value>
         </variable>
     </variableList>
 </projectDescription>
