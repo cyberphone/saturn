@@ -128,7 +128,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 connection = BankService.jdbcDataSource.getConnection();
             }
             JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest, connection);
-            if (BankService.jdbcDataSource != null) {
+            if (connection != null) {
                 connection.close();
                 connection = null;
             }

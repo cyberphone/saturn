@@ -53,7 +53,9 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final String PARAM_TAG = "msg";
     static final String ERROR_TAG = "err";
     
-    static final String BUTTON_ID = "gokg2";
+    private static final String BUTTON_ID  = "gokg2";
+    private static final String WAITING_ID = "wait";
+    private static final String ERROR_ID   = "error";
     
     static final String DEFAULT_USER_NAME_HTML = "Luke Skywalker &#x1f984;";    // Unicorn emoji
     
@@ -225,9 +227,10 @@ public class KeyProviderInitServlet extends HttpServlet {
             (KeyProviderService.useW3cPaymentRequest ?
             "function paymentRequestError(msg) {\n" +
             "  console.info('Payment request error:' + msg);\n" +
-            "  document.getElementById('" + BUTTON_ID + 
-            "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
-              "msg + '</div>';\n" +
+            "  document.getElementById('" + WAITING_ID + "').style.display = 'none';\n" +
+            "  document.getElementById('" + ERROR_ID + "').innerHTML = msg;\n" +
+            "  document.getElementById('" + ERROR_ID + "').style.display = 'block';\n" +
+            "  document.getElementById('" + BUTTON_ID + "').style.display = 'block';\n" +
             "}\n\n" +
 
             "async function enroll() {\n" +
@@ -245,8 +248,8 @@ public class KeyProviderInitServlet extends HttpServlet {
             // It may take a second or two to get PaymentRequest up and         //
             // running.  Indicate that to the user.                             //
             //==================================================================//
-            "    document.getElementById('" + BUTTON_ID + "').outerHTML = " +
-              "'<img id=\"" + BUTTON_ID + "\" src=\"waiting.gif\">';\n" +
+            "    document.getElementById('" + BUTTON_ID + "').style.display = 'none';\n" +
+            "    document.getElementById('" + WAITING_ID + "').style.display = 'block';\n" +
             //==================================================================//
             // The following code may seem strange but the Web application      //
             // does not create an HttpSession so we do this immediately after   //
@@ -309,37 +312,48 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  document.forms.shoot.submit();\n" +
             "}"),
             null,
-            "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
-            "<div>" +
-              "This proof-of-concept system provisions secure payment credentials<br>" + 
+            "<div style=\"padding:0 1em\">" +
+              "This proof-of-concept system provisions secure payment credentials " + 
               "to be used in the Android version of the Saturn &quot;Wallet&quot;." +
             "</div>" + 
             "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
               "<table>" + 
                 "<tr><td>Your name (real or made up):</td></tr>" + 
-                "<tr><td><input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
-                  "\" value=\"" + DEFAULT_USER_NAME_HTML + 
-                  "\" size=\"30\" maxlength=\"50\" " + 
-                  "style=\"background-color:#def7fc\"></td></tr>" + 
+                "<tr><td>" +
+                  "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
+                    "<input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
+                      "\" value=\"" + DEFAULT_USER_NAME_HTML + 
+                      "\" size=\"30\" maxlength=\"50\" " + 
+                      "style=\"background-color:#def7fc\">" +
+                   "</form>" +
+                 "</td></tr>" + 
               "</table>" +
             "</div>" + 
             "<div style=\"text-align:center\">" +
               "This name will be printed on your virtual payment cards." +
             "</div>" + 
+            "<div id=\"" + ERROR_ID + "\" " +
+              "style=\"color:red;font-weight:bold;padding-top:1em;display:none\"></div>" +
+            "<img id=\"" + WAITING_ID + "\" src=\"waiting.gif\" " +
+              "style=\"padding-top:1em;display:none\" alt=\"waiting\">" +
             "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
               "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"enroll()\">" +
                 BUTTON_TEXT_HTML + 
               "</div>" +
             "</div>" + 
-            "<div style=\"padding-top:40pt;padding-bottom:10pt\">If you have not " +
-              "installed WebPKI, now is the time to do it!</div>" +
+            "<div style=\"padding:4em 1em 1em 1em\">If you have not yet " + 
+              "installed the &quot;Wallet&quot;, this is the time but <i>please do not " + 
+              "start the application</i>, simply press " + 
+              "<div style=\"display:inline;background:blue;color:white;" + 
+              "font-weight:bold;padding:0 0.5em\">&lt;</div> " + 
+              "after the installation!</i>" +
+            "</div>" +
             "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
               "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
                 "title=\"Android\" onclick=\"document.location.href = " +
                 "'https://play.google.com/store/apps/details?id=" +
                 MobileProxyParameters.ANDROID_PACKAGE_NAME + "'\">" +
             "</div>" + 
-            "</form>" + 
             "</div>" + // Main window end tag
             "<div class=\"sitefooter\">Note: in a real configuration you would also need to " +
             "authenticate as a part of the enrollment."));

@@ -53,6 +53,7 @@ public class HTML implements MerchantProperties {
     static final String GAS_PUMP_LOGO = "<img src=\"images/gaspump.svg\" title=\"For showing context\" style=\"width:30pt;position:absolute;right:10pt;top:10pt\"";
 
     static final String SATURN_PAY_BUTTON = "SaturnPay";
+    static final String SATURN_PAY_WAIT   = "Waiting";
     
     static final BigDecimal HUNDRED = new BigDecimal(100);
 
@@ -76,14 +77,14 @@ public class HTML implements MerchantProperties {
             }
             s.append(bodyscript);
         }
-        s.append("><div onclick=\"document.location.href='home"
-            + "'\" title=\"Home sweet home...\" style=\"cursor:pointer;position:absolute;top:15px;"
-            + "left:15px;z-index:5;visibility:visible;padding:5pt 8pt 5pt 8pt;font-size:10pt;"
-            + "text-align:center;background: radial-gradient(ellipse at center, rgba(255,255,255,1) "
-            + "0%,rgba(242,243,252,1) 38%,rgba(196,210,242,1) 100%);border-radius:8pt;border-width:1px;"
-            + "border-style:solid;border-color:#B0B0B0;box-shadow:3pt 3pt 3pt #D0D0D0;}\">"
-            + "Saturn <font color=\"red\">3</font><br><span style=\"font-size:8pt\">Payment Demo</span></div>"
-            + "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
+        s.append("><div onclick=\"document.location.href='home" + 
+            "'\" title=\"Home sweet home...\" style=\"cursor:pointer;position:absolute;top:15px;" + 
+            "left:15px;z-index:5;visibility:visible;padding:5pt 8pt 5pt 8pt;font-size:10pt;" + 
+            "text-align:center;background: radial-gradient(ellipse at center, rgba(255,255,255,1) " + 
+            "0%,rgba(242,243,252,1) 38%,rgba(196,210,242,1) 100%);border-radius:8pt;border-width:1px;" + 
+            "border-style:solid;border-color:#B0B0B0;box-shadow:3pt 3pt 3pt #D0D0D0;}\">" + 
+            "Saturn <font color=\"red\">3</font><br><span style=\"font-size:8pt\">Payment Demo</span></div>" + 
+            "<table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" height=\"100%\">")
          .append(box)
          .append("</table></body></html>");
         return s.toString();
@@ -205,9 +206,9 @@ public class HTML implements MerchantProperties {
         .append(", this);\" autocomplete=\"off\"/></td>" +
             "</tr>" +
             "<tr>" +
-            "<td style=\"border-width:0px;padding:0px;margin:0px\">"
-            + "<input type=\"button\" class=\"updnbtn\" value=\"&#x25bc;\" title=\"Less\" "
-            + "onclick=\"updateQuantity(this.form.p")
+            "<td style=\"border-width:0px;padding:0px;margin:0px\">" + 
+            "<input type=\"button\" class=\"updnbtn\" value=\"&#x25bc;\" title=\"Less\" " + 
+            "onclick=\"updateQuantity(this.form.p")
         .append(index)
         .append(", -1, ")
         .append(index)
@@ -657,7 +658,9 @@ public class HTML implements MerchantProperties {
                     FONT_ARIAL + "\">Select Payment Method</td></tr>")
             .append(MerchantService.desktopWallet || android ?
                       "<tr><td id=\"" + SATURN_PAY_BUTTON + 
-                      "\"><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"goSaturnGo()\"></td></tr>" 
+                      "\"><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"goSaturnGo()\"></td></tr>" +
+                      "<tr><td id=\"" + SATURN_PAY_WAIT + 
+                      "\" style=\"display:none\"><img title=\"Wait\" src=\"images/waiting.gif\"></td></tr>" 
                                                                 :
                       "")
             .append(MerchantService.desktopWallet || !android ?
@@ -739,7 +742,8 @@ public class HTML implements MerchantProperties {
                 "}\n\n" +
                 "let w3cPayReq = buildW3cPaymentRequest();\n\n" +
                 "async function goSaturnGo() {\n" +
-                "  document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = '<img src=\"images/waiting.gif\">';\n" +
+                "  document.getElementById('" + SATURN_PAY_BUTTON + "').style.display = 'none';\n" +
+                "  document.getElementById('" + SATURN_PAY_WAIT + "').style.display = 'block';\n" +
                 "  if (w3cPayReq) {\n" +
                 "    try {\n" +
                 "      if (await w3cPayReq.canMakePayment()) {\n" +
@@ -751,6 +755,7 @@ public class HTML implements MerchantProperties {
                   MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
                 "      } else {\n" +
                 "        console.info('Cannot make payment');\n" +
+                "        document.getElementById('" + SATURN_PAY_BUTTON + "').style.display = 'block';\n" +
                 "        document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = " +
                   "'<div>In order to use this application you need to install<br>" +
                   "the Android app and enroll payment credentials</div><div style=\"text-align:center;padding:10pt\">" +

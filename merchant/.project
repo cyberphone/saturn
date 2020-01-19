@@ -28,13 +28,13 @@
 		<link>
 			<name>w2nb</name>
 			<type>2</type>
-			<location>copy_PARENT/desktop-client/w2nb</location>
+			<locationURI>copy_PARENT/desktop-client/w2nb</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>
-            <value>$%7BPARENT-1-PROJECT_LOC%7D</value>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D</value>
 		</variable>
 	</variableList>
 </projectDescription>

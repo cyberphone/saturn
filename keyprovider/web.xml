@@ -84,11 +84,12 @@
     <servlet>
         <servlet-name>KeyProviderServlet</servlet-name>
         <servlet-class>org.webpki.saturn.keyprovider.KeyProviderServlet</servlet-class>
-    </servlet>
+     </servlet>
 
     <servlet>
         <servlet-name>KeyProviderInitServlet</servlet-name>
         <servlet-class>org.webpki.saturn.keyprovider.KeyProviderInitServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
     </servlet>
 
     <servlet-mapping>
