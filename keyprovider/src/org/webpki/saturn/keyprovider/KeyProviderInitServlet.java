@@ -283,7 +283,7 @@ public class KeyProviderInitServlet extends HttpServlet {
 //            "          data: {supportedNetworks: ['visa', 'mastercard']}\n" +
             "        }];\n" +
             "        const payRequest = new PaymentRequest(supportedInstruments, details);\n" +
-            "        if (await payRequest.canMakePayment()) {\n" +
+            "        try {\n" +
             "          const payResponse = await payRequest.show();\n" +
             "          payResponse.complete('success');\n" +
             //==================================================================//
@@ -292,7 +292,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             //==================================================================//
             "          document.location.href = payResponse.details." +
               MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
-            "        } else {\n" +
+            "        } catch (err) {\n" +
             "          paymentRequestError('App does not seem to be installed');\n" +
             "        }\n" +
             "      } else {\n" +
