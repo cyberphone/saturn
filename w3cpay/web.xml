@@ -26,8 +26,8 @@
     </servlet>
 
     <servlet>
-        <servlet-name>AppManifestServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.w3c.manifest.AppManifestServlet</servlet-class>
+        <servlet-name>PaymentAppMethodServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.w3c.manifest.PaymentAppMethodServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
     </servlet>
 
