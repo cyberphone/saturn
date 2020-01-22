@@ -14,19 +14,12 @@
  *  limitations under the License.
  *
  */
- 
-'use strict';
+package se.bankgirot;
 
-// Holder for server signature keys
+import org.webpki.saturn.common.AuthorizationRequest;
 
-const Jsf = require('webpki.org').Jsf;
+public final class BGBackendPaymentDataEncoder extends AuthorizationRequest.BackendPaymentDataEncoder {
 
-function ServerAsymKeySigner(privateKey) {
-  this.privateKey = privateKey;
+    BGBackendPaymentDataEncoder() {
+    }
 }
-
-ServerAsymKeySigner.prototype.sign = function(jsonObject) {
-  return new Jsf.Signer(this.privateKey).sign(jsonObject);
-};
-
-module.exports = ServerAsymKeySigner;

@@ -24,12 +24,13 @@ const JsonUtil = require('webpki.org').JsonUtil;
 const BaseProperties    = require('./BaseProperties');
 const Currencies        = require('./Currencies');
 const Software          = require('./Software');
-const Payee             = require('./Payee');
 const NonDirectPayments = require('./NonDirectPayments');
 
 function PaymentRequest(rd) {
   this.root = rd;
-  this.payee = new Payee(rd.getObject(BaseProperties.PAYEE_JSON));
+  var payee = rd.getObject(BaseProperties.PAYEE_JSON);
+  this.payeeCommonName = payee.getString(BaseProperties.COMMON_NAME_JSON);
+  this.payeeHomePage = payee.getString(BaseProperties.HOME_PAGE_JSON);
   this.currency = Currencies.valueOf(rd.getString(BaseProperties.CURRENCY_JSON));
   if (rd.hasProperty(BaseProperties.NON_DIRECT_PAYMENT_JSON)) {
     this.nonDirectPayment = NonDirectPayments.fromType(rd.getString(BaseProperties.NON_DIRECT_PAYMENT_JSON));

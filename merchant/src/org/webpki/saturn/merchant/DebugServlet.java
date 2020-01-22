@@ -387,7 +387,7 @@ class DebugPrintout implements BaseProperties {
                     keyWord(PAYMENT_REQUEST_JSON) + "), to the <b>User&nbsp;Bank</b>:</p>");
         
         fancyBox(debugData.authorizationRequest);
-            descriptionStdMargin("Note the use of " + keyWord(BACKEND_METHOD_SPECIFIC_JSON) + 
+            descriptionStdMargin("Note the use of " + keyWord(BACKEND_PAYMENT_DATA_JSON) + 
                     " which holds data needed for the actual payment method.");
         
         description(point.sub() + 
@@ -453,13 +453,13 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.PAYEE_AUTHORITY) +
                 " object.</li>" +
                 "<li>Verify that the " +
-                keyWord(BACKEND_METHOD_SPECIFIC_JSON) +
+                keyWord(BACKEND_PAYMENT_DATA_JSON) +
                 " object is decodable and applicable to the operation in progress.</li>" +
                 "<li>Verify that the <i>optional</i> " +
                 keyWord(ACCOUNT_VERIFIER_JSON) + " in the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
                 " matches the account provided in the " +
-                keyWord(BACKEND_METHOD_SPECIFIC_JSON) +
+                keyWord(BACKEND_PAYMENT_DATA_JSON) +
                 " object.</li>" +
                 "</ul>&nbsp;<br>" +
                 "After verifying the <b>Merchant</b>'s request data, turn to the <b>User</b>'s authorization:" +
@@ -642,7 +642,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(message) +
                 " and checking that the <b>User</b> actually has funds matching the request," +
                 " the <b>User&nbsp;Bank</b> transfers money to the <b>Merchant</b> bank account given by the " +
-                keyWord(BACKEND_METHOD_SPECIFIC_JSON) +
+                keyWord(BACKEND_PAYMENT_DATA_JSON) +
                 " object.</p>" +
                 "<p>Note that the actual payment process may be fully <i>asynchronous</i> where the " +
                 "authorization is only used for <i>initiation</i>.</p> ");

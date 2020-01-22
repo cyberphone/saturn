@@ -21,26 +21,52 @@
 
 
 const JsonUtil  = require('webpki.org').JsonUtil;
-const Jcs       = require('webpki.org').Jcs;
+const Jsf       = require('webpki.org').Jsf;
 
 const BaseProperties        = require('./BaseProperties');
+const Messages              = require('./Messages');
+
+const PAYEE_ACCOUNTS_JSON = 'payeeAccounts';
+
+const SEPA_METHOD          = 'https://sepa.payments.org/saturn/v3#bpd';
+const SEPA_PAYEE_IBAN_JSON = 'payeeIban';
 
 function PayeeCoreProperties(rd) {
-  this.homePage = rd.getString(BaseProperties.HOME_PAGE_JSON);
-  this.commonName = rd.getString(BaseProperties.COMMON_NAME_JSON);
-  this.id = rd.getString(BaseProperties.ID_JSON);
-  var payeeAccounts = rd.getArray(BaseProperties.PAYEE_ACCOUNTS_JSON);
+  this[BaseProperties.LOCAL_PAYEE_ID_JSON] = rd.getString(BaseProperties.LOCAL_PAYEE_ID_JSON);
+  this[BaseProperties.HOME_PAGE_JSON] = rd.getString(BaseProperties.HOME_PAGE_JSON);
+  this[BaseProperties.COMMON_NAME_JSON] = rd.getString(BaseProperties.COMMON_NAME_JSON);
+
+// TODO the following line lacks the URL fix...
+  this.urlSafeId = this[BaseProperties.LOCAL_PAYEE_ID_JSON];
+
+// TODO we only understand SEPA...
+  var payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
+  var hashedAccounts = [];
   do {
-    payeeAccounts.scanItem();
+    var entry = payeeAccounts.getObject();
+    if (entry.getString(Messages.CONTEXT_JSON) != SEPA_METHOD) {
+      throw new TypeError('Unknown context: ' + jsonReader.getString(Messages.CONTEXT_JSON));
+    }
+    entry.getString(SEPA_PAYEE_IBAN_JSON);
+    var nonce = entry.getStringConditional(BaseProperties.NONCE_JSON);
+    if (nonce) {
+      if (entry.getBinary(BaseProperties.NONCE_JSON).length != 32) {
+        throw new TypeError('Wrong nonce length');
+      }
+      hashedAccounts.push(nonce);
+    }
   } while (payeeAccounts.hasMore());
+  if (hashedAccounts.length > 0) {
+    this[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON] = hashedAccounts;
+  }
   this.signatureParameters = [];
   var paramArray = rd.getArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
   do {
     var entry = paramArray.getObject();
     var param = {};
-    param[Jcs.ALGORITHM_JSON] = entry.getString(Jcs.ALGORITHM_JSON);
-    param[Jcs.PUBLIC_KEY_JSON] = entry.getPublicKey();
-    this.signatureParameters.push(param);
+    param[Jsf.ALGORITHM_JSON] = entry.getString(Jsf.ALGORITHM_JSON);
+    param[Jsf.PUBLIC_KEY_JSON] = entry.getPublicKey();
+    this[BaseProperties.SIGNATURE_PARAMETERS_JSON].push(param);
   } while (paramArray.hasMore());
   rd.checkForUnread();
 }

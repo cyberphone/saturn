@@ -22,7 +22,7 @@
 const JsonUtil = require('webpki.org').JsonUtil;
 const Keys     = require('webpki.org').Keys;
 const Jef      = require('webpki.org').Jef;
-const Jcs      = require('webpki.org').Jcs;
+const Jsf      = require('webpki.org').Jsf;
 
 const BaseProperties = require('./BaseProperties');
 const Messages       = require('./Messages');
@@ -41,15 +41,15 @@ PayeeAuthority.encode = function(authorityUrl,
   return Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
+    .setString(BaseProperties.LOCAL_PAYEE_ID_JSON, payeeCoreProperties[BaseProperties.LOCAL_PAYEE_ID_JSON])
     .setString(BaseProperties.HOME_PAGE_JSON, payeeCoreProperties[BaseProperties.HOME_PAGE_JSON])
     .setString(BaseProperties.COMMON_NAME_JSON, payeeCoreProperties[BaseProperties.COMMON_NAME_JSON])
-    .setString(BaseProperties.ID_JSON, payeeCoreProperties[BaseProperties.ID_JSON])
     .setDynamic((wr) => {
         var array = wr.setArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
         payeeCoreProperties.signatureParameters.forEach((entry) => {
           array.setObject()
-                 .setString(Jcs.ALGORITHM_JSON, entry[Jcs.ALGORITHM_JSON])
-                 .setPublicKey(entry[Jcs.PUBLIC_KEY_JSON]);
+                 .setString(Jsf.ALGORITHM_JSON, entry[Jsf.ALGORITHM_JSON])
+                 .setPublicKey(entry[Jsf.PUBLIC_KEY_JSON]);
         });
         return wr;
       })

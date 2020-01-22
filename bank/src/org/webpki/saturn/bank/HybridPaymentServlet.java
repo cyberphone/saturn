@@ -72,8 +72,8 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         // Get the payment method (we already know that it is OK since it was dealt with in
         // the initial call).
-        AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
-            authorizationRequest.getPaymentBackendMethodSpecific(BankService.knownPayeeMethods);
+        AuthorizationRequest.BackendPaymentDataDecoder backendPaymentData =
+            authorizationRequest.getBackendPaymentData(BankService.knownPayeeMethods);
         
         // Get payer account data.  Note: transaction request contains ALL required data, the
         // backend system only needs to understand the concept of reserving funds and supply
@@ -94,7 +94,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     DataBaseOperations.externalWithDraw(transactionRequest.getAmount(),
                                                         authorizationData.getAccountId(),
                                                         TransactionTypes.TRANSACT,
-                                                        paymentMethodSpecific.getPayeeAccount(),
+                                                        backendPaymentData.getPayeeAccount(),
                                                         paymentRequest.getPayeeCommonName(),
                                                         paymentRequest.getReferenceId(),
                                                         decodeReferenceId(transactionRequest
@@ -125,7 +125,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                                  paymentMethodSpecific.getPayeeAccount(),
+                                  backendPaymentData.getPayeeAccount(),
                                   testMode, 
                                   BankService.bankKey);
             optionalLogData = ibResponse.getOurReference();

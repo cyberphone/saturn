@@ -14,19 +14,12 @@
  *  limitations under the License.
  *
  */
- 
-'use strict';
+package org.payments.sepa;
 
-// Holder for server signature keys
+import org.webpki.saturn.common.AuthorizationRequest;
 
-const Jsf = require('webpki.org').Jsf;
-
-function ServerAsymKeySigner(privateKey) {
-  this.privateKey = privateKey;
+public final class SEPABackendPaymentDataEncoder extends AuthorizationRequest.BackendPaymentDataEncoder {
+   
+    SEPABackendPaymentDataEncoder() {
+    }
 }
-
-ServerAsymKeySigner.prototype.sign = function(jsonObject) {
-  return new Jsf.Signer(this.privateKey).sign(jsonObject);
-};
-
-module.exports = ServerAsymKeySigner;

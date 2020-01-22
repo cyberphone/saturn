@@ -34,6 +34,7 @@ import org.webpki.crypto.KeyStoreVerifier;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
+import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.util.ArrayUtil;
 import org.webpki.saturn.common.AuthorizationRequest;
@@ -43,8 +44,6 @@ import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
 import org.webpki.webutil.InitPropertyReader;
-import org.payments.sepa.SEPAPaymentBackendMethodEncoder;
-import org.payments.sepa.SEPAPaymentBackendMethodDecoder;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
 
@@ -88,7 +87,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String W3C_PAYMENT_REQUEST_HOST     = "w3c_payment_request_host";
 
-    static final String SEPA_ACCOUNT                 = "sepa-account.json";
+    static final String RECEIVE_ACCOUNTS             = "receive-accounts.json";
 
     static final String VERSION_CHECK                = "android_webpki_versions";
 
@@ -102,7 +101,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static JSONX509Verifier acquirerRoot;
     
-    static LinkedHashMap<String,PaymentNetwork> paymentNetworks = new LinkedHashMap<String,PaymentNetwork>();
+    static LinkedHashMap<String,PaymentNetwork> paymentNetworks = 
+            new LinkedHashMap<String,PaymentNetwork>();
+    
+    static LinkedHashMap<String,AuthorizationRequest.BackendPaymentDataEncoder> receiveAccounts =
+            new LinkedHashMap<String,AuthorizationRequest.BackendPaymentDataEncoder>();
     
     static String merchantCommonName;
     
@@ -119,13 +122,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     // Web2Native Bridge constants
     static String w2nbWalletName;
     
-    // Merchant account data
-    static AuthorizationRequest.PaymentBackendMethodEncoder sepaVerifiableAccount;
-
-    static AuthorizationRequest.PaymentBackendMethodEncoder sepaPlainAccount;
-
-    static String sepaPaymentBackendMethod;
-
     static Boolean testMode;
 
     static boolean logging;
@@ -217,13 +213,17 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                 addPaymentNetwork(MERCHANT_KEY, paymentMethod);
             }
 
-            JSONDecoderCache sepaAccount = new JSONDecoderCache();
-            sepaAccount.addToCache(SEPAPaymentBackendMethodDecoder.class);
-            SEPAPaymentBackendMethodDecoder sepaAccountDecoder = 
-                    (SEPAPaymentBackendMethodDecoder)sepaAccount.parse(readJSONFile(SEPA_ACCOUNT));
-            sepaPaymentBackendMethod = sepaAccountDecoder.getContext();
-            sepaVerifiableAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder);
-            sepaPlainAccount = new SEPAPaymentBackendMethodEncoder(sepaAccountDecoder.getPayeeAccount());
+            JSONDecoderCache knownAccounTypes = new JSONDecoderCache();
+            knownAccounTypes.addToCache(org.payments.sepa.SEPABackendPaymentDataDecoder.class);
+            knownAccounTypes.addToCache(se.bankgirot.BGBackendPaymentDataDecoder.class);
+            JSONArrayReader accounts = readJSONFile(RECEIVE_ACCOUNTS).getJSONArrayReader();
+            do {
+                AuthorizationRequest.BackendPaymentDataDecoder decoder = 
+                        (AuthorizationRequest.BackendPaymentDataDecoder) 
+                            knownAccounTypes.parse(accounts.getObject());
+                receiveAccounts.put(decoder.getContext(), 
+                                    AuthorizationRequest.BackendPaymentDataEncoder.create(decoder));
+            } while (accounts.hasMore());
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 

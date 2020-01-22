@@ -14,41 +14,49 @@
  *  limitations under the License.
  *
  */
-package org.payments.sepa;
+package se.bankgirot;
 
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.AuthorizationRequest;
+import org.webpki.saturn.common.AuthorizationRequest.BackendPaymentDataEncoder;
 
-public final class SEPAPaymentBackendMethodDecoder extends AuthorizationRequest.PaymentBackendMethodDecoder {
+public final class BGBackendPaymentDataDecoder extends AuthorizationRequest.BackendPaymentDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    String payeeIban;
-    
-    byte[] nonce;
+    static final String CONTEXT = "https://bankgirot.se/saturn/v3#bpd";
+
+    static final String BG_NUMBER_JSON = "bgNumber";
+
+    String bgNumber;
     
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        payeeIban = rd.getString(SEPAPaymentBackendMethodEncoder.PAYEE_IBAN_JSON);
-        nonce = rd.getBinaryConditional(BaseProperties.NONCE_JSON);
+        readOptionalNonce(rd);
+        bgNumber = rd.getString(BG_NUMBER_JSON);
     }
 
     @Override
     public String getPayeeAccount() {
-        return payeeIban;
+        return bgNumber;
     }
 
     @Override
-    protected JSONObjectReader getAccountObject() throws IOException {
-        return nonce == null ? null : new JSONObjectReader(getWriter());
+    protected byte[] getAccountObject() throws IOException {
+        return getWriter().serializeToBytes(JSONOutputFormats.CANONICALIZED);
     }
 
     @Override
     public String getContext() {
-        return SEPAPaymentBackendMethodEncoder.CONTEXT;
+        return CONTEXT;
+    }
+
+    @Override
+    protected BackendPaymentDataEncoder createEncoder() {
+        return new BGBackendPaymentDataEncoder();
     }
 }

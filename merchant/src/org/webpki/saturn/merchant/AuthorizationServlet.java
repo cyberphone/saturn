@@ -97,29 +97,34 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             debugData.basicCredit = !cardPayment;
             debugData.acquirerMode = cardPayment;
         }
-        
 
         if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null &&
                 !cardPayment && getHybridModeUrl(providerAuthority) == null) {
             JSONObjectWriter notImplemented = WalletAlertMessage.encode(
-                    "This card type doesn't support gas station payments yet...<p>Please select another card.");
+                    "This card type doesn't support gas station payments yet" +
+                    "...<p>Please select another card.");
             HttpSupport.writeJsonData(response, notImplemented);
             return false;
            
         }
  
         TransactionOperation transactionOperation = new TransactionOperation();
-        String clientPaymentMethodUrl = payerAuthorization.getPaymentMethod().getPaymentMethodUrl();
-        AuthorizationRequest.PaymentBackendMethodEncoder paymentBackendMethodEncoder = null;
-        for (String paymentMethod : providerAuthority.getPaymentBackendMethods(clientPaymentMethodUrl)) {
-            if (paymentMethod.equals(MerchantService.sepaPaymentBackendMethod)) {
-                paymentBackendMethodEncoder = payeeAuthority.getPayeeCoreProperties().getAccountHashes() == null ?
-                        MerchantService.sepaPlainAccount : MerchantService.sepaVerifiableAccount;
+        String clientPaymentMethodUrl =
+                payerAuthorization.getPaymentMethod().getPaymentMethodUrl();
+        AuthorizationRequest.BackendPaymentDataEncoder paymentBackendMethodEncoder = null;
+        for (String backendDataContext : 
+             providerAuthority.getPaymentBackendMethods(clientPaymentMethodUrl)) {
+            if (MerchantService.receiveAccounts.containsKey(backendDataContext)) {
+                paymentBackendMethodEncoder = 
+                        MerchantService.receiveAccounts.get(backendDataContext);
                 break;
             }
         }
         if (paymentBackendMethodEncoder == null) {
-            throw new IOException("No matching paymemt method: " + clientPaymentMethodUrl);
+            JSONObjectWriter notSupported = WalletAlertMessage.encode(
+                    "This issuer is not yet supported...<p>Please select another card.");
+            HttpSupport.writeJsonData(response, notSupported);
+            return false;
         }
 
         // Valid method. Find proper to request key and local id

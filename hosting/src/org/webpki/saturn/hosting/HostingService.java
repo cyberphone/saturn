@@ -38,6 +38,7 @@ import org.webpki.crypto.KeyStoreVerifier;
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
+import org.webpki.json.JSONDecoderCache;
 
 import org.webpki.util.ArrayUtil;
 
@@ -81,6 +82,8 @@ public class HostingService extends InitPropertyReader implements ServletContext
     
     static boolean logging;
 
+    static JSONDecoderCache knownPayeeMethods = new JSONDecoderCache();
+
     
     InputStream getResource(String name) throws IOException {
         return this.getClass().getResourceAsStream(getPropertyString(name));
@@ -114,6 +117,9 @@ public class HostingService extends InitPropertyReader implements ServletContext
              
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
+            knownPayeeMethods.addToCache(org.payments.sepa.SEPABackendPaymentDataDecoder.class);
+
+
             JSONArrayReader accounts = JSONParser.parse(
                     ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
@@ -122,8 +128,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
                 PayeeCoreProperties account = 
                         PayeeCoreProperties.init(accounts.getObject(),
                                                  getPropertyString(HOSTING_BASE_URL) + "/payees/",
-                                                 null,
-                                                 false);
+                                                 knownPayeeMethods);
                 merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
             }
 

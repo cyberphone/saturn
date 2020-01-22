@@ -74,7 +74,7 @@
       <replacefilter token="@acquirer-base-url@" value="${@acquirerhost}/${@acquirerpath}"/>
       <replacefilter token="@payer-interbank-url@" value="${@payerbankhost}/${@payerbankpath}/interbanking"/>
       <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
-      <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
+      <replacefilter token="@payee-account-db@" value="${merchants.db}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>

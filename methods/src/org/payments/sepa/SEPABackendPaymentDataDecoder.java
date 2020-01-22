@@ -18,37 +18,40 @@ package org.payments.sepa;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONOutputFormats;
 
 import org.webpki.saturn.common.AuthorizationRequest;
-import org.webpki.saturn.common.BaseProperties;
 
-public final class SEPAPaymentBackendMethodEncoder extends AuthorizationRequest.PaymentBackendMethodEncoder {
+public final class SEPABackendPaymentDataDecoder extends AuthorizationRequest.BackendPaymentDataDecoder {
 
-    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#pbm";
+    private static final long serialVersionUID = 1L;
+
+    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#bpd";
 
     static final String PAYEE_IBAN_JSON = "payeeIban";
 
     String payeeIban;
     
-    byte[] nonce;
-
-    public SEPAPaymentBackendMethodEncoder(SEPAPaymentBackendMethodDecoder sepaPaymentMethodDecoder) {
-        this(sepaPaymentMethodDecoder.payeeIban);
-        nonce = sepaPaymentMethodDecoder.nonce;
+    @Override
+    protected void readJSONData(JSONObjectReader rd) throws IOException {
+        readOptionalNonce(rd);
+        payeeIban = rd.getString(PAYEE_IBAN_JSON);
     }
-
-    public SEPAPaymentBackendMethodEncoder(String payeeIban) {
-        this.payeeIban = payeeIban;
+    
+    @Override
+    protected SEPABackendPaymentDataEncoder createEncoder() {
+        return new SEPABackendPaymentDataEncoder();
     }
 
     @Override
-    protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        wr.setString(PAYEE_IBAN_JSON, payeeIban);
-        if (nonce != null) {
-            wr.setBinary(BaseProperties.NONCE_JSON, nonce);
-        }
-        return wr;
+    public String getPayeeAccount() {
+        return payeeIban;
+    }
+
+    @Override
+    protected byte[] getAccountObject() throws IOException {
+        return getWriter().serializeToBytes(JSONOutputFormats.CANONICALIZED);
     }
 
     @Override

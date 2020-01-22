@@ -62,12 +62,12 @@ public class HomeServlet extends HttpServlet {
          .append(authorityUrl)
          .append("</a>")
          .append("</td></tr><tr><td style=\"padding-bottom:4pt\">Registered merchants:");
-        if (BankService.merchantAccountDb.isEmpty()) {
+        if (BankService.PayeeAccountDb.isEmpty()) {
             html.append(" <i>None</i></td></tr>");
         } else {
             html.append("</td></tr>" +
                 "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
-            for (PayeeCoreProperties payeeCoreProperties : BankService.merchantAccountDb.values()) {
+            for (PayeeCoreProperties payeeCoreProperties : BankService.PayeeAccountDb.values()) {
                 String payeeAuthorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
                 html.append("<tr><td style=\"text-align:right\">")
                  .append(payeeCoreProperties.getPayeeId())

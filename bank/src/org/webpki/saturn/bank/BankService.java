@@ -101,10 +101,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
     static final String USER_ACCOUNT_DB       = "user_account_db";
     
-    static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
+    static final String PAYEE_ACCOUNT_DB      = "payee_account_db";
     
-    static final String ACCOUNT_VALIDATION    = "merchant_account_validation";
-
     static final String SERVER_PORT_MAP       = "server_port_map";
     
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
@@ -120,7 +118,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys =
             new ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder>();
     
-     static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
+     static LinkedHashMap<String,PayeeCoreProperties> PayeeAccountDb =
             new LinkedHashMap<String,PayeeCoreProperties>();
     
     static String bankCommonName;
@@ -273,7 +271,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
-            knownPayeeMethods.addToCache(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class);
+            knownPayeeMethods.addToCache(org.payments.sepa.SEPABackendPaymentDataDecoder.class);
+            knownPayeeMethods.addToCache(se.bankgirot.BGBackendPaymentDataDecoder.class);
 
             knownAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
 
@@ -302,19 +301,17 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             
             String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
-            boolean accountValidation = getPropertyBoolean(ACCOUNT_VALIDATION);
             if (hostingProvider == null) {
                 JSONArrayReader accounts = 
                     JSONParser.parse(ArrayUtil
-                        .getByteArrayFromInputStream(getResource(MERCHANT_ACCOUNT_DB)))
+                        .getByteArrayFromInputStream(getResource(PAYEE_ACCOUNT_DB)))
                             .getJSONArrayReader();
                 while (accounts.hasMore()) {
                     PayeeCoreProperties account = 
                             PayeeCoreProperties.init(accounts.getObject(),
                                                      bankBaseUrl + "/payees/",
-                                                     knownPayeeMethods,
-                                                     accountValidation);
-                    merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
+                                                     knownPayeeMethods);
+                    PayeeAccountDb.put(account.getPayeeAuthorityUrl(), account);
                 }
             }
 
@@ -339,10 +336,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 new ProviderAuthority.PaymentMethodDeclarations()
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
                             PaymentMethods.BANK_DIRECT.getPaymentMethodUrl())
-                                .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class))
+                                .add(org.payments.sepa.SEPABackendPaymentDataDecoder.class)
+                                .add(se.bankgirot.BGBackendPaymentDataDecoder.class))
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
                             PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
-                                .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
+                                .add(org.payments.sepa.SEPABackendPaymentDataDecoder.class)),
                 optionalProviderExtensions,
                 new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                 new ProviderAuthority.EncryptionParameter[]{
@@ -353,7 +351,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 hostingProvider,
                 bankKey,
 
-                merchantAccountDb.values(),
+                PayeeAccountDb.values(),
                 hostingProvider == null ? new ServerAsymKeySigner(bankcreds) : null,
 
                 PROVIDER_EXPIRATION_TIME,

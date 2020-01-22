@@ -51,7 +51,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                 .getAuthorizationResponse()
                     .getAuthorizationRequest()
                         .getAuthorityUrl();
-        PayeeCoreProperties payeeCoreProperties = AcquirerService.merchantAccountDb.get(payeeAuthorityUrl);
+        PayeeCoreProperties payeeCoreProperties = AcquirerService.payeeAccountDb.get(payeeAuthorityUrl);
         if (payeeCoreProperties == null) {
             throw new IOException("Unknown merchant: " + payeeAuthorityUrl);
         }

@@ -29,7 +29,7 @@ const Fs    = require('fs');
 
 // WebPKI.org library imports
 const Keys      = require('webpki.org').Keys;
-const Jcs       = require('webpki.org').Jcs;
+const Jsf       = require('webpki.org').Jsf;
 const JsonUtil  = require('webpki.org').JsonUtil;
 const Logging   = require('webpki.org').Logging;
 
@@ -106,8 +106,8 @@ var payees = new JsonUtil.ArrayReader(JSON.parse(readFile(Config.payeeDb).toStri
 do {
   var payeeCoreProperties = new PayeeCoreProperties(payees.getObject());
   payeeCoreProperties[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
-  payeeDb.set(payeeCoreProperties[BaseProperties.ID_JSON], payeeCoreProperties);
-  logger.info('Added payee: ' + payeeCoreProperties[BaseProperties.ID_JSON]);
+  payeeDb.set(payeeCoreProperties.urlSafeId, payeeCoreProperties);
+  logger.info('Added payee: ' + payeeCoreProperties.urlSafeId);
 } while (payees.hasMore());
 
 var providerAuthority;
@@ -141,11 +141,11 @@ const jsonPostProcessors = {
       throw new TypeError('Unknown merchant ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
     }
     if (!cardPaymentRequest.getPublicKey().equals(
-         payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jcs.PUBLIC_KEY_JSON])) {
+         payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jsf.PUBLIC_KEY_JSON])) {
       throw new TypeError('Public key doesn\'t match merchant ID=' + payee.getId());
     }
     if (!cardPaymentRequest.getAuthorizationPublicKey().equals(
-        payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jcs.PUBLIC_KEY_JSON])) {
+        payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jsf.PUBLIC_KEY_JSON])) {
       throw new TypeError('Public key doesn\'t match merchant ID=' + payee.getId());
     }
 

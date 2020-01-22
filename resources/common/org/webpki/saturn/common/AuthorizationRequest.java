@@ -40,44 +40,55 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequest implements BaseProperties {
     
-    public static abstract class PaymentBackendMethodDecoder extends JSONDecoder {
+    public static abstract class BackendPaymentDataDecoder extends JSONDecoder {
 
         private static final long serialVersionUID = 1L;
+        
+        private byte[] optionalNonce;
 
-        public String logLine() throws IOException {
+        public final String logLine() throws IOException {
             return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
         }
 
-        public byte[] getAccountHash() throws IOException {
-            JSONObjectReader account = getAccountObject();
-            return account == null ? null :
-                HashAlgorithms.SHA256.digest(account.serializeToBytes(JSONOutputFormats.CANONICALIZED));
+        public final byte[] getAccountHash() throws IOException {
+            return optionalNonce == null ? null : HashAlgorithms.SHA256.digest(getAccountObject());
         }
 
-        protected abstract JSONObjectReader getAccountObject() throws IOException;
+        // All invariant backend payment data (minimally: account number + context)
+        // returned as a canonical binary
+        protected abstract byte[] getAccountObject() throws IOException;
 
+        // Account number
         public abstract String getPayeeAccount();
+
+        // Must be called in every BackendPaymentDataDecoder.readJSONData()
+        protected final void readOptionalNonce(JSONObjectReader rd) throws IOException {
+            optionalNonce = rd.getBinaryConditional(NONCE_JSON);
+        }
+        
+        protected abstract BackendPaymentDataEncoder createEncoder();
     }
 
-    public static abstract class PaymentBackendMethodEncoder {
+    public static abstract class BackendPaymentDataEncoder {
+        
+        private BackendPaymentDataDecoder backendPaymentDataDecoder;
 
-        protected abstract JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException;
-        
-        public abstract String getContext();
-        
-        public String getQualifier() {
-            return null;  // Optional
+        public final String getContext() {
+            return backendPaymentDataDecoder.getContext();
         }
-        
-        public JSONObjectWriter writeObject() throws IOException {
-            return new JSONObjectWriter()
-                .setString(JSONDecoderCache.CONTEXT_JSON, getContext())
-                .setDynamic((wr) -> {
-                    if (getQualifier() != null) {
-                        wr.setString(JSONDecoderCache.QUALIFIER_JSON, getQualifier());
-                    }
-                    return writeObject(wr);
-                });
+
+        public final String getQualifier() {
+            return backendPaymentDataDecoder.getQualifier();  // Optional
+        }
+
+        public final JSONObjectWriter writeObject() throws IOException {
+            return backendPaymentDataDecoder.getWriter();
+        }
+
+        public final static BackendPaymentDataEncoder create(BackendPaymentDataDecoder backendPaymentDataDecoder) {
+            BackendPaymentDataEncoder backendPaymentDataEncoder = backendPaymentDataDecoder.createEncoder();
+            backendPaymentDataEncoder.backendPaymentDataDecoder = backendPaymentDataDecoder;
+            return backendPaymentDataEncoder;
         }
     }
 
@@ -91,8 +102,8 @@ public class AuthorizationRequest implements BaseProperties {
         encryptedAuthorizationData = 
                 rd.getObject(ENCRYPTED_AUTHORIZATION_JSON)
                     .getEncryptionObject(new JSONCryptoHelper.Options()).require(true);
-        undecodedPaymentMethodSpecific = rd.getObject(BACKEND_METHOD_SPECIFIC_JSON);
-        rd.scanAway(BACKEND_METHOD_SPECIFIC_JSON);  // Read all to not throw on checkForUnread()
+        undecodedPaymentMethodSpecific = rd.getObject(BACKEND_PAYMENT_DATA_JSON);
+        rd.scanAway(BACKEND_PAYMENT_DATA_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
@@ -124,9 +135,9 @@ public class AuthorizationRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    public PaymentBackendMethodDecoder getPaymentBackendMethodSpecific(
+    public BackendPaymentDataDecoder getBackendPaymentData(
                                   JSONDecoderCache knownPaymentMethods) throws IOException {
-        return (PaymentBackendMethodDecoder) knownPaymentMethods
+        return (BackendPaymentDataDecoder) knownPaymentMethods
                 .parse(undecodedPaymentMethodSpecific.clone()); // Clone => Fresh read
     }
 
@@ -167,7 +178,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          PaymentBackendMethodEncoder paymentMethodSpecific,
+                                          BackendPaymentDataEncoder paymentMethodSpecific,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
@@ -177,7 +188,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setObject(BACKEND_METHOD_SPECIFIC_JSON, paymentMethodSpecific.writeObject())
+            .setObject(BACKEND_PAYMENT_DATA_JSON, paymentMethodSpecific.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)

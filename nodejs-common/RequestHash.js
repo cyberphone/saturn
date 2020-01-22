@@ -19,7 +19,7 @@
 
 // RequestHash object
 
-const Jcs = require('webpki.org').Jcs;
+const Jsf = require('webpki.org').Jsf;
 const Hash = require('webpki.org').Hash;
 
 const BaseProperties = require('./BaseProperties');
@@ -37,10 +37,10 @@ const RequestHash = {
 
   parse : function(rd) {
     rd = rd.getObject(BaseProperties.REQUEST_HASH_JSON);
-    if (rd.getString(Jcs.ALGORITHM_JSON) != RequestHash.JOSE_SHA_256_ALG_ID) {
+    if (rd.getString(Jsf.ALGORITHM_JSON) != RequestHash.JOSE_SHA_256_ALG_ID) {
       throw new TypeError('Expected algorithm: ' + RequestHash.JOSE_SHA_256_ALG_ID);
     }
-    return rd.getBinary(Jcs.VALUE_JSON);
+    return rd.getBinary(Jsf.VALUE_JSON);
   }
 
 };

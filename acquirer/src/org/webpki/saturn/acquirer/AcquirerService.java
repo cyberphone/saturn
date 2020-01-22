@@ -81,7 +81,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     
     static final String EXTENSIONS            = "provider_extensions";
 
-    static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
+    static final String PAYEE_ACCOUNT_DB      = "payee_account_db";
 
     static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
@@ -94,7 +94,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys = 
             new ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder>();
 
-    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
+    static LinkedHashMap<String,PayeeCoreProperties> payeeAccountDb =
             new LinkedHashMap<String,PayeeCoreProperties>();
 
     static JSONX509Verifier paymentRoot;
@@ -180,7 +180,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             
             knownAccountTypes.addToCache(com.supercard.SupercardAccountDataDecoder.class);
 
-            knownPayeeMethods.addToCache(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class);
+            knownPayeeMethods.addToCache(org.payments.sepa.SEPABackendPaymentDataDecoder.class);
 
             KeyStoreEnumerator acquirercreds = new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD));
@@ -189,16 +189,15 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             paymentRoot = getRoot(PAYMENT_ROOT);
 
             JSONArrayReader accounts = JSONParser.parse(
-                    ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
+                    ArrayUtil.getByteArrayFromInputStream (getResource(PAYEE_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
             String acquirerBaseUrl = getPropertyString(ACQUIRER_BASE_URL);
 
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
                                                                        acquirerBaseUrl + "/payees/",
-                                                                       knownPayeeMethods,
-                                                                       false);
-                merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
+                                                                       knownPayeeMethods);
+                payeeAccountDb.put(account.getPayeeAuthorityUrl(), account);
             }
 
             addDecryptionKey(DECRYPTION_KEY1);
@@ -219,7 +218,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 new ProviderAuthority.PaymentMethodDeclarations()
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
                                        PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
-                                .add(org.payments.sepa.SEPAPaymentBackendMethodDecoder.class)),
+                                .add(org.payments.sepa.SEPABackendPaymentDataDecoder.class)),
                 optionalProviderExtensions,
                 new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                 new ProviderAuthority.EncryptionParameter[]{
@@ -230,7 +229,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 null,
                 acquirerKey,
 
-                merchantAccountDb.values(), 
+                payeeAccountDb.values(), 
                 new ServerAsymKeySigner(acquirercreds),
 
                 PROVIDER_EXPIRATION_TIME,

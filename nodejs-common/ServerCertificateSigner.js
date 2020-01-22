@@ -19,7 +19,7 @@
 
 // Holder for server signature keys
 
-const Jcs = require('webpki.org').Jcs;
+const Jsf = require('webpki.org').Jsf;
 
 function ServerCertificateSigner(privateKey, certificatePath) {
   this.privateKey = privateKey;
@@ -27,7 +27,7 @@ function ServerCertificateSigner(privateKey, certificatePath) {
 }
 
 ServerCertificateSigner.prototype.sign = function(jsonObject) {
-  var signer = new Jcs.Signer(this.privateKey);
+  var signer = new Jsf.Signer(this.privateKey);
   signer.setCertificatePath(this.certificatePath, true);
   return signer.sign(jsonObject);
 };

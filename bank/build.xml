@@ -58,7 +58,6 @@
     <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
     <delete dir="${temp.dir}"/>
     <property name="bank.path" value="${appcorename}"/>
-    <property name="payee.account.validation" value="true"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="server.port.map" value=""/>
     <property name="merchants.db" value="merchants.${appcorename}.json"/>
@@ -109,8 +108,7 @@
       <replacefilter token="@payer-interbank-url@" value="${@payerbankhost}/${@payerbankpath}/interbanking"/>
       <replacefilter token="@payee-interbank-url@" value="${@payeebankhost}/${@payeebankpath}/interbanking"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
-      <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
-      <replacefilter token="@merchant-account-validation@" value="${payee.account.validation}"/>
+      <replacefilter token="@payee-account-db@" value="${merchants.db}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>

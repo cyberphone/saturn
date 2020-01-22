@@ -93,25 +93,19 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public static PayeeCoreProperties init(JSONObjectReader rd,
                                            String payeeBaseAuthorityUrl,
-
-                                           // Only of interest if addVerifier = true
-                                           JSONDecoderCache knownPaymentMethods,
-
-                                           boolean addVerifier) throws IOException {
+                                           JSONDecoderCache knownPaymentMethods) throws IOException {
         ArrayList<byte[]> optionalAccountHashes = new ArrayList<byte[]>();
-        if (addVerifier) {
-            JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
-            do {
-                AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodDecoder =
-                    (AuthorizationRequest
-                            .PaymentBackendMethodDecoder)knownPaymentMethods
-                                .parse(payeeAccounts.getObject());
-                byte[] accountHash = paymentMethodDecoder.getAccountHash();
-                if (accountHash != null) {
-                    optionalAccountHashes.add(accountHash);
-                }
-            } while (payeeAccounts.hasMore());
-        }
+        JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
+        do {
+            AuthorizationRequest.BackendPaymentDataDecoder paymentMethodDecoder =
+                (AuthorizationRequest
+                        .BackendPaymentDataDecoder)knownPaymentMethods
+                            .parse(payeeAccounts.getObject());
+            byte[] accountHash = paymentMethodDecoder.getAccountHash();
+            if (accountHash != null) {
+                optionalAccountHashes.add(accountHash);
+            }
+        } while (payeeAccounts.hasMore());
         PayeeCoreProperties payeeCoreProperties = new PayeeCoreProperties(rd);
         payeeCoreProperties.optionalAccountHashes = 
                 optionalAccountHashes.isEmpty() ? null : optionalAccountHashes;
@@ -181,7 +175,7 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public void verifyAccount(
-            AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific)
+            AuthorizationRequest.BackendPaymentDataDecoder paymentMethodSpecific)
     throws IOException {
         byte[] accountHash = paymentMethodSpecific.getAccountHash();
         if (getAccountHashes() == null) {

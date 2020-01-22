@@ -53,9 +53,9 @@
     </context-param>
    
     <context-param>
-        <description>Merchant Accounts</description>
-        <param-name>merchant_account_db</param-name>
-        <param-value>@merchant-account-db@</param-value>
+        <description>Payee Accounts</description>
+        <param-name>payee_account_db</param-name>
+        <param-value>@payee-account-db@</param-value>
     </context-param>
 
     <context-param>

@@ -69,8 +69,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Verify that we understand the backend payment method
-        AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
-            authorizationRequest.getPaymentBackendMethodSpecific(BankService.knownPayeeMethods);
+        AuthorizationRequest.BackendPaymentDataDecoder backendPaymentData =
+            authorizationRequest.getBackendPaymentData(BankService.knownPayeeMethods);
 
         // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
@@ -128,7 +128,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(authorizationRequest.getSignatureDecoder());
 
         // Optionally verify the claimed Payee account
-        payeeCoreProperties.verifyAccount(paymentMethodSpecific);
+        payeeCoreProperties.verifyAccount(backendPaymentData);
 
         // Decrypt and validate the encrypted Payer authorization
         AuthorizationData authorizationData = 
@@ -208,7 +208,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     DataBaseOperations.externalWithDraw(amount,
                                                         accountId,
                                                         transactionType,
-                                                        paymentMethodSpecific.getPayeeAccount(),
+                                                        backendPaymentData.getPayeeAccount(),
                                                         paymentRequest.getPayeeCommonName(),
                                                         paymentRequest.getReferenceId(),
                                                         null,
@@ -248,7 +248,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                           paymentRequest.getCurrency().toString(),
                                           paymentRequest.getPayeeCommonName(),
                                           paymentRequest.getReferenceId(),
-                                          paymentMethodSpecific.getPayeeAccount(),
+                                          backendPaymentData.getPayeeAccount(),
                                           testMode, 
                                           BankService.bankKey);
                     optionalLogData = ibResponse.getOurReference();
@@ -278,7 +278,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     ", Account ID=" + accountId + 
                     ", Payment Method=" + authorizationData.getPaymentMethodUrl() + 
                     ", Client IP=" + clientIpAddress +
-                    ", Method Specific=" + paymentMethodSpecific.logLine());
+                    ", Method Specific=" + backendPaymentData.logLine());
 
         // We did it!
         BankService.successfulTransactions++;

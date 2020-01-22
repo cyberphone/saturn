@@ -77,19 +77,19 @@ public class ProviderAuthority implements BaseProperties {
         PaymentMethodDeclaration(String clientPaymentMethod,
                                  String[] backendPaymentMethods) {
             this(clientPaymentMethod);
-            for (String backendPaymentMethod : backendPaymentMethods) {
-                this.backendPaymentMethods.add(backendPaymentMethod);
+            for (String backendPaymentData : backendPaymentMethods) {
+                this.backendPaymentMethods.add(backendPaymentData);
             }
         }
 
         public PaymentMethodDeclaration add(
-            Class<? extends AuthorizationRequest.PaymentBackendMethodDecoder> pbmd) 
+            Class<? extends AuthorizationRequest.BackendPaymentDataDecoder> pbmd) 
                 throws InstantiationException, IllegalAccessException {
             backendPaymentMethods.add(pbmd.newInstance().getContext());
             return this;
         }
         
-        public String[] getBackendPaymentMethods() {
+        public String[] getBackendPaymentDatas() {
             return backendPaymentMethods.toArray(new String[0]);
         }
     }
@@ -107,7 +107,7 @@ public class ProviderAuthority implements BaseProperties {
             for (String clientPaymentMethod : paymentMethodDeclarations.keySet()) {
                 pmdObject.setStringArray(clientPaymentMethod, 
                                          paymentMethodDeclarations.get(clientPaymentMethod)
-                                             .getBackendPaymentMethods());
+                                             .getBackendPaymentDatas());
             }
             return pmdObject;
         }
@@ -292,7 +292,7 @@ public class ProviderAuthority implements BaseProperties {
         if (pmd == null) {
             throw new IOException("Unknown method: " + clientPaymentMethod);
         }
-        return pmd.getBackendPaymentMethods();
+        return pmd.getBackendPaymentDatas();
     }
 
     EncryptionParameter[] encryptionParameters;

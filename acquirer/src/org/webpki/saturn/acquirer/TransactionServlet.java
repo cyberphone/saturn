@@ -48,10 +48,10 @@ public class TransactionServlet extends ProcessingBaseServlet {
         PaymentRequest paymentRequest = transactionRequest.getPaymentRequest();
         
         // Verify that we understand the payee payment method
-        AuthorizationRequest.PaymentBackendMethodDecoder paymentMethodSpecific =
+        AuthorizationRequest.BackendPaymentDataDecoder backendPaymentMethodSpecific =
                 transactionRequest.getAuthorizationResponse()
                     .getAuthorizationRequest()
-                        .getPaymentBackendMethodSpecific(AcquirerService.knownPayeeMethods);
+                        .getBackendPaymentData(AcquirerService.knownPayeeMethods);
 
         // Verify that the payer's (user) bank is known
         transactionRequest.verifyPayerBank(AcquirerService.paymentRoot);
@@ -61,7 +61,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                 .getAuthorizationResponse()
                     .getAuthorizationRequest()
                         .getAuthorityUrl();
-        PayeeCoreProperties payeeCoreProperties = AcquirerService.merchantAccountDb.get(payeeAuthorityUrl);
+        PayeeCoreProperties payeeCoreProperties = AcquirerService.payeeAccountDb.get(payeeAuthorityUrl);
         if (payeeCoreProperties == null) {
             throw new IOException("Unknown merchant: " + payeeAuthorityUrl);
         }
@@ -87,7 +87,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                                  paymentMethodSpecific.getPayeeAccount(),
+                                  backendPaymentMethodSpecific.getPayeeAccount(),
                                   testMode,
                                   AcquirerService.acquirerKey);
         if (!testMode) {
