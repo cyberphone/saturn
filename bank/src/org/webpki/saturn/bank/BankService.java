@@ -271,8 +271,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
-            knownPayeeMethods.addToCache(org.payments.sepa.SEPABackendPaymentDataDecoder.class);
-            knownPayeeMethods.addToCache(se.bankgirot.BGBackendPaymentDataDecoder.class);
+            knownPayeeMethods.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
+            knownPayeeMethods.addToCache(se.bankgirot.BGAccountDataDecoder.class);
 
             knownAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
 
@@ -336,11 +336,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 new ProviderAuthority.PaymentMethodDeclarations()
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
                             PaymentMethods.BANK_DIRECT.getPaymentMethodUrl())
-                                .add(org.payments.sepa.SEPABackendPaymentDataDecoder.class)
-                                .add(se.bankgirot.BGBackendPaymentDataDecoder.class))
+                                .add(org.payments.sepa.SEPAAccountDataDecoder.class)
+                                .add(se.bankgirot.BGAccountDataDecoder.class))
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
                             PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
-                                .add(org.payments.sepa.SEPABackendPaymentDataDecoder.class)),
+                                .add(org.payments.sepa.SEPAAccountDataDecoder.class)),
                 optionalProviderExtensions,
                 new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                 new ProviderAuthority.EncryptionParameter[]{

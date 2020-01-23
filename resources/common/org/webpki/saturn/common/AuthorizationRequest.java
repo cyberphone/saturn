@@ -23,15 +23,11 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 
-import org.webpki.crypto.HashAlgorithms;
-
 import org.webpki.json.JSONCryptoHelper;
-import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
-import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 
@@ -40,58 +36,6 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequest implements BaseProperties {
     
-    public static abstract class BackendPaymentDataDecoder extends JSONDecoder {
-
-        private static final long serialVersionUID = 1L;
-        
-        private byte[] optionalNonce;
-
-        public final String logLine() throws IOException {
-            return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
-        }
-
-        public final byte[] getAccountHash() throws IOException {
-            return optionalNonce == null ? null : HashAlgorithms.SHA256.digest(getAccountObject());
-        }
-
-        // All invariant backend payment data (minimally: account number + context)
-        // returned as a canonical binary
-        protected abstract byte[] getAccountObject() throws IOException;
-
-        // Account number
-        public abstract String getPayeeAccount();
-
-        // Must be called in every BackendPaymentDataDecoder.readJSONData()
-        protected final void readOptionalNonce(JSONObjectReader rd) throws IOException {
-            optionalNonce = rd.getBinaryConditional(NONCE_JSON);
-        }
-        
-        protected abstract BackendPaymentDataEncoder createEncoder();
-    }
-
-    public static abstract class BackendPaymentDataEncoder {
-        
-        private BackendPaymentDataDecoder backendPaymentDataDecoder;
-
-        public final String getContext() {
-            return backendPaymentDataDecoder.getContext();
-        }
-
-        public final String getQualifier() {
-            return backendPaymentDataDecoder.getQualifier();  // Optional
-        }
-
-        public final JSONObjectWriter writeObject() throws IOException {
-            return backendPaymentDataDecoder.getWriter();
-        }
-
-        public final static BackendPaymentDataEncoder create(BackendPaymentDataDecoder backendPaymentDataDecoder) {
-            BackendPaymentDataEncoder backendPaymentDataEncoder = backendPaymentDataDecoder.createEncoder();
-            backendPaymentDataEncoder.backendPaymentDataDecoder = backendPaymentDataDecoder;
-            return backendPaymentDataEncoder;
-        }
-    }
-
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
@@ -102,8 +46,8 @@ public class AuthorizationRequest implements BaseProperties {
         encryptedAuthorizationData = 
                 rd.getObject(ENCRYPTED_AUTHORIZATION_JSON)
                     .getEncryptionObject(new JSONCryptoHelper.Options()).require(true);
-        undecodedPaymentMethodSpecific = rd.getObject(BACKEND_PAYMENT_DATA_JSON);
-        rd.scanAway(BACKEND_PAYMENT_DATA_JSON);  // Read all to not throw on checkForUnread()
+        undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
+        rd.scanAway(PAYEE_RECEIVE_ACCOUNT_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
@@ -118,7 +62,7 @@ public class AuthorizationRequest implements BaseProperties {
 
     JSONObjectReader root;
     
-    JSONObjectReader undecodedPaymentMethodSpecific;
+    JSONObjectReader undecodedAccountData;
 
     boolean testMode;
     public boolean getTestMode() {
@@ -135,10 +79,9 @@ public class AuthorizationRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    public BackendPaymentDataDecoder getBackendPaymentData(
-                                  JSONDecoderCache knownPaymentMethods) throws IOException {
-        return (BackendPaymentDataDecoder) knownPaymentMethods
-                .parse(undecodedPaymentMethodSpecific.clone()); // Clone => Fresh read
+    public AccountDataDecoder getPayeeReceiveAccount(JSONDecoderCache knownAccountTypes)
+    throws IOException {
+        return (AccountDataDecoder) knownAccountTypes.parse(undecodedAccountData);
     }
 
     GregorianCalendar timeStamp;
@@ -178,7 +121,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
-                                          BackendPaymentDataEncoder paymentMethodSpecific,
+                                          AccountDataEncoder payeeReceiveAccount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
@@ -188,7 +131,7 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setObject(BACKEND_PAYMENT_DATA_JSON, paymentMethodSpecific.writeObject())
+            .setObject(PAYEE_RECEIVE_ACCOUNT_JSON, payeeReceiveAccount.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)

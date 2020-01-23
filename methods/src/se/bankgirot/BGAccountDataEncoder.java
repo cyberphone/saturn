@@ -14,12 +14,24 @@
  *  limitations under the License.
  *
  */
-package org.payments.sepa;
+package se.bankgirot;
 
-import org.webpki.saturn.common.AuthorizationRequest;
+import java.io.IOException;
 
-public final class SEPABackendPaymentDataEncoder extends AuthorizationRequest.BackendPaymentDataEncoder {
-   
-    SEPABackendPaymentDataEncoder() {
+import org.webpki.saturn.common.AccountDataEncoder;
+
+public final class BGAccountDataEncoder extends AccountDataEncoder {
+
+    BGAccountDataEncoder() {
+    }
+    
+    public BGAccountDataEncoder(String bgNumber) throws IOException {
+        setInternal(BGAccountDataDecoder.CONTEXT)
+            .setString(BGAccountDataDecoder.BG_NUMBER_JSON, bgNumber);
+    }
+
+    @Override
+    public String getPartialAccountIdentifier(String bgNumber) {
+        return bgNumber.substring(0, 2) + '*' + bgNumber.substring(bgNumber.length() - 4);
     }
 }

@@ -20,46 +20,27 @@ import java.io.IOException;
 
 import java.util.GregorianCalendar;
 
-import org.webpki.json.JSONObjectWriter;
-
+import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.AuthorizationResponse;
 
 import org.webpki.util.ISODateTime;
 
-public final class SupercardAccountDataEncoder extends AuthorizationResponse.AccountDataEncoder {
+public final class SupercardAccountDataEncoder extends AccountDataEncoder {
 
-    static final String ACCOUNT_DATA       = "https://supercard.com/saturn/v3#ad";
-
-    static final String CARD_NUMBER_JSON   = "cardNumber";    // PAN
-    static final String CARD_HOLDER_JSON   = "cardHolder";    // Name
-
-    String cardNumber;                   // PAN
-    String cardHolder;                   // Name
-    GregorianCalendar expirationDate;    // Card expiration date
-
+    SupercardAccountDataEncoder() {
+    }
+    
     public SupercardAccountDataEncoder(String cardNumber,
                                        String cardHolder,
-                                       GregorianCalendar expirationDate) {
-        this.cardNumber = cardNumber;
-        this.cardHolder = cardHolder;
-        this.expirationDate = expirationDate;
+                                       GregorianCalendar expirationDate) throws IOException {
+        setInternal(SupercardAccountDataDecoder.CONTEXT)
+            .setString(SupercardAccountDataDecoder.CARD_NUMBER_JSON, cardNumber)
+            .setString(SupercardAccountDataDecoder.CARD_HOLDER_JSON, cardHolder)
+            .setDateTime(BaseProperties.EXPIRES_JSON, expirationDate, ISODateTime.UTC_NO_SUBSECONDS);
     }
 
     @Override
-    protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        return wr.setString(CARD_NUMBER_JSON, cardNumber)
-                 .setString(CARD_HOLDER_JSON, cardHolder)
-                 .setDateTime(BaseProperties.EXPIRES_JSON, expirationDate, ISODateTime.UTC_NO_SUBSECONDS);
-    }
-
-    @Override
-    public String getContext() {
-        return ACCOUNT_DATA;
-    }
-
-    @Override
-    public String getPartialAccountIdentifier() {
+    public String getPartialAccountIdentifier(String cardNumber) {
         StringBuilder accountReference = new StringBuilder();
         int q = cardNumber.length() - 4;
         for (char c : cardNumber.toCharArray()) {

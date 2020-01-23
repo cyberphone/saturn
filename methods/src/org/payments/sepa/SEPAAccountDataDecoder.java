@@ -19,25 +19,43 @@ package org.payments.sepa;
 import java.io.IOException;
 
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AccountDataDecoder;
 
-public final class SEPAAccountDataDecoder extends AuthorizationResponse.AccountDataDecoder {
+public final class SEPAAccountDataDecoder extends AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    String payerIban;
-    public String geyPayerIban() {
-        return payerIban;
+    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#ad";
+
+    static final String IBAN_JSON = "iban";
+
+    String iban;
+    
+    @Override
+    protected void readJSONData(JSONObjectReader rd) throws IOException {
+        readOptionalNonce(rd);
+        iban = rd.getString(IBAN_JSON);
+    }
+    
+    @Override
+    protected SEPAAccountDataEncoder createEncoder() {
+        return new SEPAAccountDataEncoder();
     }
 
     @Override
-    protected void readJSONData(JSONObjectReader rd) throws IOException {
-        payerIban = rd.getString(SEPAAccountDataEncoder.PAYER_IBAN_JSON);
+    public String getAccountId() {
+        return iban;
+    }
+
+    @Override
+    protected byte[] getAccountObject() throws IOException {
+        return getWriter().serializeToBytes(JSONOutputFormats.CANONICALIZED);
     }
 
     @Override
     public String getContext() {
-        return SEPAAccountDataEncoder.CONTEXT;
+        return CONTEXT;
     }
 }

@@ -26,16 +26,12 @@ import java.sql.Connection;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.RefundRequest;
 import org.webpki.saturn.common.RefundResponse;
-
-import com.supercard.SupercardAccountDataDecoder;
-
-import org.payments.sepa.SEPAAccountDataDecoder;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // This is the Saturn "refund" decoder servlet                                           //
@@ -66,12 +62,10 @@ public class RefundServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(refundRequest.getSignatureDecoder());
 
         // Get payer account data.
-        AuthorizationResponse.AccountDataDecoder accountData = 
+        AccountDataDecoder accountData = 
             refundRequest.getAuthorizationResponse().getProtectedAccountData(BankService.knownAccountTypes,
                                                                              BankService.decryptionKeys);
-        String account = accountData instanceof SupercardAccountDataDecoder ?
-                ((SupercardAccountDataDecoder)accountData).getCardNumber()  :
-                ((SEPAAccountDataDecoder)accountData).geyPayerIban();
+        String accountId = accountData.getAccountId();
         PaymentRequest paymentRequest = refundRequest.getPaymentRequest();
         boolean testMode = refundRequest.getTestMode();
         String optionalLogData = null;
@@ -82,13 +76,13 @@ public class RefundServlet extends ProcessingBaseServlet {
         IBResponse ibResponse = 
                 IBRequest.perform(BankService.payerInterbankUrl,
                                   IBRequest.Operations.REVERSE_CREDIT_TRANSFER,
-                                  account,
+                                  accountId,
                                   null,
                                   refundRequest.getAmount(),
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                                  refundRequest.getPayeeSourceAccount(),
+                refundRequest.getPayeeSourceAccount(BankService.knownAccountTypes).getAccountId(),
                                   testMode,
                                   BankService.bankKey);
         String transactionId = ibResponse.getOurReference();

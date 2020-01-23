@@ -21,20 +21,23 @@ import java.io.IOException;
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONOutputFormats;
 
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.AuthorizationResponse;
 
 import org.webpki.util.ISODateTime;
 
-public final class SupercardAccountDataDecoder extends AuthorizationResponse.AccountDataDecoder {
+public final class SupercardAccountDataDecoder extends AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
+    static final String CONTEXT = "https://supercard.com/saturn/v3#ad";
+
+    static final String CARD_NUMBER_JSON   = "cardNumber";    // PAN
+    static final String CARD_HOLDER_JSON   = "cardHolder";    // Name
+
     String cardNumber;                   // PAN
-    public String getCardNumber() {
-        return cardNumber;
-    }
 
     String cardHolder;                   // Name
     public String getCardHolder() {
@@ -48,13 +51,29 @@ public final class SupercardAccountDataDecoder extends AuthorizationResponse.Acc
 
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
-        cardNumber = rd.getString(SupercardAccountDataEncoder.CARD_NUMBER_JSON);
-        cardHolder = rd.getString(SupercardAccountDataEncoder.CARD_HOLDER_JSON);
+        readOptionalNonce(rd);
+        cardNumber = rd.getString(CARD_NUMBER_JSON);
+        cardHolder = rd.getString(CARD_HOLDER_JSON);
         expirationDate = rd.getDateTime(BaseProperties.EXPIRES_JSON, ISODateTime.COMPLETE);
     }
 
     @Override
+    public String getAccountId() {
+        return cardNumber;
+    }
+
+    @Override
+    protected byte[] getAccountObject() throws IOException {
+        return getWriter().serializeToBytes(JSONOutputFormats.CANONICALIZED);
+    }
+
+    @Override
     public String getContext() {
-        return SupercardAccountDataEncoder.ACCOUNT_DATA;
+        return CONTEXT;
+    }
+
+    @Override
+    protected SupercardAccountDataEncoder createEncoder() {
+        return new SupercardAccountDataEncoder();
     }
 }

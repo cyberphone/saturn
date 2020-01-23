@@ -37,6 +37,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
@@ -111,7 +112,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         TransactionOperation transactionOperation = new TransactionOperation();
         String clientPaymentMethodUrl =
                 payerAuthorization.getPaymentMethod().getPaymentMethodUrl();
-        AuthorizationRequest.BackendPaymentDataEncoder paymentBackendMethodEncoder = null;
+        AccountDataEncoder paymentBackendMethodEncoder = null;
         for (String backendDataContext : 
              providerAuthority.getPaymentBackendMethods(clientPaymentMethodUrl)) {
             if (MerchantService.receiveAccounts.containsKey(backendDataContext)) {

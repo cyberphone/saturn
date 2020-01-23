@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
+import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
@@ -38,7 +39,8 @@ public class RefundRequest implements BaseProperties {
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         amount = rd.getMoney(AMOUNT_JSON,
                              authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
-        payeeSourceAccount = rd.getString(PAYEE_SOURCE_ACCOUNT_JSON);
+        undecodedAccountData = rd.getObject(PAYEE_SOURCE_ACCOUNT_JSON);
+        rd.scanAway(PAYEE_SOURCE_ACCOUNT_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
@@ -54,6 +56,8 @@ public class RefundRequest implements BaseProperties {
     Software software;
 
     JSONObjectReader root;
+    
+    JSONObjectReader undecodedAccountData;
 
     String recepientUrl;
     public String getRecepientUrl() {
@@ -70,9 +74,9 @@ public class RefundRequest implements BaseProperties {
         return amount;
     }
 
-    String payeeSourceAccount;
-    public String getPayeeSourceAccount() {
-        return payeeSourceAccount;
+    public AccountDataDecoder getPayeeSourceAccount(JSONDecoderCache knownAccountTypes)
+    throws IOException {
+        return (AccountDataDecoder) knownAccountTypes.parse(undecodedAccountData);
     }
 
     String referenceId;
@@ -101,7 +105,7 @@ public class RefundRequest implements BaseProperties {
     public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
                                           String recepientUrl,
                                           BigDecimal amount,
-                                          String payeeSourceAccount,
+                                          AccountDataEncoder payeeSourceAccount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.REFUND_REQUEST.createBaseMessage()
@@ -110,7 +114,7 @@ public class RefundRequest implements BaseProperties {
             .setMoney(AMOUNT_JSON,
                       amount,
                       authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
-            .setString(PAYEE_SOURCE_ACCOUNT_JSON, payeeSourceAccount)
+            .setObject(PAYEE_SOURCE_ACCOUNT_JSON, payeeSourceAccount.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 

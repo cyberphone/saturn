@@ -24,7 +24,6 @@ import java.util.GregorianCalendar;
 import java.util.ArrayList;
 
 import org.webpki.json.JSONCryptoHelper;
-import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
@@ -41,38 +40,6 @@ public class AuthorizationResponse implements BaseProperties {
     public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
     public static final String SOFTWARE_VERSION = "1.00";
 
-    public static abstract class AccountDataDecoder extends JSONDecoder {
-
-        private static final long serialVersionUID = 1L;
-
-        public String logLine() throws IOException {
-            return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
-        }
-    }
-
-    public static abstract class AccountDataEncoder {
-
-        protected abstract JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException;
-        
-        public abstract String getContext();
-        
-        public abstract String getPartialAccountIdentifier();  // Like ************4567
-        
-        public String getQualifier() {
-            return null;  // Optional
-        }
-        
-        public JSONObjectWriter writeObject() throws IOException {
-            return new JSONObjectWriter()
-                .setString(JSONDecoderCache.CONTEXT_JSON, getContext())
-                .setDynamic((wr) -> {
-                    if (getQualifier() != null) {
-                        wr.setString(JSONDecoderCache.QUALIFIER_JSON, getQualifier());
-                    }
-                    return writeObject(wr);
-                });
-        }
-    }
 
     public AuthorizationResponse(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
@@ -126,12 +93,13 @@ public class AuthorizationResponse implements BaseProperties {
     public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
                                           ProviderAuthority.EncryptionParameter encryptionParameter,
                                           AccountDataEncoder accountData,
+                                          String accountReference,
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException, GeneralSecurityException {
         return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
             .setObject(Messages.AUTHORIZATION_REQUEST.lowerCamelCase(), authorizationRequest.root)
-            .setString(ACCOUNT_REFERENCE_JSON, accountData.getPartialAccountIdentifier())
+            .setString(ACCOUNT_REFERENCE_JSON, accountReference)
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
                        JSONObjectWriter
                            .createEncryptionObject(

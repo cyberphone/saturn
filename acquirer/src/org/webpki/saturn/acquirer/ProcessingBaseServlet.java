@@ -34,6 +34,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
@@ -58,10 +59,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     static SupercardAccountDataDecoder getAccountData(AuthorizationResponse authorizationResponse)
     throws IOException, GeneralSecurityException {
-        AuthorizationResponse.AccountDataDecoder accountData = 
-                authorizationResponse
-                    .getProtectedAccountData(AcquirerService.knownAccountTypes,
-                                             AcquirerService.decryptionKeys);
+        AccountDataDecoder accountData = 
+                authorizationResponse.getProtectedAccountData(AcquirerService.clientAccountTypes,
+                                                              AcquirerService.decryptionKeys);
         return (SupercardAccountDataDecoder)accountData;
     }
 

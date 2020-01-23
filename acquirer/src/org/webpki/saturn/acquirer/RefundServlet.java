@@ -73,13 +73,13 @@ public class RefundServlet extends ProcessingBaseServlet {
         IBResponse ibResponse = 
                 IBRequest.perform(AcquirerService.payerInterbankUrl,
                                   IBRequest.Operations.CREDIT_CARD_REFUND,
-                                  accountData.getCardNumber(),
+                                  accountData.getAccountId(),
                                   null,
                                   refundRequest.getAmount(),
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                                  refundRequest.getPayeeSourceAccount(),
+                refundRequest.getPayeeSourceAccount(AcquirerService.payeeAccountTypes).getAccountId(),
                                   testMode,
                                   AcquirerService.acquirerKey);
         // It appears that we succeeded

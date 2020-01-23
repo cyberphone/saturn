@@ -24,7 +24,7 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AuthorizationRequest;
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
@@ -48,10 +48,10 @@ public class TransactionServlet extends ProcessingBaseServlet {
         PaymentRequest paymentRequest = transactionRequest.getPaymentRequest();
         
         // Verify that we understand the payee payment method
-        AuthorizationRequest.BackendPaymentDataDecoder backendPaymentMethodSpecific =
-                transactionRequest.getAuthorizationResponse()
+        AccountDataDecoder payeeReceiveAccount = transactionRequest
+                .getAuthorizationResponse()
                     .getAuthorizationRequest()
-                        .getBackendPaymentData(AcquirerService.knownPayeeMethods);
+                        .getPayeeReceiveAccount(AcquirerService.payeeAccountTypes);
 
         // Verify that the payer's (user) bank is known
         transactionRequest.verifyPayerBank(AcquirerService.paymentRoot);
@@ -81,13 +81,13 @@ public class TransactionServlet extends ProcessingBaseServlet {
         IBResponse ibResponse = 
                 IBRequest.perform(AcquirerService.payerInterbankUrl,
                                   IBRequest.Operations.CREDIT_CARD_TRANSACT,
-                                  accountData.getCardNumber(),
+                                  accountData.getAccountId(),
                                   transactionRequest.getAuthorizationResponse().getReferenceId(),
                                   transactionRequest.getAmount(),
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                                  backendPaymentMethodSpecific.getPayeeAccount(),
+                                  payeeReceiveAccount.getAccountId(),
                                   testMode,
                                   AcquirerService.acquirerKey);
         if (!testMode) {

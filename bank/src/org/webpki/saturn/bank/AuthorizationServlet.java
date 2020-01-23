@@ -39,6 +39,8 @@ import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeAuthority;
+import org.webpki.saturn.common.AccountDataDecoder;
+import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderAuthority;
@@ -69,8 +71,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Verify that we understand the backend payment method
-        AuthorizationRequest.BackendPaymentDataDecoder backendPaymentData =
-            authorizationRequest.getBackendPaymentData(BankService.knownPayeeMethods);
+        AccountDataDecoder payeeReceiveAccount =
+                authorizationRequest.getPayeeReceiveAccount(BankService.knownPayeeMethods);
 
         // Fetch the payment request object
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
@@ -128,7 +130,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(authorizationRequest.getSignatureDecoder());
 
         // Optionally verify the claimed Payee account
-        payeeCoreProperties.verifyAccount(backendPaymentData);
+        payeeCoreProperties.verifyAccount(payeeReceiveAccount);
 
         // Decrypt and validate the encrypted Payer authorization
         AuthorizationData authorizationData = 
@@ -208,7 +210,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     DataBaseOperations.externalWithDraw(amount,
                                                         accountId,
                                                         transactionType,
-                                                        backendPaymentData.getPayeeAccount(),
+                                                        payeeReceiveAccount.getAccountId(),
                                                         paymentRequest.getPayeeCommonName(),
                                                         paymentRequest.getReferenceId(),
                                                         null,
@@ -248,7 +250,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                           paymentRequest.getCurrency().toString(),
                                           paymentRequest.getPayeeCommonName(),
                                           paymentRequest.getReferenceId(),
-                                          backendPaymentData.getPayeeAccount(),
+                                          payeeReceiveAccount.getAccountId(),
                                           testMode, 
                                           BankService.bankKey);
                     optionalLogData = ibResponse.getOurReference();
@@ -263,7 +265,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Pure sample data...
         // Separate credit-card and account2account payments
-        AuthorizationResponse.AccountDataEncoder accountData = cardPayment ?
+        AccountDataEncoder accountData = cardPayment ?
             new com.supercard.SupercardAccountDataEncoder(
                     accountId, 
                     userName,
@@ -278,13 +280,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     ", Account ID=" + accountId + 
                     ", Payment Method=" + authorizationData.getPaymentMethodUrl() + 
                     ", Client IP=" + clientIpAddress +
-                    ", Method Specific=" + backendPaymentData.logLine());
+                    ", Method Specific=" + payeeReceiveAccount.logLine());
 
         // We did it!
         BankService.successfulTransactions++;
         return AuthorizationResponse.encode(authorizationRequest,
                                             providerAuthority.getEncryptionParameters()[0],
                                             accountData,
+                                            accountData.getPartialAccountIdentifier(accountId),
                                             formatReferenceId(transactionId),
                                             optionalLogData,
                                             BankService.bankKey);

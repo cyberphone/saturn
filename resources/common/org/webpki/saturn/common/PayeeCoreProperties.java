@@ -97,10 +97,8 @@ public class PayeeCoreProperties implements BaseProperties {
         ArrayList<byte[]> optionalAccountHashes = new ArrayList<byte[]>();
         JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
         do {
-            AuthorizationRequest.BackendPaymentDataDecoder paymentMethodDecoder =
-                (AuthorizationRequest
-                        .BackendPaymentDataDecoder)knownPaymentMethods
-                            .parse(payeeAccounts.getObject());
+            AccountDataDecoder paymentMethodDecoder =
+                (AccountDataDecoder)knownPaymentMethods.parse(payeeAccounts.getObject());
             byte[] accountHash = paymentMethodDecoder.getAccountHash();
             if (accountHash != null) {
                 optionalAccountHashes.add(accountHash);
@@ -174,10 +172,9 @@ public class PayeeCoreProperties implements BaseProperties {
                               " mismatch for payee: " + payeeId);
     }
 
-    public void verifyAccount(
-            AuthorizationRequest.BackendPaymentDataDecoder paymentMethodSpecific)
+    public void verifyAccount(AccountDataDecoder backendAccountDataDecoder)
     throws IOException {
-        byte[] accountHash = paymentMethodSpecific.getAccountHash();
+        byte[] accountHash = backendAccountDataDecoder.getAccountHash();
         if (getAccountHashes() == null) {
             if (accountHash != null) {
                 throw new IOException("Missing \"" + ACCOUNT_VERIFIER_JSON + 

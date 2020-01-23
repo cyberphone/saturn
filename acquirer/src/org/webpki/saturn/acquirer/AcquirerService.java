@@ -113,11 +113,11 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     
     static AuthorityObjectManager authorityObjectManager;
     
-    static JSONDecoderCache knownAccountTypes = new JSONDecoderCache();
+    static JSONDecoderCache clientAccountTypes = new JSONDecoderCache();
     
-    static boolean logging;
+    static JSONDecoderCache payeeAccountTypes = new JSONDecoderCache();;
 
-    static JSONDecoderCache knownPayeeMethods = new JSONDecoderCache();;
+    static boolean logging;
 
     
     InputStream getResource(String name) throws IOException {
@@ -178,9 +178,9 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
             
-            knownAccountTypes.addToCache(com.supercard.SupercardAccountDataDecoder.class);
+            clientAccountTypes.addToCache(com.supercard.SupercardAccountDataDecoder.class);
 
-            knownPayeeMethods.addToCache(org.payments.sepa.SEPABackendPaymentDataDecoder.class);
+            payeeAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
 
             KeyStoreEnumerator acquirercreds = new KeyStoreEnumerator(getResource(ACQUIRER_EECERT),
                                                                       getPropertyString(KEYSTORE_PASSWORD));
@@ -196,7 +196,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
                                                                        acquirerBaseUrl + "/payees/",
-                                                                       knownPayeeMethods);
+                                                                       payeeAccountTypes);
                 payeeAccountDb.put(account.getPayeeAuthorityUrl(), account);
             }
 
@@ -218,7 +218,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 new ProviderAuthority.PaymentMethodDeclarations()
                     .add(new ProviderAuthority.PaymentMethodDeclaration(
                                        PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
-                                .add(org.payments.sepa.SEPABackendPaymentDataDecoder.class)),
+                                .add(org.payments.sepa.SEPAAccountDataDecoder.class)),
                 optionalProviderExtensions,
                 new SignatureProfiles[]{SignatureProfiles.P256_ES256},
                 new ProviderAuthority.EncryptionParameter[]{

@@ -18,34 +18,21 @@ package org.payments.sepa;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONObjectWriter;
-import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AccountDataEncoder;
 
-public final class SEPAAccountDataEncoder extends AuthorizationResponse.AccountDataEncoder {
+public final class SEPAAccountDataEncoder extends AccountDataEncoder {
+   
+    SEPAAccountDataEncoder() {
+    }
 
-    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#ad";
-
-    static final String PAYER_IBAN_JSON = "payerIban";    // Payer IBAN
-
-    String payerIban;
-
-    public SEPAAccountDataEncoder(String payerIban) {
-        this.payerIban = payerIban;
+    public SEPAAccountDataEncoder(String iban) throws IOException {
+        setInternal(SEPAAccountDataDecoder.CONTEXT)
+            .setString(SEPAAccountDataDecoder.IBAN_JSON, iban);
     }
 
     @Override
-    protected JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
-        return wr.setString(PAYER_IBAN_JSON, payerIban);
-    }
-
-    @Override
-    public String getContext() {
-        return CONTEXT;
-    }
-
-    @Override
-    public String getPartialAccountIdentifier() {
-        int q = payerIban.length();
-        return payerIban.substring(0,2) + '*' + payerIban.substring(q - 6, q - 2);
+    public String getPartialAccountIdentifier(String accountId) {
+        int q = accountId.length();
+        return accountId.substring(0, 2) + '*' + accountId.substring(q - 6, q - 2);
     }
 }

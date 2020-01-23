@@ -18,10 +18,13 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,18 +34,23 @@ import javax.servlet.ServletContextListener;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONDecoderCache;
+
 import org.webpki.util.ArrayUtil;
-import org.webpki.saturn.common.AuthorizationRequest;
+
+import org.webpki.saturn.common.AccountDataDecoder;
+import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
+
 import org.webpki.webutil.InitPropertyReader;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
@@ -104,9 +112,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static LinkedHashMap<String,PaymentNetwork> paymentNetworks = 
             new LinkedHashMap<String,PaymentNetwork>();
     
-    static LinkedHashMap<String,AuthorizationRequest.BackendPaymentDataEncoder> receiveAccounts =
-            new LinkedHashMap<String,AuthorizationRequest.BackendPaymentDataEncoder>();
+    static LinkedHashMap<String,AccountDataEncoder> receiveAccounts =
+            new LinkedHashMap<String,AccountDataEncoder>();
     
+    static LinkedHashMap<String,AccountDataEncoder> sourceAccounts =
+            new LinkedHashMap<String,AccountDataEncoder>();
+    
+    static JSONDecoderCache knownBackendAccountTypes = new JSONDecoderCache();
+
     static String merchantCommonName;
     
     static String merchantHomePage;
@@ -213,16 +226,16 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                 addPaymentNetwork(MERCHANT_KEY, paymentMethod);
             }
 
-            JSONDecoderCache knownAccounTypes = new JSONDecoderCache();
-            knownAccounTypes.addToCache(org.payments.sepa.SEPABackendPaymentDataDecoder.class);
-            knownAccounTypes.addToCache(se.bankgirot.BGBackendPaymentDataDecoder.class);
+            knownBackendAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
+            knownBackendAccountTypes.addToCache(se.bankgirot.BGAccountDataDecoder.class);
             JSONArrayReader accounts = readJSONFile(RECEIVE_ACCOUNTS).getJSONArrayReader();
             do {
-                AuthorizationRequest.BackendPaymentDataDecoder decoder = 
-                        (AuthorizationRequest.BackendPaymentDataDecoder) 
-                            knownAccounTypes.parse(accounts.getObject());
-                receiveAccounts.put(decoder.getContext(), 
-                                    AuthorizationRequest.BackendPaymentDataEncoder.create(decoder));
+                JSONObjectReader accountObject = accounts.getObject();
+                AccountDataDecoder decoder = 
+                        (AccountDataDecoder) knownBackendAccountTypes.parse(accountObject);
+                receiveAccounts.put(decoder.getContext(), AccountDataEncoder.create(decoder, true));
+                // We make it simple here and refund from the same account we receive to
+                sourceAccounts.put(decoder.getContext(), AccountDataEncoder.create(decoder, false));
             } while (accounts.hasMore());
 
             paymentRoot = getRoot(PAYMENT_ROOT);

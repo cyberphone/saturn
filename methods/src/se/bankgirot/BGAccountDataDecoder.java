@@ -21,14 +21,13 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.saturn.common.AuthorizationRequest;
-import org.webpki.saturn.common.AuthorizationRequest.BackendPaymentDataEncoder;
+import org.webpki.saturn.common.AccountDataDecoder;
 
-public final class BGBackendPaymentDataDecoder extends AuthorizationRequest.BackendPaymentDataDecoder {
+public final class BGAccountDataDecoder extends AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    static final String CONTEXT = "https://bankgirot.se/saturn/v3#bpd";
+    static final String CONTEXT = "https://bankgirot.se/saturn/v3#ad";
 
     static final String BG_NUMBER_JSON = "bgNumber";
 
@@ -41,7 +40,7 @@ public final class BGBackendPaymentDataDecoder extends AuthorizationRequest.Back
     }
 
     @Override
-    public String getPayeeAccount() {
+    public String getAccountId() {
         return bgNumber;
     }
 
@@ -56,7 +55,7 @@ public final class BGBackendPaymentDataDecoder extends AuthorizationRequest.Back
     }
 
     @Override
-    protected BackendPaymentDataEncoder createEncoder() {
-        return new BGBackendPaymentDataEncoder();
+    protected BGAccountDataEncoder createEncoder() {
+        return new BGAccountDataEncoder();
     }
 }

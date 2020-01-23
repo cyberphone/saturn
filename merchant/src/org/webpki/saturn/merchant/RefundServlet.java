@@ -17,10 +17,12 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +30,7 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeAuthority;
@@ -46,8 +49,6 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
     
     static Logger logger = Logger.getLogger(RefundServlet.class.getCanonicalName());
 
-    static String DEMO_SOURCE_ACCOUNT = "FR7630002700060000000045660";
-    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         UrlHolder urlHolder = new UrlHolder(request);
@@ -84,11 +85,16 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                 return;
             }
             
+            // We do the assumption that you can receive and send money bidirectionally
+            // using the same account type
+            String context = authorizationRequest
+                    .getPayeeReceiveAccount(MerchantService.knownBackendAccountTypes).getContext();
+            
             JSONObjectWriter refundRequestData = 
                 RefundRequest.encode(resultData.optionalRefund,
                                      refundUrl,
                                      resultData.amount,
-                                     DEMO_SOURCE_ACCOUNT ,
+                                     MerchantService.sourceAccounts.get(context),
                                      MerchantService.getReferenceId(),
                                      MerchantService.paymentNetworks.get(
                                              authorizationRequest

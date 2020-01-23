@@ -83,7 +83,7 @@ public class ProviderAuthority implements BaseProperties {
         }
 
         public PaymentMethodDeclaration add(
-            Class<? extends AuthorizationRequest.BackendPaymentDataDecoder> pbmd) 
+            Class<? extends AccountDataDecoder> pbmd) 
                 throws InstantiationException, IllegalAccessException {
             backendPaymentMethods.add(pbmd.newInstance().getContext());
             return this;

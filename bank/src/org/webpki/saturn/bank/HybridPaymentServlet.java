@@ -29,6 +29,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONCryptoHelper;
 
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AuthorizationData;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
@@ -72,8 +73,8 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         // Get the payment method (we already know that it is OK since it was dealt with in
         // the initial call).
-        AuthorizationRequest.BackendPaymentDataDecoder backendPaymentData =
-            authorizationRequest.getBackendPaymentData(BankService.knownPayeeMethods);
+        AccountDataDecoder payeeReceiveAccount =
+            authorizationRequest.getPayeeReceiveAccount(BankService.knownPayeeMethods);
         
         // Get payer account data.  Note: transaction request contains ALL required data, the
         // backend system only needs to understand the concept of reserving funds and supply
@@ -94,7 +95,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     DataBaseOperations.externalWithDraw(transactionRequest.getAmount(),
                                                         authorizationData.getAccountId(),
                                                         TransactionTypes.TRANSACT,
-                                                        backendPaymentData.getPayeeAccount(),
+                                                        payeeReceiveAccount.getAccountId(),
                                                         paymentRequest.getPayeeCommonName(),
                                                         paymentRequest.getReferenceId(),
                                                         decodeReferenceId(transactionRequest
@@ -125,7 +126,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                                  backendPaymentData.getPayeeAccount(),
+                                  payeeReceiveAccount.getAccountId(),
                                   testMode, 
                                   BankService.bankKey);
             optionalLogData = ibResponse.getOurReference();
