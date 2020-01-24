@@ -118,7 +118,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             knownPayeeMethods.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
-
+            knownPayeeMethods.addToCache(se.bankgirot.BGAccountDataDecoder.class);
 
             JSONArrayReader accounts = JSONParser.parse(
                     ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))

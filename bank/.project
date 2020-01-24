@@ -16,6 +16,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>account-types</name>
+			<type>2</type>
+			<locationURI>copy_PARENT/account-types/src</locationURI>
+		</link>
+		<link>
 			<name>common</name>
 			<type>2</type>
 			<locationURI>copy_PARENT/resources/common</locationURI>
@@ -24,11 +29,6 @@
 			<name>interbanking</name>
 			<type>2</type>
 			<locationURI>copy_PARENT/interbanking/src</locationURI>
-		</link>
-		<link>
-			<name>methods</name>
-			<type>2</type>
-			<locationURI>copy_PARENT/methods/src</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>

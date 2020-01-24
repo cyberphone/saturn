@@ -63,7 +63,7 @@
        eol="lf"
        eof="remove"
        includes="**/*.java"/>
-    <fixcrlf srcdir="${@methods.src.dir}"
+    <fixcrlf srcdir="${@account-types.src.dir}"
        tab="remove"
        tablength="4"
        eol="lf"
@@ -73,7 +73,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}:${@methods.src.dir}:${w2nb.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${@account-types.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
       <include name="org/webpki/saturn/merchant/*.java"/>

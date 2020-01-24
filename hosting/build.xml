@@ -45,7 +45,7 @@
     <javac debug="${debug}"
            source="${@javaversion}"
            target="${@javaversion}"
-           srcdir="${src.dir}:${@common.src.dir}:${@methods.src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}:${@account-types.src.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
       <classpath>

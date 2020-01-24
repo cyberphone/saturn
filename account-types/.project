@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>methods</name>
+	<name>account-types</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -24,7 +24,7 @@
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>
-            <value>$%7BPARENT-1-PROJECT_LOC%7D</value>
+			<value>$%7BPARENT-1-PROJECT_LOC%7D</value>
 		</variable>
 	</variableList>
 </projectDescription>
