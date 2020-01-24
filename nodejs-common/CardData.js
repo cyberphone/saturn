@@ -28,7 +28,7 @@ const CARD_NUMBER_JSON   = 'cardNumber';
 const CARD_HOLDER_JSON   = 'cardHolder';
 const SECURITY_CODE_JSON = 'securityCode';
 
-const EXPECTED_CONTEXT   = 'https://supercard.com/saturn/v3#ad'
+const EXPECTED_CONTEXT   = 'https://supercard.com/saturn/v3#account'
 
 function CardData(rd) {
   this.root = rd;

@@ -28,7 +28,7 @@ const Messages              = require('./Messages');
 
 const PAYEE_ACCOUNTS_JSON = 'payeeAccounts';
 
-const SEPA_METHOD          = 'https://sepa.payments.org/saturn/v3#ad';
+const SEPA_METHOD          = 'https://sepa.payments.org/saturn/v3#account';
 const SEPA_PAYEE_IBAN_JSON = 'payeeIban';
 
 function PayeeCoreProperties(rd) {

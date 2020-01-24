@@ -27,7 +27,7 @@ public final class SEPAAccountDataDecoder extends AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#ad";
+    static final String CONTEXT = "https://sepa.payments.org/saturn/v3#account";
 
     static final String IBAN_JSON = "iban";
 

@@ -1,9 +1,9 @@
 [{
-  "@context": "https://sepa.payments.org/saturn/v3#ad",
+  "@context": "https://sepa.payments.org/saturn/v3#account",
   "iban": "FR7630004003200001019471656",
   "nonce": "nZFwxLP0TvFXD2xPKzRTIGevgLjpiMw2BP86hszj5x4"
 },{
-  "@context": "https://bankgirot.se/saturn/v3#ad",
+  "@context": "https://bankgirot.se/saturn/v3#account",
   "bgNumber": "BG 5051-6905",
   "nonce": "g1CFOqhz1eSMnZlQ2MiwlG7ygMsD74aG67SuKHEsxoU"
 }]

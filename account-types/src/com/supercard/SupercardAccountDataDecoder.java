@@ -32,7 +32,7 @@ public final class SupercardAccountDataDecoder extends AccountDataDecoder {
 
     private static final long serialVersionUID = 1L;
 
-    static final String CONTEXT = "https://supercard.com/saturn/v3#ad";
+    static final String CONTEXT = "https://supercard.com/saturn/v3#account";
 
     static final String CARD_NUMBER_JSON   = "cardNumber";    // PAN
     static final String CARD_HOLDER_JSON   = "cardHolder";    // Name
