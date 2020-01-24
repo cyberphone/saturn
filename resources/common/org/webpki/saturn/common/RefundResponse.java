@@ -32,11 +32,11 @@ public class RefundResponse implements BaseProperties {
     
     public RefundResponse(JSONObjectReader rd) throws IOException {
         root = Messages.REFUND_RESPONSE.parseBaseMessage(rd);
-        refundRequest = new RefundRequest(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
+        refundRequest = new RefundRequest(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
         signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, new JSONCryptoHelper.Options());
         signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
         rd.checkForUnread();
@@ -74,12 +74,12 @@ public class RefundResponse implements BaseProperties {
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
         return Messages.REFUND_RESPONSE.createBaseMessage()
-            .setObject(Messages.REFUND_REQUEST.lowerCamelCase(), refundRequest.root)
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(TransactionResponse.SOFTWARE_NAME,
                                                       TransactionResponse.SOFTWARE_VERSION))
+            .setObject(Messages.REFUND_REQUEST.lowerCamelCase(), refundRequest.root)
             .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 }

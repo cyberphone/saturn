@@ -520,7 +520,9 @@ class DebugPrintout implements BaseProperties {
     void refundMode() throws IOException, GeneralSecurityException {
         description("<p id=\"refund\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + 
                 HTML.FONT_ARIAL + "\">" + REFUND_TRANSACTION +
-                "</p>Refund in Saturn is initiated by the <b>Merchant</b>." +
+                "</p>Refund in Saturn is initiated by the <b>Merchant</b>. " +
+                "Note that the originator of a refund request is supposed to " +
+                "be <i>authenticated</i> by the <b>Merchant</b> system before being submitted." +
                 "<p>A refund message is created by embedding the originating" +
                 keyWord(Messages.AUTHORIZATION_RESPONSE) +
                 " in a " +

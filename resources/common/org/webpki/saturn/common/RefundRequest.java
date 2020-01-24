@@ -109,16 +109,16 @@ public class RefundRequest implements BaseProperties {
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.REFUND_REQUEST.createBaseMessage()
-            .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
             .setString(RECEPIENT_URL_JSON, recepientUrl)
             .setMoney(AMOUNT_JSON,
-                      amount,
-                      authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
+                    amount,
+                    authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
             .setObject(PAYEE_SOURCE_ACCOUNT_JSON, payeeSourceAccount.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 
-                                                      PaymentRequest.SOFTWARE_VERSION))
+                                                     PaymentRequest.SOFTWARE_VERSION))
+            .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 

@@ -98,7 +98,6 @@ public class AuthorizationResponse implements BaseProperties {
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException, GeneralSecurityException {
         return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
-            .setObject(Messages.AUTHORIZATION_REQUEST.lowerCamelCase(), authorizationRequest.root)
             .setString(ACCOUNT_REFERENCE_JSON, accountReference)
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
                        JSONObjectWriter
@@ -111,6 +110,7 @@ public class AuthorizationResponse implements BaseProperties {
             .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
+            .setObject(Messages.AUTHORIZATION_REQUEST.lowerCamelCase(), authorizationRequest.root)
             .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 

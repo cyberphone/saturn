@@ -73,6 +73,11 @@ public class RefundServlet extends ProcessingBaseServlet {
 
             // Here we are supposed to do the actual payment with respect to databases
         }
+
+        AccountDataDecoder payeeSourceAccount = 
+                refundRequest.getPayeeSourceAccount(BankService.knownAccountTypes);
+        // Note: here there MUST be a test that the source account actually belongs to the payee!
+
         IBResponse ibResponse = 
                 IBRequest.perform(BankService.payerInterbankUrl,
                                   IBRequest.Operations.REVERSE_CREDIT_TRANSFER,
@@ -82,7 +87,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                refundRequest.getPayeeSourceAccount(BankService.knownAccountTypes).getAccountId(),
+                                  payeeSourceAccount.getAccountId(),
                                   testMode,
                                   BankService.bankKey);
         String transactionId = ibResponse.getOurReference();

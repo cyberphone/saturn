@@ -24,6 +24,7 @@ import java.io.IOException;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
+import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.UrlHolder;
@@ -70,6 +71,11 @@ public class RefundServlet extends ProcessingBaseServlet {
 
             // Here we are supposed to do the actual payment with respect to databases
         }
+
+        AccountDataDecoder payeeSourceAccount = 
+                refundRequest.getPayeeSourceAccount(AcquirerService.payeeAccountTypes);
+        // Note: here there MUST be a test that the source account actually belongs to the payee!
+        
         IBResponse ibResponse = 
                 IBRequest.perform(AcquirerService.payerInterbankUrl,
                                   IBRequest.Operations.CREDIT_CARD_REFUND,
@@ -79,7 +85,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                                   paymentRequest.getCurrency().toString(),
                                   paymentRequest.getPayeeCommonName(),
                                   paymentRequest.getReferenceId(),
-                refundRequest.getPayeeSourceAccount(AcquirerService.payeeAccountTypes).getAccountId(),
+                                  payeeSourceAccount.getAccountId(),
                                   testMode,
                                   AcquirerService.acquirerKey);
         // It appears that we succeeded
