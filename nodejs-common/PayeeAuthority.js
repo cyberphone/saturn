@@ -26,6 +26,7 @@ const Jsf      = require('webpki.org').Jsf;
 
 const BaseProperties = require('./BaseProperties');
 const Messages       = require('./Messages');
+const RequestHash    = require('./RequestHash');
 
 function PayeeAuthority() {
 }
@@ -42,8 +43,19 @@ PayeeAuthority.encode = function(authorityUrl,
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
     .setString(BaseProperties.LOCAL_PAYEE_ID_JSON, payeeCoreProperties[BaseProperties.LOCAL_PAYEE_ID_JSON])
-    .setString(BaseProperties.HOME_PAGE_JSON, payeeCoreProperties[BaseProperties.HOME_PAGE_JSON])
     .setString(BaseProperties.COMMON_NAME_JSON, payeeCoreProperties[BaseProperties.COMMON_NAME_JSON])
+    .setString(BaseProperties.HOME_PAGE_JSON, payeeCoreProperties[BaseProperties.HOME_PAGE_JSON])
+    .setDynamic((wr) => {
+      if (payeeCoreProperties[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON]) {
+        var hashedPayeeAccounts = wr.setObject(BaseProperties.ACCOUNT_VERIFIER_JSON);
+        hashedPayeeAccounts.setString(Jsf.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID);
+        var array = hashedPayeeAccounts.setArray(BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON);
+        payeeCoreProperties[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON].forEach((entry) => {
+          array.setBinary(entry);
+        });
+      }
+      return wr;
+    })
     .setDynamic((wr) => {
         var array = wr.setArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
         payeeCoreProperties.signatureParameters.forEach((entry) => {
@@ -55,7 +67,7 @@ PayeeAuthority.encode = function(authorityUrl,
       })
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
-    .setSignature(signer);
+    .setSignature(signer, BaseProperties.ATTESTATION_SIGNATURE_JSON);
 };
 
 module.exports = PayeeAuthority;

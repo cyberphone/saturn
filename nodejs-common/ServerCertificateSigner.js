@@ -26,9 +26,12 @@ function ServerCertificateSigner(privateKey, certificatePath) {
   this.certificatePath = certificatePath;
 }
 
-ServerCertificateSigner.prototype.sign = function(jsonObject) {
+ServerCertificateSigner.prototype.sign = function(jsonObject, optionalSignatureLabel) {
   var signer = new Jsf.Signer(this.privateKey);
-  signer.setCertificatePath(this.certificatePath, true);
+  signer.setCertificatePath(this.certificatePath);
+  if (optionalSignatureLabel !== undefined) {
+    signer.setSignatureLabel(optionalSignatureLabel);
+  }
   return signer.sign(jsonObject);
 };
 

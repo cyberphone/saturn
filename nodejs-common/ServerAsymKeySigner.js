@@ -25,8 +25,12 @@ function ServerAsymKeySigner(privateKey) {
   this.privateKey = privateKey;
 }
 
-ServerAsymKeySigner.prototype.sign = function(jsonObject) {
-  return new Jsf.Signer(this.privateKey).sign(jsonObject);
+ServerAsymKeySigner.prototype.sign = function(jsonObject, optionalSignatureLabel) {
+  var signer = new Jsf.Signer(this.privateKey);
+  if (optionalSignatureLabel !== undefined) {
+    signer.setSignatureLabel(optionalSignatureLabel);
+  }
+  return signer.sign(jsonObject);
 };
 
 module.exports = ServerAsymKeySigner;
