@@ -21,10 +21,11 @@
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
-const BaseProperties = require('./BaseProperties');
-const Messages       = require('./Messages');
-const Software       = require('./Software');
-const PaymentRequest = require('./PaymentRequest');
+const BaseProperties     = require('./BaseProperties');
+const Messages           = require('./Messages');
+const Software           = require('./Software');
+const PaymentRequest     = require('./PaymentRequest');
+const AccountDataDecoder = require('./AccountDataDecoder');
     
 const EXPECTED_CONTEXT = 'https://supercard.com/saturn/v3#pms';
 
@@ -40,16 +41,15 @@ function AuthorizationRequest(rd) {
     throw new TypeError('Unrecognized payment method: ' + paymentMethod);
   }
   this.paymentRequest = new PaymentRequest(rd.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
-  this.encryptedAuthorizationData = rd.getObject(BaseProperties.ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject();
-  var paymentMethodSpecific = rd.getObject(BaseProperties.PAYMENT_METHOD_SPECIFIC_JSON);
-  if (paymentMethodSpecific.getString(Messages.CONTEXT_JSON) != EXPECTED_CONTEXT) {
-    throw new TypeError('Unrecognized payment method specfic data: ' + paymentMethodSpecific.toString());
-  }
+  rd.scanItem(BaseProperties.ENCRYPTED_AUTHORIZATION_JSON);  // Already processed by the bank
+  var payeeReceiveAccount = 
+      new AccountDataDecoder(rd.getObject(BaseProperties.PAYEE_RECEIVE_ACCOUNT_JSON));
+  payeeReceiveAccount.checkAccountTypes(AccountDataDecoder.SEPA_ACCOUNT);
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.clientIpAddress = rd.getString(BaseProperties.CLIENT_IP_ADDRESS_JSON);
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
-  this.publicKey = rd.getSignature().getPublicKey();
+  this.publicKey = rd.getSignature(BaseProperties.REQUEST_SIGNATURE_JSON).getPublicKey();
   rd.checkForUnread();
 }
 

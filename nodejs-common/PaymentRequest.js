@@ -40,7 +40,6 @@ function PaymentRequest(rd) {
   this.dateTime = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.expires = rd.getDateTime(BaseProperties.EXPIRES_JSON);
   this.software = new Software(rd);
-  this.publicKey = rd.getSignature().getPublicKey();
   rd.checkForUnread();
 }
 

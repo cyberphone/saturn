@@ -27,7 +27,7 @@ const Messages              = require('./Messages');
 const Software              = require('./Software');
 const AuthorizationResponse = require('./AuthorizationResponse');
 const AuthorizationRequest  = require('./AuthorizationRequest');
-const CardData              = require('./CardData');
+const AccountDataDecoder    = require('./AccountDataDecoder');
 
 function TransactionRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, rd);
@@ -38,7 +38,7 @@ function TransactionRequest(rd) {
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
   this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
-  this.publicKey = rd.getSignature().getPublicKey();
+  this.publicKey = rd.getSignature(BaseProperties.REQUEST_SIGNATURE_JSON).getPublicKey();
   rd.checkForUnread();
 }
 
@@ -58,8 +58,8 @@ TransactionRequest.prototype.getTestMode = function() {
   return this.authorizationResponse.authorizationRequest.testMode;
 };
 
-TransactionRequest.prototype.getPayee = function() {
-  return this.authorizationResponse.authorizationRequest.paymentRequest.payee;
+TransactionRequest.prototype.getPayeeAuthorityUrl = function() {
+  return this.authorizationResponse.authorizationRequest.authorityUrl;
 };
 
 TransactionRequest.prototype.getPublicKey = function() {
@@ -83,9 +83,11 @@ TransactionRequest.prototype.verifyPayerProvider = function(paymentRoot) {
 };
 
 TransactionRequest.prototype.getProtectedCardData = function(decryptionKeys) {
-  return new CardData(JsonUtil.ObjectReader.parse(
-                                      this.authorizationResponse.encryptedAccountData
+  let cardData = new AccountDataDecoder(JsonUtil.ObjectReader.parse(
+                               this.authorizationResponse.encryptedAccountData
                                           .getDecryptedData(decryptionKeys)));
+  cardData.checkAccountTypes(AccountDataDecoder.SUPERCARD_ACCOUNT);
+  return cardData;
 };
 
 module.exports = TransactionRequest;

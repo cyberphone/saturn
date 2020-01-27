@@ -36,14 +36,14 @@ TransactionResponse.encode = function(transactionRequest,
                                       optionalLogData,
                                       signer) {
   return Messages.createBaseMessage(Messages.TRANSACTION_RESPONSE)
-    .setObject(Messages.getLowerCamelCase(Messages.TRANSACTION_REQUEST), transactionRequest.root)
     .setString(BaseProperties.REFERENCE_ID_JSON, referenceId)
     .setDynamic((wr) => {
         return optionalLogData == null ? wr : wr.setString(BaseProperties.LOG_DATA_JSON, optionalLogData)
       })
     .setDateTime(BaseProperties.TIME_STAMP_JSON, new Date())
     .setObject(BaseProperties.SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
-    .setSignature(signer);
+    .setObject(Messages.getLowerCamelCase(Messages.TRANSACTION_REQUEST), transactionRequest.root)
+    .setSignature(signer, BaseProperties.AUTHORIZATION_SIGNATURE_JSON);
 };
 
 module.exports = TransactionResponse;

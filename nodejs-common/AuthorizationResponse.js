@@ -35,7 +35,7 @@ function AuthorizationResponse(rd) {
   this.optionalLogData = rd.getStringConditional(BaseProperties.LOG_DATA_JSON);
   this.dateTime = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.software = new Software(rd);
-  this.signatureDecoder = rd.getSignature();
+  this.signatureDecoder = rd.getSignature(BaseProperties.AUTHORIZATION_SIGNATURE_JSON);
   this.signatureDecoder.getCertificatePath();
   rd.checkForUnread();
 }

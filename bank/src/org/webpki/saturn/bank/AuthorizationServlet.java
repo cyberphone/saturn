@@ -280,7 +280,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                     ", Account ID=" + accountId + 
                     ", Payment Method=" + authorizationData.getPaymentMethodUrl() + 
                     ", Client IP=" + clientIpAddress +
-                    ", Method Specific=" + payeeReceiveAccount.logLine());
+                    ", Receive Account=" + payeeReceiveAccount.logLine());
 
         // We did it!
         BankService.successfulTransactions++;

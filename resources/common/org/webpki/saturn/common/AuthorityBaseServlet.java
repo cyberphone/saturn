@@ -37,17 +37,24 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     
     protected abstract boolean isProvider();
     
-    public static final String BORDER = "border-width:1px;border-style:solid;border-color:#a9a9a9";
-    public static final String BOX_SHADDOW = "box-shadow:3pt 3pt 3pt #d0d0d0";
-    public static final String TOP_ELEMENT = "<!DOCTYPE html><html><head><meta charset=\"utf-8\">" +
-                                             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+    public static final String BORDER = 
+            "border-width:1px;border-style:solid;border-color:#a9a9a9";
+
+    public static final String BOX_SHADDOW = 
+            "box-shadow:3pt 3pt 3pt #d0d0d0";
+
+    public static final String TOP_ELEMENT = 
+            "<!DOCTYPE html><html><head><meta charset=\"utf-8\">" +
+            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+
     public static final String REST_ELEMENT = 
         "<style type=\"text/css\">" +
         " .header {text-align:center;font-size:10pt;font-weight:bold;padding:15pt}" +
         " td {padding-bottom:8pt}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
         " .tftable td {background-color:#FFFFE0;padding:3pt 4pt;" + BORDER + "}" +
-        " .tftable th {padding:4pt 3pt;background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
+        " .tftable th {padding:4pt 3pt;background:linear-gradient(to bottom, " +
+          "#eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
         "text-align:center;" + BORDER +"}" +
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
         "'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans';background-color:white}" + 
@@ -55,24 +62,33 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         " @media (max-width:800px) {code {font-size:8pt;}}" +
         " a {color:blue;text-decoration:none}" +
         "</style></head>";
-    public static final String SATURN_LINK = "<a href=\"https://cyberphone.github.io/doc/saturn/\" target=\"_blank\">Saturn</a>";
+    public static final String SATURN_LINK = 
+            "<a href=\"https://cyberphone.github.io/doc/saturn/\" target=\"_blank\">Saturn</a>";
 
     String keyWord(String constant) {
         return "<code>&quot;" + constant + "&quot;</code>";
     }
     
-    String tableRow(JSONObjectReader rd, String property, String description) throws IOException {
+    String tableRow(JSONObjectReader rd,
+                    String property, 
+                    String description) throws IOException {
         return tableRow(rd, property, description, false);
     }
     
-    String tableRow(JSONObjectReader rd, String property, String description, boolean optional) throws IOException {
+    String tableRow(JSONObjectReader rd,
+                    String property,
+                    String description,
+                    boolean optional) throws IOException {
         if (!optional || rd.hasProperty(property)) {
             rd.scanAway(property);
         }
-        return "<tr><td><code>" + property + "</code></td><td>" + (optional ? "<i>Optional</i>. " : "") + description + "</td></tr>";
+        return "<tr><td><code>" + property + "</code></td><td>" + 
+               (optional ? "<i>Optional</i>. " : "") + description + "</td></tr>";
     }
 
-    public void processAuthorityRequest(HttpServletRequest request, HttpServletResponse response, byte[] authorityData) throws IOException, ServletException {
+    public void processAuthorityRequest(HttpServletRequest request, 
+                                        HttpServletResponse response,
+                                        byte[] authorityData) throws IOException, ServletException {
         if (authorityData == null) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } else {
@@ -88,13 +104,17 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append("saturn.png\" sizes=\"192x192\">"+
                             "<title>Saturn Authority Object</title>" +
                             REST_ELEMENT +
-                            "<body><table style=\"margin-left:auto;margin-right:auto\"><tr><td class=\"header\">")
-                    .append(isProvider() ? Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
+                            "<body><table style=\"margin-left:auto;margin-right:auto\">" +
+                            "<tr><td class=\"header\">")
+                    .append(isProvider() ? 
+  Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
                     .append("</td></tr>" +
                             "<tr><td>This " +
                             SATURN_LINK +
-                            " <i>live object</i> is normally requested by service providers for looking up partner core data. In this case " +
-                            "the requester seems to be a browser which is why a &quot;pretty-printed&quot; HTML page is returned instead of raw JSON.")
+                            " <i>live object</i> is normally requested by service providers " + 
+                            "for looking up partner core data. In this case " +
+                            "the requester seems to be a browser which is why a " +
+                            "&quot;pretty-printed&quot; HTML page is returned instead of raw JSON.")
                     .append(isProvider() ? "" : "</td></tr><tr><td>" +
                             "This particular (payee) object was issued by the provider specified by the " +
                             keyWord(PROVIDER_AUTHORITY_URL_JSON) +
@@ -130,8 +150,9 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(tableRow(rd, TIME_STAMP_JSON, "Object creation time"))
                     .append(tableRow(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
                     .append(tableRow(rd, ATTESTATION_SIGNATURE_JSON, isProvider() ?
-                                                    "X.509 provider attestation signature" : "Hosting provider attestation signature"))
-                    .append("</table></td></tr></table></body></html>");
+                                           "X.509 provider attestation signature" : "Hosting provider attestation signature"))
+                    .append("</table></td></tr></table><p>API Version: " + Version.PROTOCOL +
+                            "</p></body></html>");
                 // Just to check that we didn't forgot anything...
                 rd.checkForUnread();
                 HttpSupport.writeHtml(response, html);

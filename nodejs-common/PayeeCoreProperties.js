@@ -26,13 +26,9 @@ const Hash      = require('webpki.org').Hash;
 
 const BaseProperties        = require('./BaseProperties');
 const Messages              = require('./Messages');
+const AccountDataDecoder    = require('./AccountDataDecoder');
 
 const PAYEE_ACCOUNTS_JSON = 'payeeAccounts';
-
-const SEPA_ACCOUNT       = 'https://sepa.payments.org/saturn/v3#account';
-const SEPA_IBAN_JSON     = 'iban';
-const BG_ACCOUNT         = 'https://bankgirot.se/saturn/v3#account';
-const BG_NUMBER_JSON     = 'bgNumber';
 
 function PayeeCoreProperties(rd) {
   this[BaseProperties.LOCAL_PAYEE_ID_JSON] = rd.getString(BaseProperties.LOCAL_PAYEE_ID_JSON);
@@ -42,26 +38,13 @@ function PayeeCoreProperties(rd) {
 // TODO the following line lacks the URL fix...
   this.urlSafeId = this[BaseProperties.LOCAL_PAYEE_ID_JSON];
 
-// TODO we only understand SEPA...
   var payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
   var hashedAccounts = [];
   do {
     var entry = payeeAccounts.getObject();
-    var context = entry.getString(Messages.CONTEXT_JSON); 
-    if (context == SEPA_ACCOUNT) {
-      entry.getString(SEPA_IBAN_JSON);
-    } else if (context == BG_ACCOUNT) {
-      entry.getString(BG_NUMBER_JSON);
-    } else {
-      throw new TypeError('Unknown context: ' + jsonReader.getString(Messages.CONTEXT_JSON));
-    }
-    var nonce = entry.getStringConditional(BaseProperties.NONCE_JSON);
-    if (nonce) {
-      if (entry.getBinary(BaseProperties.NONCE_JSON).length != 32) {
-        throw new TypeError('Wrong nonce length');
-      }
-//      hashedAccounts.push(Hash.hashObject('SHA256', JSON.parse(entry.toString())));
-      hashedAccounts.push(Hash.hashObject('SHA256', entry.object));
+    var decoder = new AccountDataDecoder(entry);
+    if (decoder.nonce) {
+      hashedAccounts.push(Hash.hashObject('SHA256', entry));
     }
   } while (payeeAccounts.hasMore());
   if (hashedAccounts.length > 0) {

@@ -134,11 +134,14 @@ const jsonPostProcessors = {
     var cardPaymentRequest = new TransactionRequest(reader);
 
     // Verify that the request comes from one of "our" merchants
-    var payee = cardPaymentRequest.getPayee();
-    var payeeDbEntry = payeeDb.get(payee[BaseProperties.ID_JSON]);
-    if (payeeDbEntry === undefined ||
-        payeeDbEntry[BaseProperties.COMMON_NAME_JSON] != payee[BaseProperties.COMMON_NAME_JSON]) {
-      throw new TypeError('Unknown merchant ID=' + payee.getId() + ', Common Name=' + payee.getCommonName());
+    var payee = cardPaymentRequest.getPayeeAuthorityUrl();
+    var q = payee.lastIndexOf('/');
+    if (q < 1 || q > payee.length - 2) {
+      q = 0;
+    }
+    var payeeDbEntry = payeeDb.get(payee.substring(++q));
+    if (payeeDbEntry === undefined) {
+      throw new TypeError('Unknown merchant ID=' + payee + ', Common Name=' + payee.getCommonName());
     }
     if (!cardPaymentRequest.getPublicKey().equals(
          payeeDbEntry[BaseProperties.SIGNATURE_PARAMETERS_JSON][0][Jsf.PUBLIC_KEY_JSON])) {
@@ -158,8 +161,8 @@ const jsonPostProcessors = {
     var amountString = cardPaymentRequest.getAmount().toFixed(currency.getDecimals());
     var testMode = cardPaymentRequest.getTestMode();
     logger.info((testMode ? 'TEST ONLY: ' : '') + 
-                  'Amount=' + amountString + ' ' + currency.getSymbol() + ', Card Number=' + cardData.getCardNumber() + 
-                  ', Holder=' + cardData.getCardHolder());
+                  'Amount=' + amountString + ' ' + currency.getSymbol() + ', Card Number=' + cardData.getAccountId() + 
+                  ', Holder=' + cardData.getAccountOwner());
     if (!testMode) {
     
       /////////////////////////////////////////////////////////////

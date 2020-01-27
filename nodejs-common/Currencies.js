@@ -20,9 +20,15 @@
 // Saturn "Currencies" object
 
 const CURRENCIES = [
-  ['USD', '$\u200a',      true, 2], 
-  ['EUR', '\u20ac\u200a', true, 2],
-  ['GBP', '\u00a3\u200a', true, 2]
+  ['DKK', '\u2009Kr',     false, 2],
+  ['EUR', '\u20ac\u200a', true,  2],  // English notation
+/*
+  ['EUR', '\u2009\u20ac', false, 2],  // French notation
+*/
+  ['GBP', '\u00a3\u200a', true,  2],
+  ['NOK', '\u2009Kr',     false, 2],
+  ['SEK', '\u2009Kr',     false, 2],
+  ['USD', '$\u200a',      true,  2]
 ];
 
 function Currencies(symbol,textual, textFirst, decimals) {

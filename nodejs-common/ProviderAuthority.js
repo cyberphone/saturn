@@ -23,10 +23,11 @@ const JsonUtil = require('webpki.org').JsonUtil;
 const Keys     = require('webpki.org').Keys;
 const Jef      = require('webpki.org').Jef;
 
-const BaseProperties = require('./BaseProperties');
-const Messages       = require('./Messages');
+const BaseProperties     = require('./BaseProperties');
+const Messages           = require('./Messages');
+const AccountDataDecoder = require('./AccountDataDecoder');
 
-const PAYMENT_METHOD    = 'https://supercard.com';  // Only one...
+const SUPERCARD_METHOD  = 'https://supercard.com';  // Only one...
 const SIGNATURE_PROFILE = 'https://webpki.github.io/saturn/v3/signatures#P-256.ES256'; // Only one
 
 function ProviderAuthority() {
@@ -46,8 +47,11 @@ ProviderAuthority.encode = function(authorityUrl,
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.HOME_PAGE_JSON, homePage)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
-    .setArray(BaseProperties.PAYMENT_METHODS_JSON, 
-              new JsonUtil.ArrayWriter().setString(PAYMENT_METHOD))
+    .setObject(BaseProperties.PAYMENT_METHODS_JSON, new JsonUtil.ObjectWriter()
+        .setDynamic((wr) => {
+            wr.setArray(SUPERCARD_METHOD).setString(AccountDataDecoder.SEPA_ACCOUNT);
+            return wr;
+        }))
     .setArray(BaseProperties.SIGNATURE_PROFILES_JSON, 
               new JsonUtil.ArrayWriter().setString(SIGNATURE_PROFILE))
     .setArray(BaseProperties.ENCRYPTION_PARAMETERS_JSON, 
@@ -59,7 +63,7 @@ ProviderAuthority.encode = function(authorityUrl,
         .setPublicKey(publicKey)))
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
-    .setSignature(signer);
+    .setSignature(signer, BaseProperties.ATTESTATION_SIGNATURE_JSON);
 };
 
 module.exports = ProviderAuthority;
