@@ -170,7 +170,8 @@ public class DebugData implements Serializable {
 
             encryptedMessageSample = new EncryptedMessage(JSONParser.parse(
                 providerUserResponseSample.getObject(BaseProperties.ENCRYPTED_MESSAGE_JSON)
-                    .getEncryptionObject(new JSONCryptoHelper.Options())
+                    .getEncryptionObject(new JSONCryptoHelper.Options()
+                            .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.PLAIN_ENCRYPTION))
                         .getDecryptedData(
                     userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
                         .getBinary(BaseProperties.KEY_JSON))));            

@@ -46,7 +46,9 @@ public class AuthorizationResponse implements BaseProperties {
         accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
         encryptedAccountData = 
                 rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON)
-                    .getEncryptionObject(new JSONCryptoHelper.Options()).require(true);
+                    .getEncryptionObject(new JSONCryptoHelper.Options()
+                        .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
+                        .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED));
         referenceId = rd.getString(REFERENCE_ID_JSON);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);

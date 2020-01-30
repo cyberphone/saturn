@@ -39,7 +39,9 @@ public class ProviderUserResponse implements BaseProperties {
     public ProviderUserResponse(JSONObjectReader rd) throws IOException {
         Messages.PROVIDER_USER_RESPONSE.parseBaseMessage(rd);
         encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON)
-                .getEncryptionObject(new JSONCryptoHelper.Options()).require(false);
+                .getEncryptionObject(new JSONCryptoHelper.Options()
+                    .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
+                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.PLAIN_ENCRYPTION));
         rd.checkForUnread();
     }
 

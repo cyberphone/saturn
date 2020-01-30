@@ -36,7 +36,7 @@ public class PayerAuthorization implements BaseProperties {
         JSONCryptoHelper.Options options = 
                 new JSONCryptoHelper.Options()
                     .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY);
-        return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options).require(true);
+        return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options);
     }
 
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
