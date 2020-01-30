@@ -29,6 +29,8 @@ public abstract class AccountDataDecoder extends JSONDecoder {
     private static final long serialVersionUID = 1L;
     
     private byte[] optionalNonce;
+    
+    protected String accountId;
 
     public final String logLine() throws IOException {
         return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
@@ -46,9 +48,11 @@ public abstract class AccountDataDecoder extends JSONDecoder {
     // All invariant backend payment data (minimally: account number + context)
     // returned as a canonical binary
     protected abstract byte[] getAccountObject() throws IOException;
-
+    
     // Core account number
-    public abstract String getAccountId();
+    public final String getAccountId() {
+        return accountId;
+    }
 
     // Must be called in every BackendPaymentDataDecoder.readJSONData()
     protected final void readOptionalNonce(JSONObjectReader rd) throws IOException {

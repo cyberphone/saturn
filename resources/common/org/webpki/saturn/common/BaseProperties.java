@@ -21,7 +21,6 @@ public interface BaseProperties {
     String ATTESTATION_SIGNATURE_JSON       = "attestationSignature";       // Used for Authority Object signatures
 
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
-    String NAME_JSON                        = "name";
 
     String REQUESTER_JSON                   = "requester";                  // ProviderUserResponse
     String TEXT_JSON                        = "text";                       // ProviderUserResponse
@@ -80,7 +79,8 @@ public interface BaseProperties {
     String ENCRYPTION_PARAMETERS_JSON       = "encryptionParameters";       //    -"-
     String SIGNATURE_PARAMETERS_JSON        = "signatureParameters";        // For "PayeeAuthority" signature key(s)
     String SOFTWARE_JSON                    = "software";
-    String ID_JSON                          = "id";
+    String NAME_JSON                        = "name";
+    String VALUE_JSON                       = "value";
     String TYPE_JSON                        = "type";
     String VERSION_JSON                     = "version";
 

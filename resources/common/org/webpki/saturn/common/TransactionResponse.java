@@ -24,7 +24,6 @@ import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
-import org.webpki.json.JSONSignatureTypes;
 
 import org.webpki.util.ISODateTime;
 
@@ -45,8 +44,10 @@ public class TransactionResponse implements BaseProperties {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, new JSONCryptoHelper.Options());
-        signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
+        signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON,
+                new JSONCryptoHelper.Options()
+                    .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
+                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.CERTIFICATE_PATH));
         rd.checkForUnread();
     }
 

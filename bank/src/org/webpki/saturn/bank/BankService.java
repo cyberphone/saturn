@@ -55,6 +55,7 @@ import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
@@ -155,6 +156,14 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static JSONDecoderCache knownPayeeMethods = new JSONDecoderCache();
 
     static JSONDecoderCache knownAccountTypes = new JSONDecoderCache();
+    
+    static final JSONCryptoHelper.Options AUTHORIZATION_SIGNATURE_POLICY = 
+            new JSONCryptoHelper.Options();
+    
+    static {
+        AUTHORIZATION_SIGNATURE_POLICY.setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED);
+        AUTHORIZATION_SIGNATURE_POLICY.setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
+    }
     
     static DataSource jdbcDataSource;
 

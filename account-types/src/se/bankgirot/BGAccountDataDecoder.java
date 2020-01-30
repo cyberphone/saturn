@@ -31,17 +31,10 @@ public final class BGAccountDataDecoder extends AccountDataDecoder {
 
     static final String BG_NUMBER_JSON = "bgNumber";
 
-    String bgNumber;
-    
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
         readOptionalNonce(rd);
-        bgNumber = rd.getString(BG_NUMBER_JSON);
-    }
-
-    @Override
-    public String getAccountId() {
-        return bgNumber;
+        accountId = rd.getString(BG_NUMBER_JSON);
     }
 
     @Override

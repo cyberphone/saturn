@@ -350,11 +350,11 @@ class DebugPrintout implements BaseProperties {
             DebugData.encryptedMessageSample.getRequester() +        
             "</div><div style=\"margin:10pt 10pt 0pt 10pt\">" +
             DebugData.encryptedMessageSample.getText() +
-            "</div><div style=\"margin:5pt 10pt 0pt 10pt;width:" + 
-            DebugData.encryptedMessageSample.getOptionalUserChallengeItems()[0].getOptionalLength() +
-            "em;background-color:white;border-width:1px;padding:1pt 0pt 2pt 4pt;border-style:solid;border-color:#a9a9a9;margin-top:3pt\">"+
+            "</div><div style=\"margin:5pt 10pt 0pt 10pt;width:20em;background-color:white;" +
+            "border-width:1px;padding:1pt 0pt 2pt 4pt;border-style:solid;border-color:#a9a9a9;margin-top:3pt\">"+
             "&#x25cf;&#x2009;&#x25cf;&#x2009;&#x25cf;&#x2009;&#x25cf;&#x2009;&#x25cf;</div>" +
-            "<table style=\"margin-left:auto;margin-right:auto;margin-top:12pt;margin-bottom:12pt\"><tr><td><div class=\"button\">Cancel</div></td><td style=\"width:4em\"></td><td><div class=\"button\">Submit!</div></tr></table>" +
+            "<table style=\"margin-left:auto;margin-right:auto;margin-top:12pt;margin-bottom:12pt\">" +
+            "<tr><td><div class=\"button\">Cancel</div></td><td style=\"width:4em\"></td><td><div class=\"button\">Submit!</div></tr></table>" +
             "</div>");
         description("When the user have issued the requested data the <b>Wallet</b> creates a new user authentication object which " +
             "now also contains a matching " +

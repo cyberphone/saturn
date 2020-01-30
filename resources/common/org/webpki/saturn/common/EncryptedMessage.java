@@ -37,8 +37,8 @@ public class EncryptedMessage implements BaseProperties {
             JSONArrayReader ar = rd.getArray(USER_CHALLENGE_ITEMS_JSON);
              do {
                 UserChallengeItem userChallengeItem = new UserChallengeItem(ar.getObject());
-                if (items.put(userChallengeItem.getId(), userChallengeItem) != null) {
-                    throw new IOException("Duplicate: " + userChallengeItem.getId());
+                if (items.put(userChallengeItem.getName(), userChallengeItem) != null) {
+                    throw new IOException("Duplicate: " + userChallengeItem.getName());
                 }
             } while (ar.hasMore());
             optionalUserChallengeItems = items.values().toArray(new UserChallengeItem[0]);

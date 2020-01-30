@@ -30,7 +30,6 @@ import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
-import org.webpki.json.JSONSignatureTypes;
 import org.webpki.json.DataEncryptionAlgorithms;
 
 import org.webpki.json.KeyEncryptionAlgorithms;
@@ -247,8 +246,10 @@ public class ProviderAuthority implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         expiresInMillis = expires.getTimeInMillis();
-        signatureDecoder = rd.getSignature(ATTESTATION_SIGNATURE_JSON, new JSONCryptoHelper.Options());
-        signatureDecoder.verify(JSONSignatureTypes.X509_CERTIFICATE);
+        signatureDecoder = rd.getSignature(ATTESTATION_SIGNATURE_JSON,
+                new JSONCryptoHelper.Options()
+                    .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
+                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.CERTIFICATE_PATH));
         rd.checkForUnread();
     }
 

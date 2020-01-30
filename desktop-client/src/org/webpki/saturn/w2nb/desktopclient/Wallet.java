@@ -163,6 +163,7 @@ public class Wallet {
     static final String BUTTON_SUBMIT          = "Submit";
 
     static final int TIMEOUT_FOR_REQUEST       = 10000;
+    static final int TEXT_FIELD_LENGTH         = 20;
     
     static final String DUMMY_BALANCE       = "12341234123412341234";
 
@@ -756,14 +757,13 @@ public class Wallet {
                 c.insets = new Insets(fontSize, fontSize * 2, 0, fontSize * 2);
                 for (UserChallengeItem userChallengeItem : encryptedMessage.getOptionalUserChallengeItems()) {
                     c.gridy++;
-                    Integer optionalLength = userChallengeItem.getOptionalLength();
                     JTextField submitData =
                         (userChallengeItem.getType() == UserChallengeItem.TYPE.NUMERIC_SECRET ||
                          userChallengeItem.getType() == UserChallengeItem.TYPE.ALPHANUMERIC_SECRET) ?
-                            new JPasswordField(optionalLength) : new JTextField(optionalLength);
+                            new JPasswordField(TEXT_FIELD_LENGTH) : new JTextField(TEXT_FIELD_LENGTH);
                     submitData.setFont(standardFont);
                     pane.add(submitData, c);
-                    challengeTextFields.put(userChallengeItem.getId(), submitData);
+                    challengeTextFields.put(userChallengeItem.getName(), submitData);
                 }
             }
             JButton okOrSubmitButton = hasSubmit ? new JButton(BUTTON_SUBMIT) : new JButtonSlave(BUTTON_OK, authorizationCancelButton);

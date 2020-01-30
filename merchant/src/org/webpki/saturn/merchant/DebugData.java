@@ -123,9 +123,9 @@ public class DebugData implements Serializable {
                                   Currencies.EUR,
                                   null,
                                   "#100006878", 
-                                  ISODateTime.parseDateTime("2019-12-20T10:45:08Z",
+                                  ISODateTime.parseDateTime("2020-01-20T10:45:08Z",
                                                             ISODateTime.COMPLETE),
-                                  ISODateTime.parseDateTime("2019-12-20T11:15:08Z", 
+                                  ISODateTime.parseDateTime("2020-01-20T11:15:08Z", 
                                                             ISODateTime.COMPLETE));
         return new JSONObjectReader(AuthorizationData.encode(
                                  new PaymentRequest(new JSONObjectReader(paymentRequest)), 
@@ -136,7 +136,7 @@ public class DebugData implements Serializable {
                                  WALLET_SESSION_ENCRYPTION_KEY, 
                                  DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
                                  userResponseItems,
-                                 ISODateTime.parseDateTime("2019-12-20T11:46:17+01:00",
+                                 ISODateTime.parseDateTime("2020-01-20T11:46:17+01:00",
                                                            ISODateTime.COMPLETE),
                                  new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));
     }
@@ -151,7 +151,8 @@ public class DebugData implements Serializable {
             
             userChallAuthzSample = createUserAuthorizationSample();
             
-            AuthorizationData authorizationData = new AuthorizationData(userAuthzSample);
+            AuthorizationData authorizationData = 
+                    new AuthorizationData(userAuthzSample, new JSONCryptoHelper.Options());
             
             providerUserResponseSample = new JSONObjectReader(ProviderUserResponse.encode(
                     "My Bank",
@@ -163,7 +164,6 @@ public class DebugData implements Serializable {
                     new UserChallengeItem[] {
                         new UserChallengeItem("mother",
                                               UserChallengeItem.TYPE.ALPHANUMERIC,
-                                              20,
                                               null)},
                     authorizationData.getDataEncryptionKey(),
                     authorizationData.getDataEncryptionAlgorithm()));

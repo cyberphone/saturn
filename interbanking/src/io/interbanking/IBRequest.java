@@ -97,7 +97,9 @@ public class IBRequest extends IBCommon {
         payeeAccount = rd.getString(PAYEE_ACCOUNT_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
-        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options());
+        signatureDecoder = rd.getSignature(new JSONCryptoHelper.Options()
+                .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
+                .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.CERTIFICATE_PATH));
         rd.checkForUnread();
     }
 

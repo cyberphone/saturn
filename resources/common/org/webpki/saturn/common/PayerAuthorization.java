@@ -23,6 +23,7 @@ import java.security.PublicKey;
 
 import org.webpki.json.JSONAsymKeyEncrypter;
 import org.webpki.json.JSONCryptoHelper;
+import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
@@ -31,16 +32,17 @@ import org.webpki.json.KeyEncryptionAlgorithms;
 
 public class PayerAuthorization implements BaseProperties {
     
+    static JSONDecryptionDecoder getEncryptedAuthorization(JSONObjectReader rd) throws IOException {
+        JSONCryptoHelper.Options options = 
+                new JSONCryptoHelper.Options()
+                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY);
+        return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options).require(true);
+    }
+
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
         Messages.PAYER_AUTHORIZATION.parseBaseMessage(rd);
         // Only syntax checking for intermediaries
-        JSONObjectReader ea = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON);
-        JSONCryptoHelper.Options options = new JSONCryptoHelper.Options();
-        if (ea.hasProperty(JSONCryptoHelper.KEY_ID_JSON)) {
-            options.setRequirePublicKeyInfo(false)
-                   .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.REQUIRED);
-        }
-        ea.getEncryptionObject(options).require(true);
+        getEncryptedAuthorization(rd);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         rd.checkForUnread();

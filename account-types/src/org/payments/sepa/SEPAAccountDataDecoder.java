@@ -31,22 +31,15 @@ public final class SEPAAccountDataDecoder extends AccountDataDecoder {
 
     static final String IBAN_JSON = "iban";
 
-    String iban;
-    
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
         readOptionalNonce(rd);
-        iban = rd.getString(IBAN_JSON);
+        accountId = rd.getString(IBAN_JSON);
     }
     
     @Override
     protected SEPAAccountDataEncoder createEncoder() {
         return new SEPAAccountDataEncoder();
-    }
-
-    @Override
-    public String getAccountId() {
-        return iban;
     }
 
     @Override

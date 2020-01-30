@@ -80,8 +80,9 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         // backend system only needs to understand the concept of reserving funds and supply
         // an identifier to the requesting party which is subsequently referred to here.
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
-        AuthorizationData authorizationData = 
-            authorizationRequest.getDecryptedAuthorizationData(BankService.decryptionKeys);
+        AuthorizationData authorizationData = authorizationRequest
+                .getDecryptedAuthorizationData(BankService.decryptionKeys,
+                                               BankService.AUTHORIZATION_SIGNATURE_POLICY);
 
         boolean testMode = transactionRequest.getTestMode();
         String optionalLogData = null;

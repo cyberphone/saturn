@@ -23,29 +23,29 @@ import org.webpki.json.JSONObjectWriter;
 
 public class UserResponseItem implements BaseProperties {
 
-    public UserResponseItem(String id, String text) {
-        this.id = id;
-        this.text = text;
+    public UserResponseItem(String name, String value) {
+        this.name = name;
+        this.value = value;
     }
 
     public JSONObjectWriter writeObject() throws IOException {
         return new JSONObjectWriter()
-            .setString(ID_JSON, id)
-            .setString(TEXT_JSON, text);
+            .setString(NAME_JSON, name)
+            .setString(VALUE_JSON, value);
     }
 
-    String id;
-    public String getId() {
-        return id;
+    String name;
+    public String getName() {
+        return name;
     }
 
-    String text;
-    public String getText() {
-        return text;
+    String value;
+    public String getValue() {
+        return value;
     }
 
     public UserResponseItem(JSONObjectReader rd) throws IOException {
-        id = rd.getString(ID_JSON);
-        text = rd.getStringConditional(TEXT_JSON);
+        name = rd.getString(NAME_JSON);
+        value = rd.getStringConditional(VALUE_JSON);
     }
 }

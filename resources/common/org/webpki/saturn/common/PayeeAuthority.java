@@ -55,7 +55,11 @@ public class PayeeAuthority implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         expiresInMillis = expires.getTimeInMillis();
-        attestationKey = rd.getSignature(ATTESTATION_SIGNATURE_JSON, new JSONCryptoHelper.Options()).getPublicKey();
+        attestationKey = rd.getSignature(ATTESTATION_SIGNATURE_JSON, 
+                    new JSONCryptoHelper.Options()
+                        .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
+                        .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED))
+                .getPublicKey();
         rd.checkForUnread();
     }
 

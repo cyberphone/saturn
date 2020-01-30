@@ -74,6 +74,19 @@ public class AuthorizationData implements BaseProperties {
                  .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 
+    public static String formatCardNumber(String accountId) {
+        StringBuilder s = new StringBuilder();
+        int q = 0;
+        for (char c : accountId.toCharArray()) {
+            if (q != 0 && q % 4 == 0) {
+                s.append(' ');
+            }
+            s.append(c);
+            q++;
+        }
+        return s.toString();
+    }
+
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           String domainName,
                                           String paymentMethod,
@@ -96,20 +109,8 @@ public class AuthorizationData implements BaseProperties {
                       new JSONAsymKeySigner(signer).setSignatureAlgorithm(signatureAlgorithm));
     }
 
-    public static String formatCardNumber(String accountId) {
-        StringBuilder s = new StringBuilder();
-        int q = 0;
-        for (char c : accountId.toCharArray()) {
-            if (q != 0 && q % 4 == 0) {
-                s.append(' ');
-            }
-            s.append(c);
-            q++;
-        }
-        return s.toString();
-    }
-
-    public AuthorizationData(JSONObjectReader rd) throws IOException {
+    public AuthorizationData(JSONObjectReader rd, 
+                             JSONCryptoHelper.Options signatureOptions) throws IOException {
         requestHash = RequestHash.parse(rd);
         domainName = rd.getString(DOMAIN_NAME_JSON);
         paymentMethodUrl = rd.getString(PAYMENT_METHOD_JSON);
@@ -123,15 +124,14 @@ public class AuthorizationData implements BaseProperties {
             JSONArrayReader ar = rd.getArray(USER_RESPONSE_ITEMS_JSON);
              do {
                  UserResponseItem challengeResult = new UserResponseItem(ar.getObject());
-                if (optionalUserResponseItems.put(challengeResult.getId(), challengeResult) != null) {
-                    throw new IOException("Duplicate: " + challengeResult.getId());
+                if (optionalUserResponseItems.put(challengeResult.getName(), challengeResult) != null) {
+                    throw new IOException("Duplicate: " + challengeResult.getName());
                 }
             } while (ar.hasMore());
         }
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        publicKey = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, 
-                                    new JSONCryptoHelper.Options()).getPublicKey();
+        publicKey = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, signatureOptions).getPublicKey();
         rd.checkForUnread();
     }
 
@@ -145,7 +145,8 @@ public class AuthorizationData implements BaseProperties {
         return dataEncryptionKey;
     }
 
-    LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = new LinkedHashMap<String,UserResponseItem>();
+    LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = 
+            new LinkedHashMap<String,UserResponseItem>();
     public LinkedHashMap<String,UserResponseItem> getUserResponseItems() {
         return optionalUserResponseItems;
     }

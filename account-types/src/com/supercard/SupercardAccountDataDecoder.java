@@ -37,8 +37,6 @@ public final class SupercardAccountDataDecoder extends AccountDataDecoder {
     static final String CARD_NUMBER_JSON   = "cardNumber";    // PAN
     static final String CARD_HOLDER_JSON   = "cardHolder";    // Name
 
-    String cardNumber;                   // PAN
-
     String cardHolder;                   // Name
     public String getCardHolder() {
         return cardHolder;
@@ -52,14 +50,9 @@ public final class SupercardAccountDataDecoder extends AccountDataDecoder {
     @Override
     protected void readJSONData(JSONObjectReader rd) throws IOException {
         readOptionalNonce(rd);
-        cardNumber = rd.getString(CARD_NUMBER_JSON);
+        accountId = rd.getString(CARD_NUMBER_JSON);
         cardHolder = rd.getString(CARD_HOLDER_JSON);
         expirationDate = rd.getDateTime(BaseProperties.EXPIRES_JSON, ISODateTime.COMPLETE);
-    }
-
-    @Override
-    public String getAccountId() {
-        return cardNumber;
     }
 
     @Override

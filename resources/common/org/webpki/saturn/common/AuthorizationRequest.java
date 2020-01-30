@@ -43,16 +43,17 @@ public class AuthorizationRequest implements BaseProperties {
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
-        encryptedAuthorizationData = 
-                rd.getObject(ENCRYPTED_AUTHORIZATION_JSON)
-                    .getEncryptionObject(new JSONCryptoHelper.Options()).require(true);
+        encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
         undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
         rd.scanAway(PAYEE_RECEIVE_ACCOUNT_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(REQUEST_SIGNATURE_JSON, new JSONCryptoHelper.Options());
+        signatureDecoder = rd.getSignature(REQUEST_SIGNATURE_JSON, 
+                new JSONCryptoHelper.Options()
+                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
+                    .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN));
         rd.checkForUnread();
     }
 
@@ -140,10 +141,12 @@ public class AuthorizationRequest implements BaseProperties {
     }
 
     public AuthorizationData getDecryptedAuthorizationData(
-            ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
+            ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys,
+            JSONCryptoHelper.Options option)
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
-            new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)));
+            new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)),
+                                                   option);
         if (!ArrayUtil.compare(authorizationData.requestHash, paymentRequest.getRequestHash())) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }
