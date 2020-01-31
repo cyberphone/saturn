@@ -51,7 +51,8 @@ public class ProviderUserResponse implements BaseProperties {
                                                 DataEncryptionAlgorithms dataEncryptionAlgorithm)
     throws IOException, GeneralSecurityException {
         if (encryptedData.getDataEncryptionAlgorithm() != dataEncryptionAlgorithm) {
-            throw new IOException("Unexpected data encryption algorithm:" + encryptedData.getDataEncryptionAlgorithm().toString());
+            throw new IOException("Unexpected data encryption algorithm:" + 
+                                  encryptedData.getDataEncryptionAlgorithm().toString());
         }
         return new EncryptedMessage(JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey))); 
     }
@@ -60,7 +61,8 @@ public class ProviderUserResponse implements BaseProperties {
                                           String text,
                                           UserChallengeItem[] optionalUserChallengeItems,
                                           byte[] dataEncryptionKey,
-                                          DataEncryptionAlgorithms dataEncryptionAlgorithm) throws IOException, GeneralSecurityException {
+                                          DataEncryptionAlgorithms dataEncryptionAlgorithm)
+    throws IOException, GeneralSecurityException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setString(REQUESTER_JSON, requester)
             .setString(TEXT_JSON, text);

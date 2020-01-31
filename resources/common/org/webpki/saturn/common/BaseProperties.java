@@ -25,8 +25,10 @@ public interface BaseProperties {
     String REQUESTER_JSON                   = "requester";                  // ProviderUserResponse
     String TEXT_JSON                        = "text";                       // ProviderUserResponse
     String USER_CHALLENGE_ITEMS_JSON        = "userChallengeItems";         // ProviderUserResponse
+    String NAME_JSON                        = "name";                       // ProviderUserResponse
+    String VALUE_JSON                       = "value";                      // ProviderUserResponse
+    String TYPE_JSON                        = "type";                       // ProviderUserResponse
     String LABEL_JSON                       = "label";                      // ProviderUserResponse
-    String LENGTH_JSON                      = "length";                     // ProviderUserResponse
     String ENCRYPTED_MESSAGE_JSON           = "encryptedMessage";           // ProviderUserResponse
 
     String KEY_JSON                         = "key";                        // Wallet-originated encryption key
@@ -79,9 +81,6 @@ public interface BaseProperties {
     String ENCRYPTION_PARAMETERS_JSON       = "encryptionParameters";       //    -"-
     String SIGNATURE_PARAMETERS_JSON        = "signatureParameters";        // For "PayeeAuthority" signature key(s)
     String SOFTWARE_JSON                    = "software";
-    String NAME_JSON                        = "name";
-    String VALUE_JSON                       = "value";
-    String TYPE_JSON                        = "type";
     String VERSION_JSON                     = "version";
 
     String SATURN_WEB_PAY_CONTEXT_URI       = "https://webpki.github.io/saturn/v3";
