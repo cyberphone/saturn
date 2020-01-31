@@ -48,7 +48,5 @@ public class ServerAsymKeySigner extends JSONAsymKeySigner {
                 return key.getPublicKey();
             }
         });
-        setSignatureAlgorithm(key.getPublicKey() instanceof RSAPublicKey ?
-                  AsymSignatureAlgorithms.RSA_SHA256 : AsymSignatureAlgorithms.ECDSA_SHA256);
-     }
+    }
 }
