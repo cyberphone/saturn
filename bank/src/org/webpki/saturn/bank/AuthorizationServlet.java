@@ -173,7 +173,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         UserResponseItem userResponseItem;
         if (amount.compareTo(DEMO_RBA_LIMIT) >= 0 &&
             (((userResponseItem = authorizationData.getUserResponseItems().get(RBA_PARM_MOTHER)) == null) ||
-            (!userResponseItem.getName().equals(MOTHER_NAME)))) {
+            (!userResponseItem.getValue().equals(MOTHER_NAME)))) {
             BankService.rejectedTransactions++;
             boolean specialTest = amount.compareTo(DEMO_RBA_LIMIT_CT) == 0;
             return createProviderUserResponse("Transaction requests exceeding " +
