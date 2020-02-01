@@ -579,7 +579,7 @@ class DebugPrintout implements BaseProperties {
                  "which may differ from the card like (&quot;virtual&quot;) account used by the customer.");
         }
         description(point +
-                "<p>Finally <b>User&nbsp;Bank</b> signs the completed object with " +
+                "<p>Finally <b>User&nbsp;Bank</b> <i>counter-signs</i> the completed object with " +
                 "its private key and certificate.  The result is then returned to the <b>Merchant</b>" +
                 " as a response to the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +
