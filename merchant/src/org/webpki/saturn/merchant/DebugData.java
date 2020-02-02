@@ -147,7 +147,7 @@ public class DebugData implements Serializable {
                     DebugData.class.getResourceAsStream("sampleauthorizationkey.jwk"))).getKeyPair();
             userAuthzSample = createUserAuthorizationSample();
             
-            userResponseItems = new UserResponseItem[]{new UserResponseItem("mother", "garbo")};
+            userResponseItems = new UserResponseItem[]{new UserResponseItem("mother", "smith")};
             
             userChallAuthzSample = createUserAuthorizationSample();
             
