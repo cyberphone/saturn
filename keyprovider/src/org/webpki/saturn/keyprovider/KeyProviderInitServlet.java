@@ -316,7 +316,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  if (setup) {\n" +
             (KeyProviderService.useW3cPaymentRequest ? "    setupW3CRequest();\n" : "") +
             // UGLY WORKAROUND 
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=999920#c5
+            // https://bugs.chromium.org/p/chromium/issues/detail?id=999920#c6
             "    setTimeout(function() {\n" +
             "      document.getElementById('" + BUTTON_ID + "').style.display = 'block';\n" +
             "    }, 500);\n" +
