@@ -34,13 +34,13 @@ public class PayeeAuthority implements BaseProperties {
                                           String providerAuthorityUrl,
                                           PayeeCoreProperties payeeCoreProperties,
                                           GregorianCalendar expires,
-                                          ServerAsymKeySigner attestSigner) throws IOException {
+                                          ServerAsymKeySigner issuerSigner) throws IOException {
         return payeeCoreProperties.writeObject(Messages.PAYEE_AUTHORITY.createBaseMessage()
                                      .setString(AUTHORITY_URL_JSON, authorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setSignature(ATTESTATION_SIGNATURE_JSON, attestSigner);
+            .setSignature(ISSUER_SIGNATURE_JSON, issuerSigner);
     }
 
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
@@ -55,7 +55,7 @@ public class PayeeAuthority implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         expiresInMillis = expires.getTimeInMillis();
-        attestationKey = rd.getSignature(ATTESTATION_SIGNATURE_JSON, 
+        attestationKey = rd.getSignature(ISSUER_SIGNATURE_JSON, 
                     new JSONCryptoHelper.Options()
                         .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
                         .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED))

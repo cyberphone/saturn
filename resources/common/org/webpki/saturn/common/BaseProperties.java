@@ -18,7 +18,7 @@ package org.webpki.saturn.common;
 
 public interface BaseProperties {
 
-    String ATTESTATION_SIGNATURE_JSON       = "attestationSignature";       // Used for Authority Object signatures
+    String ISSUER_SIGNATURE_JSON            = "issuerSignature";            // Used for Authority Object signatures
 
     String COMMON_NAME_JSON                 = "commonName";                 // Common name of providers to be used in UIs
 

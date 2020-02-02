@@ -427,7 +427,7 @@ class DebugPrintout implements BaseProperties {
                 ".</li>" +
                 "<li>Verify that the " +
                 keyWord(JSONCryptoHelper.PUBLIC_KEY_JSON) + " in the " +
-                keyWord(ATTESTATION_SIGNATURE_JSON) +
+                keyWord(ISSUER_SIGNATURE_JSON) +
                 " object of the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
                 " object and the public key of the first (=signature) certificate in the " +

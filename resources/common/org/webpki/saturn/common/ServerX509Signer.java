@@ -22,9 +22,6 @@ import java.security.GeneralSecurityException;
 
 import java.security.cert.X509Certificate;
 
-import java.security.interfaces.RSAPublicKey;
-
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.SignatureWrapper;
 import org.webpki.crypto.SignerInterface;

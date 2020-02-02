@@ -149,8 +149,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             )
                     .append(tableRow(rd, TIME_STAMP_JSON, "Object creation time"))
                     .append(tableRow(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
-                    .append(tableRow(rd, ATTESTATION_SIGNATURE_JSON, isProvider() ?
-                                           "X.509 provider attestation signature" : "Hosting provider attestation signature"))
+                    .append(tableRow(rd, ISSUER_SIGNATURE_JSON, isProvider() ?
+                                           "X.509 provider signature" : "Hosting provider signature"))
                     .append("</table></td></tr></table><p>API Version: " + Version.PROTOCOL +
                             "</p></body></html>");
                 // Just to check that we didn't forgot anything...

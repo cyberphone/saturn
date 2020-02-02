@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
-import java.security.interfaces.RSAPublicKey;
-
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.SignatureWrapper;
 import org.webpki.crypto.AsymKeySignerInterface;

@@ -123,7 +123,7 @@ public class ProviderAuthority implements BaseProperties {
                                           EncryptionParameter[] encryptionParameters,
                                           HostingProvider optionalHostingProvider,
                                           GregorianCalendar expires,
-                                          ServerX509Signer signer) throws IOException {
+                                          ServerX509Signer issuerSigner) throws IOException {
         return Messages.PROVIDER_AUTHORITY.createBaseMessage()
             .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
             .setString(AUTHORITY_URL_JSON, authorityUrl)
@@ -154,7 +154,7 @@ public class ProviderAuthority implements BaseProperties {
                 wr : wr.setObject(HOSTING_PROVIDER_JSON, optionalHostingProvider.writeObject()))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setSignature(ATTESTATION_SIGNATURE_JSON, signer);
+            .setSignature(ISSUER_SIGNATURE_JSON, issuerSigner);
     }
 
     public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
@@ -246,7 +246,7 @@ public class ProviderAuthority implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         expiresInMillis = expires.getTimeInMillis();
-        signatureDecoder = rd.getSignature(ATTESTATION_SIGNATURE_JSON,
+        signatureDecoder = rd.getSignature(ISSUER_SIGNATURE_JSON,
                 new JSONCryptoHelper.Options()
                     .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
                     .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.CERTIFICATE_PATH));
