@@ -755,6 +755,7 @@ public class HTML implements MerchantProperties {
                   MobileProxyParameters.W3CPAY_GOTO_URL + ";\n" +
                 "      } else {\n" +
                 "        console.info('Cannot make payment');\n" +
+                "        document.getElementById('" + SATURN_PAY_WAIT + "').style.display = 'none';\n" +
                 "        document.getElementById('" + SATURN_PAY_BUTTON + "').style.display = 'block';\n" +
                 "        document.getElementById('" + SATURN_PAY_BUTTON + "').innerHTML = " +
                   "'<div>In order to use this application you need to install<br>" +
