@@ -331,7 +331,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "    paymentRequestError(err.message);\n" +
             "  }\n" +
             "}\n" +
-            "document.addEventListener('DOMContentLoaded', function() {\n" +
+            "window.addEventListener('load', (event) => {\n" +
             "  setUserName();\n" +
             (KeyProviderService.useW3cPaymentRequest ?
                     " setupW3CRequest();\n" 
