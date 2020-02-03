@@ -57,9 +57,14 @@ public class KeyProviderInitServlet extends HttpServlet {
     private static final String WAITING_ID = "wait";
     private static final String ERROR_ID   = "error";
     
+    private static final String THIS_SERVLET   = "init";
+    
     static final String DEFAULT_USER_NAME_HTML = "Luke Skywalker &#x1f984;";    // Unicorn emoji
     
     static final String BUTTON_TEXT_HTML       = "Start Enrollment &#x1f680;";  // Rocket emoji
+    
+    static final String AFTER_INSTALL_JS       =
+            new String(Character.toChars(Integer.parseInt("1f449", 16))) + " Click here AFTER install";
     
     static final String ANONYMOUS_JAVA         = "Anonymous " + 
                  new String(Character.toChars(Integer.parseInt("1f47d", 16)));  // E.T. emoji
@@ -67,9 +72,9 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final int MINIMUM_CHROME_VERSION    = 75;
 
     static final String GO_HOME =              
-            "history.pushState(null, null, 'init');\n" +
+            "history.pushState(null, null, '" + THIS_SERVLET + "');\n" +
             "window.addEventListener('popstate', function(event) {\n" +
-            "    history.pushState(null, null, 'init');\n" +
+            "    history.pushState(null, null, '" + THIS_SERVLET + "');\n" +
             "});\n";
 
     static final String HTML_INIT = 
@@ -238,7 +243,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  document.getElementById('" + BUTTON_ID + "').style.display = 'block';\n" +
             "}\n" +
             "let w3cPaymentRequest = null;\n" +
-            "function setupW3CRequest() {\n" +
+            "async function setupW3CRequest() {\n" +
             "  if (window.PaymentRequest) {\n" +
             //==================================================================//
             // W3C PaymentRequest using dummy data.                             //
@@ -255,6 +260,21 @@ public class KeyProviderInitServlet extends HttpServlet {
 //            "          data: {supportedNetworks: ['visa', 'mastercard']}\n" +
             "    }];\n" +
             "    w3cPaymentRequest = new PaymentRequest(supportedInstruments, details);\n" +
+
+            // Fixes https://bugs.chromium.org/p/chromium/issues/detail?id=999920#c6
+            "    const w3cCanMakePayment = await w3cPaymentRequest.canMakePayment();\n" +
+            "    if (w3cCanMakePayment) {\n" +
+            "      document.getElementById('" + WAITING_ID + "').style.display = 'none';\n" +
+            "      document.getElementById('" + BUTTON_ID + "').style.display = 'block';\n" +
+            "    } else {\n" +
+            "      document.getElementById('" + BUTTON_ID + "').innerHTML = '" +
+                     AFTER_INSTALL_JS + "';\n" +
+            "      document.getElementById('" + BUTTON_ID + "').onclick = function() {\n" +
+            "        document.location.href = '" + THIS_SERVLET + "';\n" +
+            "      }\n" +
+            "      paymentRequestError('App does not seem to be installed');\n" +
+            "      w3cPaymentRequest = null;\n" +
+            "    }\n" +
             "  }\n" +
             "}\n" +
             "async function enroll() {\n" +
@@ -275,7 +295,6 @@ public class KeyProviderInitServlet extends HttpServlet {
             "    document.getElementById('" + BUTTON_ID + "').style.display = 'none';\n" +
             "    document.getElementById('" + WAITING_ID + "').style.display = 'block';\n" +
             "    try {\n" +
-
             "      const payResponse = await w3cPaymentRequest.show();\n" +
             "      payResponse.complete('success');\n" +
             //==================================================================//
@@ -293,13 +312,13 @@ public class KeyProviderInitServlet extends HttpServlet {
             "    document.forms.shoot.submit();\n" +
             "  }\n" +
             "}\n" +
-            "async function setUserName(setup) {\n" +
+            "async function setUserName() {\n" +
             "  var formData = new URLSearchParams();\n" +
             "  formData.append('" + USERNAME_SESSION_ATTR +
               "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
             "  formData.append('" + W3C_PAYMENT_REQUEST_MODE_PARM + "', 1);\n" +
             "  try {\n" +
-            "    const httpResponse = await fetch('init', {\n" +
+            "    const httpResponse = await fetch('" + THIS_SERVLET + "', {\n" +
             "      method: 'POST',\n" +
             "       body: formData\n" +
             "    });\n" +
@@ -311,17 +330,14 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  } catch(err) {\n" +
             "    paymentRequestError(err.message);\n" +
             "  }\n" +
-            "  if (setup) {\n" +
-            (KeyProviderService.useW3cPaymentRequest ? "    setupW3CRequest();\n" : "") +
-            // UGLY WORKAROUND 
-            // https://bugs.chromium.org/p/chromium/issues/detail?id=999920#c6
-            "    setTimeout(function() {\n" +
-            "      document.getElementById('" + BUTTON_ID + "').style.display = 'block';\n" +
-            "    }, 500);\n" +
-            "  }\n" +
             "}\n" +
             "document.addEventListener('DOMContentLoaded', function() {\n" +
-            "  setUserName(true);\n" +
+            "  setUserName();\n" +
+            (KeyProviderService.useW3cPaymentRequest ?
+                    " setupW3CRequest();\n" 
+                                                     :
+                    " document.getElementById('" + BUTTON_ID + "').style.display = 'block';\n" +
+                    " document.getElementById('" + WAITING_ID + "').style.display = 'none';\n") +
             "});\n",
             null,
             "<div style=\"padding:0 1em\">" +
@@ -332,11 +348,11 @@ public class KeyProviderInitServlet extends HttpServlet {
               "<table>" + 
                 "<tr><td>Your name (real or made up):</td></tr>" + 
                 "<tr><td>" +
-                  "<form name=\"shoot\" method=\"POST\" action=\"init\">" + 
+                  "<form name=\"shoot\" method=\"POST\" action=\"" + THIS_SERVLET + "\">" + 
                     "<input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
                       "\" value=\"" + DEFAULT_USER_NAME_HTML + 
                       "\" size=\"30\" maxlength=\"50\" " + 
-                      "style=\"background-color:#def7fc\" oninput=\"setUserName(false)\">" +
+                      "style=\"background-color:#def7fc\" oninput=\"setUserName()\">" +
                    "</form>" +
                  "</td></tr>" + 
               "</table>" +
@@ -347,8 +363,8 @@ public class KeyProviderInitServlet extends HttpServlet {
             "<div id=\"" + ERROR_ID + "\" " +
               "style=\"color:red;font-weight:bold;padding-top:1em;display:none\"></div>" +
             "<img id=\"" + WAITING_ID + "\" src=\"waiting.gif\" " +
-              "style=\"padding-top:1em;display:none\" alt=\"waiting\">" +
-            "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
+              "style=\"padding-top:1em\" alt=\"waiting\">" +
+            "<div style=\"display:flex;justify-content:center;padding-top:1em\">" +
               "<div id=\"" + BUTTON_ID + "\" style=\"display:none\" class=\"stdbtn\" onclick=\"enroll()\">" +
                 BUTTON_TEXT_HTML + 
               "</div>" +
