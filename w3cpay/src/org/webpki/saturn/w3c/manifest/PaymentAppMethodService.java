@@ -70,7 +70,7 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
             JSONObjectWriter oneApp = new JSONObjectWriter();
             oneApp.setString("platform", "play")
                   .setString("id", MobileProxyParameters.ANDROID_PACKAGE_NAME)
-                  .setString("min_version", "1")
+                  .setString("min_version", "1.00")
                   .setArray("fingerprints")
                     .setObject()
                         .setString("type", "sha256_cert")
