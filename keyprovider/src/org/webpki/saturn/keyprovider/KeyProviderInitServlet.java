@@ -403,7 +403,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("utf-8");
-        HttpSession session = request.getSession(true);
+        HttpSession session = request.getSession(false);
         String userName = request.getParameter(USERNAME_SESSION_ATTR);
         if (userName != null) {
             userName = userName.trim();

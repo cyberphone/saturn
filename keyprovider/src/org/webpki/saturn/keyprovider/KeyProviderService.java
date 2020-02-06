@@ -85,6 +85,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String LOGGING                     = "logging";
 
+    static final String IN_HOUSE                    = "inhouse";
+
     static KeyStoreEnumerator keyManagementKey;
     
     static Integer serverPortMapping;
@@ -96,7 +98,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static String grantedVersions;
 
     static DataSource jdbcDataSource;
-    
+
+    static boolean inHouse;
+
     static boolean logging;
 
     class CredentialTemplate {
@@ -131,8 +135,11 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             }
             authorityUrl = rd.getString("authorityUrl");
             friendlyName = rd.getString("friendlyName");
-            svgCardImage = new String(ArrayUtil
-                    .getByteArrayFromInputStream(getResource(rd.getString("cardImage"))), "utf-8");
+            svgCardImage = getResourceAsString(rd.getString("cardImage"));
+            if (inHouse) {
+                svgCardImage = svgCardImage.substring(0, svgCardImage.lastIndexOf("</svg>")) +
+                        getResourceAsString("inhouse-flag.txt");
+            }
             JSONObjectReader encryptionParameters = rd.getObject("encryptionParameters");
             encryptionKey = encryptionParameters.getPublicKey();
             dataEncryptionAlgorithm = 
@@ -169,8 +176,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         return is;
     }
 
-    String getResourceAsString(String propertyName) throws IOException {
-        return new String(ArrayUtil.getByteArrayFromInputStream(getResource(getPropertyString(propertyName))),
+    String getResourceAsString(String name) throws IOException {
+        return new String(ArrayUtil.getByteArrayFromInputStream(getResource(name)),
                           "UTF-8");
     }
 
@@ -184,15 +191,18 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         try {
 
             ////////////////////////////////////////////////////////////////////////////////////////////
+            // In house operation?
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            inHouse = getPropertyString(IN_HOUSE).length() > 0;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials
             ////////////////////////////////////////////////////////////////////////////////////////////
-            JSONArrayReader ar = 
-                    JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(getResource("credential-templates.json")))
-                            .getJSONArrayReader();
+            JSONArrayReader ar = JSONParser.parse(getResourceAsString("credential-templates.json"))
+                    .getJSONArrayReader();
             while (ar.hasMore()) {
                 credentialTemplates.add(new CredentialTemplate(ar.getObject()));
             }
-
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // SKS key management key
@@ -203,7 +213,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Saturn logotype
             ////////////////////////////////////////////////////////////////////////////////////////////
-            saturnLogotype = getResourceAsString(SATURN_LOGO);
+            saturnLogotype = getResourceAsString(getPropertyString(SATURN_LOGO));
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check (vlow-vhigh)

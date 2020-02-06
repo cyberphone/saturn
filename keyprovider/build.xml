@@ -13,6 +13,10 @@
   <property name="logging" value="false"/>
   
   <property name="application" value="${@keyprovpath}.war"/>
+  
+  <condition property="inhouse" value="inhouse-" else="">
+    <equals arg1="${@inhouse-host}" arg2="${@keyprovhost}"/>
+  </condition>
 
   <property name="debug" value="on"/>
   <property environment="env"/>
@@ -67,10 +71,11 @@
         </classpath>
     </javac>
     <replace file="${temp.dir}/web.xml">
+      <replacefilter token="@inhouse@" value="${@inhouse}"/>
       <replacefilter token="@saturn-logotype@" value="${@saturn-logotype.file}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
-      <replacefilter token="@keyprov-kmk@" value="${@kg2kmkey_ec}.p12"/>
+      <replacefilter token="@keyprov-kmk@" value="${inhouse}${@kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@server-tls-certificate@" value="${@kg2_tls_cert_file}"/>
       <replacefilter token="@merchant-url@" value="${@merchanthost}/${@merchantpath}"/>
@@ -93,7 +98,7 @@
          <include name="${@webpki-webutil.jar}"/>
       </lib>
       <zipfileset dir="${@key.dir}" prefix="${class_war_path}">
-         <include name="${@kg2kmkey_ec}.p12"/>
+         <include name="${inhouse}${@kg2kmkey_ec}.p12"/>
       </zipfileset>
       <zipfileset dir="card-images" prefix="${class_war_path}"/>
       <zipfileset dir="${@logotype.dir}" prefix="${class_war_path}"/>

@@ -12,6 +12,12 @@
     </resource-ref>
 
     <context-param>
+        <description>Inhouse operation (non-zero-length)</description>
+        <param-name>inhouse</param-name>
+        <param-value>@inhouse@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Saturn Logotype</description>
         <param-name>saturn_logotype</param-name>
         <param-value>@saturn-logotype@</param-value>
