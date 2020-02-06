@@ -71,7 +71,7 @@
         </classpath>
     </javac>
     <replace file="${temp.dir}/web.xml">
-      <replacefilter token="@inhouse@" value="${@inhouse}"/>
+      <replacefilter token="@inhouse@" value="${inhouse}"/>
       <replacefilter token="@saturn-logotype@" value="${@saturn-logotype.file}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
