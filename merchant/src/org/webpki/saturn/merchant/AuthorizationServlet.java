@@ -179,8 +179,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         resultData.referenceId = paymentRequest.getReferenceId();
         resultData.currency = paymentRequest.getCurrency();
         resultData.paymentMethod = authorizationResponse.getAuthorizationRequest().getPaymentMethod();
-        String accountReference = authorizationResponse.getAccountReference();
-        if (cardPayment) {
+        String accountReference = authorizationResponse.getOptionalAccountReference();
+        if (accountReference == null) {
+            accountReference = "N/A";
+        } else if (cardPayment) {
             accountReference = AuthorizationData.formatCardNumber(accountReference);
         }
         resultData.accountReference = accountReference;

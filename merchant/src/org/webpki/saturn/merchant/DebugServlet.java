@@ -556,11 +556,9 @@ class DebugPrintout implements BaseProperties {
                                    :
                 new org.payments.sepa.SEPAAccountDataEncoder("FR7630002111110020050015158")).writeObject();
         description(point.sub() +
-                "<p>After a <i>successful</i> preceding step, the <b>User&nbsp;Bank</b> embeds the " +
-                keyWord(Messages.AUTHORIZATION_REQUEST) +
-                " in a newly created " +
+                "<p>After a <i>successful</i> preceding step, the <b>User&nbsp;Bank</b> creates an empty " +
                 keyWord(Messages.AUTHORIZATION_RESPONSE) +
-                "object.</p>");
+                " object.</p>");
         description(point.sub() +
                 "<p>Then a number of properties are added including " +
                 keyWord(ENCRYPTED_ACCOUNT_DATA_JSON) + " which holds " +
@@ -575,9 +573,16 @@ class DebugPrintout implements BaseProperties {
         encryptedAccount = point.ref(true);
         fancyBox(sampleAccountData);
         if (!debugData.acquirerMode) {
-            descriptionStdMargin("Note that encrypted account data always points to a <i>real</i> account " +
-                 "which may differ from the card like (&quot;virtual&quot;) account used by the customer.");
+            descriptionStdMargin("<p>Note that encrypted account data always points to a <i>real</i> account " +
+                 "which may differ from the card like (&quot;virtual&quot;) account used by the customer.</p>");
         }
+        descriptionStdMargin("<p>The <i>optional</i> " +
+               keyWord(ACCOUNT_REFERENCE_JSON) +
+               " property holds a short version of the used payment account which can be featured in receipts etc.</p>");
+        description(point.sub() +
+                "<p>The last element to be added is the original " +
+                keyWord(Messages.AUTHORIZATION_REQUEST) +
+                " object.</p>");
         description(point +
                 "<p>Finally <b>User&nbsp;Bank</b> <i>counter-signs</i> the completed object with " +
                 "its private key and certificate.  The result is then returned to the <b>Merchant</b>" +

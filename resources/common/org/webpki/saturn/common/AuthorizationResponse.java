@@ -43,7 +43,7 @@ public class AuthorizationResponse implements BaseProperties {
     public AuthorizationResponse(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
         authorizationRequest = new AuthorizationRequest(Messages.AUTHORIZATION_REQUEST.getEmbeddedMessage(rd));
-        accountReference = rd.getString(ACCOUNT_REFERENCE_JSON);
+        optionalAccountReference = rd.getStringConditional(ACCOUNT_REFERENCE_JSON);
         encryptedAccountData = 
                 rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON)
                     .getEncryptionObject(new JSONCryptoHelper.Options()
@@ -76,9 +76,9 @@ public class AuthorizationResponse implements BaseProperties {
         return referenceId;
     }
 
-    String accountReference;
-    public String getAccountReference() {
-        return accountReference;
+    String optionalAccountReference;
+    public String getOptionalAccountReference() {
+        return optionalAccountReference;
     }
 
     JSONSignatureDecoder signatureDecoder;
@@ -96,12 +96,13 @@ public class AuthorizationResponse implements BaseProperties {
     public static JSONObjectWriter encode(AuthorizationRequest authorizationRequest,
                                           ProviderAuthority.EncryptionParameter encryptionParameter,
                                           AccountDataEncoder accountData,
-                                          String accountReference,
+                                          String optionalAccountReference,
                                           String referenceId,
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException, GeneralSecurityException {
         return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
-            .setString(ACCOUNT_REFERENCE_JSON, accountReference)
+            .setDynamic((wr) -> optionalAccountReference == null ?
+                    wr :  wr.setString(ACCOUNT_REFERENCE_JSON, optionalAccountReference))
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
                        JSONObjectWriter
                            .createEncryptionObject(
