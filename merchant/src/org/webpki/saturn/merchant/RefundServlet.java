@@ -32,6 +32,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.AuthorizationRequest;
+import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
@@ -87,11 +88,8 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                 return;
             }
             
-            // We do the assumption that you can receive and send money bidirectionally
-            // using the same account type
-            String context = authorizationRequest
-                    .getPayeeReceiveAccount(MerchantService.knownBackendAccountTypes).getContext();
-            
+            // We do the assumption here that SEPA is always useful for receiving and sending money
+            String context = new org.payments.sepa.SEPAAccountDataDecoder().getContext();
             JSONObjectWriter refundRequestData = 
                 RefundRequest.encode(resultData.optionalRefund,
                                      refundUrl,
@@ -122,7 +120,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                                   resultData);
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
-            logger.log(Level.SEVERE, message, e);
+            logger.log(Level.SEVERE, HttpSupport.getStackTrace(e, message));
             ErrorServlet.systemFail(response, message);
         }
     }

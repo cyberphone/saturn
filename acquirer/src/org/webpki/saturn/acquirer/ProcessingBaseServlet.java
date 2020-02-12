@@ -106,7 +106,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // general connectivity problems.                                                      //
             /////////////////////////////////////////////////////////////////////////////////////////
             String message = (urlHolder == null ? "" : "Source" + urlHolder.getCallerAddress()) + e.getMessage();
-            logger.log(Level.SEVERE, message, e);
+            logger.log(Level.SEVERE, HttpSupport.getStackTrace(e, message));
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             PrintWriter writer = response.getWriter();
             writer.print(message);

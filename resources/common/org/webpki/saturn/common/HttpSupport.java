@@ -73,4 +73,24 @@ public class HttpSupport {
         }
         return JSONParser.parse(ServletUtil.getData(request));
     }
+    
+    public static String getStackTrace(Exception e, String message) {
+        StringBuilder error = new StringBuilder()
+                .append(e.getClass().getName())
+                .append(": ")
+                .append(message);
+        StackTraceElement[] st = e.getStackTrace();
+        int length = st.length;
+        if (length > 20) {
+            length = 20;
+        }
+        for (int i = 0; i < length; i++) {
+            String entry = st[i].toString();
+            error.append("\n  at " + entry);
+            if (entry.contains(".HttpServlet")) {
+                break;
+            }
+        }
+        return error.toString();
+    }
 }

@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
@@ -100,7 +101,7 @@ public class ResultServlet extends HttpServlet implements MerchantProperties {
                                       resultData);
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
-            logger.log(Level.SEVERE, message, e);
+            logger.log(Level.SEVERE, HttpSupport.getStackTrace(e, message));
             ErrorServlet.systemFail(response, "An unexpected error occurred.<br>Please try again or contact support.");
         }
     }

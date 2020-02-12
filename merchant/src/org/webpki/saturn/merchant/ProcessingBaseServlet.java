@@ -147,23 +147,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
-            StringBuilder error = new StringBuilder()
-                    .append(e.getClass().getName())
-                    .append(": ")
-                    .append(message);
-            StackTraceElement[] st = e.getStackTrace();
-            int length = st.length;
-            if (length > 20) {
-                length = 20;
-            }
-            for (int i = 0; i < length; i++) {
-                String entry = st[i].toString();
-                error.append("\n  at " + entry);
-                if (entry.contains(".HttpServlet")) {
-                    break;
-                }
-            }
-            logger.log(Level.SEVERE, error.toString());
+            logger.log(Level.SEVERE, HttpSupport.getStackTrace(e, message));
             JSONObjectWriter userError = WalletAlertMessage.encode("An unexpected error occurred.<br>" +
                                                                    "Please try again or contact support.");
             HttpSupport.writeJsonData(response, userError);
