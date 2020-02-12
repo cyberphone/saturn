@@ -168,7 +168,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     static String getHTML(String javascript, String bodyscript, String box) {
         StringBuilder s = new StringBuilder(HTML_INIT);
         if (javascript != null) {
-            s.append("<script>").append(javascript).append("</script>");
+            s.append("<script>\n\"use strict\";\n").append(javascript).append("</script>");
         }
         s.append("</head><body");
         if (bodyscript != null) {
@@ -247,7 +247,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  document.getElementById('" + BUTTON_ID + "').style.display = 'block';\n" +
             "}\n" +
             "async function setUserName() {\n" +
-            "  var formData = new URLSearchParams();\n" +
+            "  let formData = new URLSearchParams();\n" +
             "  formData.append('" + USERNAME_SESSION_ATTR +
               "', document.forms.shoot.elements." + USERNAME_SESSION_ATTR + ".value);\n" +
             "  formData.append('" + W3C_PAYMENT_REQUEST_MODE_PARM + "', 1);\n" +
