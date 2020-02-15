@@ -41,7 +41,7 @@
   </path>
   
   <target name="help">
-      <echo message="cryptotest createcerts initwallet [-Dlocalhost=0] inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter]"/>
+      <echo message="cryptotest createcerts initwallet [-Dlocalhost=0] inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter] escaping"/>
   </target>
  
   <target name="inittestpage">
@@ -120,6 +120,36 @@
         <arg value="${@merchantkey}.p12"/>
         <arg value="${@payeebankpath}-eecert.p12"/>
         <arg value="${@keypassword}"/>
+    </java>
+  </target>
+
+  <target name="escaping">
+    <javac debug="${debug}"
+           source="${@javaversion}"
+           target="${@javaversion}"
+           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
+           destdir="${temp.dir}" 
+           classpathref="compile.classpath"
+           includeAntRuntime="false">
+    </javac>
+    <java classname="org.webpki.saturn.resources.Escaping"
+          failonerror="true">
+        <classpath>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-libext.jar}"/>
+          </fileset>
+          <fileset dir="${@webpki.lib.dir}">
+             <include name="${@webpki-webutil.jar}"/>
+          </fileset>
+          <fileset dir="${@bcprovider.lib.dir}">
+             <include name="${@bcprovider.jar}"/>
+          </fileset>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="servlet-api.jar"/>
+          </fileset>
+          <pathelement location="${temp.dir}"/>
+        </classpath>
+      <arg line="${cmd}"/>
     </java>
   </target>
 
