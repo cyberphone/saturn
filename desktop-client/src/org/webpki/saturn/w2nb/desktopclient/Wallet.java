@@ -200,7 +200,7 @@ public class Wallet {
         }
     }
 
-    static LinkedHashMap<Integer,Account> cardCollection = new LinkedHashMap<Integer,Account>();
+    static LinkedHashMap<Integer,Account> cardCollection = new LinkedHashMap<>();
 
     static byte[] dataEncryptionKey;
 
@@ -450,7 +450,7 @@ public class Wallet {
                 scrollPane.setBorder(new EmptyBorder(0, 0, 0, 0));
                 cardSelectionView.add(scrollPane, c);
             } else {
-                LinkedHashMap<Integer,Account> cards = new LinkedHashMap<Integer,Account>();
+                LinkedHashMap<Integer,Account> cards = new LinkedHashMap<>();
                 for (int i = 0; i < 2; i++) {
                     cards.put(i, new Account("n/a", "n/a", DUMMY_BALANCE,
                                              true, dummyCardIcon, null, null, new BigDecimal("1.00")));
@@ -737,7 +737,7 @@ public class Wallet {
         }
 
         void showProviderDialog (EncryptedMessage encryptedMessage) {
-            final LinkedHashMap<String,JTextField> challengeTextFields = new LinkedHashMap<String,JTextField>();
+            final LinkedHashMap<String,JTextField> challengeTextFields = new LinkedHashMap<>();
             final JDialog dialog =
                 new JDialog(frame, "Message from: " + encryptedMessage.getRequester(), true);
             Container pane = dialog.getContentPane();
@@ -785,7 +785,7 @@ public class Wallet {
                     dialog.setVisible(false);
                     windowAdapter.windowClosing(null);
                     if (hasSubmit) {
-                        ArrayList<UserResponseItem> results = new ArrayList<UserResponseItem>();
+                        ArrayList<UserResponseItem> results = new ArrayList<>();
                         for (String id : challengeTextFields.keySet()) {
                             JTextField inputText = challengeTextFields.get(id);
                             results.add(new UserResponseItem(id, inputText instanceof JPasswordField ?

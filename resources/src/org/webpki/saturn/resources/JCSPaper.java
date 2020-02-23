@@ -282,7 +282,7 @@ public class JCSPaper implements BaseProperties {
             publicKey = JSONParser.parse(josePK.toString()).getPublicKey();
         } else {
             JSONArrayReader ar = protectedHeader.getArray(JOSE_X5C);
-            ArrayList<X509Certificate> certs = new ArrayList<X509Certificate>();
+            ArrayList<X509Certificate> certs = new ArrayList<>();
             while (ar.hasMore()) {
                 certs.add(CertificateUtil.getCertificateFromBlob(new Base64().getBinaryFromBase64String(ar.getString())));
             }

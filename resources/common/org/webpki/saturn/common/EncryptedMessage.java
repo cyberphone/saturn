@@ -33,7 +33,7 @@ public class EncryptedMessage implements BaseProperties {
         requester = rd.getString(REQUESTER_JSON);
         text = rd.getString(TEXT_JSON);
         if (rd.hasProperty(USER_CHALLENGE_ITEMS_JSON)) {
-            LinkedHashMap<String,UserChallengeItem> items = new LinkedHashMap<String,UserChallengeItem>();
+            LinkedHashMap<String,UserChallengeItem> items = new LinkedHashMap<>();
             JSONArrayReader ar = rd.getArray(USER_CHALLENGE_ITEMS_JSON);
              do {
                 UserChallengeItem userChallengeItem = new UserChallengeItem(ar.getObject());

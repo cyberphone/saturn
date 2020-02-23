@@ -33,7 +33,7 @@ import org.webpki.crypto.KeyStoreReader;
 
 public class KeyStoreEnumerator {
 
-    ArrayList<X509Certificate> certificatePath = new ArrayList<X509Certificate>();
+    ArrayList<X509Certificate> certificatePath = new ArrayList<>();
     PrivateKey privateKey = null;
     String keyId;
     

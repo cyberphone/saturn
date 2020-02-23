@@ -44,11 +44,9 @@ public class DataBaseOperations {
     static Logger logger = Logger.getLogger(DataBaseOperations.class.getCanonicalName());
 
     // Speed-up solutions, looking up static data every time seems unnecessary
-    private static HashMap<PaymentMethods,Integer> paymentMethod2DbInt = 
-            new HashMap<PaymentMethods,Integer>();
+    private static HashMap<PaymentMethods,Integer> paymentMethod2DbInt = new HashMap<>();
     
-    private static HashMap<TransactionTypes,Integer> transactionType2DbInt = 
-            new HashMap<TransactionTypes,Integer>();
+    private static HashMap<TransactionTypes,Integer> transactionType2DbInt = new HashMap<>();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Authenticate user authorization using a stored procedure                                   //

@@ -117,10 +117,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
     static ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys =
-            new ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder>();
+            new ArrayList<>();
     
-     static LinkedHashMap<String,PayeeCoreProperties> PayeeAccountDb =
-            new LinkedHashMap<String,PayeeCoreProperties>();
+     static LinkedHashMap<String,PayeeCoreProperties> PayeeAccountDb = new LinkedHashMap<>();
     
     static String bankCommonName;
 

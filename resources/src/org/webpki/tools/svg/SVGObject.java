@@ -37,11 +37,11 @@ public abstract class SVGObject {
         }
     };
 
-    private LinkedHashMap<SVGAttributes,SVGValue> _attributes = new LinkedHashMap<SVGAttributes,SVGValue>();
+    private LinkedHashMap<SVGAttributes,SVGValue> _attributes = new LinkedHashMap<>();
     
-    ArrayList<SVGObject> beforeDependencyElements = new ArrayList<SVGObject>();
+    ArrayList<SVGObject> beforeDependencyElements = new ArrayList<>();
 
-    ArrayList<SVGObject> afterDependencyElements = new ArrayList<SVGObject>();
+    ArrayList<SVGObject> afterDependencyElements = new ArrayList<>();
     
     boolean invisible;
     

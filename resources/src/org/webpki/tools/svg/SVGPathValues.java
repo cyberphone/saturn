@@ -81,7 +81,7 @@ public class SVGPathValues extends SVGValue {
 
     class SubCommand implements Cloneable {
         char command;
-        ArrayList<Coordinate> coordinates = new ArrayList<Coordinate>();
+        ArrayList<Coordinate> coordinates = new ArrayList<>();
         
         SubCommand (char command) {
             this.command = command;
@@ -106,7 +106,7 @@ public class SVGPathValues extends SVGValue {
         }
     }
 
-    ArrayList<SubCommand> commands = new ArrayList<SubCommand>();
+    ArrayList<SubCommand> commands = new ArrayList<>();
     
     @Override
     public String getStringRepresentation() {

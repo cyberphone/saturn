@@ -304,7 +304,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         CertSpec certSpec = new CertSpec();
                         certSpec.setKeyUsageBit(KeyUsageBits.DIGITAL_SIGNATURE);
                         certSpec.setSubject("CN=" + userName + ", serialNumber=" + accountAndCredential.accountId);
-                        Hashtable<String,String> issuer = new Hashtable<String,String>();
+                        Hashtable<String,String> issuer = new Hashtable<>();
                         issuer.put("CN", "Saturn SKS Carrier Certificate");
                         long startTime = System.currentTimeMillis();
                         key.setCertificatePath(new X509Certificate[]{new CA().createCert(

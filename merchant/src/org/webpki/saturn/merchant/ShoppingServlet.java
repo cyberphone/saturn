@@ -37,7 +37,7 @@ public class ShoppingServlet extends HttpServlet {
     
     static Logger logger = Logger.getLogger(ShoppingServlet.class.getName ());
     
-    static LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<String,ProductEntry>();
+    static LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<>();
     
     static {
         products.put("7d688", new ProductEntry("product-car.png", "Model Car", 49999)); 

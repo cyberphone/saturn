@@ -30,7 +30,7 @@ public class AuthorityObjectManager extends Thread {
 
     private static final Logger logger = Logger.getLogger(AuthorityObjectManager.class.getCanonicalName());
 
-    HashMap<String,byte[]> payeeAuthorityBlobs = new HashMap<String,byte[]>();
+    HashMap<String,byte[]> payeeAuthorityBlobs = new HashMap<>();
 
     String providerAuthorityUrl;
     String providerHomePage;

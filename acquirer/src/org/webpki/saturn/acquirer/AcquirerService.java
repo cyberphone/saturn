@@ -91,11 +91,9 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
-    static ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys = 
-            new ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder>();
+    static ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys = new ArrayList<>();
 
-    static LinkedHashMap<String,PayeeCoreProperties> payeeAccountDb =
-            new LinkedHashMap<String,PayeeCoreProperties>();
+    static LinkedHashMap<String,PayeeCoreProperties> payeeAccountDb = new LinkedHashMap<>();
 
     static JSONX509Verifier paymentRoot;
 

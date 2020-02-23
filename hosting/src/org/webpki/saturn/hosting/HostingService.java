@@ -69,8 +69,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
 
     static final int PROVIDER_EXPIRATION_TIME = 3600;
 
-    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb =
-        new LinkedHashMap<String,PayeeCoreProperties>();
+    static LinkedHashMap<String,PayeeCoreProperties> merchantAccountDb = new LinkedHashMap<>();
 
     static String providerAuthorityUrl;
     

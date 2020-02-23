@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 public abstract class SVGDocument {
 
-    static ArrayList<SVGObject> svgObjects = new ArrayList<SVGObject>();
+    static ArrayList<SVGObject> svgObjects = new ArrayList<>();
     
     double currentMaxX;
     double currentMaxY;

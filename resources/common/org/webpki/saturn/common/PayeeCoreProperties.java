@@ -67,7 +67,7 @@ public class PayeeCoreProperties implements BaseProperties {
         payeeCommonName = rd.getString(COMMON_NAME_JSON);
         payeeHomePage = rd.getString(HOME_PAGE_JSON);
         if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
-            optionalAccountHashes = new ArrayList<byte[]>();
+            optionalAccountHashes = new ArrayList<>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
             if (!accountVerifier.getString(JSONCryptoHelper.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
                 throw new IOException("Unexpected hash algorithm");
@@ -77,7 +77,7 @@ public class PayeeCoreProperties implements BaseProperties {
                 optionalAccountHashes.add(accountHashes.getBinary());
             } while (accountHashes.hasMore());
         }
-        ArrayList<SignatureParameter> parameterArray = new ArrayList<SignatureParameter>();
+        ArrayList<SignatureParameter> parameterArray = new ArrayList<>();
         JSONArrayReader jsonParameterArray = rd.getArray(SIGNATURE_PARAMETERS_JSON);
         do {
             JSONObjectReader signatureParameter = jsonParameterArray.getObject();
@@ -94,7 +94,7 @@ public class PayeeCoreProperties implements BaseProperties {
     public static PayeeCoreProperties init(JSONObjectReader rd,
                                            String payeeBaseAuthorityUrl,
                                            JSONDecoderCache knownPaymentMethods) throws IOException {
-        ArrayList<byte[]> optionalAccountHashes = new ArrayList<byte[]>();
+        ArrayList<byte[]> optionalAccountHashes = new ArrayList<>();
         JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
         do {
             AccountDataDecoder paymentMethodDecoder =

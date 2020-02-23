@@ -55,11 +55,11 @@ public class ExternalCalls {
     
     // Authority object caches
 
-    Map<String,PayeeAuthority> payeeAuthorityObjects =
-            Collections.synchronizedMap(new LinkedHashMap<String,PayeeAuthority>());
+    Map<String,PayeeAuthority> payeeAuthorityObjects = 
+            Collections.synchronizedMap(new LinkedHashMap<>());
 
     Map<String,ProviderAuthority> providerAuthorityObjects = 
-            Collections.synchronizedMap(new LinkedHashMap<String,ProviderAuthority>());
+            Collections.synchronizedMap(new LinkedHashMap<>());
 
     String portFilter(String url) throws IOException {
         // Our JBoss installation has some port mapping issues...

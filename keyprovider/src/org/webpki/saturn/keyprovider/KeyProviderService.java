@@ -156,7 +156,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         }
     }
 
-    static ArrayList<CredentialTemplate> credentialTemplates = new ArrayList<CredentialTemplate>();
+    static ArrayList<CredentialTemplate> credentialTemplates = new ArrayList<>();
 
     static String saturnLogotype;
 

@@ -46,7 +46,7 @@ public class SVGEmbeddedText {
 
     public static class GlyphReader extends XMLObjectWrapper {
         
-        LinkedHashMap<Character,DecodedGlyph> glyphs = new LinkedHashMap<Character,DecodedGlyph>();
+        LinkedHashMap<Character,DecodedGlyph> glyphs = new LinkedHashMap<>();
         int index;
         String d;
 

@@ -109,14 +109,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static JSONX509Verifier acquirerRoot;
     
-    static LinkedHashMap<String,PaymentNetwork> paymentNetworks = 
-            new LinkedHashMap<String,PaymentNetwork>();
+    static LinkedHashMap<String,PaymentNetwork> paymentNetworks = new LinkedHashMap<>();
     
-    static LinkedHashMap<String,AccountDataEncoder> receiveAccounts =
-            new LinkedHashMap<String,AccountDataEncoder>();
+    static LinkedHashMap<String,AccountDataEncoder> receiveAccounts = new LinkedHashMap<>();
     
-    static LinkedHashMap<String,AccountDataEncoder> sourceAccounts =
-            new LinkedHashMap<String,AccountDataEncoder>();
+    static LinkedHashMap<String,AccountDataEncoder> sourceAccounts = new LinkedHashMap<>();
     
     static JSONDecoderCache knownBackendAccountTypes = new JSONDecoderCache();
 
@@ -216,7 +213,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             merchantHomePage = getPropertyString(MERCHANT_HOME_PAGE);
 
             // The standard payment network supported by the Saturn demo
-            ArrayList<String> acceptedAccountTypes = new ArrayList<String>();
+            ArrayList<String> acceptedAccountTypes = new ArrayList<>();
             for (PaymentMethods card : PaymentMethods.values()) {
                 if (card != PaymentMethods.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
                     acceptedAccountTypes.add(card.getPaymentMethodUrl());

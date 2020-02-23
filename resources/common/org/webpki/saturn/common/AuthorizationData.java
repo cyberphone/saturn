@@ -145,8 +145,7 @@ public class AuthorizationData implements BaseProperties {
         return dataEncryptionKey;
     }
 
-    LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = 
-            new LinkedHashMap<String,UserResponseItem>();
+    LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = new LinkedHashMap<>();
     public LinkedHashMap<String,UserResponseItem> getUserResponseItems() {
         return optionalUserResponseItems;
     }

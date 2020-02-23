@@ -67,7 +67,7 @@ public class ProviderAuthority implements BaseProperties {
 
     public static class PaymentMethodDeclaration {
         String clientPaymentMethod;
-        ArrayList<String> backendPaymentMethods = new ArrayList<String>();
+        ArrayList<String> backendPaymentMethods = new ArrayList<>();
         
         public PaymentMethodDeclaration(String clientPaymentMethod) {
             this.clientPaymentMethod = clientPaymentMethod;
@@ -95,7 +95,7 @@ public class ProviderAuthority implements BaseProperties {
 
     public static class PaymentMethodDeclarations {
         LinkedHashMap<String,PaymentMethodDeclaration> paymentMethodDeclarations =
-                new LinkedHashMap<String,PaymentMethodDeclaration>();
+                new LinkedHashMap<>();
         public PaymentMethodDeclarations add(PaymentMethodDeclaration pmb) {
             paymentMethodDeclarations.put(pmb.clientPaymentMethod, pmb);
             return this;
@@ -186,7 +186,7 @@ public class ProviderAuthority implements BaseProperties {
 
         // Signature profiles tell other parties what kind of signatures that are accepted
         // Additional signature profiles can be introduced without breaking existing applications
-        ArrayList<SignatureProfiles> profileArray = new ArrayList<SignatureProfiles>();
+        ArrayList<SignatureProfiles> profileArray = new ArrayList<>();
         JSONArrayReader jsonProfileArray = rd.getArray(SIGNATURE_PROFILES_JSON);
         do {
             SignatureProfiles signatureProfile = SignatureProfiles.getProfileFromString(jsonProfileArray.getString());
@@ -201,7 +201,7 @@ public class ProviderAuthority implements BaseProperties {
 
         // Encryption parameters tell other parties what kind of encryption keys you have
         // Additional algorithms can be introduced without breaking existing applications
-        ArrayList<EncryptionParameter> parameterArray = new ArrayList<EncryptionParameter>();
+        ArrayList<EncryptionParameter> parameterArray = new ArrayList<>();
         JSONArrayReader jsonParameterArray = rd.getArray(ENCRYPTION_PARAMETERS_JSON);
         do {
             JSONObjectReader encryptionParameter = jsonParameterArray.getObject();
