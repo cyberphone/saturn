@@ -186,6 +186,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     static void output(HttpServletResponse response, String html) throws IOException, ServletException {
         response.setContentType("text/html; charset=utf-8");
         response.setHeader("Pragma", "No-Cache");
+        response.setHeader("Cache-Control", "no-store");
         response.setDateHeader("EXPIRES", 0);
         byte[] data = html.getBytes("utf-8");
         response.setContentLength(data.length);
