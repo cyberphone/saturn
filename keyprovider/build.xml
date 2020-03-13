@@ -10,7 +10,10 @@
   <property file="../resources/w3c.properties"/>
   <property file="../resources/accounts.properties"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/keyprovider"/>
+
+  <!-- Ant command line overridables -->
   <property name="logging" value="false"/>
+  <property name="biometricsupport" value="true"/>
   
   <property name="application" value="${@keyprovpath}.war"/>
   
@@ -77,6 +80,7 @@
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
       <replacefilter token="@keyprov-kmk@" value="${inhouse}${@kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
+      <replacefilter token="@biometric-support@" value="${biometricsupport}"/>
       <replacefilter token="@server-tls-certificate@" value="${@kg2_tls_cert_file}"/>
       <replacefilter token="@merchant-url@" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="@keygen2-base-url@" value="${@keyprovhost}/${@keyprovpath}"/>

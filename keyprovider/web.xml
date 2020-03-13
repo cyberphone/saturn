@@ -48,6 +48,12 @@
     </context-param>
 
     <context-param>
+        <description>Biometric Support</description>
+        <param-name>biometric_support</param-name>
+        <param-value>@biometric-support@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Where to go after success</description>
         <param-name>merchant_url</param-name>
         <param-value>@merchant-url@</param-value>

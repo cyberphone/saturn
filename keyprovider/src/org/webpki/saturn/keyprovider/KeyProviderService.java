@@ -85,6 +85,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String LOGGING                     = "logging";
 
+    static final String BIOMETRIC_SUPPORT           = "biometric_support";
+
     static final String IN_HOUSE                    = "inhouse";
 
     static KeyStoreEnumerator keyManagementKey;
@@ -100,6 +102,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static DataSource jdbcDataSource;
 
     static boolean inHouse;
+    
+    static boolean biometricSupport;
 
     static boolean logging;
 
@@ -194,6 +198,11 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // In house operation?
             ////////////////////////////////////////////////////////////////////////////////////////////
             inHouse = getPropertyString(IN_HOUSE).length() > 0;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // We support biometric authentication?
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            biometricSupport = getPropertyBoolean(BIOMETRIC_SUPPORT);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Credentials
