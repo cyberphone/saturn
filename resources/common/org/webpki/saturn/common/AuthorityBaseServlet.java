@@ -90,7 +90,9 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                                         HttpServletResponse response,
                                         byte[] authorityData) throws IOException, ServletException {
         if (authorityData == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setContentType("text/plain");
+            response.getWriter().append("No such entry");
         } else {
             String accept = request.getHeader(HttpSupport.HTTP_ACCEPT_HEADER);
             if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
@@ -133,7 +135,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             tableRow(rd, AUTHORITY_URL_JSON, "The address of this object") +
                             tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
                             tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
-                            tableRow(rd, PAYMENT_METHODS_JSON, "Supported client:[backend...] payment methods") +
+                            tableRow(rd, SUPPORTED_PAYMENT_METHODS_JSON, "Supported client:[backend...] payment methods") +
                             tableRow(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
                             tableRow(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algorithms <i>recognized</i> by the provider") +
                             tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider") +

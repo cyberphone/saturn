@@ -155,7 +155,7 @@ public class InitTestPage implements BaseProperties {
         // Create a payment request
         
         write(Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage()
-                .setStringArray(PAYMENT_METHODS_JSON,
+                .setStringArray(SUPPORTED_PAYMENT_METHODS_JSON,
                                 new String[]{"https://nosuchcard.com",
                                     PaymentMethods.SUPER_CARD.getPaymentMethodUrl(),
                                     PaymentMethods.BANK_DIRECT.getPaymentMethodUrl()})
@@ -165,7 +165,7 @@ public class InitTestPage implements BaseProperties {
         write(";\n\n" +
               "// All our cards/accounts should match during the discovery phase...\n" +
               "var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-              "scrollMatchingRequest."  + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"");
+              "scrollMatchingRequest."  + SUPPORTED_PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"");
         for (PaymentMethods paymentMethod : PaymentMethods.values()) {
             write(", \"");
             write(paymentMethod.getPaymentMethodUrl());
@@ -175,7 +175,7 @@ public class InitTestPage implements BaseProperties {
         write("];\n\n" +
                 "// No card/account should match during the discovery phase...\n" +
                 "var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +
-                "nonMatchingRequest." + PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"];\n\n");
+                "nonMatchingRequest." + SUPPORTED_PAYMENT_METHODS_JSON + " = [\"https://nosuchcard.com\"];\n\n");
 
         write("// Note the modified \"" + PAYEE_JSON + "\" property...\n" +
               "var badSignatureRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone\n" +

@@ -45,6 +45,7 @@ import javax.sql.DataSource;
 
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CertificateUtil;
+import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
@@ -56,6 +57,7 @@ import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
+import org.webpki.saturn.common.HashSupport;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.PaymentMethods;
 
@@ -119,6 +121,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         String authorityUrl;
         String svgCardImage;
         PublicKey encryptionKey;
+        HashAlgorithms requestHashAlgorithm;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         
@@ -129,6 +132,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                     AsymSignatureAlgorithms.getAlgorithmFromId(rd.getString("signatureAlgorithm"),
                                                                AlgorithmPreferences.JOSE);
             accountType = rd.getString("accountType");
+            requestHashAlgorithm = HashSupport.getHashAlgorithm(rd, "requestHashAlgorithm");
             keyAlgorithm = 
                     KeyAlgorithms.getKeyAlgorithmFromId(rd.getString("signatureKeyAlgorithm"), 
                                                         AlgorithmPreferences.JOSE);

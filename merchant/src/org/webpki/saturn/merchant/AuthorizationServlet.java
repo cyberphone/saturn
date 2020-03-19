@@ -129,7 +129,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Valid method. Find proper to request key and local id
-        PaymentNetwork paymentNetwork = MerchantService.paymentNetworks.get(clientPaymentMethodUrl);
+        PaymentMethodDescriptor paymentNetwork = MerchantService.supportedPaymentMethods.get(clientPaymentMethodUrl);
 
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
@@ -137,6 +137,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         providerAuthority.getServiceUrl(),
                                         payeeAuthorityUrl,
                                         payerAuthorization.getPaymentMethod(),
+                                        null,
                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                         request.getRemoteAddr(),
                                         paymentRequest,
@@ -239,7 +240,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                       transactionOperation.urlToCall,
                                       actualAmount,
                                       MerchantService.getReferenceId(),
-                                      MerchantService.paymentNetworks.get(
+                                      MerchantService.supportedPaymentMethods.get(
                                               transactionOperation.authorizationResponse
                                                   .getAuthorizationRequest()
                                                       .getPaymentMethod()

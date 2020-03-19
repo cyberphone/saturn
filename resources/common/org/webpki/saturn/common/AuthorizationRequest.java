@@ -23,6 +23,9 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 
+import org.webpki.crypto.AlgorithmPreferences;
+import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
@@ -36,12 +39,19 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequest implements BaseProperties {
     
+    public static final HashAlgorithms DEFAULT_KEY_HASH_ALGORITHM = HashAlgorithms.SHA256;
+    
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
+        keyHashAlgorithm = rd.hasProperty(KEY_HASH_ALGORITHM_JSON) ?
+                HashAlgorithms.getAlgorithmFromId(rd.getString(KEY_HASH_ALGORITHM_JSON),
+                                                  AlgorithmPreferences.JOSE)
+                                                                   :
+                DEFAULT_KEY_HASH_ALGORITHM;                   
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
         undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
@@ -64,6 +74,8 @@ public class AuthorizationRequest implements BaseProperties {
     JSONObjectReader root;
     
     JSONObjectReader undecodedAccountData;
+    
+    HashAlgorithms keyHashAlgorithm;
 
     boolean testMode;
     public boolean getTestMode() {
@@ -119,6 +131,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           String recepientUrl,
                                           String authorityUrl,
                                           PaymentMethods paymentMethod,
+                                          HashAlgorithms keyHashAlgorithm,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
@@ -131,6 +144,8 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
+            .setDynamic((wr) -> keyHashAlgorithm == DEFAULT_KEY_HASH_ALGORITHM ?
+                    wr : wr.setString(KEY_HASH_ALGORITHM_JSON, keyHashAlgorithm.getJoseAlgorithmId()))
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
             .setObject(PAYEE_RECEIVE_ACCOUNT_JSON, payeeReceiveAccount.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
@@ -147,11 +162,17 @@ public class AuthorizationRequest implements BaseProperties {
         AuthorizationData authorizationData =
             new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)),
                                                    option);
-        if (!ArrayUtil.compare(authorizationData.requestHash, paymentRequest.getRequestHash())) {
+        if (!ArrayUtil.compare(authorizationData.requestHash, 
+                               paymentRequest.getRequestHash(authorizationData.requestHashAlgorithm))) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
         }
         if (!authorizationData.paymentMethodUrl.equals(paymentMethod.paymentMethodUrl)) {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
+        }
+        if (!ArrayUtil.compare(HashSupport.getJwkThumbPrint(signatureDecoder.getPublicKey(),
+                                                            keyHashAlgorithm),
+                               authorizationData.keyHash)) {
+            throw new IOException("Non-matching \"" + KEY_HASH_JSON + "\"");
         }
         return authorizationData;
     }

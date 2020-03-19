@@ -18,14 +18,17 @@ package org.webpki.saturn.merchant;
 
 import org.webpki.saturn.common.ServerAsymKeySigner;
 
-public class PaymentNetwork {
+public class PaymentMethodDescriptor {
     
     ServerAsymKeySigner signer;
-    String paymentMethodUrl;
+    String paymentMethod;      // A URL
+    byte[] keyHash;            // For binding a user authorization to a payee request signature key
     
-    PaymentNetwork(ServerAsymKeySigner signer,
-                   String paymentMethodUrl) {
+    PaymentMethodDescriptor(ServerAsymKeySigner signer,
+                            String paymentMethod,
+                            byte[] keyHash) {
         this.signer = signer;
-        this.paymentMethodUrl = paymentMethodUrl;
+        this.paymentMethod = paymentMethod;
+        this.keyHash = keyHash;
     }
 }

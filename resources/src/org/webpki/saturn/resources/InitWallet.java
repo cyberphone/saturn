@@ -163,10 +163,11 @@ public class InitWallet {
                                     credentialId,
                                     accountId, 
                                     authorityUrl,
+                                    HashAlgorithms.SHA256,
                                     rsa_flag ?
-                                         AsymSignatureAlgorithms.RSA_SHA256
-                                                           :
-                                         AsymSignatureAlgorithms.ECDSA_SHA256,
+                             AsymSignatureAlgorithms.RSA_SHA256
+                                             :
+                             AsymSignatureAlgorithms.ECDSA_SHA256,
                                     dataEncryptionAlgorithm, 
                                     keyEncryptionAlgorithm, 
                                     encryptionKey, 

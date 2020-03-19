@@ -24,6 +24,7 @@ import java.util.LinkedHashMap;
 import java.security.PublicKey;
 
 import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.AsymKeySignerInterface;
 
 import org.webpki.json.JSONArrayReader;
@@ -42,8 +43,10 @@ public class AuthorizationData implements BaseProperties {
     public static final String SOFTWARE_VERSION = "1.00";
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
+                                          HashAlgorithms reguestHashAlgorithm,
                                           String domainName,
                                           String paymentMethodUrl,
+                                          byte[] keyHash,
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
@@ -53,14 +56,16 @@ public class AuthorizationData implements BaseProperties {
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
-                .setString(JSONCryptoHelper.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
-                .setBinary(JSONCryptoHelper.VALUE_JSON, paymentRequest.getRequestHash()))
+                .setString(JSONCryptoHelper.ALGORITHM_JSON, 
+                           reguestHashAlgorithm.getJoseAlgorithmId())
+                .setBinary(JSONCryptoHelper.VALUE_JSON, 
+                           paymentRequest.getRequestHash(reguestHashAlgorithm)))
             .setString(DOMAIN_NAME_JSON, domainName)
             .setString(PAYMENT_METHOD_JSON, paymentMethodUrl)
+            .setBinary(KEY_HASH_JSON, keyHash)
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
-            .setObject(ENCRYPTION_PARAMETERS_JSON, 
-                       new JSONObjectWriter()
+            .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setBinary(KEY_JSON, dataEncryptionKey));
         if (optionalUserResponseItems != null && optionalUserResponseItems.length > 0) {
@@ -88,8 +93,10 @@ public class AuthorizationData implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
+                                          HashAlgorithms requestHashAlgorithm,
                                           String domainName,
                                           String paymentMethod,
+                                          byte[] keyHash,
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
@@ -98,8 +105,10 @@ public class AuthorizationData implements BaseProperties {
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
+                      requestHashAlgorithm,
                       domainName,
                       paymentMethod,
+                      keyHash,
                       credentialId,
                       accountId,
                       dataEncryptionKey,
@@ -111,9 +120,13 @@ public class AuthorizationData implements BaseProperties {
 
     public AuthorizationData(JSONObjectReader rd, 
                              JSONCryptoHelper.Options signatureOptions) throws IOException {
-        requestHash = RequestHash.parse(rd);
+        JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
+        requestHashAlgorithm = HashSupport.getHashAlgorithm(requestHashObject, 
+                                                            JSONCryptoHelper.ALGORITHM_JSON);
+        requestHash = requestHashObject.getBinary(VALUE_JSON);
         domainName = rd.getString(DOMAIN_NAME_JSON);
         paymentMethodUrl = rd.getString(PAYMENT_METHOD_JSON);
+        keyHash = rd.getBinary(KEY_HASH_JSON);
         credentialId = rd.getString(CREDENTIAL_ID_JSON);
         accountId = rd.getString(ACCOUNT_ID_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
@@ -133,6 +146,16 @@ public class AuthorizationData implements BaseProperties {
         software = new Software(rd);
         publicKey = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, signatureOptions).getPublicKey();
         rd.checkForUnread();
+    }
+
+    HashAlgorithms requestHashAlgorithm;
+    public HashAlgorithms getRequestHashAlgorithm() {
+        return requestHashAlgorithm;
+    }
+
+    byte[] keyHash;
+    public byte[] getKeyHash() {
+        return keyHash;
     }
 
     DataEncryptionAlgorithms dataEncryptionAlgorithm;

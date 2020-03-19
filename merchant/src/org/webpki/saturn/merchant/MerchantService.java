@@ -23,7 +23,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
 import java.util.LinkedHashMap;
-import java.util.ArrayList;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +32,7 @@ import javax.servlet.ServletContextListener;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
+import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONObjectReader;
@@ -50,22 +50,24 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
-
+import org.webpki.saturn.common.HashSupport;
 import org.webpki.webutil.InitPropertyReader;
 
 public class MerchantService extends InitPropertyReader implements ServletContextListener {
 
     static Logger logger = Logger.getLogger(MerchantService.class.getCanonicalName());
     
-    static final String MERCHANT_KEY                 = "merchant_key";
+    static final String MERCHANT_BANK_NETWORK_KEY    = "merchant_bank_network_key";
     
+    static final String MERCHANT_CARD_NETWORK_KEY    = "merchant_card_network_key";
+
+    static final String KEYSTORE_PASSWORD            = "key_password";
+
     static final String MERCHANT_COMMON_NAME         = "merchant_common_name";
 
     static final String MERCHANT_HOME_PAGE           = "merchant_home_page";
 
     static final String MERCHANT_BASE_URL            = "merchant_base_url";
-
-    static final String KEYSTORE_PASSWORD            = "key_password";
 
     static final String PAYMENT_ROOT                 = "payment_root";
     
@@ -104,12 +106,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static final String LOGGING                      = "logging";
 
     static final String TEST_MODE                    = "test-mode";
+    
+    static final HashAlgorithms KEY_HASH_ALGORITHM   = HashAlgorithms.SHA256;
 
     static JSONX509Verifier paymentRoot;
     
     static JSONX509Verifier acquirerRoot;
     
-    static LinkedHashMap<String,PaymentNetwork> paymentNetworks = new LinkedHashMap<>();
+    static LinkedHashMap<String,PaymentMethodDescriptor> supportedPaymentMethods = new LinkedHashMap<>();
     
     static LinkedHashMap<String,AccountDataEncoder> receiveAccounts = new LinkedHashMap<>();
     
@@ -183,12 +187,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     }
     
     void addPaymentNetwork(String keyIdProperty, 
-                           String paymentMethodUrl) throws IOException {
+                           String name) throws IOException {
         KeyStoreEnumerator kse = new KeyStoreEnumerator(getResource(keyIdProperty),
                                                         getPropertyString(KEYSTORE_PASSWORD));
-        PaymentNetwork paymentNetwork = new PaymentNetwork(new ServerAsymKeySigner(kse),
-                                                           paymentMethodUrl);
-        paymentNetworks.put(paymentMethodUrl, paymentNetwork);
+        PaymentMethodDescriptor paymentNetwork = 
+            new PaymentMethodDescriptor(new ServerAsymKeySigner(kse),
+                              name,
+                              HashSupport.getJwkThumbPrint(kse.getPublicKey(), KEY_HASH_ALGORITHM));
+        supportedPaymentMethods.put(name, paymentNetwork);
     }
 
 
@@ -212,15 +218,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             merchantCommonName = getPropertyString(MERCHANT_COMMON_NAME);
             merchantHomePage = getPropertyString(MERCHANT_HOME_PAGE);
 
-            // The standard payment network supported by the Saturn demo
-            ArrayList<String> acceptedAccountTypes = new ArrayList<>();
-            for (PaymentMethods card : PaymentMethods.values()) {
-                if (card != PaymentMethods.UNUSUAL_CARD || getPropertyBoolean(ADD_UNUSUAL_CARD)) {
-                    acceptedAccountTypes.add(card.getPaymentMethodUrl());
+            // The standard payment networks supported by the Saturn demo
+            for (PaymentMethods paymentMethod : PaymentMethods.values()) {
+                if (paymentMethod != PaymentMethods.UNUSUAL_CARD || 
+                    getPropertyBoolean(ADD_UNUSUAL_CARD)) {
+                    addPaymentNetwork(paymentMethod == PaymentMethods.SUPER_CARD ?
+                            MERCHANT_CARD_NETWORK_KEY : MERCHANT_BANK_NETWORK_KEY,
+                            paymentMethod.getPaymentMethodUrl());
                 }
-            }
-            for (String paymentMethod : acceptedAccountTypes) {
-                addPaymentNetwork(MERCHANT_KEY, paymentMethod);
             }
 
             knownBackendAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);

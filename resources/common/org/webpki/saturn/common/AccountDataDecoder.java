@@ -36,8 +36,8 @@ public abstract class AccountDataDecoder extends JSONDecoder {
         return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
     }
 
-    public final byte[] getAccountHash() throws IOException {
-        return optionalNonce == null ? null : HashAlgorithms.SHA256.digest(getAccountObject());
+    public final byte[] getAccountHash(HashAlgorithms accountHashAlgorithm) throws IOException {
+        return optionalNonce == null ? null : accountHashAlgorithm.digest(getAccountObject());
     }
 
     @Override

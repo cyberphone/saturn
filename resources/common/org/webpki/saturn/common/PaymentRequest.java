@@ -22,6 +22,8 @@ import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
 
+import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
@@ -118,7 +120,7 @@ public class PaymentRequest implements BaseProperties {
 
     JSONObjectReader root;
 
-    public byte[] getRequestHash() throws IOException {
-        return RequestHash.getRequestHash(new JSONObjectWriter(root));
+    public byte[] getRequestHash(HashAlgorithms requestHashAlgorithm) throws IOException {
+        return HashSupport.getJsonHash(new JSONObjectWriter(root), requestHashAlgorithm);
     }
 }

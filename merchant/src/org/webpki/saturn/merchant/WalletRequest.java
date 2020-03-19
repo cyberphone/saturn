@@ -25,6 +25,7 @@ import java.util.GregorianCalendar;
 
 import javax.servlet.http.HttpSession;
 
+import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
@@ -67,9 +68,14 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
                                   timeStamp,
                                   expires);
 
-         requestObject.setStringArray(PAYMENT_METHODS_JSON,
-                                      MerchantService.paymentNetworks.keySet().toArray(new String[0]))
-                      .setObject(PAYMENT_REQUEST_JSON, paymentRequest);
+        JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
+        for (String key : MerchantService.supportedPaymentMethods.keySet()) {
+            PaymentMethodDescriptor paymentMethodDescriptor = MerchantService.supportedPaymentMethods.get(key);
+            methodList.setObject()
+                .setString(PAYMENT_METHOD_JSON, paymentMethodDescriptor.paymentMethod)
+                .setBinary(KEY_HASH_JSON, paymentMethodDescriptor.keyHash);
+        }
+        requestObject.setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         if (MerchantService.noMatchingMethodsUrl != null) {
             requestObject.setString(NO_MATCHING_METHODS_URL_JSON, MerchantService.noMatchingMethodsUrl);
         }

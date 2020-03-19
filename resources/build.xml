@@ -117,7 +117,7 @@
         </classpath>
         <arg value="${jcspaper}"/>
         <arg value="${logotype}"/>
-        <arg value="${@merchantkey}.p12"/>
+        <arg value="${@merchantBankNetworkKey}.p12"/>
         <arg value="${@payeebankpath}-eecert.p12"/>
         <arg value="${@keypassword}"/>
     </java>
@@ -498,16 +498,22 @@
 
   <target name="_merchantkeys">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantkey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantBankNetworkKey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${@merchantkey}"/>
+       <param name="rootfile" value="${@merchantBankNetworkKey}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Old Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantkey.old}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Old Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantBankNetworkKey.old}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
-       <param name="rootfile" value="${@merchantkey.old}"/>
+       <param name="rootfile" value="${@merchantBankNetworkKey.old}"/>
+    </antcall>
+    <antcall target="_createcert">
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantCardNetworkKey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+    </antcall>
+    <antcall target="_getroot">
+       <param name="rootfile" value="${@merchantCardNetworkKey}"/>
     </antcall>
   </target>
 

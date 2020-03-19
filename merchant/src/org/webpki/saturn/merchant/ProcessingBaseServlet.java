@@ -112,7 +112,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             PayerAuthorization payerAuthorization = new PayerAuthorization(walletResponse);
             
             // Check that we got a valid payment method
-            if (!MerchantService.paymentNetworks.containsKey(
+            if (!MerchantService.supportedPaymentMethods.containsKey(
                     payerAuthorization.getPaymentMethod().getPaymentMethodUrl())) {
                 throw new IOException("Unexpected: " + payerAuthorization.getPaymentMethod().getPaymentMethodUrl());
             }

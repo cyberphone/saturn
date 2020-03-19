@@ -22,8 +22,8 @@ import java.math.BigDecimal;
 
 import java.security.PublicKey;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.KeyEncryptionAlgorithms;
@@ -39,6 +39,7 @@ public class CardDataEncoder {
                                           String credentialId,
                                           String accountId,
                                           String authorityUrl,
+                                          HashAlgorithms reguestHashAlgorithm,
                                           AsymSignatureAlgorithms signatureAlgorithm,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
@@ -52,8 +53,10 @@ public class CardDataEncoder {
             .setString(BaseProperties.ACCOUNT_ID_JSON, accountId)
             .setString(BaseProperties.CREDENTIAL_ID_JSON, credentialId)
             .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, authorityUrl)
+            .setString(CardDataDecoder.REQUEST_HASH_ALGORITHM_JSON, 
+                       reguestHashAlgorithm.getJoseAlgorithmId())
             .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
-                    signatureAlgorithm.getAlgorithmId(AlgorithmPreferences.JOSE))
+                       signatureAlgorithm.getJoseAlgorithmId())
             .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                 .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, keyEncryptionAlgorithm.toString())

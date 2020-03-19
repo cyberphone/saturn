@@ -1,3 +1,4 @@
+
 /*
  *  Copyright 2015-2020 WebPKI.org (http://webpki.org).
  *
@@ -61,6 +62,8 @@ public class PayeeCoreProperties implements BaseProperties {
             this.publicKey = publicKey;
         }
     }
+    
+    
 
     public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
         payeeId = rd.getString(LOCAL_PAYEE_ID_JSON);
@@ -69,7 +72,7 @@ public class PayeeCoreProperties implements BaseProperties {
         if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
             optionalAccountHashes = new ArrayList<>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
-            if (!accountVerifier.getString(JSONCryptoHelper.ALGORITHM_JSON).equals(RequestHash.JOSE_SHA_256_ALG_ID)) {
+            if (!accountVerifier.getString(JSONCryptoHelper.ALGORITHM_JSON).equals(HashSupport.JOSE_SHA_256_ALG_ID)) {
                 throw new IOException("Unexpected hash algorithm");
             }
             JSONArrayReader accountHashes = accountVerifier.getArray(HASHED_PAYEE_ACCOUNTS_JSON);
@@ -142,7 +145,7 @@ public class PayeeCoreProperties implements BaseProperties {
           .setString(HOME_PAGE_JSON, payeeHomePage);
         if (optionalAccountHashes != null) {
             wr.setObject(ACCOUNT_VERIFIER_JSON)
-                  .setString(JSONCryptoHelper.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID)
+                  .setString(JSONCryptoHelper.ALGORITHM_JSON, HashSupport.JOSE_SHA_256_ALG_ID)
                   .setBinaryArray(HASHED_PAYEE_ACCOUNTS_JSON, optionalAccountHashes);
         }
         JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PARAMETERS_JSON);
@@ -150,7 +153,7 @@ public class PayeeCoreProperties implements BaseProperties {
             jsonArray.setObject().setString(JSONCryptoHelper.ALGORITHM_JSON,
                                             signatureParameter
                                                 .signatureAlgorithm
-                                                    .getAlgorithmId(AlgorithmPreferences.JOSE))
+                                                    .getJoseAlgorithmId())
                                  .setPublicKey(signatureParameter.publicKey, 
                                                AlgorithmPreferences.JOSE);
         }

@@ -25,13 +25,16 @@ public interface BaseProperties {
     String REQUESTER_JSON                   = "requester";                  // ProviderUserResponse
     String TEXT_JSON                        = "text";                       // ProviderUserResponse
     String USER_CHALLENGE_ITEMS_JSON        = "userChallengeItems";         // ProviderUserResponse
-    String NAME_JSON                        = "name";                       // ProviderUserResponse
+    String NAME_JSON                        = "name";                       // ProviderUserResponse & more
     String VALUE_JSON                       = "value";                      // ProviderUserResponse
     String TYPE_JSON                        = "type";                       // ProviderUserResponse
     String LABEL_JSON                       = "label";                      // ProviderUserResponse
     String ENCRYPTED_MESSAGE_JSON           = "encryptedMessage";           // ProviderUserResponse
 
     String KEY_JSON                         = "key";                        // Wallet-originated encryption key
+    
+    String KEY_HASH_JSON                    = "keyHash";                    // For binding authorization to request signature
+    String KEY_HASH_ALGORITHM_JSON          = "keyHashAlgorithm";           // Default "S256" = SHA-256
 
     String USER_RESPONSE_ITEMS_JSON         = "userResponseItems";          // Result of ProviderUserResponse 
 
@@ -58,7 +61,7 @@ public interface BaseProperties {
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider authority object
     String HOSTING_PROVIDER_JSON            = "hostingProvider";            // Optional object in ProviderAuthority
     String HOME_PAGE_JSON                   = "homePage";                   // URL to the public Web of the entity
-    String PAYMENT_METHODS_JSON             = "paymentMethods";             // List of accepted payment methods (URLs)
+    String SUPPORTED_PAYMENT_METHODS_JSON   = "supportedPaymentMethods";    // List of accepted payment methods (URLs)
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)
     String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User and bank authorization signature
     String REQUEST_SIGNATURE_JSON           = "requestSignature";           // Payee signature

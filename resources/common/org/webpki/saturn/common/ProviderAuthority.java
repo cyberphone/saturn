@@ -129,7 +129,7 @@ public class ProviderAuthority implements BaseProperties {
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
-            .setObject(PAYMENT_METHODS_JSON, paymentMethods.toObject())
+            .setObject(SUPPORTED_PAYMENT_METHODS_JSON, paymentMethods.toObject())
             .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
             .setDynamic((wr) -> {
                 JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PROFILES_JSON);
@@ -170,7 +170,7 @@ public class ProviderAuthority implements BaseProperties {
         }
         homePage = rd.getString(HOME_PAGE_JSON);
         serviceUrl = rd.getString(SERVICE_URL_JSON);
-        JSONObjectReader paymentMethodsObject = rd.getObject(PAYMENT_METHODS_JSON);
+        JSONObjectReader paymentMethodsObject = rd.getObject(SUPPORTED_PAYMENT_METHODS_JSON);
         paymentMethods = new PaymentMethodDeclarations();
         for (String clientPaymentMethod : paymentMethodsObject.getProperties()) {
             paymentMethods.add(new PaymentMethodDeclaration(clientPaymentMethod,

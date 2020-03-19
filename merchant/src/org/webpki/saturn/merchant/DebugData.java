@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 
 import java.security.KeyPair;
 
+import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONCryptoHelper;
@@ -128,9 +130,11 @@ public class DebugData implements Serializable {
                                   ISODateTime.parseDateTime("2020-01-20T11:15:08Z", 
                                                             ISODateTime.COMPLETE));
         return new JSONObjectReader(AuthorizationData.encode(
-                                 new PaymentRequest(new JSONObjectReader(paymentRequest)), 
+                                 new PaymentRequest(new JSONObjectReader(paymentRequest)),
+                                 HashAlgorithms.SHA256,
                                  "demomerchant.com", 
                                  PaymentMethods.BANK_DIRECT.getPaymentMethodUrl(),
+                                 HashAlgorithms.SHA256.digest(WALLET_SESSION_ENCRYPTION_KEY),
                                  "54674448", 
                                  "FR7630002111110020050012733", 
                                  WALLET_SESSION_ENCRYPTION_KEY, 
@@ -157,7 +161,7 @@ public class DebugData implements Serializable {
             providerUserResponseSample = new JSONObjectReader(ProviderUserResponse.encode(
                     "My Bank",
                     "Transaction requests exceeding " +
-                      "<span style=\"font-weight:bold;white-space:nowrap\">€&#x2009;1,000</span>" +
+                      "<span style=\"font-weight:bold;white-space:nowrap\">&#x20ac;&#x2009;1,000</span>" +
                       " require additional user authentication to " +
                       "be performed. Please enter your " +
                       "<span style=\"color:blue\">mother's maiden name</span>.",

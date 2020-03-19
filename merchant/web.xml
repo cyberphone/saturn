@@ -17,9 +17,15 @@
     </context-param>
  
     <context-param>
-        <description>Merchant Key</description>
-        <param-name>merchant_key</param-name>
-        <param-value>@merchant-key@</param-value>
+        <description>Merchant Bank Network Key</description>
+        <param-name>merchant_bank_network_key</param-name>
+        <param-value>@merchant-bank-network-key@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Merchant Card Network Key</description>
+        <param-name>merchant_card_network_key</param-name>
+        <param-value>@merchant-card-network-key@</param-value>
     </context-param>
 
     <context-param>

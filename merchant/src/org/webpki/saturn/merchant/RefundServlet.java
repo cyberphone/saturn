@@ -96,7 +96,7 @@ public class RefundServlet extends HttpServlet implements MerchantProperties {
                                      resultData.amount,
                                      MerchantService.sourceAccounts.get(context),
                                      MerchantService.getReferenceId(),
-                                     MerchantService.paymentNetworks.get(
+                                     MerchantService.supportedPaymentMethods.get(
                                              authorizationRequest
                                                  .getPaymentMethod()
                                                      .getPaymentMethodUrl()).signer);

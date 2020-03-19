@@ -60,7 +60,7 @@ const BaseProperties = {
     PROVIDER_AUTHORITY_URL_JSON     : 'providerAuthorityUrl',       // URL to payment provider authority object
     HOSTING_PROVIDER_JSON           : 'hostingProvider',            // Optional object in ProviderAuthority
     HOME_PAGE_JSON                  : 'homePage',                   // URL to the public Web of the entity
-    PAYMENT_METHODS_JSON            : 'paymentMethods',             // List of accepted payment methods (URLs)
+    SUPPORTED_PAYMENT_METHODS_JSON            : 'paymentMethods',             // List of accepted payment methods (URLs)
     PAYMENT_METHOD_JSON             : 'paymentMethod',              // Payment method (URL)
     AUTHORIZATION_SIGNATURE_JSON    : 'authorizationSignature',     // User and bank authorization signature
     REQUEST_SIGNATURE_JSON          : 'requestSignature',           // Payee signature

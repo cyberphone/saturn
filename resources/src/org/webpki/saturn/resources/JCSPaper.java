@@ -170,7 +170,7 @@ public class JCSPaper implements BaseProperties {
         JSONObjectWriter joseSignedPaymentRequest = 
             jws(josePaymentRequest, 
                 new JSONObjectWriter()
-                    .setString(JOSE_ALG, AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE))
+                    .setString(JOSE_ALG, AsymSignatureAlgorithms.ECDSA_SHA256.getJoseAlgorithmId())
                     .setObject(JOSE_JWK, new JSONObjectWriter()
                         .setString(JOSE_KTY, joseHeader.getString(JSONCryptoHelper.KTY_JSON))
                         .setString(JOSE_CRV, joseHeader.getString(JSONCryptoHelper.CRV_JSON))
@@ -198,7 +198,7 @@ public class JCSPaper implements BaseProperties {
               "Anyway, here is the sample message using " +  RFC7515() + " notation:" +
               "</div><div class=\"json\">");
         JSONObjectWriter joseAuthorizationHeader = new JSONObjectWriter()
-            .setString(JOSE_ALG, AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE));
+            .setString(JOSE_ALG, AsymSignatureAlgorithms.ECDSA_SHA256.getJoseAlgorithmId());
         JSONArrayWriter aw = joseAuthorizationHeader.setArray(JOSE_X5C);
         for (X509Certificate cert : authorizationKey.getCertificatePath()) {
             aw.setString(new Base64(false).getBase64StringFromBinary(cert.getEncoded()));
@@ -267,7 +267,7 @@ public class JCSPaper implements BaseProperties {
 
     static void checkJws(JSONObjectReader jws) throws Exception {
         JSONObjectReader protectedHeader = JSONParser.parse(jws.getBinary(JOSE_PROTECTED));
-        if (!protectedHeader.getString(JOSE_ALG).equals(AsymSignatureAlgorithms.ECDSA_SHA256.getAlgorithmId(AlgorithmPreferences.JOSE))) {
+        if (!protectedHeader.getString(JOSE_ALG).equals(AsymSignatureAlgorithms.ECDSA_SHA256.getJoseAlgorithmId())) {
             throw new IOException("Bad alg");
         }
         PublicKey publicKey = null;

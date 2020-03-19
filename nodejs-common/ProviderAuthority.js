@@ -47,7 +47,7 @@ ProviderAuthority.encode = function(authorityUrl,
     .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
     .setString(BaseProperties.HOME_PAGE_JSON, homePage)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
-    .setObject(BaseProperties.PAYMENT_METHODS_JSON, new JsonUtil.ObjectWriter()
+    .setObject(BaseProperties.SUPPORTED_PAYMENT_METHODS_JSON, new JsonUtil.ObjectWriter()
         .setDynamic((wr) => {
             wr.setArray(SUPERCARD_METHOD).setString(AccountDataDecoder.SEPA_ACCOUNT);
             return wr;
