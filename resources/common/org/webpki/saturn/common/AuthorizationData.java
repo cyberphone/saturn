@@ -122,7 +122,7 @@ public class AuthorizationData implements BaseProperties {
                              JSONCryptoHelper.Options signatureOptions) throws IOException {
         JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
         requestHashAlgorithm = Utils.getHashAlgorithm(requestHashObject, 
-                                                            JSONCryptoHelper.ALGORITHM_JSON);
+                                                      JSONCryptoHelper.ALGORITHM_JSON);
         requestHash = requestHashObject.getBinary(VALUE_JSON);
         domainName = rd.getString(DOMAIN_NAME_JSON);
         paymentMethodUrl = rd.getString(PAYMENT_METHOD_JSON);

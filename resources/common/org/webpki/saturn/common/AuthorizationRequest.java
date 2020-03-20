@@ -152,8 +152,9 @@ public class AuthorizationRequest implements BaseProperties {
             JSONCryptoHelper.Options option)
     throws IOException, GeneralSecurityException {
         AuthorizationData authorizationData =
-            new AuthorizationData(JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)),
-                                                   option);
+            new AuthorizationData(
+                    JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)),
+                                     option);
         if (!ArrayUtil.compare(authorizationData.requestHash, 
                                paymentRequest.getRequestHash(authorizationData.requestHashAlgorithm))) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
@@ -162,7 +163,7 @@ public class AuthorizationRequest implements BaseProperties {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
         if (!ArrayUtil.compare(Utils.getJwkThumbPrint(signatureDecoder.getPublicKey(),
-                                                            keyHashAlgorithm),
+                                                      keyHashAlgorithm),
                                authorizationData.keyHash)) {
             throw new IOException("Non-matching \"" + KEY_HASH_JSON + "\"");
         }
