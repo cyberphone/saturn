@@ -62,9 +62,9 @@ public class AuthorizationData implements BaseProperties {
                            paymentRequest.getRequestHash(reguestHashAlgorithm)))
             .setString(DOMAIN_NAME_JSON, domainName)
             .setString(PAYMENT_METHOD_JSON, paymentMethodUrl)
-            .setBinary(KEY_HASH_JSON, keyHash)
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
+            .setBinary(KEY_HASH_JSON, keyHash)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setBinary(KEY_JSON, dataEncryptionKey));
@@ -126,9 +126,9 @@ public class AuthorizationData implements BaseProperties {
         requestHash = requestHashObject.getBinary(VALUE_JSON);
         domainName = rd.getString(DOMAIN_NAME_JSON);
         paymentMethodUrl = rd.getString(PAYMENT_METHOD_JSON);
-        keyHash = rd.getBinary(KEY_HASH_JSON);
         credentialId = rd.getString(CREDENTIAL_ID_JSON);
         accountId = rd.getString(ACCOUNT_ID_JSON);
+        keyHash = rd.getBinary(KEY_HASH_JSON);
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
             .getAlgorithmFromId(encryptionParameters.getString(JSONCryptoHelper.ALGORITHM_JSON));
