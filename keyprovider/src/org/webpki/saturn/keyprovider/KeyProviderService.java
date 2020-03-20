@@ -126,6 +126,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         BigDecimal tempBalanceFix;
         
         public CredentialTemplate(JSONObjectReader rd) throws IOException {
+            paymentMethod = rd.getString("paymentMethod");
             signatureAlgorithm = Utils.getSignatureAlgorithm(rd, "signatureAlgorithm");
             accountType = rd.getString("accountType");
             requestHashAlgorithm = Utils.getHashAlgorithm(rd, "requestHashAlgorithm");
