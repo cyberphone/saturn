@@ -75,7 +75,7 @@ public class PayeeCoreProperties implements BaseProperties {
             optionalAccountHashes = new ArrayList<>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
             accountHashAlgorithm = 
-                    Utils.getHashAlgorithm(accountVerifier, JSONCryptoHelper.ALGORITHM_JSON);
+                    CryptoUtils.getHashAlgorithm(accountVerifier, JSONCryptoHelper.ALGORITHM_JSON);
             JSONArrayReader accountHashes = accountVerifier.getArray(HASHED_PAYEE_ACCOUNTS_JSON);
             do {
                 optionalAccountHashes.add(accountHashes.getBinary());
@@ -87,8 +87,8 @@ public class PayeeCoreProperties implements BaseProperties {
             JSONObjectReader signatureParameter = jsonParameterArray.getObject();
             parameterArray.add(
                     new SignatureParameter(
-                            Utils.getSignatureAlgorithm(signatureParameter,
-                                                        JSONCryptoHelper.ALGORITHM_JSON),
+                            CryptoUtils.getSignatureAlgorithm(signatureParameter,
+                                                              JSONCryptoHelper.ALGORITHM_JSON),
                     signatureParameter.getPublicKey()));
         } while (jsonParameterArray.hasMore());
         signatureParameters = parameterArray.toArray(new SignatureParameter[0]);

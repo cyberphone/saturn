@@ -28,7 +28,9 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
-public class Utils {
+public class CryptoUtils {
+    
+    private CryptoUtils() {}
   
     public static byte[] getJsonHash(JSONObjectWriter request, 
                                      HashAlgorithms hashAlgorithm) throws IOException {

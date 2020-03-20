@@ -44,7 +44,7 @@ public class AuthorizationRequest implements BaseProperties {
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
-        keyHashAlgorithm = Utils.getHashAlgorithm(rd, KEY_HASH_ALGORITHM_JSON);                   
+        keyHashAlgorithm = CryptoUtils.getHashAlgorithm(rd, KEY_HASH_ALGORITHM_JSON);                   
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
         undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
@@ -162,8 +162,8 @@ public class AuthorizationRequest implements BaseProperties {
         if (!authorizationData.paymentMethodUrl.equals(paymentMethod.paymentMethodUrl)) {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
-        if (!ArrayUtil.compare(Utils.getJwkThumbPrint(signatureDecoder.getPublicKey(),
-                                                      keyHashAlgorithm),
+        if (!ArrayUtil.compare(CryptoUtils.getJwkThumbPrint(signatureDecoder.getPublicKey(),
+                                                            keyHashAlgorithm),
                                authorizationData.keyHash)) {
             throw new IOException("Non-matching \"" + KEY_HASH_JSON + "\"");
         }

@@ -50,7 +50,7 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
-import org.webpki.saturn.common.Utils;
+import org.webpki.saturn.common.CryptoUtils;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -193,8 +193,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                                         getPropertyString(KEYSTORE_PASSWORD));
         PaymentMethodDescriptor paymentNetwork = 
             new PaymentMethodDescriptor(new ServerAsymKeySigner(kse),
-                              name,
-                              Utils.getJwkThumbPrint(kse.getPublicKey(), KEY_HASH_ALGORITHM));
+                                        name,
+                                        CryptoUtils.getJwkThumbPrint(kse.getPublicKey(), 
+                                                                     KEY_HASH_ALGORITHM));
         supportedPaymentMethods.put(name, paymentNetwork);
     }
 

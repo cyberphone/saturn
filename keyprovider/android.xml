@@ -25,7 +25,7 @@
             <include name="**/Messages.java"/>
             <include name="**/EncryptedMessage.java"/>
             <include name="**/PaymentRequest.java"/>
-            <include name="**/Utils.java"/>
+            <include name="**/CryptoUtils.java"/>
             <include name="**/Software.java"/>
             <include name="**/UserChallengeItem.java"/>
             <include name="**/UserResponseItem.java"/>

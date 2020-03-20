@@ -56,7 +56,7 @@ import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.Utils;
+import org.webpki.saturn.common.CryptoUtils;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 
 import org.webpki.webutil.InitPropertyReader;
@@ -127,10 +127,10 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         
         public CredentialTemplate(JSONObjectReader rd) throws IOException {
             paymentMethod = rd.getString("paymentMethod");
-            signatureAlgorithm = Utils.getSignatureAlgorithm(rd, "signatureAlgorithm");
+            signatureAlgorithm = CryptoUtils.getSignatureAlgorithm(rd, "signatureAlgorithm");
             accountType = rd.getString("accountType");
-            requestHashAlgorithm = Utils.getHashAlgorithm(rd, "requestHashAlgorithm");
-            keyAlgorithm = Utils.getKeyAlgorithm(rd, "signatureKeyAlgorithm");
+            requestHashAlgorithm = CryptoUtils.getHashAlgorithm(rd, "requestHashAlgorithm");
+            keyAlgorithm = CryptoUtils.getKeyAlgorithm(rd, "signatureKeyAlgorithm");
             cardFormatted = rd.getBoolean("cardFormatted");
             if (rd.hasProperty("serverSetPIN")) {
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");
