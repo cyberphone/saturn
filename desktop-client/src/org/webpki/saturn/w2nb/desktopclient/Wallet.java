@@ -83,6 +83,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
@@ -98,6 +99,7 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataDecoder;
+import org.webpki.saturn.common.CryptoUtils;
 import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.AuthorizationData;
@@ -172,7 +174,8 @@ public class Wallet {
 
     static class Account {
         String paymentMethod;
-        byte[] keyHash;
+        HashAlgorithms keyHashAlgorithm;
+        byte[] keyHashValue;
         HashAlgorithms requestHashAlgorithm;
         String credentialId;
         String accountId;
@@ -188,7 +191,8 @@ public class Wallet {
         
         Account(String paymentMethod,
                 HashAlgorithms requestHashAlgorithm,
-                byte[] keyHash,
+                HashAlgorithms keyHashAlgorithm,
+                byte[] keyHashValue,
                 String credentialId,
                 String accountId,
                 boolean cardFormatAccountId,
@@ -198,7 +202,8 @@ public class Wallet {
                 BigDecimal tempBalanceFix) {
             this.paymentMethod = paymentMethod;
             this.requestHashAlgorithm = requestHashAlgorithm;
-            this.keyHash = keyHash;
+            this.keyHashAlgorithm = keyHashAlgorithm;
+            this.keyHashValue = keyHashValue;
             this.credentialId = credentialId;
             this.accountId = accountId;
             this.cardFormatAccountId = cardFormatAccountId;
@@ -215,7 +220,8 @@ public class Wallet {
     
     static class PaymentMethodDescriptor {
         String name;     // URL actually
-        byte[] keyHash;
+        HashAlgorithms keyHashAlgorithm;
+        byte[] keyHashValue;
     }
 
     static class ScalingIcon extends ImageIcon {
@@ -466,7 +472,7 @@ public class Wallet {
             } else {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<>();
                 for (int i = 0; i < 2; i++) {
-                    cards.put(i, new Account("n/a", null, new byte[0], "n/a", DUMMY_BALANCE,
+                    cards.put(i, new Account("n/a", null, null, new byte[0], "n/a", DUMMY_BALANCE,
                                              true, dummyCardIcon, null, null, new BigDecimal("1.00")));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
@@ -921,8 +927,13 @@ public class Wallet {
                                             new PaymentMethodDescriptor();
                                     paymentMethodDescriptor.name = 
                                             paymentMethodEntry.getString(BaseProperties.PAYMENT_METHOD_JSON);
-                                    paymentMethodDescriptor.keyHash =
-                                            paymentMethodEntry.getBinary(BaseProperties.KEY_HASH_JSON);
+                                    JSONObjectReader keyHashObject = 
+                                            paymentMethodEntry.getObject(BaseProperties.KEY_HASH_JSON);
+                                    paymentMethodDescriptor.keyHashValue = 
+                                            keyHashObject.getBinary(JSONCryptoHelper.VALUE_JSON);
+                                    paymentMethodDescriptor.keyHashAlgorithm = 
+                                            CryptoUtils.getHashAlgorithm(keyHashObject, 
+                                                                         JSONCryptoHelper.ALGORITHM_JSON);
                                     paymentMethods.add(paymentMethodDescriptor);
                                 } while (methodList.hasMore());
                                 paymentRequest = new PaymentRequest(
@@ -1025,7 +1036,8 @@ public class Wallet {
                     Account card =
                         new Account(paymentMethodName,
                                     cardProperties.getRequestHashAlgorithm(),
-                                    acceptedPaymentMethod.keyHash,
+                                    acceptedPaymentMethod.keyHashAlgorithm,
+                                    acceptedPaymentMethod.keyHashValue,
                                     cardProperties.getCredentialId(),
                                     cardProperties.getAccountId(),
                                     true,
@@ -1069,7 +1081,8 @@ public class Wallet {
                         selectedCard.requestHashAlgorithm,
                         domainName,
                         selectedCard.paymentMethod,
-                        selectedCard.keyHash,
+                        selectedCard.keyHashAlgorithm,
+                        selectedCard.keyHashValue,
                         selectedCard.credentialId,
                         selectedCard.accountId,
                         dataEncryptionKey,

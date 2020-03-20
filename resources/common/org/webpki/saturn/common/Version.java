@@ -18,5 +18,5 @@ package org.webpki.saturn.common;
 
 public class Version {
     public final static String PROTOCOL = "0.63";
-    public final static String DATE     = "2020-03-18";
+    public final static String DATE     = "2020-03-20";
 }

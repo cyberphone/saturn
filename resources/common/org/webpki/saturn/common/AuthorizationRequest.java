@@ -23,8 +23,6 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 
-import org.webpki.crypto.HashAlgorithms;
-
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
@@ -44,7 +42,6 @@ public class AuthorizationRequest implements BaseProperties {
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
-        keyHashAlgorithm = CryptoUtils.getHashAlgorithm(rd, KEY_HASH_ALGORITHM_JSON);                   
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
         undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
@@ -68,8 +65,6 @@ public class AuthorizationRequest implements BaseProperties {
     
     JSONObjectReader undecodedAccountData;
     
-    HashAlgorithms keyHashAlgorithm;
-
     boolean testMode;
     public boolean getTestMode() {
         return testMode;
@@ -124,7 +119,6 @@ public class AuthorizationRequest implements BaseProperties {
                                           String recepientUrl,
                                           String authorityUrl,
                                           PaymentMethods paymentMethod,
-                                          HashAlgorithms keyHashAlgorithm,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
                                           PaymentRequest paymentRequest,
@@ -138,7 +132,6 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setString(KEY_HASH_ALGORITHM_JSON, keyHashAlgorithm.getJoseAlgorithmId())
             .setObject(PAYEE_RECEIVE_ACCOUNT_JSON, payeeReceiveAccount.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
@@ -163,8 +156,8 @@ public class AuthorizationRequest implements BaseProperties {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
         if (!ArrayUtil.compare(CryptoUtils.getJwkThumbPrint(signatureDecoder.getPublicKey(),
-                                                            keyHashAlgorithm),
-                               authorizationData.keyHash)) {
+                                                            authorizationData.keyHashAlgorithm),
+                               authorizationData.keyHashValue)) {
             throw new IOException("Non-matching \"" + KEY_HASH_JSON + "\"");
         }
         return authorizationData;

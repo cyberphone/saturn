@@ -34,7 +34,6 @@ public interface BaseProperties {
     String KEY_JSON                         = "key";                        // Wallet-originated encryption key
     
     String KEY_HASH_JSON                    = "keyHash";                    // For binding authorization to request signature
-    String KEY_HASH_ALGORITHM_JSON          = "keyHashAlgorithm";           // Default "S256" = SHA-256
 
     String USER_RESPONSE_ITEMS_JSON         = "userResponseItems";          // Result of ProviderUserResponse 
 

@@ -16,19 +16,24 @@
  */
 package org.webpki.saturn.merchant;
 
+import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.saturn.common.ServerAsymKeySigner;
 
 public class PaymentMethodDescriptor {
     
     ServerAsymKeySigner signer;
-    String paymentMethod;      // A URL
-    byte[] keyHash;            // For binding a user authorization to a payee request signature key
+    String paymentMethod;             // A URL
+    byte[] keyHashValue;                   // For binding a user authorization to a payee request signature key
+    HashAlgorithms keyHashAlgorithm;  // Using this algorithm
     
     PaymentMethodDescriptor(ServerAsymKeySigner signer,
                             String paymentMethod,
-                            byte[] keyHash) {
+                            HashAlgorithms keyHashAlgorithm,
+                            byte[] keyHashValue) {
         this.signer = signer;
         this.paymentMethod = paymentMethod;
-        this.keyHash = keyHash;
+        this.keyHashAlgorithm = keyHashAlgorithm;
+        this.keyHashValue = keyHashValue;
     }
 }

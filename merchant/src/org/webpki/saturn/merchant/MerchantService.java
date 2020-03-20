@@ -194,6 +194,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         PaymentMethodDescriptor paymentNetwork = 
             new PaymentMethodDescriptor(new ServerAsymKeySigner(kse),
                                         name,
+                                        KEY_HASH_ALGORITHM,
                                         CryptoUtils.getJwkThumbPrint(kse.getPublicKey(), 
                                                                      KEY_HASH_ALGORITHM));
         supportedPaymentMethods.put(name, paymentNetwork);

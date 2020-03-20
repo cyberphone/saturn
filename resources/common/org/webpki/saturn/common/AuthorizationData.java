@@ -46,7 +46,8 @@ public class AuthorizationData implements BaseProperties {
                                           HashAlgorithms reguestHashAlgorithm,
                                           String domainName,
                                           String paymentMethodUrl,
-                                          byte[] keyHash,
+                                          HashAlgorithms keyHashAlgorithm,
+                                          byte[] keyHashValue,
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
@@ -60,11 +61,14 @@ public class AuthorizationData implements BaseProperties {
                            reguestHashAlgorithm.getJoseAlgorithmId())
                 .setBinary(JSONCryptoHelper.VALUE_JSON, 
                            paymentRequest.getRequestHash(reguestHashAlgorithm)))
+            .setObject(KEY_HASH_JSON, new JSONObjectWriter()
+                .setString(JSONCryptoHelper.ALGORITHM_JSON, 
+                           keyHashAlgorithm.getJoseAlgorithmId())
+                .setBinary(JSONCryptoHelper.VALUE_JSON, keyHashValue))
             .setString(DOMAIN_NAME_JSON, domainName)
             .setString(PAYMENT_METHOD_JSON, paymentMethodUrl)
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
-            .setBinary(KEY_HASH_JSON, keyHash)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
                 .setBinary(KEY_JSON, dataEncryptionKey));
@@ -96,7 +100,8 @@ public class AuthorizationData implements BaseProperties {
                                           HashAlgorithms requestHashAlgorithm,
                                           String domainName,
                                           String paymentMethod,
-                                          byte[] keyHash,
+                                          HashAlgorithms keyHashAlgorithm,
+                                          byte[] keyHashValue,
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
@@ -108,7 +113,8 @@ public class AuthorizationData implements BaseProperties {
                       requestHashAlgorithm,
                       domainName,
                       paymentMethod,
-                      keyHash,
+                      keyHashAlgorithm,
+                      keyHashValue,
                       credentialId,
                       accountId,
                       dataEncryptionKey,
@@ -124,15 +130,23 @@ public class AuthorizationData implements BaseProperties {
         requestHashAlgorithm = CryptoUtils.getHashAlgorithm(requestHashObject, 
                                                             JSONCryptoHelper.ALGORITHM_JSON);
         requestHash = requestHashObject.getBinary(VALUE_JSON);
+
+        JSONObjectReader keyHashObject = rd.getObject(KEY_HASH_JSON);
+        keyHashAlgorithm = CryptoUtils.getHashAlgorithm(keyHashObject, 
+                                                        JSONCryptoHelper.ALGORITHM_JSON);
+        keyHashValue = keyHashObject.getBinary(VALUE_JSON);
+
         domainName = rd.getString(DOMAIN_NAME_JSON);
+
         paymentMethodUrl = rd.getString(PAYMENT_METHOD_JSON);
         credentialId = rd.getString(CREDENTIAL_ID_JSON);
         accountId = rd.getString(ACCOUNT_ID_JSON);
-        keyHash = rd.getBinary(KEY_HASH_JSON);
+
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
             .getAlgorithmFromId(encryptionParameters.getString(JSONCryptoHelper.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
+
         if (rd.hasProperty(USER_RESPONSE_ITEMS_JSON)) {
             JSONArrayReader ar = rd.getArray(USER_RESPONSE_ITEMS_JSON);
              do {
@@ -142,6 +156,7 @@ public class AuthorizationData implements BaseProperties {
                 }
             } while (ar.hasMore());
         }
+
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
         publicKey = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, signatureOptions).getPublicKey();
@@ -149,14 +164,10 @@ public class AuthorizationData implements BaseProperties {
     }
 
     HashAlgorithms requestHashAlgorithm;
-    public HashAlgorithms getRequestHashAlgorithm() {
-        return requestHashAlgorithm;
-    }
+    byte[] requestHash;
 
-    byte[] keyHash;
-    public byte[] getKeyHash() {
-        return keyHash;
-    }
+    HashAlgorithms keyHashAlgorithm;
+    byte[] keyHashValue;
 
     DataEncryptionAlgorithms dataEncryptionAlgorithm;
     public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
@@ -171,11 +182,6 @@ public class AuthorizationData implements BaseProperties {
     LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = new LinkedHashMap<>();
     public LinkedHashMap<String,UserResponseItem> getUserResponseItems() {
         return optionalUserResponseItems;
-    }
-
-    byte[] requestHash;
-    public byte[] getRequestHash() {
-        return requestHash;
     }
 
     String domainName;
