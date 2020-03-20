@@ -33,6 +33,7 @@ import javax.servlet.ServletContextListener;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
+import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
@@ -127,6 +128,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
                 PayeeCoreProperties account = 
                         PayeeCoreProperties.init(accounts.getObject(),
                                                  getPropertyString(HOSTING_BASE_URL) + "/payees/",
+                                                 HashAlgorithms.SHA256,
                                                  knownPayeeMethods);
                 merchantAccountDb.put(account.getPayeeAuthorityUrl(), account);
             }

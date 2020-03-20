@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.webpki.crypto.HashAlgorithms;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -137,7 +138,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         providerAuthority.getServiceUrl(),
                                         payeeAuthorityUrl,
                                         payerAuthorization.getPaymentMethod(),
-                                        null,
+                                        HashAlgorithms.SHA256,
                                         walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
                                         request.getRemoteAddr(),
                                         paymentRequest,

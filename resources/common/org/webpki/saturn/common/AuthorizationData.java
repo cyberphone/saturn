@@ -121,7 +121,7 @@ public class AuthorizationData implements BaseProperties {
     public AuthorizationData(JSONObjectReader rd, 
                              JSONCryptoHelper.Options signatureOptions) throws IOException {
         JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
-        requestHashAlgorithm = HashSupport.getHashAlgorithm(requestHashObject, 
+        requestHashAlgorithm = Utils.getHashAlgorithm(requestHashObject, 
                                                             JSONCryptoHelper.ALGORITHM_JSON);
         requestHash = requestHashObject.getBinary(VALUE_JSON);
         domainName = rd.getString(DOMAIN_NAME_JSON);

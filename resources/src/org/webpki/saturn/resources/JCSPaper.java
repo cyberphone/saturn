@@ -28,7 +28,6 @@ import java.security.cert.X509Certificate;
 
 import java.util.ArrayList;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;

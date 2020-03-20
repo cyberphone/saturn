@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServlet;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
+import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
@@ -194,6 +195,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             while (accounts.hasMore()) {
                 PayeeCoreProperties account = PayeeCoreProperties.init(accounts.getObject(),
                                                                        acquirerBaseUrl + "/payees/",
+                                                                       HashAlgorithms.SHA256,
                                                                        payeeAccountTypes);
                 payeeAccountDb.put(account.getPayeeAuthorityUrl(), account);
             }
@@ -218,7 +220,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                        PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
                                 .add(org.payments.sepa.SEPAAccountDataDecoder.class)),
                 optionalProviderExtensions,
-                new SignatureProfiles[]{SignatureProfiles.P256_ES256},
+                SignatureProfiles.values(),
                 new ProviderAuthority.EncryptionParameter[]{
                     new ProviderAuthority.EncryptionParameter(
                             DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,

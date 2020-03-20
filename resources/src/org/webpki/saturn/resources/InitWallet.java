@@ -80,11 +80,12 @@ import org.webpki.util.DebugFormatter;
 public class InitWallet {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 12) {
+        if (args.length != 13) {
             System.out.println("\nUsage: " +
                                InitWallet.class.getCanonicalName() +
                                "sksFile clientKeyCore kg2Pin accountType credentialId accountId balance" +
-                               " authorityUrl keyEncryptionKey imageFile dataEncrytionAlgorithm keyEncrytionAlgorithm");
+                               " authorityUrl keyEncryptionKey imageFile" +
+                               " reguestHashAlgorithm dataEncrytionAlgorithm keyEncrytionAlgorithm");
             System.exit(-3);
         }
         String sksFile = args[0];
@@ -98,8 +99,9 @@ public class InitWallet {
         String authorityUrl = args[7];
         PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
         String imageFile = args[9];
-        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[10]);
-        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[11]);
+        HashAlgorithms requestHashAgorithm = HashAlgorithms.getAlgorithmFromId(args[10], AlgorithmPreferences.JOSE);
+        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[11]);
+        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[12]);
   
         // Read importedKey/certificate to be imported
         JSONObjectReader privateKeyJWK = JSONParser.parse(ArrayUtil.readFile(clientKeyCore + ".jwk"));
@@ -163,7 +165,7 @@ public class InitWallet {
                                     credentialId,
                                     accountId, 
                                     authorityUrl,
-                                    HashAlgorithms.SHA256,
+                                    requestHashAgorithm,
                                     rsa_flag ?
                              AsymSignatureAlgorithms.RSA_SHA256
                                              :

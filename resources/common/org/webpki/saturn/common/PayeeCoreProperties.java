@@ -25,8 +25,8 @@ import java.security.PublicKey;
 
 import java.util.ArrayList;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONArrayWriter;
@@ -52,6 +52,8 @@ public class PayeeCoreProperties implements BaseProperties {
     String urlSafeId;
     String payeeAuthorityUrl;
 
+    private HashAlgorithms accountHashAlgorithm;
+
     public static class SignatureParameter {
         
         AsymSignatureAlgorithms signatureAlgorithm;
@@ -72,9 +74,8 @@ public class PayeeCoreProperties implements BaseProperties {
         if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
             optionalAccountHashes = new ArrayList<>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
-            if (!accountVerifier.getString(JSONCryptoHelper.ALGORITHM_JSON).equals(HashSupport.JOSE_SHA_256_ALG_ID)) {
-                throw new IOException("Unexpected hash algorithm");
-            }
+            accountHashAlgorithm = 
+                    Utils.getHashAlgorithm(accountVerifier, JSONCryptoHelper.ALGORITHM_JSON);
             JSONArrayReader accountHashes = accountVerifier.getArray(HASHED_PAYEE_ACCOUNTS_JSON);
             do {
                 optionalAccountHashes.add(accountHashes.getBinary());
@@ -85,10 +86,9 @@ public class PayeeCoreProperties implements BaseProperties {
         do {
             JSONObjectReader signatureParameter = jsonParameterArray.getObject();
             parameterArray.add(
-                new SignatureParameter(
-                    AsymSignatureAlgorithms
-                        .getAlgorithmFromId(signatureParameter.getString(JSONCryptoHelper.ALGORITHM_JSON),
-                                            AlgorithmPreferences.JOSE),
+                    new SignatureParameter(
+                            Utils.getSignatureAlgorithm(signatureParameter,
+                                                        JSONCryptoHelper.ALGORITHM_JSON),
                     signatureParameter.getPublicKey()));
         } while (jsonParameterArray.hasMore());
         signatureParameters = parameterArray.toArray(new SignatureParameter[0]);
@@ -96,18 +96,20 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public static PayeeCoreProperties init(JSONObjectReader rd,
                                            String payeeBaseAuthorityUrl,
+                                           HashAlgorithms accountHashAlgorithm,
                                            JSONDecoderCache knownPaymentMethods) throws IOException {
         ArrayList<byte[]> optionalAccountHashes = new ArrayList<>();
         JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
         do {
             AccountDataDecoder paymentMethodDecoder =
                 (AccountDataDecoder)knownPaymentMethods.parse(payeeAccounts.getObject());
-            byte[] accountHash = paymentMethodDecoder.getAccountHash();
+            byte[] accountHash = paymentMethodDecoder.getAccountHash(accountHashAlgorithm);
             if (accountHash != null) {
                 optionalAccountHashes.add(accountHash);
             }
         } while (payeeAccounts.hasMore());
         PayeeCoreProperties payeeCoreProperties = new PayeeCoreProperties(rd);
+        payeeCoreProperties.accountHashAlgorithm = accountHashAlgorithm;
         payeeCoreProperties.optionalAccountHashes = 
                 optionalAccountHashes.isEmpty() ? null : optionalAccountHashes;
         String urlSafeId = payeeCoreProperties.payeeId;
@@ -145,7 +147,8 @@ public class PayeeCoreProperties implements BaseProperties {
           .setString(HOME_PAGE_JSON, payeeHomePage);
         if (optionalAccountHashes != null) {
             wr.setObject(ACCOUNT_VERIFIER_JSON)
-                  .setString(JSONCryptoHelper.ALGORITHM_JSON, HashSupport.JOSE_SHA_256_ALG_ID)
+                  .setString(JSONCryptoHelper.ALGORITHM_JSON,
+                             accountHashAlgorithm.getJoseAlgorithmId())
                   .setBinaryArray(HASHED_PAYEE_ACCOUNTS_JSON, optionalAccountHashes);
         }
         JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PARAMETERS_JSON);
@@ -154,8 +157,7 @@ public class PayeeCoreProperties implements BaseProperties {
                                             signatureParameter
                                                 .signatureAlgorithm
                                                     .getJoseAlgorithmId())
-                                 .setPublicKey(signatureParameter.publicKey, 
-                                               AlgorithmPreferences.JOSE);
+                                 .setPublicKey(signatureParameter.publicKey);
         }
         return wr;
     }
@@ -177,7 +179,7 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public void verifyAccount(AccountDataDecoder backendAccountDataDecoder)
     throws IOException {
-        byte[] accountHash = backendAccountDataDecoder.getAccountHash();
+        byte[] accountHash = backendAccountDataDecoder.getAccountHash(accountHashAlgorithm);
         if (getAccountHashes() == null) {
             if (accountHash != null) {
                 throw new IOException("Missing \"" + ACCOUNT_VERIFIER_JSON + 

@@ -329,6 +329,7 @@
         <arg value="${bank.host}/${bankpath}/authority"/>
         <arg value="${key.encryption.key}.cer"/>
         <arg value="${card.path}"/>
+        <arg value="${rqa}"/>
         <arg value="${dea}"/>
         <arg value="${kea}"/>
     </java>
@@ -357,6 +358,7 @@
        <param name="card.image" value="supercard.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>
        <param name="key.encryption.key" value="${@payerbankpath}-enc-key-ec"/>
+       <param name="rqa" value="S384"/>
        <param name="dea" value="A128CBC-HS256"/>
        <param name="kea" value="ECDH-ES+A128KW"/>
     </antcall>
@@ -370,6 +372,7 @@
        <param name="card.image" value="bankdirect.png"/>
        <param name="bankpath" value="${@payerbankpath}"/>
        <param name="key.encryption.key" value="${@payerbankpath}-enc-key-ec"/>
+       <param name="rqa" value="S256"/>
        <param name="dea" value="A256GCM"/>
        <param name="kea" value="ECDH-ES"/>
     </antcall>
@@ -383,6 +386,7 @@
        <param name="card.image" value="unusualcard.png"/>
        <param name="bankpath" value="${@payeebankpath}"/>
        <param name="key.encryption.key" value="${@payeebankpath}-enc-key-ec"/>
+       <param name="rqa" value="S512"/>
        <param name="dea" value="A128CBC-HS256"/>
        <param name="kea" value="ECDH-ES"/>
      </antcall>

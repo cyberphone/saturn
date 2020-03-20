@@ -43,7 +43,6 @@ import javax.servlet.ServletContextListener;
 
 import javax.sql.DataSource;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.AsymSignatureAlgorithms;
@@ -57,9 +56,8 @@ import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
-import org.webpki.saturn.common.HashSupport;
+import org.webpki.saturn.common.Utils;
 import org.webpki.saturn.common.KeyStoreEnumerator;
-import org.webpki.saturn.common.PaymentMethods;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -128,15 +126,10 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         BigDecimal tempBalanceFix;
         
         public CredentialTemplate(JSONObjectReader rd) throws IOException {
-            signatureAlgorithm =
-                    AsymSignatureAlgorithms.getAlgorithmFromId(rd.getString("signatureAlgorithm"),
-                                                               AlgorithmPreferences.JOSE);
+            signatureAlgorithm = Utils.getSignatureAlgorithm(rd, "signatureAlgorithm");
             accountType = rd.getString("accountType");
-            requestHashAlgorithm = HashSupport.getHashAlgorithm(rd, "requestHashAlgorithm");
-            keyAlgorithm = 
-                    KeyAlgorithms.getKeyAlgorithmFromId(rd.getString("signatureKeyAlgorithm"), 
-                                                        AlgorithmPreferences.JOSE);
-            PaymentMethods.fromTypeUrl(paymentMethod = rd.getString("paymentMethod"));
+            requestHashAlgorithm = Utils.getHashAlgorithm(rd, "requestHashAlgorithm");
+            keyAlgorithm = Utils.getKeyAlgorithm(rd, "signatureKeyAlgorithm");
             cardFormatted = rd.getBoolean("cardFormatted");
             if (rd.hasProperty("serverSetPIN")) {
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");

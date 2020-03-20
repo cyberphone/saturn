@@ -121,6 +121,6 @@ public class PaymentRequest implements BaseProperties {
     JSONObjectReader root;
 
     public byte[] getRequestHash(HashAlgorithms requestHashAlgorithm) throws IOException {
-        return HashSupport.getJsonHash(new JSONObjectWriter(root), requestHashAlgorithm);
+        return Utils.getJsonHash(new JSONObjectWriter(root), requestHashAlgorithm);
     }
 }

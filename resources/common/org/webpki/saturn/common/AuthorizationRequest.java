@@ -23,7 +23,6 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.JSONCryptoHelper;
@@ -39,19 +38,13 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequest implements BaseProperties {
     
-    public static final HashAlgorithms DEFAULT_KEY_HASH_ALGORITHM = HashAlgorithms.SHA256;
-    
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         authorityUrl = rd.getString(AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
-        keyHashAlgorithm = rd.hasProperty(KEY_HASH_ALGORITHM_JSON) ?
-                HashAlgorithms.getAlgorithmFromId(rd.getString(KEY_HASH_ALGORITHM_JSON),
-                                                  AlgorithmPreferences.JOSE)
-                                                                   :
-                DEFAULT_KEY_HASH_ALGORITHM;                   
+        keyHashAlgorithm = Utils.getHashAlgorithm(rd, KEY_HASH_ALGORITHM_JSON);                   
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
         undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
@@ -144,9 +137,8 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(AUTHORITY_URL_JSON, authorityUrl)
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
-            .setDynamic((wr) -> keyHashAlgorithm == DEFAULT_KEY_HASH_ALGORITHM ?
-                    wr : wr.setString(KEY_HASH_ALGORITHM_JSON, keyHashAlgorithm.getJoseAlgorithmId()))
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
+            .setString(KEY_HASH_ALGORITHM_JSON, keyHashAlgorithm.getJoseAlgorithmId())
             .setObject(PAYEE_RECEIVE_ACCOUNT_JSON, payeeReceiveAccount.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
@@ -169,7 +161,7 @@ public class AuthorizationRequest implements BaseProperties {
         if (!authorizationData.paymentMethodUrl.equals(paymentMethod.paymentMethodUrl)) {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
-        if (!ArrayUtil.compare(HashSupport.getJwkThumbPrint(signatureDecoder.getPublicKey(),
+        if (!ArrayUtil.compare(Utils.getJwkThumbPrint(signatureDecoder.getPublicKey(),
                                                             keyHashAlgorithm),
                                authorizationData.keyHash)) {
             throw new IOException("Non-matching \"" + KEY_HASH_JSON + "\"");

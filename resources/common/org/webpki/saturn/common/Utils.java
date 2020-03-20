@@ -21,13 +21,14 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 import org.webpki.crypto.AlgorithmPreferences;
+import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
-
+import org.webpki.crypto.KeyAlgorithms;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
-public class HashSupport {
+public class Utils {
   
     public static byte[] getJsonHash(JSONObjectWriter request, 
                                      HashAlgorithms hashAlgorithm) throws IOException {
@@ -41,7 +42,22 @@ public class HashSupport {
                            hashAlgorithm);
     }
 
-    public static HashAlgorithms getHashAlgorithm(JSONObjectReader rd, String keyWord) throws IOException {
+    public static HashAlgorithms getHashAlgorithm(JSONObjectReader rd, String keyWord) 
+    throws IOException {
         return HashAlgorithms.getAlgorithmFromId(rd.getString(keyWord), AlgorithmPreferences.JOSE);
+    }
+
+    public static AsymSignatureAlgorithms getSignatureAlgorithm(JSONObjectReader rd,
+                                                                String keyWord) 
+    throws IOException {
+        return AsymSignatureAlgorithms.getAlgorithmFromId(rd.getString(keyWord), 
+                                                          AlgorithmPreferences.JOSE);
+    }
+
+    public static KeyAlgorithms getKeyAlgorithm(JSONObjectReader rd, String keyWord) 
+    throws IOException {
+        return KeyAlgorithms.getKeyAlgorithmFromId(rd.getString(keyWord), 
+                                                   AlgorithmPreferences.JOSE);
+
     }
 }

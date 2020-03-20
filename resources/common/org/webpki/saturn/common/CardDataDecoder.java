@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 
 import java.security.PublicKey;
 
-import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
 
@@ -56,12 +55,9 @@ public class CardDataDecoder {
             accountId = rd.getString(BaseProperties.ACCOUNT_ID_JSON);
             credentialId = rd.getString(BaseProperties.CREDENTIAL_ID_JSON);
             authorityUrl = rd.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON);
-            requestHashAlgorithm = 
-                    HashAlgorithms.getAlgorithmFromId(rd.getString(REQUEST_HASH_ALGORITHM_JSON),
-                                                      AlgorithmPreferences.JOSE);
-            signatureAlgorithm = AsymSignatureAlgorithms
-                    .getAlgorithmFromId(rd.getString(BaseProperties.SIGNATURE_ALGORITHM_JSON),
-                                                     AlgorithmPreferences.JOSE);
+            requestHashAlgorithm = Utils.getHashAlgorithm(rd, REQUEST_HASH_ALGORITHM_JSON);
+            signatureAlgorithm = 
+                    Utils.getSignatureAlgorithm(rd, BaseProperties.SIGNATURE_ALGORITHM_JSON);
             JSONObjectReader ep = rd.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
             dataEncryptionAlgorithm = DataEncryptionAlgorithms
                     .getAlgorithmFromId(ep.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
