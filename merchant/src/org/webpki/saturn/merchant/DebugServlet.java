@@ -269,8 +269,10 @@ class DebugPrintout implements BaseProperties {
         }
         
         description(point.sub() +
-            "<p>After an <i>optional</i> selection of account (card) in the <b>Wallet</b> UI, the user " +
-            "authorizes the payment request (typically using a PIN):</p>" +
+            "<p>After an optional selection of account (card) in the <b>Wallet</b> UI " +
+            "(accomplished through &quot;swiping&quot; card logotypes in the " +
+            "reference application), the user " +
+            "<i>authorizes</i> the payment request, using a PIN or biometric operation:</p>" +
             "<img style=\"display:block;margin-left:auto;margin-right:auto;max-width:250pt;" +
             "border-width:1px;border-style:solid;border-color:grey;box-shadow:3pt 3pt 3pt #d0d0d0\" " +
             "src=\"https://cyberphone.github.io/doc/saturn/" +
