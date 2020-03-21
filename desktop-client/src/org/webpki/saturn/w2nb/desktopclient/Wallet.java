@@ -216,9 +216,9 @@ public class Wallet {
     static byte[] dataEncryptionKey;
     
     static class PaymentMethodDescriptor {
-        String name;     // URL actually
-        HashAlgorithms keyHashAlgorithm;
-        byte[] keyHashValue;
+        String paymentMethod;             // URL actually
+        HashAlgorithms keyHashAlgorithm;  // Declared by Merchant
+        byte[] keyHashValue;              //     -"-
     }
 
     static class ScalingIcon extends ImageIcon {
@@ -922,7 +922,7 @@ public class Wallet {
                                     JSONObjectReader paymentMethodEntry = methodList.getObject();
                                     PaymentMethodDescriptor paymentMethodDescriptor =
                                             new PaymentMethodDescriptor();
-                                    paymentMethodDescriptor.name = 
+                                    paymentMethodDescriptor.paymentMethod = 
                                             paymentMethodEntry.getString(BaseProperties.PAYMENT_METHOD_JSON);
                                     JSONObjectReader keyHashObject = 
                                             paymentMethodEntry.getObject(BaseProperties.KEY_HASH_JSON);
@@ -1029,7 +1029,7 @@ public class Wallet {
             String paymentMethodName = cardProperties.getPaymentMethod();
             for (PaymentMethodDescriptor acceptedPaymentMethod : 
                     supportedPaymentMethods.toArray(new PaymentMethodDescriptor[0])) {
-                if (acceptedPaymentMethod.name.equals(paymentMethodName)) {
+                if (acceptedPaymentMethod.paymentMethod.equals(paymentMethodName)) {
                     Account card =
                         new Account(paymentMethodName,
                                     cardProperties.getRequestHashAlgorithm(),
