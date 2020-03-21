@@ -179,7 +179,6 @@ public class Wallet {
         HashAlgorithms requestHashAlgorithm;
         String credentialId;
         String accountId;
-        boolean cardFormatAccountId;
         ImageIcon cardIcon;
         AsymSignatureAlgorithms signatureAlgorithm;
         String authorityUrl;
@@ -195,7 +194,6 @@ public class Wallet {
                 byte[] keyHashValue,
                 String credentialId,
                 String accountId,
-                boolean cardFormatAccountId,
                 ImageIcon cardIcon,
                 AsymSignatureAlgorithms signatureAlgorithm,
                 String authorityUrl,
@@ -206,7 +204,6 @@ public class Wallet {
             this.keyHashValue = keyHashValue;
             this.credentialId = credentialId;
             this.accountId = accountId;
-            this.cardFormatAccountId = cardFormatAccountId;
             this.cardIcon = cardIcon;
             this.signatureAlgorithm = signatureAlgorithm;
             this.authorityUrl = authorityUrl;
@@ -473,7 +470,7 @@ public class Wallet {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<>();
                 for (int i = 0; i < 2; i++) {
                     cards.put(i, new Account("n/a", null, null, new byte[0], "n/a", DUMMY_BALANCE,
-                                             true, dummyCardIcon, null, null, new BigDecimal("1.00")));
+                                             dummyCardIcon, null, null, new BigDecimal("1.00")));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
             }
@@ -1040,7 +1037,6 @@ public class Wallet {
                                     acceptedPaymentMethod.keyHashValue,
                                     cardProperties.getCredentialId(),
                                     cardProperties.getAccountId(),
-                                    true,
                                     getImageIcon(sks.getExtension(keyHandle, 
                                                  KeyGen2URIs.LOGOTYPES.CARD).getExtensionData(SecureKeyStore.SUB_TYPE_LOGOTYPE),
                                                  false),

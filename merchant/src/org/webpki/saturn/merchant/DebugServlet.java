@@ -249,6 +249,9 @@ class DebugPrintout implements BaseProperties {
             "list of accepted payment methods and a " +
             keyWord(PAYMENT_REQUEST_JSON) + " object to the <b>Wallet</b>:</p>");
 
+        if (clean && debugData.InvokeWallet.hasProperty(NO_MATCHING_METHODS_URL_JSON)) {
+            debugData.InvokeWallet.removeProperty(NO_MATCHING_METHODS_URL_JSON);
+        }
         fancyBox(debugData.InvokeWallet);
         descriptionStdMargin("Note that payment networks <i>may</i> have their own <b>Merchant</b> keys, " +
             "which is why there is a " + keyWord(KEY_HASH_JSON) + " for each " + 
@@ -309,11 +312,11 @@ class DebugPrintout implements BaseProperties {
         descriptionStdMargin("Explanations:<p>" +
             keyWord(REQUEST_HASH_JSON) + " holds the hash of the " +
             keyWord(PAYMENT_REQUEST_JSON) + " object.</p><p>" +
+            keyWord(KEY_HASH_JSON) + " holds the <i>declared</i> hash of the key to be used by the " +
+            "<b>Merchant</b> for signing the associated " + keyWord(Messages.AUTHORIZATION_REQUEST) + 
+            " message.  See also " + keyWord(Messages.PAYMENT_CLIENT_REQUEST) + ".</p><p>" +
             keyWord(DOMAIN_NAME_JSON) + " holds the DNS name of the <b>Merchant</b>.</p><p>" +
             keyWord(PAYMENT_METHOD_JSON) + " holds the payment method associated with the selected virtual card.</p><p>" +
-            keyWord(KEY_HASH_JSON) + " holds the <i>declared</i> hash of the key to be used by the " +
-             "<b>Merchant</b> for signing an associated " + keyWord(Messages.AUTHORIZATION_REQUEST) + 
-             " message.  See also " + keyWord(Messages.PAYMENT_CLIENT_REQUEST) + ".</p><p>" +
             keyWord(CREDENTIAL_ID_JSON) + " holds a serial number or similar unique identifier associated with the selected virtual card.</p><p>" +
             keyWord(ACCOUNT_ID_JSON) + " holds an account identifier associated with the selected virtual card. " +
             "See also <a href=\"" + encryptedAccount + "\">Encrypted Account Data</a>.</p><p>" +
