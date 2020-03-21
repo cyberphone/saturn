@@ -21,9 +21,9 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class TimeUtil {
+public class TimeUtils {
 
-    private TimeUtil() {}
+    private TimeUtils() {}
     
     private static GregorianCalendar upwardTime(long upfactor, int argument, long divisor) {
         GregorianCalendar gregorianCalendar = new GregorianCalendar();

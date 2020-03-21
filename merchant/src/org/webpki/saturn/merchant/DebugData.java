@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 
 import java.security.KeyPair;
 
+import java.util.GregorianCalendar;
+
 import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.DataEncryptionAlgorithms;
@@ -39,11 +41,11 @@ import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ArrayUtil;
-import org.webpki.util.ISODateTime;
 
 public class DebugData implements Serializable {
 
@@ -98,7 +100,7 @@ public class DebugData implements Serializable {
     static JSONObjectReader userAuthzSample;
 
     static JSONObjectReader userChallAuthzSample;
-
+    
     static EncryptedMessage encryptedMessageSample;
 
     static JSONObjectReader providerUserResponseSample;
@@ -118,6 +120,9 @@ public class DebugData implements Serializable {
           (byte) 0x74, (byte) 0x34, (byte) 0x69, (byte) 0x09 };
     
     static JSONObjectReader createUserAuthorizationSample() throws IOException {
+        GregorianCalendar then = TimeUtils.inSeconds(-27);
+        GregorianCalendar authTime = TimeUtils.inSeconds(23);
+        GregorianCalendar expires = TimeUtils.inMinutes(30);
         JSONObjectWriter paymentRequest = 
             PaymentRequest.encode("Demo Merchant",
                                   "https://demomerchant.com",
@@ -125,10 +130,8 @@ public class DebugData implements Serializable {
                                   Currencies.EUR,
                                   null,
                                   "#100006878", 
-                                  ISODateTime.parseDateTime("2020-01-20T10:45:08Z",
-                                                            ISODateTime.COMPLETE),
-                                  ISODateTime.parseDateTime("2020-01-20T11:15:08Z", 
-                                                            ISODateTime.COMPLETE));
+                                  then,
+                                  expires);
         return new JSONObjectReader(AuthorizationData.encode(
                                  new PaymentRequest(new JSONObjectReader(paymentRequest)),
                                  HashAlgorithms.SHA256,
@@ -141,8 +144,7 @@ public class DebugData implements Serializable {
                                   WALLET_SESSION_ENCRYPTION_KEY, 
                                  DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
                                  userResponseItems,
-                                 ISODateTime.parseDateTime("2020-01-20T11:46:17+01:00",
-                                                           ISODateTime.COMPLETE),
+                                 userResponseItems == null ? then : authTime,
                                  new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));
     }
 

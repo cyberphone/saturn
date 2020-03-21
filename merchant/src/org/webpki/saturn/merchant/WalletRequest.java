@@ -32,7 +32,7 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.NonDirectPayments;
-import org.webpki.saturn.common.TimeUtil;
+import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 
@@ -52,7 +52,7 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         requestObject = Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage();
         GregorianCalendar timeStamp = new GregorianCalendar();
-        GregorianCalendar expires = TimeUtil.inMinutes(30);
+        GregorianCalendar expires = TimeUtils.inMinutes(30);
         String currentReferenceId = MerchantService.getReferenceId();
 
         // Create a payment request

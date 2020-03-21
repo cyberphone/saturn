@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.AuthorityBaseServlet;
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.TimeUtil;
+import org.webpki.saturn.common.TimeUtils;
 
 // This servlet publishes a miniscule "home page".
 
@@ -47,7 +47,7 @@ public class HomeServlet extends HttpServlet {
            AuthorityBaseServlet.SATURN_LINK +
            " &quot;hosting&quot; server.</td></tr>" +
            "<tr><td>Started: ")
-         .append(TimeUtil.displayUtcTime(HostingService.started))
+         .append(TimeUtils.displayUtcTime(HostingService.started))
          .append("</td></tr>" +
            "<tr><td>Authority object: " +
            "<a href=\"")
