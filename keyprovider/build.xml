@@ -27,7 +27,8 @@
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-      <echo message="tomcat build [-Dlogging]"/>
+      <!-- "-Dinhouse=" (with quotes!) is to get away from the text Inhouse in card logotypes -->
+      <echo message="tomcat build [-Dlogging=true] [&quot;-Dinhouse=&quot;]"/>
   </target>
 
   <target name="_init" unless="app_path">
