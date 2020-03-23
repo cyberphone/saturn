@@ -104,6 +104,11 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
 
+    <servlet>
+        <servlet-name>WalletUiTestServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.keyprovider.WalletUiTestServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>KeyProviderServlet</servlet-name>
         <url-pattern>/getkeys</url-pattern>
@@ -112,6 +117,11 @@
     <servlet-mapping>
         <servlet-name>KeyProviderInitServlet</servlet-name>
         <url-pattern>/init</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>WalletUiTestServlet</servlet-name>
+        <url-pattern>/walletuitest</url-pattern>
     </servlet-mapping>
 
     <security-constraint>

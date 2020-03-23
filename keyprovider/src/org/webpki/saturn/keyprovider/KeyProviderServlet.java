@@ -290,6 +290,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     // so it does NOT function as a user ID...
                     String userName = 
                             (String) session.getAttribute(KeyProviderInitServlet.USERNAME_SESSION_ATTR);
+                    boolean testMode =
+                            session.getAttribute(KeyProviderInitServlet.TESTMODE_SESSION_ATTR) != null;
                     int userId = DataBaseOperations.createUser(userName);
 
                     // now create Saturn payment credentials based on the template
@@ -359,7 +361,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                     credentialTemplate.signatureAlgorithm, 
                                     credentialTemplate.dataEncryptionAlgorithm, 
                                     credentialTemplate.keyEncryptionAlgorithm, 
-                                    credentialTemplate.encryptionKey,
+                                    testMode ?
+         KeyProviderService.keyManagementKey.getPublicKey() : credentialTemplate.encryptionKey,
                                     null,
                                     null,
                                     credentialTemplate.tempBalanceFix)
@@ -371,6 +374,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                             @Override
                             public byte[] getData() throws IOException {
                                 String cardImage = new String(credentialTemplate.svgCardImage);
+                                if (testMode && KeyProviderService.inHouse) {
+                                    cardImage = cardImage.substring(0, cardImage.lastIndexOf("<g ")) + "</svg>";
+                                }
                                 String cardUserName = userName;
                                 if (cardUserName.length() > MAX_CARD_NAME_LENGTH) {
                                     cardUserName = cardUserName.substring(0, MAX_CARD_NAME_LENGTH);
@@ -465,8 +471,13 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             if (session == null) {
                 html.append("You need to restart the session");
             } else {
+                boolean testMode =
+                        session.getAttribute(KeyProviderInitServlet.TESTMODE_SESSION_ATTR) != null;
                 session.invalidate();
-                html.append(KeyProviderService.successMessage);
+                html.append(testMode ?
+                            "<div><a href=\"walletuitest\" class=\"link\">Wallet UI Test</a></div>" 
+                                     :
+                            KeyProviderService.successMessage);
             }
         }
         KeyProviderInitServlet.output(response, 

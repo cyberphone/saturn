@@ -44,6 +44,7 @@ public class KeyProviderInitServlet extends HttpServlet {
 
     static final String KEYGEN2_SESSION_ATTR           = "keygen2";
     static final String USERNAME_SESSION_ATTR          = "userName";
+    static final String TESTMODE_SESSION_ATTR          = "test";
     static final String W3C_PAYMENT_REQUEST_MODE_PARM  = "w3cmode";  // POST is used in two ways...
     
     static final int NAME_MAX_LENGTH                   = 50;  // Reflected in the DB
@@ -238,6 +239,11 @@ public class KeyProviderInitServlet extends HttpServlet {
                                 KeyProviderService.keygen2RunUrl,
                                 KeyProviderService.serverCertificate,
                                 null));
+        if (request.getParameter(TESTMODE_SESSION_ATTR) == null) {
+            session.removeAttribute(TESTMODE_SESSION_ATTR);
+        } else {
+            session.setAttribute(TESTMODE_SESSION_ATTR, "true");
+        }
         output(response, 
                getHTML(GO_HOME +
             "function paymentRequestError(msg) {\n" +
