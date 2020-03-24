@@ -71,7 +71,7 @@ public class WalletUiTestServlet extends HttpServlet {
         s.append('>')
          .append(box)
          .append("</table></body></html>");
- //       HTML.output(response, s.toString());
+        KeyProviderInitServlet.output(response, s.toString());
     }
 
     private void w3cMode(HttpServletRequest request, HttpServletResponse response)  throws IOException, ServletException {
