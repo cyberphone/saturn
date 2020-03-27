@@ -71,7 +71,8 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
 
         JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
         for (String key : MerchantService.supportedPaymentMethods.keySet()) {
-            PaymentMethodDescriptor paymentMethodDescriptor = MerchantService.supportedPaymentMethods.get(key);
+            PaymentMethodDescriptor paymentMethodDescriptor = 
+                    MerchantService.supportedPaymentMethods.get(key);
             methodList.setObject()
                 .setString(PAYMENT_METHOD_JSON, paymentMethodDescriptor.paymentMethod)
                 .setObject(KEY_HASH_JSON, new JSONObjectWriter()
@@ -81,7 +82,8 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
         }
         requestObject.setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         if (MerchantService.noMatchingMethodsUrl != null) {
-            requestObject.setString(NO_MATCHING_METHODS_URL_JSON, MerchantService.noMatchingMethodsUrl);
+            requestObject.setString(NO_MATCHING_METHODS_URL_JSON, 
+                                    MerchantService.noMatchingMethodsUrl);
         }
         
         if (debugMode) {

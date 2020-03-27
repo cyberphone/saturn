@@ -78,7 +78,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final String GO_HOME =              
             "history.pushState(null, null, '" + THIS_SERVLET + "');\n" +
             "window.addEventListener('popstate', function(event) {\n" +
-            "    history.pushState(null, null, '" + THIS_SERVLET + "');\n" +
+            "  history.pushState(null, null, '" + THIS_SERVLET + "');\n" +
             "});\n";
 
     static final String HTML_INIT = 
@@ -90,13 +90,14 @@ public class KeyProviderInitServlet extends HttpServlet {
             "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" + 
             "<style type=\"text/css\">" + 
             ".displayContainer {" + 
-            "    display: block;" + 
-            "    height: 100%;" + 
-            "    width: 100%;" + 
-            "    align-items: center;" + 
-            "    display: flex;" + 
-            "    flex-direction: column;" + 
-            "    justify-content: center;" + 
+            "  display:block;" + 
+            "  height:100%;" + 
+            "  width:100%;" + 
+            "  align-items:center;" + 
+            "  display:flex;" + 
+            "  flex-direction:column;" + 
+            "  justify-content:center;" +
+//            "  background-color:red;" +
             "}" +
             
             ".link {" +
@@ -123,18 +124,18 @@ public class KeyProviderInitServlet extends HttpServlet {
             "}" +
             
             "body {" + 
-            "    font-size:10pt;" + 
-            "    color:#000000;" + 
-            "    font-family:verdana,arial;" + 
-            "    background-color: white;" + 
-            "    height: 100%;" + 
-            "    margin: 0;" + 
-            "    width: 100%;" + 
+            "  font-size:10pt;" + 
+            "  color:#000000;" + 
+            "  font-family:verdana,arial;" + 
+            "  background-color:white;" + 
+            "  height:100%;" + 
+            "  margin:0;" + 
+            "  width:100%;" + 
             "}" + 
 
             "html {" + 
-            "    height: 100%;" + 
-            "    width: 100%;" + 
+            "  height:100%;" + 
+            "  width:100%;" + 
             "}" +
 
             ".sitefooter {" + 
