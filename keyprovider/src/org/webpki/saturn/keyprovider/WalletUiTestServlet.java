@@ -56,6 +56,7 @@ import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.TimeUtils;
+
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 import org.webpki.util.PEMDecoder;
@@ -72,9 +73,8 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
 
     private static final String TYPE = "type";
     
-    private static final String KEY =  "key";
-    
-    private static final String BUTTON = "start";
+    private static final String KEY      =  "key";
+    private static final String KEY_TEXT =  "keytxt";
     
     private static final String AUTHZ = "authz";
     private static final String REQUEST = "req";
@@ -85,6 +85,10 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     private static final String ABORT_TAG = "abort";
     private static final String PARAM_TAG = "msg";
     private static final String ERROR_TAG = "err";
+
+    private static final String BUTTON_ID  = "start";
+    private static final String ERROR_ID   = "err";
+    private static final String WAITING_ID = "wait";
 
     static class PaymentType {
         String commonName;
@@ -195,23 +199,26 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         return html.append("</select>").toString();
     }
     
-
-    private String decryptionKey() {
+    private String decryptionKey(HttpSession session) {
+        String key = (session != null && session.getAttribute(KEY_TEXT) != null) ?
+                (String)session.getAttribute(KEY_TEXT)
+                            : 
+                "-----BEGIN PRIVATE KEY-----\n" +
+                    new Base64().getBase64StringFromBinary(
+                        KeyProviderService.keyManagementKey.getPrivateKey().getEncoded()) +
+                        "\n-----END PRIVATE KEY-----";
         return new StringBuilder(
                 "<textarea" +
                 " rows=\"10\" maxlength=\"100000\"" +
                 " style=\"box-sizing:border-box;width:100%;white-space:nowrap;overflow:scroll;" +
                 "border-width:1px;border-style:solid;border-color:grey;padding:10pt\" " +
-                "id=\"" + KEY + "\">" + 
-                "-----BEGIN PRIVATE KEY-----\n")
-            .append(new Base64().getBase64StringFromBinary(
-                    KeyProviderService.keyManagementKey.getPrivateKey().getEncoded()))
-            .append(
-                "\n-----END PRIVATE KEY-----" +
-                "</textarea>").toString();
+                "id=\"" + KEY + "\">")
+            .append(key)
+            .append("</textarea>").toString();
     }
 
     private void guiGetInit(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HttpSession session = request.getSession(false);
         StringBuilder html = new StringBuilder(
             "<div style=\"padding:0 1em\">" +
                     "This application is intended for testing the Saturn wallet." +
@@ -225,15 +232,18 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
             "<div style=\"flex:none;display:block;width:inherit\">" +
               "<div style=\"padding:1em\">" +
                 "<div style=\"margin-bottom:2pt\">Bank decryption key:</div>" + 
-                 decryptionKey() + 
+                 decryptionKey(session) + 
               "</div>" +
             "</div>" +
+            "<div id=\"" + ERROR_ID + "\" " +
+            "style=\"color:red;font-weight:bold;padding:1em 0;display:none\"></div>" +
+            "<img id=\"" + WAITING_ID + "\" src=\"waiting.gif\" " +
+            "style=\"padding-bottom:1em;display:none\" alt=\"waiting\">" +
             "<div style=\"display:flex;justify-content:center\">" +
-              "<div id=\"" + BUTTON + "\" class=\"stdbtn\" onclick=\"invokeWallet()\">" +
+              "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"invokeWallet()\">" +
                 "Invoke Wallet!" + 
               "</div>" +
             "</div>");
-        HttpSession session = request.getSession(false);
         if (session != null) {
             byte[] jsonBlob = (byte[])session.getAttribute(AUTHZ);
             if (jsonBlob != null) {
@@ -278,12 +288,12 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                     }
                     html.append("<div style=\"text-align:center;font-size:11pt\">Successful Operation</div>");
                  } catch (Exception e) {
-                    e.printStackTrace();
-                    html.append("<div style=\"text-align:center;font-size:11pt\">")
+                    html.append("<div style=\"text-align:center;font-size:11pt;color:red\">")
                         .append(e.getMessage())
                         .append("</div>");
                 }
             }
+            session.removeAttribute(AUTHZ);
         }
         printHtml(response,
                   "history.pushState(null, null, '" + THIS_SERVLET + "');\n" +
@@ -292,17 +302,17 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                   "});\n" +
                   "function applicationError(msg) {\n" +
                   "  console.error(msg);\n" +
-                  "  document.getElementById('" + BUTTON + 
-                  "').outerHTML = '<div style=\"color:red;font-weight:bold\">' + " +
-                    "msg + '</div>';\n" +
+                  "  let element = document.getElementById('" + ERROR_ID + "');\n" +
+                  "  element.innerHTML = msg;\n" +
+                  "  element.style.display = 'block';\n" +
+                  "  document.getElementById('" + WAITING_ID + "').style.display = 'none';\n" +
                   "}\n\n" +
 
                   "async function invokeWallet() {\n" +
                   "  if (window.PaymentRequest) {\n" +
                   // It takes a second or two to get PaymentRequest up and running.
                   // Show that to the user.
-                  "    document.getElementById('" + BUTTON + "').outerHTML = " +
-                    "'<img id=\"" + BUTTON + "\" src=\"waiting.gif\">';\n" +
+                  "    document.getElementById('" + WAITING_ID + "').style.display = 'block';\n" +
                   // This code may seem strange but the Web application does not create
                   // an HttpSession so we do this immediately after the user hit the
                   // invokeWallet button.  Using fetch this becomes invisible UI wise.
@@ -399,6 +409,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
             HttpSession session = request.getSession(true);
             session.setAttribute(TYPE, getParameter(request, TYPE));
             String key = getParameter(request, KEY).trim();
+            session.setAttribute(KEY_TEXT, key);
             KeyPair keyPair;
             try {
                 keyPair = key.startsWith("{") ?
@@ -407,7 +418,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                     PEMDecoder.getKeyPair(key.getBytes("utf-8"));
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                KeyProviderInitServlet.output(response, "Suppled key problem: " + e.getMessage());
+                KeyProviderInitServlet.output(response, "Supplied key problem: " + e.getMessage());
                 return;
             }
             session.setAttribute(KEY, keyPair);
