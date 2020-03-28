@@ -18,7 +18,7 @@
         <mkdir dir="${temp.dir}"/>
         <copy todir="${temp.dir}/org/webpki/mobile/android/saturn/common" preservelastmodified="true" includeEmptyDirs="false" flatten="true">
           <fileset dir="${src.dir}">
-            <include name="**/AuthorizationData.java"/>
+            <include name="**/AuthorizationDataEncoder.java"/>
             <include name="**/BaseProperties.java"/>
             <include name="**/CardDataDecoder.java"/>
             <include name="**/Currencies.java"/>

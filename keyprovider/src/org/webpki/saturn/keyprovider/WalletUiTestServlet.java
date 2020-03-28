@@ -23,7 +23,6 @@ import java.math.BigDecimal;
 import java.net.URLEncoder;
 
 import java.security.KeyPair;
-import java.security.PrivateKey;
 
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
@@ -48,7 +47,8 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.net.MobileProxyParameters;
-import org.webpki.saturn.common.AuthorizationData;
+
+import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.Messages;
@@ -56,7 +56,7 @@ import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.TimeUtils;
-
+import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 import org.webpki.util.PEMDecoder;
 
@@ -237,8 +237,11 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         if (session != null) {
             byte[] jsonBlob = (byte[])session.getAttribute(AUTHZ);
             if (jsonBlob != null) {
-                html.append("<div style=\"padding-top:2em\">Scroll up for the result</div></div><div style=\"padding:1em\">");
-                fancyPrint(html, "Wallet Request", new JSONObjectReader((JSONObjectWriter)session.getAttribute(REQUEST)));
+                html.append("<div style=\"padding-top:2em\">Scroll up for the result</div>" +
+                            "</div><div style=\"padding:1em\">");
+                JSONObjectReader walletRequest =
+                        new JSONObjectReader((JSONObjectWriter)session.getAttribute(REQUEST));
+                fancyPrint(html, "Wallet Request", walletRequest);
                 JSONObjectReader walletResponse = JSONParser.parse(jsonBlob);
                 fancyPrint(html, "Wallet Response", walletResponse);
                 JSONDecryptionDecoder decoder =
@@ -259,22 +262,24 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                     JSONCryptoHelper.Options options = new JSONCryptoHelper.Options();
                     boolean verifiableSignature = 
                             signatureObject.hasProperty(JSONCryptoHelper.PUBLIC_KEY_JSON);
-                    options.setPublicKeyOption(verifiableSignature ?
-                                            JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED
-                                                                   :
-                                            JSONCryptoHelper.PUBLIC_KEY_OPTIONS.FORBIDDEN);
-                     options.setKeyIdOption(verifiableSignature ?
-                            JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN
-                                                   :
-                            JSONCryptoHelper.KEY_ID_OPTIONS.REQUIRED);
-                    AuthorizationData authorizationData =
-                            new AuthorizationData(userAuthorization, options);
+                    options.setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.OPTIONAL);
+                    options.setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
+                    AuthorizationDataDecoder authorizationData =
+                            new AuthorizationDataDecoder(userAuthorization, options);
                     if (!verifiableSignature) {
-                        html.append("<div>Signature was not verified (no public key)</div>");
+                        html.append("<div>Signature was not verified (public key " +
+                                    "is associated with \"" + CREDENTIAL_ID_JSON + "\").</div>");
                     }
-                } catch (Exception e) {
+                    if (!ArrayUtil.compare(authorizationData.getRequestHashAlgorithm().digest(
+                            walletRequest.getObject(PAYMENT_REQUEST_JSON)
+                                .serializeToBytes(JSONOutputFormats.CANONICALIZED)), 
+                                           authorizationData.getRequestHash())) {
+                        throw new IOException("\"" + REQUEST_HASH_JSON + "\" mismatch");
+                    }
+                    html.append("<div style=\"text-align:center;font-size:11pt\">Successful Operation</div>");
+                 } catch (Exception e) {
                     e.printStackTrace();
-                    html.append("<div>")
+                    html.append("<div style=\"text-align:center;font-size:11pt\">")
                         .append(e.getMessage())
                         .append("</div>");
                 }
@@ -357,7 +362,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     }
     
     private void fancyPrint(StringBuilder html, String header, JSONObjectReader json) throws IOException {
-        html.append("<div style=\"text-align:center\">")
+        html.append("<div style=\"text-align:center;font-size:11pt\">")
             .append(header)
             .append("</div><div style=\"margin:2pt 0;max-width:100%;white-space:nowrap;overflow:scroll\">")
             .append(json.serializeToString(JSONOutputFormats.PRETTY_HTML))

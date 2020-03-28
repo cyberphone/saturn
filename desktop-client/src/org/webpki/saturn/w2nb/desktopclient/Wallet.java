@@ -102,7 +102,7 @@ import org.webpki.saturn.common.CardDataDecoder;
 import org.webpki.saturn.common.CryptoUtils;
 import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
-import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AuthorizationDataEncoder;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderUserResponse;
@@ -1072,7 +1072,7 @@ public class Wallet {
                     // User authorizations are always signed by a key that only needs to be
                     // understood by the issuing Payment Provider (bank).
                     dataEncryptionKey = CryptoRandom.generateRandom(selectedCard.dataEncryptionAlgorithm.getKeyLength());
-                    JSONObjectWriter authorizationData = AuthorizationData.encode(
+                    JSONObjectWriter authorizationData = AuthorizationDataEncoder.encode(
                         paymentRequest,
                         selectedCard.requestHashAlgorithm,
                         domainName,

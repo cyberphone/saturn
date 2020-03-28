@@ -34,7 +34,8 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
 
-import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AuthorizationDataDecoder;
+import org.webpki.saturn.common.AuthorizationDataEncoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.EncryptedMessage;
@@ -132,7 +133,7 @@ public class DebugData implements Serializable {
                                   "#100006878", 
                                   then,
                                   expires);
-        return new JSONObjectReader(AuthorizationData.encode(
+        return new JSONObjectReader(AuthorizationDataEncoder.encode(
                                  new PaymentRequest(new JSONObjectReader(paymentRequest)),
                                  HashAlgorithms.SHA256,
                                  "demomerchant.com", 
@@ -158,8 +159,8 @@ public class DebugData implements Serializable {
             
             userChallAuthzSample = createUserAuthorizationSample();
             
-            AuthorizationData authorizationData = 
-                    new AuthorizationData(userAuthzSample, new JSONCryptoHelper.Options());
+            AuthorizationDataDecoder authorizationData = 
+                    new AuthorizationDataDecoder(userAuthzSample, new JSONCryptoHelper.Options());
             
             providerUserResponseSample = new JSONObjectReader(ProviderUserResponse.encode(
                     "My Bank",

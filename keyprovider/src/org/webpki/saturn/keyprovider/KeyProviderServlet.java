@@ -72,7 +72,7 @@ import org.webpki.sks.AppUsage;
 import org.webpki.sks.BiometricProtection;
 import org.webpki.sks.PassphraseFormat;
 
-import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataEncoder;
 import org.webpki.saturn.common.CardImageData;
@@ -392,10 +392,11 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                 }
                                 return cardImage
                                     .replace(CardImageData.STANDARD_NAME, cardUserName)
-                                    .replace(CardImageData.STANDARD_ACCOUNT, credentialTemplate.cardFormatted ?
-                                        AuthorizationData.formatCardNumber(accountAndCredential.accountId) 
-                                                        :
-                                            accountAndCredential.accountId).getBytes("utf-8");
+                                    .replace(CardImageData.STANDARD_ACCOUNT,
+                                             credentialTemplate.cardFormatted ?
+                                AccountDataEncoder.visualFormattedAccountId(accountAndCredential.accountId) 
+                                                                              :
+                                accountAndCredential.accountId).getBytes("utf-8");
                             }
 
                             @Override

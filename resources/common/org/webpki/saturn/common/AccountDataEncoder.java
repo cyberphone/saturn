@@ -52,5 +52,17 @@ public abstract class AccountDataEncoder {
         accountDataEncoder.writer = new JSONObjectWriter(reader);
         return accountDataEncoder;
     }
-}
 
+    public static String visualFormattedAccountId(String accountId) {
+        StringBuilder s = new StringBuilder();
+        int q = 0;
+        for (char c : accountId.toCharArray()) {
+            if (q != 0 && q % 4 == 0) {
+                s.append(' ');
+            }
+            s.append(c);
+            q++;
+        }
+        return s.toString();
+    }
+}

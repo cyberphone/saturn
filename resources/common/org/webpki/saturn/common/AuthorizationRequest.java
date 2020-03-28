@@ -140,12 +140,12 @@ public class AuthorizationRequest implements BaseProperties {
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 
-    public AuthorizationData getDecryptedAuthorizationData(
+    public AuthorizationDataDecoder getDecryptedAuthorizationData(
             ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys,
             JSONCryptoHelper.Options option)
     throws IOException, GeneralSecurityException {
-        AuthorizationData authorizationData =
-            new AuthorizationData(
+        AuthorizationDataDecoder authorizationData =
+            new AuthorizationDataDecoder(
                     JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)),
                                      option);
         if (!ArrayUtil.compare(authorizationData.requestHash, 
@@ -157,7 +157,7 @@ public class AuthorizationRequest implements BaseProperties {
         }
         if (!ArrayUtil.compare(CryptoUtils.getJwkThumbPrint(signatureDecoder.getPublicKey(),
                                                             authorizationData.keyHashAlgorithm),
-                               authorizationData.keyHashValue)) {
+                               authorizationData.keyHash)) {
             throw new IOException("Non-matching \"" + KEY_HASH_JSON + "\"");
         }
         return authorizationData;

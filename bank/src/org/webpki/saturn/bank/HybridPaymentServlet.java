@@ -30,7 +30,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONCryptoHelper;
 
 import org.webpki.saturn.common.AccountDataDecoder;
-import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.PayeeAuthority;
@@ -80,7 +80,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         // backend system only needs to understand the concept of reserving funds and supply
         // an identifier to the requesting party which is subsequently referred to here.
         PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
-        AuthorizationData authorizationData = authorizationRequest
+        AuthorizationDataDecoder authorizationData = authorizationRequest
                 .getDecryptedAuthorizationData(BankService.decryptionKeys,
                                                BankService.AUTHORIZATION_SIGNATURE_POLICY);
 

@@ -41,7 +41,7 @@ import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AccountDataEncoder;
-import org.webpki.saturn.common.AuthorizationData;
+import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.NonDirectPayments;
@@ -133,7 +133,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verifyAccount(payeeReceiveAccount);
 
         // Decrypt and validate the encrypted Payer authorization
-        AuthorizationData authorizationData = authorizationRequest
+        AuthorizationDataDecoder authorizationData = authorizationRequest
                 .getDecryptedAuthorizationData(BankService.decryptionKeys,
                                                BankService.AUTHORIZATION_SIGNATURE_POLICY);
 
