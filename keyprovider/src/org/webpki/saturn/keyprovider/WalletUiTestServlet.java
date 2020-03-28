@@ -236,7 +236,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
               "</div>" +
             "</div>" +
             "<div id=\"" + ERROR_ID + "\" " +
-            "style=\"color:red;font-weight:bold;padding:1em 0;display:none\"></div>" +
+            "style=\"color:red;font-weight:bold;padding:1em 0 2em 0;display:none\"></div>" +
             "<img id=\"" + WAITING_ID + "\" src=\"waiting.gif\" " +
             "style=\"padding-bottom:1em;display:none\" alt=\"waiting\">" +
             "<div style=\"display:flex;justify-content:center\">" +
@@ -244,6 +244,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                 "Invoke Wallet!" + 
               "</div>" +
             "</div>");
+        String bodyScript = null;
         if (session != null) {
             byte[] jsonBlob = (byte[])session.getAttribute(AUTHZ);
             if (jsonBlob != null) {
@@ -257,7 +258,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                 JSONDecryptionDecoder decoder =
                     walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON)
                         .getEncryptionObject(new JSONCryptoHelper.Options()
-                             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY)
+                             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_XOR_PUBLIC_KEY)
                              .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.OPTIONAL));
                 try {
                     KeyPair keyPair = (KeyPair)session.getAttribute(KEY);
@@ -288,9 +289,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                     }
                     html.append("<div style=\"text-align:center;font-size:11pt\">Successful Operation</div>");
                  } catch (Exception e) {
-                    html.append("<div style=\"text-align:center;font-size:11pt;color:red\">")
-                        .append(e.getMessage())
-                        .append("</div>");
+                    bodyScript = "onload=\"applicationError('" + e.getMessage() + "')\"";
                 }
             }
             session.removeAttribute(AUTHZ);
@@ -367,7 +366,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                   "      applicationError('Browser does not support PaymentRequest!');\n" +
                   "  }\n" +
                   "}",
-                  null,
+                  bodyScript,
                   html.toString());
     }
     
