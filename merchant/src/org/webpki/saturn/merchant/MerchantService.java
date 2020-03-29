@@ -82,8 +82,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String SERVER_PORT_MAP              = "server_port_map";
     
-    static final String LOCAL_INSTALLATION           = "local_installation";
-
     static final String DESKTOP_WALLET               = "desktop_wallet";
 
     static final String CURRENCY                     = "currency";
@@ -153,8 +151,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static String grantedVersions;
 
-    static boolean localInstallation;
-
     static boolean desktopWallet;
 
     static String merchantBaseUrl;
@@ -210,8 +206,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         initProperties (sce);
         try {
             CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
-
-            localInstallation = getPropertyBoolean(LOCAL_INSTALLATION);
 
             desktopWallet = getPropertyBoolean(DESKTOP_WALLET);
             

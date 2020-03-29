@@ -44,6 +44,7 @@
     <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
     <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
     <property name="zip.qr.lib.dir" value="${@qr.lib.dir}"/>
+    <property name="authorityurl" value="${@payerbankhost}/${@payerbankpath}/authority"/>
     <delete dir="${temp.dir}"/>
     <fixcrlf srcdir="."
        tab="remove"
@@ -76,6 +77,7 @@
     </javac>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@inhouse@" value="${inhouse}"/>
+      <replacefilter token="@authority-url@" value="${authorityurl}"/>
       <replacefilter token="@saturn-logotype@" value="${@saturn-logotype.file}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>

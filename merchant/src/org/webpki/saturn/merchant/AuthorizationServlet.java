@@ -76,21 +76,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Strictly put not entirely necessary (YET...)
         ProviderAuthority ownProviderAuthority = 
-            MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
+            MerchantService.externalCalls.getProviderAuthority(urlHolder,
+                    payeeAuthority.getProviderAuthorityUrl());
         
-        // ugly fix to cope with local installation
-        String providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
-        if (MerchantService.localInstallation) {
-            URL url = new URL(MerchantService.payeeProviderAuthorityUrl);
-            providerAuthorityUrl = new URL(url.getProtocol(),
-                                           url.getHost(), 
-                                           url.getPort(),
-                                           new URL(providerAuthorityUrl).getFile()).toExternalForm();
-        }
-
-        // Lookup of Payer's bank
+         // Lookup of Payer's bank
         ProviderAuthority providerAuthority = 
-            MerchantService.externalCalls.getProviderAuthority(urlHolder, providerAuthorityUrl);
+            MerchantService.externalCalls.getProviderAuthority(urlHolder, 
+                    payerAuthorization.getProviderAuthorityUrl());
 
         if (debug) {
             debugData.providerAuthority = providerAuthority.getRoot();

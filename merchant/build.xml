@@ -34,7 +34,6 @@
   </target>
 
   <target name="build">
-    <property name="local.installation" value="true"/>
     <property name="desktop.wallet" value="true"/>
 
     <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
@@ -99,7 +98,6 @@
       </classpath>
     </javac>
     <replace file="${temp.dir}/web.xml">
-      <replacefilter token="@local-installation@" value="${local.installation}"/>
       <replacefilter token="@desktop-wallet@" value="${desktop.wallet}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>

@@ -13,10 +13,6 @@
   <property file="../resources/accounts.properties"/>
   <property file="../resources/merchants.properties"/>
 
-  <condition property="bank.host" value="https://localhost:8442" else="https://mobilepki.org">
-    <isset property="localhost"/>
-  </condition>
-  
   <property name="debug" value="on"/>
   
   <property environment="env"/>
@@ -41,7 +37,7 @@
   </path>
   
   <target name="help">
-      <echo message="cryptotest createcerts initwallet [-Dlocalhost=0] inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter] escaping"/>
+      <echo message="cryptotest createcerts initwallet inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter] escaping"/>
   </target>
  
   <target name="inittestpage">
@@ -306,6 +302,8 @@
   <target name="_import">
     <property name="card.path" location="${@cardimage.dir}/${card.image}"/>
     <property name="sks.path" location="${@credentials.dir}/${@credentials_store}"/>
+    <property name="bank.path" value="${@payerbankhost}/${@payerbankpath}/authority"/>
+    <property name="key.encryption.key" value="${@payerbankpath}-enc-key-ec.cer"/>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitWallet"
           dir="${@key.dir}"
@@ -326,8 +324,8 @@
         <arg value="${card.credential}"/>
         <arg value="${card.number}"/>
         <arg value="${card.balance}"/>
-        <arg value="${bank.host}/${bankpath}/authority"/>
-        <arg value="${key.encryption.key}.cer"/>
+        <arg value="${bank.path}"/>
+        <arg value="${key.encryption.key}"/>
         <arg value="${card.path}"/>
         <arg value="${rqa}"/>
         <arg value="${dea}"/>
@@ -356,8 +354,6 @@
        <param name="card.number" value="4532562005001233"/>
        <param name="card.balance" value="2390.00"/>
        <param name="card.image" value="supercard.png"/>
-       <param name="bankpath" value="${@payerbankpath}"/>
-       <param name="key.encryption.key" value="${@payerbankpath}-enc-key-ec"/>
        <param name="rqa" value="S384"/>
        <param name="dea" value="A128CBC-HS256"/>
        <param name="kea" value="ECDH-ES+A128KW"/>
@@ -370,8 +366,6 @@
        <param name="card.number" value="FR7630002111110020050012442"/>
        <param name="card.balance" value="5543.00"/>
        <param name="card.image" value="bankdirect.png"/>
-       <param name="bankpath" value="${@payerbankpath}"/>
-       <param name="key.encryption.key" value="${@payerbankpath}-enc-key-ec"/>
        <param name="rqa" value="S256"/>
        <param name="dea" value="A256GCM"/>
        <param name="kea" value="ECDH-ES"/>
@@ -384,8 +378,6 @@
        <param name="card.number" value="6011032005001257"/>
        <param name="card.balance" value="120.00"/>
        <param name="card.image" value="unusualcard.png"/>
-       <param name="bankpath" value="${@payeebankpath}"/>
-       <param name="key.encryption.key" value="${@payeebankpath}-enc-key-ec"/>
        <param name="rqa" value="S512"/>
        <param name="dea" value="A128CBC-HS256"/>
        <param name="kea" value="ECDH-ES"/>

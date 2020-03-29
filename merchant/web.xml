@@ -5,12 +5,6 @@
     version="2.4">
 
     <context-param>
-        <description>Local Installation</description>
-        <param-name>local_installation</param-name>
-        <param-value>@local-installation@</param-value>
-    </context-param>
-
-    <context-param>
         <description>Merchant Key Password</description>
         <param-name>key_password</param-name>
         <param-value>@key-password@</param-value>

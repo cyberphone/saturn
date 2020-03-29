@@ -356,7 +356,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                     credentialTemplate.paymentMethod,
                                     accountAndCredential.credentialId,
                                     accountAndCredential.accountId,
-                                    credentialTemplate.authorityUrl,
+                                    KeyProviderService.authorityUrl,
                                     credentialTemplate.requestHashAlgorithm,
                                     credentialTemplate.signatureAlgorithm, 
                                     credentialTemplate.dataEncryptionAlgorithm, 

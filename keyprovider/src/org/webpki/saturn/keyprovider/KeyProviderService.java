@@ -72,6 +72,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static final String MERCHANT_URL                = "merchant_url";
 
     static final String KEYGEN2_BASE_URL            = "keygen2_base_url";
+    
+    static final String AUTHORITY_URL               = "authority_url";
 
     static final String KEYSTORE_PASSWORD           = "key_password";
 
@@ -116,7 +118,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         boolean cardFormatted;
         byte[] optionalServerPin;
         String friendlyName;
-        String authorityUrl;
         String svgCardImage;
         PublicKey encryptionKey;
         HashAlgorithms requestHashAlgorithm;
@@ -135,7 +136,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             if (rd.hasProperty("serverSetPIN")) {
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");
             }
-            authorityUrl = rd.getString("authorityUrl");
             friendlyName = rd.getString("friendlyName");
             svgCardImage = getResourceAsString(rd.getString("cardImage"));
             if (inHouse) {
@@ -163,6 +163,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static String saturnLogotype;
 
     static String keygen2RunUrl;
+    
+    static String authorityUrl;
 
     static boolean useW3cPaymentRequest;
 
@@ -196,6 +198,11 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // In house operation?
             ////////////////////////////////////////////////////////////////////////////////////////////
             inHouse = getPropertyString(IN_HOUSE).length() > 0;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Authority URL.  Assumption: all virtual cards are issued by the same entity
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            authorityUrl = getPropertyString(AUTHORITY_URL);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // We support biometric authentication?

@@ -18,6 +18,12 @@
     </context-param>
 
     <context-param>
+        <description>Authority URL (Payer bank)</description>
+        <param-name>authority_url</param-name>
+        <param-value>@authority-url@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Saturn Logotype</description>
         <param-name>saturn_logotype</param-name>
         <param-value>@saturn-logotype@</param-value>
