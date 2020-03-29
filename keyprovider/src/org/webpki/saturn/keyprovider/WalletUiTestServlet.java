@@ -136,8 +136,11 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                           String javascript, 
                           String bodyscript, 
                           String box) throws IOException, ServletException {
-        KeyProviderInitServlet.output(response, 
-                                      KeyProviderInitServlet.getHTML(javascript, bodyscript, box));
+        String html = KeyProviderInitServlet.getHTML(javascript, bodyscript, box)
+                .replaceFirst("position:absolute;top:15pt;left:15pt;z-index:5;", "padding:1em;")
+                .replaceFirst("displayContainer \\{  display:block;  height:100%;",
+                              "displayContainer {  display:block;");
+        KeyProviderInitServlet.output(response, html);
     }
 
     private void addPaymentMethod(JSONArrayWriter methodList, 
@@ -189,11 +192,11 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         StringBuilder html = new StringBuilder("<select id=\"" + TYPE + "\">");
         for (String merchant : sampleTests.keySet()) {
              html.append("<option value=\"")
-                .append(merchant)
-                .append("\"")
-                .append(first ? " selected>" : ">")
-                .append(merchant)
-                .append("</option>");
+                 .append(merchant)
+                 .append("\"")
+                 .append(first ? " selected>" : ">")
+                 .append(merchant)
+                 .append("</option>");
              first = false;
         }
         return html.append("</select>").toString();
@@ -248,8 +251,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         if (session != null) {
             byte[] jsonBlob = (byte[])session.getAttribute(AUTHZ);
             if (jsonBlob != null) {
-                html.append("<div style=\"padding-top:2em\">Scroll up for the result</div>" +
-                            "</div><div style=\"padding:1em\">");
+                html.append("</div><div style=\"padding:1.5em 1em\">");
                 JSONObjectReader walletRequest =
                         new JSONObjectReader((JSONObjectWriter)session.getAttribute(REQUEST));
                 fancyPrint(html, "Wallet Request", walletRequest);

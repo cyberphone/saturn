@@ -61,14 +61,15 @@ class DebugPrintout implements BaseProperties {
     String encryptedAccount;
 
     static final String SUPERCARD_AUTHZ_SAMPLE       = "wallet-supercard-auth.png";
-
     static final String BANKDIRECT_AUTHZ_SAMPLE      = "wallet-bankdirect-auth.png";
+    static final String GASSTATION_AUTHZ             = "wallet-gasstation-auth.png";
 
   
     static final String REFUND_TRANSACTION = "Refund&nbsp;Transaction";
     static final String PROV_USER_RESPONSE = "Provider&nbsp;User&nbsp;Response";
     static final String UNENCRYPTED_AUTHZ  = "Unencrypted&nbsp;User&nbsp;Authorization";
-    
+
+     
     String getShortenedB64(byte[] bin, int maxLength) throws IOException {
         String b64 = Base64URL.encode(bin);
         if (b64.length() > maxLength) {
@@ -276,7 +277,8 @@ class DebugPrintout implements BaseProperties {
             "<img style=\"display:block;margin-left:auto;margin-right:auto;max-width:250pt;" +
             "border-width:1px;border-style:solid;border-color:grey;box-shadow:3pt 3pt 3pt #d0d0d0\" " +
             "src=\"https://cyberphone.github.io/doc/saturn/" +
-            (debugData.acquirerMode ? SUPERCARD_AUTHZ_SAMPLE : BANKDIRECT_AUTHZ_SAMPLE) + 
+            (debugData.gasStation ? GASSTATION_AUTHZ :
+                debugData.acquirerMode ? SUPERCARD_AUTHZ_SAMPLE : BANKDIRECT_AUTHZ_SAMPLE) + 
             "\">");
         description(point.sub() +
             "<p>The result of this process is not supposed be " +

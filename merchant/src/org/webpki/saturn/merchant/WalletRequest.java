@@ -60,7 +60,8 @@ public class WalletRequest implements BaseProperties, MerchantProperties {
             PaymentRequest.encode(optionalNonDirectPayment == null ? 
                     // We cheated a bit and only defined a single merchant...
                                           MerchantService.merchantCommonName : "Planet Gas", 
-                                  MerchantService.merchantHomePage,
+                                  optionalNonDirectPayment == null ?
+                                          MerchantService.merchantHomePage : "planetgas.com",
                                   new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
                                                  MerchantService.currency.getDecimals()),
                                   MerchantService.currency,
