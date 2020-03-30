@@ -5,36 +5,6 @@
     version="2.4">
 
     <context-param>
-        <description>Merchant Key Password</description>
-        <param-name>key_password</param-name>
-        <param-value>@key-password@</param-value>
-    </context-param>
- 
-    <context-param>
-        <description>Merchant Bank Network Key</description>
-        <param-name>merchant_bank_network_key</param-name>
-        <param-value>@merchant-bank-network-key@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Merchant Card Network Key</description>
-        <param-name>merchant_card_network_key</param-name>
-        <param-value>@merchant-card-network-key@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Merchant Common Name</description>
-        <param-name>merchant_common_name</param-name>
-        <param-value>@merchant-common-name@</param-value>
-    </context-param>
-
-    <context-param>
-        <description>Merchant Home Page</description>
-        <param-name>merchant_home_page</param-name>
-        <param-value>@merchant-home-page@</param-value>
-    </context-param>
-
-    <context-param>
         <description>Home of Merchant</description>
         <param-name>merchant_base_url</param-name>
         <param-value>@merchant-base-url@</param-value>

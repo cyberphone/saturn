@@ -58,16 +58,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static Logger logger = Logger.getLogger(MerchantService.class.getCanonicalName());
     
-    static final String MERCHANT_BANK_NETWORK_KEY    = "merchant_bank_network_key";
-    
-    static final String MERCHANT_CARD_NETWORK_KEY    = "merchant_card_network_key";
-
-    static final String KEYSTORE_PASSWORD            = "key_password";
-
-    static final String MERCHANT_COMMON_NAME         = "merchant_common_name";
-
-    static final String MERCHANT_HOME_PAGE           = "merchant_home_page";
-
     static final String MERCHANT_BASE_URL            = "merchant_base_url";
 
     static final String PAYMENT_ROOT                 = "payment_root";
@@ -96,7 +86,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String W3C_PAYMENT_REQUEST_HOST     = "w3c_payment_request_host";
 
-    static final String RECEIVE_ACCOUNTS             = "receive-accounts.json";
+    static final String ACCOUNTS                     = "accounts.json";
 
     static final String VERSION_CHECK                = "android_webpki_versions";
 
@@ -112,18 +102,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static JSONX509Verifier acquirerRoot;
     
-    static LinkedHashMap<String,PaymentMethodDescriptor> supportedPaymentMethods = new LinkedHashMap<>();
-    
-    static LinkedHashMap<String,AccountDataEncoder> receiveAccounts = new LinkedHashMap<>();
-    
-    static LinkedHashMap<String,AccountDataEncoder> sourceAccounts = new LinkedHashMap<>();
-    
     static JSONDecoderCache knownBackendAccountTypes = new JSONDecoderCache();
 
-    static String merchantCommonName;
-    
-    static String merchantHomePage;
-    
     static String payeeAcquirerAuthorityUrl;
     
     static String payeeProviderAuthorityUrl;
@@ -227,7 +207,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             knownBackendAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
             knownBackendAccountTypes.addToCache(se.bankgirot.BGAccountDataDecoder.class);
-            JSONArrayReader accounts = readJSONFile(RECEIVE_ACCOUNTS).getJSONArrayReader();
+            JSONArrayReader accounts = readJSONFile(ACCOUNTS).getJSONArrayReader();
             do {
                 JSONObjectReader accountObject = accounts.getObject();
                 AccountDataDecoder decoder = 

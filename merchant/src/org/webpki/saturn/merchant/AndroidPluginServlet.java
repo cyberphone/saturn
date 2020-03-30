@@ -34,7 +34,7 @@ import org.webpki.saturn.common.NonDirectPayments;
 
 import org.webpki.net.MobileProxyParameters;
 
-public class AndroidPluginServlet extends HttpServlet implements MerchantProperties {
+public class AndroidPluginServlet extends HttpServlet implements MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
     

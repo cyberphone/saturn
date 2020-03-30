@@ -100,14 +100,9 @@
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@desktop-wallet@" value="${desktop.wallet}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
-      <replacefilter token="@key-password@" value="${@keypassword}"/>
-      <replacefilter token="@merchant-bank-network-key@" value="${@merchantBankNetworkKey}.p12"/>
-      <replacefilter token="@merchant-card-network-key@" value="${@merchantCardNetworkKey}.p12"/>
-      <replacefilter token="@merchant-common-name@" value="${@merchantCommonName}"/>
-      <replacefilter token="@merchant-home-page@" value="${@merchantHomePage}"/>
       <replacefilter token="@merchant-base-url@" value="${@merchanthost}/${@merchantpath}"/>
-      <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
-      <replacefilter token="@acquirer-root@" value="${@acquirerroot}.cer"/>
+      <replacefilter token="@payment-root@" value="${@banknetworkroot}.cer"/>
+      <replacefilter token="@acquirer-root@" value="${@acquirernetworkroot}.cer"/>
       <replacefilter token="@payee-acquirer-authority-url@" value="${@acquirerhost}/${@acquirerpath}/payees/${@merchantIdCardNetwork}"/>
       <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.url}/payees/${@merchantIdBankNetwork}"/>
       <replacefilter token="@no-matching-methods-url@" value="${@keyprovhost}/${@keyprovpath}"/>
@@ -139,13 +134,10 @@
          <include name="proxy-support.jar"/>
       </lib>
       <zipfileset dir="${@key.dir}" prefix="${class_war_path}">
-         <include name="${@merchantBankNetworkKey}.p12"/>
-         <include name="${@merchantCardNetworkKey}.p12"/>
-         <include name="${@othernetworkkey}.p12"/>
-         <include name="${@paymentnetworkroot}.cer"/>
-         <include name="${@acquirerroot}.cer"/>
+         <include name="${@banknetworkroot}.cer"/>
+         <include name="${@acquirernetworkroot}.cer"/>
       </zipfileset>
-      <zipfileset file="receive-accounts.json" prefix="${class_war_path}"/>
+      <zipfileset file="accounts.json" prefix="${class_war_path}"/>
       <zipfileset dir="debug-samples" prefix="${class_war_path}"/>
       <fileset dir="web"/>
     </war>

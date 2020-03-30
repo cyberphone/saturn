@@ -16,7 +16,7 @@
  */
 package org.webpki.saturn.merchant;
 
-public interface MerchantProperties {
+public interface MerchantSessionProperties {
 
     public String WALLET_REQUEST_SESSION_ATTR   = "WALLREQ";
     public String DEBUG_DATA_SESSION_ATTR       = "DBGDATA";

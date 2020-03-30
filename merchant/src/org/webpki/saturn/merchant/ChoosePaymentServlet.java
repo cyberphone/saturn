@@ -33,7 +33,7 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.BaseProperties;
 
-public class ChoosePaymentServlet extends HttpServlet implements BaseProperties, MerchantProperties {
+public class ChoosePaymentServlet extends HttpServlet implements BaseProperties, MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
     

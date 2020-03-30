@@ -36,7 +36,7 @@ import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequest;
 
-public class WalletRequest implements BaseProperties, MerchantProperties {
+public class WalletRequest implements BaseProperties, MerchantSessionProperties {
 
     boolean debugMode;
     SavedShoppingCart savedShoppingCart;

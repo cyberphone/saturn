@@ -102,8 +102,8 @@
       <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>
       <replacefilter token="@bank-decryptionkey2@" value="${enc.key.rsa}"/>
-      <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
-      <replacefilter token="@acquirer-root@" value="${@acquirerroot}.cer"/>
+      <replacefilter token="@payment-root@" value="${@banknetworkroot}.cer"/>
+      <replacefilter token="@acquirer-root@" value="${@acquirernetworkroot}.cer"/>
       <replacefilter token="@bank-base-url@" value="${bankhost}/${bank.path}"/>
       <replacefilter token="@payer-interbank-url@" value="${@payerbankhost}/${@payerbankpath}/interbanking"/>
       <replacefilter token="@payee-interbank-url@" value="${@payeebankhost}/${@payeebankpath}/interbanking"/>
@@ -129,8 +129,8 @@
          <include name="${enc.key.rsa}"/>
          <include name="${enc.key.ec}"/>
          <include name="${cert.key}"/>
-         <include name="${@paymentnetworkroot}.cer"/>
-         <include name="${@acquirerroot}.cer"/>
+         <include name="${@banknetworkroot}.cer"/>
+         <include name="${@acquirernetworkroot}.cer"/>
          <include name="${hosting.provider.key}"/>
       </zipfileset>
       <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">

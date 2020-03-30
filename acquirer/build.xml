@@ -73,7 +73,7 @@
       <replacefilter token="@acquirer-decryptionkey2@" value="${@acquirerencryptionkey_rsa}.p12"/>
       <replacefilter token="@acquirer-base-url@" value="${@acquirerhost}/${@acquirerpath}"/>
       <replacefilter token="@payer-interbank-url@" value="${@payerbankhost}/${@payerbankpath}/interbanking"/>
-      <replacefilter token="@payment-root@" value="${@paymentnetworkroot}.cer"/>
+      <replacefilter token="@payment-root@" value="${@banknetworkroot}.cer"/>
       <replacefilter token="@payee-account-db@" value="${merchants.db}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@logging@" value="${logging}"/>
@@ -95,7 +95,7 @@
          <include name="${@acquirerencryptionkey_rsa}.p12"/>
          <include name="${@acquirerencryptionkey_ec}.p12"/>
          <include name="${@acquirersignaturekey}.p12"/>
-         <include name="${@paymentnetworkroot}.cer"/>
+         <include name="${@banknetworkroot}.cer"/>
       </zipfileset>
       <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
          <include name="${merchants.db}"/>

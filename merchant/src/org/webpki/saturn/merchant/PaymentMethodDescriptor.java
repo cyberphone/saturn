@@ -16,24 +16,33 @@
  */
 package org.webpki.saturn.merchant;
 
+import java.util.LinkedHashMap;
+
 import org.webpki.crypto.HashAlgorithms;
 
+import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 
 public class PaymentMethodDescriptor {
     
+    String localId;
     ServerAsymKeySigner signer;
-    String paymentMethod;             // A URL
-    byte[] keyHashValue;                   // For binding a user authorization to a payee request signature key
+    byte[] keyHashValue;              // For binding a user authorization to a payee request signature key
     HashAlgorithms keyHashAlgorithm;  // Using this algorithm
+    LinkedHashMap<String, AccountDataEncoder> receiverAccounts;
+    LinkedHashMap<String, AccountDataEncoder> sourceAccounts;
     
-    PaymentMethodDescriptor(ServerAsymKeySigner signer,
-                            String paymentMethod,
+    PaymentMethodDescriptor(String localId,
+                            ServerAsymKeySigner signer,
                             HashAlgorithms keyHashAlgorithm,
-                            byte[] keyHashValue) {
+                            byte[] keyHashValue,
+                            LinkedHashMap<String, AccountDataEncoder> receiverAccounts,
+                            LinkedHashMap<String, AccountDataEncoder> sourceAccounts) {
+        this.localId = localId;
         this.signer = signer;
-        this.paymentMethod = paymentMethod;
         this.keyHashAlgorithm = keyHashAlgorithm;
         this.keyHashValue = keyHashValue;
+        this.receiverAccounts = receiverAccounts;
+        this.sourceAccounts = sourceAccounts;
     }
 }

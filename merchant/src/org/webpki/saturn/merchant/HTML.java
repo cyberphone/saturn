@@ -39,7 +39,7 @@ import org.webpki.saturn.w2nb.support.W2NB;
 
 import org.webpki.w2nbproxy.ExtensionPositioning;
 
-public class HTML implements MerchantProperties {
+public class HTML implements MerchantSessionProperties {
 
     static final String STICK_TO_HOME_URL            =
                     "history.pushState(null, null, 'home');\n" +

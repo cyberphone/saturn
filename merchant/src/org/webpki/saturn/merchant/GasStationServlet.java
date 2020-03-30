@@ -29,7 +29,7 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.saturn.common.NonDirectPayments;
 
-public class GasStationServlet extends HttpServlet implements MerchantProperties {
+public class GasStationServlet extends HttpServlet implements MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
     

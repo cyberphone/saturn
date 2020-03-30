@@ -36,7 +36,7 @@ import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
 
 
-public class QRDisplayServlet extends HttpServlet implements MerchantProperties {
+public class QRDisplayServlet extends HttpServlet implements MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
     

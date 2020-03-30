@@ -46,7 +46,7 @@ import org.webpki.saturn.common.UrlHolder;
 // Payee. This would typically involve user authentication and logging. //
 //////////////////////////////////////////////////////////////////////////
 
-public class RefundServlet extends HttpServlet implements MerchantProperties {
+public class RefundServlet extends HttpServlet implements MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
     

@@ -49,7 +49,7 @@ import org.webpki.saturn.common.WalletAlertMessage;
 // This servlet holds core methods used by Saturn and Saturn "Native"   //
 //////////////////////////////////////////////////////////////////////////
 
-public abstract class ProcessingBaseServlet extends HttpServlet implements BaseProperties, MerchantProperties {
+public abstract class ProcessingBaseServlet extends HttpServlet implements BaseProperties, MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
     

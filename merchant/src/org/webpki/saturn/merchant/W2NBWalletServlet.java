@@ -27,7 +27,7 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONOutputFormats;
 
-public class W2NBWalletServlet extends HttpServlet implements MerchantProperties {
+public class W2NBWalletServlet extends HttpServlet implements MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
    
