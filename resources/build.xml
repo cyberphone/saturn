@@ -11,7 +11,6 @@
   
   <property file="../resources/common.properties"/>
   <property file="../resources/accounts.properties"/>
-  <property file="../resources/merchants.properties"/>
 
   <property name="debug" value="on"/>
   
@@ -491,25 +490,46 @@
        <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:rsa -selfsigned -entity/ee -extension/ku keyEncipherment -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirerencryptionkey_rsa}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA256"/>
     </antcall>
   </target>
+  
+  <target name="_merchantkey">
+    <antcall target="_createcert">
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=${merchant}&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${merchant}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+    </antcall>
+    <java fork="yes"
+          classname="org.webpki.tools.KeyStore2JWKConverter"
+          dir="${@key.dir}"
+          failonerror="true">
+      <classpath>
+        <fileset dir="${@webpki.lib.dir}">
+           <include name="${@webpki-libext.jar}"/>
+        </fileset>
+        <fileset dir="${@webpki.lib.dir}">
+           <include name="${@webpki-webutil.jar}"/>
+        </fileset>
+        <fileset dir="${@bcprovider.lib.dir}">
+           <include name="${@bcprovider.jar}"/>
+        </fileset>
+        <fileset dir="${@reference.lib.dir}">
+           <include name="servlet-api.jar"/>
+        </fileset>
+      </classpath>
+      <arg line="${merchant}.p12 ${@keypassword} ${merchant}.jwk private"/>
+    </java>
+    <delete file="${@key.dir}/${merchant}.p12"/>
+  </target>
 
   <target name="_merchantkeys">
-    <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantBankNetworkKey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+    <antcall target="_merchantkey">
+       <param name="merchant" value="demomerchant.com-banknet"/>
     </antcall>
-    <antcall target="_getroot">
-       <param name="rootfile" value="${@merchantBankNetworkKey}"/>
+    <antcall target="_merchantkey">
+       <param name="merchant" value="demomerchant.com-cardnet"/>
     </antcall>
-    <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Old Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantBankNetworkKey.old}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+    <antcall target="_merchantkey">
+       <param name="merchant" value="planetgas.com-banknet"/>
     </antcall>
-    <antcall target="_getroot">
-       <param name="rootfile" value="${@merchantBankNetworkKey.old}"/>
-    </antcall>
-    <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=Demo Merchant Key, C=US&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@merchantCardNetworkKey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
-    </antcall>
-    <antcall target="_getroot">
-       <param name="rootfile" value="${@merchantCardNetworkKey}"/>
+    <antcall target="_merchantkey">
+       <param name="merchant" value="planetgas.com-cardnet"/>
     </antcall>
   </target>
 
