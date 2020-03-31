@@ -791,19 +791,22 @@ public class HTML implements MerchantSessionProperties {
     }
     
     static StringBuilder pumpDisplay(int digits, int decimals, String leader, String trailer, String prefix) {
-        StringBuilder s = new StringBuilder("<table cellspacing=\"5\"><tr><td style=\"color:white\">")
+        StringBuilder s = new StringBuilder("<tr><td style=\"color:white;text-align:right\">")
             .append(leader)
             .append("</td>");
         while (digits-- > 0) {
             s.append(pumpDigit(digits + decimals, prefix));
         }
         s.append("<td style=\"color:white\">&#x2022;</td>");
+        String tableFix = decimals == 1 ? " colspan=\"2\"":"";
         while (decimals-- > 0) {
             s.append(pumpDigit(decimals, prefix));
         }
-        return s.append("<td style=\"color:white\">")
+        return s.append("<td style=\"color:white\"")
+                .append(tableFix)
+                .append('>')
                 .append(trailer)
-                .append("</td></tr></table>");
+                .append("</td></tr>");
     }
     
     static String gasStation(String header, boolean visiblePumpDisplay) {
@@ -816,10 +819,12 @@ public class HTML implements MerchantSessionProperties {
         if (visiblePumpDisplay) {
             s.append("<tr><td style=\"padding-bottom:15pt\" align=\"center\"><table title=\"This is [sort of] a pump display\"><tr>"+
                      "<td align=\"center\" style=\"box-shadow:5pt 5pt 5pt #c0c0c0;background:linear-gradient(135deg, #516287 0%,#5697e2 71%,#5697e2 71%,#516287 100%);border-radius:4pt\">" +
-                     "<div style=\"padding:3pt;font-size:12pt;color:white\">Pump O'Matic</div>")
+                     "<div style=\"padding:3pt;font-size:12pt;color:white\">Pump O'Matic</div>" +
+                     "<table cellspacing=\"5\">")
              .append(pumpDisplay(3, 1, "Volume", "Litres", "pvol"))
-             .append(pumpDisplay(3, 2, "To Pay", "&#8364;", "ppri"))
-             .append("</td></tr></table></td></tr>");
+             .append("<tr><td colspan=\"8\" style=\"max-height:3px\"></td></tr>")
+             .append(pumpDisplay(3, 2, "Total", "<span style=\"font-size:14pt\">&#x20ac;</span>", "ppri"))
+             .append("</table></td></tr></table></td></tr>");
         }
         return s.toString();
 
