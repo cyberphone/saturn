@@ -68,7 +68,7 @@ public class ShoppingServlet extends HttpServlet implements MerchantSessionPrope
             ErrorServlet.sessionTimeout(response);
             return;
         }
-        session.setAttribute(MERCHANT_HOMEPAGE_ATTR, "demomerchant.com");
+        session.setAttribute(MERCHANT_HOMEPAGE_ATTR, MerchantService.DEMO_MERCHANT_COM);
         HTML.merchantPage(response, new SavedShoppingCart());
     }
 }

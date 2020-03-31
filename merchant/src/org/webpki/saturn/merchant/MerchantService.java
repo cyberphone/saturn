@@ -99,8 +99,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String TEST_MODE                    = "test-mode";
     
-    static final HashAlgorithms KEY_HASH_ALGORITHM   = HashAlgorithms.SHA256;
-
+    static final String DEMO_MERCHANT_COM            = "demomerchant.com";
+    static final String PLANET_GAS_COM               = "planetgas.com";
+    
     static JSONX509Verifier paymentRoot;
     
     static JSONX509Verifier acquirerRoot;
@@ -219,10 +220,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             knownBackendAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
             knownBackendAccountTypes.addToCache(se.bankgirot.BGAccountDataDecoder.class);
 
-            JSONArrayReader merchants = readJSONFile(MERCHANTS).getJSONArrayReader();
+            JSONArrayReader merchantList = readJSONFile(MERCHANTS).getJSONArrayReader();
             do {
-                addMerchant(merchants.getObject());
-            } while (merchants.hasMore());
+                addMerchant(merchantList.getObject());
+            } while (merchantList.hasMore());
+            if (!merchants.containsKey(DEMO_MERCHANT_COM) ||
+                !merchants.containsKey(PLANET_GAS_COM)) {
+                throw new IOException("Merchant id errors");
+            }
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
