@@ -1,0 +1,81 @@
+[{
+  "homePage": "demomerchant.com",
+  "commonName": "Demo Merchant",
+  "paymentNetworks": [{
+    "paymentMethod": "https://bankdirect.net",
+    "localPayeeId": "86344",
+    "keyHashAlgorithm": "S256",
+    "key": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "8VY09NWUy-aVGNHZZQDIyy-H3RxLfXbiPR2SVlEubjE",
+      "y": "OuHehTNjMbphW0s3nBBVdAALLdzE9x-hup4CnJ1gM-o",
+      "d": "2Sm9G2mWLur-dPtD8h9g93OHWyofbKaIw-l03PKAfoA"
+    },
+    "payeeAccounts": [{
+      "@context": "https://sepa.payments.org/saturn/v3#account",
+      "iban": "FR7630004003200001019471656",
+      "nonce": "nZFwxLP0TvFXD2xPKzRTIGevgLjpiMw2BP86hszj5x4"
+    },{
+      "@context": "https://bankgirot.se/saturn/v3#account",
+      "bgNumber": "BG 5051-6905",
+      "nonce": "g1CFOqhz1eSMnZlQ2MiwlG7ygMsD74aG67SuKHEsxoU"
+    }]
+  },{
+    "paymentMethod": "https://supercard.com",
+    "localPayeeId": "1077342",
+    "keyHashAlgorithm": "S256",
+    "key": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "t4DjDTgLk6PIAX9bn46JybFgWOv0npE2iEQs0P2kzjs",
+      "y": "YcrZeO3SQZgxAyRI8myWlapaNHOBqGL5Pqi5xDXiNt8",
+      "d": "e6DKxKYoSK0J7rhgqvpEbhwaF8eFlRFhCe8E34S1xwk"
+    },
+    "payeeAccounts": [{
+      "@context": "https://sepa.payments.org/saturn/v3#account",
+      "iban": "FR7630004003200001019471656",
+      "nonce": "nZFwxLP0TvFXD2xPKzRTIGevgLjpiMw2BP86hszj5x4"
+    }]
+  }]
+},{
+  "homePage": "planetgas.com",
+  "commonName": "Planet Gas",
+  "paymentNetworks": [{
+    "paymentMethod": "https://bankdirect.net",
+    "localPayeeId": "973277",
+    "keyHashAlgorithm": "S256",
+    "key": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "yxkJV3w2WH5g_4IBSrdZ1EFmLojQIiYhhiwOd3YjooU",
+      "y": "-8mDbeY6oEFpwktEPOQPlMo5BNW1AJoeTmQ4gmsADy4",
+      "d": "r6nSCfno2jV-rtyFotyT_sG1TRqBkRjxjIDliN1VTTI"
+    },
+    "payeeAccounts": [{
+      "@context": "https://sepa.payments.org/saturn/v3#account",
+      "iban": "FR7630002111110020050047168",
+      "nonce": "Fh2rl0LGTtvaomOuhuRNo9Drz9o0--WXV2ITvdVQFRY"
+    },{
+      "@context": "https://bankgirot.se/saturn/v3#account",
+      "bgNumber": "BG 5051-6907",
+      "nonce": "rylnl8Z_CBYDmkLAfRrlhI_EbJzSwxQwE8cNDTHBWdQ"
+    }]
+  },{
+    "paymentMethod": "https://supercard.com",
+    "localPayeeId": "8888",
+    "keyHashAlgorithm": "S256",
+    "key": {
+      "kty": "EC",
+      "crv": "P-256",
+      "x": "_6soiu94ku4oBHe9O4yS7kIaVIgSiL_RLabSPOAcYPI",
+      "y": "N5lB1JwdVw32WVaW-AriD2ajuWYuHFoCvRX2RxpVlHw",
+      "d": "by9eq4bP78QuymERv6V2N4gJKCzwcB3eSJBMOoPeds4"
+    },
+    "payeeAccounts": [{
+      "@context": "https://sepa.payments.org/saturn/v3#account",
+      "iban": "FR7630004003200001019471656",
+      "nonce": "nZFwxLP0TvFXD2xPKzRTIGevgLjpiMw2BP86hszj5x4"
+    }]
+  }]
+}]

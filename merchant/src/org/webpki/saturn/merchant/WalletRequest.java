@@ -50,32 +50,28 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
         }
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+        MerchantDescriptor merchant = MerchantService.getMerchant(session);
         requestObject = Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage();
-        GregorianCalendar timeStamp = new GregorianCalendar();
-        GregorianCalendar expires = TimeUtils.inMinutes(30);
-        String currentReferenceId = MerchantService.getReferenceId();
 
         // Create a payment request
         JSONObjectWriter paymentRequest =
-            PaymentRequest.encode(optionalNonDirectPayment == null ? 
-                    // We cheated a bit and only defined a single merchant...
-                                          MerchantService.merchantCommonName : "Planet Gas", 
-                                  optionalNonDirectPayment == null ?
-                                          MerchantService.merchantHomePage : "planetgas.com",
-                                  new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
-                                                 MerchantService.currency.getDecimals()),
+            PaymentRequest.encode(merchant.commonName, 
+                                  merchant.homePage,
+                                  new BigDecimal(
+                                      BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
+                                      MerchantService.currency.getDecimals()),
                                   MerchantService.currency,
                                   optionalNonDirectPayment,
-                                  currentReferenceId,
-                                  timeStamp,
-                                  expires);
+                                  merchant.getReferenceId(),
+                                  new GregorianCalendar(),
+                                  TimeUtils.inMinutes(30));
 
         JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
-        for (String key : MerchantService.supportedPaymentMethods.keySet()) {
-            PaymentMethodDescriptor paymentMethodDescriptor = 
-                    MerchantService.supportedPaymentMethods.get(key);
+        for (String paymentMethod : merchant.paymentMethods.keySet()) {
+            PaymentMethodDescriptor paymentMethodDescriptor =
+                    merchant.paymentMethods.get(paymentMethod);
             methodList.setObject()
-                .setString(PAYMENT_METHOD_JSON, paymentMethodDescriptor.paymentMethod)
+                .setString(PAYMENT_METHOD_JSON, paymentMethod)
                 .setObject(KEY_HASH_JSON, new JSONObjectWriter()
                     .setString(JSONCryptoHelper.ALGORITHM_JSON, 
                                paymentMethodDescriptor.keyHashAlgorithm.getJoseAlgorithmId())

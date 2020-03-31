@@ -93,6 +93,13 @@ public class PayeeCoreProperties implements BaseProperties {
         } while (jsonParameterArray.hasMore());
         signatureParameters = parameterArray.toArray(new SignatureParameter[0]);
     }
+    
+    public static String createUrlSafeId(String payeeId) throws IOException {
+        if (URLEncoder.encode(payeeId, "utf-8").equals(payeeId)) {
+            return payeeId;
+        }
+        return Base64URL.encode(payeeId.getBytes("utf-8"));
+    }
 
     public static PayeeCoreProperties init(JSONObjectReader rd,
                                            String payeeBaseAuthorityUrl,
@@ -112,10 +119,7 @@ public class PayeeCoreProperties implements BaseProperties {
         payeeCoreProperties.accountHashAlgorithm = accountHashAlgorithm;
         payeeCoreProperties.optionalAccountHashes = 
                 optionalAccountHashes.isEmpty() ? null : optionalAccountHashes;
-        String urlSafeId = payeeCoreProperties.payeeId;
-        if (!URLEncoder.encode(urlSafeId, "utf-8").equals(urlSafeId)) {
-            urlSafeId = Base64URL.encode(urlSafeId.getBytes("utf-8"));
-        }
+        String urlSafeId = createUrlSafeId(payeeCoreProperties.payeeId);
         payeeCoreProperties.urlSafeId = urlSafeId;
         payeeCoreProperties.payeeAuthorityUrl = payeeBaseAuthorityUrl + urlSafeId;
         return payeeCoreProperties;

@@ -63,7 +63,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return null;
     }
 
-    abstract boolean processCall(JSONObjectReader walletResponse,
+    abstract boolean processCall(MerchantDescriptor merchant, 
+                                 JSONObjectReader walletResponse,
                                  PaymentRequest paymentRequest, 
                                  PayerAuthorization payerAuthorization,
                                  HttpSession session,
@@ -111,19 +112,22 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // Decode the user's authorization.  The encrypted data is only parsed for correctness
             PayerAuthorization payerAuthorization = new PayerAuthorization(walletResponse);
             
+            // Get merchant
+            MerchantDescriptor merchant = MerchantService.getMerchant(session);
+            
             // Check that we got a valid payment method
-            if (!MerchantService.supportedPaymentMethods.containsKey(
+            if (!merchant.paymentMethods.containsKey(
                     payerAuthorization.getPaymentMethod().getPaymentMethodUrl())) {
                 throw new IOException("Unexpected: " + payerAuthorization.getPaymentMethod().getPaymentMethodUrl());
             }
-
             // Restore PaymentRequest
             PaymentRequest paymentRequest =
                 new PaymentRequest(new JSONObjectReader((JSONObjectWriter) 
                         session.getAttribute(WALLET_REQUEST_SESSION_ATTR)).getObject(PAYMENT_REQUEST_JSON));
             
             // The actual processing is here
-            if (processCall(walletResponse,
+            if (processCall(merchant,
+                            walletResponse,
                             paymentRequest, 
                             payerAuthorization,
                             session,

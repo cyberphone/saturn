@@ -20,9 +20,9 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
-import java.net.URL;
-
 import java.security.GeneralSecurityException;
+
+import java.util.LinkedHashMap;
 
 import javax.servlet.ServletException;
 
@@ -45,6 +45,7 @@ import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.PaymentRequest;
 import org.webpki.saturn.common.PayerAuthorization;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
@@ -58,7 +59,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    boolean processCall(JSONObjectReader walletResponse,
+    boolean processCall(MerchantDescriptor merchant,
+                        JSONObjectReader walletResponse,
                         PaymentRequest paymentRequest, 
                         PayerAuthorization payerAuthorization,
                         HttpSession session,
@@ -68,8 +70,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                         DebugData debugData, 
                         UrlHolder urlHolder) throws IOException, GeneralSecurityException {
         // Slightly different flows for card- and bank-to-bank authorizations
-        boolean cardPayment = payerAuthorization.getPaymentMethod().isCardPayment();
-        String payeeAuthorityUrl = cardPayment ? MerchantService.payeeAcquirerAuthorityUrl : MerchantService.payeeProviderAuthorityUrl;
+        PaymentMethods paymentMethodEnum = payerAuthorization.getPaymentMethod();
+        boolean cardPayment = paymentMethodEnum.isCardPayment();
+        String clientPaymentMethodUrl = paymentMethodEnum.getPaymentMethodUrl();
+        String payeeAuthorityUrl = merchant.paymentMethods.get(clientPaymentMethodUrl).authorityUrl;
         
         // Lookup of self (since it is provided by an external party)
         PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
@@ -101,14 +105,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
  
         TransactionOperation transactionOperation = new TransactionOperation();
-        String clientPaymentMethodUrl =
-                payerAuthorization.getPaymentMethod().getPaymentMethodUrl();
+        LinkedHashMap<String,AccountDataEncoder> receiveAccounts = 
+                merchant.paymentMethods.get(clientPaymentMethodUrl).receiverAccounts;
         AccountDataEncoder paymentBackendMethodEncoder = null;
         for (String backendDataContext : 
              providerAuthority.getPaymentBackendMethods(clientPaymentMethodUrl)) {
-            if (MerchantService.receiveAccounts.containsKey(backendDataContext)) {
-                paymentBackendMethodEncoder = 
-                        MerchantService.receiveAccounts.get(backendDataContext);
+            if (receiveAccounts.containsKey(backendDataContext)) {
+                paymentBackendMethodEncoder = receiveAccounts.get(backendDataContext);
                 break;
             }
         }
@@ -119,8 +122,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             return false;
         }
 
-        // Valid method. Find proper to request key and local id
-        PaymentMethodDescriptor paymentNetwork = MerchantService.supportedPaymentMethods.get(clientPaymentMethodUrl);
+        // Valid method. Find proper to request key and auhorityUrl
+        PaymentMethodDescriptor paymentNetwork = merchant.paymentMethods.get(clientPaymentMethodUrl);
 
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
@@ -132,7 +135,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         request.getRemoteAddr(),
                                         paymentRequest,
                                         paymentBackendMethodEncoder,
-                                        MerchantService.getReferenceId(),
+                                        merchant.getReferenceId(),
                                         paymentNetwork.signer);
 
         // Call Payer bank
@@ -191,7 +194,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 debugData.acquirerAuthority = ownProviderAuthority.getRoot();
             }
             resultData.transactionError =
-                processTransaction(transactionOperation,
+                processTransaction(merchant,
+                                   transactionOperation,
                                    // Just a copy since we don't have a complete scenario 
                                    paymentRequest.getAmount(),                                
                                    urlHolder,
@@ -220,7 +224,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return true;
     }
 
-    static TransactionResponse.ERROR processTransaction(TransactionOperation transactionOperation,
+    static TransactionResponse.ERROR processTransaction(MerchantDescriptor merchant,
+                                                        TransactionOperation transactionOperation,
                                                         BigDecimal actualAmount,
                                                         UrlHolder urlHolder,
                                                         DebugData debugData) throws IOException {
@@ -229,15 +234,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             TransactionRequest.encode(transactionOperation.authorizationResponse,
                                       transactionOperation.urlToCall,
                                       actualAmount,
-                                      MerchantService.getReferenceId(),
-                                      MerchantService.supportedPaymentMethods.get(
+                                      merchant.getReferenceId(),
+                                      merchant.paymentMethods.get(
                                               transactionOperation.authorizationResponse
                                                   .getAuthorizationRequest()
                                                       .getPaymentMethod()
                                                           .getPaymentMethodUrl()).signer);
         // Acquirer or Hybrid call
         JSONObjectReader response =
-            MerchantService.externalCalls.postJsonData(urlHolder, transactionOperation.urlToCall, transactionRequest);
+            MerchantService.externalCalls.postJsonData(urlHolder, 
+                                                       transactionOperation.urlToCall, 
+                                                       transactionRequest);
 
         if (debugData != null) {
             debugData.transactionRequest = new JSONObjectReader(transactionRequest);

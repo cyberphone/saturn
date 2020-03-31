@@ -18,12 +18,7 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.security.GeneralSecurityException;
-import java.security.PublicKey;
-
-import org.webpki.crypto.AsymSignatureAlgorithms;
-import org.webpki.crypto.SignatureWrapper;
-import org.webpki.crypto.AsymKeySignerInterface;
+import java.security.KeyPair;
 
 import org.webpki.json.JSONAsymKeySigner;
 
@@ -31,20 +26,11 @@ public class ServerAsymKeySigner extends JSONAsymKeySigner {
     
     private static final long serialVersionUID = 1L;
 
-    public ServerAsymKeySigner(final KeyStoreEnumerator key) throws IOException {
-        super(new AsymKeySignerInterface() {
-            @Override
-            public byte[] signData(byte[] data, AsymSignatureAlgorithms algorithm) throws IOException {
-                try {
-                    return new SignatureWrapper(algorithm, key.getPrivateKey()).update(data).sign();
-                } catch (GeneralSecurityException e) {
-                    throw new IOException (e);
-                }
-            }
-            @Override
-            public PublicKey getPublicKey() throws IOException {
-                return key.getPublicKey();
-            }
-        });
+    public ServerAsymKeySigner(KeyPair keyPair) throws IOException {
+        super(keyPair.getPrivate(), keyPair.getPublic(), null);
+    }
+
+    public ServerAsymKeySigner(KeyStoreEnumerator kse) throws IOException {
+        super(kse.getPrivateKey(), kse.getPublicKey(), null);
     }
 }

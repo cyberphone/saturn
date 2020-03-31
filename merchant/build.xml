@@ -103,8 +103,8 @@
       <replacefilter token="@merchant-base-url@" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="@payment-root@" value="${@banknetworkroot}.cer"/>
       <replacefilter token="@acquirer-root@" value="${@acquirernetworkroot}.cer"/>
-      <replacefilter token="@payee-acquirer-authority-url@" value="${@acquirerhost}/${@acquirerpath}/payees/${@merchantIdCardNetwork}"/>
-      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.url}/payees/${@merchantIdBankNetwork}"/>
+      <replacefilter token="@payee-acquirer-authority-url@" value="${@acquirerhost}/${@acquirerpath}/payees/"/>
+      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.url}/payees/"/>
       <replacefilter token="@no-matching-methods-url@" value="${@keyprovhost}/${@keyprovpath}"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusual.card}"/>
@@ -137,7 +137,7 @@
          <include name="${@banknetworkroot}.cer"/>
          <include name="${@acquirernetworkroot}.cer"/>
       </zipfileset>
-      <zipfileset file="accounts.json" prefix="${class_war_path}"/>
+      <zipfileset file="merchants.json" prefix="${class_war_path}"/>
       <zipfileset dir="debug-samples" prefix="${class_war_path}"/>
       <fileset dir="web"/>
     </war>

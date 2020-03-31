@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-public class ShoppingServlet extends HttpServlet {
+public class ShoppingServlet extends HttpServlet implements MerchantSessionProperties {
 
     private static final long serialVersionUID = 1L;
     
@@ -67,7 +67,8 @@ public class ShoppingServlet extends HttpServlet {
         if (session == null) {
             ErrorServlet.sessionTimeout(response);
             return;
-         }
+        }
+        session.setAttribute(MERCHANT_HOMEPAGE_ATTR, "demomerchant.com");
         HTML.merchantPage(response, new SavedShoppingCart());
     }
 }

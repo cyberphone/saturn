@@ -56,6 +56,7 @@ public class GasStationServlet extends HttpServlet implements MerchantSessionPro
             return;
         }
         session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPayments.GAS_STATION.toString());
+        session.setAttribute(MERCHANT_HOMEPAGE_ATTR, "planetgas.com");
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
         savedShoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;
         session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
 import java.security.KeyStore;
 
 import java.util.LinkedHashMap;
@@ -29,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.http.HttpSession;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
@@ -45,9 +47,10 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AccountDataEncoder;
+import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.Currencies;
-import org.webpki.saturn.common.KeyStoreEnumerator;
+import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
 import org.webpki.saturn.common.CryptoUtils;
@@ -86,7 +89,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String W3C_PAYMENT_REQUEST_HOST     = "w3c_payment_request_host";
 
-    static final String ACCOUNTS                     = "accounts.json";
+    static final String MERCHANTS                    = "merchants.json";
 
     static final String VERSION_CHECK                = "android_webpki_versions";
 
@@ -104,13 +107,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static JSONDecoderCache knownBackendAccountTypes = new JSONDecoderCache();
 
-    static String payeeAcquirerAuthorityUrl;
-    
-    static String payeeProviderAuthorityUrl;
-    
     static String noMatchingMethodsUrl;
 
     static Currencies currency;
+    
+    static LinkedHashMap<String,MerchantDescriptor> merchants = new LinkedHashMap<>();
 
     // Web2Native Bridge constants
     static String w2nbWalletName;
@@ -127,17 +128,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     private static boolean slowOperation;
 
-    private static int referenceId = 1000000;
-
     static String grantedVersions;
 
     static boolean desktopWallet;
 
     static String merchantBaseUrl;
-
-    static String getReferenceId() {
-        return "#" + (referenceId++);
-    }
 
     static void slowOperationSimulator() throws InterruptedException {
         if (slowOperation) {
@@ -163,19 +158,48 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
-    void addPaymentNetwork(String keyIdProperty, 
-                           String name) throws IOException {
-        KeyStoreEnumerator kse = new KeyStoreEnumerator(getResource(keyIdProperty),
-                                                        getPropertyString(KEYSTORE_PASSWORD));
-        PaymentMethodDescriptor paymentNetwork = 
-            new PaymentMethodDescriptor(new ServerAsymKeySigner(kse),
-                                        name,
-                                        KEY_HASH_ALGORITHM,
-                                        CryptoUtils.getJwkThumbPrint(kse.getPublicKey(), 
-                                                                     KEY_HASH_ALGORITHM));
-        supportedPaymentMethods.put(name, paymentNetwork);
+    void addMerchant(JSONObjectReader merchant) throws IOException {
+        String homePage = merchant.getString(BaseProperties.HOME_PAGE_JSON);
+        String commonName = merchant.getString(BaseProperties.COMMON_NAME_JSON);
+        LinkedHashMap<String,PaymentMethodDescriptor> pmd = new LinkedHashMap<>();
+        JSONArrayReader paymentNetworks = merchant.getArray("paymentNetworks");
+        do {
+            JSONObjectReader paymentNetwork = paymentNetworks.getObject();
+            String paymentMethodUrl = paymentNetwork.getString(BaseProperties.PAYMENT_METHOD_JSON);
+            PaymentMethods paymentMethod = PaymentMethods.fromTypeUrl(paymentMethodUrl);
+            String authorityUrl = getPropertyString(paymentMethod.isCardPayment() ?
+                               PAYEE_ACQUIRER_AUTHORITY_URL : PAYEE_PROVIDER_AUTHORITY_URL) +
+                    PayeeCoreProperties.createUrlSafeId(
+                            paymentNetwork.getString(BaseProperties.LOCAL_PAYEE_ID_JSON));
+            HashAlgorithms keyHashAlgorithm = 
+                    CryptoUtils.getHashAlgorithm(paymentNetwork, "keyHashAlgorithm");
+            KeyPair keyPair = paymentNetwork.getObject("key").getKeyPair();
+            LinkedHashMap<String,AccountDataEncoder> receiveAccounts = new LinkedHashMap<>();
+            LinkedHashMap<String,AccountDataEncoder> sourceAccounts = new LinkedHashMap<>();
+            JSONArrayReader payeeAccounts = paymentNetwork.getArray("payeeAccounts");
+            do {
+                AccountDataDecoder decoder = (AccountDataDecoder) knownBackendAccountTypes.parse(
+                        payeeAccounts.getObject());
+                receiveAccounts.put(decoder.getContext(), AccountDataEncoder.create(decoder, true));
+                // We make it simple here and refund from the same account we receive to
+                sourceAccounts.put(decoder.getContext(), AccountDataEncoder.create(decoder, false));
+            } while (payeeAccounts.hasMore());
+            pmd.put(paymentMethodUrl,
+                    new PaymentMethodDescriptor(authorityUrl,
+                                                new ServerAsymKeySigner(keyPair),
+                                                keyHashAlgorithm,
+                                                CryptoUtils.getJwkThumbPrint(keyPair.getPublic(),
+                                                                             keyHashAlgorithm), 
+                                                receiveAccounts, 
+                                                sourceAccounts));
+        } while (paymentNetworks.hasMore());
+        merchants.put(homePage, new MerchantDescriptor(homePage, commonName, pmd));
     }
 
+    public static MerchantDescriptor getMerchant(HttpSession session) {
+        return merchants.get((String)session.getAttribute(
+                MerchantSessionProperties.MERCHANT_HOMEPAGE_ATTR));
+    }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
@@ -191,31 +215,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             
             merchantBaseUrl = getPropertyString(MERCHANT_BASE_URL);
 
-            // Should be common for all payment networks...
-            merchantCommonName = getPropertyString(MERCHANT_COMMON_NAME);
-            merchantHomePage = getPropertyString(MERCHANT_HOME_PAGE);
-
             // The standard payment networks supported by the Saturn demo
-            for (PaymentMethods paymentMethod : PaymentMethods.values()) {
-                if (paymentMethod != PaymentMethods.UNUSUAL_CARD || 
-                    getPropertyBoolean(ADD_UNUSUAL_CARD)) {
-                    addPaymentNetwork(paymentMethod == PaymentMethods.SUPER_CARD ?
-                            MERCHANT_CARD_NETWORK_KEY : MERCHANT_BANK_NETWORK_KEY,
-                            paymentMethod.getPaymentMethodUrl());
-                }
-            }
-
             knownBackendAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
             knownBackendAccountTypes.addToCache(se.bankgirot.BGAccountDataDecoder.class);
-            JSONArrayReader accounts = readJSONFile(ACCOUNTS).getJSONArrayReader();
+
+            JSONArrayReader merchants = readJSONFile(MERCHANTS).getJSONArrayReader();
             do {
-                JSONObjectReader accountObject = accounts.getObject();
-                AccountDataDecoder decoder = 
-                        (AccountDataDecoder) knownBackendAccountTypes.parse(accountObject);
-                receiveAccounts.put(decoder.getContext(), AccountDataEncoder.create(decoder, true));
-                // We make it simple here and refund from the same account we receive to
-                sourceAccounts.put(decoder.getContext(), AccountDataEncoder.create(decoder, false));
-            } while (accounts.hasMore());
+                addMerchant(merchants.getObject());
+            } while (merchants.hasMore());
 
             paymentRoot = getRoot(PAYMENT_ROOT);
 
@@ -228,10 +235,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             useW3cPaymentRequest = getPropertyBoolean(USE_W3C_PAYMENT_REQUEST);
 
             w3cPaymentRequestUrl = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
-
-            payeeProviderAuthorityUrl = getPropertyString(PAYEE_PROVIDER_AUTHORITY_URL);
-
-            payeeAcquirerAuthorityUrl = getPropertyString(PAYEE_ACQUIRER_AUTHORITY_URL);
 
             String noMatching = getPropertyString(NO_MATCHING_METHODS_URL);
             if (noMatching.length() != 0) {

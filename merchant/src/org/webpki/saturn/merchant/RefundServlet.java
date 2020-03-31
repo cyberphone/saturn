@@ -66,6 +66,7 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
                 ErrorServlet.systemFail(response, "Missing result data");
                 return;
             }
+            MerchantDescriptor merchant = MerchantService.getMerchant(session);
 
             boolean debug = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             
@@ -90,17 +91,15 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
             
             // We do the assumption here that SEPA is always useful for receiving and sending money
             String context = new org.payments.sepa.SEPAAccountDataDecoder().getContext();
-            JSONObjectWriter refundRequestData = 
+            PaymentMethodDescriptor pmd = merchant.paymentMethods.get(
+                    authorizationRequest.getPaymentMethod().getPaymentMethodUrl());
+            JSONObjectWriter refundRequestData =
                 RefundRequest.encode(resultData.optionalRefund,
                                      refundUrl,
                                      resultData.amount,
-                                     MerchantService.sourceAccounts.get(context),
-                                     MerchantService.getReferenceId(),
-                                     MerchantService.supportedPaymentMethods.get(
-                                             authorizationRequest
-                                                 .getPaymentMethod()
-                                                     .getPaymentMethodUrl()).signer);
-        
+                                     pmd.sourceAccounts.get(context),
+                                     merchant.getReferenceId(),
+                                     pmd.signer);
             JSONObjectReader refundResponseData =
                 MerchantService.externalCalls.postJsonData(urlHolder, refundUrl, refundRequestData);
 

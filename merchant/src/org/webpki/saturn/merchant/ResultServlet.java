@@ -90,10 +90,12 @@ public class ResultServlet extends HttpServlet implements MerchantSessionPropert
             resultData.amount = actualAmount;
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
             urlHolder.setUrl(reservation.urlToCall);
-            resultData.transactionError = AuthorizationServlet.processTransaction(reservation,
-                                                                                  actualAmount,
-                                                                                  urlHolder,
-                                                                                  debugData);
+            resultData.transactionError = 
+                    AuthorizationServlet.processTransaction(MerchantService.getMerchant(session),
+                                                            reservation,
+                                                            actualAmount,
+                                                            urlHolder,
+                                                            debugData);
             HTML.gasStationResultPage(response,
                                       fuelType,
                                       decilitres,
