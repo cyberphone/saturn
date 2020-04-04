@@ -18,8 +18,6 @@ package org.webpki.saturn.merchant;
 
 import java.util.LinkedHashMap;
 
-import org.webpki.crypto.HashAlgorithms;
-
 import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 
@@ -27,21 +25,15 @@ public class PaymentMethodDescriptor {
     
     String authorityUrl;              // Merchant authorityUrl
     ServerAsymKeySigner signer;       // Holding merchant/method specific key
-    byte[] keyHashValue;              // For binding a user authorization to a merchant request signature key
-    HashAlgorithms keyHashAlgorithm;  // Using this algorithm
     LinkedHashMap<String, AccountDataEncoder> receiverAccounts;  // Where to receive money
     LinkedHashMap<String, AccountDataEncoder> sourceAccounts;    // For refunds
     
     PaymentMethodDescriptor(String authorityUrl,
                             ServerAsymKeySigner signer,
-                            HashAlgorithms keyHashAlgorithm,
-                            byte[] keyHashValue,
                             LinkedHashMap<String, AccountDataEncoder> receiverAccounts,
                             LinkedHashMap<String, AccountDataEncoder> sourceAccounts) {
         this.authorityUrl = authorityUrl;
         this.signer = signer;
-        this.keyHashAlgorithm = keyHashAlgorithm;
-        this.keyHashValue = keyHashValue;
         this.receiverAccounts = receiverAccounts;
         this.sourceAccounts = sourceAccounts;
     }

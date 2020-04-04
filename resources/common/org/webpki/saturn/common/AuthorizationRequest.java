@@ -40,7 +40,7 @@ public class AuthorizationRequest implements BaseProperties {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
-        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
+        payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
@@ -95,9 +95,9 @@ public class AuthorizationRequest implements BaseProperties {
         return recepientUrl;
     }
 
-    String authorityUrl;
+    String payeeAuthorityUrl;
     public String getAuthorityUrl() {
-        return authorityUrl;
+        return payeeAuthorityUrl;
     }
 
     String referenceId;
@@ -117,7 +117,7 @@ public class AuthorizationRequest implements BaseProperties {
 
     public static JSONObjectWriter encode(Boolean testMode,
                                           String recepientUrl,
-                                          String authorityUrl,
+                                          String payeeAuthorityUrl,
                                           PaymentMethods paymentMethod,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
@@ -128,7 +128,7 @@ public class AuthorizationRequest implements BaseProperties {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECEPIENT_URL_JSON, recepientUrl)
-            .setString(AUTHORITY_URL_JSON, authorityUrl)
+            .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
@@ -150,15 +150,13 @@ public class AuthorizationRequest implements BaseProperties {
                                      option);
         if (!ArrayUtil.compare(authorizationData.requestHash, 
                                paymentRequest.getRequestHash(authorizationData.requestHashAlgorithm))) {
-            throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\" value");
+            throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
         }
         if (!authorizationData.paymentMethodUrl.equals(paymentMethod.paymentMethodUrl)) {
             throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
-        if (!ArrayUtil.compare(CryptoUtils.getJwkThumbPrint(signatureDecoder.getPublicKey(),
-                                                            authorizationData.keyHashAlgorithm),
-                               authorizationData.keyHash)) {
-            throw new IOException("Non-matching \"" + KEY_HASH_JSON + "\"");
+        if (!authorizationData.payeeAuthorityUrl.equals(payeeAuthorityUrl)) {
+            throw new IOException("Non-matching \"" + PAYEE_AUTHORITY_URL_JSON + "\"");
         }
         return authorizationData;
     }

@@ -41,12 +41,8 @@ public class AuthorizationDataDecoder implements BaseProperties {
                                                             JSONCryptoHelper.ALGORITHM_JSON);
         requestHash = requestHashObject.getBinary(VALUE_JSON);
 
-        JSONObjectReader keyHashObject = rd.getObject(KEY_HASH_JSON);
-        keyHashAlgorithm = CryptoUtils.getHashAlgorithm(keyHashObject, 
-                                                        JSONCryptoHelper.ALGORITHM_JSON);
-        keyHash = keyHashObject.getBinary(VALUE_JSON);
-
-        domainName = rd.getString(DOMAIN_NAME_JSON);
+        payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
+        payeeHost = rd.getString(PAYEE_HOST_JSON);
 
         paymentMethodUrl = rd.getString(PAYMENT_METHOD_JSON);
         credentialId = rd.getString(CREDENTIAL_ID_JSON);
@@ -55,7 +51,7 @@ public class AuthorizationDataDecoder implements BaseProperties {
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
         dataEncryptionAlgorithm = DataEncryptionAlgorithms
             .getAlgorithmFromId(encryptionParameters.getString(JSONCryptoHelper.ALGORITHM_JSON));
-        dataEncryptionKey = encryptionParameters.getBinary(KEY_JSON);
+        dataEncryptionKey = encryptionParameters.getBinary(ENCRYPTION_KEY_JSON);
 
         if (rd.hasProperty(USER_RESPONSE_ITEMS_JSON)) {
             JSONArrayReader ar = rd.getArray(USER_RESPONSE_ITEMS_JSON);
@@ -69,6 +65,10 @@ public class AuthorizationDataDecoder implements BaseProperties {
 
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
+        JSONObjectReader platform = rd.getObject(PLATFORM_JSON);
+        clientPlatform = new ClientPlatform(platform.getString(NAME_JSON),
+                                            platform.getString(VERSION_JSON),
+                                            platform.getString(VENDOR_JSON));
         publicKey = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, signatureOptions).getPublicKey();
         rd.checkForUnread();
     }
@@ -83,14 +83,9 @@ public class AuthorizationDataDecoder implements BaseProperties {
         return requestHash;
     }
 
-    HashAlgorithms keyHashAlgorithm;
-    public HashAlgorithms getKeyHashAlgorithm() {
-        return keyHashAlgorithm;
-    }
-
-    byte[] keyHash;
-    public byte[] getKeyHash() {
-        return keyHash;
+    String payeeAuthorityUrl;
+    public String getPayeeAuthorityUrl() {
+        return payeeAuthorityUrl;
     }
 
     DataEncryptionAlgorithms dataEncryptionAlgorithm;
@@ -108,9 +103,9 @@ public class AuthorizationDataDecoder implements BaseProperties {
         return optionalUserResponseItems;
     }
 
-    String domainName;
-    public String getDomainName() {
-        return domainName;
+    String payeeHost;
+    public String getPayeeHost() {
+        return payeeHost;
     }
 
     String paymentMethodUrl;
@@ -136,6 +131,11 @@ public class AuthorizationDataDecoder implements BaseProperties {
     Software software;
     public Software getSoftware() {
         return software;
+    }
+
+    ClientPlatform clientPlatform;
+    ClientPlatform getClientPlatform() {
+        return clientPlatform;
     }
 
     PublicKey publicKey;

@@ -39,16 +39,16 @@ public class AuthorizationDataEncoder implements BaseProperties {
 
     public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           HashAlgorithms reguestHashAlgorithm,
-                                          String domainName,
+                                          String payeeAuthorityUrl,
+                                          String payeeHost,
                                           String paymentMethodUrl,
-                                          HashAlgorithms keyHashAlgorithm,
-                                          byte[] keyHash,
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
                                           GregorianCalendar timeStamp,
+                                          ClientPlatform clientPlatform,
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
@@ -56,17 +56,14 @@ public class AuthorizationDataEncoder implements BaseProperties {
                            reguestHashAlgorithm.getJoseAlgorithmId())
                 .setBinary(JSONCryptoHelper.VALUE_JSON, 
                            paymentRequest.getRequestHash(reguestHashAlgorithm)))
-            .setObject(KEY_HASH_JSON, new JSONObjectWriter()
-                .setString(JSONCryptoHelper.ALGORITHM_JSON, 
-                           keyHashAlgorithm.getJoseAlgorithmId())
-                .setBinary(JSONCryptoHelper.VALUE_JSON, keyHash))
-            .setString(DOMAIN_NAME_JSON, domainName)
+            .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
+            .setString(PAYEE_HOST_JSON, payeeHost)
             .setString(PAYMENT_METHOD_JSON, paymentMethodUrl)
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
-                .setBinary(KEY_JSON, dataEncryptionKey));
+                .setBinary(ENCRYPTION_KEY_JSON, dataEncryptionKey));
         if (optionalUserResponseItems != null && optionalUserResponseItems.length > 0) {
             JSONArrayWriter aw = wr.setArray(USER_RESPONSE_ITEMS_JSON);
             for (UserResponseItem challengeResult : optionalUserResponseItems) {
@@ -75,34 +72,38 @@ public class AuthorizationDataEncoder implements BaseProperties {
         }
         return wr.setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
                  .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
+                 .setObject(PLATFORM_JSON, new JSONObjectWriter()
+                     .setString(NAME_JSON, clientPlatform.name)
+                     .setString(VERSION_JSON, clientPlatform.version)
+                     .setString(VENDOR_JSON, clientPlatform.vendor))
                  .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 
    public static JSONObjectWriter encode(PaymentRequest paymentRequest,
                                           HashAlgorithms requestHashAlgorithm,
-                                          String domainName,
+                                          String payeeAuthorityUrl,
+                                          String payeeHost,
                                           String paymentMethod,
-                                          HashAlgorithms keyHashAlgorithm,
-                                          byte[] keyHashValue,
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
                                           AsymSignatureAlgorithms signatureAlgorithm,
+                                          ClientPlatform clientPlatform,
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
                       requestHashAlgorithm,
-                      domainName,
+                      payeeAuthorityUrl,
+                      payeeHost,
                       paymentMethod,
-                      keyHashAlgorithm,
-                      keyHashValue,
                       credentialId,
                       accountId,
                       dataEncryptionKey,
                       dataEncryptionAlgorithm,
                       optionalUserResponseItems,
                       new GregorianCalendar(),
+                      clientPlatform,
                       new JSONAsymKeySigner(signer).setSignatureAlgorithm(signatureAlgorithm));
     }
 }

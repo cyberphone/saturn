@@ -36,8 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.crypto.HashAlgorithms;
-
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecryptionDecoder;
@@ -147,11 +145,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                   PaymentMethods paymentMethod) throws IOException {
         methodList.setObject()
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
-            .setObject(KEY_HASH_JSON, new JSONObjectWriter()
-                .setString(JSONCryptoHelper.ALGORITHM_JSON, 
-                           HashAlgorithms.SHA256.getJoseAlgorithmId())
-                .setBinary(JSONCryptoHelper.VALUE_JSON,
-                           HashAlgorithms.SHA256.digest(new byte[]{9,6})));  // Dummy data
+            .setString(PAYEE_AUTHORITY_URL_JSON, "https://blah/blu");  // Dummy data
     }
     
     private void returnJson(HttpServletResponse response, JSONObjectWriter json) throws IOException {

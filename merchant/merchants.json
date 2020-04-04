@@ -4,7 +4,6 @@
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",
     "localPayeeId": "86344",
-    "keyHashAlgorithm": "S256",
     "key": {
       "kty": "EC",
       "crv": "P-256",
@@ -24,7 +23,6 @@
   },{
     "paymentMethod": "https://supercard.com",
     "localPayeeId": "1077342",
-    "keyHashAlgorithm": "S256",
     "key": {
       "kty": "EC",
       "crv": "P-256",
@@ -44,7 +42,6 @@
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",
     "localPayeeId": "973277",
-    "keyHashAlgorithm": "S256",
     "key": {
       "kty": "EC",
       "crv": "P-256",
@@ -64,7 +61,6 @@
   },{
     "paymentMethod": "https://supercard.com",
     "localPayeeId": "8888",
-    "keyHashAlgorithm": "S256",
     "key": {
       "kty": "EC",
       "crv": "P-256",

@@ -31,10 +31,8 @@ public interface BaseProperties {
     String LABEL_JSON                       = "label";                      // ProviderUserResponse
     String ENCRYPTED_MESSAGE_JSON           = "encryptedMessage";           // ProviderUserResponse
 
-    String KEY_JSON                         = "key";                        // Wallet-originated encryption key
+    String ENCRYPTION_KEY_JSON              = "encryptionKey";              // Wallet-originated encryption key
     
-    String KEY_HASH_JSON                    = "keyHash";                    // For binding authorization to request signature
-
     String USER_RESPONSE_ITEMS_JSON         = "userResponseItems";          // Result of ProviderUserResponse 
 
     String NO_MATCHING_METHODS_URL_JSON     = "noMatchingMethodsUrl";       // Optional tip by Payee to Payer in case nothing matches
@@ -58,6 +56,7 @@ public interface BaseProperties {
     String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
     String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Encrypted Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider authority object
+    String PAYEE_AUTHORITY_URL_JSON         = "payeeAuthorityUrl";          // URL to peyee authority object
     String HOSTING_PROVIDER_JSON            = "hostingProvider";            // Optional object in ProviderAuthority
     String HOME_PAGE_JSON                   = "homePage";                   // URL to the public Web of the entity
     String SUPPORTED_PAYMENT_METHODS_JSON   = "supportedPaymentMethods";    // List of accepted payment methods (URLs)
@@ -72,8 +71,10 @@ public interface BaseProperties {
     String PAYEE_RECEIVE_ACCOUNT_JSON       = "payeeReceiveAccount";        // Holding payee account data
     String PAYEE_SOURCE_ACCOUNT_JSON        = "payeeSourceAccount";         // For refunds
     String REQUEST_HASH_JSON                = "requestHash";                // Wallet authorization
-    String DOMAIN_NAME_JSON                 = "domainName";
+    String PAYEE_HOST_JSON                  = "payeeHost";                  // As given to the wallet
     String ACCOUNT_VERIFIER_JSON            = "accountVerifier";            // Option for "PayeeAuthority"
+    String PLATFORM_JSON                    = "platform";                   // Wallet (client) platform
+    String VENDOR_JSON                      = "vendor";                     // Hardware
     String HASHED_PAYEE_ACCOUNTS_JSON       = "hashedPayeeAccounts";        //    -"-
     String NONCE_JSON                       = "nonce";                      // For usage in methods together with the option above
     String SIGNATURE_ALGORITHM_JSON         = "signatureAlgorithm";

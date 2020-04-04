@@ -37,6 +37,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.AuthorizationDataEncoder;
 import org.webpki.saturn.common.BaseProperties;
+import org.webpki.saturn.common.ClientPlatform;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PaymentMethods;
@@ -136,16 +137,16 @@ public class DebugData implements Serializable {
         return new JSONObjectReader(AuthorizationDataEncoder.encode(
                                  new PaymentRequest(new JSONObjectReader(paymentRequest)),
                                  HashAlgorithms.SHA256,
+                                 "https://payments.bigbank.com/payees/86344",
                                  "demomerchant.com", 
                                  PaymentMethods.BANK_DIRECT.getPaymentMethodUrl(),
-                                 HashAlgorithms.SHA256,
-                                 HashAlgorithms.SHA256.digest(WALLET_SESSION_ENCRYPTION_KEY),
                                  "54674448", 
                                  "FR7630002111110020050012733", 
                                   WALLET_SESSION_ENCRYPTION_KEY, 
                                  DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
                                  userResponseItems,
                                  userResponseItems == null ? then : authTime,
+                                 new ClientPlatform("Android", "10.0", "Huawei"),
                                  new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));
     }
 
@@ -182,7 +183,7 @@ public class DebugData implements Serializable {
                             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.PLAIN_ENCRYPTION))
                         .getDecryptedData(
                     userAuthzSample.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON)
-                        .getBinary(BaseProperties.KEY_JSON))));            
+                        .getBinary(BaseProperties.ENCRYPTION_KEY_JSON))));            
         } catch (Exception e) {
             new RuntimeException(e);
         }

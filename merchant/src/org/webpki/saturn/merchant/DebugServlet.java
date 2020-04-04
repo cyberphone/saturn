@@ -164,7 +164,7 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
-        updateSpecific(jsonTree, rewriter, DOMAIN_NAME_JSON, "demomerchant.com");
+        updateSpecific(jsonTree, rewriter, PAYEE_HOST_JSON, "demomerchant.com");
         updateSpecific(jsonTree, rewriter, CLIENT_IP_ADDRESS_JSON, "220.13.198.144");
     }
 
@@ -254,8 +254,9 @@ class DebugPrintout implements BaseProperties {
             debugData.InvokeWallet.removeProperty(NO_MATCHING_METHODS_URL_JSON);
         }
         fancyBox(debugData.InvokeWallet);
-        descriptionStdMargin("Note that payment networks <i>may</i> have their own <b>Merchant</b> keys, " +
-            "which is why there is a " + keyWord(KEY_HASH_JSON) + " for each " + 
+        descriptionStdMargin("Note that payment networks would normally host their own " +
+            "<b>Merchant</b> authority objects (and associated keys), " +
+            "which is why there is a " + keyWord(PAYEE_AUTHORITY_URL_JSON) + " for each " + 
             keyWord(PAYMENT_METHOD_JSON) + ".");
         if (debugData.gasStation) {
             descriptionStdMargin("<p>Note that there is a property " +
@@ -316,12 +317,12 @@ class DebugPrintout implements BaseProperties {
 
         fancyBox(DebugData.userAuthzSample);
         descriptionStdMargin("Explanations:<p>" +
-            keyWord(REQUEST_HASH_JSON) + " holds the hash of the " +
+            keyWord(REQUEST_HASH_JSON) + " holds a by the <b>Wallet</b> calculated hash of the " +
             keyWord(PAYMENT_REQUEST_JSON) + " object.</p><p>" +
-            keyWord(KEY_HASH_JSON) + " holds the <i>declared</i> hash of the key to be used by the " +
-            "<b>Merchant</b> for signing the associated " + keyWord(Messages.AUTHORIZATION_REQUEST) + 
+            keyWord(PAYEE_AUTHORITY_URL_JSON) + " binds a <i>declared</i> " +
+            "<b>Merchant</b> authority object (holding keys) to an anticipated " + keyWord(Messages.AUTHORIZATION_REQUEST) + 
             " message.  See also " + keyWord(Messages.PAYMENT_CLIENT_REQUEST) + ".</p><p>" +
-            keyWord(DOMAIN_NAME_JSON) + " holds the DNS name of the <b>Merchant</b>.</p><p>" +
+            keyWord(PAYEE_HOST_JSON) + " holds the host name of the <b>Merchant</b> as recorded by the <b>Wallet</b>.</p><p>" +
             keyWord(PAYMENT_METHOD_JSON) + " holds the payment method associated with the selected virtual card.</p><p>" +
             keyWord(CREDENTIAL_ID_JSON) + " holds a serial number or similar unique identifier associated with the selected virtual card.</p><p>" +
             keyWord(ACCOUNT_ID_JSON) + " holds an account identifier associated with the selected virtual card. " +
@@ -333,7 +334,8 @@ class DebugPrintout implements BaseProperties {
             "be omitted</i> if " + keyWord(CREDENTIAL_ID_JSON) + " is sufficient for locating the proper " +
             "signature key.</p><p>" +
             "Note that the algorithms to use are stored in the selected virtual card. " +
-            "That is, they are exclusively defined by the <i>issuer</i>, but must be within the limits of the <b>Wallet</b> software.</p>");
+            "That is, algorithms are exclusively defined by the <i>issuer</i>, although they must " +
+            "(of course) be within the limits of the <b>Wallet</b> software.</p>");
         description("<p id=\"provuserresp\" style=\"text-align:center;font-weight:bold;font-size:10pt;font-family:" + 
             HTML.FONT_ARIAL + "\">" +
             PROV_USER_RESPONSE + "</p>" +
@@ -504,11 +506,13 @@ class DebugPrintout implements BaseProperties {
                 keyWord(PAYMENT_REQUEST_JSON) +
                 " object.</li>" +
                 "<li>Verify that the " +
-                keyWord(KEY_HASH_JSON) +
-                " in the user authorization object matches the hash of the signature key (in JWK " +
-                keyWord("Thumbprint") + " format), in the " +
+                keyWord(PAYEE_AUTHORITY_URL_JSON) +
+                " matches the copy in the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +
-                " object.</li>" +
+                " object. Although this this duplication of data indeed is " +
+                "<i>technically redundant</i>, it was added " +
+                "to enable filtering out &quot;bad&quot; merchants <i>before</i> taking on " +
+                "user authorization.</li>" +
                 "<li>Verify that the " +
                 keyWord(PAYMENT_METHOD_JSON) + " in the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +

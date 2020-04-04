@@ -16,7 +16,27 @@
  */
 package org.webpki.saturn.common;
 
-public class Version {
-    public final static String PROTOCOL = "0.64";
-    public final static String DATE     = "2020-04-04";
+public class ClientPlatform {
+
+    String name;
+    String version;
+    String vendor;
+
+    public String getName() {
+        return name;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public String getVendor() {
+        return vendor;
+    }
+
+    public ClientPlatform(String name, String version, String vendor) {
+        this.name = name;
+        this.version = version;
+        this.vendor = vendor;
+    }
 }

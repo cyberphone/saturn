@@ -33,7 +33,7 @@ const BaseProperties = {
     LENGTH_JSON                     : 'length',                     // ProviderUserResponse
     ENCRYPTED_MESSAGE_JSON          : 'encryptedMessage',           // ProviderUserResponse
 
-    KEY_JSON                        : 'key',                        // Wallet-originated encryption key
+    ENCRYPTION_KEY_JSON                        : 'key',                        // Wallet-originated encryption key
 
     USER_RESPONSE_ITEMS_JSON        : 'userResponseItems',          // Result of ProviderUserResponse 
 
@@ -72,7 +72,7 @@ const BaseProperties = {
     PAYEE_RECEIVE_ACCOUNT_JSON      : 'payeeReceiveAccount',        // Holding payee account data
     PAYEE_SOURCE_ACCOUNT_JSON       : 'payeeSourceAccount',         // For refunds
     REQUEST_HASH_JSON               : 'requestHash',                // Wallet authorization
-    DOMAIN_NAME_JSON                : 'domainName',
+    PAYEE_HOST_JSON                : 'domainName',
     ACCOUNT_VERIFIER_JSON           : 'accountVerifier',            // Option for "PayeeAuthority"
     HASHED_PAYEE_ACCOUNTS_JSON      : 'hashedPayeeAccounts',        //    -"-
     NONCE_JSON                      : 'nonce',                      // For usage in methods together with the option above

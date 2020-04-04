@@ -34,7 +34,6 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
-import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONObjectReader;
@@ -53,7 +52,6 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.ExternalCalls;
-import org.webpki.saturn.common.CryptoUtils;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -168,12 +166,10 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             JSONObjectReader paymentNetwork = paymentNetworks.getObject();
             String paymentMethodUrl = paymentNetwork.getString(BaseProperties.PAYMENT_METHOD_JSON);
             PaymentMethods paymentMethod = PaymentMethods.fromTypeUrl(paymentMethodUrl);
-            String authorityUrl = getPropertyString(paymentMethod.isCardPayment() ?
+            String payeeAuthorityUrl = getPropertyString(paymentMethod.isCardPayment() ?
                                PAYEE_ACQUIRER_AUTHORITY_URL : PAYEE_PROVIDER_AUTHORITY_URL) +
                     PayeeCoreProperties.createUrlSafeId(
                             paymentNetwork.getString(BaseProperties.LOCAL_PAYEE_ID_JSON));
-            HashAlgorithms keyHashAlgorithm = 
-                    CryptoUtils.getHashAlgorithm(paymentNetwork, "keyHashAlgorithm");
             KeyPair keyPair = paymentNetwork.getObject("key").getKeyPair();
             LinkedHashMap<String,AccountDataEncoder> receiveAccounts = new LinkedHashMap<>();
             LinkedHashMap<String,AccountDataEncoder> sourceAccounts = new LinkedHashMap<>();
@@ -186,11 +182,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                 sourceAccounts.put(decoder.getContext(), AccountDataEncoder.create(decoder, false));
             } while (payeeAccounts.hasMore());
             pmd.put(paymentMethodUrl,
-                    new PaymentMethodDescriptor(authorityUrl,
+                    new PaymentMethodDescriptor(payeeAuthorityUrl,
                                                 new ServerAsymKeySigner(keyPair),
-                                                keyHashAlgorithm,
-                                                CryptoUtils.getJwkThumbPrint(keyPair.getPublic(),
-                                                                             keyHashAlgorithm), 
                                                 receiveAccounts, 
                                                 sourceAccounts));
         } while (paymentNetworks.hasMore());

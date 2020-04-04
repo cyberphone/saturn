@@ -18,12 +18,11 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.security.PublicKey;
-
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
+
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
@@ -35,13 +34,6 @@ public class CryptoUtils {
     public static byte[] getJsonHash(JSONObjectWriter request, 
                                      HashAlgorithms hashAlgorithm) throws IOException {
         return hashAlgorithm.digest(request.serializeToBytes(JSONOutputFormats.CANONICALIZED));
-    }
-
-    public static byte[] getJwkThumbPrint(PublicKey publicKey, 
-                                          HashAlgorithms hashAlgorithm) throws IOException {
-        return getJsonHash(JSONObjectWriter.createCorePublicKey(publicKey, 
-                                                                AlgorithmPreferences.JOSE),
-                           hashAlgorithm);
     }
 
     public static HashAlgorithms getHashAlgorithm(JSONObjectReader rd, String keyWord) 

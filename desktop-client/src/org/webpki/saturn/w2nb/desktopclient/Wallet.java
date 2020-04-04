@@ -83,7 +83,6 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
@@ -99,7 +98,7 @@ import org.webpki.util.ArrayUtil;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataDecoder;
-import org.webpki.saturn.common.CryptoUtils;
+import org.webpki.saturn.common.ClientPlatform;
 import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.AuthorizationDataEncoder;
@@ -174,14 +173,13 @@ public class Wallet {
 
     static class Account {
         String paymentMethod;
-        HashAlgorithms keyHashAlgorithm;
-        byte[] keyHashValue;
+        String payeeAuthorityUrl;
         HashAlgorithms requestHashAlgorithm;
         String credentialId;
         String accountId;
         ImageIcon cardIcon;
         AsymSignatureAlgorithms signatureAlgorithm;
-        String authorityUrl;
+        String providerAuthorityUrl;
         String optionalKeyId;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
@@ -189,24 +187,22 @@ public class Wallet {
         BigDecimal tempBalanceFix;
         
         Account(String paymentMethod,
+                String payeeAuthorityUrl,
                 HashAlgorithms requestHashAlgorithm,
-                HashAlgorithms keyHashAlgorithm,
-                byte[] keyHashValue,
                 String credentialId,
                 String accountId,
                 ImageIcon cardIcon,
                 AsymSignatureAlgorithms signatureAlgorithm,
-                String authorityUrl,
+                String providerAuthorityUrl,
                 BigDecimal tempBalanceFix) {
             this.paymentMethod = paymentMethod;
+            this.payeeAuthorityUrl = payeeAuthorityUrl;
             this.requestHashAlgorithm = requestHashAlgorithm;
-            this.keyHashAlgorithm = keyHashAlgorithm;
-            this.keyHashValue = keyHashValue;
             this.credentialId = credentialId;
             this.accountId = accountId;
             this.cardIcon = cardIcon;
             this.signatureAlgorithm = signatureAlgorithm;
-            this.authorityUrl = authorityUrl;
+            this.providerAuthorityUrl = providerAuthorityUrl;
             this.tempBalanceFix = tempBalanceFix;
         }
     }
@@ -217,8 +213,7 @@ public class Wallet {
     
     static class PaymentMethodDescriptor {
         String paymentMethod;             // URL actually
-        HashAlgorithms keyHashAlgorithm;  // Declared by Merchant
-        byte[] keyHashValue;              //     -"-
+        String payeeAuthorityUrl;         // Home of the payee
     }
 
     static class ScalingIcon extends ImageIcon {
@@ -469,7 +464,7 @@ public class Wallet {
             } else {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<>();
                 for (int i = 0; i < 2; i++) {
-                    cards.put(i, new Account("n/a", null, null, new byte[0], "n/a", DUMMY_BALANCE,
+                    cards.put(i, new Account("n/a", null, null, "n/a", DUMMY_BALANCE,
                                              dummyCardIcon, null, null, new BigDecimal("1.00")));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
@@ -681,7 +676,7 @@ public class Wallet {
             selectedCard = cardCollection.get(keyHandle);
             logger.info("Selected Card: Key=" + keyHandle +
                         ", AccountId=" + selectedCard.accountId +
-                        ", URL=" + selectedCard.authorityUrl +
+                        ", URL=" + selectedCard.providerAuthorityUrl +
                         ", KeyEncryptionKey=" + selectedCard.encryptionKey);
             this.keyHandle = keyHandle;
             amountField.setText("\u200a" + amountString);
@@ -923,14 +918,11 @@ public class Wallet {
                                     PaymentMethodDescriptor paymentMethodDescriptor =
                                             new PaymentMethodDescriptor();
                                     paymentMethodDescriptor.paymentMethod = 
-                                            paymentMethodEntry.getString(BaseProperties.PAYMENT_METHOD_JSON);
-                                    JSONObjectReader keyHashObject = 
-                                            paymentMethodEntry.getObject(BaseProperties.KEY_HASH_JSON);
-                                    paymentMethodDescriptor.keyHashValue = 
-                                            keyHashObject.getBinary(JSONCryptoHelper.VALUE_JSON);
-                                    paymentMethodDescriptor.keyHashAlgorithm = 
-                                            CryptoUtils.getHashAlgorithm(keyHashObject, 
-                                                                         JSONCryptoHelper.ALGORITHM_JSON);
+                                            paymentMethodEntry.getString(
+                                                    BaseProperties.PAYMENT_METHOD_JSON);
+                                    paymentMethodDescriptor.payeeAuthorityUrl = 
+                                            paymentMethodEntry.getString(
+                                                    BaseProperties.PAYEE_AUTHORITY_URL_JSON);
                                     paymentMethods.add(paymentMethodDescriptor);
                                 } while (methodList.hasMore());
                                 paymentRequest = new PaymentRequest(
@@ -1032,9 +1024,8 @@ public class Wallet {
                 if (acceptedPaymentMethod.paymentMethod.equals(paymentMethodName)) {
                     Account card =
                         new Account(paymentMethodName,
+                                    acceptedPaymentMethod.payeeAuthorityUrl,
                                     cardProperties.getRequestHashAlgorithm(),
-                                    acceptedPaymentMethod.keyHashAlgorithm,
-                                    acceptedPaymentMethod.keyHashValue,
                                     cardProperties.getCredentialId(),
                                     cardProperties.getAccountId(),
                                     getImageIcon(sks.getExtension(keyHandle, 
@@ -1075,16 +1066,16 @@ public class Wallet {
                     JSONObjectWriter authorizationData = AuthorizationDataEncoder.encode(
                         paymentRequest,
                         selectedCard.requestHashAlgorithm,
+                        selectedCard.payeeAuthorityUrl,
                         domainName,
                         selectedCard.paymentMethod,
-                        selectedCard.keyHashAlgorithm,
-                        selectedCard.keyHashValue,
                         selectedCard.credentialId,
                         selectedCard.accountId,
                         dataEncryptionKey,
                         selectedCard.dataEncryptionAlgorithm,
                         challengeResults,
                         selectedCard.signatureAlgorithm,
+                        new ClientPlatform("Java 8","0.2","Dell"),
                         new AsymKeySignerInterface () {
                             @Override
                             public PublicKey getPublicKey() throws IOException {
@@ -1106,7 +1097,7 @@ public class Wallet {
                     // to not leak user information to Payees.  Only the proper Payment Provider can decrypt
                     // and process user authorizations.
                     resultMessage = PayerAuthorization.encode(authorizationData,
-                                                              selectedCard.authorityUrl,
+                                                              selectedCard.providerAuthorityUrl,
                                                               selectedCard.paymentMethod,
                                                               selectedCard.dataEncryptionAlgorithm,
                                                               selectedCard.keyEncryptionAlgorithm,
