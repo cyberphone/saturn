@@ -50,9 +50,9 @@ import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.NonDirectPayments;
+import org.webpki.saturn.common.NonDirectPaymentEncoder;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestEncoder;
 import org.webpki.saturn.common.TimeUtils;
 
 import org.webpki.util.ArrayUtil;
@@ -92,7 +92,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         String commonName;
         BigDecimal amount;
         String homePage;
-        NonDirectPayments nonDirectPayments;
+        NonDirectPaymentEncoder nonDirectPayments;
     }
     
     static LinkedHashMap<String, PaymentType> sampleTests = new LinkedHashMap<>();
@@ -101,7 +101,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                              String commonName, 
                              String homePage, 
                              String amount, 
-                             NonDirectPayments nonDirectPayments) {
+                             NonDirectPaymentEncoder nonDirectPayments) {
         PaymentType o = new PaymentType();
         o.commonName = commonName;
         o.homePage = homePage;
@@ -116,10 +116,14 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                       "550",
                                       null);
 
-         initMerchant("Gas Station",  "Planet Gas",
-                                      "planetgas.com",
-                                      "200",
-                                      NonDirectPayments.GAS_STATION);
+         try {
+            initMerchant("Gas Station",  "Planet Gas",
+                                          "planetgas.com",
+                                          "200",
+                                          NonDirectPaymentEncoder.gasStation());
+        } catch (IOException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -164,14 +168,14 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         GregorianCalendar expires = TimeUtils.inMinutes(30);
         // Create a payment request
         JSONObjectWriter paymentRequest =
-            PaymentRequest.encode(paymentData.commonName, 
-                                  paymentData.homePage,
-                                  paymentData.amount,
-                                  Currencies.EUR,
-                                  paymentData.nonDirectPayments,
-                                  "754329",
-                                  timeStamp,
-                                  expires);
+            PaymentRequestEncoder.encode(paymentData.commonName, 
+                                         paymentData.homePage,
+                                         paymentData.amount,
+                                         Currencies.EUR,
+                                         paymentData.nonDirectPayments,
+                                         "754329",
+                                         timeStamp,
+                                         expires);
         JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
         addPaymentMethod(methodList, PaymentMethods.BANK_DIRECT);
         addPaymentMethod(methodList, PaymentMethods.SUPER_CARD);

@@ -25,7 +25,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.AccountDataDecoder;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
 import org.webpki.saturn.common.TransactionResponse;
@@ -45,7 +45,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
         // Decode and finalize the cardpay request
         TransactionRequest transactionRequest = new TransactionRequest(providerRequest, true);
-        PaymentRequest paymentRequest = transactionRequest.getPaymentRequest();
+        PaymentRequestDecoder paymentRequest = transactionRequest.getPaymentRequest();
         
         // Verify that we understand the payee payment method
         AccountDataDecoder payeeReceiveAccount = transactionRequest

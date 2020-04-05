@@ -37,7 +37,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
     public static final String SOFTWARE_ID      = "WebPKI.org - Wallet";
     public static final String SOFTWARE_VERSION = "1.00";
 
-    public static JSONObjectWriter encode(PaymentRequest paymentRequest,
+    public static JSONObjectWriter encode(PaymentRequestDecoder paymentRequest,
                                           HashAlgorithms reguestHashAlgorithm,
                                           String payeeAuthorityUrl,
                                           String payeeHost,
@@ -79,7 +79,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
                  .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 
-   public static JSONObjectWriter encode(PaymentRequest paymentRequest,
+   public static JSONObjectWriter encode(PaymentRequestDecoder paymentRequest,
                                           HashAlgorithms requestHashAlgorithm,
                                           String payeeAuthorityUrl,
                                           String payeeHost,

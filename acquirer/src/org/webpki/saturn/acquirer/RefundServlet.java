@@ -26,7 +26,7 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PayeeCoreProperties;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.RefundRequest;
 import org.webpki.saturn.common.RefundResponse;
@@ -59,7 +59,7 @@ public class RefundServlet extends ProcessingBaseServlet {
         payeeCoreProperties.verify(refundRequest.getSignatureDecoder());
 
         SupercardAccountDataDecoder accountData = getAccountData(refundRequest.getAuthorizationResponse());
-        PaymentRequest paymentRequest = refundRequest.getPaymentRequest();
+        PaymentRequestDecoder paymentRequest = refundRequest.getPaymentRequest();
 
         boolean testMode = refundRequest.getTestMode();
         logger.info((testMode ? "TEST ONLY: ":"") +

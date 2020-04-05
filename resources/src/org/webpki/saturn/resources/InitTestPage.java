@@ -42,7 +42,7 @@ import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestEncoder;
 
 import org.webpki.saturn.w2nb.support.W2NB;
 
@@ -118,14 +118,16 @@ public class InitTestPage implements BaseProperties {
 
         // Create payment request
         JSONObjectWriter paymentRequest = 
-            PaymentRequest.encode("Demo Merchant",
-                                  "https://demomerchant.com",
-                                  new BigDecimal("306.25"),
-                                  Currencies.USD,
-                                  null,
-                                  "#6100004",
-                                  ISODateTime.parseDateTime("2016-12-27T09:45:23Z", ISODateTime.UTC_NO_SUBSECONDS),
-                                  ISODateTime.parseDateTime("2030-09-14T00:00:00Z", ISODateTime.UTC_NO_SUBSECONDS));
+            PaymentRequestEncoder.encode("Demo Merchant",
+                                         "https://demomerchant.com",
+                                         new BigDecimal("306.25"),
+                                         Currencies.USD,
+                                         null,
+                                         "#6100004",
+                                         ISODateTime.parseDateTime("2016-12-27T09:45:23Z",
+                                                                   ISODateTime.UTC_NO_SUBSECONDS),
+                                         ISODateTime.parseDateTime("2030-09-14T00:00:00Z", 
+                                                                   ISODateTime.UTC_NO_SUBSECONDS));
         // Header
         write("<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><title>Payment Agent (Wallet) Tester</title>"
               + "</head>\n<body onload=\"getTargetDimensions()\"><script>\n\n" +

@@ -41,7 +41,7 @@ import org.webpki.saturn.common.ProviderAuthority;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.WalletAlertMessage;
 
@@ -65,7 +65,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
     abstract boolean processCall(MerchantDescriptor merchant, 
                                  JSONObjectReader walletResponse,
-                                 PaymentRequest paymentRequest, 
+                                 PaymentRequestDecoder paymentRequest, 
                                  PayerAuthorization payerAuthorization,
                                  HttpSession session,
                                  HttpServletRequest request,
@@ -121,8 +121,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 throw new IOException("Unexpected: " + payerAuthorization.getPaymentMethod().getPaymentMethodUrl());
             }
             // Restore PaymentRequest
-            PaymentRequest paymentRequest =
-                new PaymentRequest(new JSONObjectReader((JSONObjectWriter) 
+            PaymentRequestDecoder paymentRequest =
+                new PaymentRequestDecoder(new JSONObjectReader((JSONObjectWriter) 
                         session.getAttribute(WALLET_REQUEST_SESSION_ATTR)).getObject(PAYMENT_REQUEST_JSON));
             
             // The actual processing is here

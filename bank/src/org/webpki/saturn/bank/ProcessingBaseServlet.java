@@ -41,7 +41,7 @@ import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.UrlHolder;
 
@@ -78,7 +78,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return r;
     }
 
-    static String amountInHtml(PaymentRequest paymentRequest, BigDecimal amount) throws IOException {
+    static String amountInHtml(PaymentRequestDecoder paymentRequest, BigDecimal amount) throws IOException {
         return "<span style=\"font-weight:bold;white-space:nowrap\">" + 
                paymentRequest.getCurrency().amountToDisplayString(amount, true) +
                "</span>";

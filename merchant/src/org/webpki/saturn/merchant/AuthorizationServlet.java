@@ -43,7 +43,7 @@ import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.ProviderUserResponse;
@@ -61,7 +61,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     @Override
     boolean processCall(MerchantDescriptor merchant,
                         JSONObjectReader walletResponse,
-                        PaymentRequest paymentRequest, 
+                        PaymentRequestDecoder paymentRequest, 
                         PayerAuthorization payerAuthorization,
                         HttpSession session,
                         HttpServletRequest request,

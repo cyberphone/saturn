@@ -41,7 +41,8 @@ import org.webpki.saturn.common.ClientPlatform;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
+import org.webpki.saturn.common.PaymentRequestEncoder;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.UserChallengeItem;
@@ -126,16 +127,16 @@ public class DebugData implements Serializable {
         GregorianCalendar authTime = TimeUtils.inSeconds(23);
         GregorianCalendar expires = TimeUtils.inMinutes(30);
         JSONObjectWriter paymentRequest = 
-            PaymentRequest.encode("Demo Merchant",
-                                  "https://demomerchant.com",
-                                  new BigDecimal("100.00"),
-                                  Currencies.EUR,
-                                  null,
-                                  "#100006878", 
-                                  then,
-                                  expires);
+            PaymentRequestEncoder.encode("Demo Merchant",
+                                         "https://demomerchant.com",
+                                         new BigDecimal("100.00"),
+                                         Currencies.EUR,
+                                         null,
+                                         "#100006878", 
+                                         then,
+                                         expires);
         return new JSONObjectReader(AuthorizationDataEncoder.encode(
-                                 new PaymentRequest(new JSONObjectReader(paymentRequest)),
+                                 new PaymentRequestDecoder(new JSONObjectReader(paymentRequest)),
                                  HashAlgorithms.SHA256,
                                  "https://payments.bigbank.com/payees/86344",
                                  "demomerchant.com", 

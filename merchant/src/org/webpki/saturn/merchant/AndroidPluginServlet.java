@@ -30,7 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.NonDirectPayments;
+import org.webpki.saturn.common.NonDirectPaymentEncoder;
 
 import org.webpki.net.MobileProxyParameters;
 
@@ -126,12 +126,12 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
                 ErrorServlet.systemFail(response, "Session already used");
             }
 
-            String nonDirectPayment = (String)session.getAttribute(GAS_STATION_SESSION_ATTR);
+            NonDirectPaymentEncoder optionalNonDirectPayment = 
+                    (NonDirectPaymentEncoder)session.getAttribute(GAS_STATION_SESSION_ATTR);
 
             HttpSupport.writeJsonData(response, 
                     new WalletRequest(session,
-                                      nonDirectPayment == null ?
-                           null : NonDirectPayments.fromType(nonDirectPayment)).requestObject);
+                                      optionalNonDirectPayment).requestObject);
         } else {
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {

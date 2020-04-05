@@ -29,41 +29,16 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.util.ISODateTime;
 
-public class PaymentRequest implements BaseProperties {
+public class PaymentRequestDecoder implements BaseProperties {
     
-    public static final String SOFTWARE_NAME    = "WebPKI.org - Payee";
-    public static final String SOFTWARE_VERSION = "1.00";
-
-    public static JSONObjectWriter encode(String payeeCommonName,
-                                          String payeeHomePage,
-                                          BigDecimal amount,
-                                          Currencies currency,
-                                          NonDirectPayments optionalNonDirectPayment,
-                                          String referenceId,
-                                          GregorianCalendar timeStamp,
-                                          GregorianCalendar expires) throws IOException {
-        return new JSONObjectWriter()
-            .setObject(PAYEE_JSON, new JSONObjectWriter()
-                                   .setString(COMMON_NAME_JSON, payeeCommonName)
-                                   .setString(HOME_PAGE_JSON, payeeHomePage))
-            .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
-            .setString(CURRENCY_JSON, currency.toString())
-            .setDynamic((wr) -> optionalNonDirectPayment == null ?
-                    wr : wr.setString(NON_DIRECT_PAYMENT_JSON, optionalNonDirectPayment.toString()))
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.UTC_NO_SUBSECONDS)
-            .setDateTime(EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION));
-    }
-
-    public PaymentRequest(JSONObjectReader rd) throws IOException {
+    public PaymentRequestDecoder(JSONObjectReader rd) throws IOException {
         root = rd;
         JSONObjectReader payee = rd.getObject(PAYEE_JSON);
         payeeCommonName = payee.getString(COMMON_NAME_JSON);
         payeeHomePage = payee.getString(HOME_PAGE_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         if (rd.hasProperty(NON_DIRECT_PAYMENT_JSON)) {
-            nonDirectPayment = NonDirectPayments.fromType(rd.getString(NON_DIRECT_PAYMENT_JSON));
+            nonDirectPayment = new NonDirectPaymentDecoder(rd.getObject(NON_DIRECT_PAYMENT_JSON));
         }
         amount = rd.getMoney(AMOUNT_JSON, currency.getDecimals());
         referenceId = rd.getString(REFERENCE_ID_JSON);
@@ -98,8 +73,8 @@ public class PaymentRequest implements BaseProperties {
         return currency;
     }
 
-    NonDirectPayments nonDirectPayment;
-    public NonDirectPayments getNonDirectPayment() {
+    NonDirectPaymentDecoder nonDirectPayment;
+    public NonDirectPaymentDecoder getNonDirectPayment() {
         return nonDirectPayment;
     }
 

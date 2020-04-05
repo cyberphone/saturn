@@ -45,7 +45,7 @@ import org.webpki.util.ISODateTime;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.NonDirectPayments;
+import org.webpki.saturn.common.NonDirectPaymentTypes;
 import org.webpki.saturn.common.Version;
 import org.webpki.saturn.common.KnownExtensions;
 
@@ -164,6 +164,7 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
+        updateUrls(jsonTree, rewriter, PAYEE_AUTHORITY_URL_JSON);
         updateSpecific(jsonTree, rewriter, PAYEE_HOST_JSON, "demomerchant.com");
         updateSpecific(jsonTree, rewriter, CLIENT_IP_ADDRESS_JSON, "220.13.198.144");
     }
@@ -173,9 +174,13 @@ class DebugPrintout implements BaseProperties {
             reader = reader.clone();
             cleanData(reader);
         }
-        s.append("<div class=\"jsonbox\">" +
-                 reader.serializeToString(JSONOutputFormats.PRETTY_HTML) +
-                 "</div>");
+        String html = reader.serializeToString(JSONOutputFormats.PRETTY_HTML);
+        if (html.endsWith("<br>")) {
+            html = html.substring(0, html.length() - 4);
+        }
+        s.append("<div class=\"jsonbox\">")
+         .append(html)
+         .append("</div>");
     }
 
     void fancyBox(JSONObjectWriter writer) throws IOException, GeneralSecurityException {
@@ -261,8 +266,9 @@ class DebugPrintout implements BaseProperties {
         if (debugData.gasStation) {
             descriptionStdMargin("<p>Note that there is a property " +
                 keyWord(NON_DIRECT_PAYMENT_JSON) + 
-                " having the value " +
-                keyWord(NonDirectPayments.GAS_STATION.toString()) +
+                " having the " + keyWord(TYPE_JSON) +
+                " attribute set to " +
+                keyWord(NonDirectPaymentTypes.GAS_STATION.toString()) +
                 " which means that there is a <i>reservation phase</i> involving the user, " +
                 "followed by an actual payment operation for a usually considerably lower " +
                 keyWord(AMOUNT_JSON) + ". This mode should preferably be indicated " +
@@ -275,12 +281,17 @@ class DebugPrintout implements BaseProperties {
             "(accomplished through &quot;swiping&quot; card logotypes in the " +
             "reference application), the user " +
             "<i>authorizes</i> the payment request, using a PIN or biometric operation:</p>" +
-            "<img style=\"display:block;margin-left:auto;margin-right:auto;max-width:250pt;" +
+            "<img style=\"display:block;margin-left:auto;margin-right:auto;margin-bottom:10pt;max-width:250pt;" +
             "border-width:1px;border-style:solid;border-color:grey;box-shadow:3pt 3pt 3pt #d0d0d0\" " +
             "src=\"https://cyberphone.github.io/doc/saturn/" +
             (debugData.gasStation ? GASSTATION_AUTHZ :
                 debugData.acquirerMode ? SUPERCARD_AUTHZ_SAMPLE : BANKDIRECT_AUTHZ_SAMPLE) + 
-            "\">");
+            "\">" +
+            "The &quot;Balance&quot; field could also function as a touch button " +
+            "for showing a list of recent transactions for the selected virtual card account." +
+            "<p>The &quot;Payee&quot; field could also function as a touch button to trigger " +
+            "a <b>Merchant</b> lookup service by using the " + keyWord(PAYEE_AUTHORITY_URL_JSON) + 
+            " associated with the selected virtual card.</p>");
         description(point.sub() +
             "<p>The result of this process is not supposed be " +
             "directly available to the <b>Merchant</b> since it contains potentially sensitive user data.&nbsp;&nbsp;" +
@@ -320,15 +331,27 @@ class DebugPrintout implements BaseProperties {
             keyWord(REQUEST_HASH_JSON) + " holds a by the <b>Wallet</b> calculated hash of the " +
             keyWord(PAYMENT_REQUEST_JSON) + " object.</p><p>" +
             keyWord(PAYEE_AUTHORITY_URL_JSON) + " binds a <i>declared</i> " +
-            "<b>Merchant</b> authority object (holding keys) to an anticipated " + keyWord(Messages.AUTHORIZATION_REQUEST) + 
+            "<b>Merchant</b> authority object (holding keys) to an anticipated " + 
+            keyWord(Messages.AUTHORIZATION_REQUEST) + 
             " message.  See also " + keyWord(Messages.PAYMENT_CLIENT_REQUEST) + ".</p><p>" +
-            keyWord(PAYEE_HOST_JSON) + " holds the host name of the <b>Merchant</b> as recorded by the <b>Wallet</b>.</p><p>" +
-            keyWord(PAYMENT_METHOD_JSON) + " holds the payment method associated with the selected virtual card.</p><p>" +
-            keyWord(CREDENTIAL_ID_JSON) + " holds a serial number or similar unique identifier associated with the selected virtual card.</p><p>" +
-            keyWord(ACCOUNT_ID_JSON) + " holds an account identifier associated with the selected virtual card. " +
+            keyWord(PAYEE_HOST_JSON) + 
+            " holds the host name of the <b>Merchant</b> as recorded by the <b>Wallet</b>.</p><p>" +
+            keyWord(PAYMENT_METHOD_JSON) + 
+            " holds the payment method associated with the selected virtual card.</p><p>" +
+            keyWord(CREDENTIAL_ID_JSON) + 
+            " holds a serial number or similar unique identifier associated with the selected virtual card.</p><p>" +
+            keyWord(ACCOUNT_ID_JSON) + 
+            " holds an account identifier associated with the selected virtual card. " +
             "See also <a href=\"" + encryptedAccount + "\">Encrypted Account Data</a>.</p><p>" +
-            keyWord(ENCRYPTION_PARAMETERS_JSON) + " holds session specific encryption parameters generated by the <b>Wallet</b>. " +
+            keyWord(ENCRYPTION_PARAMETERS_JSON) + 
+            " holds session specific encryption parameters generated by the <b>Wallet</b>. " +
             "See <a href=\"#provuserresp\">" + PROV_USER_RESPONSE + "</a> for more information.</p><p>" + 
+            keyWord(TIME_STAMP_JSON) + 
+            " holds the date and time for the authorization event in RFC&nbsp;3339 " +
+            "(ISO) notation inclding local time offset.</p><p>" + 
+            keyWord(SOFTWARE_JSON) + " holds the name and version of the <b>Wallet</b> software.</p><p>" + 
+            keyWord(PLATFORM_JSON) + " holds the name and version of the platform software as well " +
+            "as the hardware vendor suppying it.</p><p>" + 
             keyWord(AUTHORIZATION_SIGNATURE_JSON) + " holds the user's authorization signature. " +
             "Note that " + keyWord(JSONCryptoHelper.PUBLIC_KEY_JSON) + " <i>may "  +
             "be omitted</i> if " + keyWord(CREDENTIAL_ID_JSON) + " is sufficient for locating the proper " +

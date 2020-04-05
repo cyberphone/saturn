@@ -91,7 +91,7 @@ public class RefundRequest implements BaseProperties {
         return authorizationResponse.authorizationRequest.testMode;
     }
 
-    public PaymentRequest getPaymentRequest() {
+    public PaymentRequestDecoder getPaymentRequest() {
         return authorizationResponse.authorizationRequest.paymentRequest;
     }
 
@@ -119,8 +119,8 @@ public class RefundRequest implements BaseProperties {
             .setObject(PAYEE_SOURCE_ACCOUNT_JSON, payeeSourceAccount.writeObject())
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, 
-                                                     PaymentRequest.SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequestEncoder.SOFTWARE_NAME, 
+                                                      PaymentRequestEncoder.SOFTWARE_VERSION))
             .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }

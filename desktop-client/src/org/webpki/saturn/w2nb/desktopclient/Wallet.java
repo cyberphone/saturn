@@ -103,7 +103,7 @@ import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.AuthorizationDataEncoder;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.UserChallengeItem;
@@ -312,7 +312,7 @@ public class Wallet {
         int fontSize;
         JTextField amountField;
         JTextField payeeField;
-        PaymentRequest paymentRequest;
+        PaymentRequestDecoder paymentRequest;
         String amountString;
         String payeeCommonName;
         JPasswordField pinText;
@@ -925,7 +925,7 @@ public class Wallet {
                                                     BaseProperties.PAYEE_AUTHORITY_URL_JSON);
                                     paymentMethods.add(paymentMethodDescriptor);
                                 } while (methodList.hasMore());
-                                paymentRequest = new PaymentRequest(
+                                paymentRequest = new PaymentRequestDecoder(
                                         invokeMessage.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
                                 // Primary information to the user...
                                 amountString = paymentRequest.getCurrency()

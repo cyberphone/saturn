@@ -30,10 +30,10 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.BaseProperties;
-import org.webpki.saturn.common.NonDirectPayments;
 import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.NonDirectPaymentEncoder;
+import org.webpki.saturn.common.PaymentRequestEncoder;
 
 public class WalletRequest implements BaseProperties, MerchantSessionProperties {
 
@@ -42,7 +42,7 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
     JSONObjectWriter requestObject;
     
     WalletRequest(HttpSession session,
-                  NonDirectPayments optionalNonDirectPayment) throws IOException {
+                  NonDirectPaymentEncoder optionalNonDirectPayment) throws IOException {
         debugMode = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
         DebugData debugData = null;
         if (debugMode) {
@@ -54,16 +54,16 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
 
         // Create a payment request
         JSONObjectWriter paymentRequest =
-            PaymentRequest.encode(merchant.commonName, 
-                                  merchant.homePage,
-                                  new BigDecimal(
-                                      BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
-                                      MerchantService.currency.getDecimals()),
-                                  MerchantService.currency,
-                                  optionalNonDirectPayment,
-                                  merchant.getReferenceId(),
-                                  new GregorianCalendar(),
-                                  TimeUtils.inMinutes(30));
+            PaymentRequestEncoder.encode(merchant.commonName, 
+                                         merchant.homePage,
+                                         new BigDecimal(
+                                             BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
+                                             MerchantService.currency.getDecimals()),
+                                         MerchantService.currency,
+                                         optionalNonDirectPayment,
+                                         merchant.getReferenceId(),
+                                         new GregorianCalendar(),
+                                         TimeUtils.inMinutes(30));
 
         JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
         for (String paymentMethod : merchant.paymentMethods.keySet()) {

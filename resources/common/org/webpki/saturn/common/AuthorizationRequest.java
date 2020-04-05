@@ -42,7 +42,7 @@ public class AuthorizationRequest implements BaseProperties {
         recepientUrl = rd.getString(RECEPIENT_URL_JSON);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
-        paymentRequest = new PaymentRequest(rd.getObject(PAYMENT_REQUEST_JSON));
+        paymentRequest = new PaymentRequestDecoder(rd.getObject(PAYMENT_REQUEST_JSON));
         encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
         undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
         rd.scanAway(PAYEE_RECEIVE_ACCOUNT_JSON);  // Read all to not throw on checkForUnread()
@@ -110,8 +110,8 @@ public class AuthorizationRequest implements BaseProperties {
         return clientIpAddress;
     }
 
-    PaymentRequest paymentRequest;
-    public PaymentRequest getPaymentRequest() {
+    PaymentRequestDecoder paymentRequest;
+    public PaymentRequestDecoder getPaymentRequest() {
         return paymentRequest;
     }
 
@@ -121,7 +121,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           PaymentMethods paymentMethod,
                                           JSONObjectReader encryptedAuthorizationData,
                                           String clientIpAddress,
-                                          PaymentRequest paymentRequest,
+                                          PaymentRequestDecoder paymentRequest,
                                           AccountDataEncoder payeeReceiveAccount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
@@ -136,7 +136,8 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequest.SOFTWARE_NAME, PaymentRequest.SOFTWARE_VERSION))
+            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequestEncoder.SOFTWARE_NAME,
+                                                      PaymentRequestEncoder.SOFTWARE_VERSION))
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 

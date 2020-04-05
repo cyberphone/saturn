@@ -34,7 +34,7 @@ import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.PayeeAuthority;
-import org.webpki.saturn.common.PaymentRequest;
+import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionRequest;
@@ -79,7 +79,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         // Get payer account data.  Note: transaction request contains ALL required data, the
         // backend system only needs to understand the concept of reserving funds and supply
         // an identifier to the requesting party which is subsequently referred to here.
-        PaymentRequest paymentRequest = authorizationRequest.getPaymentRequest();
+        PaymentRequestDecoder paymentRequest = authorizationRequest.getPaymentRequest();
         AuthorizationDataDecoder authorizationData = authorizationRequest
                 .getDecryptedAuthorizationData(BankService.decryptionKeys,
                                                BankService.AUTHORIZATION_SIGNATURE_POLICY);
