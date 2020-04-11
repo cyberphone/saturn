@@ -268,7 +268,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(NON_DIRECT_PAYMENT_JSON) + 
                 " having the " + keyWord(TYPE_JSON) +
                 " attribute set to " +
-                keyWord(NonDirectPaymentTypes.GAS_STATION.toString()) +
+                keyWord(NonDirectPaymentTypes.RESERVATION.toString()) +
                 " which means that there is a <i>reservation phase</i> involving the user, " +
                 "followed by an actual payment operation for a usually considerably lower " +
                 keyWord(AMOUNT_JSON) + ". This mode should preferably be indicated " +
@@ -468,7 +468,7 @@ class DebugPrintout implements BaseProperties {
                 " using the following steps:</p><ul>" +
                 "<li style=\"padding:0pt\">Verify that the " +
                 keyWord(RECEPIENT_URL_JSON) + " in the " +
-                keyWord(Messages.AUTHORIZATION_REQUEST) + " matches the " +
+                keyWord(Messages.AUTHORIZATION_REQUEST) + " object matches the " +
                 keyWord(SERVICE_URL_JSON) + " of the <b>User&nbsp;Bank</b>" +
                 ".</li>" +
                 "<li>Verify that the " +
@@ -493,7 +493,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(JSONCryptoHelper.ALGORITHM_JSON) +
                 " in the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +
-                " matches one of the " +
+                " object matches one of the " +
                 keyWord(SIGNATURE_PARAMETERS_JSON) +
                 " objects in the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
@@ -501,10 +501,10 @@ class DebugPrintout implements BaseProperties {
                 "<li>Verify that the " +
                 keyWord(PAYEE_RECEIVE_ACCOUNT_JSON) +
                 " object is decodable and applicable to the operation in progress.</li>" +
-                "<li>Verify that the <i>optional</i> " +
-                keyWord(ACCOUNT_VERIFIER_JSON) + " in the " +
+                "<li>Verify that one of the elements in the <i>optional</i> " +
+                keyWord(ACCOUNT_VERIFIER_JSON) + " list of the " +
                 keyWord(Messages.PAYEE_AUTHORITY) +
-                " matches the account provided in the " +
+                " object matches the hash of the account provided in the " +
                 keyWord(PAYEE_RECEIVE_ACCOUNT_JSON) +
                 " object.</li>" +
                 "</ul>&nbsp;<br>" +
@@ -512,9 +512,9 @@ class DebugPrintout implements BaseProperties {
                 "<ul>" +
                 "<li>Verify that decrypting " +
                 keyWord(ENCRYPTED_AUTHORIZATION_JSON) +
-                " returns a valid user authorization object including " +
+                " returns a valid user authorization object including an " +
                 keyWord(AUTHORIZATION_SIGNATURE_JSON) +
-                ".</li>" +
+                " object.</li>" +
                 "<li>Verify that the " +
                 keyWord(CREDENTIAL_ID_JSON) +
                 " points to valid credential.</li>" +
@@ -539,7 +539,7 @@ class DebugPrintout implements BaseProperties {
                 "<li>Verify that the " +
                 keyWord(PAYMENT_METHOD_JSON) + " in the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) +
-                " and in the user authorization object are identical.</li>" +
+                " object and in the user authorization object are identical.</li>" +
                 "<li>Verify that the " +
                 keyWord(TIME_STAMP_JSON) +
                 " in the user authorization object is within limits like " +

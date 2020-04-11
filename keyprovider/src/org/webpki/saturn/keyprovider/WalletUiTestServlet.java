@@ -53,6 +53,8 @@ import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.NonDirectPaymentEncoder;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequestEncoder;
+import org.webpki.saturn.common.RecurringPaymentIntervals;
+import org.webpki.saturn.common.ReservationSubTypes;
 import org.webpki.saturn.common.TimeUtils;
 
 import org.webpki.util.ArrayUtil;
@@ -111,16 +113,43 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     }
     
     static {
-         initMerchant("Direct",       "Demo Merchant",
-                                      "demomerchant.com",
-                                      "550",
-                                      null);
-
          try {
-            initMerchant("Gas Station",  "Planet Gas",
+            initMerchant("Direct",        "Demo Merchant",
+                                          "demomerchant.com",
+                                          "550",
+                                          null);
+
+            initMerchant("Gas Station",   "Planet Gas",
                                           "planetgas.com",
                                           "200",
-                                          NonDirectPaymentEncoder.gasStation());
+                                          NonDirectPaymentEncoder.reservation(
+                                                  ReservationSubTypes.GAS_STATION,
+                                                  TimeUtils.inMinutes(45),
+                                                  true));
+
+            initMerchant("Hotel Booking", "Best Lodging",
+                                          "bestlodging.com",
+                                          "1200",
+                                          NonDirectPaymentEncoder.reservation(
+                                                  ReservationSubTypes.BOOKING,
+                                                  TimeUtils.inDays(10), 
+                                                  true));
+            initMerchant("Electricy",     "Power to You",
+                                          "power2u.com",
+                                          "0",
+                                          NonDirectPaymentEncoder.recurring(
+                                                  RecurringPaymentIntervals.MONTHLY,                                           
+                                                  TimeUtils.inDays(365), 
+                                                  false));
+
+            initMerchant("Phone Subscription", 
+                                          "ET Phone Home",
+                                          "etphonehome.com",
+                                          "25.50",
+                                          NonDirectPaymentEncoder.recurring(
+                                                  RecurringPaymentIntervals.MONTHLY,                                             
+                                                  TimeUtils.inDays(365 * 2), 
+                                                  false));
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
@@ -146,10 +175,11 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     }
 
     private void addPaymentMethod(JSONArrayWriter methodList, 
-                                  PaymentMethods paymentMethod) throws IOException {
+                                  PaymentMethods paymentMethod,
+                                  String payeeAuthorityUrl) throws IOException {
         methodList.setObject()
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
-            .setString(PAYEE_AUTHORITY_URL_JSON, "https://blah/blu");  // Dummy data
+            .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl);
     }
     
     private void returnJson(HttpServletResponse response, JSONObjectWriter json) throws IOException {
@@ -177,8 +207,12 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                          timeStamp,
                                          expires);
         JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
-        addPaymentMethod(methodList, PaymentMethods.BANK_DIRECT);
-        addPaymentMethod(methodList, PaymentMethods.SUPER_CARD);
+        addPaymentMethod(methodList, 
+                         PaymentMethods.BANK_DIRECT, 
+                         "https://payments.bigbank.com/payees/86344");
+        addPaymentMethod(methodList, 
+                         PaymentMethods.SUPER_CARD, 
+                         "https://secure.cardprocessor.com/payees/1077342");
         requestObject.setObject(PAYMENT_REQUEST_JSON, paymentRequest);
         session.setAttribute(REQUEST, requestObject);
         returnJson(response, requestObject);

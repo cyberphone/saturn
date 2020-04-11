@@ -21,10 +21,15 @@
             <include name="**/AuthorizationDataEncoder.java"/>
             <include name="**/BaseProperties.java"/>
             <include name="**/CardDataDecoder.java"/>
+            <include name="**/ClientPlatform.java"/>
             <include name="**/Currencies.java"/>
             <include name="**/Messages.java"/>
             <include name="**/EncryptedMessage.java"/>
-            <include name="**/PaymentRequest.java"/>
+            <include name="**/PaymentRequestDecoder.java"/>
+            <include name="**/NonDirectPaymentDecoder.java"/>
+            <include name="**/NonDirectPaymentTypes.java"/>
+            <include name="**/ReservationSubTypes.java"/>
+            <include name="**/RecurringPaymentIntervals.java"/>
             <include name="**/CryptoUtils.java"/>
             <include name="**/Software.java"/>
             <include name="**/UserChallengeItem.java"/>

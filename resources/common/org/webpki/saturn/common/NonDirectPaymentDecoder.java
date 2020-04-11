@@ -17,9 +17,12 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+
+import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;
+
+import org.webpki.util.ISODateTime;
 
 public class NonDirectPaymentDecoder implements BaseProperties {
 
@@ -28,7 +31,46 @@ public class NonDirectPaymentDecoder implements BaseProperties {
         return type;
     }
 
+    GregorianCalendar expires;
+    public GregorianCalendar getExpiration() throws IOException {
+        nullCheck(expires);
+        return expires;
+    }
+
+    boolean fixed;
+    public boolean isFixedAmount() throws IOException {
+        return fixed;
+    }
+
+    ReservationSubTypes subType;
+    public ReservationSubTypes getReservationSubType() throws IOException {
+        nullCheck(subType);
+        return subType;
+    }
+
+    RecurringPaymentIntervals interval;
+    public RecurringPaymentIntervals getInterval() throws IOException {
+        nullCheck(interval);
+        return interval;
+    }
+
+    private void nullCheck(Object object) throws IOException {
+        if (object == null) {
+            throw new IOException("Invalid method for this kind of non-direct payment");
+        }
+    }
+
     public NonDirectPaymentDecoder (JSONObjectReader rd) throws IOException {
-        type = NonDirectPaymentTypes.valueOf(rd.getString(TYPE_JSON));
+        switch (type = NonDirectPaymentTypes.valueOf(rd.getString(TYPE_JSON))) {
+            case RESERVATION:
+                subType = ReservationSubTypes.valueOf(rd.getString(SUB_TYPE_JSON));
+                break;
+                
+            case RECURRING:
+                interval = RecurringPaymentIntervals.valueOf(rd.getString(INTERVAL_JSON));
+                break;
+        }
+        expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
+        fixed = rd.getBoolean(FIXED_JSON);
     }
 }

@@ -63,6 +63,9 @@ public interface BaseProperties {
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)
     String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User and bank authorization signature
     String REQUEST_SIGNATURE_JSON           = "requestSignature";           // Payee signature
+    String SUB_TYPE_JSON                    = "subType";                    // For some non-direct payments
+    String FIXED_JSON                       = "fixed";                      //    -"-
+    String INTERVAL_JSON                    = "interval";                   //    -"-
     String EXTENSIONS_JSON                  = "extensions";                 // Optional provider authority data
     String ACCOUNT_ID_JSON                  = "accountId";                  // Account identifier or PAN
     String CREDENTIAL_ID_JSON               = "credentialId";               // Each virtual card has a unique ID

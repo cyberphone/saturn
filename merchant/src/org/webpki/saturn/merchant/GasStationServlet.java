@@ -28,6 +28,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.saturn.common.NonDirectPaymentEncoder;
+import org.webpki.saturn.common.ReservationSubTypes;
+import org.webpki.saturn.common.TimeUtils;
 
 public class GasStationServlet extends HttpServlet implements MerchantSessionProperties {
 
@@ -55,7 +57,10 @@ public class GasStationServlet extends HttpServlet implements MerchantSessionPro
         if (!HomeServlet.browserIsSupported(request, response)) {
             return;
         }
-        session.setAttribute(GAS_STATION_SESSION_ATTR, NonDirectPaymentEncoder.gasStation());
+        session.setAttribute(GAS_STATION_SESSION_ATTR,
+                             NonDirectPaymentEncoder.reservation(ReservationSubTypes.GAS_STATION,
+                                                                 TimeUtils.inMinutes(45),
+                                                                 true));
         session.setAttribute(MERCHANT_HOMEPAGE_ATTR, MerchantService.PLANET_GAS_COM);
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
         savedShoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;
