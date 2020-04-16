@@ -147,7 +147,7 @@ public class DebugData implements Serializable {
                                  DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
                                  userResponseItems,
                                  userResponseItems == null ? then : authTime,
-                                 "WebPKI.org",
+                                 "WebPKI Suite/Saturn",
                                  "1.0",
                                  new ClientPlatform("Android", "10", "Huawei"),
                                  new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));

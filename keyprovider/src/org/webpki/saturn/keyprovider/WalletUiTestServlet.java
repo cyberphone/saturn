@@ -145,10 +145,18 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
             initMerchant("Phone Subscription", 
                                           "ET Phone Home",
                                           "etphonehome.com",
-                                          "25.50",
+                                          "129.99",
                                           NonDirectPaymentEncoder.recurring(
                                                   RecurringPaymentIntervals.MONTHLY,                                             
                                                   24, 
+                                                  true));
+            initMerchant("Multiple Paments", 
+                                          "Amazon",
+                                          "amazon.com.com",
+                                          "34.75",
+                                          NonDirectPaymentEncoder.recurring(
+                                                  RecurringPaymentIntervals.UNSPECIFIED,                                             
+                                                  null, 
                                                   false));
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
