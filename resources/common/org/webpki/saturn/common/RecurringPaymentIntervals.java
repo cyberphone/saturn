@@ -16,16 +16,27 @@
  */
 package org.webpki.saturn.common;
 
+import java.util.GregorianCalendar;
+
 public enum RecurringPaymentIntervals {
 
-    WEEKLY,
-    BI_WEEKLY,    // Every two weeks
-    MONTHLY,
-    BI_MONTHLY,   // Every two months
-    TRIMESTER,    // Every three months
-    QUARTERLY,
-    SEMI_ANNUAL,  // Every six months
+    WEEKLY      (GregorianCalendar.HOUR,  7 * 24),
+    BI_WEEKLY   (GregorianCalendar.HOUR,  14 * 24),     // Every two weeks
+    MONTHLY     (GregorianCalendar.MONTH, 1),
+    BI_MONTHLY  (GregorianCalendar.MONTH, 2),           // Every two months
+    QUARTERLY   (GregorianCalendar.MONTH, 3),           // Every three months
+    TRI_ANNUAL  (GregorianCalendar.MONTH, 4),           // Every four months
+    SEMI_ANNUAL (GregorianCalendar.MONTH, 6),           // Every six months
+    ANNUALY     (GregorianCalendar.YEAR,  1),           // Once a year
     
-    UNSPECIFIED;
+    UNSPECIFIED (-1, 0);
+
+    int field;
+    int quantity;
+
+    RecurringPaymentIntervals(int field, int quantity) {
+        this.field = field;
+        this.quantity = quantity;
+    }
 }
 

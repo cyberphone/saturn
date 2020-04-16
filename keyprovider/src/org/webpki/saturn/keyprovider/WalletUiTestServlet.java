@@ -139,7 +139,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                           "0",
                                           NonDirectPaymentEncoder.recurring(
                                                   RecurringPaymentIntervals.MONTHLY,                                           
-                                                  TimeUtils.inDays(365), 
+                                                  12, 
                                                   false));
 
             initMerchant("Phone Subscription", 
@@ -148,7 +148,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                           "25.50",
                                           NonDirectPaymentEncoder.recurring(
                                                   RecurringPaymentIntervals.MONTHLY,                                             
-                                                  TimeUtils.inDays(365 * 2), 
+                                                  24, 
                                                   false));
         } catch (IOException e) {
             throw new IllegalArgumentException(e);

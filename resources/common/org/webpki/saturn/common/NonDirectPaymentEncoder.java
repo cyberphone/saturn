@@ -51,12 +51,22 @@ public class NonDirectPaymentEncoder implements BaseProperties {
     }
 
     public static NonDirectPaymentEncoder recurring(RecurringPaymentIntervals interval,
-                                                    GregorianCalendar expires,
+                                                    Integer optionalInstallments,
                                                     boolean fixed) throws IOException {
+        if (optionalInstallments == null ^ interval == RecurringPaymentIntervals.UNSPECIFIED) {
+            throw new IOException("Invalid combination");
+        }
         return common(NonDirectPaymentTypes.RECURRING)
             .intervalAttribute(interval)
-            .fixedAttribute(fixed)
-            .expireAttribute(expires);
+            .installmentsAttribute(optionalInstallments)
+            .fixedAttribute(fixed);
+    }
+
+    private NonDirectPaymentEncoder installmentsAttribute(Integer optionalInstallments) throws IOException {
+        if (optionalInstallments != null && optionalInstallments != 0) {
+            root.setInt(INSTALLMENTS_JSON, optionalInstallments);
+        }
+        return this;
     }
 
     private NonDirectPaymentEncoder subTypeAttribute(ReservationSubTypes subType)

@@ -32,45 +32,58 @@ public class NonDirectPaymentDecoder implements BaseProperties {
     }
 
     GregorianCalendar expires;
-    public GregorianCalendar getExpiration() throws IOException {
+    public GregorianCalendar getExpiration() {
         nullCheck(expires);
         return expires;
     }
 
     boolean fixed;
-    public boolean isFixedAmount() throws IOException {
+    public boolean isFixedAmount() {
         return fixed;
     }
 
     ReservationSubTypes subType;
-    public ReservationSubTypes getReservationSubType() throws IOException {
+    public ReservationSubTypes getReservationSubType() {
         nullCheck(subType);
         return subType;
     }
 
     RecurringPaymentIntervals interval;
-    public RecurringPaymentIntervals getInterval() throws IOException {
+    public RecurringPaymentIntervals getInterval() {
         nullCheck(interval);
         return interval;
     }
+    
+    Integer installments;
+    public int getInstallments() throws IOException {
+        nullCheck(installments);
+        return installments;
+    }
 
-    private void nullCheck(Object object) throws IOException {
+    private void nullCheck(Object object) {
         if (object == null) {
-            throw new IOException("Invalid method for this kind of non-direct payment");
+            throw new UnsupportedOperationException(
+                    "Invalid method for this kind of non-direct payment");
         }
     }
 
-    public NonDirectPaymentDecoder (JSONObjectReader rd) throws IOException {
+    public NonDirectPaymentDecoder (JSONObjectReader rd, GregorianCalendar timeStamp)
+    throws IOException {
         switch (type = NonDirectPaymentTypes.valueOf(rd.getString(TYPE_JSON))) {
             case RESERVATION:
                 subType = ReservationSubTypes.valueOf(rd.getString(SUB_TYPE_JSON));
+                expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
                 break;
                 
             case RECURRING:
                 interval = RecurringPaymentIntervals.valueOf(rd.getString(INTERVAL_JSON));
+                if (interval != RecurringPaymentIntervals.UNSPECIFIED) {
+                    installments = rd.getInt(INSTALLMENTS_JSON);
+                    expires = (GregorianCalendar) timeStamp.clone();
+                    expires.add(interval.field, interval.quantity * installments);
+                }
                 break;
         }
-        expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         fixed = rd.getBoolean(FIXED_JSON);
     }
 }

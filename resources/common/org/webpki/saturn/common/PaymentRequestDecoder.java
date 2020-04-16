@@ -37,14 +37,15 @@ public class PaymentRequestDecoder implements BaseProperties {
         payeeCommonName = payee.getString(COMMON_NAME_JSON);
         payeeHomePage = payee.getString(HOME_PAGE_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
-        if (rd.hasProperty(NON_DIRECT_PAYMENT_JSON)) {
-            nonDirectPayment = new NonDirectPaymentDecoder(rd.getObject(NON_DIRECT_PAYMENT_JSON));
-        }
         amount = rd.getMoney(AMOUNT_JSON, currency.getDecimals());
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
+        if (rd.hasProperty(NON_DIRECT_PAYMENT_JSON)) {
+            nonDirectPayment = new NonDirectPaymentDecoder(rd.getObject(NON_DIRECT_PAYMENT_JSON),
+                                                           dateTime);
+        }
         rd.checkForUnread();
     }
 

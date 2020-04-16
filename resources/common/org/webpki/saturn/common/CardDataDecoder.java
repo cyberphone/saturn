@@ -39,7 +39,7 @@ public class CardDataDecoder {
     // Since deployed card data should preferably remain useful even if the Saturn protocol
     // changes, multiple versions may need to be supported by client software.
     static final String VERSION_JSON   = "version";
-    static final String ACTUAL_VERSION = "3";
+    static final String ACTUAL_VERSION = "4";
     
     static final String REQUEST_HASH_ALGORITHM_JSON = "requestHashAlgorithm";
     
@@ -69,6 +69,10 @@ public class CardDataDecoder {
             tempBalanceFix = rd.getMoney(TEMPORARY_BALANCE_FIX, 2);
             rd.checkForUnread();
         }
+    }
+
+    public CardDataDecoder(byte[] cardDataBlob) throws IOException {
+        this(ACTUAL_VERSION, cardDataBlob);
     }
 
     boolean recognized;

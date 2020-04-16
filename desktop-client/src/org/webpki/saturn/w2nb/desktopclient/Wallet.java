@@ -1075,7 +1075,9 @@ public class Wallet {
                         selectedCard.dataEncryptionAlgorithm,
                         challengeResults,
                         selectedCard.signatureAlgorithm,
-                        new ClientPlatform("Java 8","0.2","Dell"),
+                        "Saturn Internal Test Wallet",
+                        "1.0",
+                        new ClientPlatform("Java","8","W10"),
                         new AsymKeySignerInterface () {
                             @Override
                             public PublicKey getPublicKey() throws IOException {

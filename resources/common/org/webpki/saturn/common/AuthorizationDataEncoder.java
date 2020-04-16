@@ -34,11 +34,8 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationDataEncoder implements BaseProperties {
 
-    public static final String SOFTWARE_ID      = "WebPKI.org - Wallet";
-    public static final String SOFTWARE_VERSION = "1.00";
-
     public static JSONObjectWriter encode(PaymentRequestDecoder paymentRequest,
-                                          HashAlgorithms reguestHashAlgorithm,
+                                          HashAlgorithms requestHashAlgorithm,
                                           String payeeAuthorityUrl,
                                           String payeeHost,
                                           String paymentMethodUrl,
@@ -48,14 +45,16 @@ public class AuthorizationDataEncoder implements BaseProperties {
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
                                           GregorianCalendar timeStamp,
+                                          String applicationName,
+                                          String applicationVersion,
                                           ClientPlatform clientPlatform,
                                           JSONAsymKeySigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, 
-                           reguestHashAlgorithm.getJoseAlgorithmId())
+                           requestHashAlgorithm.getJoseAlgorithmId())
                 .setBinary(JSONCryptoHelper.VALUE_JSON, 
-                           paymentRequest.getRequestHash(reguestHashAlgorithm)))
+                           paymentRequest.getRequestHash(requestHashAlgorithm)))
             .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
             .setString(PAYEE_HOST_JSON, payeeHost)
             .setString(PAYMENT_METHOD_JSON, paymentMethodUrl)
@@ -71,7 +70,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
             }
         }
         return wr.setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
-                 .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_ID, SOFTWARE_VERSION))
+                 .setObject(SOFTWARE_JSON, Software.encode(applicationName, applicationVersion))
                  .setObject(PLATFORM_JSON, new JSONObjectWriter()
                      .setString(NAME_JSON, clientPlatform.name)
                      .setString(VERSION_JSON, clientPlatform.version)
@@ -90,6 +89,8 @@ public class AuthorizationDataEncoder implements BaseProperties {
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
                                           AsymSignatureAlgorithms signatureAlgorithm,
+                                          String applicationName,
+                                          String applicationVersion,
                                           ClientPlatform clientPlatform,
                                           AsymKeySignerInterface signer) throws IOException {
         return encode(paymentRequest,
@@ -103,6 +104,8 @@ public class AuthorizationDataEncoder implements BaseProperties {
                       dataEncryptionAlgorithm,
                       optionalUserResponseItems,
                       new GregorianCalendar(),
+                      applicationName,
+                      applicationVersion,
                       clientPlatform,
                       new JSONAsymKeySigner(signer).setSignatureAlgorithm(signatureAlgorithm));
     }
