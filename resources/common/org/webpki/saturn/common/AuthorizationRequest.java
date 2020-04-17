@@ -96,7 +96,7 @@ public class AuthorizationRequest implements BaseProperties {
     }
 
     String payeeAuthorityUrl;
-    public String getAuthorityUrl() {
+    public String getPayeeAuthorityUrl() {
         return payeeAuthorityUrl;
     }
 

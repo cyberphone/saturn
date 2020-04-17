@@ -78,7 +78,7 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
                         ", Method=" + resultData.paymentMethod.getPaymentMethodUrl());
 
             PayeeAuthority payeeAuthority = 
-                MerchantService.externalCalls.getPayeeAuthority(urlHolder, authorizationRequest.getAuthorityUrl());
+                MerchantService.externalCalls.getPayeeAuthority(urlHolder, authorizationRequest.getPayeeAuthorityUrl());
              ProviderAuthority providerAuthority =
                 MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
 

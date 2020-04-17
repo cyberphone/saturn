@@ -60,7 +60,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
         String payeeAuthorityUrl = transactionRequest
                 .getAuthorizationResponse()
                     .getAuthorizationRequest()
-                        .getAuthorityUrl();
+                        .getPayeeAuthorityUrl();
         PayeeCoreProperties payeeCoreProperties = AcquirerService.payeeAccountDb.get(payeeAuthorityUrl);
         if (payeeCoreProperties == null) {
             throw new IOException("Unknown merchant: " + payeeAuthorityUrl);

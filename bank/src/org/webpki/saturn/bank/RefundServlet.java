@@ -53,7 +53,7 @@ public class RefundServlet extends ProcessingBaseServlet {
         String payeeAuthorityUrl = refundRequest
                 .getAuthorizationResponse()
                     .getAuthorizationRequest()
-                        .getAuthorityUrl();
+                        .getPayeeAuthorityUrl();
         PayeeCoreProperties payeeCoreProperties = 
                 BankService.PayeeAccountDb.get(payeeAuthorityUrl);
         if (payeeCoreProperties == null) {
