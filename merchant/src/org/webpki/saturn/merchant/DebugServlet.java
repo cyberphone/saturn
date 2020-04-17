@@ -161,7 +161,6 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, NO_MATCHING_METHODS_URL_JSON);
         updateUrls(jsonTree, rewriter, HOME_PAGE_JSON);
         updateUrls(jsonTree, rewriter, RECEPIENT_URL_JSON);
-        updateUrls(jsonTree, rewriter, AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, PAYEE_AUTHORITY_URL_JSON);
@@ -439,7 +438,7 @@ class DebugPrintout implements BaseProperties {
         description(point.sub() + 
                 "<p>After receiving the " + keyWord(Messages.AUTHORIZATION_REQUEST) +
                 " object, the <b>User&nbsp;Bank</b> uses the enclosed " +
-                keyWord(AUTHORITY_URL_JSON) + " to retrieve the <b>Merchant</b> " +
+                keyWord(PAYEE_AUTHORITY_URL_JSON) + " to retrieve the <b>Merchant</b> " +
                 keyWord(Messages.PAYEE_AUTHORITY) + " object:</p>");
 
         fancyBox(debugData.payeeAuthority);

@@ -30,13 +30,13 @@ import org.webpki.util.ISODateTime;
 
 public class PayeeAuthority implements BaseProperties {
     
-    public static JSONObjectWriter encode(String authorityUrl,
+    public static JSONObjectWriter encode(String payeeAuthorityUrl,
                                           String providerAuthorityUrl,
                                           PayeeCoreProperties payeeCoreProperties,
                                           GregorianCalendar expires,
                                           ServerAsymKeySigner issuerSigner) throws IOException {
         return payeeCoreProperties.writeObject(Messages.PAYEE_AUTHORITY.createBaseMessage()
-                                     .setString(AUTHORITY_URL_JSON, authorityUrl)
+                                     .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
@@ -45,9 +45,11 @@ public class PayeeAuthority implements BaseProperties {
 
     public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         root = Messages.PAYEE_AUTHORITY.parseBaseMessage(rd);
-        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-        if (!authorityUrl.equals(expectedAuthorityUrl)) {
-            throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
+        payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
+        if (!payeeAuthorityUrl.equals(expectedAuthorityUrl)) {
+            throw new IOException("\"" + PAYEE_AUTHORITY_URL_JSON + 
+                                  "\" mismatch, read=" + 
+                                  payeeAuthorityUrl +
                                   " expected=" + expectedAuthorityUrl);
         }
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
@@ -65,9 +67,9 @@ public class PayeeAuthority implements BaseProperties {
 
     long expiresInMillis;
 
-    String authorityUrl;
-    public String getAuthorityUrl() {
-        return authorityUrl;
+    String payeeAuthorityUrl;
+    public String getPayeeAuthorityUrl() {
+        return payeeAuthorityUrl;
     }
 
     String providerAuthorityUrl;

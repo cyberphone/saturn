@@ -132,7 +132,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             "<tr><td><table class=\"tftable\"><tr><th>Property</th><th>Description</th></tr>")
                     .append(isProvider() ?
                             tableRow(rd, HTTP_VERSION_JSON, "Preferred HTTP version (&#x2265; HTTP/1.1)") +
-                            tableRow(rd, AUTHORITY_URL_JSON, "The address of this object") +
+                            tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +
                             tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
                             tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
                             tableRow(rd, SUPPORTED_PAYMENT_METHODS_JSON, "Supported client:[backend...] payment methods") +
@@ -141,7 +141,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider") +
                             tableRow(rd, HOSTING_PROVIDER_JSON, "Holds core data of a payee hosting provider", true)
                                : 
-                            tableRow(rd, AUTHORITY_URL_JSON, "The address of this object (payee \"identity\")") +
+                            tableRow(rd, PAYEE_AUTHORITY_URL_JSON, "The address of this object (payee \"identity\")") +
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of the issuing provider's authority object") +
                             tableRow(rd, LOCAL_PAYEE_ID_JSON, "Local payee id used by the payee provider") +
                             tableRow(rd, COMMON_NAME_JSON, "Payee common name") +

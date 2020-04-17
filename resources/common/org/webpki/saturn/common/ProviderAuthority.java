@@ -114,7 +114,7 @@ public class ProviderAuthority implements BaseProperties {
 
     public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
 
-    public static JSONObjectWriter encode(String authorityUrl,
+    public static JSONObjectWriter encode(String providerAuthorityUrl,
                                           String homePage,
                                           String serviceUrl,
                                           PaymentMethodDeclarations paymentMethods,
@@ -126,7 +126,7 @@ public class ProviderAuthority implements BaseProperties {
                                           ServerX509Signer issuerSigner) throws IOException {
         return Messages.PROVIDER_AUTHORITY.createBaseMessage()
             .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
-            .setString(AUTHORITY_URL_JSON, authorityUrl)
+            .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
             .setObject(SUPPORTED_PAYMENT_METHODS_JSON, paymentMethods.toObject())
@@ -161,11 +161,15 @@ public class ProviderAuthority implements BaseProperties {
         root = Messages.PROVIDER_AUTHORITY.parseBaseMessage(rd);
         httpVersion = rd.getString(HTTP_VERSION_JSON);
         if (!httpVersion.equals(HTTP_VERSION_SUPPORT)) {
-            throw new IOException("\"" + HTTP_VERSION_JSON + "\" is currently limited to " + HTTP_VERSION_SUPPORT);
+            throw new IOException("\"" + HTTP_VERSION_JSON + 
+                                 "\" is currently limited to " + 
+                                 HTTP_VERSION_SUPPORT);
         }
-        authorityUrl = rd.getString(AUTHORITY_URL_JSON);
-        if (!authorityUrl.equals(expectedAuthorityUrl)) {
-            throw new IOException("\"" + AUTHORITY_URL_JSON + "\" mismatch, read=" + authorityUrl +
+        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
+        if (!providerAuthorityUrl.equals(expectedAuthorityUrl)) {
+            throw new IOException("\"" + PROVIDER_AUTHORITY_URL_JSON +
+                                  "\" mismatch, read=" + 
+                                  providerAuthorityUrl +
                                   " expected=" + expectedAuthorityUrl);
         }
         homePage = rd.getString(HOME_PAGE_JSON);
@@ -260,9 +264,9 @@ public class ProviderAuthority implements BaseProperties {
         return httpVersion;
     }
 
-    String authorityUrl;
-    public String getAuthorityUrl() {
-        return authorityUrl;
+    String providerAuthorityUrl;
+    public String getProviderAuthorityUrl() {
+        return providerAuthorityUrl;
     }
 
     String homePage;

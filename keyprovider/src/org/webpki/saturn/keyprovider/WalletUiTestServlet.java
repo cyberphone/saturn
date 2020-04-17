@@ -279,7 +279,10 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
               "</div>" +
             "</div>" +
             "<div id=\"" + ERROR_ID + "\" " +
-            "style=\"color:red;font-weight:bold;padding:1em 0 2em 0;display:none\"></div>" +
+              "style=\"color:red;font-weight:bold;padding:1em 0 2em 0" + 
+                (request.getParameter(ABORT_TAG) == null ? 
+                       ";display:none\">" : "\">User cancelled the operation") +
+            "</div>" +
             "<img id=\"" + WAITING_ID + "\" src=\"waiting.gif\" " +
             "style=\"padding-bottom:1em;display:none\" alt=\"waiting\">" +
             "<div style=\"display:flex;justify-content:center\">" +
