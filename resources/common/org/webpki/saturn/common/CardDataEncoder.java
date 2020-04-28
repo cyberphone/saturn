@@ -18,8 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.math.BigDecimal;
-
 import java.security.PublicKey;
 
 import org.webpki.crypto.AsymSignatureAlgorithms;
@@ -45,8 +43,7 @@ public class CardDataEncoder {
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                           PublicKey encryptionKey,
                                           String optionalKeyId,
-                                          byte[] optionalAccountStatusKeyHash,
-                                          BigDecimal tempBalanceFix) throws IOException {
+                                          byte[] optionalAccountStatusKeyHash) throws IOException {
         return new JSONObjectWriter()
             .setString(CardDataDecoder.VERSION_JSON, CardDataDecoder.ACTUAL_VERSION)
             .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentMethod)
@@ -58,13 +55,15 @@ public class CardDataEncoder {
             .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
                        signatureAlgorithm.getJoseAlgorithmId())
             .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
-                .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, keyEncryptionAlgorithm.toString())
+                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, 
+                           dataEncryptionAlgorithm.toString())
+                .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
+                           keyEncryptionAlgorithm.toString())
                 .setPublicKey(encryptionKey)
                 .setDynamic((wr)-> optionalKeyId == null ?
                         wr : wr.setString(JSONCryptoHelper.KEY_ID_JSON, optionalKeyId)))
             .setDynamic((wr)-> optionalAccountStatusKeyHash == null ?
-                    wr : wr.setBinary(CardDataDecoder.ACCOUNT_STATUS_KEY_HASH, optionalAccountStatusKeyHash))
-            .setMoney(CardDataDecoder.TEMPORARY_BALANCE_FIX, tempBalanceFix);
+                    wr : wr.setBinary(CardDataDecoder.ACCOUNT_STATUS_KEY_HASH,
+                                      optionalAccountStatusKeyHash));
     }
 }

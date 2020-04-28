@@ -322,7 +322,6 @@
         <arg value="${card.type}"/>
         <arg value="${card.credential}"/>
         <arg value="${card.number}"/>
-        <arg value="${card.balance}"/>
         <arg value="${bank.path}"/>
         <arg value="${key.encryption.key}"/>
         <arg value="${card.path}"/>
@@ -351,7 +350,6 @@
        <param name="card.type" value="SUPER_CARD"/>
        <param name="card.credential" value="100000000"/>
        <param name="card.number" value="4532562005001233"/>
-       <param name="card.balance" value="2390.00"/>
        <param name="card.image" value="supercard.png"/>
        <param name="rqa" value="S384"/>
        <param name="dea" value="A128CBC-HS256"/>
@@ -363,7 +361,6 @@
        <param name="card.type" value="BANK_DIRECT"/>
        <param name="card.credential" value="100000001"/>
        <param name="card.number" value="FR7630002111110020050012442"/>
-       <param name="card.balance" value="5543.00"/>
        <param name="card.image" value="bankdirect.png"/>
        <param name="rqa" value="S256"/>
        <param name="dea" value="A256GCM"/>
@@ -375,7 +372,6 @@
        <param name="card.type" value="UNUSUAL_CARD"/>
        <param name="card.credential" value="100000002"/>
        <param name="card.number" value="6011032005001257"/>
-       <param name="card.balance" value="120.00"/>
        <param name="card.image" value="unusualcard.png"/>
        <param name="rqa" value="S512"/>
        <param name="dea" value="A128CBC-HS256"/>

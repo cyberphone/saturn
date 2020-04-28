@@ -123,8 +123,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         HashAlgorithms requestHashAlgorithm;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
-        
-        BigDecimal tempBalanceFix;
+        boolean balanceService;
         
         public CredentialTemplate(JSONObjectReader rd) throws IOException {
             paymentMethod = rd.getString("paymentMethod");
@@ -153,7 +152,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                         .getAlgorithmFromId(encryptionParameters
                             .getString("keyEncryptionAlgorithm"));
             
-            tempBalanceFix = rd.getBigDecimal("temp.bal.fix");
+            balanceService = rd.getBoolean("balanceService");
             rd.checkForUnread();
         }
     }

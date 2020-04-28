@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import java.math.BigDecimal;
-
 import java.security.KeyPair;
 import java.security.PublicKey;
 
@@ -80,10 +78,10 @@ import org.webpki.util.DebugFormatter;
 public class InitWallet {
 
     public static void main(String[] args) throws Exception {
-        if (args.length != 13) {
+        if (args.length != 12) {
             System.out.println("\nUsage: " +
                                InitWallet.class.getCanonicalName() +
-                               "sksFile clientKeyCore kg2Pin accountType credentialId accountId balance" +
+                               "sksFile clientKeyCore kg2Pin accountType credentialId accountId" +
                                " authorityUrl keyEncryptionKey imageFile" +
                                " reguestHashAlgorithm dataEncrytionAlgorithm keyEncrytionAlgorithm");
             System.exit(-3);
@@ -95,13 +93,12 @@ public class InitWallet {
         PaymentMethods paymentMethod = PaymentMethods.valueOf(args[3]);
         String credentialId = args[4];
         String accountId = args[5];
-        String balance = args[6];
-        String authorityUrl = args[7];
-        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[8])).getPublicKey();
-        String imageFile = args[9];
-        HashAlgorithms requestHashAgorithm = HashAlgorithms.getAlgorithmFromId(args[10], AlgorithmPreferences.JOSE);
-        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[11]);
-        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[12]);
+        String authorityUrl = args[6];
+        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[7])).getPublicKey();
+        String imageFile = args[8];
+        HashAlgorithms requestHashAgorithm = HashAlgorithms.getAlgorithmFromId(args[9], AlgorithmPreferences.JOSE);
+        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[10]);
+        KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[11]);
   
         // Read importedKey/certificate to be imported
         JSONObjectReader privateKeyJWK = JSONParser.parse(ArrayUtil.readFile(clientKeyCore + ".jwk"));
@@ -174,8 +171,7 @@ public class InitWallet {
                                     keyEncryptionAlgorithm, 
                                     encryptionKey, 
                                     null,
-                                    null,
-                                    new BigDecimal(balance));
+                                    null);
         surrogateKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                                   SecureKeyStore.SUB_TYPE_EXTENSION,
                                   "",

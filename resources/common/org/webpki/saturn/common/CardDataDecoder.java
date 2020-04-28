@@ -18,8 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.math.BigDecimal;
-
 import java.security.PublicKey;
 
 import org.webpki.crypto.AsymSignatureAlgorithms;
@@ -39,7 +37,7 @@ public class CardDataDecoder {
     // Since deployed card data should preferably remain useful even if the Saturn protocol
     // changes, multiple versions may need to be supported by client software.
     static final String VERSION_JSON   = "version";
-    static final String ACTUAL_VERSION = "4";
+    static final String ACTUAL_VERSION = "5";
     
     static final String REQUEST_HASH_ALGORITHM_JSON = "requestHashAlgorithm";
     
@@ -66,7 +64,6 @@ public class CardDataDecoder {
             encryptionKey = ep.getPublicKey();
             optionalKeyId = ep.getStringConditional(JSONCryptoHelper.KEY_ID_JSON);
             optionalAccountStatusKeyHash = rd.getBinaryConditional(ACCOUNT_STATUS_KEY_HASH);
-            tempBalanceFix = rd.getMoney(TEMPORARY_BALANCE_FIX, 2);
             rd.checkForUnread();
         }
     }
@@ -138,9 +135,4 @@ public class CardDataDecoder {
     public byte[] getOptionalAccountStatusKeyHash() {
         return optionalAccountStatusKeyHash;
     }
-
-    BigDecimal tempBalanceFix;
-    public BigDecimal getTempBalanceFix() {
-        return tempBalanceFix;
-    }    
 }

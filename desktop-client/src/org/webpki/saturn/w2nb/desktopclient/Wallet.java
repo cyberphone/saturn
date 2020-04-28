@@ -41,8 +41,6 @@ import java.awt.event.WindowAdapter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 
-import java.math.BigDecimal;
-
 import java.lang.reflect.Field;
 
 import java.net.URL;
@@ -184,7 +182,6 @@ public class Wallet {
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey encryptionKey;
-        BigDecimal tempBalanceFix;
         
         Account(String paymentMethod,
                 String payeeAuthorityUrl,
@@ -193,8 +190,7 @@ public class Wallet {
                 String accountId,
                 ImageIcon cardIcon,
                 AsymSignatureAlgorithms signatureAlgorithm,
-                String providerAuthorityUrl,
-                BigDecimal tempBalanceFix) {
+                String providerAuthorityUrl) {
             this.paymentMethod = paymentMethod;
             this.payeeAuthorityUrl = payeeAuthorityUrl;
             this.requestHashAlgorithm = requestHashAlgorithm;
@@ -203,7 +199,6 @@ public class Wallet {
             this.cardIcon = cardIcon;
             this.signatureAlgorithm = signatureAlgorithm;
             this.providerAuthorityUrl = providerAuthorityUrl;
-            this.tempBalanceFix = tempBalanceFix;
         }
     }
 
@@ -427,7 +422,7 @@ public class Wallet {
                                       0,
                                       0,
                                       0);
-                JLabel accountId = new JLabel(card.tempBalanceFix.toPlainString(), JLabel.CENTER);
+                JLabel accountId = new JLabel(card.accountId, JLabel.CENTER);
                 accountId.setFont(cardNumberFont);
                 cardSelectionViewCore.add(accountId, c);
                 if (!even) {
@@ -465,7 +460,7 @@ public class Wallet {
                 LinkedHashMap<Integer,Account> cards = new LinkedHashMap<>();
                 for (int i = 0; i < 2; i++) {
                     cards.put(i, new Account("n/a", null, null, "n/a", DUMMY_BALANCE,
-                                             dummyCardIcon, null, null, new BigDecimal("1.00")));
+                                             dummyCardIcon, null, null));
                 }
                 cardSelectionView.add(initCardSelectionViewCore(cards), c);
             }
@@ -683,7 +678,7 @@ public class Wallet {
             payeeField.setText("\u200a" + payeeCommonName);
             selectedCardImage.setIcon(selectedCard.cardIcon);
             selectedCardImage.setPressedIcon(selectedCard.cardIcon);
-            selectedCardBalance.setText(selectedCard.tempBalanceFix.toPlainString());
+            selectedCardBalance.setText(selectedCard.accountId);
             ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
             payeeField.setCaretPosition(0);
             pinText.requestFocusInWindow();
@@ -952,7 +947,7 @@ public class Wallet {
                                     // This key had the attribute signifying that it is a Saturn payment credential
                                     // but it might still not match the Payee's list of supported account types.
                                     collectPotentialCard(ek.getKeyHandle(),
-                                                         new CardDataDecoder("3", 
+                                                         new CardDataDecoder(
                                             ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
                                                          paymentMethods);
                                 }
@@ -1032,8 +1027,7 @@ public class Wallet {
                                                  KeyGen2URIs.LOGOTYPES.CARD).getExtensionData(SecureKeyStore.SUB_TYPE_LOGOTYPE),
                                                  false),
                                     cardProperties.getSignatureAlgorithm(),
-                                    cardProperties.getAuthorityUrl(),
-                                    cardProperties.getTempBalanceFix());
+                                    cardProperties.getAuthorityUrl());
                     card.optionalKeyId = cardProperties.getOptionalKeyId();
                     card.keyEncryptionAlgorithm = cardProperties.getKeyEncryptionAlgorithm();
                     card.dataEncryptionAlgorithm = cardProperties.getDataEncryptionAlgorithm();
