@@ -19,8 +19,6 @@ package org.webpki.saturn.keyprovider;
 import java.io.IOException;
 import java.io.InputStream;
 
-import java.math.BigDecimal;
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;

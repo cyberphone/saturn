@@ -250,6 +250,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                          3,
                                                          null);
                   
+                    // Create the signature keys first
                     for (KeyProviderService.CredentialTemplate credentialTemplate 
                             : KeyProviderService.credentialTemplates) {
                         ServerState.Key key = credentialTemplate.optionalServerPin == null ?
@@ -272,6 +273,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                             key.setBiometricProtection(BiometricProtection.ALTERNATIVE);
                         }
                     }
+
+                    // Then create the optional balance keys (order imposed by KeyGen2)
                     for (KeyProviderService.CredentialTemplate credentialTemplate 
                             : KeyProviderService.credentialTemplates) {
                         if (credentialTemplate.balanceService) {
@@ -282,6 +285,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                             .setFriendlyName(credentialTemplate.friendlyName + " balance key");
                         }
                     }
+
                     keygen2JSONBody(response, new KeyCreationRequestEncoder(keygen2State));
                     return;
 
@@ -299,38 +303,35 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     // first create a user since even demo users are supposed to be
                     // independent of each other.  Note, user name is just an "alias"
                     // so it does NOT function as a user ID...
-                    String userName = 
-                            (String) session.getAttribute(KeyProviderInitServlet.USERNAME_SESSION_ATTR);
-                    boolean testMode =
-                            session.getAttribute(KeyProviderInitServlet.TESTMODE_SESSION_ATTR) != null;
+                    String userName = (String) session.getAttribute(
+                            KeyProviderInitServlet.USERNAME_SESSION_ATTR);
+                    boolean testMode = session.getAttribute(
+                            KeyProviderInitServlet.TESTMODE_SESSION_ATTR) != null;
                     int userId = DataBaseOperations.createUser(userName);
-                    int coreKeys = 0;
-                    for (KeyProviderService.CredentialTemplate credentialTemplate 
-                            : KeyProviderService.credentialTemplates) {
-                        coreKeys++;
-                    }
 
-                    // now create Saturn payment credentials based on the template
+                    // Create Saturn payment credentials based on the template
                     ServerState.Key[] keys = keygen2State.getKeys();
                     int keyIndex = 0;
+                    int coreKeys = KeyProviderService.credentialTemplates.size();
                     int balanceKeyIndex = coreKeys;
                     while (keyIndex < coreKeys) {
                         ServerState.Key signatureKey = keys[keyIndex++];
                         KeyProviderService.CredentialTemplate credentialTemplate =
                                 (KeyProviderService.CredentialTemplate)signatureKey.getUserObject();
 
-                        // There may be a balance service as well
+                        // 1. There may be a balance key associated with the same account as well
                         ServerState.Key balanceKey = null;
                         PublicKey balancePublicKey = null;
                         byte[] balanceKeyHash = null;
                         if (credentialTemplate.balanceService) {
                             balanceKey = keys[balanceKeyIndex++];
                             balancePublicKey = balanceKey.getPublicKey();
+                            // The link between the keys a is SHA-256 hash
                             balanceKeyHash = 
                                     HashAlgorithms.SHA256.digest(balancePublicKey.getEncoded());
                         }
 
-                        // 1. Create an account and get an ID for accessing it
+                        // 2. Create an account and get an ID for accessing it
                         DataBaseOperations.AccountAndCredential accountAndCredential = 
                                 DataBaseOperations
                                     .createAccountAndCredential(userId, 
@@ -340,13 +341,14 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                                 signatureKey.getPublicKey(),
                                                                 balancePublicKey);
 
-                        // 2. Create a "carrier" certificate for the signature key (SKS need that)
+                        // 3. Create a "carrier" certificate for the signature key (SKS need that)
                         createCarrierCerificate(signatureKey, userName, accountAndCredential);
                         if (credentialTemplate.balanceService) {
+                            // 3a. Create a "carrier" certificate for the optional balance key
                             createCarrierCerificate(balanceKey, userName, accountAndCredential);
                         }
 
-                        // 3. Add card data blob to the key entry
+                        // 4. Add card data blob to the signature key
                         signatureKey.addExtension(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI,
                             CardDataEncoder.encode(
                                     credentialTemplate.paymentMethod,
@@ -363,7 +365,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                     balanceKeyHash)
                             .serializeToBytes(JSONOutputFormats.NORMALIZED));
 
-                        // 4. Add personalized card image
+                        // 5. Add personalized card image
                         signatureKey.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
 
                             @Override
