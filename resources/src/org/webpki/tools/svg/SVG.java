@@ -70,7 +70,7 @@ public class SVG {
                        .append("</")
                        .append(svgObject.getTag());
             }
-        } else {
+        } else if (!(svgObject instanceof SVGBeginGlobal)) {
             svgText.append("/");
         }
         svgText.append(">\n");

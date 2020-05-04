@@ -33,5 +33,9 @@ public class SVGStringValue extends SVGValue {
     public String getStringRepresentation() {
          return value;
     }
+
+    public static SVGStringValue parse(String value) {
+        return value == null ? null : new SVGStringValue(value);
+    }
 }
 

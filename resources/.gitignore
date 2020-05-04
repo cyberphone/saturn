@@ -2,9 +2,6 @@
 .tmp
 /credentials/sks.serialized
 /nodejscryptotest/
-/svg-gen/play
-/svg-filters/play
-/src/org/webpki/tools/svg/test/play
 
 
 

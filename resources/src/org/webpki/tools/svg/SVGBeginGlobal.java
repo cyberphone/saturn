@@ -16,35 +16,29 @@
  */
 package org.webpki.tools.svg;
 
-public class SVGDoubleValue extends SVGValue {
+public class SVGBeginGlobal extends SVGObject {
     
-    private double value;
-
-    public SVGDoubleValue(double value) {
-        this.value = value;
+    public SVGBeginGlobal() {
     }
 
     @Override
-    public String getStringRepresentation() {
-        return niceDouble(value);
-    }
-    
-    @Override
-    public String getString() {
-        return getStringRepresentation();
+    String getTag() {
+        return "g";
     }
 
     @Override
-    public double getDouble() {
-        return value;
+    boolean hasBody() {
+        return false;
     }
 
-    public void setDouble(double value) {
-        this.value = value;
+    @Override
+    double getMaxX() {
+        return 0;
     }
 
-    public static SVGDoubleValue parse(Double value) {
-        return value == null ? null : new SVGDoubleValue(value);
+    @Override
+    double getMaxY() {
+        return 0;
     }
+   
 }
-

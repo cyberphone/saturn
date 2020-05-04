@@ -28,8 +28,8 @@ public class SVGLine extends SVGObject {
         addDouble(SVGAttributes.Y1, y1);
         addDouble(SVGAttributes.X2, x2);
         addDouble(SVGAttributes.Y2, y2);
-        addDouble(SVGAttributes.STROKE_WIDTH, new SVGDoubleValue(strokeWidth));
-        addString(SVGAttributes.STROKE_COLOR, new SVGStringValue(strokeColor));
+        addDouble(SVGAttributes.STROKE_WIDTH, SVGDoubleValue.parse(strokeWidth));
+        addString(SVGAttributes.STROKE_COLOR, SVGStringValue.parse(strokeColor));
     }
 
     @Override

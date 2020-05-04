@@ -9,7 +9,7 @@
   <property name="server.dir" value="server"/>
   
   <target name="help">
-      <echo message="createroot createcert -Dserver=HostNameOrIpAddress"/>
+      <echo message="createroot createcert -Dserver=HostNameOrIpAddress [-Dcn.hostname=HostName]"/>
   </target>
  
   <target name="_createcert">
@@ -53,9 +53,21 @@
         <isset property="ipaddress"/>
       </not>
     </condition>
+    <condition property="cert.file" value="${cn.hostname}-and-${server}" else="${server}">
+      <and>
+        <isset property="ipaddress"/>
+        <isset property="cn.hostname"/>
+      </and>
+    </condition>
+    <condition property="opt.san.host" value="-extension/dns ${cn.hostname}" else="">
+      <and>
+        <isset property="ipaddress"/>
+        <isset property="cn.hostname"/>
+      </and>
+    </condition>
     <antcall target="_createcert">
        <param name="target.dir" value="${server.dir}"/>
-       <param name="cmd" value="-ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} -subject &quot;CN=TLS certificate for ${server}&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${server}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
+       <param name="cmd" value="-ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} ${opt.san.host} -subject &quot;CN=TLS certificate for ${cert.file}&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${cert.file}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
     </antcall>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2PEMConverter"
@@ -75,7 +87,7 @@
              <include name="*.jar"/>
           </fileset>
         </classpath>
-        <arg line="${server}.p12 ${@keypassword} ${server}.cert.pem certificate"/>
+        <arg line="${cert.file}.p12 ${@keypassword} ${cert.file}.cert.pem certificate"/>
     </java>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2PEMConverter"
@@ -95,7 +107,7 @@
              <include name="*.jar"/>
           </fileset>
         </classpath>
-        <arg line="${server}.p12 ${@keypassword} ${server}.key.pem private"/>
+        <arg line="${cert.file}.p12 ${@keypassword} ${cert.file}.key.pem private"/>
     </java>
   </target>
 <!-- 

@@ -80,14 +80,19 @@ public abstract class SVGObject {
     }
     
     void addDouble(SVGAttributes svgAttribute, SVGValue svgValue) {
-        svgValue.getDouble(); // For type checking
-        _addAttribute(svgAttribute, svgValue);
+        if (svgValue != null) {
+            svgValue.getDouble(); // For type checking
+            _addAttribute(svgAttribute, svgValue);
+        }
     }
 
 
-    public void addString(SVGAttributes svgAttribute, SVGValue svgValue) {
-        svgValue.getString(); // For type checking
-        _addAttribute(svgAttribute, svgValue);
+    public SVGObject addString(SVGAttributes svgAttribute, SVGValue svgValue) {
+        if (svgValue != null) {
+            svgValue.getString(); // For type checking
+            _addAttribute(svgAttribute, svgValue);
+        }
+        return this;
     }
 
     void addDashes(double written, double empty) {

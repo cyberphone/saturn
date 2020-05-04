@@ -33,6 +33,7 @@ public enum SVGAttributes {
     STROKE_LINECAP ("stroke-linecap"),
     STROKE_WIDTH   ("stroke-width"),
     STROKE_DASHES  ("stroke-dasharray"),
+    STROKE_OPACITY ("stroke-opacity"),
     WIDTH          ("width"),
     HEIGHT         ("height"),
     POINTS         ("points"),
