@@ -244,7 +244,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                          null);
                     standardPinPolicy.setGrouping(Grouping.SHARED);
                     ServerState.PINPolicy serverPinPolicy = 
-                            keygen2State.createPINPolicy(PassphraseFormat.STRING,
+                            keygen2State.createPINPolicy(PassphraseFormat.NUMERIC,
                                                          4,
                                                          8,
                                                          3,
@@ -335,8 +335,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         DataBaseOperations.AccountAndCredential accountAndCredential = 
                                 DataBaseOperations
                                     .createAccountAndCredential(userId, 
-                                                                credentialTemplate
-                                                                    .accountType,
+                                                                credentialTemplate.accountType,
                                                                 credentialTemplate.paymentMethod,
                                                                 signatureKey.getPublicKey(),
                                                                 balancePublicKey);
@@ -354,6 +353,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                     credentialTemplate.paymentMethod,
                                     accountAndCredential.credentialId,
                                     accountAndCredential.accountId,
+                                    accountAndCredential.currency,
                                     KeyProviderService.authorityUrl,
                                     credentialTemplate.requestHashAlgorithm,
                                     credentialTemplate.signatureAlgorithm, 

@@ -29,6 +29,8 @@ import java.util.logging.Logger;
 
 import org.webpki.crypto.HashAlgorithms;
 
+import org.webpki.saturn.common.Currencies;
+
 public class DataBaseOperations {
 
     static Logger logger = Logger.getLogger(DataBaseOperations.class.getCanonicalName());
@@ -60,6 +62,7 @@ public class DataBaseOperations {
     static class AccountAndCredential {
         String accountId;
         String credentialId;
+        Currencies currency;
     }
 
     static AccountAndCredential createAccountAndCredential(int userId,
@@ -72,6 +75,7 @@ public class DataBaseOperations {
 /*
         CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
                                                        OUT p_CredentialId INT,
+                                                       OUT p_Currency CHAR(3),
                                                        IN p_UserId INT, 
                                                        IN p_AccountTypeName VARCHAR(20),
                                                        IN p_PaymentMethodUrl VARCHAR(50),
@@ -80,18 +84,20 @@ public class DataBaseOperations {
 */
             try (Connection connection = KeyProviderService.jdbcDataSource.getConnection();
                  CallableStatement stmt = 
-                    connection.prepareCall("{call CreateAccountAndCredentialSP(?,?,?,?,?,?,?)}");) {
+                    connection.prepareCall("{call CreateAccountAndCredentialSP(?,?,?,?,?,?,?,?)}");) {
                 stmt.registerOutParameter(1, java.sql.Types.VARCHAR);
                 stmt.registerOutParameter(2, java.sql.Types.INTEGER);
-                stmt.setInt(3, userId);
-                stmt.setString(4, accountType);
-                stmt.setString(5, paymentMethodUrl);
-                stmt.setBytes(6, s256(payReq));
-                stmt.setBytes(7, s256(optionalBalReq));
+                stmt.registerOutParameter(3, java.sql.Types.VARCHAR);
+                stmt.setInt(4, userId);
+                stmt.setString(5, accountType);
+                stmt.setString(6, paymentMethodUrl);
+                stmt.setBytes(7, s256(payReq));
+                stmt.setBytes(8, s256(optionalBalReq));
                 stmt.execute();
                 AccountAndCredential accountAndCredential = new AccountAndCredential();
                 accountAndCredential.accountId = stmt.getString(1);
                 accountAndCredential.credentialId = String.valueOf(stmt.getString(2));
+                accountAndCredential.currency = Currencies.valueOf(stmt.getString(3));
                 return accountAndCredential;
             }
         } catch (SQLException e) {

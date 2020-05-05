@@ -31,11 +31,12 @@ import org.webpki.json.JSONObjectWriter;
 // This class holds the data associated with a virtual card (modulo the logotype).
 // The data is embedded in an SKS (Secure Key Store) extension object belonging to the signature key.
 
-public class CardDataEncoder {
+public class CardDataEncoder implements BaseProperties {
      
     public static JSONObjectWriter encode(String paymentMethod,
                                           String credentialId,
                                           String accountId,
+                                          Currencies currency,
                                           String authorityUrl,
                                           HashAlgorithms reguestHashAlgorithm,
                                           AsymSignatureAlgorithms signatureAlgorithm,
@@ -46,24 +47,23 @@ public class CardDataEncoder {
                                           byte[] optionalAccountStatusKeyHash) throws IOException {
         return new JSONObjectWriter()
             .setString(CardDataDecoder.VERSION_JSON, CardDataDecoder.ACTUAL_VERSION)
-            .setString(BaseProperties.PAYMENT_METHOD_JSON, paymentMethod)
-            .setString(BaseProperties.ACCOUNT_ID_JSON, accountId)
-            .setString(BaseProperties.CREDENTIAL_ID_JSON, credentialId)
-            .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, authorityUrl)
-            .setString(CardDataDecoder.REQUEST_HASH_ALGORITHM_JSON, 
-                       reguestHashAlgorithm.getJoseAlgorithmId())
-            .setString(BaseProperties.SIGNATURE_ALGORITHM_JSON,
-                       signatureAlgorithm.getJoseAlgorithmId())
-            .setObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, 
+            .setString(PAYMENT_METHOD_JSON, paymentMethod)
+            .setString(ACCOUNT_ID_JSON, accountId)
+            .setString(CURRENCY_JSON, currency.toString())
+            .setString(CREDENTIAL_ID_JSON, credentialId)
+            .setString(PROVIDER_AUTHORITY_URL_JSON, authorityUrl)
+            .setString(REQUEST_HASH_ALGORITHM_JSON, reguestHashAlgorithm.getJoseAlgorithmId())
+            .setString(SIGNATURE_ALGORITHM_JSON, signatureAlgorithm.getJoseAlgorithmId())
+            .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
+                .setString(DATA_ENCRYPTION_ALGORITHM_JSON, 
                            dataEncryptionAlgorithm.toString())
-                .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
+                .setString(KEY_ENCRYPTION_ALGORITHM_JSON, 
                            keyEncryptionAlgorithm.toString())
                 .setPublicKey(encryptionKey)
                 .setDynamic((wr)-> optionalKeyId == null ?
                         wr : wr.setString(JSONCryptoHelper.KEY_ID_JSON, optionalKeyId)))
             .setDynamic((wr)-> optionalAccountStatusKeyHash == null ?
-                    wr : wr.setBinary(CardDataDecoder.ACCOUNT_STATUS_KEY_HASH,
+                    wr : wr.setBinary(CardDataDecoder.ACCOUNT_STATUS_KEY_HASH_JSON,
                                       optionalAccountStatusKeyHash));
     }
 }

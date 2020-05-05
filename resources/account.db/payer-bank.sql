@@ -357,6 +357,7 @@ DETERMINISTIC
 //
 
 CREATE PROCEDURE _CreateAccountSP (OUT p_InternalAccountId INT,
+                                   OUT p_Currency CHAR(3),
                                    IN p_UserId INT, 
                                    IN p_AccountTypeId INT)
   BEGIN
@@ -364,6 +365,7 @@ CREATE PROCEDURE _CreateAccountSP (OUT p_InternalAccountId INT,
         SELECT p_UserId, p_AccountTypeId, ACCOUNT_TYPES.CappedAt 
         FROM ACCOUNT_TYPES WHERE Id = p_AccountTypeId;
     SET p_InternalAccountId = LAST_INSERT_ID();
+    SELECT Currency INTO p_Currency FROM ACCOUNTS WHERE Id = p_InternalAccountId;
   END
 //
 
@@ -398,13 +400,14 @@ CREATE PROCEDURE _CreateDemoCredentialSP (OUT p_CredentialId INT,
 
 CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
                                                OUT p_CredentialId INT,
+                                               OUT p_Currency CHAR(3),
                                                IN p_UserId INT, 
                                                IN p_AccountTypeName VARCHAR(20),
                                                IN p_PaymentMethodUrl VARCHAR(50),
                                                IN p_S256PayReq BINARY(32),
                                                IN p_S256BalReq BINARY(32))
   BEGIN
-    CALL _CreateAccountSP(@accountNumber, p_UserId, GetAccountTypeId(p_AccountTypeName));
+    CALL _CreateAccountSP(@accountNumber, p_Currency, p_UserId, GetAccountTypeId(p_AccountTypeName));
     SELECT Id, Format INTO @paymentMethodId, @format FROM PAYMENT_METHODS
         WHERE PAYMENT_METHODS.Name = p_PaymentMethodUrl;
     SET @sql = CONCAT('SET @accountId = ', @format);
@@ -819,7 +822,7 @@ CALL _CreateTransactionTypeSP("*FAILED*",
 
 CALL CreateUserSP(@userid, "Luke Skywalker");
 
-CALL _CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("CREDIT_CARD_ACCOUNT"));
+CALL _CreateAccountSP(@internalAccountId, @currency, @userid, GetAccountTypeId("CREDIT_CARD_ACCOUNT"));
 
 CALL _CreateDemoCredentialSP(@credentialid,
                              @accountId,
@@ -829,7 +832,7 @@ CALL _CreateDemoCredentialSP(@credentialid,
                              NULL);
 SELECT @credentialid, @accountId, @internalAccountId;
 
-CALL _CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("STANDARD_ACCOUNT"));
+CALL _CreateAccountSP(@internalAccountId, @currency, @userid, GetAccountTypeId("STANDARD_ACCOUNT"));
 
 CALL _CreateDemoCredentialSP(@credentialid,
                              @accountId,
@@ -839,7 +842,7 @@ CALL _CreateDemoCredentialSP(@credentialid,
                              x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
 SELECT @credentialid, @accountId, @internalAccountId;
 
-CALL _CreateAccountSP(@internalAccountId, @userid, GetAccountTypeId("NEW_USER_ACCOUNT"));
+CALL _CreateAccountSP(@internalAccountId, @currency, @userid, GetAccountTypeId("NEW_USER_ACCOUNT"));
 
 CALL _CreateDemoCredentialSP(@credentialid,
                              @accountId,
@@ -853,21 +856,23 @@ CALL CreateUserSP(@userid, "Chewbacca");
 
 CALL CreateAccountAndCredentialSP(@accountId,
                                   @credentialid,
+                                  @currency,
                                   @userid,
                                   "CREDIT_CARD_ACCOUNT",
                                   "https://supercard.com",  
                                   x'f3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a', 
                                   NULL);
-SELECT @credentialid, @accountId;
+SELECT @credentialid, @accountId, @currency;
 
 CALL CreateAccountAndCredentialSP(@accountId,
                                   @credentialid,
+                                  @currency,
                                   @userid,
                                   "STANDARD_ACCOUNT",
                                   "https://bankdirect.net",
                                   x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
                                   x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
-SELECT @credentialid, @accountId;
+SELECT @credentialid, @accountId, @currency;
 
 CALL AuthenticatePayReqSP(@error,
                           @userName,

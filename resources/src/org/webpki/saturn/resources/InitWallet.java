@@ -53,6 +53,7 @@ import org.webpki.keygen2.KeyGen2URIs;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataEncoder;
+import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.PaymentMethods;
 
 import org.webpki.sks.AppUsage;
@@ -160,7 +161,8 @@ public class InitWallet {
         JSONObjectWriter ow =
              CardDataEncoder.encode(paymentMethod.getPaymentMethodUrl(),
                                     credentialId,
-                                    accountId, 
+                                    accountId,
+                                    Currencies.EUR,
                                     authorityUrl,
                                     requestHashAgorithm,
                                     rsa_flag ?

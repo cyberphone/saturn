@@ -32,44 +32,48 @@ import org.webpki.json.JSONParser;
 // This class holds the data associated with a virtual card (modulo the logotype).
 // The data is embedded in an SKS (Secure Key Store) extension object belonging to the signature key.
 
-public class CardDataDecoder {
+public class CardDataDecoder implements BaseProperties {
 
     // Since deployed card data should preferably remain useful even if the Saturn protocol
     // changes, multiple versions may need to be supported by client software.
     static final String VERSION_JSON   = "version";
     static final String ACTUAL_VERSION = "5";
     
-    static final String REQUEST_HASH_ALGORITHM_JSON = "requestHashAlgorithm";
-    
-    static final String ACCOUNT_STATUS_KEY_HASH     = "accountStatusKeyHash";
-    static final String TEMPORARY_BALANCE_FIX       = "temp.bal.fix";
+    // SKS specific solution for linking related keys
+    static final String ACCOUNT_STATUS_KEY_HASH_JSON = "accountStatusKeyHash";
     
     public CardDataDecoder(String expectedVersion, byte[] cardDataBlob) throws IOException {
         JSONObjectReader rd = JSONParser.parse(cardDataBlob);
         version = rd.getString(VERSION_JSON);
         if (version.equals(expectedVersion)) {
             recognized = true;
-            paymentMethod= rd.getString(BaseProperties.PAYMENT_METHOD_JSON);
-            accountId = rd.getString(BaseProperties.ACCOUNT_ID_JSON);
-            credentialId = rd.getString(BaseProperties.CREDENTIAL_ID_JSON);
-            authorityUrl = rd.getString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON);
+            paymentMethod= rd.getString(PAYMENT_METHOD_JSON);
+            accountId = rd.getString(ACCOUNT_ID_JSON);
+            currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
+            credentialId = rd.getString(CREDENTIAL_ID_JSON);
+            authorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
             requestHashAlgorithm = CryptoUtils.getHashAlgorithm(rd, REQUEST_HASH_ALGORITHM_JSON);
             signatureAlgorithm = 
-                    CryptoUtils.getSignatureAlgorithm(rd, BaseProperties.SIGNATURE_ALGORITHM_JSON);
-            JSONObjectReader ep = rd.getObject(BaseProperties.ENCRYPTION_PARAMETERS_JSON);
+                    CryptoUtils.getSignatureAlgorithm(rd, SIGNATURE_ALGORITHM_JSON);
+            JSONObjectReader ep = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
             dataEncryptionAlgorithm = DataEncryptionAlgorithms
-                    .getAlgorithmFromId(ep.getString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON));
+                    .getAlgorithmFromId(ep.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
             keyEncryptionAlgorithm = KeyEncryptionAlgorithms
-                    .getAlgorithmFromId(ep.getString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON));
+                    .getAlgorithmFromId(ep.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
             encryptionKey = ep.getPublicKey();
             optionalKeyId = ep.getStringConditional(JSONCryptoHelper.KEY_ID_JSON);
-            optionalAccountStatusKeyHash = rd.getBinaryConditional(ACCOUNT_STATUS_KEY_HASH);
+            optionalAccountStatusKeyHash = rd.getBinaryConditional(ACCOUNT_STATUS_KEY_HASH_JSON);
             rd.checkForUnread();
         }
     }
 
     public CardDataDecoder(byte[] cardDataBlob) throws IOException {
         this(ACTUAL_VERSION, cardDataBlob);
+    }
+
+    Currencies currency;
+    public Currencies getCurrency() {
+        return currency;
     }
 
     boolean recognized;
