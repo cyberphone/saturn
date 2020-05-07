@@ -247,11 +247,11 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
 
     private String testAlternatives() {
         boolean first = true;
-        StringBuilder html = new StringBuilder("<select id=\"" + TYPE + "\">");
+        StringBuilder html = new StringBuilder("<select id='" + TYPE + "'>");
         for (String merchant : sampleTests.keySet()) {
-             html.append("<option value=\"")
+             html.append("<option value='")
                  .append(merchant)
-                 .append("\"")
+                 .append("'")
                  .append(first ? " selected>" : ">")
                  .append(merchant)
                  .append("</option>");
@@ -270,10 +270,10 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                         "\n-----END PRIVATE KEY-----";
         return new StringBuilder(
                 "<textarea" +
-                " rows=\"10\" maxlength=\"100000\"" +
-                " style=\"box-sizing:border-box;width:100%;white-space:nowrap;overflow:scroll;" +
-                "border-width:1px;border-style:solid;border-color:grey;padding:10pt\" " +
-                "id=\"" + KEY + "\">")
+                " rows='10' maxlength='100000'" +
+                " style='box-sizing:border-box;width:100%;white-space:nowrap;overflow:scroll;" +
+                "border-width:1px;border-style:solid;border-color:grey;padding:10pt' " +
+                "id='" + KEY + "'>")
             .append(key)
             .append("</textarea>").toString();
     }
@@ -281,30 +281,30 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     private void guiGetInit(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         StringBuilder html = new StringBuilder(
-            "<div style=\"padding:0 1em\">" +
+            "<div style='padding:0 1em'>" +
                     "This application is intended for testing the Saturn wallet." +
             "</div>" +
-            "<div style=\"display:flex;justify-content:center;padding-top:1em\">" +
+            "<div style='display:flex;justify-content:center;padding-top:1em'>" +
               "<div>" +
-                "<div style=\"margin-bottom:2pt\">Select payment type:</div>" + 
+                "<div style='margin-bottom:2pt'>Select payment type:</div>" + 
                 testAlternatives() +
               "</div>" +
             "</div>" +
-            "<div style=\"flex:none;display:block;width:inherit\">" +
-              "<div style=\"padding:1em\">" +
-                "<div style=\"margin-bottom:2pt\">Bank decryption key:</div>" + 
+            "<div style='flex:none;display:block;width:inherit'>" +
+              "<div style='padding:1em'>" +
+                "<div style='margin-bottom:2pt'>Bank decryption key:</div>" + 
                  decryptionKey(session) + 
               "</div>" +
             "</div>" +
-            "<div id=\"" + ERROR_ID + "\" " +
-              "style=\"color:red;font-weight:bold;padding:1em 0 2em 0" + 
+            "<div id='" + ERROR_ID + "' " +
+              "style='color:red;font-weight:bold;padding:1em 0 2em 0" + 
                 (request.getParameter(ABORT_TAG) == null ? 
-                       ";display:none\">" : "\">User cancelled the operation") +
+                       ";display:none'>" : "'>User cancelled the operation") +
             "</div>" +
-            "<img id=\"" + WAITING_ID + "\" src=\"waiting.gif\" " +
-            "style=\"padding-bottom:1em;display:none\" alt=\"waiting\">" +
-            "<div style=\"display:flex;justify-content:center\">" +
-              "<div id=\"" + BUTTON_ID + "\" class=\"stdbtn\" onclick=\"invokeWallet()\">" +
+            "<img id='" + WAITING_ID + "' src='waiting.gif' " +
+            "style='padding-bottom:1em;display:none' alt='waiting'>" +
+            "<div style='display:flex;justify-content:center'>" +
+              "<div id='" + BUTTON_ID + "' class='stdbtn' onclick=\"invokeWallet()\">" +
                 "Invoke Wallet!" + 
               "</div>" +
             "</div>");
@@ -312,7 +312,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         if (session != null) {
             byte[] jsonBlob = (byte[])session.getAttribute(AUTHZ);
             if (jsonBlob != null) {
-                html.append("</div><div style=\"padding:1.5em 1em\">");
+                html.append("</div><div style='padding:1.5em 1em'>");
                 JSONObjectReader walletRequest =
                         new JSONObjectReader((JSONObjectWriter)session.getAttribute(REQUEST));
                 fancyPrint(html, "Wallet Request", walletRequest);
@@ -350,7 +350,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                            authorizationData.getRequestHash())) {
                         throw new IOException("\"" + REQUEST_HASH_JSON + "\" mismatch");
                     }
-                    html.append("<div style=\"text-align:center;font-size:11pt\">Successful Operation</div>");
+                    html.append("<div style='text-align:center;font-size:11pt'>Successful Operation</div>");
                  } catch (Exception e) {
                     bodyScript = "onload=\"applicationError('" + e.getMessage() + "')\"";
                 }
@@ -434,9 +434,9 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     }
     
     private void fancyPrint(StringBuilder html, String header, JSONObjectReader json) throws IOException {
-        html.append("<div style=\"text-align:center;font-size:11pt\">")
+        html.append("<div style='text-align:center;font-size:11pt'>")
             .append(header)
-            .append("</div><div style=\"margin:2pt 0;max-width:100%;white-space:nowrap;overflow:scroll\">")
+            .append("</div><div style='margin:2pt 0;max-width:100%;white-space:nowrap;overflow:scroll'>")
             .append(json.serializeToString(JSONOutputFormats.PRETTY_HTML))
             .append("</div>");
     }

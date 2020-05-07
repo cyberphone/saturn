@@ -44,11 +44,11 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
             "box-shadow:3pt 3pt 3pt #d0d0d0";
 
     public static final String TOP_ELEMENT = 
-            "<!DOCTYPE html><html><head><meta charset=\"utf-8\">" +
-            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+            "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
+            "<meta name='viewport' content='width=device-width, initial-scale=1'>";
 
     public static final String REST_ELEMENT = 
-        "<style type=\"text/css\">" +
+        "<style type='text/css'>" +
         " .header {text-align:center;font-size:10pt;font-weight:bold;padding:15pt}" +
         " td {padding-bottom:8pt}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
@@ -63,7 +63,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         " a {color:blue;text-decoration:none}" +
         "</style></head>";
     public static final String SATURN_LINK = 
-            "<a href=\"https://cyberphone.github.io/doc/saturn/\" target=\"_blank\">Saturn</a>";
+            "<a href='https://cyberphone.github.io/doc/saturn/' target='_blank'>Saturn</a>";
 
     String keyWord(String constant) {
         return "<code>&quot;" + constant + "&quot;</code>";
@@ -101,13 +101,13 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 rd.getString(JSONDecoderCache.CONTEXT_JSON);
                 rd.getString(JSONDecoderCache.QUALIFIER_JSON);
                 StringBuilder html = new StringBuilder(TOP_ELEMENT +
-                            "<link rel=\"icon\" href=\"")
+                            "<link rel='icon' href='")
                     .append(isProvider() ? "" : "../")
-                    .append("saturn.png\" sizes=\"192x192\">"+
+                    .append("saturn.png' sizes='192x192'>"+
                             "<title>Saturn Authority Object</title>" +
                             REST_ELEMENT +
-                            "<body><table style=\"margin-left:auto;margin-right:auto\">" +
-                            "<tr><td class=\"header\">")
+                            "<body><table style='margin-left:auto;margin-right:auto'>" +
+                            "<tr><td class='header'>")
                     .append(isProvider() ? 
   Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
                     .append("</td></tr>" +
@@ -120,16 +120,16 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(isProvider() ? "" : "</td></tr><tr><td>" +
                             "This particular (payee) object was issued by the provider specified by the " +
                             keyWord(PROVIDER_AUTHORITY_URL_JSON) +
-                            " property: <a href=\"" +
-                            rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "\" target=\"_blank\">" + 
+                            " property: <a href='" +
+                            rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "' target='_blank'>" + 
                             rd.getString(PROVIDER_AUTHORITY_URL_JSON) + 
                             "</a>.")
                     .append("</td></tr>" +
-                            "<tr><td><div style=\"word-break:break-all;background-color:#F8F8F8;padding:10pt;" +
-                            BORDER + ";" + BOX_SHADDOW + "\">")
+                            "<tr><td><div style='word-break:break-all;background-color:#F8F8F8;padding:10pt;" +
+                            BORDER + ";" + BOX_SHADDOW + "'>")
                     .append(rd.serializeToString(JSONOutputFormats.PRETTY_HTML))
-                    .append("</div></td></tr><tr><td style=\"padding:4pt 0pt 4pt 0pt\">Short reference:</td></tr>" +
-                            "<tr><td><table class=\"tftable\"><tr><th>Property</th><th>Description</th></tr>")
+                    .append("</div></td></tr><tr><td style='padding:4pt 0pt 4pt 0pt'>Short reference:</td></tr>" +
+                            "<tr><td><table class='tftable'><tr><th>Property</th><th>Description</th></tr>")
                     .append(isProvider() ?
                             tableRow(rd, HTTP_VERSION_JSON, "Preferred HTTP version (&#x2265; HTTP/1.1)") +
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +

@@ -39,10 +39,10 @@ public class HomeServlet extends HttpServlet {
         String authorityUrl = BankService.providerAuthorityUrl;
         StringBuilder html = new StringBuilder(
            AuthorityBaseServlet.TOP_ELEMENT +
-           "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\"><title>Saturn Bank</title>" +
+           "<link rel='icon' href='saturn.png' sizes='192x192'><title>Saturn Bank</title>" +
            AuthorityBaseServlet.REST_ELEMENT +
            "<body><table>" +
-           "<tr><td class=\"header\">Bank Server</td></tr>" +
+           "<tr><td class='header'>Bank Server</td></tr>" +
            "<tr><td>This is a " +
            AuthorityBaseServlet.SATURN_LINK +
            " &quot;bank&quot; server.</td></tr>" +
@@ -56,26 +56,26 @@ public class HomeServlet extends HttpServlet {
          .append(BankService.rejectedTransactions)
          .append("</td></tr>" +
            "<tr><td>Authority object: " +
-           "<a href=\"")
+           "<a href='")
          .append(authorityUrl)
-         .append("\" target=\"_blank\">")
+         .append("' target='_blank'>")
          .append(authorityUrl)
          .append("</a>")
-         .append("</td></tr><tr><td style=\"padding-bottom:4pt\">Registered merchants:");
+         .append("</td></tr><tr><td style='padding-bottom:4pt'>Registered merchants:");
         if (BankService.PayeeAccountDb.isEmpty()) {
             html.append(" <i>None</i></td></tr>");
         } else {
             html.append("</td></tr>" +
-                "<tr><td><table class=\"tftable\"><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
+                "<tr><td><table class='tftable'><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : BankService.PayeeAccountDb.values()) {
                 String payeeAuthorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
-                html.append("<tr><td style=\"text-align:right\">")
+                html.append("<tr><td style='text-align:right'>")
                  .append(payeeCoreProperties.getPayeeId())
                  .append("</td><td>")
                  .append(payeeCoreProperties.getCommonName())
-                 .append("</td><td><a href=\"")
+                 .append("</td><td><a href='")
                  .append(payeeAuthorityUrl)
-                 .append("\" target=\"_blank\">")
+                 .append("' target='_blank'>")
                  .append(payeeAuthorityUrl)
                  .append("</a></td></tr>");
             }

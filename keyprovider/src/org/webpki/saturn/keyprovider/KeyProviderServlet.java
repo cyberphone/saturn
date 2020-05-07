@@ -371,7 +371,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                             @Override
                             public byte[] getData() throws IOException {
                                 String cardImage = new String(credentialTemplate.svgCardImage);
-                                if (testMode && KeyProviderService.inHouse) {
+                                if (testMode && KeyProviderService.inHouseLogo) {
                                     cardImage = cardImage.substring(0, cardImage.lastIndexOf("<g ")) + "</svg>";
                                 }
                                 String cardUserName = userName;
@@ -498,11 +498,11 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             executeRequest(request, response, true);
             return;
         }
-        StringBuilder html = new StringBuilder("<div class=\"label\">");
+        StringBuilder html = new StringBuilder("<div class='label'>");
         StringBuilder result = new StringBuilder();
         if (foundData(request, result, KeyProviderInitServlet.ERROR_TAG)) {
             html.append("<table><tr><td>Failure Report:</td></tr><tr><td>" +
-                        "<pre style=\"color:red;font-size:10pt\">")
+                        "<pre style='color:red;font-size:10pt'>")
                 .append(result)
                 .append("</pre></td></tr></table>");
         } else if (foundData(request, result, KeyProviderInitServlet.PARAM_TAG)) {
@@ -519,7 +519,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         session.getAttribute(KeyProviderInitServlet.TESTMODE_SESSION_ATTR) != null;
                 session.invalidate();
                 html.append(testMode ?
-                            "<div><a href=\"walletuitest\" class=\"link\">Wallet UI Test</a></div>" 
+                            "<div><a href='walletuitest' class='link'>Wallet UI Test</a></div>" 
                                      :
                             KeyProviderService.successMessage);
             }

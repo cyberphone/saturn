@@ -12,9 +12,9 @@
     </resource-ref>
 
     <context-param>
-        <description>Inhouse operation (non-zero-length)</description>
-        <param-name>inhouse</param-name>
-        <param-value>@inhouse@</param-value>
+        <description>In-house Logotype</description>
+        <param-name>inhouse_logo</param-name>
+        <param-value>@inhouse-logo@</param-value>
     </context-param>
 
     <context-param>

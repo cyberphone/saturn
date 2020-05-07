@@ -87,7 +87,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String BIOMETRIC_SUPPORT           = "biometric_support";
 
-    static final String IN_HOUSE                    = "inhouse";
+    static final String INHOUSE_LOGO                = "inhouse_logo";
 
     static KeyStoreEnumerator keyManagementKey;
     
@@ -101,7 +101,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static DataSource jdbcDataSource;
 
-    static boolean inHouse;
+    static boolean inHouseLogo;
     
     static boolean biometricSupport;
 
@@ -131,11 +131,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             keyAlgorithm = CryptoUtils.getKeyAlgorithm(rd, "signatureKeyAlgorithm");
             cardFormatted = rd.getBoolean("cardFormatted");
             if (rd.hasProperty("serverSetPIN")) {
+                // Note: numbers only
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");
             }
             friendlyName = rd.getString("friendlyName");
             svgCardImage = getResourceAsString(rd.getString("cardImage"));
-            if (inHouse) {
+            if (inHouseLogo) {
                 svgCardImage = svgCardImage.substring(0, svgCardImage.lastIndexOf("</svg>")) +
                         getResourceAsString("inhouse-flag.txt");
             }
@@ -194,7 +195,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // In house operation?
             ////////////////////////////////////////////////////////////////////////////////////////////
-            inHouse = getPropertyString(IN_HOUSE).length() > 0;
+            inHouseLogo = getPropertyBoolean(INHOUSE_LOGO);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Authority URL.  Assumption: all virtual cards are issued by the same entity

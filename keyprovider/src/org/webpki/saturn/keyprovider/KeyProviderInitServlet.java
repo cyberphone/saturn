@@ -361,50 +361,50 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  }\n" +
             "}\n",
             null,
-            "<div style=\"padding:0 1em\">" +
+            "<div style='padding:0 1em'>" +
               "This proof-of-concept system provisions secure payment credentials " + 
               "to be used in the Android version of the Saturn &quot;Wallet&quot;." +
             "</div>" + 
-            "<div style=\"display:flex;justify-content:center;padding-top:15pt\">" +
+            "<div style='display:flex;justify-content:center;padding-top:15pt'>" +
               "<table>" + 
                 "<tr><td>Your name (real or made up):</td></tr>" + 
                 "<tr><td>" +
-                  "<form name=\"shoot\" method=\"POST\" action=\"" + THIS_SERVLET + "\">" + 
-                    "<input type=\"text\" name=\"" + USERNAME_SESSION_ATTR + 
-                      "\" value=\"" + DEFAULT_USER_NAME_HTML + 
-                      "\" size=\"30\" maxlength=\"50\" " + 
-                      "style=\"background-color:#def7fc\" oninput=\"setUserName()\">" +
+                  "<form name='shoot' method='POST' action='" + THIS_SERVLET + "'>" + 
+                    "<input type='text' name='" + USERNAME_SESSION_ATTR + 
+                      "' value='" + DEFAULT_USER_NAME_HTML + 
+                      "' size='30' maxlength='50' " + 
+                      "style='background-color:#def7fc' oninput=\"setUserName()\">" +
                    "</form>" +
                  "</td></tr>" + 
               "</table>" +
             "</div>" + 
-            "<div style=\"text-align:center\">" +
+            "<div style='text-align:center'>" +
               "This name will be printed on your virtual payment cards." +
             "</div>" + 
-            "<div id=\"" + ERROR_ID + "\" " +
-              "style=\"color:red;font-weight:bold;padding-top:1em;display:none\"></div>" +
-            "<img id=\"" + WAITING_ID + "\" src=\"waiting.gif\" " +
-              "style=\"padding-top:1em\" alt=\"waiting\">" +
-            "<div style=\"display:flex;justify-content:center;padding-top:1em\">" +
-              "<div id=\"" + BUTTON_ID + "\" style=\"display:none\" class=\"stdbtn\" onclick=\"enroll()\">" +
+            "<div id='" + ERROR_ID + "' " +
+              "style='color:red;font-weight:bold;padding-top:1em;display:none'></div>" +
+            "<img id='" + WAITING_ID + "' src='waiting.gif' " +
+              "style='padding-top:1em' alt='waiting'>" +
+            "<div style='display:flex;justify-content:center;padding-top:1em'>" +
+              "<div id='" + BUTTON_ID + "' style='display:none' class='stdbtn' onclick=\"enroll()\">" +
                 BUTTON_TEXT_HTML + 
               "</div>" +
             "</div>" + 
-            "<div style=\"padding:4em 1em 1em 1em\">If you have not yet " + 
+            "<div style='padding:4em 1em 1em 1em'>If you have not yet " + 
               "installed the &quot;Wallet&quot;, this is the time but <i>please do not " + 
               "start the application</i>, simply press " + 
-              "<div style=\"display:inline;background:blue;color:white;" + 
-              "font-weight:bold;padding:0 0.5em\">&lt;</div> " + 
+              "<div style='display:inline;background:blue;color:white;" + 
+              "font-weight:bold;padding:0 0.5em'>&lt;</div> " + 
               "after the installation!</i>" +
             "</div>" +
-            "<div style=\"cursor:pointer;display:flex;justify-content:center;align-items:center\">" +
-              "<img src=\"google-play-badge.png\" style=\"height:25pt;padding:0 15pt\" alt=\"image\" " +
-                "title=\"Android\" onclick=\"document.location.href = " +
-                "'https://play.google.com/store/apps/details?id=" +
+            "<div style='cursor:pointer;display:flex;justify-content:center;align-items:center'>" +
+              "<img src='google-play-badge.png' style='height:25pt;padding:0 15pt' alt='image' " +
+                "title='Android' onclick=\"document.location.href = '" +
+                "https://play.google.com/store/apps/details?id=" +
                 MobileProxyParameters.ANDROID_PACKAGE_NAME + "'\">" +
             "</div>" + 
             "</div>" + // Main window end tag
-            "<div class=\"sitefooter\">Note: in a real configuration you would also need to " +
+            "<div class='sitefooter'>Note: in a real configuration you would also need to " +
             "authenticate as a part of the enrollment."));
     }
 
@@ -431,8 +431,8 @@ public class KeyProviderInitServlet extends HttpServlet {
                     "#Intent;scheme=webpkiproxy;package=" +  
                     MobileProxyParameters.ANDROID_PACKAGE_NAME +
                     ";end';\"", 
-                "<div><div class=\"label\" style=\"text-align:center\">Saturn App Bootstrap</div>" +
-                "<div style=\"padding-top:15pt\">If this is all you get there is " +
+                "<div><div class='label' style='text-align:center'>Saturn App Bootstrap</div>" +
+                "<div style='padding-top:15pt'>If this is all you get there is " +
                 "something wrong with the installation.</div>" +
                 "</div>"));
         } else {

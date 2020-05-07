@@ -14,6 +14,9 @@
   <!-- Ant command line overridables -->
   <property name="logging" value="false"/>
   <property name="biometricsupport" value="true"/>
+  <condition property="inhouselogo" value="true" else="false">
+    <equals arg1="${@inhouse-host}" arg2="${@keyprovhost}"/>
+  </condition>
   
   <property name="application" value="${@keyprovpath}.war"/>
   
@@ -27,8 +30,7 @@
   <property name="catalina.home" value="${env.CATALINA_HOME}"/>
 
   <target name="help">
-      <!-- "-Dinhouse=" (with quotes!) is to get away from the text Inhouse in card logotypes -->
-      <echo message="tomcat build [-Dlogging=true] [&quot;-Dinhouse=&quot;]"/>
+      <echo message="tomcat build [-Dlogging=true] [-Dinhouselogo=false] [-Dbiometricsupport=false]"/>
   </target>
 
   <target name="_init" unless="app_path">
@@ -76,7 +78,7 @@
         </classpath>
     </javac>
     <replace file="${temp.dir}/web.xml">
-      <replacefilter token="@inhouse@" value="${inhouse}"/>
+      <replacefilter token="@inhouse-logo@" value="${inhouselogo}"/>
       <replacefilter token="@authority-url@" value="${authorityurl}"/>
       <replacefilter token="@saturn-logotype@" value="${@saturn-logotype.file}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
