@@ -721,12 +721,13 @@ public class HTML implements MerchantSessionProperties {
                 // As a consequence we give PaymentRequest some fictitious data to keep it happy,
                 // while doing the interesting stuff "behind the curtain" :-)
                 "  const dummyDetails = {total:{label:'total',amount:{currency:'EUR',value:'1.00'}}};\n\n" +
- 
                 "  const methodData = [{\n" +
                 "    supportedMethods: '" + MerchantService.w3cPaymentRequestUrl + "',\n" +
-                "    data: ['" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
-                                                                            request.getSession(false).getId(),
-                                                                            null) + "']\n" +
+                "    data: ['" + 
+                        AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
+                                                              request.getSession(false).getId(),
+                                                              null) + 
+                           "']\n" +
 //                "    supportedMethods: 'weird-pay',\n" +
 //                "    supportedMethods: 'basic-card',\n" +
 //                "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +

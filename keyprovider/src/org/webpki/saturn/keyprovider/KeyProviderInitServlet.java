@@ -305,8 +305,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "    supportedMethods: '" + KeyProviderService.w3cPaymentRequestUrl + "',\n" +
 // Test data
 //            "        supportedMethods: 'weird-pay',\n" +
-            "    data: ['" + 
-               getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, session) + "']\n" +
+            "    data: ['" + getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, session) + "']\n" +
 // Test data
 //            "        supportedMethods: 'basic-card',\n" +
 //            "        data: {supportedNetworks: ['visa', 'mastercard']}\n" +
