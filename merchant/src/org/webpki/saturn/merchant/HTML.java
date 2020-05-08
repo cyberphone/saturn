@@ -711,7 +711,7 @@ public class HTML implements MerchantSessionProperties {
                 // tags request type (like Gas Station which changes the UI), they may therefore
                 // equally well be ignored.
                 
-                // The "supportedInstruments" is also a bit of a misnomer; in reality it is more
+                // The "methodData" is also a bit of a misnomer; in reality it is more
                 // likely to represent specific "wallet" or payment authorization schemes.
                 // Recent (2019) W3C activities mentions "skipping the list" (in the browser),
                 // which also supports his notion.  Dealing with lots of quite different payment
@@ -720,9 +720,9 @@ public class HTML implements MerchantSessionProperties {
                 
                 // As a consequence we give PaymentRequest some fictitious data to keep it happy,
                 // while doing the interesting stuff "behind the curtain" :-)
-                "  const details = {total:{label:'total',amount:{currency:'EUR',value:'1.00'}}};\n\n" +
+                "  const dummyDetails = {total:{label:'total',amount:{currency:'EUR',value:'1.00'}}};\n\n" +
  
-                "  const supportedInstruments = [{\n" +
+                "  const methodData = [{\n" +
                 "    supportedMethods: '" + MerchantService.w3cPaymentRequestUrl + "',\n" +
                 "    data: {url: '" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
                                                                             request.getSession(false).getId(),
@@ -734,7 +734,7 @@ public class HTML implements MerchantSessionProperties {
 
                 "  let request = null;\n\n" +
                 "  try {\n" +
-                "    request = new PaymentRequest(supportedInstruments, details);\n" +
+                "    request = new PaymentRequest(methodData, dummyDetails);\n" +
                 "  } catch (e) {\n" +
                 "    console.info('Developer mistake:' + e.message);\n" +
                 "  }\n" +

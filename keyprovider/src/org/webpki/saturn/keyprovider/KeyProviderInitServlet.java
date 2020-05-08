@@ -300,8 +300,8 @@ public class KeyProviderInitServlet extends HttpServlet {
             //==================================================================//
             // W3C PaymentRequest using dummy data.                             //
             //==================================================================//
-            "  const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
-            "  const supportedInstruments = [{\n" +
+            "  const dummyDetails = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
+            "  const methodData = [{\n" +
             "    supportedMethods: '" + KeyProviderService.w3cPaymentRequestUrl + "',\n" +
 // Test data
 //            "        supportedMethods: 'weird-pay',\n" +
@@ -311,7 +311,7 @@ public class KeyProviderInitServlet extends HttpServlet {
 //            "        supportedMethods: 'basic-card',\n" +
 //            "        data: {supportedNetworks: ['visa', 'mastercard']}\n" +
             "  }];\n" +
-            "  w3cPaymentRequest = new PaymentRequest(supportedInstruments, details);\n" +
+            "  w3cPaymentRequest = new PaymentRequest(methodData, dummyDetails);\n" +
             // Addresses https://bugs.chromium.org/p/chromium/issues/detail?id=999920#c8
             "  w3cPaymentRequest.canMakePayment().then(function(result) {\n" +
             "    waitForBrowserDisplay(result);\n" +

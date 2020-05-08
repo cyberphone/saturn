@@ -166,7 +166,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                                   true));
             initMerchant("Multiple Paments", 
                                           "Amazon",
-                                          "amazon.com.com",
+                                          "amazon.com",
                                           "34.75",
                                           Currencies.EUR,
                                           NonDirectPaymentEncoder.recurring(
