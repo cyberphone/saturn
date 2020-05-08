@@ -724,9 +724,9 @@ public class HTML implements MerchantSessionProperties {
  
                 "  const methodData = [{\n" +
                 "    supportedMethods: '" + MerchantService.w3cPaymentRequestUrl + "',\n" +
-                "    data: {url: '" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
+                "    data: ['" + AndroidPluginServlet.getInvocationUrl(MobileProxyParameters.SCHEME_W3CPAY, 
                                                                             request.getSession(false).getId(),
-                                                                            null) + "'}\n" +
+                                                                            null) + "']\n" +
 //                "    supportedMethods: 'weird-pay',\n" +
 //                "    supportedMethods: 'basic-card',\n" +
 //                "    data: {supportedNetworks: ['visa', 'mastercard']}\n" +

@@ -393,17 +393,17 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                   "      if (httpResponse.status == " + HttpServletResponse.SC_OK + ") {\n" +
                   "        const invocationUrl = await httpResponse.text();\n" +
                   // Success! Now we hook into the W3C PaymentRequest using "dummy" payment data
-                  "        const details = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
-                  "        const supportedInstruments = [{\n" +
+                  "        const dummyDetails = {total:{label:'total',amount:{currency:'USD',value:'1.00'}}};\n" +
+                  "        const methodData = [{\n" +
                   "          supportedMethods: '" + KeyProviderService.w3cPaymentRequestUrl + "',\n" +
             // Test data
 //                  "          supportedMethods: 'weird-pay',\n" +
-                  "          data: {url: invocationUrl}\n" +
+                  "          data: [invocationUrl]\n" +
             // Test data
 //                  "          supportedMethods: 'basic-card',\n" +
 //                  "          data: {supportedNetworks: ['visa', 'mastercard']}\n" +
                   "        }];\n" +
-                  "        const payRequest = new PaymentRequest(supportedInstruments, details);\n" +
+                  "        const payRequest = new PaymentRequest(methodData, dummyDetails);\n" +
                   "        if (await payRequest.canMakePayment()) {\n" +
                   "          const payResponse = await payRequest.show();\n" +
                   "          payResponse.complete('success');\n" +
