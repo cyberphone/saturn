@@ -307,7 +307,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                             KeyProviderInitServlet.USERNAME_SESSION_ATTR);
                     boolean testMode = session.getAttribute(
                             KeyProviderInitServlet.TESTMODE_SESSION_ATTR) != null;
-                    int userId = DataBaseOperations.createUser(userName);
+                    int userId = DataBaseOperations.createUser(userName, request.getRemoteAddr());
 
                     // Create Saturn payment credentials based on the template
                     ServerState.Key[] keys = keygen2State.getKeys();

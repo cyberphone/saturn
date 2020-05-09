@@ -50,6 +50,8 @@ USE PAYER_BANK;
 CREATE TABLE USERS
   (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique User ID
+    
+    IpAddress   VARCHAR(50)   NOT NULL,                                  -- "Statistics"
 
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
 
@@ -250,9 +252,10 @@ CREATE FUNCTION _GetNextTransactionIdSP () RETURNS INT
 //
 
 CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
-                               IN p_UserName VARCHAR(50))
+                               IN p_UserName VARCHAR(50),
+                               IN p_IpAddress VARCHAR(50))
   BEGIN
-    INSERT INTO USERS(Name) VALUES(p_UserName);
+    INSERT INTO USERS(Name, IpAddress) VALUES(p_UserName, p_IpAddress);
     SET p_UserId = LAST_INSERT_ID();
   END
 //
@@ -820,7 +823,7 @@ CALL _CreateTransactionTypeSP("*FAILED*",
 
 -- Demo and test data
 
-CALL CreateUserSP(@userid, "Luke Skywalker");
+CALL CreateUserSP(@userid, "Luke Skywalker", "127.0.0.1");
 
 CALL _CreateAccountSP(@internalAccountId, @currency, @userid, GetAccountTypeId("CREDIT_CARD_ACCOUNT"));
 
@@ -852,7 +855,7 @@ CALL _CreateDemoCredentialSP(@credentialid,
                              NULL);
 SELECT @credentialid, @accountId, @internalAccountId;
                             
-CALL CreateUserSP(@userid, "Chewbacca");
+CALL CreateUserSP(@userid, "Chewbacca", "127.0.0.1");
 
 CALL CreateAccountAndCredentialSP(@accountId,
                                   @credentialid,

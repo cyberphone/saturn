@@ -35,21 +35,19 @@ public class DataBaseOperations {
 
     static Logger logger = Logger.getLogger(DataBaseOperations.class.getCanonicalName());
     
-    static int createUser(String userName) throws SQLException {
+    static int createUser(String userName, String ipAddress) throws SQLException {
         try {
 /*
-        CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
-                                       IN p_UserName VARCHAR(50))
-          BEGIN
-            INSERT INTO USERS(Name) VALUES(p_UserName);
-            SET p_UserId = LAST_INSERT_ID();
-          END
+            CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
+                                           IN p_UserName VARCHAR(50),
+                                           IN p_IpAddress VARCHAR(50))
 */
             try (Connection connection = KeyProviderService.jdbcDataSource.getConnection();
                  CallableStatement stmt = 
-                    connection.prepareCall("{call CreateUserSP(?,?)}");) {
+                    connection.prepareCall("{call CreateUserSP(?,?,?)}");) {
                 stmt.registerOutParameter(1, java.sql.Types.INTEGER);
                 stmt.setString(2, userName);
+                stmt.setString(3, ipAddress);
                 stmt.execute();
                 return stmt.getInt(1);
             }
