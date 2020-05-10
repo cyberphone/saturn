@@ -139,11 +139,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");
             }
             friendlyName = rd.getString("friendlyName");
-            svgCardImage = getResourceAsString(rd.getString("cardImage"));
+            getResourceAsString(rd.getString("cardImage"));
             if (inHouseLogo) {
                 svgCardImage = svgCardImage.substring(0, svgCardImage.lastIndexOf("</svg>")) +
                         getResourceAsString("inhouse-flag.txt");
             }
+            svgCardImage = svgCardImage.replaceAll("\n", "");
             JSONObjectReader encryptionParameters = rd.getObject("encryptionParameters");
             encryptionKey = encryptionParameters.getPublicKey();
             dataEncryptionAlgorithm = 
