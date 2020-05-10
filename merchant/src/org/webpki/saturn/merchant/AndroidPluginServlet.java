@@ -47,7 +47,8 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
     // The following is the actual contract between an issuing server and a Saturn client.
     // The PUP_INIT_URL argument bootstraps the protocol via an HTTP GET
     ////////////////////////////////////////////////////////////////////////////////////////////
-    static String getInvocationUrl(String scheme, String httpSessionId, String qrSessionId) throws IOException {
+    static String getInvocationUrl(String scheme, String httpSessionId, String qrSessionId)
+    throws IOException {
         String encodedUrl = URLEncoder.encode(MerchantService.merchantBaseUrl, "utf-8");
         String cancelUrl = encodedUrl + "%2Fandroidplugin%3F" + ANDROID_CANCEL + "%3D";
         if (qrSessionId != null) {
@@ -58,7 +59,7 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
                "&" + MobileProxyParameters.PUP_INIT_URL   + "=" + encodedUrl + "%2Fandroidplugin" +
                "&" + MobileProxyParameters.PUP_MAIN_URL   + "=" + encodedUrl + "%2Fauthorize" + 
                "&" + MobileProxyParameters.PUP_CANCEL_URL + "=" + cancelUrl +
-               "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + MerchantService.grantedVersions;
+               "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + MerchantService.androidWebPkiVersions;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////

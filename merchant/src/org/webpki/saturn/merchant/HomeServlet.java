@@ -29,8 +29,6 @@ public class HomeServlet extends HttpServlet implements MerchantSessionPropertie
 
     private static final long serialVersionUID = 1L;
 
-    static final int MINIMUM_CHROME_VERSION = 75;
-    
     static final String GOTO_URL = "gotoUrl";
 
     boolean isTapConnect() {
@@ -49,14 +47,14 @@ public class HomeServlet extends HttpServlet implements MerchantSessionPropertie
             int i = userAgent.indexOf(" Chrome/");
             if (i > 0) {
                 String chromeVersion = userAgent.substring(i + 8, userAgent.indexOf('.', i));
-                if (Integer.parseInt(chromeVersion) >= MINIMUM_CHROME_VERSION) {
+                if (Integer.parseInt(chromeVersion) >= MerchantService.androidChromeVersion) {
                     notOk = false;
                 }
             }
         }
         if (notOk) {
             ErrorServlet.systemFail(response, "This proof-of-concept system requires \"Chrome\" (min version: " + 
-                                              MINIMUM_CHROME_VERSION + ") when using Android");
+                                              MerchantService.androidChromeVersion + ") when using Android");
             return false;
         }
         if (userAgent.contains(" Chrome/") ||

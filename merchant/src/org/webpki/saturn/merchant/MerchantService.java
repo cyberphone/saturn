@@ -89,7 +89,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String MERCHANTS                    = "merchants.json";
 
-    static final String VERSION_CHECK                = "android_webpki_versions";
+    static final String ANDROID_WEBPKI_VERSIONS      = "android_webpki_versions";
+
+    static final String ANDROID_CHROME_VERSION       = "android_chrome_version";
 
     static final String BOUNCYCASTLE_FIRST           = "bouncycastle_first";
     
@@ -127,7 +129,9 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     private static boolean slowOperation;
 
-    static String grantedVersions;
+    static String androidWebPkiVersions;
+
+    static int androidChromeVersion;
 
     static boolean desktopWallet;
 
@@ -255,7 +259,12 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check
             ////////////////////////////////////////////////////////////////////////////////////////////
-            grantedVersions = getPropertyString(VERSION_CHECK);
+            androidWebPkiVersions = getPropertyString(ANDROID_WEBPKI_VERSIONS);
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Android Chrome version check
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            androidChromeVersion = getPropertyInt(ANDROID_CHROME_VERSION);
 
             logger.info("Saturn Merchant-server initiated");
         } catch (Exception e) {

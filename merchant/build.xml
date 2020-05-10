@@ -114,6 +114,7 @@
       <replacefilter token="@w3c-payment-request-host@" value="${@w3c.manifesthost}/${@w3c.manifestpath}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
+      <replacefilter token="@android-chrome-version@" value="${@android.chrome.version}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">

@@ -77,6 +77,12 @@
     </context-param>
 
     <context-param>
+        <description>Android Chrome Version Check</description>
+        <param-name>android_chrome_version</param-name>
+        <param-value>@android-chrome-version@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Support Desktop Wallet</description>
         <param-name>desktop_wallet</param-name>
         <param-value>@desktop-wallet@</param-value>
