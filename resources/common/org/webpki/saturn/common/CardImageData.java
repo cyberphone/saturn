@@ -20,8 +20,8 @@ public interface CardImageData {
     
     public double STANDARD_WIDTH          = 300;
     public double STANDARD_HEIGHT         = 180;
-    public String STANDARD_NAME           = "Luke Skywalker";
-    public String STANDARD_ACCOUNT        = "1234 1234 1234 1234";
+    public String STANDARD_NAME           = "Your Name";
+    public String STANDARD_ACCOUNT        = "ACCOUNT NUMBER";
     public double STANDARD_TEXT_LEFT      = 30;
     public double STANDARD_TEXT_Y_OFFSET  = 22;
     public int STANDARD_NAME_FONT_SIZE    = 20;

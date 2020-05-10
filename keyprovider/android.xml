@@ -19,6 +19,7 @@
         <copy todir="${temp.dir}/org/webpki/mobile/android/saturn/common" preservelastmodified="true" includeEmptyDirs="false" flatten="true">
           <fileset dir="${src.dir}">
             <include name="**/AuthorizationDataEncoder.java"/>
+            <include name="**/KnownExtensions.java"/>
             <include name="**/BaseProperties.java"/>
             <include name="**/CardDataDecoder.java"/>
             <include name="**/ClientPlatform.java"/>
