@@ -65,7 +65,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static final String SATURN_LOGO                 = "saturn_logotype";
 
-    static final String VERSION_CHECK               = "android_webpki_versions";
+    static final String ANDROID_WEBPKI_VERSIONS     = "android_webpki_versions";
+
+    static final String ANDROID_CHROME_VERSION      = "android_chrome_version";
 
     static final String MERCHANT_URL                = "merchant_url";
 
@@ -97,7 +99,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static KeyPair carrierCaKeyPair;
 
-    static String grantedVersions;
+    static String androidWebPkiVersions;
+
+    static int androidChromeVersion;
 
     static DataSource jdbcDataSource;
 
@@ -230,7 +234,12 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check (vlow-vhigh)
             ////////////////////////////////////////////////////////////////////////////////////////////
-            grantedVersions = getPropertyString(VERSION_CHECK);
+            androidWebPkiVersions = getPropertyString(ANDROID_WEBPKI_VERSIONS);
+
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Android Chrome version check
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            androidChromeVersion = getPropertyInt(ANDROID_CHROME_VERSION);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Get TLS server certificate

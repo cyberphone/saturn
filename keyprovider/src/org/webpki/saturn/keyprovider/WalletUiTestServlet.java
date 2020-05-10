@@ -494,7 +494,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                 "&" + MobileProxyParameters.PUP_INIT_URL   + "=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
                 "&" + MobileProxyParameters.PUP_MAIN_URL   + "=" + urlEncoded +
                 "&" + MobileProxyParameters.PUP_CANCEL_URL + "=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue" +
-                "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + KeyProviderService.grantedVersions;
+                "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + KeyProviderService.androidWebPkiVersions;
             logger.info("POST return=" + invocationUrl);
             KeyProviderInitServlet.output(response, invocationUrl);
         }

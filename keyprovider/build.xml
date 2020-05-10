@@ -83,6 +83,7 @@
       <replacefilter token="@saturn-logotype@" value="${@saturn-logotype.file}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
+      <replacefilter token="@android-chrome-version@" value="${@android.chrome.version}"/>
       <replacefilter token="@keyprov-kmk@" value="${inhouse}${@kg2kmkey_ec}.p12"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@biometric-support@" value="${biometricsupport}"/>

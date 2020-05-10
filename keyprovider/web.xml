@@ -48,6 +48,12 @@
     </context-param>
 
     <context-param>
+        <description>Android Chrome Version Check</description>
+        <param-name>android_chrome_version</param-name>
+        <param-value>@android-chrome-version@</param-value>
+    </context-param>
+
+    <context-param>
         <description>KeyGen2 Base URL</description>
         <param-name>keygen2_base_url</param-name>
         <param-value>@keygen2-base-url@</param-value>

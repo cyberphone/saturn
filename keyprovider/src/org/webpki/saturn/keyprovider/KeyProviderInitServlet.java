@@ -73,8 +73,6 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final String ANONYMOUS_JAVA         = "Anonymous " + 
                  new String(Character.toChars(Integer.parseInt("1f47d", 16)));  // E.T. emoji
     
-    static final int MINIMUM_CHROME_VERSION    = 75;
-
     static final String GO_HOME =              
             "history.pushState(null, null, '" + THIS_SERVLET + "');\n" +
             "window.addEventListener('popstate', function(event) {\n" +
@@ -207,7 +205,7 @@ public class KeyProviderInitServlet extends HttpServlet {
                "&" + MobileProxyParameters.PUP_INIT_URL   + "=" + urlEncoded + "%3F" + INIT_TAG + "%3Dtrue" +
                "&" + MobileProxyParameters.PUP_MAIN_URL   + "=" + urlEncoded +
                "&" + MobileProxyParameters.PUP_CANCEL_URL + "=" + urlEncoded + "%3F" + ABORT_TAG + "%3Dtrue" +
-               "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + KeyProviderService.grantedVersions;
+               "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + KeyProviderService.androidWebPkiVersions;
    }
     
     @Override
@@ -218,7 +216,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             int i = userAgent.indexOf(" Chrome/");
             if (i > 0) {
                 String chromeVersion = userAgent.substring(i + 8, userAgent.indexOf('.', i));
-                if (Integer.parseInt(chromeVersion) >= MINIMUM_CHROME_VERSION) {
+                if (Integer.parseInt(chromeVersion) >= KeyProviderService.androidChromeVersion) {
                     notOk = false;
                 }
             }
@@ -229,7 +227,7 @@ public class KeyProviderInitServlet extends HttpServlet {
                             null,
                 "<div class=\"label\">This proof-of-concept system only supports " +
                   "Android and using the \"Chrome\" browser (min version: " + 
-                  MINIMUM_CHROME_VERSION + ")" +
+                  KeyProviderService.androidChromeVersion + ")" +
                 "</div>"));
             return;
         }
