@@ -139,7 +139,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");
             }
             friendlyName = rd.getString("friendlyName");
-            getResourceAsString(rd.getString("cardImage"));
+            svgCardImage = getResourceAsString(rd.getString("cardImage"));
             if (inHouseLogo) {
                 svgCardImage = svgCardImage.substring(0, svgCardImage.lastIndexOf("</svg>")) +
                         getResourceAsString("inhouse-flag.txt");
