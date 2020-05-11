@@ -50,6 +50,6 @@ public class PaymentRequestEncoder implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.UTC_NO_SUBSECONDS)
             .setDateTime(EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION));
+            .setDynamic((wr) -> Software.encode(wr, SOFTWARE_NAME, SOFTWARE_VERSION));
     }
 }

@@ -38,12 +38,19 @@ public enum Messages {
     TRANSACTION_REQUEST           ("TransactionRequest"),            // Payee to Acquirer or Payer provider
     TRANSACTION_RESPONSE          ("TransactionResponse"),           // Response to the former
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Saturn optional
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     REFUND_REQUEST                ("RefundRequest"),                 // Payee to Acquirer or Payee provider
     REFUND_RESPONSE               ("RefundResponse"),                // Response to the former
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
-    PROVIDER_AUTHORITY            ("ProviderAuthority"),             // Published provider entity data
     
+    BALANCE_REQUEST               ("BalanceRequest"),                // Created by the PaymentClient
+    BALANCE_RESPONSE              ("BalanceResponse"),               // Response by Payer provider
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Saturn authority lookup response messages
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    PROVIDER_AUTHORITY            ("ProviderAuthority"),             // Published provider entity data
     PAYEE_AUTHORITY               ("PayeeAuthority");                // Published Payee entity data
 
     String qualifier;

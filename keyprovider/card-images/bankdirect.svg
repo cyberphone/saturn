@@ -57,5 +57,5 @@
 <rect x="111" y="102.96" width="34" height="2.04" stroke="#404040" stroke-width="0.5" fill="#f2f2f2"/>
 <rect x="112.7" y="100.91" width="30.6" height="2.04" stroke="#404040" stroke-width="0.5" fill="#f2f2f2"/>
 <text x="30" y="141.3" font-family="Sans-serif" font-size="20">Your Name</text>
-<text x="30" y="163.3" font-family="Noto Sans" font-size="15" font-weight="500">ACCOUNT NUMBER</text>
+<text x="30" y="165" font-family="Noto Sans" font-size="15" font-weight="500">ACCOUNT NUMBER</text>
 </svg>

@@ -39,12 +39,12 @@ public class PaymentRequestDecoder implements BaseProperties {
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         amount = rd.getMoney(AMOUNT_JSON, currency.getDecimals());
         referenceId = rd.getString(REFERENCE_ID_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
         if (rd.hasProperty(NON_DIRECT_PAYMENT_JSON)) {
             nonDirectPayment = new NonDirectPaymentDecoder(rd.getObject(NON_DIRECT_PAYMENT_JSON),
-                                                           dateTime);
+                                                           timeStamp);
         }
         rd.checkForUnread();
     }
@@ -84,9 +84,9 @@ public class PaymentRequestDecoder implements BaseProperties {
         return referenceId;
     }
     
-    GregorianCalendar dateTime;
-    public GregorianCalendar getDateTime() {
-        return dateTime;
+    GregorianCalendar timeStamp;
+    public GregorianCalendar getTimeStamp() {
+        return timeStamp;
     }
 
     Software software;

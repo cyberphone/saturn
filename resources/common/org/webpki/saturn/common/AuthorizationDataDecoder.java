@@ -35,7 +35,7 @@ import org.webpki.util.ISODateTime;
 public class AuthorizationDataDecoder implements BaseProperties {
 
     public AuthorizationDataDecoder(JSONObjectReader rd, 
-                             JSONCryptoHelper.Options signatureOptions) throws IOException {
+                                    JSONCryptoHelper.Options signatureOptions) throws IOException {
         JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
         requestHashAlgorithm = CryptoUtils.getHashAlgorithm(requestHashObject, 
                                                             JSONCryptoHelper.ALGORITHM_JSON);

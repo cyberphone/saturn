@@ -107,8 +107,9 @@ public class TransactionRequest implements BaseProperties {
                     authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequestEncoder.SOFTWARE_NAME, 
-                                                      PaymentRequestEncoder.SOFTWARE_VERSION))
+            .setDynamic((wr) -> Software.encode(wr,
+                                                PaymentRequestEncoder.SOFTWARE_NAME, 
+                                                PaymentRequestEncoder.SOFTWARE_VERSION))
             .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }

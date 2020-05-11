@@ -40,9 +40,9 @@ public class Software implements BaseProperties {
         return version;
     }
 
-    public static JSONObjectWriter encode(String name, String version) throws IOException {
-        return new JSONObjectWriter()
+    public static JSONObjectWriter encode(JSONObjectWriter wr, String name, String version) throws IOException {
+        return wr.setObject(SOFTWARE_JSON, new JSONObjectWriter()
             .setString(NAME_JSON, name)
-            .setString(VERSION_JSON, version);
+            .setString(VERSION_JSON, version));
     }
 }

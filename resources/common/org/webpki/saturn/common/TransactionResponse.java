@@ -93,7 +93,7 @@ public class TransactionResponse implements BaseProperties {
             .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
+            .setDynamic((wr) -> Software.encode(wr, SOFTWARE_NAME, SOFTWARE_VERSION))
             .setObject(Messages.TRANSACTION_REQUEST.lowerCamelCase(), transactionRequest.root)
             .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }

@@ -136,8 +136,9 @@ public class AuthorizationRequest implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(PaymentRequestEncoder.SOFTWARE_NAME,
-                                                      PaymentRequestEncoder.SOFTWARE_VERSION))
+            .setDynamic((wr) -> Software.encode(wr, 
+                                                PaymentRequestEncoder.SOFTWARE_NAME,
+                                                PaymentRequestEncoder.SOFTWARE_VERSION))
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 

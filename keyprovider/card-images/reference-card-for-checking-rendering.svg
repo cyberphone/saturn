@@ -1,0 +1,13 @@
+<svg width="300" height="180" xmlns="http://www.w3.org/2000/svg">
+<rect x="0" y="0" width="300" height="180" fill="#e0e0e0"/>
+<path fill="none" stroke-width="1" stroke="green" d="m0.5,20 l0,-19.5 l20,0 l0,9.5"/> 
+<path fill="none" stroke-width="1" stroke="yellow" d="m1.5,20 l0,-18.5 l18,0 l0,8.5"/> 
+<path fill="none" stroke-width="1" stroke="green" d="m299.5,20 l0,-19.5 l-20,0 l0,9.5"/> 
+<path fill="none" stroke-width="1" stroke="yellow" d="m298.5,20 l0,-18.5 l-18,0 l0,8.5"/> 
+<path fill="none" stroke-width="1" stroke="green" d="m0.5,160 l0,19.5 l20,0 l0,-9.5"/> 
+<path fill="none" stroke-width="1" stroke="yellow" d="m1.5,160 l0,18.5 l18,0 l0,-8.5"/> 
+<path fill="none" stroke-width="1" stroke="green" d="m299.5,160 l0,19.5 l-20,0 l0,-9.5"/> 
+<path fill="none" stroke-width="1" stroke="yellow" d="m298.5,160 l0,18.5 l-18,0 l0,-8.5"/> 
+<text x="30" y="141.3" font-family="Sans-serif" font-size="20">Your Name</text>
+<text x="30" y="165" font-family="Noto Sans" font-size="15" font-weight="500">ACCOUNT NUMBER</text>
+</svg>

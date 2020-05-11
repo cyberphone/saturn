@@ -70,7 +70,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
             }
         }
         return wr.setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
-                 .setObject(SOFTWARE_JSON, Software.encode(applicationName, applicationVersion))
+                 .setDynamic((wr2) -> Software.encode(wr2, applicationName, applicationVersion))
                  .setObject(PLATFORM_JSON, new JSONObjectWriter()
                      .setString(NAME_JSON, clientPlatform.name)
                      .setString(VERSION_JSON, clientPlatform.version)

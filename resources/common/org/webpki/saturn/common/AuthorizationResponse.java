@@ -113,7 +113,7 @@ public class AuthorizationResponse implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setObject(SOFTWARE_JSON, Software.encode(SOFTWARE_NAME, SOFTWARE_VERSION))
+            .setDynamic((wr) -> Software.encode(wr, SOFTWARE_NAME, SOFTWARE_VERSION))
             .setObject(Messages.AUTHORIZATION_REQUEST.lowerCamelCase(), authorizationRequest.root)
             .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
