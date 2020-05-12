@@ -18,33 +18,20 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.security.PublicKey;
+import java.math.BigDecimal;
 
-import java.util.GregorianCalendar;
-
-import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 
-import org.webpki.util.ISODateTime;
 
-public class BalanceRequestDecoder implements BaseProperties {
+public class BalanceResponseDecoder implements BaseProperties {
     
-    public BalanceRequestDecoder(JSONObjectReader rd, 
-                                 JSONCryptoHelper.Options signatureOptions) throws IOException {
-        Messages.BALANCE_REQUEST.parseBaseMessage(rd);
-        recipientUrl = rd.getString(RECIPIENT_URL_JSON);
+    public BalanceResponseDecoder(JSONObjectReader rd) throws IOException {
+        Messages.BALANCE_RESPONSE.parseBaseMessage(rd);
         accountId = rd.getString(ACCOUNT_ID_JSON);
-        credentialId = rd.getString(CREDENTIAL_ID_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
-        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        amount = rd.getMoney(AMOUNT_JSON, currency.getDecimals());
         software = new Software(rd);
-        publicKey = rd.getSignature(REQUEST_SIGNATURE_JSON, signatureOptions).getPublicKey();
         rd.checkForUnread();
-    }
-
-    String recipientUrl;
-    public String getRecipientUrl() {
-        return recipientUrl;
     }
 
     String accountId;
@@ -52,24 +39,14 @@ public class BalanceRequestDecoder implements BaseProperties {
         return accountId;
     }
 
-    String credentialId;
-    public String getCredentialId() {
-        return credentialId;
-    }
-
-    PublicKey publicKey;
-    public PublicKey getPublicKey() {
-        return publicKey;
+    BigDecimal amount;
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     Currencies currency;
     public Currencies getCurrency() {
         return currency;
-    }
-
-    GregorianCalendar timeStamp;
-    public GregorianCalendar getTimeStamp() {
-        return timeStamp;
     }
 
     Software software;

@@ -41,7 +41,7 @@ const BaseProperties = {
     PAYMENT_REQUEST_JSON            : 'paymentRequest',
     HTTP_VERSION_JSON               : 'httpVersion',                // For per partner being able to use HTTP/2 and further
     EXPIRES_JSON                    : 'expires',                    // Object expiration time
-    RECEPIENT_URL_JSON              : 'recepientUrl',               // Where we are sending (target address)
+    RECIPIENT_URL_JSON              : 'recipientUrl',               // Where we are sending (target address)
     AUTHORITY_URL_JSON              : 'authorityUrl',               // Double use self in *Authority objects and initiator
     SERVICE_URL_JSON                : 'serviceUrl',                 // Saturn core
     AMOUNT_JSON                     : 'amount',                     // Money

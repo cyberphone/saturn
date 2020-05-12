@@ -35,7 +35,7 @@ public class TransactionRequest implements BaseProperties {
     public TransactionRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         root = Messages.TRANSACTION_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponse(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
-        recepientUrl = rd.getString(RECEPIENT_URL_JSON);
+        recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         actualAmount = rd.getMoney(AMOUNT_JSON,
                                    authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
         referenceId = rd.getString(REFERENCE_ID_JSON);
@@ -57,9 +57,9 @@ public class TransactionRequest implements BaseProperties {
 
     JSONObjectReader root;
 
-    String recepientUrl;
-    public String getRecepientUrl() {
-        return recepientUrl;
+    String recipientUrl;
+    public String getRecipientUrl() {
+        return recipientUrl;
     }
 
     GregorianCalendar timeStamp;
@@ -96,12 +96,12 @@ public class TransactionRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
-                                          String recepientUrl,
+                                          String recipientUrl,
                                           BigDecimal actualAmount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.TRANSACTION_REQUEST.createBaseMessage()
-            .setString(RECEPIENT_URL_JSON, recepientUrl)
+            .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setMoney(AMOUNT_JSON,
                     actualAmount,
                     authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)

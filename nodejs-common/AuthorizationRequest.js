@@ -34,7 +34,7 @@ const EXPECTED_METHOD  = 'https://supercard.com';
 function AuthorizationRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.AUTHORIZATION_REQUEST, rd);
   this.testMode = rd.getBooleanConditional(BaseProperties.TEST_MODE_JSON);
-  this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
+  this.recipientUrl = rd.getString(BaseProperties.RECIPIENT_URL_JSON);
   this.authorityUrl = rd.getString(BaseProperties.AUTHORITY_URL_JSON);
   var paymentMethod = rd.getString(BaseProperties.PAYMENT_METHOD_JSON);
   if (paymentMethod != EXPECTED_METHOD) {

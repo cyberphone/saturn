@@ -20,6 +20,8 @@
           <fileset dir="${src.dir}">
             <include name="**/AuthorizationDataEncoder.java"/>
             <include name="**/KnownExtensions.java"/>
+            <include name="**/BalanceRequestEncoder.java"/>
+            <include name="**/BalanceResponseDecoder.java"/>
             <include name="**/BaseProperties.java"/>
             <include name="**/CardDataDecoder.java"/>
             <include name="**/ClientPlatform.java"/>

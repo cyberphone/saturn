@@ -32,7 +32,7 @@ const AccountDataDecoder    = require('./AccountDataDecoder');
 function TransactionRequest(rd) {
   this.root = Messages.parseBaseMessage(Messages.TRANSACTION_REQUEST, rd);
   this.authorizationResponse = new AuthorizationResponse(Messages.getEmbeddedMessage(Messages.AUTHORIZATION_RESPONSE, rd));
-  this.recepientUrl = rd.getString(BaseProperties.RECEPIENT_URL_JSON);
+  this.recipientUrl = rd.getString(BaseProperties.RECIPIENT_URL_JSON);
   this.actualAmount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON,
                                        this.authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);

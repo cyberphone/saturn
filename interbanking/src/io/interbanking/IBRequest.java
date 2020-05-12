@@ -60,7 +60,7 @@ public class IBRequest extends IBCommon {
 
     static final String OPERATION_JSON                   = "operation";                  // What is actually requested
 
-    static final String RECEPIENT_URL_JSON               = "recepientUrl";               // Target
+    static final String RECIPIENT_URL_JSON               = "recipientUrl";               // Target
 
     static final String ACCOUNT_JSON                     = "account";                    // Reference to a payer account/credential ID
 
@@ -87,7 +87,7 @@ public class IBRequest extends IBCommon {
     public IBRequest(JSONObjectReader rd) throws IOException {
         check(rd, INTERBANKING_REQUEST);
         operation = Operations.valueOf(rd.getString(OPERATION_JSON));
-        recepientUrl = rd.getString(RECEPIENT_URL_JSON);
+        recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         account = rd.getString(ACCOUNT_JSON);
         transactionReference = rd.getStringConditional(TRANSACTION_REFERENCE_JSON);
         amount = rd.getMoney(AMOUNT_JSON);
@@ -118,9 +118,9 @@ public class IBRequest extends IBCommon {
         return account;
     }
 
-    private String recepientUrl;
-    public String getRecepientUrl() {
-        return recepientUrl;
+    private String recipientUrl;
+    public String getRecipientUrl() {
+        return recipientUrl;
     }
 
     private String currency;
@@ -178,7 +178,7 @@ public class IBRequest extends IBCommon {
             .setString(JSONDecoderCache.CONTEXT_JSON, INTERBANKING_CONTEXT_URI)
             .setString(JSONDecoderCache.QUALIFIER_JSON, INTERBANKING_REQUEST)
             .setString(OPERATION_JSON, operation.toString())
-            .setString(RECEPIENT_URL_JSON, url)
+            .setString(RECIPIENT_URL_JSON, url)
             .setString(ACCOUNT_JSON, account)
             .setDynamic((wr) -> transactionReference == null ?
                     wr : wr.setString(TRANSACTION_REFERENCE_JSON, transactionReference))

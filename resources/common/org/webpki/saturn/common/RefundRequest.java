@@ -36,7 +36,7 @@ public class RefundRequest implements BaseProperties {
     public RefundRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponse(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
-        recepientUrl = rd.getString(RECEPIENT_URL_JSON);
+        recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         amount = rd.getMoney(AMOUNT_JSON,
                              authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
         undecodedAccountData = rd.getObject(PAYEE_SOURCE_ACCOUNT_JSON);
@@ -62,9 +62,9 @@ public class RefundRequest implements BaseProperties {
     
     JSONObjectReader undecodedAccountData;
 
-    String recepientUrl;
-    public String getRecepientUrl() {
-        return recepientUrl;
+    String recipientUrl;
+    public String getRecipientUrl() {
+        return recipientUrl;
     }
 
     GregorianCalendar timeStamp;
@@ -106,13 +106,13 @@ public class RefundRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
-                                          String recepientUrl,
+                                          String recipientUrl,
                                           BigDecimal amount,
                                           AccountDataEncoder payeeSourceAccount,
                                           String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.REFUND_REQUEST.createBaseMessage()
-            .setString(RECEPIENT_URL_JSON, recepientUrl)
+            .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setMoney(AMOUNT_JSON,
                     amount,
                     authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)

@@ -161,7 +161,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             new JSONCryptoHelper.Options();
     
     static {
+        // Full public key please.
         AUTHORIZATION_SIGNATURE_POLICY.setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED);
+        // Although the Saturn specification permits using a key ID, this implementation does not.
         AUTHORIZATION_SIGNATURE_POLICY.setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
     }
     
@@ -376,6 +378,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                            RefundServlet.class,
                            "Refund Servlet");
             
+            dynamicServlet(sce,
+                           KnownExtensions.BALANCE_REQUEST,
+                           BalanceRequestServlet.class,
+                           "Balance Servlet");
             externalCalls = 
                     new ExternalCalls(logging,
                                       logger,

@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.util.GregorianCalendar;
 
+import org.webpki.crypto.AsymKeySignerInterface;
+
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONObjectWriter;
 
@@ -27,21 +29,21 @@ import org.webpki.util.ISODateTime;
 
 public class BalanceRequestEncoder implements BaseProperties {
     
-    public static JSONObjectWriter encode(String recepientUrl,
+    public static JSONObjectWriter encode(String recipientUrl,
                                           Currencies currency,
                                           String accountId,
                                           String credentialId,
                                           GregorianCalendar timeStamp,
                                           String softwareName,
                                           String softwareVersion,
-                                          JSONAsymKeySigner signer) throws IOException {
+                                          AsymKeySignerInterface signer) throws IOException {
         return Messages.BALANCE_REQUEST.createBaseMessage()
-            .setString(RECEPIENT_URL_JSON, recepientUrl)
+            .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(CURRENCY_JSON, currency.toString())
             .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
             .setDynamic((wr) -> Software.encode(wr, softwareName, softwareVersion))
-            .setSignature(REQUEST_SIGNATURE_JSON, signer);
+            .setSignature(REQUEST_SIGNATURE_JSON, new JSONAsymKeySigner(signer));
     }
 }

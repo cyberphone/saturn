@@ -39,7 +39,7 @@ public interface BaseProperties {
     String PAYMENT_REQUEST_JSON             = "paymentRequest";
     String HTTP_VERSION_JSON                = "httpVersion";                // For per partner being able to use HTTP/2 and further
     String EXPIRES_JSON                     = "expires";                    // Object expiration time
-    String RECEPIENT_URL_JSON               = "recepientUrl";               // Where we are sending (target address)
+    String RECIPIENT_URL_JSON               = "recipientUrl";               // Where we are sending (target address)
     String SERVICE_URL_JSON                 = "serviceUrl";                 // Saturn core
     String AMOUNT_JSON                      = "amount";                     // Money
     String CURRENCY_JSON                    = "currency";                   // In this format

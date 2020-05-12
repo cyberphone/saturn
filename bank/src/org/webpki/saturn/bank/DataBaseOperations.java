@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.webpki.crypto.HashAlgorithms;
-
+import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.TransactionTypes;
 
@@ -63,7 +63,7 @@ public class DataBaseOperations {
                                                IN p_CredentialId INT,
                                                IN p_AccountId VARCHAR(30),
                                                IN p_PaymentMethodId INT,
-                                               IN p_S256PayReq BINARY(32))
+                                               IN p_S256AuthKey BINARY(32))
 */
         try (CallableStatement stmt = 
                 connection.prepareCall("{call AuthenticatePayReqSP(?,?,?,?,?,?)}");) {
@@ -86,7 +86,7 @@ public class DataBaseOperations {
                     logger.severe("No such account ID: " + accountId);
                     throw new NormalException("No such user account");
 
-                case 3:
+                case 4:
                     logger.severe("Wrong payment method: " + paymentMethod.toString() + " for account ID: " + accountId);
                     throw new NormalException("Wrong payment method");
 
@@ -176,6 +176,56 @@ public class DataBaseOperations {
     }
 
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Authenticate and perform a balance request using a stored procedure                                   //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    static BigDecimal requestAccountBalance(String credentialId,
+                                            String accountId,
+                                            PublicKey balanceKey,
+                                            Currencies currency,
+                                            Connection connection) 
+    throws SQLException, IOException, NormalException {
+/*
+        CREATE PROCEDURE RequestAccountBalanceSP (OUT p_Error INT,
+                                                  OUT p_Balance DECIMAL(8,2),
+                                                  IN p_CredentialId INT,
+                                                  IN p_AccountId VARCHAR(30),
+                                                  IN p_S256BalKey BINARY(32),
+                                                  IN p_Currency CHAR(3))
+*/
+        try (CallableStatement stmt = 
+                connection.prepareCall("{call RequestAccountBalanceSP(?,?,?,?,?,?)}");) {
+            stmt.registerOutParameter(1, java.sql.Types.INTEGER);
+            stmt.registerOutParameter(2, java.sql.Types.DECIMAL);
+            stmt.setInt(3, Integer.parseInt(credentialId));
+            stmt.setString(4, accountId);
+            stmt.setBytes(5, s256(balanceKey));
+            stmt.setString(6, currency.toString());
+            stmt.execute();
+            switch (stmt.getInt(1)) {
+                case 0:
+                    return stmt.getBigDecimal(2);
+
+                case 1:
+                    logger.severe("No such credential ID: " + credentialId);
+                    throw new NormalException("No such user credential");
+
+                case 2:
+                    logger.severe("No such account ID: " + accountId);
+                    throw new NormalException("No such user account");
+
+                case 5:
+                    logger.severe("Wrong currency: " + currency.toString() + " for account ID: " + accountId);
+                    throw new NormalException("Wrong currency");
+
+                default:
+                    logger.severe("Wrong public key for account ID: " + accountId);
+                    throw new NormalException("Wrong user public key");
+            }
+        }
+    }
+
+    
     private static int init(Connection connection,
                             String functionName,
                             String name) throws SQLException {

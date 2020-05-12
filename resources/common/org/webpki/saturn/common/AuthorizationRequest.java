@@ -39,7 +39,7 @@ public class AuthorizationRequest implements BaseProperties {
     public AuthorizationRequest(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
-        recepientUrl = rd.getString(RECEPIENT_URL_JSON);
+        recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         paymentRequest = new PaymentRequestDecoder(rd.getObject(PAYMENT_REQUEST_JSON));
@@ -90,9 +90,9 @@ public class AuthorizationRequest implements BaseProperties {
         return timeStamp;
     }
 
-    String recepientUrl;
-    public String getRecepientUrl() {
-        return recepientUrl;
+    String recipientUrl;
+    public String getRecipientUrl() {
+        return recipientUrl;
     }
 
     String payeeAuthorityUrl;
@@ -116,7 +116,7 @@ public class AuthorizationRequest implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(Boolean testMode,
-                                          String recepientUrl,
+                                          String recipientUrl,
                                           String payeeAuthorityUrl,
                                           PaymentMethods paymentMethod,
                                           JSONObjectReader encryptedAuthorizationData,
@@ -127,7 +127,7 @@ public class AuthorizationRequest implements BaseProperties {
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
-            .setString(RECEPIENT_URL_JSON, recepientUrl)
+            .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)

@@ -1,3 +1,4 @@
 {
-  "https://webpki.github.io/saturn/v3/extensions#hybrid": "${host}/hybridpay"
+  "https://webpki.github.io/saturn/v3/extensions#hybrid": "${host}/hybridpay",
+  "https://webpki.github.io/saturn/v3/extensions#balance": "${host}/balancereq"
 }

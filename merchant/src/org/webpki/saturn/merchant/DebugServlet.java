@@ -160,7 +160,7 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, KnownExtensions.HYBRID_PAYMENT);
         updateUrls(jsonTree, rewriter, NO_MATCHING_METHODS_URL_JSON);
         updateUrls(jsonTree, rewriter, HOME_PAGE_JSON);
-        updateUrls(jsonTree, rewriter, RECEPIENT_URL_JSON);
+        updateUrls(jsonTree, rewriter, RECIPIENT_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, PAYEE_AUTHORITY_URL_JSON);
@@ -466,7 +466,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.AUTHORIZATION_REQUEST) +
                 " using the following steps:</p><ul>" +
                 "<li style=\"padding:0pt\">Verify that the " +
-                keyWord(RECEPIENT_URL_JSON) + " in the " +
+                keyWord(RECIPIENT_URL_JSON) + " in the " +
                 keyWord(Messages.AUTHORIZATION_REQUEST) + " object matches the " +
                 keyWord(SERVICE_URL_JSON) + " of the <b>User&nbsp;Bank</b>" +
                 ".</li>" +
@@ -585,7 +585,7 @@ class DebugPrintout implements BaseProperties {
         fancyBox(debugData.refundRequest);
         descriptionStdMargin("See also <a href=\"" + encryptedAccount + "\">Encrypted Account Data</a>. " +
             "Note that " +
-            keyWord(RECEPIENT_URL_JSON) +
+            keyWord(RECIPIENT_URL_JSON) +
             " for the refund operation is derived from the " +
             keyWord(EXTENSIONS_JSON) +
             " object of the " +
@@ -645,7 +645,7 @@ class DebugPrintout implements BaseProperties {
         fancyBox(debugData.authorizationResponse);
     }
 
-    void cardOrHybridPayment(String recepient) throws IOException, GeneralSecurityException {
+    void cardOrHybridPayment(String recipient) throws IOException, GeneralSecurityException {
         description(point + 
             "<p>To finalize the transaction the <b>Merchant</b> embeds the " +
             keyWord(Messages.AUTHORIZATION_RESPONSE) +
@@ -653,12 +653,12 @@ class DebugPrintout implements BaseProperties {
             keyWord(Messages.TRANSACTION_REQUEST) +
             " including a possibly updated " +
             keyWord(AMOUNT_JSON) +
-            " and sends the completed object to the <b>" + recepient + 
+            " and sends the completed object to the <b>" + recipient + 
             "</b>:</p>");
         fancyBox(debugData.transactionRequest);
         if (debugData.hybridMode) {
             descriptionStdMargin("Note that " +
-            keyWord(RECEPIENT_URL_JSON) +
+            keyWord(RECIPIENT_URL_JSON) +
             " for the " +
             keyWord(Messages.TRANSACTION_REQUEST) +
             " is derived from the " +
@@ -674,7 +674,7 @@ class DebugPrintout implements BaseProperties {
                     " the <b>Acquirer</b> performs a request to the associated card network.</p>");
         }
         description(point + 
-            "<p>After successful processing of the transaction request the <b>" + recepient + "</b> returns a matching response to the <b>Merchant</b>:</p>");
+            "<p>After successful processing of the transaction request the <b>" + recipient + "</b> returns a matching response to the <b>Merchant</b>:</p>");
         fancyBox(debugData.transactionResponse);
     }
     

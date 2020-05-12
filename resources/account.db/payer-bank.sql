@@ -153,9 +153,9 @@ CREATE TABLE CREDENTIALS
 -- by verifying that both SHA256 of the public key (in X.509 DER
 -- format) and claimed Id (Card number, IBAN) match.
 
-    S256PayReq  BINARY(32)    NOT NULL,                                  -- Payment request key hash 
+    S256AuthKey BINARY(32)    NOT NULL,                                  -- Payment request key hash 
 
-    S256BalReq  BINARY(32)    NULL,                                      -- Optional: balance key hash 
+    S256BalKey  BINARY(32)    NULL,                                      -- Optional: balance key hash 
 
     PRIMARY KEY (Id),
     FOREIGN KEY (PaymentMethodId) REFERENCES PAYMENT_METHODS(Id),
@@ -376,8 +376,8 @@ CREATE PROCEDURE _CreateDemoCredentialSP (OUT p_CredentialId INT,
                                           OUT p_AccountId VARCHAR(30),
                                           IN p_InternalAccountId INT, 
                                           IN p_PaymentMethodUrl VARCHAR(50),
-                                          IN p_S256PayReq BINARY(32),
-                                          IN p_S256BalReq BINARY(32))
+                                          IN p_S256AuthKey BINARY(32),
+                                          IN p_S256BalKey BINARY(32))
   BEGIN
     SELECT Id, Format INTO @paymentMethodId, @format FROM PAYMENT_METHODS
         WHERE PAYMENT_METHODS.Name = p_PaymentMethodUrl;
@@ -388,13 +388,13 @@ CREATE PROCEDURE _CreateDemoCredentialSP (OUT p_CredentialId INT,
     DEALLOCATE PREPARE stmt;
     INSERT INTO CREDENTIALS(InternalAccountId, 
                             AccountId,
-                            S256PayReq,
-                            S256BalReq,
+                            S256AuthKey,
+                            S256BalKey,
                             PaymentMethodId) 
         VALUES(p_InternalAccountId,
                @accountId,
-               p_S256PayReq,
-               p_S256BalReq,
+               p_S256AuthKey,
+               p_S256BalKey,
                @paymentMethodId);
     SET p_CredentialId = LAST_INSERT_ID();
     SET p_AccountId = @accountId; 
@@ -407,8 +407,8 @@ CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
                                                IN p_UserId INT, 
                                                IN p_AccountTypeName VARCHAR(20),
                                                IN p_PaymentMethodUrl VARCHAR(50),
-                                               IN p_S256PayReq BINARY(32),
-                                               IN p_S256BalReq BINARY(32))
+                                               IN p_S256AuthKey BINARY(32),
+                                               IN p_S256BalKey BINARY(32))
   BEGIN
     CALL _CreateAccountSP(@accountNumber, p_Currency, p_UserId, GetAccountTypeId(p_AccountTypeName));
     SELECT Id, Format INTO @paymentMethodId, @format FROM PAYMENT_METHODS
@@ -420,13 +420,13 @@ CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
     INSERT INTO CREDENTIALS(InternalAccountId,
                             AccountId,
                             PaymentMethodId,
-                            S256PayReq, 
-                            S256BalReq) 
+                            S256AuthKey, 
+                            S256BalKey) 
         VALUES(@accountNumber, 
                @accountId,
                @paymentMethodId,
-               p_S256PayReq,
-               p_S256BalReq);
+               p_S256AuthKey,
+               p_S256BalKey);
     SET p_CredentialId = LAST_INSERT_ID();
     SET p_AccountId = @accountId;
   END
@@ -437,25 +437,26 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
 
 -- Note: the assumption is that the following variables are non-NULL otherwise
 -- you may get wrong answer due to the (weird) way SQL deals with comparing NULL!
+
                                        IN p_CredentialId INT,
                                        IN p_AccountId VARCHAR(30),
                                        IN p_PaymentMethodId INT,
-                                       IN p_S256PayReq BINARY(32))
+                                       IN p_S256AuthKey BINARY(32))
   BEGIN
     DECLARE v_UserId INT;
     DECLARE v_AccountId VARCHAR(30);
-    DECLARE v_S256PayReq BINARY(32);
+    DECLARE v_S256AuthKey BINARY(32);
     DECLARE v_PaymentMethodId INT;
     DECLARE v_InternalAccountId INT;
     
-    SELECT AccountId, S256PayReq, InternalAccountId, PaymentMethodId 
-        INTO v_AccountId, v_S256PayReq, v_InternalAccountId, v_PaymentMethodId
+    SELECT AccountId, S256AuthKey, InternalAccountId, PaymentMethodId 
+        INTO v_AccountId, v_S256AuthKey, v_InternalAccountId, v_PaymentMethodId
         FROM CREDENTIALS WHERE CREDENTIALS.Id = p_CredentialId;
-    IF v_AccountId IS NULL THEN
+    IF v_InternalAccountId IS NULL THEN
       SET p_Error = 1;    -- No such credential
     ELSEIF v_AccountId <> p_AccountId THEN
       SET p_Error = 2;    -- Non-matching account
-    ELSEIF v_S256PayReq <> p_S256PayReq THEN
+    ELSEIF v_S256AuthKey <> p_S256AuthKey THEN
       SET p_Error = 3;    -- Non-matching key
     ELSEIF v_PaymentMethodId <> p_PaymentMethodId THEN
       SET p_Error = 4;    -- Non-matching payment method
@@ -471,31 +472,42 @@ CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
   END
 //
 
-CREATE PROCEDURE AuthenticateBalReqSP (OUT p_Error INT,
-                                       OUT p_Balance DECIMAL(8,2),
+CREATE PROCEDURE RequestAccountBalanceSP (OUT p_Error INT,
+                                          OUT p_Balance DECIMAL(8,2),
 
 -- Note: the assumption is that the following variables are non-NULL otherwise
 -- you may get wrong answer due to the (weird) way SQL deals with comparing NULL!
-                                       IN p_CredentialId INT,
-                                       IN p_S256BalReq BINARY(32))
+
+                                          IN p_CredentialId INT,
+                                          IN p_AccountId VARCHAR(30),
+                                          IN p_S256BalKey BINARY(32),
+                                          IN p_Currency CHAR(3))
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
+    DECLARE v_AccountId VARCHAR(30);
+    DECLARE v_S256BalKey BINARY(32);
+    DECLARE v_InternalAccountId INT;
+    DECLARE v_Currency CHAR(3);
 
-    SELECT ACCOUNTS.Balance INTO v_Balance FROM ACCOUNTS 
-        INNER JOIN CREDENTIALS ON ACCOUNTS.Id = CREDENTIALS.InternalAccountId
-            WHERE CREDENTIALS.Id = p_CredentialId AND
-                  CREDENTIALS.S256BalReq = p_S256BalReq
-            LIMIT 1;
-    IF v_Balance IS NULL THEN    -- Failed => Find reason
-      IF EXISTS (SELECT * FROM CREDENTIALS WHERE CREDENTIALS.Id = p_CredentialId) THEN
-        SET p_Error = 3;           -- Key does not match account
+    SELECT AccountId, S256BalKey, InternalAccountId 
+        INTO v_AccountId, v_S256BalKey, v_InternalAccountId
+        FROM CREDENTIALS WHERE CREDENTIALS.Id = p_CredentialId;
+    IF v_InternalAccountId IS NULL THEN
+      SET p_Error = 1;    -- No such credential
+    ELSEIF v_AccountId <> p_AccountId THEN
+      SET p_Error = 2;    -- Non-matching account
+    ELSEIF v_S256BalKey <> p_S256BalKey THEN
+      SET p_Error = 3;    -- Non-matching key
+    ELSE                       
+      SELECT Balance, Currency 
+          INTO p_Balance, v_Currency 
+          FROM ACCOUNTS WHERE ACCOUNTS.Id = v_InternalAccountId;
+      IF v_Currency <> p_Currency THEN
+        SET p_Error = 5;  -- Currency mismatch
       ELSE
-        SET p_Error = 1;           -- No such account
+        SET p_Error = 0;  -- Success
       END IF;
-    ELSE
-      SET p_Error = 0;           -- Success
     END IF;
-    SET p_Balance = v_Balance;
   END
 //
 
@@ -508,6 +520,10 @@ CREATE PROCEDURE ExternalWithDrawSP (OUT p_Error INT,
                                      IN p_OptionalReservationId INT,
                                      IN p_Amount DECIMAL(8,2),
                                      IN p_AccountId VARCHAR(30))
+
+-- Note: AccountId MUST be uniquely associated with a specific ACCOUNT.Id
+-- Note: Currency is currently not taken in consideration
+
   BEGIN
     DECLARE v_Balance DECIMAL(8,2);
     DECLARE v_NewBalance DECIMAL(8,2);
@@ -926,12 +942,46 @@ CALL AuthenticatePayReqSP(@error,
 CALL ASSERT_TRUE(@error = 0, "Auth");
 CALL ASSERT_TRUE(@userName = "Chewbacca", "UserName");
 
-CALL AuthenticateBalReqSP(@error,
-                          @balance,
-                          @credentialId,
-                          x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
+CALL RequestAccountBalanceSP(@error,
+                             @balance,
+                             @credentialId,
+                             @accountId,
+                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
+                             "EUR");
 CALL ASSERT_TRUE(@error = 0, "Auth balance");
 CALL ASSERT_TRUE(@balance = @sepaAccountBalance, "Check balance"); 
+
+CALL RequestAccountBalanceSP(@error,
+                             @balance,
+                             @credentialId + 1,
+                             @accountId,
+                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
+                             "EUR");
+CALL ASSERT_TRUE(@error = 1, "Auth balance");
+
+CALL RequestAccountBalanceSP(@error,
+                             @balance,
+                             @credentialId,
+                             "BLAH",
+                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
+                             "EUR");
+CALL ASSERT_TRUE(@error = 2, "Auth balance");
+
+CALL RequestAccountBalanceSP(@error,
+                             @balance,
+                             @credentialId,
+                             @accountId,
+                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104b',
+                             "EUR");
+CALL ASSERT_TRUE(@error = 3, "Auth balance");
+
+CALL RequestAccountBalanceSP(@error,
+                             @balance,
+                             @credentialId,
+                             @accountId,
+                             x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a',
+                             "USD");
+CALL ASSERT_TRUE(@error = 5, "Auth balance");
 
 CALL ExternalWithDrawSP(@error,
                         @transactionId,
