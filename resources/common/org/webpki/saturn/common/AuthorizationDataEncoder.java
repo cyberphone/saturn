@@ -25,7 +25,7 @@ import org.webpki.crypto.HashAlgorithms;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONAsymKeySigner;
+import org.webpki.json.JSONSigner;
 import org.webpki.json.DataEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
@@ -46,7 +46,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
                                           String applicationName,
                                           String applicationVersion,
                                           ClientPlatform clientPlatform,
-                                          JSONAsymKeySigner signer) throws IOException {
+                                          JSONSigner signer) throws IOException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, 
