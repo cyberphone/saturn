@@ -52,6 +52,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
+
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -81,6 +83,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
@@ -1068,11 +1071,11 @@ public class Wallet {
                         dataEncryptionKey,
                         selectedCard.dataEncryptionAlgorithm,
                         challengeResults,
-                        selectedCard.signatureAlgorithm,
+                        new GregorianCalendar(),
                         "Saturn Internal Test Wallet",
                         "1.0",
                         new ClientPlatform("Java","8","W10"),
-                        new AsymKeySignerInterface () {
+                        new JSONAsymKeySigner(new AsymKeySignerInterface () {
                             @Override
                             public PublicKey getPublicKey() throws IOException {
                                 return sks.getKeyAttributes(keyHandle).getCertificatePath()[0].getPublicKey();
@@ -1086,7 +1089,7 @@ public class Wallet {
                                                           new String(pinText.getPassword()).getBytes("UTF-8"),
                                                           algorithm.getDigestAlgorithm().digest(data));
                             }
-                        });
+                        }).setSignatureAlgorithm(selectedCard.signatureAlgorithm));
                     logger.info("Authorization before encryption:\n" + authorizationData);
 
                     // Since user authorizations are pushed through the Payees they must be encrypted in order

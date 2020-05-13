@@ -169,10 +169,10 @@ public class DebugData implements Serializable {
             providerUserResponseSample = new JSONObjectReader(ProviderUserResponse.encode(
                     "My Bank",
                     "Transaction requests exceeding " +
-                      "<span style=\"font-weight:bold;white-space:nowrap\">&#x20ac;&#x2009;1,000</span>" +
+                      "<span style='font-weight:bold;white-space:nowrap'>&#x20ac;&#x2009;1,000</span>" +
                       " require additional user authentication to " +
                       "be performed. Please enter your " +
-                      "<span style=\"color:blue\">mother's maiden name</span>.",
+                      "<span style='color:blue'>mother's maiden name</span>.",
                     new UserChallengeItem[] {
                         new UserChallengeItem("mother",
                                               UserChallengeItem.TYPE.ALPHANUMERIC,

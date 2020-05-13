@@ -20,9 +20,7 @@ import java.io.IOException;
 
 import java.util.GregorianCalendar;
 
-import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
-import org.webpki.crypto.AsymKeySignerInterface;
 
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;
@@ -76,37 +74,5 @@ public class AuthorizationDataEncoder implements BaseProperties {
                      .setString(VERSION_JSON, clientPlatform.version)
                      .setString(VENDOR_JSON, clientPlatform.vendor))
                  .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
-    }
-
-   public static JSONObjectWriter encode(PaymentRequestDecoder paymentRequest,
-                                          HashAlgorithms requestHashAlgorithm,
-                                          String payeeAuthorityUrl,
-                                          String payeeHost,
-                                          String paymentMethod,
-                                          String credentialId,
-                                          String accountId,
-                                          byte[] dataEncryptionKey,
-                                          DataEncryptionAlgorithms dataEncryptionAlgorithm,
-                                          UserResponseItem[] optionalUserResponseItems,
-                                          AsymSignatureAlgorithms signatureAlgorithm,
-                                          String applicationName,
-                                          String applicationVersion,
-                                          ClientPlatform clientPlatform,
-                                          AsymKeySignerInterface signer) throws IOException {
-        return encode(paymentRequest,
-                      requestHashAlgorithm,
-                      payeeAuthorityUrl,
-                      payeeHost,
-                      paymentMethod,
-                      credentialId,
-                      accountId,
-                      dataEncryptionKey,
-                      dataEncryptionAlgorithm,
-                      optionalUserResponseItems,
-                      new GregorianCalendar(),
-                      applicationName,
-                      applicationVersion,
-                      clientPlatform,
-                      new JSONAsymKeySigner(signer).setSignatureAlgorithm(signatureAlgorithm));
     }
 }
