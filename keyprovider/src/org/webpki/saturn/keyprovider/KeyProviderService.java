@@ -91,6 +91,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static final String INHOUSE_LOGO                = "inhouse_logo";
 
+    static final String UI_STRESS                   = "ui_stress";
+
     static KeyStoreEnumerator keyManagementKey;
     
     static Integer serverPortMapping;
@@ -217,8 +219,16 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ////////////////////////////////////////////////////////////////////////////////////////////
             JSONArrayReader ar = JSONParser.parse(getResourceAsString("credential-templates.json"))
                     .getJSONArrayReader();
+            boolean uiStress = getPropertyBoolean(UI_STRESS);
             while (ar.hasMore()) {
-                credentialTemplates.add(new CredentialTemplate(ar.getObject()));
+                CredentialTemplate credentialTemplate = new CredentialTemplate(ar.getObject());
+                if (uiStress) {
+                    for (int q = 0; q < 19; q++) {
+                        credentialTemplates.add(credentialTemplate);
+                    }
+                    uiStress = false;
+                }
+                credentialTemplates.add(credentialTemplate);
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////

@@ -179,10 +179,11 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     keygen2State.update(invocationResponse);
 
                     // Now we really start doing something
+                    int sessionKeyLimit = 20 + KeyProviderService.credentialTemplates.size() * 12;
                     ProvisioningInitializationRequestEncoder provisioningInitRequest =
                         new ProvisioningInitializationRequestEncoder(keygen2State,
                                                                        (short)1000,
-                                                                       (short)50);
+                                                                       (short)sessionKeyLimit);
                     provisioningInitRequest.setKeyManagementKey(
                             KeyProviderService.keyManagementKey.getPublicKey());
                     keygen2JSONBody(response, provisioningInitRequest);

@@ -14,6 +14,7 @@
   <!-- Ant command line overridables -->
   <property name="logging" value="false"/>
   <property name="biometricsupport" value="true"/>
+  <property name="uistress" value="false"/>
   <condition property="inhouselogo" value="true" else="false">
     <equals arg1="${@inhouse-host}" arg2="${@keyprovhost}"/>
   </condition>
@@ -79,6 +80,7 @@
     </javac>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@inhouse-logo@" value="${inhouselogo}"/>
+      <replacefilter token="@ui-stress@" value="${uistress}"/>
       <replacefilter token="@authority-url@" value="${authorityurl}"/>
       <replacefilter token="@saturn-logotype@" value="${@saturn-logotype.file}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>

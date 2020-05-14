@@ -18,6 +18,12 @@
     </context-param>
 
     <context-param>
+        <description>UI Stress Test</description>
+        <param-name>ui_stress</param-name>
+        <param-value>@ui-stress@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Authority URL (Payer bank)</description>
         <param-name>authority_url</param-name>
         <param-value>@authority-url@</param-value>
