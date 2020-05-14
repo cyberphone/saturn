@@ -108,6 +108,18 @@
     </context-param>
 
     <context-param>
+        <description>Balance Slow Test</description>
+        <param-name>balance_slow_test</param-name>
+        <param-value>@balance-slow-test@</param-value>
+    </context-param>
+
+    <context-param>
+        <description>Balance Fail Test</description>
+        <param-name>balance_fail_test</param-name>
+        <param-value>@balance-fail-test@</param-value>
+    </context-param>
+
+    <context-param>
         <description>Logging</description>
         <param-name>logging</param-name>
         <param-value>@logging@</param-value>

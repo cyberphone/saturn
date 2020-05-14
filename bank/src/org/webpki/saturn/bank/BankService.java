@@ -112,6 +112,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String PAYER_INTERBANK_URL   = "payer_interbank_url";
 
     static final String PAYEE_INTERBANK_URL   = "payee_interbank_url";
+    
+    static final String BALANCE_SLOW_TEST     = "balance_slow_test";
+
+    static final String BALANCE_FAIL_TEST     = "balance_fail_test";
 
     static final String LOGGING               = "logging";
     
@@ -172,6 +176,10 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static boolean logging;
     
     static ExternalCalls externalCalls;
+    
+    static boolean balanceSlowTest;  // General slowness
+    
+    static String balanceFailTest;   // Specific account
     
     
     class AccountRestorer implements Runnable {
@@ -407,6 +415,9 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             payerInterbankUrl = getPropertyString(PAYER_INTERBANK_URL);
             payeeInterbankUrl = getPropertyString(PAYEE_INTERBANK_URL);
             IBRequest.setLogging(logging, logger);
+            
+            balanceSlowTest = getPropertyBoolean(BALANCE_SLOW_TEST);
+            balanceFailTest = getPropertyString(BALANCE_FAIL_TEST);
 
             started = new GregorianCalendar();
 

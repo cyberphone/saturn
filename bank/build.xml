@@ -32,7 +32,10 @@
     </and>
   </condition>
 
+  <!-- Useful ommand line variables --> 
   <property name="logging" value="false"/>
+  <property name="balancefail" value=""/>
+  <property name="balanceslow" value="false"/>
     
   <property name="server.port.map" value=""/>
 
@@ -110,6 +113,8 @@
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@payee-account-db@" value="${merchants.db}"/>
       <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
+      <replacefilter token="@balance-slow-test@" value="${balanceslow}"/>
+      <replacefilter token="@balance-fail-test@" value="${balancefail}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${appcorename}.war" webxml="${temp.dir}/web.xml">

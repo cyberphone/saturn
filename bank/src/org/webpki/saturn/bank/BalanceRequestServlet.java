@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.bank;
 
+import java.io.IOException;
+
 import java.math.BigDecimal;
 
 import java.sql.Connection;
@@ -52,6 +54,14 @@ public class BalanceRequestServlet extends ProcessingBaseServlet {
                                                          balanceRequest.getPublicKey(),
                                                          balanceRequest.getCurrency(), 
                                                          connection);
+        
+        // Specific tests
+        if (BankService.balanceSlowTest) {
+            Thread.sleep(30000);
+        }
+        if (balanceRequest.getAccountId().equals(BankService.balanceFailTest)) {
+            throw new IOException("Programmed fail for:" + BankService.balanceFailTest);
+        }
 
         // We did it, now return the result to the "wallet"
         return BalanceResponseEncoder.encode(balanceRequest.getAccountId(), 
