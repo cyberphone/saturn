@@ -56,11 +56,11 @@ public class BalanceRequestServlet extends ProcessingBaseServlet {
                                                          connection);
         
         // Specific tests
-        if (BankService.balanceSlowTest) {
-            Thread.sleep(30000);
-        }
         if (balanceRequest.getAccountId().equals(BankService.balanceFailTest)) {
             throw new IOException("Programmed fail for:" + BankService.balanceFailTest);
+        }
+        if (BankService.balanceSlowTest) {
+            Thread.sleep(30000);
         }
 
         // We did it, now return the result to the "wallet"
