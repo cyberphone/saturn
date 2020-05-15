@@ -30,7 +30,7 @@ public class Spinner extends SVGDocument {
     }
 
     final static double RADIUS        = 50;
-    final static double LINE_WIDTH    = 8;
+    final static double LINE_WIDTH    = 10;
     final static double LINE_LENGTH   = 25;
     final static int    SEGMENTS      = 12;
     final static String CORE_COLOR    = "black";
@@ -54,8 +54,8 @@ public class Spinner extends SVGDocument {
                             new SVGDoubleValue(Math.cos(angle) * (RADIUS - LINE_LENGTH) + RADIUS - LINE_WIDTH / 2), 
                             new SVGDoubleValue(Math.sin(angle) * (RADIUS -LINE_LENGTH) + RADIUS - LINE_WIDTH / 2), 
                             null, 
-//                            null).addString(SVGAttributes.STROKE_OPACITY, new SVGDoubleValue(opacity)));
-                            null));
+                            null).addString(SVGAttributes.STROKE_OPACITY, new SVGDoubleValue(opacity)));
+ //                           null));
             opacity -= 0.7 / SEGMENTS;
 
         }
