@@ -148,7 +148,8 @@ public class DebugData implements Serializable {
                                  userResponseItems,
                                  userResponseItems == null ? then : authTime,
                                  "WebPKI Suite/Saturn",
-                                 "1.0",
+                                 MerchantService.androidWebPkiVersions.substring(0, 
+                                                         MerchantService.androidWebPkiVersions.indexOf('-')),
                                  new ClientPlatform("Android", "10", "Huawei"),
                                  new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));
     }
