@@ -41,6 +41,10 @@ public class BalanceRequestServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, 
                                  JSONObjectReader providerRequest,
                                  Connection connection) throws Exception {
+        
+        if (BankService.logging) {
+            logger.info("Balance request:\n" + providerRequest);
+        }
 
         // Decode the balance request
         BalanceRequestDecoder balanceRequest = 
