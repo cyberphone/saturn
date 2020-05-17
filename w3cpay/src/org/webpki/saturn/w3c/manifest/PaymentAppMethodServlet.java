@@ -21,11 +21,13 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.webpki.json.JSONOutputFormats;
+import org.webpki.json.JSONParser;
 
 public class PaymentAppMethodServlet extends HttpServlet {
 
@@ -33,28 +35,20 @@ public class PaymentAppMethodServlet extends HttpServlet {
 
     static Logger logger = Logger.getLogger(PaymentAppMethodServlet.class.getCanonicalName());
 
-    static void outputManifestData(HttpServletResponse response, byte[] manifestData) 
-            throws IOException {
-        response.setContentType("application/manifest+json");
-        response.setContentLength(manifestData.length);
-        response.setHeader("Connection", "Close");
-        ServletOutputStream os = response.getOutputStream();
-        os.write(manifestData);
-        os.close();
-    }
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {
         logger.info("GET");
-        outputManifestData(response, PaymentAppMethodService.appManifest);
+        response.setContentType("text/plain");
+        response.getOutputStream().write(
+            JSONParser.parse(
+                PaymentAppMethodService.paymentManifest).serializeToBytes(JSONOutputFormats.PRETTY_PRINT));
     }
 
     @Override
     public void doHead(HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {
         logger.info("HEAD");
-        response.setHeader("Connection", "Close");
         response.setHeader("Link", "<payment-manifest.json>; rel=\"payment-method-manifest\"");
     }
 }

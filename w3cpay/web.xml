@@ -22,20 +22,12 @@
     <servlet>
         <servlet-name>PaymentManifestServlet</servlet-name>
         <servlet-class>org.webpki.saturn.w3c.manifest.PaymentManifestServlet</servlet-class>
-        <load-on-startup>1</load-on-startup>
-    </servlet>
-
-    <servlet>
-        <servlet-name>PaymentAppMethodServlet</servlet-name>
-        <servlet-class>org.webpki.saturn.w3c.manifest.PaymentAppMethodServlet</servlet-class>
-        <load-on-startup>2</load-on-startup>
     </servlet>
 
     <servlet-mapping>
         <servlet-name>PaymentAppMethodServlet</servlet-name>
         <url-pattern>/method</url-pattern>
-        <url-pattern>/app-manifest.json</url-pattern>
-   </servlet-mapping>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>PaymentManifestServlet</servlet-name>

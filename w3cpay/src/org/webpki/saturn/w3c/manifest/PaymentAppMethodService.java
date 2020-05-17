@@ -30,9 +30,9 @@ import org.webpki.crypto.HashAlgorithms;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.util.ArrayUtil;
-
 import org.webpki.net.MobileProxyParameters;
+
+import org.webpki.util.ArrayUtil;
 
 import org.webpki.webutil.InitPropertyReader;
 
@@ -45,8 +45,6 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
     static final String HOST_PATH                    = "host_path";
 
     static byte[] paymentManifest;
-
-    static byte[] appManifest;
     
     byte[] getBinary(String name) throws IOException {
         return ArrayUtil.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name));
@@ -64,13 +62,11 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
 
             JSONObjectWriter temp = new JSONObjectWriter();
             temp.setArray("default_applications")
-                .setString(getPropertyString(HOST_PATH) + "/app-manifest.json");
-            paymentManifest = temp.serializeToBytes(JSONOutputFormats.PRETTY_PRINT);
-            temp = new JSONObjectWriter();
+                .setString(getPropertyString(HOST_PATH) + "/payment-manifest.json");
             JSONObjectWriter oneApp = new JSONObjectWriter();
             oneApp.setString("platform", "play")
                   .setString("id", MobileProxyParameters.ANDROID_PACKAGE_NAME)
-                  .setString("min_version", "1.00")
+                  .setString("min_version", "1")
                   .setArray("fingerprints")
                     .setObject()
                         .setString("type", "sha256_cert")
@@ -84,7 +80,8 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
                 .setObject(oneApp.setString("url", 
                                             "https://play.google.com/store/apps/details?id=" +
                                                     MobileProxyParameters.ANDROID_PACKAGE_NAME));
-             appManifest = temp.serializeToBytes(JSONOutputFormats.PRETTY_PRINT);
+//            temp.setString("supported_origins", "*");
+            paymentManifest = temp.serializeToBytes(JSONOutputFormats.NORMALIZED);
             
             logger.info("W3C/Android Payment App Method initiated\nSubject=" +
                     CertificateUtil.getCertificateFromBlob(certificate).getSubjectDN());

@@ -36,6 +36,7 @@ public class PaymentManifestServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
         logger.info("GET");
-        PaymentAppMethodServlet.outputManifestData(response, PaymentAppMethodService.paymentManifest);
+        response.setContentType("application/manifest+json");
+        response.getOutputStream().write(PaymentAppMethodService.paymentManifest);
     }
 }
