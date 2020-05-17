@@ -34,8 +34,9 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationDataDecoder implements BaseProperties {
 
-    public AuthorizationDataDecoder(JSONObjectReader rd, 
+     public AuthorizationDataDecoder(JSONObjectReader rd, 
                                     JSONCryptoHelper.Options signatureOptions) throws IOException {
+        root = rd;
         JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
         requestHashAlgorithm = CryptoUtils.getHashAlgorithm(requestHashObject, 
                                                             JSONCryptoHelper.ALGORITHM_JSON);
@@ -71,6 +72,11 @@ public class AuthorizationDataDecoder implements BaseProperties {
                                             platform.getString(VENDOR_JSON));
         publicKey = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, signatureOptions).getPublicKey();
         rd.checkForUnread();
+    }
+
+    JSONObjectReader root;
+    public JSONObjectReader getAuthorizationObject() {
+        return root;
     }
 
     HashAlgorithms requestHashAlgorithm;

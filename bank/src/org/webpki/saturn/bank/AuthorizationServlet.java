@@ -123,7 +123,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Verify that the authority objects were signed by a genuine payment partner
-        providerAuthority.getSignatureDecoder().verify(cardPayment ? BankService.acquirerRoot : BankService.paymentRoot);
+        providerAuthority.getSignatureDecoder().verify(cardPayment ? 
+                                          BankService.acquirerRoot : BankService.paymentRoot);
 
         // Verify Payee signature key.  It may be one generation back as well
         PayeeCoreProperties payeeCoreProperties = payeeAuthority.getPayeeCoreProperties();
@@ -136,6 +137,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         AuthorizationDataDecoder authorizationData = authorizationRequest
                 .getDecryptedAuthorizationData(BankService.decryptionKeys,
                                                BankService.AUTHORIZATION_SIGNATURE_POLICY);
+        if (BankService.logging) {
+            logger.info("Decrypted user authorization:\n" + 
+                        authorizationData.getAuthorizationObject());
+        }
 
         // Verify that the there is a matching Payer account
         String accountId = authorizationData.getAccountId();
