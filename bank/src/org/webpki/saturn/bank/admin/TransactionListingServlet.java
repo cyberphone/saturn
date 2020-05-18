@@ -86,7 +86,7 @@ public class TransactionListingServlet extends HttpServlet {
                 ResultSetMetaData rsmd = rs.getMetaData();
                 int numberOfColumns = rsmd.getColumnCount();
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
-                        "<link rel='icon' href='saturn.png' sizes='192x192'>"+
+                        "<link rel='icon' href='../saturn.png' sizes='192x192'>"+
                         "<title>Transaction List</title>" +
                         AuthorityBaseServlet.REST_ELEMENT +
                         "<body><div class='header' style='margin-left:auto;margin-right:auto'>" +

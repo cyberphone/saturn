@@ -55,7 +55,7 @@ public class UserListingServlet extends HttpServlet {
                  PreparedStatement stmt = connection.prepareStatement(SQL);
                  ResultSet rs = stmt.executeQuery();) {
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
-                        "<link rel='icon' href='saturn.png' sizes='192x192'>"+
+                        "<link rel='icon' href='../saturn.png' sizes='192x192'>"+
                         "<title>Registered List</title>" +
                         AuthorityBaseServlet.REST_ELEMENT +
                         "<body><div class='header' style='margin-left:auto;margin-right:auto'>" +
