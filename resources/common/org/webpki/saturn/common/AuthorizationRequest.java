@@ -23,10 +23,13 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 
+import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
@@ -73,6 +76,12 @@ public class AuthorizationRequest implements BaseProperties {
     PaymentMethods paymentMethod;
     public PaymentMethods getPaymentMethod() {
         return paymentMethod;
+    }
+
+    public byte[] getHashOfAuthorization(HashAlgorithms hashAlgorithm) throws IOException {
+System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
+        return hashAlgorithm.digest(encryptedAuthorizationData
+                .getEncryptionObject().serializeToBytes(JSONOutputFormats.CANONICALIZED));
     }
 
     JSONSignatureDecoder signatureDecoder;

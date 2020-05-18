@@ -65,6 +65,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Decode authorization request message
         AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);
 
+// TODO for idempotent operation and replay protection
+//        byte[] authorizationHash = authorizationRequest.getHashOfAuthorization(HashAlgorithms.SHA256);
+
         // Check that we actually were the intended party
         if (!BankService.serviceUrl.equals(authorizationRequest.getRecipientUrl())) {
             throw new IOException("Unexpected \"" + RECIPIENT_URL_JSON + "\" : " + authorizationRequest.getRecipientUrl());
