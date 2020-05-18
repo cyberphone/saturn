@@ -836,7 +836,7 @@ CALL _CreateTransactionTypeSP("CREDIT_ACCOUNT",
 CALL _CreateTransactionTypeSP("*FAILED*",
                               "Referenced transaction failed and was nullified");
 
--- Demo and test data
+-- Predefined demo user for the Java desktop client
 
 CALL CreateUserSP(@userid, "Luke Skywalker", "127.0.0.1");
 
@@ -869,7 +869,9 @@ CALL _CreateDemoCredentialSP(@credentialid,
                              x'19aed933edacc289d0d63fba788cf424612d346754d110863cd043b52abecd53',
                              NULL);
 SELECT @credentialid, @accountId, @internalAccountId;
-                            
+
+// Test only user
+                 
 CALL CreateUserSP(@userid, "Chewbacca", "127.0.0.1");
 
 CALL CreateAccountAndCredentialSP(@accountId,
@@ -1085,3 +1087,7 @@ CALL ASSERT_TRANSACTION(@error, @transactionId, @reftrans, @sepaAccountBalance -
 CALL NullifyTransactionSP(@error, @transactionId);
 -- SELECT * from TRANSACTIONS;
 CALL ASSERT_TRANSACTION(@error, @transactionId + 1, @transactionId, @sepaAccountBalance - 200.00, "*FAILED*");
+
+// Clean up after testing
+
+DELETE FROM USERS WHERE Name="Chewbacca";
