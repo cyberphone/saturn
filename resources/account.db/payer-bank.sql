@@ -707,7 +707,6 @@ CREATE PROCEDURE NullifyTransactionSP (OUT p_Error INT,
 
 CREATE PROCEDURE _RestoreUserAccountsSP(IN p_UserId INT)
   BEGIN
-    UPDATE USERS SET LastAccess = NULL, AccessCount = 0 WHERE Id = p_UserId;
     SET SQL_SAFE_UPDATES = 0;
     UPDATE ACCOUNTS INNER JOIN ACCOUNT_TYPES ON ACCOUNTS.AccountTypeId = ACCOUNT_TYPES.Id
         SET Balance = ACCOUNT_TYPES.CappedAt

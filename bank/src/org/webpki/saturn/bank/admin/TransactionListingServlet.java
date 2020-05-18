@@ -14,7 +14,7 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.bank;
+package org.webpki.saturn.bank.admin;
 
 import java.io.IOException;
 
@@ -30,11 +30,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webpki.saturn.bank.BankService;
 import org.webpki.saturn.common.AuthorityBaseServlet;
 import org.webpki.saturn.common.HttpSupport;
 
 /////////////////////////////////////////////////////////////////////////////////
-// This is just a debugger/demo servlet showing the last 50 transactions       //
+// This is a debugger/demo servlet showing the last 50 transactions            //
 /////////////////////////////////////////////////////////////////////////////////
 
 public class TransactionListingServlet extends HttpServlet {

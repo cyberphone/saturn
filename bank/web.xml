@@ -192,7 +192,7 @@
   <security-constraint>
     <web-resource-collection>
       <web-resource-name>Bank admin manager</web-resource-name>
-      <url-pattern>/transactions</url-pattern>
+      <url-pattern>/admin/*</url-pattern>
     </web-resource-collection>
     <auth-constraint>
        <role-name>manager</role-name>

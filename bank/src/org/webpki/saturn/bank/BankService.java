@@ -67,6 +67,9 @@ import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
+import org.webpki.saturn.bank.admin.TransactionListingServlet;
+import org.webpki.saturn.bank.admin.UserListingServlet;
+
 import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.HostingProvider;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -171,7 +174,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
         AUTHORIZATION_SIGNATURE_POLICY.setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
     }
     
-    static DataSource jdbcDataSource;
+    public static DataSource jdbcDataSource;
 
     static boolean logging;
     
@@ -407,9 +410,14 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 new Thread(new AccountRestorer()).start();
                 
                 registerServlet(sce, 
-                                "/transactions",
+                                "/admin/transactions",
                                 TransactionListingServlet.class, 
                                 "List transactions");
+
+                registerServlet(sce, 
+                                "/admin/users",
+                                UserListingServlet.class, 
+                                "List users");
             }
 
             payerInterbankUrl = getPropertyString(PAYER_INTERBANK_URL);
