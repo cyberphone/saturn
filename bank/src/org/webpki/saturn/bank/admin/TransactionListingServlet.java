@@ -79,11 +79,10 @@ public class TransactionListingServlet extends HttpServlet {
             "ORDER BY LASTTRANS.TId DESC";
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Connection connection = null; 
         try {
-            connection = BankService.jdbcDataSource.getConnection();
-            try (PreparedStatement stmt = connection.prepareStatement(SQL);) {
-                ResultSet rs = stmt.executeQuery();
+            try (Connection connection = BankService.jdbcDataSource.getConnection();
+                 PreparedStatement stmt = connection.prepareStatement(SQL);
+                 ResultSet rs = stmt.executeQuery();) {
                 ResultSetMetaData rsmd = rs.getMetaData();
                 int numberOfColumns = rsmd.getColumnCount();
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
@@ -114,14 +113,7 @@ public class TransactionListingServlet extends HttpServlet {
                 }
                 HttpSupport.writeHtml(response, html.append("</table></body></html>"));
             }
-            connection.close();
-        } catch (Exception e) {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e1) {
-                }
-            }
+        } catch (SQLException e) {
             throw new IOException(e);
         }
     }

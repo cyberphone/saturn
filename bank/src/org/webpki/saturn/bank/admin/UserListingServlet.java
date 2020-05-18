@@ -17,7 +17,9 @@
 package org.webpki.saturn.bank.admin;
 
 import java.io.IOException;
+
 import java.net.InetAddress;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,11 +50,10 @@ public class UserListingServlet extends HttpServlet {
                               "ORDER BY Created DESC LIMIT " + MAX_ROWS;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Connection connection = null; 
         try {
-            connection = BankService.jdbcDataSource.getConnection();
-            try (PreparedStatement stmt = connection.prepareStatement(SQL);) {
-                ResultSet rs = stmt.executeQuery();
+            try (Connection connection = BankService.jdbcDataSource.getConnection();
+                 PreparedStatement stmt = connection.prepareStatement(SQL);
+                 ResultSet rs = stmt.executeQuery();) {
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
                         "<link rel='icon' href='saturn.png' sizes='192x192'>"+
                         "<title>Registered List</title>" +
@@ -89,14 +90,7 @@ public class UserListingServlet extends HttpServlet {
                 }
                 HttpSupport.writeHtml(response, html.append("</table></body></html>"));
             }
-            connection.close();
-        } catch (Exception e) {
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (SQLException e1) {
-                }
-            }
+        } catch (SQLException e) {
             throw new IOException(e);
         }
     }
