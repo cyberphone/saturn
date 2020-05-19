@@ -46,7 +46,8 @@ public class UserListingServlet extends HttpServlet {
     
     static final String MAX_ROWS = "100";
 
-    static final String SQL = "SELECT DISTINCT IpAddress, Name, Created, AccessCount FROM USERS " +
+    static final String SQL = "SELECT DISTINCT IpAddress, Name, Id, Created, AccessCount, " + 
+                              "COALESCE(LastAccess,'') FROM USERS " +
                               "ORDER BY Created DESC LIMIT " + MAX_ROWS;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -68,12 +69,14 @@ public class UserListingServlet extends HttpServlet {
                         "<th>IP Address</th>" +
                         "<th>Host</th>" +
                         "<th>User Name</th>" +
+                        "<th>User ID</th>" +
                         "<th>Created</th>" +
                         "<th>Access Count</th>" +
+                        "<th>Last Access</th>" +
                         "</tr>");
                while (rs.next()) {
                     html.append("<tr>");
-                    for (int q = 1; q <= 4; q++) {
+                    for (int q = 1; q <= 6; q++) {
                         String value = rs.getString(q);
                         html.append("<td>")
                             .append(value)
