@@ -43,9 +43,12 @@
     
     <property name="logging" value="false"/>
     <property name="var.slow.operation" value="false"/>
-    <condition property="payee_provider.url" value="${@hostinghost}/${@hostingpath}" else="${@payeebankhost}/${@payeebankpath}">
+    <condition property="payee_provider.url" 
+               value="${@hostinghost}/${@hostingpath}/payees/" 
+               else="${@payeebankhost}/${@payeebankpath}/payees/">
       <isset property="hostingoption"/>
     </condition>
+    <property name="payee_acquirer.url" value="${@acquirerhost}/${@acquirerpath}/payees/"/>
     <property name="server.port.map" value=""/>
     <property name="unusual.card" value="false"/>
     <property name="currency" value="EUR"/>
@@ -103,8 +106,8 @@
       <replacefilter token="@merchant-base-url@" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="@payment-root@" value="${@banknetworkroot}.cer"/>
       <replacefilter token="@acquirer-root@" value="${@acquirernetworkroot}.cer"/>
-      <replacefilter token="@payee-acquirer-authority-url@" value="${@acquirerhost}/${@acquirerpath}/payees/"/>
-      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.url}/payees/"/>
+      <replacefilter token="@payee-acquirer-authority-url@" value="${payee_acquirer.url}"/>
+      <replacefilter token="@payee-provider-authority-url@" value="${payee_provider.url}"/>
       <replacefilter token="@no-matching-methods-url@" value="${@keyprovhost}/${@keyprovpath}"/>
       <replacefilter token="@currency@" value="${currency}"/>
       <replacefilter token="@add-unusual-card@" value="${unusual.card}"/>

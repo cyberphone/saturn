@@ -59,7 +59,7 @@ TransactionRequest.prototype.getTestMode = function() {
 };
 
 TransactionRequest.prototype.getPayeeAuthorityUrl = function() {
-  return this.authorizationResponse.authorizationRequest.authorityUrl;
+  return this.authorizationResponse.authorizationRequest.payeeAuthorityUrl;
 };
 
 TransactionRequest.prototype.getPublicKey = function() {

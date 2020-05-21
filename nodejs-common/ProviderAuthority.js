@@ -28,12 +28,12 @@ const Messages           = require('./Messages');
 const AccountDataDecoder = require('./AccountDataDecoder');
 
 const SUPERCARD_METHOD  = 'https://supercard.com';  // Only one...
-const SIGNATURE_PROFILE = 'https://webpki.github.io/saturn/v3/signatures#P-256.ES256'; // Only one
+const SIGNATURE_PROFILE = 'https://webpki.github.io/saturn/v3/signatures#ES256.P-256'; // Only one
 
 function ProviderAuthority() {
 }
 
-ProviderAuthority.encode = function(authorityUrl,
+ProviderAuthority.encode = function(providerAuthorityUrl,
                                     homePage,
                                     serviceUrl,
                                     publicKey,
@@ -44,7 +44,7 @@ ProviderAuthority.encode = function(authorityUrl,
   expires.setTime(now.getTime() + expiresInSeconds * 1000);
   return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
     .setString(BaseProperties.HTTP_VERSION_JSON, "HTTP/1.1")
-    .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
+    .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
     .setString(BaseProperties.HOME_PAGE_JSON, homePage)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)
     .setObject(BaseProperties.SUPPORTED_PAYMENT_METHODS_JSON, new JsonUtil.ObjectWriter()
@@ -63,7 +63,7 @@ ProviderAuthority.encode = function(authorityUrl,
         .setPublicKey(publicKey)))
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
-    .setSignature(signer, BaseProperties.ATTESTATION_SIGNATURE_JSON);
+    .setSignature(signer, BaseProperties.ISSUER_SIGNATURE_JSON);
 };
 
 module.exports = ProviderAuthority;

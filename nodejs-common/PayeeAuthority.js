@@ -31,7 +31,7 @@ const RequestHash    = require('./RequestHash');
 function PayeeAuthority() {
 }
 
-PayeeAuthority.encode = function(authorityUrl,
+PayeeAuthority.encode = function(payeeAuthorityUrl,
                                  providerAuthorityUrl,
                                  payeeCoreProperties,
                                  now,
@@ -40,7 +40,7 @@ PayeeAuthority.encode = function(authorityUrl,
   var expires = new Date();
   expires.setTime(now.getTime() + expiresInSeconds * 1000);
   return Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
-    .setString(BaseProperties.AUTHORITY_URL_JSON, authorityUrl)
+    .setString(BaseProperties.PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
     .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
     .setString(BaseProperties.LOCAL_PAYEE_ID_JSON, payeeCoreProperties[BaseProperties.LOCAL_PAYEE_ID_JSON])
     .setString(BaseProperties.COMMON_NAME_JSON, payeeCoreProperties[BaseProperties.COMMON_NAME_JSON])
@@ -67,7 +67,7 @@ PayeeAuthority.encode = function(authorityUrl,
       })
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)
-    .setSignature(signer, BaseProperties.ATTESTATION_SIGNATURE_JSON);
+    .setSignature(signer, BaseProperties.ISSUER_SIGNATURE_JSON);
 };
 
 module.exports = PayeeAuthority;

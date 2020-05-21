@@ -42,7 +42,6 @@ const BaseProperties = {
     HTTP_VERSION_JSON               : 'httpVersion',                // For per partner being able to use HTTP/2 and further
     EXPIRES_JSON                    : 'expires',                    // Object expiration time
     RECIPIENT_URL_JSON              : 'recipientUrl',               // Where we are sending (target address)
-    AUTHORITY_URL_JSON              : 'authorityUrl',               // Double use self in *Authority objects and initiator
     SERVICE_URL_JSON                : 'serviceUrl',                 // Saturn core
     AMOUNT_JSON                     : 'amount',                     // Money
     CURRENCY_JSON                   : 'currency',                   // In this format
@@ -57,12 +56,14 @@ const BaseProperties = {
     LOCAL_PAYEE_ID_JSON             : 'localPayeeId',               // Provider's local ID of Payee
     TEST_MODE_JSON                  : 'testMode',                   // Test mode = no real money involved
     ENCRYPTED_AUTHORIZATION_JSON    : 'encryptedAuthorization',     // Encrypted Payer authorization data
+    PAYEE_AUTHORITY_URL_JSON        : 'payeeAuthorityUrl',          // URL to payee authority object
     PROVIDER_AUTHORITY_URL_JSON     : 'providerAuthorityUrl',       // URL to payment provider authority object
     HOSTING_PROVIDER_JSON           : 'hostingProvider',            // Optional object in ProviderAuthority
     HOME_PAGE_JSON                  : 'homePage',                   // URL to the public Web of the entity
-    SUPPORTED_PAYMENT_METHODS_JSON            : 'paymentMethods',             // List of accepted payment methods (URLs)
+    SUPPORTED_PAYMENT_METHODS_JSON  : 'supportedPaymentMethods',    // List of accepted payment methods (URLs)
     PAYMENT_METHOD_JSON             : 'paymentMethod',              // Payment method (URL)
     AUTHORIZATION_SIGNATURE_JSON    : 'authorizationSignature',     // User and bank authorization signature
+    ISSUER_SIGNATURE_JSON           : 'issuerSignature',            // Authority objects
     REQUEST_SIGNATURE_JSON          : 'requestSignature',           // Payee signature
     EXTENSIONS_JSON                 : 'extensions',                 // Optional provider authority data
     ACCOUNT_ID_JSON                 : 'accountId',                  // Account identifier or PAN
@@ -72,7 +73,7 @@ const BaseProperties = {
     PAYEE_RECEIVE_ACCOUNT_JSON      : 'payeeReceiveAccount',        // Holding payee account data
     PAYEE_SOURCE_ACCOUNT_JSON       : 'payeeSourceAccount',         // For refunds
     REQUEST_HASH_JSON               : 'requestHash',                // Wallet authorization
-    PAYEE_HOST_JSON                : 'domainName',
+    PAYEE_HOST_JSON                 : 'domainName',
     ACCOUNT_VERIFIER_JSON           : 'accountVerifier',            // Option for "PayeeAuthority"
     HASHED_PAYEE_ACCOUNTS_JSON      : 'hashedPayeeAccounts',        //    -"-
     NONCE_JSON                      : 'nonce',                      // For usage in methods together with the option above
