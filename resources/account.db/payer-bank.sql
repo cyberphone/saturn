@@ -862,7 +862,7 @@ CALL _CreateDemoCredentialSP(@credentialid,
                              NULL);
 SELECT @credentialid, @accountId, @internalAccountId;
 
-// Test only user
+-- Test only user
                  
 CALL CreateUserSP(@userid, "Chewbacca", "127.0.0.1");
 
@@ -1080,6 +1080,6 @@ CALL NullifyTransactionSP(@error, @transactionId);
 -- SELECT * from TRANSACTIONS;
 CALL ASSERT_TRANSACTION(@error, @transactionId + 1, @transactionId, @sepaAccountBalance - 200.00, "*FAILED*");
 
-// Clean up after testing
+-- Clean up after testing
 
 DELETE FROM USERS WHERE Name="Chewbacca";
