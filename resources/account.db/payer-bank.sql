@@ -47,8 +47,7 @@ USE PAYER_BANK;
 /*                   USERS                     */
 /*=============================================*/
 
-CREATE TABLE USERS
-  (
+CREATE TABLE USERS (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique User ID
     
     IpAddress   VARCHAR(50)   NOT NULL,                                  -- "Statistics"
@@ -62,15 +61,14 @@ CREATE TABLE USERS
     Name        VARCHAR(50)   NOT NULL,                                  -- Human name
 
     PRIMARY KEY (Id)
-  );
+);
 
 
 /*=============================================*/
 /*                 ACCOUNT_TYPES               */
 /*=============================================*/
 
-CREATE TABLE ACCOUNT_TYPES
-  (
+CREATE TABLE ACCOUNT_TYPES (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Type ID
 
     Name        VARCHAR(20)   NOT NULL,                                  -- As a symbolic name
@@ -80,15 +78,14 @@ CREATE TABLE ACCOUNT_TYPES
     CappedAt    DECIMAL(8,2)  NOT NULL,                                  -- Capped at
 
     PRIMARY KEY (Id)
-  );
+);
 
 
 /*=============================================*/
 /*                 ACCOUNTS                    */
 /*=============================================*/
 
-CREATE TABLE ACCOUNTS
-  (
+CREATE TABLE ACCOUNTS (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique (internal) Account ID
 
 -- One could imagine a more flexible arrangement supporting multiple owners
@@ -106,15 +103,14 @@ CREATE TABLE ACCOUNTS
     PRIMARY KEY (Id),
     FOREIGN KEY (AccountTypeId) REFERENCES ACCOUNT_TYPES(Id),
     FOREIGN KEY (UserId) REFERENCES USERS(Id) ON DELETE CASCADE
-  ) AUTO_INCREMENT=200500123;
+) AUTO_INCREMENT=200500123;
 
 
 /*=============================================*/
 /*              PAYMENT_METHODS                */
 /*=============================================*/
 
-CREATE TABLE PAYMENT_METHODS
-  (
+CREATE TABLE PAYMENT_METHODS (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Payment Method ID
 
     Name        VARCHAR(50)   NOT NULL  UNIQUE,                          -- Payment method (URL)
@@ -124,15 +120,14 @@ CREATE TABLE PAYMENT_METHODS
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
 
     PRIMARY KEY (Id)
-  );
+);
 
 
 /*=============================================*/
 /*                CREDENTIALS                  */
 /*=============================================*/
 
-CREATE TABLE CREDENTIALS
-  (
+CREATE TABLE CREDENTIALS (
 
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Credential ID
 
@@ -160,7 +155,7 @@ CREATE TABLE CREDENTIALS
     PRIMARY KEY (Id),
     FOREIGN KEY (PaymentMethodId) REFERENCES PAYMENT_METHODS(Id),
     FOREIGN KEY (InternalAccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
-  ) AUTO_INCREMENT=100000000;
+) AUTO_INCREMENT=100000000;
   
 CREATE INDEX SpeedUpAccountId ON CREDENTIALS (AccountId);
 
@@ -169,8 +164,7 @@ CREATE INDEX SpeedUpAccountId ON CREDENTIALS (AccountId);
 /*             TRANSACTION_TYPES               */
 /*=============================================*/
 
-CREATE TABLE TRANSACTION_TYPES
-  (
+CREATE TABLE TRANSACTION_TYPES (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique Transaction Type ID
 
     Name        VARCHAR(20)   NOT NULL,                                  -- As a symbolic name
@@ -178,15 +172,14 @@ CREATE TABLE TRANSACTION_TYPES
     Description VARCHAR(80)   NOT NULL,                                  -- A bit more on the topic
 
     PRIMARY KEY (Id)
-  );
+);
 
 
 /*=============================================*/
 /*               TRANSACTIONS                  */
 /*=============================================*/
 
-CREATE TABLE TRANSACTIONS
-  (
+CREATE TABLE TRANSACTIONS (
     Id          INT           NOT NULL  UNIQUE,                          -- Unique Transaction ID
 
     InternalAccountId INT     NOT NULL,                                  -- Referring to an Account
@@ -216,15 +209,14 @@ CREATE TABLE TRANSACTIONS
     PRIMARY KEY (Id),
     FOREIGN KEY (TransactionTypeId) REFERENCES TRANSACTION_TYPES(Id),
     FOREIGN KEY (InternalAccountId) REFERENCES ACCOUNTS(Id) ON DELETE CASCADE
-  );
+);
 
 
 /*=============================================*/
 /*            TRANSACTION_COUNTER              */
 /*=============================================*/
 
-CREATE TABLE TRANSACTION_COUNTER
-  (
+CREATE TABLE TRANSACTION_COUNTER (
 -- MySQL 5.7 auto increment is unreliable for this application since it
 -- loses track for power fails if TRANSACTIONS are emptied like in the demo.
 
@@ -232,7 +224,7 @@ CREATE TABLE TRANSACTION_COUNTER
 
     Next        INT           NOT NULL                                   -- Monotonic counter
 
-  );
+);
 
 INSERT INTO TRANSACTION_COUNTER(Next) VALUES(100345078);
 
