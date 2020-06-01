@@ -38,14 +38,13 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     protected abstract boolean isProvider();
     
     public static final String BORDER = 
-            "border-width:1px;border-style:solid;border-color:#a9a9a9";
+        "border-width:1px;border-style:solid;border-color:#a9a9a9";
 
-    public static final String BOX_SHADDOW = 
-            "box-shadow:3pt 3pt 3pt #d0d0d0";
+    public static final String BOX_SHADDOW = "box-shadow:3pt 3pt 3pt #d0d0d0";
 
     public static final String TOP_ELEMENT = 
-            "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
-            "<meta name='viewport' content='width=device-width, initial-scale=1'>";
+        "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
+        "<meta name='viewport' content='width=device-width, initial-scale=1'>";
 
     public static final String REST_ELEMENT = 
         "<style type='text/css'>" +
