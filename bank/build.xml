@@ -40,23 +40,30 @@
   <property name="server.port.map" value=""/>
 
   <property name="debug" value="on"/>
-  <property environment="env"/>
 
-  <property name="catalina.home" value="${env.CATALINA_HOME}"/>
+  <property name="javaversion" value="${ant.java.version}"/>
+  <condition property="tested.version" else="false">
+    <equals arg1="11" arg2="${javaversion}"/>
+  </condition>
+
+  <target name="_jdk11" unless="${tested.version}">
+    <echo message="&#10;
+***************************************************************&#10;
+    WARNING - This package has only been tested with Java 11!&#10;
+***************************************************************&#10;&#10;"/>
+  </target>
+
+  <property environment="env"/>
+  <condition property="catalina.home" value="${env.CATALINA_HOME}">
+    <isset property="env.CATALINA_HOME"/>
+  </condition>
 
   <target name="help">
       <echo message="both tomcat [-Dlogging=true] [-Dpayeebank=0] [-Dhostingoption=0]"/>
   </target>
 
-  <target name="_init" unless="app_path">
-    <!-- Set up where application should reside --> 
-    <condition property="tomcat_app_root_set">
-      <isset property="env.CATALINA_HOME"/>
-    </condition>
-    <fail message="CATALINA_HOME must be set to environment!" unless="tomcat_app_root_set"/>
-  </target>
-
   <target name="build">
+    <antcall target="_jdk11"/>
     <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
     <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
     <delete dir="${temp.dir}"/>
@@ -75,8 +82,6 @@
        includes="**/*.java, **/*.xml, **/*.json"/>
     <copy file="web.xml" todir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}:${@account-types.src.dir}:${@interbanking.src.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
@@ -159,9 +164,10 @@
       </ant>
   </target>
 
-  <target name="tomcat" depends="_init">
+  <target name="tomcat">
+    <fail message="CATALINA_HOME must be set to environment!" unless="catalina.home"/>
     <antcall target="build"/>
-    <copy file="${dist.dir}/${appcorename}.war" todir="${env.CATALINA_HOME}/webapps" overwrite="true" preservelastmodified="true"/>
+    <copy file="${dist.dir}/${appcorename}.war" todir="${catalina.home}/webapps" overwrite="true" preservelastmodified="true"/>
   </target>
    
 </project>

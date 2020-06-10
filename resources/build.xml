@@ -14,9 +14,6 @@
 
   <property name="debug" value="on"/>
   
-  <property environment="env"/>
-  <property name="catalina.home" value="${env.CATALINA_HOME}"/>
-    
   <path id="compile.classpath">
     <fileset dir="${@webpki.lib.dir}">
        <include name="${@webpki-libext.jar}"/>
@@ -44,8 +41,6 @@
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
@@ -84,8 +79,6 @@
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
@@ -120,8 +113,6 @@
 
   <target name="escaping">
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
@@ -156,8 +147,6 @@
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}${additional.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
@@ -337,8 +326,6 @@
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
@@ -385,8 +372,6 @@
     <delete dir="${nodejscryptotest.dir}"/>
     <mkdir dir="${nodejscryptotest.dir}"/>
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"

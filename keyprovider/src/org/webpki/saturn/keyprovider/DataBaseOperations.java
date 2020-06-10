@@ -107,4 +107,8 @@ public class DataBaseOperations {
     private static byte[] s256(PublicKey publicKey) throws IOException {
         return publicKey == null ? null : HashAlgorithms.SHA256.digest(publicKey.getEncoded());
     }
+
+    static void testConnection() throws SQLException {
+        try (Connection connection = KeyProviderService.jdbcDataSource.getConnection();) { }
+    }
 }

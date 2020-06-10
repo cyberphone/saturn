@@ -299,6 +299,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             Context initContext = new InitialContext();
             Context envContext  = (Context)initContext.lookup("java:/comp/env");
             jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
+            DataBaseOperations.testConnection();
 
             logger.info("Saturn KeyProvider-server initiated: " + serverCertificate.getSubjectX500Principal().getName());
         } catch (Exception e) {

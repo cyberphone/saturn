@@ -49,8 +49,6 @@
        eof="remove"
        includes="**/*.java"/>
     <javac debug="${debug}"
-           source="${@javaversion}"
-           target="${@javaversion}"
            srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
            destdir="${temp.dir}" 
            classpathref="compile.classpath"
