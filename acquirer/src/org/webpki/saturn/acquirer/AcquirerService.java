@@ -40,7 +40,6 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServlet;
 
 import org.webpki.crypto.CertificateUtil;
-import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
@@ -83,8 +82,6 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     static final String EXTENSIONS            = "provider_extensions";
 
     static final String PAYEE_ACCOUNT_DB      = "payee_account_db";
-
-    static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
     static final String LOGGING               = "logging";
 
@@ -175,8 +172,6 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         try {
             logging = getPropertyBoolean(LOGGING);
 
-            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
-            
             clientAccountTypes.addToCache(com.supercard.SupercardAccountDataDecoder.class);
 
             payeeAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);

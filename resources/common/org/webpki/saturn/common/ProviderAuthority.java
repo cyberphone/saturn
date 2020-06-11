@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.common;
 
+import java.lang.reflect.InvocationTargetException;
+
 import java.io.IOException;
 
 import java.security.PublicKey;
@@ -83,8 +85,10 @@ public class ProviderAuthority implements BaseProperties {
 
         public PaymentMethodDeclaration add(
             Class<? extends AccountDataDecoder> pbmd) 
-                throws InstantiationException, IllegalAccessException {
-            backendPaymentMethods.add(pbmd.newInstance().getContext());
+                throws InstantiationException, IllegalAccessException, 
+                       IllegalArgumentException, InvocationTargetException, 
+                       NoSuchMethodException, SecurityException {
+            backendPaymentMethods.add(pbmd.getDeclaredConstructor().newInstance().getContext());
             return this;
         }
         

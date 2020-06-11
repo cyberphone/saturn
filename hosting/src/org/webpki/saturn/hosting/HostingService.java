@@ -32,7 +32,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.webpki.crypto.CertificateUtil;
-import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
@@ -63,8 +62,6 @@ public class HostingService extends InitPropertyReader implements ServletContext
     static final String PROVIDER_BASE_URL     = "provider_base_url";
 
     static final String MERCHANT_ACCOUNT_DB   = "merchant_account_db";
-
-    static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
 
     static final String LOGGING               = "logging";
 
@@ -115,8 +112,6 @@ public class HostingService extends InitPropertyReader implements ServletContext
         try {
             logging = getPropertyBoolean(LOGGING);
              
-            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
-
             knownPayeeMethods.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
             knownPayeeMethods.addToCache(se.bankgirot.BGAccountDataDecoder.class);
 

@@ -65,7 +65,6 @@
   <target name="build">
     <antcall target="_jdk11"/>
     <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
-    <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
     <delete dir="${temp.dir}"/>
     <property name="bank.path" value="${appcorename}"/>
     <property name="extensions.file" value="extensions-${appcorename}.json"/>
@@ -93,9 +92,6 @@
           <fileset dir="${@webpki.lib.dir}">
              <include name="${@webpki-webutil.jar}"/>
           </fileset>
-          <fileset dir="${@bcprovider.lib.dir}">
-             <include name="${@bcprovider.jar}"/>
-          </fileset>
           <fileset dir="${@reference.lib.dir}">
              <include name="servlet-api.jar"/>
           </fileset>
@@ -117,7 +113,6 @@
       <replacefilter token="@payee-interbank-url@" value="${@payeebankhost}/${@payeebankpath}/interbanking"/>
       <replacefilter token="@user-account-db@" value="${users.db}"/>
       <replacefilter token="@payee-account-db@" value="${merchants.db}"/>
-      <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@balance-slow-test@" value="${balanceslow}"/>
       <replacefilter token="@balance-fail-test@" value="${balancefail}"/>
       <replacefilter token="@logging@" value="${logging}"/>
@@ -129,9 +124,6 @@
         <lib dir="${zip.webpki.lib.dir}">
            <include name="${@webpki-libext.jar}"/>
         </lib>
-         <lib dir="${zip.bcprovider.lib.dir}">
-           <include name="${@bcprovider.jar}"/>
-         </lib>
         <lib dir="${zip.webpki.lib.dir}">
            <include name="${@webpki-webutil.jar}"/>
         </lib>

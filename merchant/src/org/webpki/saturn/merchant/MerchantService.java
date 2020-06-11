@@ -33,7 +33,6 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.http.HttpSession;
 
 import org.webpki.crypto.CertificateUtil;
-import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONObjectReader;
@@ -93,8 +92,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String ANDROID_CHROME_VERSION       = "android_chrome_version";
 
-    static final String BOUNCYCASTLE_FIRST           = "bouncycastle_first";
-    
     static final String LOGGING                      = "logging";
 
     static final String TEST_MODE                    = "test-mode";
@@ -207,7 +204,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     public void contextInitialized(ServletContextEvent sce) {
         initProperties (sce);
         try {
-            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             desktopWallet = getPropertyBoolean(DESKTOP_WALLET);
             

@@ -102,12 +102,6 @@
   </context-param>
 
   <context-param>
-    <description>Loading of Bouncycastle</description>
-    <param-name>bouncycastle_first</param-name>
-    <param-value>@bouncycastle-first@</param-value>
-  </context-param>
-
-  <context-param>
     <description>Balance Slow Test</description>
     <param-name>balance_slow_test</param-name>
     <param-value>@balance-slow-test@</param-value>

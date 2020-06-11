@@ -51,7 +51,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.webpki.crypto.CertificateUtil;
-import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
@@ -110,8 +109,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final String SERVER_PORT_MAP       = "server_port_map";
     
-    static final String BOUNCYCASTLE_FIRST    = "bouncycastle_first";
-
     static final String PAYER_INTERBANK_URL   = "payer_interbank_url";
 
     static final String PAYEE_INTERBANK_URL   = "payee_interbank_url";
@@ -290,8 +287,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
         initProperties(sce);
         try {
             logging = getPropertyBoolean(LOGGING);
-
-            CustomCryptoProvider.forcedLoad(getPropertyBoolean(BOUNCYCASTLE_FIRST));
 
             knownPayeeMethods.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
             knownPayeeMethods.addToCache(se.bankgirot.BGAccountDataDecoder.class);

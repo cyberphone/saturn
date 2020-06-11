@@ -51,7 +51,6 @@
   <target name="build">
     <antcall target="_jdk11"/>
     <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
-    <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
     <property name="zip.qr.lib.dir" value="${@qr.lib.dir}"/>
     <property name="authorityurl" value="${@payerbankhost}/${@payerbankpath}/authority"/>
     <delete dir="${temp.dir}"/>
@@ -74,9 +73,6 @@
           <fileset dir="${@webpki.lib.dir}">
              <include name="${@webpki-webutil.jar}"/>
           </fileset>
-          <fileset dir="${@bcprovider.lib.dir}">
-             <include name="${@bcprovider.jar}"/>
-          </fileset>
           <fileset dir="${@reference.lib.dir}">
              <include name="servlet-api.jar"/>
           </fileset>
@@ -91,7 +87,6 @@
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
       <replacefilter token="@android-chrome-version@" value="${@android.chrome.version}"/>
       <replacefilter token="@keyprov-kmk@" value="${inhouse}${@kg2kmkey_ec}.p12"/>
-      <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@biometric-support@" value="${biometricsupport}"/>
       <replacefilter token="@server-tls-certificate@" value="${@kg2_tls_cert_file}"/>
       <replacefilter token="@merchant-url@" value="${@merchanthost}/${@merchantpath}"/>
@@ -107,9 +102,6 @@
       <lib dir="${zip.webpki.lib.dir}">
          <include name="${@webpki-libext.jar}"/>
       </lib>
-       <lib dir="${zip.bcprovider.lib.dir}">
-         <include name="${@bcprovider.jar}"/>
-       </lib>
       <lib dir="${zip.webpki.lib.dir}">
          <include name="${@webpki-webutil.jar}"/>
       </lib>

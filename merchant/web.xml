@@ -63,12 +63,6 @@
         <param-name>w2nb_wallet</param-name>
         <param-value>@w2nb-wallet@</param-value>
     </context-param>
-
-    <context-param>
-        <description>Loading of Bouncycastle</description>
-        <param-name>bouncycastle_first</param-name>
-        <param-value>@bouncycastle-first@</param-value>
-    </context-param>
     
     <context-param>
         <description>Android WebPKI Version Check</description>

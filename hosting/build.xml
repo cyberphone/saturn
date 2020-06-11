@@ -39,7 +39,6 @@
   <target name="build">
     <antcall target="_jdk11"/>
     <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
-    <property name="zip.bcprovider.lib.dir" value="${@bcprovider.lib.dir}"/>
     <delete dir="${temp.dir}"/>
     <property name="merchants.db" value="merchants.${@payeebankpath}.json"/>
     <fixcrlf srcdir="."
@@ -60,9 +59,6 @@
         <fileset dir="${@webpki.lib.dir}">
            <include name="${@webpki-webutil.jar}"/>
         </fileset>
-        <fileset dir="${@bcprovider.lib.dir}">
-           <include name="${@bcprovider.jar}"/>
-        </fileset>
         <fileset dir="${@reference.lib.dir}">
            <include name="servlet-api.jar"/>
         </fileset>
@@ -74,7 +70,6 @@
       <replacefilter token="@hosting-base-url@" value="${@hostinghost}/${@hostingpath}"/>
       <replacefilter token="@provider-base-url@" value="${@payeebankhost}/${@payeebankpath}"/>
       <replacefilter token="@merchant-account-db@" value="${merchants.db}"/>
-      <replacefilter token="@bouncycastle-first@" value="${@bcprovider}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
@@ -83,9 +78,6 @@
       </classes>
       <lib dir="${zip.webpki.lib.dir}">
          <include name="${@webpki-libext.jar}"/>
-      </lib>
-      <lib dir="${zip.bcprovider.lib.dir}">
-        <include name="${@bcprovider.jar}"/>
       </lib>
       <lib dir="${zip.webpki.lib.dir}">
         <include name="${@webpki-webutil.jar}"/>
