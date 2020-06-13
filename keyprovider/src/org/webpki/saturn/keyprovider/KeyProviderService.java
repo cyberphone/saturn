@@ -18,7 +18,7 @@ package org.webpki.saturn.keyprovider;
 
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.net.URL;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
@@ -143,8 +143,10 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             friendlyName = rd.getString("friendlyName");
             svgCardImage = getResourceAsString(rd.getString("cardImage"));
             if (inHouseLogo) {
+                URL hostUrl = new URL(authorityUrl);
+                String host = hostUrl.getHost() + ":" + hostUrl.getPort();
                 svgCardImage = svgCardImage.substring(0, svgCardImage.lastIndexOf("</svg>")) +
-                        getResourceAsString("inhouse-flag.txt");
+                        getResourceAsString("inhouse-flag.txt").replace("HOST", host);
             }
             svgCardImage = svgCardImage.replaceAll("\n", "");
             JSONObjectReader encryptionParameters = rd.getObject("encryptionParameters");
