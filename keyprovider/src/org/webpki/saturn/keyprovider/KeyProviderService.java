@@ -144,7 +144,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             svgCardImage = getResourceAsString(rd.getString("cardImage"));
             if (inHouseLogo) {
                 URL hostUrl = new URL(authorityUrl);
-                String host = hostUrl.getHost() + ":" + hostUrl.getPort();
+                String host = hostUrl.getHost() + (hostUrl.getPort() < 0 ? "" : ":" +  hostUrl.getPort());
                 svgCardImage = svgCardImage.substring(0, svgCardImage.lastIndexOf("</svg>")) +
                         getResourceAsString("inhouse-flag.txt").replace("HOST", host);
             }
