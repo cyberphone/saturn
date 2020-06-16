@@ -38,7 +38,9 @@
 
   <target name="build">
     <antcall target="_jdk11"/>
-    <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
+    <condition property="zip.webpki.lib.dir" value="${@webpki.lib.dir}" else="empty.lib">
+      <isset property="@include.webpki.in.war"/>
+    </condition>
     <delete dir="${temp.dir}"/>
     <property name="merchants.db" value="merchants.${@payeebankpath}.json"/>
     <fixcrlf srcdir="."

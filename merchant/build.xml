@@ -43,7 +43,9 @@
     <antcall target="_jdk11"/>
     <property name="desktop.wallet" value="true"/>
 
-    <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
+    <condition property="zip.webpki.lib.dir" value="${@webpki.lib.dir}" else="empty.lib">
+      <isset property="@include.webpki.in.war"/>
+    </condition>
     <property name="zip.qr.lib.dir" value="${@qr.lib.dir}"/>
     <delete dir="${temp.dir}"/>
     

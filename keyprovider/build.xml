@@ -50,7 +50,9 @@
 
   <target name="build">
     <antcall target="_jdk11"/>
-    <property name="zip.webpki.lib.dir" value="${@webpki.lib.dir}"/>
+    <condition property="zip.webpki.lib.dir" value="${@webpki.lib.dir}" else="empty.lib">
+      <isset property="@include.webpki.in.war"/>
+    </condition>
     <property name="zip.qr.lib.dir" value="${@qr.lib.dir}"/>
     <property name="authorityurl" value="${@payerbankhost}/${@payerbankpath}/authority"/>
     <delete dir="${temp.dir}"/>
