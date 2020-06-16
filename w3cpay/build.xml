@@ -10,8 +10,6 @@
   
   <property name="application" value="${@w3c.manifestpath}.war"/>
   
-  <property name="zip.webpki.lib.dir" location="${@webpki.lib.dir}"/>
-  
   <property name="debug" value="on"/>
 
   <property name="javaversion" value="${ant.java.version}"/>
@@ -43,6 +41,9 @@
 
   <target name="build">
     <antcall target="_jdk11"/>
+    <condition property="zip.webpki.lib.dir" value="${@webpki.lib.dir}" else="empty.lib">
+      <isset property="@include.webpki.in.war"/>
+    </condition>
     <mkdir dir="${dist.dir}"/>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
