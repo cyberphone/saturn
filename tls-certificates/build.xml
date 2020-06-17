@@ -7,6 +7,7 @@
   <property name="rootfile" value="tlsroot"/>
   <property name="root.dir" value="root"/>
   <property name="server.dir" value="server"/>
+  <property name="bcprovider.jar" value="bcprov-jdk15on-151.jar"/>
   
   <target name="help">
       <echo message="createroot createcert -Dserver=HostNameOrIpAddress [-Dcn.hostname=HostName]"/>
@@ -24,8 +25,8 @@
           <fileset dir="${@webpki.lib.dir}">
              <include name="${@webpki-webutil.jar}"/>
           </fileset>
-          <fileset dir="${@bcprovider.lib.dir}">
-             <include name="${@bcprovider.jar}"/>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="${bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
              <include name="*.jar"/>
@@ -65,6 +66,7 @@
         <isset property="cn.hostname"/>
       </and>
     </condition>
+    <echo message="File: ${cert.file}"/>
     <antcall target="_createcert">
        <param name="target.dir" value="${server.dir}"/>
        <param name="cmd" value="-ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} ${opt.san.host} -subject &quot;CN=TLS certificate for ${cert.file}&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${cert.file}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
@@ -80,8 +82,8 @@
           <fileset dir="${@webpki.lib.dir}">
              <include name="${@webpki-webutil.jar}"/>
           </fileset>
-          <fileset dir="${@bcprovider.lib.dir}">
-             <include name="${@bcprovider.jar}"/>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="${bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
              <include name="*.jar"/>
@@ -100,8 +102,8 @@
           <fileset dir="${@webpki.lib.dir}">
              <include name="${@webpki-webutil.jar}"/>
           </fileset>
-          <fileset dir="${@bcprovider.lib.dir}">
-             <include name="${@bcprovider.jar}"/>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="${bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
              <include name="*.jar"/>
@@ -136,8 +138,8 @@ qualifier = [public private certificate trust]
           <fileset dir="${@webpki.lib.dir}">
              <include name="${@webpki-webutil.jar}"/>
           </fileset>
-          <fileset dir="${@bcprovider.lib.dir}">
-             <include name="${@bcprovider.jar}"/>
+          <fileset dir="${@reference.lib.dir}">
+             <include name="${bcprovider.jar}"/>
           </fileset>
           <fileset dir="${@reference.lib.dir}">
              <include name="*.jar"/>
