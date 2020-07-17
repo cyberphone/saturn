@@ -18,7 +18,9 @@ package org.webpki.saturn.keyprovider;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.net.URL;
+
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
@@ -267,7 +269,6 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             ECGenParameterSpec eccgen = new ECGenParameterSpec(KeyAlgorithms.NIST_P_256.getJceName());
             generator.initialize(eccgen, new SecureRandom());
             carrierCaKeyPair = generator.generateKeyPair();
-
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Own URL
