@@ -32,6 +32,8 @@ import javax.servlet.http.HttpSession;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.NonDirectPaymentEncoder;
 
+import org.webpki.json.JSONObjectWriter;
+
 import org.webpki.net.MobileProxyParameters;
 
 public class AndroidPluginServlet extends HttpServlet implements MerchantSessionProperties {
@@ -87,6 +89,9 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
     ///////////////////////////////////////////////////////////////////////////////////
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (MerchantService.logging) {
+            logger.info("GET from: " + request.getRemoteAddr());
+        }
         String id = request.getParameter(ANDROID_CANCEL);
         if (id != null) {
             if (id.isEmpty()) {
@@ -130,9 +135,12 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
             NonDirectPaymentEncoder optionalNonDirectPayment = 
                     (NonDirectPaymentEncoder)session.getAttribute(GAS_STATION_SESSION_ATTR);
 
-            HttpSupport.writeJsonData(response, 
-                    new WalletRequest(session,
-                                      optionalNonDirectPayment).requestObject);
+            JSONObjectWriter walletRequest = 
+                    new WalletRequest(session, optionalNonDirectPayment).requestObject;
+            if (MerchantService.logging) {
+                logger.info("Sent to wallet:\n" + walletRequest.toString());
+            }
+            HttpSupport.writeJsonData(response, walletRequest);
         } else {
             String httpSessionId = QRSessions.getHttpSessionId(id);
             if (httpSessionId == null) {
