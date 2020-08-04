@@ -129,6 +129,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         HashAlgorithms requestHashAlgorithm;
         DataEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
+        boolean biometricOption;
         boolean balanceService;
         
         public CredentialTemplate(JSONObjectReader rd) throws IOException {
@@ -138,6 +139,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             requestHashAlgorithm = CryptoUtils.getHashAlgorithm(rd, "requestHashAlgorithm");
             keyAlgorithm = CryptoUtils.getKeyAlgorithm(rd, "signatureKeyAlgorithm");
             cardFormatted = rd.getBoolean("cardFormatted");
+            biometricOption = rd.getBoolean("biometricOption");
             if (rd.hasProperty("serverSetPIN")) {
                 // Note: numbers only
                 optionalServerPin = rd.getString("serverSetPIN").getBytes("utf-8");

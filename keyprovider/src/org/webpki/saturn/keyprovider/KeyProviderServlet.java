@@ -270,7 +270,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                            .setFriendlyName(credentialTemplate.friendlyName)
                            .setUserObject(credentialTemplate);
                         if (keygen2State.isFeatureSupported(
-                                KeyGen2URIs.CLIENT_FEATURES.BIOMETRIC_SUPPORT)) {
+                                KeyGen2URIs.CLIENT_FEATURES.BIOMETRIC_SUPPORT) &&
+                            credentialTemplate.biometricOption) {
                             key.setBiometricProtection(BiometricProtection.ALTERNATIVE);
                         }
                     }
