@@ -42,6 +42,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
                                           byte[] dataEncryptionKey,
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
+                                          UserAuthorizationMethods userAuthorizationMethod,
                                           GregorianCalendar timeStamp,
                                           String applicationName,
                                           String applicationVersion,
@@ -67,7 +68,8 @@ public class AuthorizationDataEncoder implements BaseProperties {
                 aw.setObject(challengeResult.writeObject());
             }
         }
-        return wr.setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
+        return wr.setString(USER_AUTHORIZATION_METHOD_JSON, userAuthorizationMethod.toString())
+                 .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
                  .setDynamic((wr2) -> Software.encode(wr2, applicationName, applicationVersion))
                  .setObject(PLATFORM_JSON, new JSONObjectWriter()
                      .setString(NAME_JSON, clientPlatform.name)

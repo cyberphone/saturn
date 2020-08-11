@@ -45,6 +45,7 @@ import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PaymentRequestEncoder;
 import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.TimeUtils;
+import org.webpki.saturn.common.UserAuthorizationMethods;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.UserResponseItem;
 
@@ -146,6 +147,7 @@ public class DebugData implements Serializable {
                                   WALLET_SESSION_ENCRYPTION_KEY, 
                                  DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
                                  userResponseItems,
+                                 UserAuthorizationMethods.PIN,
                                  userResponseItems == null ? then : authTime,
                                  "WebPKI Suite/Saturn",
                                  MerchantService.androidWebPkiVersions.substring(0, 

@@ -34,7 +34,7 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationDataDecoder implements BaseProperties {
 
-     public AuthorizationDataDecoder(JSONObjectReader rd, 
+    public AuthorizationDataDecoder(JSONObjectReader rd, 
                                     JSONCryptoHelper.Options signatureOptions) throws IOException {
         root = rd;
         JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
@@ -58,12 +58,14 @@ public class AuthorizationDataDecoder implements BaseProperties {
             JSONArrayReader ar = rd.getArray(USER_RESPONSE_ITEMS_JSON);
              do {
                  UserResponseItem challengeResult = new UserResponseItem(ar.getObject());
-                if (optionalUserResponseItems.put(challengeResult.getName(), challengeResult) != null) {
+                if (optionalUserResponseItems.put(challengeResult.getName(), 
+                                                  challengeResult) != null) {
                     throw new IOException("Duplicate: " + challengeResult.getName());
                 }
             } while (ar.hasMore());
         }
-
+        userAuthorizationMethod = 
+                UserAuthorizationMethods.valueOf(rd.getString(USER_AUTHORIZATION_METHOD_JSON));
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
         JSONObjectReader platform = rd.getObject(PLATFORM_JSON);
@@ -127,6 +129,11 @@ public class AuthorizationDataDecoder implements BaseProperties {
     String accountId;
     public String getAccountId() {
         return accountId;
+    }
+
+    UserAuthorizationMethods userAuthorizationMethod;
+    public UserAuthorizationMethods getUserAuthorizationMethod() {
+        return userAuthorizationMethod;
     }
 
     GregorianCalendar timeStamp;

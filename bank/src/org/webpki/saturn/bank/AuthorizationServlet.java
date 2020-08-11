@@ -35,6 +35,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
+import org.webpki.saturn.common.UserAuthorizationMethods;
 import org.webpki.saturn.common.AuthorizationRequest;
 import org.webpki.saturn.common.AuthorizationResponse;
 import org.webpki.saturn.common.NonDirectPaymentDecoder;
@@ -200,8 +201,19 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                              UserChallengeItem.TYPE.ALPHANUMERIC_SECRET,
                                                              specialTest ? 
                                                  "Mother's maiden name" : null)},
-              authorizationData);
+                                              authorizationData);
         }
+
+        // A very special test just for showing more what RBA can do...
+        if (authorizationData.getUserAuthorizationMethod() != UserAuthorizationMethods.PIN &&
+            amount.compareTo(DEMO_FINGER_PRINT_TEST) == 0) {
+            BankService.rejectedTransactions++;
+            return createProviderUserResponse("Demo alert &#x1f642 For the transaction amount " +
+                                                amountInHtml(paymentRequest, DEMO_FINGER_PRINT_TEST) +
+                                                " you need to use a PIN code.",
+                                              null,
+                                              authorizationData);
+            }        
 
         TransactionTypes transactionType = 
                 !cardPayment && nonDirectPayment == null ? 
