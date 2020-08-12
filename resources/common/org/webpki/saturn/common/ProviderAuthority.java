@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.ArrayList;
 
@@ -32,6 +33,7 @@ import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
+
 import org.webpki.json.DataEncryptionAlgorithms;
 
 import org.webpki.json.KeyEncryptionAlgorithms;
@@ -116,7 +118,15 @@ public class ProviderAuthority implements BaseProperties {
         }
     }
 
-    public static final String HTTP_VERSION_SUPPORT = "HTTP/1.1";
+    public static final String[] HTTP_VERSION_SUPPORT = {"HTTP/1.1", "HTTP/2"};
+    
+    static final HashSet<String> CHECK_HTTP = new HashSet<>();
+    
+    static {
+        for (String httpVersion : HTTP_VERSION_SUPPORT) {
+            CHECK_HTTP.add(httpVersion);
+        }
+    }
 
     public static JSONObjectWriter encode(String providerAuthorityUrl,
                                           String homePage,
@@ -125,11 +135,11 @@ public class ProviderAuthority implements BaseProperties {
                                           JSONObjectReader optionalExtensions,
                                           SignatureProfiles[] signatureProfiles,
                                           EncryptionParameter[] encryptionParameters,
-                                          HostingProvider optionalHostingProvider,
+                                          HostingProvider[] optionalHostingProviders,
                                           GregorianCalendar expires,
                                           ServerX509Signer issuerSigner) throws IOException {
         return Messages.PROVIDER_AUTHORITY.createBaseMessage()
-            .setString(HTTP_VERSION_JSON, HTTP_VERSION_SUPPORT)
+            .setStringArray(HTTP_VERSIONS_JSON, HTTP_VERSION_SUPPORT)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
@@ -154,8 +164,17 @@ public class ProviderAuthority implements BaseProperties {
                 }
                 return wr;
             })
-            .setDynamic((wr) -> optionalHostingProvider == null ? 
-                wr : wr.setObject(HOSTING_PROVIDER_JSON, optionalHostingProvider.writeObject()))
+            .setDynamic((wr) -> {
+                    if (optionalHostingProviders == null) {
+                        return wr;
+                    } else {
+                        JSONArrayWriter aw = wr.setArray(HOSTING_PROVIDERS_JSON);
+                        for (HostingProvider hostingProvider : optionalHostingProviders) {
+                            aw.setObject(hostingProvider.writeObject());
+                        }
+                        return wr;
+                    }
+                })
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
             .setSignature(ISSUER_SIGNATURE_JSON, issuerSigner);
@@ -163,9 +182,16 @@ public class ProviderAuthority implements BaseProperties {
 
     public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         root = Messages.PROVIDER_AUTHORITY.parseBaseMessage(rd);
-        httpVersion = rd.getString(HTTP_VERSION_JSON);
-        if (!httpVersion.equals(HTTP_VERSION_SUPPORT)) {
-            throw new IOException("\"" + HTTP_VERSION_JSON + 
+        httpVersions = rd.getStringArray(HTTP_VERSIONS_JSON);
+        boolean notFound = true;
+        for (String httpVersion : httpVersions) {
+            if (CHECK_HTTP.contains(httpVersion)) {
+                notFound = false;
+                break;
+            }
+        }
+        if (notFound) {
+            throw new IOException("\"" + HTTP_VERSIONS_JSON + 
                                  "\" is currently limited to " + 
                                  HTTP_VERSION_SUPPORT);
         }
@@ -247,8 +273,13 @@ public class ProviderAuthority implements BaseProperties {
         // If the following object is defined it means that the bank/provider
         // have outsourced the administration of Merchants to a Hosting
         // facility which it vouches for here
-        if (rd.hasProperty(HOSTING_PROVIDER_JSON)) {
-            optionalHostingProvider = new HostingProvider(rd.getObject(HOSTING_PROVIDER_JSON));
+        if (rd.hasProperty(HOSTING_PROVIDERS_JSON)) {
+            JSONArrayReader ar = rd.getArray(HOSTING_PROVIDERS_JSON);
+            ArrayList<HostingProvider> hostingProviders = new ArrayList<>();
+            do {
+                hostingProviders.add(new HostingProvider(ar.getObject()));
+            } while (ar.hasMore());
+            optionalHostingProviders = hostingProviders.toArray(new HostingProvider[0]);
         }
 
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
@@ -263,9 +294,9 @@ public class ProviderAuthority implements BaseProperties {
 
     long expiresInMillis;
 
-    String httpVersion;
-    public String getHttpVersion() {
-        return httpVersion;
+    String[] httpVersions;
+    public String[] getHttpVersions() {
+        return httpVersions;
     }
 
     String providerAuthorityUrl;
@@ -309,9 +340,9 @@ public class ProviderAuthority implements BaseProperties {
         return encryptionParameters;
     }
 
-    HostingProvider optionalHostingProvider;
-    public HostingProvider getHostingProvider() {
-        return optionalHostingProvider;
+    HostingProvider[] optionalHostingProviders;
+    public HostingProvider[] getHostingProviders() {
+        return optionalHostingProviders;
     }
 
     GregorianCalendar expires;
@@ -327,6 +358,22 @@ public class ProviderAuthority implements BaseProperties {
     JSONSignatureDecoder signatureDecoder;
     public JSONSignatureDecoder getSignatureDecoder() {
         return signatureDecoder;
+    }
+
+    public boolean checkPayeeKey(PayeeAuthority payeeAuthority) throws IOException {
+        if (optionalHostingProviders == null) {
+            // Direct attestation of Payee
+            return payeeAuthority.attestationKey.equals(
+                    signatureDecoder.getCertificatePath()[0].getPublicKey());
+        } else {
+            // Indirect attestation of Payee through a designated Hosting provider
+            for (HostingProvider hostingProvider : optionalHostingProviders) {
+                if (payeeAuthority.payeeAuthorityUrl.startsWith(hostingProvider.hostingUrl)) {
+                    return payeeAuthority.attestationKey.equals(hostingProvider.publicKey);
+                }
+            }
+            return false;
+        }
     }
 
     JSONObjectReader root;

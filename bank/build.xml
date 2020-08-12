@@ -104,6 +104,7 @@
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@bank-name@" value="${common.name}"/>
       <replacefilter token="@hosting-provider-key@" value="${hosting.provider.key}"/>
+      <replacefilter token="@hosting-provider-url@" value="${@hostinghost}/${@hostingpath}"/>
       <replacefilter token="@provider-extensions@" value="${extensions.file}"/>
       <replacefilter token="@bank-eecert@" value="${cert.key}"/>
       <replacefilter token="@bank-decryptionkey1@" value="${enc.key.ec}"/>

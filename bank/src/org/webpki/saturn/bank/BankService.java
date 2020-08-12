@@ -50,6 +50,7 @@ import javax.sql.DataSource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
+import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
@@ -96,6 +97,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     static final String DECRYPTION_KEY2       = "bank_decryptionkey2";
 
     static final String HOSTING_PROVIDER_KEY  = "hosting_provider_key";
+
+    static final String HOSTING_PROVIDER_URL  = "hosting_provider_url";
 
     static final String PAYMENT_ROOT          = "payment_root";
 
@@ -301,15 +304,29 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             bankCertificatePath = bankcreds.getCertificatePath();
             bankKey = new ServerX509Signer(bankcreds);
             
-            HostingProvider hostingProvider = null;
+            ArrayList<HostingProvider> hostingProviders = null;
             String hostingProviderKeyName = getPropertyString(HOSTING_PROVIDER_KEY);
             if (!hostingProviderKeyName.isEmpty()) {
-                hostingProvider = 
+                hostingProviders = new ArrayList<>();
+                // Demo only
+                hostingProviders.add(
+                        new HostingProvider("https://hosting.com/home",
+                                            "https://secure.hosting.com/auth",
+                                            JSONParser.parse(
+                               "{" +
+                               "\"kty\": \"EC\"," +
+                               "\"crv\": \"P-256\"," +
+                               "\"x\": \"MNGpxRCX3nbLR2IsLIVUpNDkbGJs4FaSCPW0odyIXMY\"," +
+                               "\"y\": \"8gsEOvO5Y5HL-s092cmKp1MQXWUmytp4jBEvnw67weM\"" +
+                               "}").getCorePublicKey(AlgorithmPreferences.JOSE)));
+                // Real stuff
+                hostingProviders.add(
                     new HostingProvider(
-                            "https://hosting.com",
+                            getPropertyString(HOSTING_PROVIDER_URL),
+                            getPropertyString(HOSTING_PROVIDER_URL),
                             new KeyStoreEnumerator(
                                     getResource(HOSTING_PROVIDER_KEY),
-                                    getPropertyString(KEYSTORE_PASSWORD)).getPublicKey());
+                                    getPropertyString(KEYSTORE_PASSWORD)).getPublicKey()));
             }
 
             paymentRoot = getRoot(PAYMENT_ROOT);
@@ -318,7 +335,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             
             String bankBaseUrl = getPropertyString(BANK_BASE_URL);
             
-            if (hostingProvider == null) {
+            if (hostingProviders == null) {
                 JSONArrayReader accounts = 
                     JSONParser.parse(ArrayUtil
                         .getByteArrayFromInputStream(getResource(PAYEE_ACCOUNT_DB)))
@@ -366,11 +383,11 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                             DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                             decryptionKeys.get(0).getKeyEncryptionAlgorithm(), 
                             decryptionKeys.get(0).getPublicKey())},
-                hostingProvider,
+                hostingProviders == null ? null : hostingProviders.toArray(new HostingProvider[0]),
                 bankKey,
 
                 PayeeAccountDb.values(),
-                hostingProvider == null ? new ServerAsymKeySigner(bankcreds) : null,
+                hostingProviders == null ? new ServerAsymKeySigner(bankcreds) : null,
 
                 PROVIDER_EXPIRATION_TIME,
                 logging);

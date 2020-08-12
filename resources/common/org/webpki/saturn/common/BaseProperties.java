@@ -37,10 +37,11 @@ public interface BaseProperties {
 
     String NO_MATCHING_METHODS_URL_JSON     = "noMatchingMethodsUrl";       // Optional tip by Payee to Payer in case nothing matches
     String PAYMENT_REQUEST_JSON             = "paymentRequest";
-    String HTTP_VERSION_JSON                = "httpVersion";                // For per partner being able to use HTTP/2 and further
+    String HTTP_VERSIONS_JSON               = "httpVersions";               // List of understood HTTP versions
     String EXPIRES_JSON                     = "expires";                    // Object expiration time
     String RECIPIENT_URL_JSON               = "recipientUrl";               // Where we are sending (target address)
     String SERVICE_URL_JSON                 = "serviceUrl";                 // Saturn core
+    String HOSTING_URL_JSON                 = "hostingUrl";                 // For hosting entities
     String AMOUNT_JSON                      = "amount";                     // Money
     String CURRENCY_JSON                    = "currency";                   // In this format
     String NON_DIRECT_PAYMENT_JSON          = "nonDirectPayment";           // Deposit, automated gas station, booking
@@ -56,7 +57,7 @@ public interface BaseProperties {
     String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Encrypted Payer authorization data
     String PROVIDER_AUTHORITY_URL_JSON      = "providerAuthorityUrl";       // URL to payment provider authority object
     String PAYEE_AUTHORITY_URL_JSON         = "payeeAuthorityUrl";          // URL to peyee authority object
-    String HOSTING_PROVIDER_JSON            = "hostingProvider";            // Optional object in ProviderAuthority
+    String HOSTING_PROVIDERS_JSON           = "hostingProviders";           // Optional array in ProviderAuthority
     String HOME_PAGE_JSON                   = "homePage";                   // URL to the public Web of the entity
     String SUPPORTED_PAYMENT_METHODS_JSON   = "supportedPaymentMethods";    // List of accepted payment methods (URLs)
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)

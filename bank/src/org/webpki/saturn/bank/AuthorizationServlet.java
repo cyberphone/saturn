@@ -46,6 +46,7 @@ import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.HostingProvider;
 import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ISODateTime;
@@ -97,17 +98,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             // Lookup of Payee's Provider
             urlHolder.setNonCachedMode(nonCached);
             providerAuthority =
-                BankService.externalCalls.getProviderAuthority(urlHolder,
-                                                               payeeAuthority.getProviderAuthorityUrl());
+                BankService.externalCalls
+                        .getProviderAuthority(urlHolder,
+                                              payeeAuthority.getProviderAuthorityUrl());
 
-            // Now verify that they are issued by the same entity
-            if (payeeAuthority.getAttestationKey().equals(
-                    providerAuthority.getHostingProvider() == null ?
-                // Direct attestation of Payee
-                providerAuthority.getSignatureDecoder().getCertificatePath()[0].getPublicKey()
-                                                                   :
-                // Indirect attestation of Payee through a designated Hosting provider
-                providerAuthority.getHostingProvider().getPublicKey())) {
+            // Now verify that the Payee is vouched for by a proper entity
+            if (providerAuthority.checkPayeeKey(payeeAuthority)) {
                 break;
             }
 

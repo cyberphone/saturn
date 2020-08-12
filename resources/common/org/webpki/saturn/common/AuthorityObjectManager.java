@@ -39,7 +39,7 @@ public class AuthorityObjectManager extends Thread {
     ProviderAuthority.PaymentMethodDeclarations paymentMethods;
     SignatureProfiles[] signatureProfiles;
     ProviderAuthority.EncryptionParameter[] encryptionParameters;
-    HostingProvider optionalHostingProvider; 
+    HostingProvider[] optionalHostingProviders; 
 
     Collection<PayeeCoreProperties> payees;
 
@@ -62,7 +62,7 @@ public class AuthorityObjectManager extends Thread {
                                                                  optionalExtensions,
                                                                  signatureProfiles,
                                                                  encryptionParameters,
-                                                                 optionalHostingProvider, 
+                                                                 optionalHostingProviders, 
                                                                  TimeUtils.inSeconds(expiryTimeInSeconds),
                                                                  providerSigner).serializeToBytes(JSONOutputFormats.NORMALIZED);
             }
@@ -99,7 +99,7 @@ public class AuthorityObjectManager extends Thread {
                                   JSONObjectReader optionalExtensions,
                                   SignatureProfiles[] signatureProfiles,
                                   ProviderAuthority.EncryptionParameter[] encryptionParameters,
-                                  HostingProvider optionalHostingProvider, 
+                                  HostingProvider[] optionalHostingProviders, 
                                   ServerX509Signer providerSigner,
                                     
                                   // PayeeAuthority (may be null)
@@ -115,7 +115,7 @@ public class AuthorityObjectManager extends Thread {
         this.optionalExtensions = optionalExtensions;
         this.signatureProfiles = signatureProfiles;
         this.encryptionParameters = encryptionParameters;
-        this.optionalHostingProvider = optionalHostingProvider; 
+        this.optionalHostingProviders = optionalHostingProviders; 
 
         this.payees = payees;
         

@@ -54,6 +54,12 @@
   </context-param>
 
   <context-param>
+    <description>[Optional] Hosting Provider Url</description>
+    <param-name>hosting_provider_url</param-name>
+    <param-value>@hosting-provider-url@</param-value>
+  </context-param>
+
+  <context-param>
     <description>Provider Extension JSON File</description>
     <param-name>provider_extensions</param-name>
     <param-value>@provider-extensions@</param-value>

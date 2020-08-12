@@ -26,12 +26,16 @@ import org.webpki.json.JSONObjectWriter;
 public class HostingProvider implements BaseProperties {
 
     public HostingProvider(JSONObjectReader rd) throws IOException {
-        entityHomePage = rd.getString(HOME_PAGE_JSON);
+        homePage = rd.getString(HOME_PAGE_JSON);
+        hostingUrl = rd.getString(HOSTING_URL_JSON);
         publicKey = rd.getPublicKey();
     }
 
-    public HostingProvider(String entityHomePage, PublicKey publicKey) {
-        this.entityHomePage = entityHomePage;
+    public HostingProvider(String homePage,
+                           String hostingUrl,
+                           PublicKey publicKey) {
+        this.homePage = homePage;
+        this.hostingUrl = hostingUrl;
         this.publicKey = publicKey;
     }
 
@@ -40,14 +44,20 @@ public class HostingProvider implements BaseProperties {
         return publicKey;
     }
 
-    String entityHomePage;
-    public String getEntityHomePage() {
-        return entityHomePage;
+    String homePage;
+    public String getHomePage() {
+        return homePage;
+    }
+
+    String hostingUrl;
+    public String getHostingUrl() {
+        return hostingUrl;
     }
 
     public JSONObjectWriter writeObject() throws IOException {
         return new JSONObjectWriter()
-                       .setString(HOME_PAGE_JSON, entityHomePage)
+                       .setString(HOME_PAGE_JSON, homePage)
+                       .setString(HOSTING_URL_JSON, hostingUrl)
                        .setPublicKey(publicKey);
     }
 }
