@@ -34,7 +34,7 @@ let NonDirectPayments = {
         break;
       
       case 'RECURRING':
-        throw new TypeError('No such type: ' + this.type);
+        throw new TypeError('Not yet implemented: ' + this.type);
         break;
 
       default:
