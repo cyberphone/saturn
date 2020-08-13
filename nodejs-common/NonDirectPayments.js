@@ -25,12 +25,12 @@ const BaseProperties = require('./BaseProperties');
 
 const NON_DIRECT_PAYMENTS = ['GAS_STATION', 'BOOKING', 'DEPOSIT', 'REOCCURRING', 'OTHER'];
 
-var NonDirectPayments = {
+let NonDirectPayments = {
 
   fromType: function(type) {
-    var q = 0;
+    let q = 0;
     while (q < NON_DIRECT_PAYMENTS.length) {
-      var entry = NON_DIRECT_PAYMENTS[q++];
+      let entry = NON_DIRECT_PAYMENTS[q++];
       if (entry == type) {
         return entry;
       }

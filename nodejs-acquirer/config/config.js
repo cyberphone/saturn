@@ -21,7 +21,7 @@
 
 const Url = require('url');
 
-var config = {};
+let config = {};
 
 config.logging = false;
 

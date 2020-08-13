@@ -28,7 +28,7 @@ const NonDirectPayments = require('./NonDirectPayments');
 
 function PaymentRequest(rd) {
   this.root = rd;
-  var payee = rd.getObject(BaseProperties.PAYEE_JSON);
+  let payee = rd.getObject(BaseProperties.PAYEE_JSON);
   this.payeeCommonName = payee.getString(BaseProperties.COMMON_NAME_JSON);
   this.payeeHomePage = payee.getString(BaseProperties.HOME_PAGE_JSON);
   this.currency = Currencies.valueOf(rd.getString(BaseProperties.CURRENCY_JSON));

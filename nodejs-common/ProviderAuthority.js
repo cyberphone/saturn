@@ -39,11 +39,16 @@ ProviderAuthority.encode = function(providerAuthorityUrl,
                                     publicKey,
                                     expiresInSeconds,
                                     signer) {
-  var now = new Date();
-  var expires = new Date();
+  let now = new Date();
+  let expires = new Date();
   expires.setTime(now.getTime() + expiresInSeconds * 1000);
   return Messages.createBaseMessage(Messages.PROVIDER_AUTHORITY)
-    .setString(BaseProperties.HTTP_VERSION_JSON, "HTTP/1.1")
+    .setDynamic((wr) => {
+        let ar = wr.setArray(BaseProperties.HTTP_VERSIONS_JSON);
+        ar.setString('HTTP/1.1')
+          .setString('HTTP/2');
+        return wr;
+    })
     .setString(BaseProperties.PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
     .setString(BaseProperties.HOME_PAGE_JSON, homePage)
     .setString(BaseProperties.SERVICE_URL_JSON, serviceUrl)

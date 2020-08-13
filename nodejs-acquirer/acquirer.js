@@ -60,16 +60,16 @@ const homePage = readFile(__dirname + '/index.html');
 
 const AO_EXPIRY_TIME = 3600;  // Authority object expiry time in seconds
 
-var referenceId = 194006;
+let referenceId = 194006;
 function getReferenceId() {
   return '#' + (referenceId++);
 }
 
-var port = Url.parse(Config.host).port;
+let port = Url.parse(Config.host).port;
 if (port == null) {
   port = 443;
 }
-var applicationPath = Url.parse(Config.host).path;
+let applicationPath = Url.parse(Config.host).path;
 if (applicationPath == '/') {
   applicationPath = '';
 }
@@ -102,15 +102,15 @@ encryptionKeys.push(Keys.createPrivateKeyFromPem(readFile(Config.ownKeys.rsaEncr
 /////////////////////////////////
 
 const payeeDb = new Map();
-var payees = new JsonUtil.ArrayReader(JSON.parse(readFile(Config.payeeDb).toString('utf8')));
+let payees = new JsonUtil.ArrayReader(JSON.parse(readFile(Config.payeeDb).toString('utf8')));
 do {
-  var payeeCoreProperties = new PayeeCoreProperties(payees.getObject());
+  let payeeCoreProperties = new PayeeCoreProperties(payees.getObject());
   payeeCoreProperties[BaseProperties.TIME_STAMP_JSON] = 0;  // To make it expired from the beginning
   payeeDb.set(payeeCoreProperties.urlSafeId, payeeCoreProperties);
   logger.info('Added payee: ' + payeeCoreProperties.urlSafeId);
 } while (payees.hasMore());
 
-var providerAuthority;
+let providerAuthority;
 function updateProviderAuthority() {
   providerAuthority = ProviderAuthority.encode(Config.host + '/authority',
                                                Config.host,
@@ -131,15 +131,15 @@ const jsonPostProcessors = {
   authorize : function(reader) {
 
     // Decode the card payment request message
-    var cardPaymentRequest = new TransactionRequest(reader);
+    let cardPaymentRequest = new TransactionRequest(reader);
 
     // Verify that the request comes from one of "our" merchants
-    var payee = cardPaymentRequest.getPayeeAuthorityUrl();
-    var q = payee.lastIndexOf('/');
+    let payee = cardPaymentRequest.getPayeeAuthorityUrl();
+    let q = payee.lastIndexOf('/');
     if (q < 1 || q > payee.length - 2) {
       q = 0;
     }
-    var payeeDbEntry = payeeDb.get(payee.substring(++q));
+    let payeeDbEntry = payeeDb.get(payee.substring(++q));
     if (payeeDbEntry === undefined) {
       throw new TypeError('Unknown merchant ID=' + payee + ', Common Name=' + payee.getCommonName());
     }
@@ -156,10 +156,10 @@ const jsonPostProcessors = {
     cardPaymentRequest.verifyPayerProvider(paymentRoot);
 
     // This is the account we are processing
-    var cardData = cardPaymentRequest.getProtectedCardData(encryptionKeys);
-    var currency = cardPaymentRequest.getPaymentRequest().getCurrency();
-    var amountString = cardPaymentRequest.getAmount().toFixed(currency.getDecimals());
-    var testMode = cardPaymentRequest.getTestMode();
+    let cardData = cardPaymentRequest.getProtectedCardData(encryptionKeys);
+    let currency = cardPaymentRequest.getPaymentRequest().getCurrency();
+    let amountString = cardPaymentRequest.getAmount().toFixed(currency.getDecimals());
+    let testMode = cardPaymentRequest.getTestMode();
     logger.info((testMode ? 'TEST ONLY: ' : '') + 
                   'Amount=' + amountString + ' ' + currency.getSymbol() + ', Card Number=' + cardData.getAccountId() + 
                   ', Holder=' + cardData.getAccountOwner());
@@ -191,13 +191,13 @@ const jsonGetProcessors = {
     if (getArgument) {
 
       // Valid merchant id?
-      var payeeInformation = payeeDb.get(getArgument);
+      let payeeInformation = payeeDb.get(getArgument);
       if (payeeInformation === undefined) {
         return null;
       }
 
       // If the payee authority object has less than half of its life left, renew it
-      var now = new Date();
+      let now = new Date();
       if (payeeInformation[BaseProperties.TIME_STAMP_JSON] < now.getTime() - (AO_EXPIRY_TIME * 500)) {
         payeeInformation[BaseProperties.TIME_STAMP_JSON] = now.getTime();
         payeeInformation.payeeAuthority = PayeeAuthority.encode(Config.host + '/payees/' + getArgument,
@@ -255,7 +255,7 @@ function returnJsonData(request, response, jsonWriter) {
 }
 
 function noSuchFileResponse(response, request) {
-    var message = 'No such file: ' + request.url;
+    let message = 'No such file: ' + request.url;
     response.writeHead(404, {'Connection'    : 'close',
                              'Content-Type'  : 'text/plain',
                              'Content-Length': message.length});
@@ -268,15 +268,15 @@ function writeHtml(response, htmlData) {
 }
 
 Https.createServer(options, (request, response) => {
-  var pathname = Url.parse(request.url).pathname;
+  let pathname = Url.parse(request.url).pathname;
   if (pathname.startsWith(applicationPath + '/')) {
     pathname = pathname.substring(applicationPath.length + 1);
   }
   if (request.method == 'GET') {
     // Find possible REST-like argument list
-    var i = pathname.indexOf('/');
-    var getPath = pathname;
-    var getArgument = null;
+    let i = pathname.indexOf('/');
+    let getPath = pathname;
+    let getArgument = null;
     if (i > 0) {
       getPath = pathname.substring(0, i);
       getArgument = pathname.substring(i + 1);
@@ -287,9 +287,9 @@ Https.createServer(options, (request, response) => {
     }
     if (getPath in jsonGetProcessors) {
       try {
-        var jsonWriter = jsonGetProcessors[getPath](getArgument);
+        let jsonWriter = jsonGetProcessors[getPath](getArgument);
         if (jsonWriter) {
-          var accept = request.headers['accept'];
+          let accept = request.headers['accept'];
           if (!accept || accept == BaseProperties.JSON_CONTENT_TYPE) {
             returnJsonData(request, response, jsonWriter);
           } else {
@@ -313,7 +313,7 @@ Https.createServer(options, (request, response) => {
   } else if (request.method != 'POST') {
     serverError(response, '"POST" method expected');
   } else if (pathname in jsonPostProcessors) {
-    var chunks = [];
+    let chunks = [];
     request.on('data', (chunk) => {
       chunks.push(chunk);
     });
@@ -322,7 +322,7 @@ Https.createServer(options, (request, response) => {
         if (request.headers['content-type'] != BaseProperties.JSON_CONTENT_TYPE) {
           serverError(response, 'Content type must be: ' + BaseProperties.JSON_CONTENT_TYPE);
         } else {
-          var jsonReader = JsonUtil.ObjectReader.parse(Buffer.concat(chunks));
+          let jsonReader = JsonUtil.ObjectReader.parse(Buffer.concat(chunks));
           successLog('Received data', request, jsonReader);
           returnJsonData(request, response, jsonPostProcessors[pathname](jsonReader));
         }

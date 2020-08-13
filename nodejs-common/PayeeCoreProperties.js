@@ -38,11 +38,11 @@ function PayeeCoreProperties(rd) {
 // TODO the following line lacks the URL fix...
   this.urlSafeId = this[BaseProperties.LOCAL_PAYEE_ID_JSON];
 
-  var payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
-  var hashedAccounts = [];
+  let payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
+  let hashedAccounts = [];
   do {
-    var entry = payeeAccounts.getObject();
-    var decoder = new AccountDataDecoder(entry);
+    let entry = payeeAccounts.getObject();
+    let decoder = new AccountDataDecoder(entry);
     if (decoder.nonce) {
       hashedAccounts.push(Hash.hashObject('SHA256', entry));
     }
@@ -51,10 +51,10 @@ function PayeeCoreProperties(rd) {
     this[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON] = hashedAccounts;
   }
   this.signatureParameters = [];
-  var paramArray = rd.getArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
+  let paramArray = rd.getArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
   do {
-    var entry = paramArray.getObject();
-    var param = {};
+    let entry = paramArray.getObject();
+    let param = {};
     param[Jsf.ALGORITHM_JSON] = entry.getString(Jsf.ALGORITHM_JSON);
     param[Jsf.PUBLIC_KEY_JSON] = entry.getPublicKey();
     this[BaseProperties.SIGNATURE_PARAMETERS_JSON].push(param);

@@ -37,7 +37,7 @@ PayeeAuthority.encode = function(payeeAuthorityUrl,
                                  now,
                                  expiresInSeconds,
                                  signer) {
-  var expires = new Date();
+  let expires = new Date();
   expires.setTime(now.getTime() + expiresInSeconds * 1000);
   return Messages.createBaseMessage(Messages.PAYEE_AUTHORITY)
     .setString(BaseProperties.PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
@@ -47,9 +47,9 @@ PayeeAuthority.encode = function(payeeAuthorityUrl,
     .setString(BaseProperties.HOME_PAGE_JSON, payeeCoreProperties[BaseProperties.HOME_PAGE_JSON])
     .setDynamic((wr) => {
       if (payeeCoreProperties[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON]) {
-        var hashedPayeeAccounts = wr.setObject(BaseProperties.ACCOUNT_VERIFIER_JSON);
+        let hashedPayeeAccounts = wr.setObject(BaseProperties.ACCOUNT_VERIFIER_JSON);
         hashedPayeeAccounts.setString(Jsf.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID);
-        var array = hashedPayeeAccounts.setArray(BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON);
+        let array = hashedPayeeAccounts.setArray(BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON);
         payeeCoreProperties[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON].forEach((entry) => {
           array.setBinary(entry);
         });
@@ -57,7 +57,7 @@ PayeeAuthority.encode = function(payeeAuthorityUrl,
       return wr;
     })
     .setDynamic((wr) => {
-        var array = wr.setArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
+        let array = wr.setArray(BaseProperties.SIGNATURE_PARAMETERS_JSON);
         payeeCoreProperties.signatureParameters.forEach((entry) => {
           array.setObject()
                  .setString(Jsf.ALGORITHM_JSON, entry[Jsf.ALGORITHM_JSON])

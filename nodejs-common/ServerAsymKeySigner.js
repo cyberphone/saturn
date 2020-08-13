@@ -26,7 +26,7 @@ function ServerAsymKeySigner(privateKey) {
 }
 
 ServerAsymKeySigner.prototype.sign = function(jsonObject, optionalSignatureLabel) {
-  var signer = new Jsf.Signer(this.privateKey);
+  let signer = new Jsf.Signer(this.privateKey);
   if (optionalSignatureLabel !== undefined) {
     signer.setSignatureLabel(optionalSignatureLabel);
   }

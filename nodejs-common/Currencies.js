@@ -47,7 +47,7 @@ Currencies.prototype.getSymbol = function() {
 }
 
 Currencies.prototype.amountToDisplayString = function(amount) {
-  var amountString = amount.toFixed(this.decimals);
+  let amountString = amount.toFixed(this.decimals);
   return this.textFirst ? this.textual + amountString : amountString + this.textual;
 };
 
@@ -56,7 +56,7 @@ Currencies.prototype.toString = function() {
 };
 
 Currencies.valueOf = function(currencySymbol) {
-  var currency = Currencies[currencySymbol];
+  let currency = Currencies[currencySymbol];
   if (currency === undefined) {
     throw new TypeError('No such currency: ' + currencySymbol);
   }

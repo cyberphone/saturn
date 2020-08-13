@@ -35,7 +35,7 @@ const BG_ACCOUNT         = 'https://bankgirot.se/saturn/v3#account';
 const BG_NUMBER_JSON     = 'bgNumber';
 
 function AccountDataDecoder(rd) {
-  var accountType = rd.getString(Messages.CONTEXT_JSON); 
+  let accountType = rd.getString(Messages.CONTEXT_JSON); 
   if (accountType == SEPA_ACCOUNT) {
     this.accountId = rd.getString(SEPA_IBAN_JSON);
   } else if (accountType == SUPERCARD_ACCOUNT) {
@@ -47,7 +47,7 @@ function AccountDataDecoder(rd) {
   } else {
     throw new TypeError('Unknown account type: ' + accountType);
   }
-  var nonce = rd.getStringConditional(BaseProperties.NONCE_JSON);
+  let nonce = rd.getStringConditional(BaseProperties.NONCE_JSON);
   if (nonce) {
     this.nonce = rd.getBinary(BaseProperties.NONCE_JSON);
     if (this.nonce.length != 32) {
@@ -76,7 +76,7 @@ AccountDataDecoder.prototype.getAccountType = function() {
 
 AccountDataDecoder.prototype.checkAccountTypes = function(recognized) {
   if (!Array.isArray(recognized)) {
-    var temp = recognized;
+    let temp = recognized;
     recognized = [];
     recognized.push(temp);
   } 
