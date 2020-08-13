@@ -21,27 +21,28 @@
 
 const JsonUtil = require('webpki.org').JsonUtil;
 
-const BaseProperties = require('./BaseProperties');
-
-const NON_DIRECT_PAYMENTS = ['GAS_STATION', 'BOOKING', 'DEPOSIT', 'REOCCURRING', 'OTHER'];
+const ReservationSubTypes = require('./ReservationSubTypes');
+const BaseProperties      = require('./BaseProperties');
 
 let NonDirectPayments = {
 
-  fromType: function(type) {
-    let q = 0;
-    while (q < NON_DIRECT_PAYMENTS.length) {
-      let entry = NON_DIRECT_PAYMENTS[q++];
-      if (entry == type) {
-        return entry;
-      }
-    };
-    throw new TypeError('No such type: ' + type);
+  from: function(rd, timeStamp) {
+    switch (this.type = rd.getString(BaseProperties.TYPE_JSON)) {
+      case 'RESERVATION':
+        this.subType = ReservationSubTypes.from(rd.getString(BaseProperties.SUB_TYPE_JSON));
+        this.expires = rd.getDateTime(BaseProperties.EXPIRES_JSON);
+        break;
+      
+      case 'RECURRING':
+        throw new TypeError('No such type: ' + this.type);
+        break;
+
+      default:
+        throw new TypeError('No such type: ' + this.type);
+    }
+    this.fixed = rd.getBoolean(BaseProperties.FIXED_JSON);
   }
 
 };
-
-NON_DIRECT_PAYMENTS.forEach((entry) => {
-  NonDirectPayments[entry] = entry;
-});
 
 module.exports = NonDirectPayments;

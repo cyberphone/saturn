@@ -32,14 +32,16 @@ function PaymentRequest(rd) {
   this.payeeCommonName = payee.getString(BaseProperties.COMMON_NAME_JSON);
   this.payeeHomePage = payee.getString(BaseProperties.HOME_PAGE_JSON);
   this.currency = Currencies.valueOf(rd.getString(BaseProperties.CURRENCY_JSON));
-  if (rd.hasProperty(BaseProperties.NON_DIRECT_PAYMENT_JSON)) {
-    this.nonDirectPayment = NonDirectPayments.fromType(rd.getString(BaseProperties.NON_DIRECT_PAYMENT_JSON));
-  }
   this.amount = rd.getBigDecimal(BaseProperties.AMOUNT_JSON, this.currency.getDecimals());
   this.referenceId = rd.getString(BaseProperties.REFERENCE_ID_JSON);
-  this.dateTime = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
+  this.timeStamp = rd.getDateTime(BaseProperties.TIME_STAMP_JSON);
   this.expires = rd.getDateTime(BaseProperties.EXPIRES_JSON);
   this.software = new Software(rd);
+  if (rd.hasProperty(BaseProperties.NON_DIRECT_PAYMENT_JSON)) {
+    this.nonDirectPayment = 
+        NonDirectPayments.from(rd.getObject(BaseProperties.NON_DIRECT_PAYMENT_JSON),
+        this.timeStamp);
+  }
   rd.checkForUnread();
 }
 
@@ -63,8 +65,8 @@ PaymentRequest.prototype.getReferenceId = function() {
   return this.referenceId;
 };
   
-PaymentRequest.prototype.getDateTime = function() {
-  return this.dateTime;
+PaymentRequest.prototype.getTimeStamp = function() {
+  return this.timeStamp;
 };
 
 PaymentRequest.prototype.getSoftware = function() {
