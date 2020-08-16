@@ -106,6 +106,7 @@ import org.webpki.saturn.common.AuthorizationDataEncoder;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.UserAuthorizationMethods;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.WalletAlertMessage;
@@ -1071,6 +1072,7 @@ public class Wallet {
                         dataEncryptionKey,
                         selectedCard.dataEncryptionAlgorithm,
                         challengeResults,
+                        UserAuthorizationMethods.PIN,
                         new GregorianCalendar(),
                         "Saturn Internal Test Wallet",
                         "1.0",
