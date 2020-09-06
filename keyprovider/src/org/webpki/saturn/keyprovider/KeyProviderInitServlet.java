@@ -32,7 +32,7 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.keygen2.ServerState;
 
-import org.webpki.net.MobileProxyParameters;
+import org.webpki.saturn.common.MobileProxyParameters;
 
 // Initiation code for KeyGen2
 

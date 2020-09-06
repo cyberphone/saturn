@@ -29,8 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
 
-import org.webpki.net.MobileProxyParameters;
-
+import org.webpki.saturn.common.MobileProxyParameters;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.Messages;

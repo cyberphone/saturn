@@ -29,12 +29,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.webpki.saturn.common.MobileProxyParameters;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.NonDirectPaymentEncoder;
 
 import org.webpki.json.JSONObjectWriter;
-
-import org.webpki.net.MobileProxyParameters;
 
 public class AndroidPluginServlet extends HttpServlet implements MerchantSessionProperties {
 
