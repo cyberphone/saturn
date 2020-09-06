@@ -44,8 +44,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
-import org.webpki.net.MobileProxyParameters;
-
+import org.webpki.saturn.common.MobileProxyParameters;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;

@@ -55,7 +55,7 @@
        includes="**/*.java"/>
     <copy file="web.xml" todir="${temp.dir}"/>
     <javac debug="${debug}"
-           srcdir="${src.dir}"
+           srcdir="${src.dir}:${@common.src.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
 		<classpath>

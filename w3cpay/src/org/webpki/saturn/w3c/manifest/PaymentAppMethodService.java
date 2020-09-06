@@ -30,7 +30,7 @@ import org.webpki.crypto.HashAlgorithms;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.net.MobileProxyParameters;
+import org.webpki.saturn.common.MobileProxyParameters;
 
 import org.webpki.util.ArrayUtil;
 
