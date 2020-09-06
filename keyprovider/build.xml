@@ -94,7 +94,7 @@
       <replacefilter token="@merchant-url@" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="@keygen2-base-url@" value="${@keyprovhost}/${@keyprovpath}"/>
       <replacefilter token="@use-w3c-payment-request@" value="${@w3c.paymentrequest}"/>
-      <replacefilter token="@w3c-payment-request-host@" value="${@w3c.manifesthost}/${@w3c.manifestpath}"/>
+      <replacefilter token="@w3c-payment-request-url@" value="${@w3c.manifesturl}"/>
       <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">

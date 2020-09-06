@@ -84,7 +84,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String USE_W3C_PAYMENT_REQUEST      = "use_w3c_payment_request";
 
-    static final String W3C_PAYMENT_REQUEST_HOST     = "w3c_payment_request_host";
+    static final String W3C_PAYMENT_REQUEST_URL      = "w3c_payment_request_url";
 
     static final String MERCHANTS                    = "merchants.json";
 
@@ -232,7 +232,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             useW3cPaymentRequest = getPropertyBoolean(USE_W3C_PAYMENT_REQUEST);
 
-            w3cPaymentRequestUrl = getPropertyString(W3C_PAYMENT_REQUEST_HOST) + "/method";
+            w3cPaymentRequestUrl = getPropertyString(W3C_PAYMENT_REQUEST_URL);
 
             String noMatching = getPropertyString(NO_MATCHING_METHODS_URL);
             if (noMatching.length() != 0) {

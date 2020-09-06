@@ -117,7 +117,7 @@
       <replacefilter token="@slow-operation@" value="${var.slow.operation}"/>
       <replacefilter token="@w2nb-wallet@" value="${@w2nb.webwallet}"/>
       <replacefilter token="@use-w3c-payment-request@" value="${@w3c.paymentrequest}"/>
-      <replacefilter token="@w3c-payment-request-host@" value="${@w3c.manifesthost}/${@w3c.manifestpath}"/>
+      <replacefilter token="@w3c-payment-request-url@" value="${@w3c.manifesturl}"/>
       <replacefilter token="@android-webpki-versions@" value="${@android.webpki.versions}"/>
       <replacefilter token="@android-chrome-version@" value="${@android.chrome.version}"/>
       <replacefilter token="@logging@" value="${logging}"/>

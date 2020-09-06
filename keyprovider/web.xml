@@ -42,9 +42,9 @@
     </context-param>
 
     <context-param>
-        <description>W3C PaymentRequest Manifest Host</description>
-        <param-name>w3c_payment_request_host</param-name>
-        <param-value>@w3c-payment-request-host@</param-value>
+        <description>W3C PaymentRequest Manifest URL</description>
+        <param-name>w3c_payment_request_url</param-name>
+        <param-value>@w3c-payment-request-url@</param-value>
     </context-param>
 
     <context-param>

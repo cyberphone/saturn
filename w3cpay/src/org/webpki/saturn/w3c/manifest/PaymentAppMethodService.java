@@ -62,7 +62,7 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
 
             JSONObjectWriter temp = new JSONObjectWriter();
             temp.setArray("default_applications")
-                .setString(getPropertyString(HOST_PATH) + "/payment-manifest.json");
+                .setString(getPropertyString(HOST_PATH));
             JSONObjectWriter oneApp = new JSONObjectWriter();
             oneApp.setString("platform", "play")
                   .setString("id", MobileProxyParameters.ANDROID_PACKAGE_NAME)
