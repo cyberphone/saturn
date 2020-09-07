@@ -48,9 +48,9 @@ import java.net.URL;
 import java.security.PublicKey;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
@@ -82,7 +82,6 @@ import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.DataEncryptionAlgorithms;
-import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
@@ -102,6 +101,7 @@ import org.webpki.saturn.common.CardDataDecoder;
 import org.webpki.saturn.common.ClientPlatform;
 import org.webpki.saturn.common.UserResponseItem;
 import org.webpki.saturn.common.PayerAuthorization;
+import org.webpki.saturn.common.PaymentClientRequestDecoder;
 import org.webpki.saturn.common.AuthorizationDataEncoder;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequestDecoder;
@@ -110,6 +110,8 @@ import org.webpki.saturn.common.UserAuthorizationMethods;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.WalletAlertMessage;
+
+import org.webpki.saturn.common.PaymentClientRequestDecoder.SupportedPaymentMethod;
 
 import org.webpki.saturn.w2nb.support.W2NB;
 
@@ -210,11 +212,6 @@ public class Wallet {
 
     static byte[] dataEncryptionKey;
     
-    static class PaymentMethodDescriptor {
-        String paymentMethod;             // URL actually
-        String payeeAuthorityUrl;         // Home of the payee
-    }
-
     static class ScalingIcon extends ImageIcon {
  
         private static final long serialVersionUID = 1L;
@@ -898,8 +895,8 @@ public class Wallet {
                 }
             }, TIMEOUT_FOR_REQUEST);
             try {
-                final JSONObjectReader invokeMessage = 
-                        Messages.PAYMENT_CLIENT_REQUEST.parseBaseMessage(stdin.readJSONObject());
+                final PaymentClientRequestDecoder invokeMessage =
+                        new PaymentClientRequestDecoder(stdin.readJSONObject());
                 logger.info("Received from browser:\n" + invokeMessage);
                 timer.cancel();
                 if (running) {
@@ -909,23 +906,7 @@ public class Wallet {
                         public void run() {
                             running = false;
                             try {
-                                Vector<PaymentMethodDescriptor> paymentMethods = new Vector<>();
-                                JSONArrayReader methodList = 
-                                        invokeMessage.getArray(BaseProperties.SUPPORTED_PAYMENT_METHODS_JSON);
-                                do {
-                                    JSONObjectReader paymentMethodEntry = methodList.getObject();
-                                    PaymentMethodDescriptor paymentMethodDescriptor =
-                                            new PaymentMethodDescriptor();
-                                    paymentMethodDescriptor.paymentMethod = 
-                                            paymentMethodEntry.getString(
-                                                    BaseProperties.PAYMENT_METHOD_JSON);
-                                    paymentMethodDescriptor.payeeAuthorityUrl = 
-                                            paymentMethodEntry.getString(
-                                                    BaseProperties.PAYEE_AUTHORITY_URL_JSON);
-                                    paymentMethods.add(paymentMethodDescriptor);
-                                } while (methodList.hasMore());
-                                paymentRequest = new PaymentRequestDecoder(
-                                        invokeMessage.getObject(BaseProperties.PAYMENT_REQUEST_JSON));
+                                paymentRequest = invokeMessage.getPaymentRequest();
                                 // Primary information to the user...
                                 amountString = paymentRequest.getCurrency()
                                     .amountToDisplayString(paymentRequest.getAmount(), false);
@@ -953,7 +934,7 @@ public class Wallet {
                                     collectPotentialCard(ek.getKeyHandle(),
                                                          new CardDataDecoder(
                                             ext.getExtensionData(SecureKeyStore.SUB_TYPE_EXTENSION)),
-                                                         paymentMethods);
+                                                         invokeMessage.getSupportedPaymentMethods());
                                 }
                             } catch (Exception e) {
                                 sksProblem(e);
@@ -1015,11 +996,10 @@ public class Wallet {
 
         void collectPotentialCard(int keyHandle,
                                   CardDataDecoder cardProperties,
-                                  Vector<PaymentMethodDescriptor> supportedPaymentMethods)
+                                  List<SupportedPaymentMethod> supportedPaymentMethods)
         throws IOException {
             String paymentMethodName = cardProperties.getPaymentMethod();
-            for (PaymentMethodDescriptor acceptedPaymentMethod : 
-                    supportedPaymentMethods.toArray(new PaymentMethodDescriptor[0])) {
+            for (SupportedPaymentMethod acceptedPaymentMethod : supportedPaymentMethods) {
                 if (acceptedPaymentMethod.paymentMethod.equals(paymentMethodName)) {
                     Account card =
                         new Account(paymentMethodName,

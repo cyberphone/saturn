@@ -37,7 +37,6 @@ public class BalanceRequestDecoder implements BaseProperties {
         credentialId = rd.getString(CREDENTIAL_ID_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
-        software = new Software(rd);
         publicKey = rd.getSignature(REQUEST_SIGNATURE_JSON, signatureOptions).getPublicKey();
         rd.checkForUnread();
     }
@@ -70,10 +69,5 @@ public class BalanceRequestDecoder implements BaseProperties {
     GregorianCalendar timeStamp;
     public GregorianCalendar getTimeStamp() {
         return timeStamp;
-    }
-
-    Software software;
-    public Software getSoftware() {
-        return software;
     }
 }

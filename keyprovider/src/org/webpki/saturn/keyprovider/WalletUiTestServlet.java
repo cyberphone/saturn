@@ -24,8 +24,10 @@ import java.net.URLEncoder;
 
 import java.security.KeyPair;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import java.util.logging.Logger;
 
@@ -36,7 +38,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
@@ -48,13 +49,15 @@ import org.webpki.saturn.common.MobileProxyParameters;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.Currencies;
-import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.NonDirectPaymentEncoder;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.PaymentRequestEncoder;
 import org.webpki.saturn.common.RecurringPaymentIntervals;
 import org.webpki.saturn.common.ReservationSubTypes;
 import org.webpki.saturn.common.TimeUtils;
+import org.webpki.saturn.common.PaymentRequestEncoder;
+import org.webpki.saturn.common.PaymentClientRequestEncoder;
+
+import org.webpki.saturn.common.PaymentClientRequestEncoder.SupportedPaymentMethod;
 
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
@@ -196,14 +199,6 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         KeyProviderInitServlet.output(response, html);
     }
 
-    private void addPaymentMethod(JSONArrayWriter methodList, 
-                                  PaymentMethods paymentMethod,
-                                  String payeeAuthorityUrl) throws IOException {
-        methodList.setObject()
-            .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
-            .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl);
-    }
-    
     private void returnJson(HttpServletResponse response, JSONObjectWriter json) throws IOException {
         logger.info(json.toString());
         response.setContentType(JSON_CONTENT_TYPE);
@@ -215,7 +210,6 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     private void walletGetInit(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = getSession(request);
         PaymentType paymentData = sampleTests.get((String)session.getAttribute(TYPE));
-        JSONObjectWriter requestObject = Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage();
         GregorianCalendar timeStamp = new GregorianCalendar();
         GregorianCalendar expires = TimeUtils.inMinutes(30);
         // Create a payment request
@@ -228,17 +222,21 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                          "754329",
                                          timeStamp,
                                          expires);
-        JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
-        addPaymentMethod(methodList, 
-                         PaymentMethods.BANK_DIRECT, 
-                         "https://payments.bigbank.com/payees/86344");
-        addPaymentMethod(methodList, 
-                         PaymentMethods.SUPER_CARD, 
-                         "https://secure.cardprocessor.com/payees/1077342");
-        addPaymentMethod(methodList, 
-                         PaymentMethods.UNUSUAL_CARD, 
-                         "https://payments.bigbank.com/payees/86344");
-        requestObject.setObject(PAYMENT_REQUEST_JSON, paymentRequest);
+        List<SupportedPaymentMethod> supportedPaymentMethods = new ArrayList<>();
+        supportedPaymentMethods.add(
+                new SupportedPaymentMethod(PaymentMethods.BANK_DIRECT,
+                                           "https://payments.bigbank.com/payees/86344"));
+        supportedPaymentMethods.add(
+                new SupportedPaymentMethod(PaymentMethods.SUPER_CARD, 
+                                           "https://secure.cardprocessor.com/payees/1077342"));
+        supportedPaymentMethods.add(
+                new SupportedPaymentMethod(PaymentMethods.UNUSUAL_CARD, 
+                                           "https://payments.bigbank.com/payees/86344"));
+        JSONObjectWriter requestObject = 
+                PaymentClientRequestEncoder.encode(supportedPaymentMethods,
+                                                   null, 
+                                                   paymentRequest,
+                                                   null);
         session.setAttribute(REQUEST, requestObject);
         returnJson(response, requestObject);
     }

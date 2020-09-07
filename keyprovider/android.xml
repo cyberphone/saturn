@@ -38,6 +38,7 @@
             <include name="**/UserChallengeItem.java"/>
             <include name="**/UserResponseItem.java"/>
             <include name="**/UserAuthorizationMethods.java"/>
+            <include name="**/MobileProxyParameters.java"/>
           </fileset>
         </copy>
         <replace dir="${temp.dir}" value="org.webpki.mobile.android.saturn.common">

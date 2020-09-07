@@ -20,7 +20,11 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.util.GregorianCalendar;
+
 import org.webpki.json.JSONObjectWriter;
+
+import org.webpki.util.ISODateTime;
 
 public class BalanceResponseEncoder implements BaseProperties {
     
@@ -31,8 +35,6 @@ public class BalanceResponseEncoder implements BaseProperties {
             .setString(ACCOUNT_ID_JSON, accountId)
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
-            .setDynamic((wr) -> Software.encode(wr, 
-                                                AuthorizationResponse.SOFTWARE_NAME, 
-                                                AuthorizationResponse.SOFTWARE_VERSION));
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.LOCAL_NO_SUBSECONDS);
     }
 }

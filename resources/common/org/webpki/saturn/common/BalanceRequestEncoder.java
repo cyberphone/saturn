@@ -31,17 +31,13 @@ public class BalanceRequestEncoder implements BaseProperties {
                                           Currencies currency,
                                           String accountId,
                                           String credentialId,
-                                          GregorianCalendar timeStamp,
-                                          String softwareName,
-                                          String softwareVersion,
                                           JSONAsymKeySigner signer) throws IOException {
         return Messages.BALANCE_REQUEST.createBaseMessage()
             .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(CURRENCY_JSON, currency.toString())
-            .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr, softwareName, softwareVersion))
+            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.LOCAL_NO_SUBSECONDS)
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 }

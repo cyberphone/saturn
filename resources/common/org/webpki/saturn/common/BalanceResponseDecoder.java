@@ -20,7 +20,10 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.util.GregorianCalendar;
+
 import org.webpki.json.JSONObjectReader;
+import org.webpki.util.ISODateTime;
 
 
 public class BalanceResponseDecoder implements BaseProperties {
@@ -30,7 +33,7 @@ public class BalanceResponseDecoder implements BaseProperties {
         accountId = rd.getString(ACCOUNT_ID_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         amount = rd.getMoney(AMOUNT_JSON, currency.getDecimals());
-        software = new Software(rd);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         rd.checkForUnread();
     }
 
@@ -49,8 +52,8 @@ public class BalanceResponseDecoder implements BaseProperties {
         return currency;
     }
 
-    Software software;
-    public Software getSoftware() {
-        return software;
+    GregorianCalendar timeStamp;
+    public GregorianCalendar getTimeStamp() {
+        return timeStamp;
     }
 }

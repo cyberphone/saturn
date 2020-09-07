@@ -34,46 +34,9 @@
   </path>
   
   <target name="help">
-      <echo message="cryptotest createcerts initwallet inittestpage jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter] escaping"/>
+      <echo message="createcerts initwallet jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter] escaping"/>
   </target>
  
-  <target name="inittestpage">
-    <delete file="${testpage}"/>
-    <delete dir="${temp.dir}"/>
-    <mkdir dir="${temp.dir}"/>
-    <javac debug="${debug}"
-           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
-           destdir="${temp.dir}" 
-           classpathref="compile.classpath"
-           includeAntRuntime="false">
-    </javac>
-    <java fork="yes"
-          classname="org.webpki.saturn.resources.InitTestPage"
-          dir="${@key.dir}"
-          failonerror="true">
-        <classpath>
-          <fileset dir="${@webpki.lib.dir}">
-             <include name="${@webpki-libext.jar}"/>
-          </fileset>
-          <fileset dir="${@webpki.lib.dir}">
-             <include name="${@webpki-webutil.jar}"/>
-          </fileset>
-          <fileset dir="${@reference.lib.dir}">
-             <include name="${bcprovider.jar}"/>
-          </fileset>
-          <fileset dir="${@reference.lib.dir}">
-             <include name="servlet-api.jar"/>
-          </fileset>
-          <fileset dir="${@common.lib.dir}">
-             <include name="*.jar"/>
-          </fileset>
-          <pathelement location="${temp.dir}"/>
-        </classpath>
-        <arg value="${testpage}"/>
-        <arg value="${@w2nb.webwallet}"/>
-    </java>
-  </target>
-
   <target name="jcspaper">
     <property name="logotype" location="${@logotype.dir}/${@webpki-logotype.file}"/>
     <delete file="${jcspaper}"/>
@@ -365,44 +328,6 @@
        <param name="dea" value="A128CBC-HS256"/>
        <param name="kea" value="ECDH-ES"/>
      </antcall>
-  </target>
-  
-  <target name="cryptotest">
-    <delete dir="${temp.dir}"/>
-    <mkdir dir="${temp.dir}"/>
-    <delete dir="${nodejscryptotest.dir}"/>
-    <mkdir dir="${nodejscryptotest.dir}"/>
-    <javac debug="${debug}"
-           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
-           destdir="${temp.dir}" 
-           classpathref="compile.classpath"
-           includeAntRuntime="false">
-    </javac>
-    <copy todir="${temp.dir}">
-       <fileset dir="${src.dir}">
-          <include name="**/*.jwk"/>
-       </fileset>
-    </copy>
-    <java fork="yes"
-          classname="org.webpki.saturn.resources.CryptoTesting"
-          failonerror="true">
-        <classpath>
-          <fileset dir="${@webpki.lib.dir}">
-             <include name="${@webpki-libext.jar}"/>
-          </fileset>
-          <fileset dir="${@webpki.lib.dir}">
-             <include name="${@webpki-webutil.jar}"/>
-          </fileset>
-          <fileset dir="${@reference.lib.dir}">
-             <include name="${bcprovider.jar}"/>
-          </fileset>
-          <fileset dir="${@reference.lib.dir}">
-             <include name="servlet-api.jar"/>
-          </fileset>
-          <pathelement location="${temp.dir}"/>
-        </classpath>
-        <arg value="${nodejscryptotest.dir}/ecdh.js"/>
-    </java>
   </target>
   
   <target name="_createcert">

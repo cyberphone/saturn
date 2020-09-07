@@ -20,20 +20,23 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.TimeUtils;
-import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.NonDirectPaymentEncoder;
 import org.webpki.saturn.common.PaymentRequestEncoder;
+import org.webpki.saturn.common.PaymentClientRequestEncoder;
+
+import org.webpki.saturn.common.PaymentClientRequestEncoder.SupportedPaymentMethod;
+
 
 public class WalletRequest implements BaseProperties, MerchantSessionProperties {
 
@@ -50,7 +53,6 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         }
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         MerchantDescriptor merchant = MerchantService.getMerchant(session);
-        requestObject = Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage();
 
         // Create a payment request
         JSONObjectWriter paymentRequest =
@@ -64,20 +66,20 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
                                          merchant.getReferenceId(),
                                          new GregorianCalendar(),
                                          TimeUtils.inMinutes(30));
-
-        JSONArrayWriter methodList = requestObject.setArray(SUPPORTED_PAYMENT_METHODS_JSON);
+        
+        List<SupportedPaymentMethod> supportedPaymentMethods = new ArrayList<>();
         for (String paymentMethod : merchant.paymentMethods.keySet()) {
             PaymentMethodDescriptor paymentMethodDescriptor =
                     merchant.paymentMethods.get(paymentMethod);
-            methodList.setObject()
-                .setString(PAYMENT_METHOD_JSON, paymentMethod)
-                .setString(PAYEE_AUTHORITY_URL_JSON, paymentMethodDescriptor.authorityUrl);
+            supportedPaymentMethods.add(
+                    new SupportedPaymentMethod(paymentMethod,
+                                               paymentMethodDescriptor.authorityUrl));
         }
-        requestObject.setObject(PAYMENT_REQUEST_JSON, paymentRequest);
-        if (MerchantService.noMatchingMethodsUrl != null) {
-            requestObject.setString(NO_MATCHING_METHODS_URL_JSON, 
-                                    MerchantService.noMatchingMethodsUrl);
-        }
+
+        requestObject = PaymentClientRequestEncoder.encode(supportedPaymentMethods,
+                                                           null,
+                                                           paymentRequest,
+                                                           MerchantService.noMatchingMethodsUrl); 
         
         if (debugMode) {
             debugData.InvokeWallet = new JSONObjectReader(requestObject);
