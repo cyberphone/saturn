@@ -26,13 +26,13 @@ CREATE DATABASE PAYER_BANK CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 --
 -- Create our single user
 --
-DROP USER IF EXISTS saturn@localhost;
-CREATE USER saturn@localhost IDENTIFIED BY 'foo123';
+DROP USER IF EXISTS saturn_bank@localhost;
+CREATE USER saturn_bank@localhost IDENTIFIED BY 'foo123';
 --
 -- Give this user access
 --
-GRANT ALL ON PAYER_BANK.* TO saturn@localhost;
-GRANT SELECT ON mysql.proc TO saturn@localhost;
+GRANT ALL ON PAYER_BANK.* TO saturn_bank@localhost;
+GRANT SELECT ON mysql.proc TO saturn_bank@localhost;
 --
 -- Create tables and stored procedures
 --

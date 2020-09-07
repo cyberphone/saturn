@@ -124,12 +124,15 @@
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
       </classes>
-        <lib dir="${zip.webpki.lib.dir}">
+      <metainf dir=".">
+        <include name="context.xml"/>
+      </metainf>
+      <lib dir="${zip.webpki.lib.dir}">
            <include name="${@webpki-libext.jar}"/>
-        </lib>
-        <lib dir="${zip.webpki.lib.dir}">
+      </lib>
+      <lib dir="${zip.webpki.lib.dir}">
            <include name="${@webpki-webutil.jar}"/>
-        </lib>
+      </lib>
       <zipfileset dir="${@key.dir}" prefix="${class_war_path}">
          <include name="${enc.key.rsa}"/>
          <include name="${enc.key.ec}"/>
