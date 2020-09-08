@@ -193,6 +193,11 @@
         <servlet-class>org.webpki.saturn.merchant.GasStationServlet</servlet-class>
     </servlet>
 
+    <servlet>
+        <servlet-name>ReceiptServlet</servlet-name>
+        <servlet-class>org.webpki.saturn.merchant.ReceiptServlet</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>HomeServlet</servlet-name>
         <url-pattern>/home</url-pattern>
@@ -261,6 +266,11 @@
     <servlet-mapping>
         <servlet-name>GasStationServlet</servlet-name>
         <url-pattern>/gasstation</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>ReceiptServlet</servlet-name>
+        <url-pattern>/receipts/*</url-pattern>
     </servlet-mapping>
 
     <session-config>

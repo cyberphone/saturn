@@ -20,9 +20,13 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
 
@@ -36,7 +40,6 @@ import org.webpki.saturn.common.PaymentRequestEncoder;
 import org.webpki.saturn.common.PaymentClientRequestEncoder;
 
 import org.webpki.saturn.common.PaymentClientRequestEncoder.SupportedPaymentMethod;
-
 
 public class WalletRequest implements BaseProperties, MerchantSessionProperties {
 
@@ -75,9 +78,18 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
                     new SupportedPaymentMethod(paymentMethod,
                                                paymentMethodDescriptor.authorityUrl));
         }
+        String receiptBaseUrl = null;
+        if (true) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            receiptBaseUrl = MerchantService.merchantBaseUrl + 
+                             "/receipts/" +
+                             sdf.format(System.currentTimeMillis()) +
+                             ".";
+        }
 
         requestObject = PaymentClientRequestEncoder.encode(supportedPaymentMethods,
-                                                           null,
+                                                           receiptBaseUrl,
                                                            paymentRequest,
                                                            MerchantService.noMatchingMethodsUrl); 
         

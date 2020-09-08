@@ -60,7 +60,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
     @Override
     boolean processCall(MerchantDescriptor merchant,
-                        JSONObjectReader walletResponse,
                         PaymentRequestDecoder paymentRequest, 
                         PayerAuthorization payerAuthorization,
                         HttpSession session,
@@ -124,14 +123,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // Valid method. Find proper to request key and auhorityUrl
         PaymentMethodDescriptor paymentNetwork = merchant.paymentMethods.get(clientPaymentMethodUrl);
-
+        
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
             AuthorizationRequest.encode(MerchantService.testMode,
                                         providerAuthority.getServiceUrl(),
                                         payeeAuthorityUrl,
                                         payerAuthorization.getPaymentMethod(),
-                                        walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON),
+                                        payerAuthorization.getEncryptedAuthorization(),
                                         request.getRemoteAddr(),
                                         paymentRequest,
                                         paymentBackendMethodEncoder,

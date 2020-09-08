@@ -30,24 +30,41 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
+import org.webpki.crypto.HashAlgorithms;
+
+import org.webpki.util.Base64URL;
+
 public class PayerAuthorization implements BaseProperties {
     
+    static final JSONCryptoHelper.Options options =
+        new JSONCryptoHelper.Options()
+                .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY);
+    
     static JSONDecryptionDecoder getEncryptedAuthorization(JSONObjectReader rd) throws IOException {
-        JSONCryptoHelper.Options options = 
-                new JSONCryptoHelper.Options()
-                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY);
         return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options);
     }
 
     public PayerAuthorization(JSONObjectReader rd) throws IOException {
         Messages.PAYER_AUTHORIZATION.parseBaseMessage(rd);
+        encryptedAuthorization = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON);
         // Only syntax checking for intermediaries
-        getEncryptedAuthorization(rd);
+        encryptedAuthorization.getEncryptionObject(options);
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         rd.checkForUnread();
     }
-    
+
+    JSONObjectReader encryptedAuthorization;
+    public JSONObjectReader getEncryptedAuthorization() {
+        return encryptedAuthorization;
+    }
+
+    public String getReceiptPathElement() throws IOException {
+        return Base64URL.encode(
+                HashAlgorithms.SHA256.digest(
+                        encryptedAuthorization.serializeToBytes(JSONOutputFormats.CANONICALIZED)));
+    }
+
     String providerAuthorityUrl;
     public String getProviderAuthorityUrl() {
         return providerAuthorityUrl;
