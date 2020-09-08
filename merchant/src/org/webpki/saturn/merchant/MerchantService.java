@@ -28,9 +28,15 @@ import java.util.LinkedHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+
 import javax.servlet.http.HttpSession;
+
+import javax.sql.DataSource;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.KeyStoreVerifier;
@@ -133,6 +139,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static boolean desktopWallet;
 
     static String merchantBaseUrl;
+
+    static DataSource jdbcDataSource;
 
     static void slowOperationSimulator() throws InterruptedException {
         if (slowOperation) {
@@ -262,6 +270,14 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             ////////////////////////////////////////////////////////////////////////////////////////////
             androidChromeVersion = getPropertyInt(ANDROID_CHROME_VERSION);
 
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            // Database
+            ////////////////////////////////////////////////////////////////////////////////////////////
+            Context initContext = new InitialContext();
+            Context envContext  = (Context)initContext.lookup("java:/comp/env");
+            jdbcDataSource = (DataSource)envContext.lookup("jdbc/MERCHANT");
+            DataBaseOperations.testConnection();
+            
             logger.info("Saturn Merchant-server initiated");
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+    <Resource name="jdbc/MERCHANT" auth="Container" type="javax.sql.DataSource"
+              maxTotal="100" maxIdle="30" maxWaitMillis="10000"
+              username="saturn_merchant" password="foo123" driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://localhost:3306/MERCHANT?useUnicode=true&amp;characterEncoding=utf8&amp;serverTimezone=CET"/>
+
+</Context>
