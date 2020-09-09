@@ -59,7 +59,7 @@ public class PayerAuthorization implements BaseProperties {
         return encryptedAuthorization;
     }
 
-    public String getReceiptPathElement() throws IOException {
+    public String getAuthorizationHash() throws IOException {
         return Base64URL.encode(
                 HashAlgorithms.SHA256.digest(
                         encryptedAuthorization.serializeToBytes(JSONOutputFormats.CANONICALIZED)));

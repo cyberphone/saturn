@@ -46,7 +46,12 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
     boolean debugMode;
     SavedShoppingCart savedShoppingCart;
     JSONObjectWriter requestObject;
+    JSONObjectWriter paymentRequest;
+    String receiptUrl;
     
+    private static int receiptNumber;
+    private static String currentDate = ""; 
+
     WalletRequest(HttpSession session,
                   NonDirectPaymentEncoder optionalNonDirectPayment) throws IOException {
         debugMode = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
@@ -58,7 +63,7 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         MerchantDescriptor merchant = MerchantService.getMerchant(session);
 
         // Create a payment request
-        JSONObjectWriter paymentRequest =
+        paymentRequest =
             PaymentRequestEncoder.encode(merchant.commonName, 
                                          merchant.homePage,
                                          new BigDecimal(
@@ -78,18 +83,22 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
                     new SupportedPaymentMethod(paymentMethod,
                                                paymentMethodDescriptor.authorityUrl));
         }
-        String receiptBaseUrl = null;
         if (true) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
             sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            receiptBaseUrl = MerchantService.merchantBaseUrl + 
+            String yyyyMmDd = sdf.format(System.currentTimeMillis());
+            if (!yyyyMmDd.equals(currentDate)) {
+                currentDate = yyyyMmDd;
+                receiptNumber = 0;
+            }
+            receiptUrl = MerchantService.merchantBaseUrl + 
                              "/receipts/" +
-                             sdf.format(System.currentTimeMillis()) +
-                             ".";
+                             yyyyMmDd +
+                             "." + (++receiptNumber);
         }
 
         requestObject = PaymentClientRequestEncoder.encode(supportedPaymentMethods,
-                                                           receiptBaseUrl,
+                                                           receiptUrl,
                                                            paymentRequest,
                                                            MerchantService.noMatchingMethodsUrl); 
         
@@ -98,6 +107,6 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         }
 
         // Must keep
-        session.setAttribute(WALLET_REQUEST_SESSION_ATTR, requestObject);
+        session.setAttribute(WALLET_REQUEST_SESSION_ATTR, this);
     }
 }

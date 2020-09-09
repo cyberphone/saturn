@@ -42,7 +42,7 @@ public interface BaseProperties {
     String RECIPIENT_URL_JSON               = "recipientUrl";               // Where we are sending (target address)
     String SERVICE_URL_JSON                 = "serviceUrl";                 // Saturn core
     String HOSTING_URL_JSON                 = "hostingUrl";                 // For hosting entities
-    String RECEIPT_BASE_URL_JSON            = "receiptBaseUrl";             // For fetching optional receipts
+    String RECEIPT_URL_JSON                 = "receiptUrl";                 // For fetching optional receipts
     String AMOUNT_JSON                      = "amount";                     // Money
     String CURRENCY_JSON                    = "currency";                   // In this format
     String NON_DIRECT_PAYMENT_JSON          = "nonDirectPayment";           // Deposit, automated gas station, booking
@@ -63,6 +63,7 @@ public interface BaseProperties {
     String SUPPORTED_PAYMENT_METHODS_JSON   = "supportedPaymentMethods";    // List of accepted payment methods (URLs)
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)
     String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User and bank authorization signature
+    String AUTHORIZATION_HASH_JSON          = "authorizationHash";          // See Receipts
     String USER_AUTHORIZATION_METHOD_JSON   = "userAuthorizationMethod";    // PIN, Fingerprint, etc.
     String REQUEST_SIGNATURE_JSON           = "requestSignature";           // Payee signature
     String SUB_TYPE_JSON                    = "subType";                    // For non-direct payments

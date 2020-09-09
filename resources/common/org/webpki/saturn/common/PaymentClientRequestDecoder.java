@@ -45,7 +45,7 @@ public class PaymentClientRequestDecoder implements BaseProperties {
             supportedPaymentMethod.payeeAuthorityUrl = spm.getString(PAYEE_AUTHORITY_URL_JSON);
             supportedPaymentMethods.add(supportedPaymentMethod);
         } while (ar.hasMore());
-        optionalReceiptBaseUrl = rd.getStringConditional(RECEIPT_BASE_URL_JSON);
+        optionalReceiptUrl = rd.getStringConditional(RECEIPT_URL_JSON);
         paymentRequest = new PaymentRequestDecoder(rd.getObject(PAYMENT_REQUEST_JSON));
         noMatchingMethodsUrl = rd.getStringConditional(NO_MATCHING_METHODS_URL_JSON);
         rd.checkForUnread();
@@ -56,9 +56,9 @@ public class PaymentClientRequestDecoder implements BaseProperties {
         return supportedPaymentMethods;
     }
 
-    String optionalReceiptBaseUrl;
-    public String getReceiptBaseUrl() {
-        return optionalReceiptBaseUrl;
+    String optionalReceiptUrl;
+    public String getReceiptUrl() {
+        return optionalReceiptUrl;
     }
 
     PaymentRequestDecoder paymentRequest;

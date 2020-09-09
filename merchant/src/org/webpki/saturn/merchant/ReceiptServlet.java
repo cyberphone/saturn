@@ -26,6 +26,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONOutputFormats;
+import org.webpki.json.JSONParser;
+
 public class ReceiptServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -34,7 +38,21 @@ public class ReceiptServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
-        String receipt = request.getPathInfo();
-        HTML.debugPage(response, receipt, false);
-     }
+        String sequenceId = request.getPathInfo();
+        if (!sequenceId.isEmpty()) {
+            sequenceId = sequenceId.substring(1);
+        }
+        try {
+            String receipt = DataBaseOperations.fetchReceipt(sequenceId);
+            if (receipt == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.flushBuffer();
+                return;
+            }
+            JSONObjectReader json = JSONParser.parse(receipt);
+            HTML.debugPage(response, json.serializeToString(JSONOutputFormats.PRETTY_HTML), false);
+        } catch (Exception e) {
+            HTML.debugPage(response, e.getMessage(), false);
+        }
+    }
 }

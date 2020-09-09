@@ -43,7 +43,7 @@ public class PaymentClientRequestEncoder implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(List<SupportedPaymentMethod> supportedPaymentMethods,
-                                          String optionalReceiptBaseUrl,
+                                          String optionalReceiptUrl,
                                           JSONObjectWriter paymentRequest, 
                                           String noMatchingMethodsUrl) throws IOException {
         return Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage()
@@ -58,8 +58,8 @@ public class PaymentClientRequestEncoder implements BaseProperties {
                 }
                 return wr;
             })
-            .setDynamic((wr) -> optionalReceiptBaseUrl == null ?
-                      wr : wr.setString(RECEIPT_BASE_URL_JSON, optionalReceiptBaseUrl))
+            .setDynamic((wr) -> optionalReceiptUrl == null ?
+                      wr : wr.setString(RECEIPT_URL_JSON, optionalReceiptUrl))
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest)
             .setDynamic((wr) -> noMatchingMethodsUrl == null ?
                     wr : wr.setString(NO_MATCHING_METHODS_URL_JSON, noMatchingMethodsUrl));

@@ -20,8 +20,6 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
-import java.security.GeneralSecurityException;
-
 import java.util.LinkedHashMap;
 
 import javax.servlet.ServletException;
@@ -47,6 +45,7 @@ import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.ReceiptEncoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
 
@@ -62,12 +61,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     boolean processCall(MerchantDescriptor merchant,
                         PaymentRequestDecoder paymentRequest, 
                         PayerAuthorization payerAuthorization,
+                        String receiptUrl,
                         HttpSession session,
                         HttpServletRequest request,
                         HttpServletResponse response,
                         boolean debug, 
                         DebugData debugData, 
-                        UrlHolder urlHolder) throws IOException, GeneralSecurityException {
+                        UrlHolder urlHolder) throws Exception {
         // Slightly different flows for card- and bank-to-bank authorizations
         PaymentMethods paymentMethodEnum = payerAuthorization.getPaymentMethod();
         boolean cardPayment = paymentMethodEnum.isCardPayment();
@@ -138,9 +138,19 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         paymentNetwork.signer);
 
         // Call Payer bank
-        JSONObjectReader resultMessage = MerchantService.externalCalls.postJsonData(urlHolder,
-                                                                                    providerAuthority.getServiceUrl(),
-                                                                                    authorizationRequest);
+        JSONObjectReader resultMessage = 
+                MerchantService.externalCalls.postJsonData(urlHolder,
+                                                           providerAuthority.getServiceUrl(),
+                                                           authorizationRequest);
+        // Receipt handling
+        if (receiptUrl != null) {
+             DataBaseOperations.storeReceipt(
+                     new ReceiptEncoder(receiptUrl,
+                                        clientPaymentMethodUrl,
+                                        payeeAuthorityUrl,
+                                        paymentRequest,
+                                        payerAuthorization.getAuthorizationHash()));
+        }
 
         if (debug) {
             debugData.authorizationRequest = new JSONObjectReader(authorizationRequest);

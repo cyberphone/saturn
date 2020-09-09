@@ -18,14 +18,16 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 
-import java.security.PublicKey;
-
-import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.webpki.json.JSONOutputFormats;
+
+import org.webpki.saturn.common.ReceiptEncoder;
 
 public class DataBaseOperations {
 
@@ -33,5 +35,33 @@ public class DataBaseOperations {
     
     static void testConnection() throws SQLException {
         try (Connection connection = MerchantService.jdbcDataSource.getConnection();) { }
+    }
+
+    static final String RECEIPT_INSERT_SQL = 
+            "INSERT INTO RECEIPTS(SequenceId, Receipt) VALUES(?, ?)";
+
+    static void storeReceipt(ReceiptEncoder receiptEncoder) 
+    throws SQLException, IOException {
+        String receiptUrl = receiptEncoder.getReceiptUrl();
+        try (Connection connection = MerchantService.jdbcDataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(RECEIPT_INSERT_SQL);) {
+            stmt.setString(1, receiptUrl.substring(receiptUrl.lastIndexOf("/") + 1));
+            stmt.setString(2, receiptEncoder.getReceiptDocument()
+                                  .serializeToString(JSONOutputFormats.NORMALIZED));
+            stmt.executeUpdate();
+        }
+    }
+
+    static final String RECEIPT_FETCH_SQL = "SELECT Receipt FROM RECEIPTS WHERE SequenceId=?";
+
+    static String fetchReceipt(String sequenceId) 
+    throws SQLException, IOException {
+        try (Connection connection = MerchantService.jdbcDataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(RECEIPT_FETCH_SQL);) {
+            stmt.setString(1, sequenceId);
+            try (ResultSet rs = stmt.executeQuery();) {
+                return rs.next() ? rs.getString(1) : null;
+            }
+        }
     }
 }

@@ -44,21 +44,15 @@ GRANT SELECT ON mysql.proc TO saturn_merchant@localhost;
 USE MERCHANT;
 
 /*=============================================*/
-/*                   USERS                     */
+/*                  RECEIPTS                   */
 /*=============================================*/
 
-CREATE TABLE USERS (
-    Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique User ID
+CREATE TABLE RECEIPTS (
+    SequenceId  VARCHAR(20)   NOT NULL,                                  -- Unique sequence Id
     
-    IpAddress   VARCHAR(50)   NOT NULL,                                  -- "Statistics"
+    Receipt     TEXT          NOT NULL,                                  -- The receipt itself in JSON format
 
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
 
-    AccessCount INT           NOT NULL  DEFAULT 0,                       -- Administrator data
-
-    LastAccess  TIMESTAMP     NULL,                                      -- Administrator data
-
-    Name        VARCHAR(50)   NOT NULL,                                  -- Human name
-
-    PRIMARY KEY (Id)
+    PRIMARY KEY (SequenceId)
 );

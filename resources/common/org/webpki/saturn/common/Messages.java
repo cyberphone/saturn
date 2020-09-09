@@ -51,7 +51,12 @@ public enum Messages {
     // Saturn authority lookup response messages
     ///////////////////////////////////////////////////////////////////////////////////////////////
     PROVIDER_AUTHORITY            ("ProviderAuthority"),             // Published provider entity data
-    PAYEE_AUTHORITY               ("PayeeAuthority");                // Published Payee entity data
+    PAYEE_AUTHORITY               ("PayeeAuthority"),                // Published Payee entity data
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Saturn Receipt messages
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    RECEIPT                       ("Receipt");                       // "Published" receipt
 
     String qualifier;
     

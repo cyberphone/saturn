@@ -66,12 +66,13 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     abstract boolean processCall(MerchantDescriptor merchant, 
                                  PaymentRequestDecoder paymentRequest, 
                                  PayerAuthorization payerAuthorization,
+                                 String receiptUrl,
                                  HttpSession session,
                                  HttpServletRequest request,
                                  HttpServletResponse response,
                                  boolean debug, 
                                  DebugData debugData, 
-                                 UrlHolder urlHolder) throws IOException, GeneralSecurityException;
+                                 UrlHolder urlHolder) throws Exception;
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -117,17 +118,22 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // Check that we got a valid payment method
             if (!merchant.paymentMethods.containsKey(
                     payerAuthorization.getPaymentMethod().getPaymentMethodUrl())) {
-                throw new IOException("Unexpected: " + payerAuthorization.getPaymentMethod().getPaymentMethodUrl());
+                throw new IOException("Unexpected: " +
+                                      payerAuthorization.getPaymentMethod().getPaymentMethodUrl());
             }
+            // Restore WalletRequest
+            WalletRequest walletRequest = 
+                    (WalletRequest)session.getAttribute(WALLET_REQUEST_SESSION_ATTR);
+
             // Restore PaymentRequest
             PaymentRequestDecoder paymentRequest =
-                new PaymentRequestDecoder(new JSONObjectReader((JSONObjectWriter) 
-                        session.getAttribute(WALLET_REQUEST_SESSION_ATTR)).getObject(PAYMENT_REQUEST_JSON));
+                    new PaymentRequestDecoder(new JSONObjectReader(walletRequest.paymentRequest));
             
             // The actual processing is here
             if (processCall(merchant,
                             paymentRequest, 
                             payerAuthorization,
+                            walletRequest.receiptUrl,
                             session,
                             request,
                             response,
@@ -140,7 +146,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 QRSessions.optionalSessionSetReady(qrId);
     
                 logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
-                logger.info("Receipt path=" + payerAuthorization.getReceiptPathElement());
+                logger.info("Receipt path=" + payerAuthorization.getAuthorizationHash());
                 /////////////////////////////////////////////////////////////////////////////////////////
                 // Normal return                                                                       //
                 /////////////////////////////////////////////////////////////////////////////////////////
@@ -149,10 +155,12 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
 
         } catch (Exception e) {
-            String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
+            String message = (urlHolder.getUrl() == null ? 
+                    "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();
             logger.log(Level.SEVERE, HttpSupport.getStackTrace(e, message));
-            JSONObjectWriter userError = WalletAlertMessage.encode("An unexpected error occurred.<br>" +
-                                                                   "Please try again or contact support.");
+            JSONObjectWriter userError = 
+                    WalletAlertMessage.encode("An unexpected error occurred.<br>" +
+                                              "Please try again or contact support.");
             HttpSupport.writeJsonData(response, userError);
         }
     }
