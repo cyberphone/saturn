@@ -31,7 +31,7 @@ import javax.servlet.http.HttpSession;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AuthorizationRequest;
+import org.webpki.saturn.common.AuthorizationRequestDecoder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeAuthority;
@@ -70,22 +70,25 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
 
             boolean debug = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             
-            AuthorizationRequest authorizationRequest = resultData.optionalRefund.getAuthorizationRequest();
+            AuthorizationRequestDecoder authorizationRequest = 
+                    resultData.optionalRefund.getAuthorizationRequest();
 
             logger.info("Trying to refund Amount=" + resultData.amount.toString() +
                           " " + resultData.currency.toString() + 
                         ", Account=" + resultData.accountReference + 
                         ", Method=" + resultData.paymentMethod.getPaymentMethodUrl());
 
-            PayeeAuthority payeeAuthority = 
-                MerchantService.externalCalls.getPayeeAuthority(urlHolder, authorizationRequest.getPayeeAuthorityUrl());
-             ProviderAuthority providerAuthority =
-                MerchantService.externalCalls.getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
+            PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(
+                    urlHolder, authorizationRequest.getPayeeAuthorityUrl());
+             ProviderAuthority providerAuthority = MerchantService.externalCalls
+                     .getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
 
             String refundUrl = providerAuthority.getExtensions() == null ? null :
-                providerAuthority.getExtensions().getStringConditional(KnownExtensions.REFUND_REQUEST);
+                providerAuthority.getExtensions()
+                    .getStringConditional(KnownExtensions.REFUND_REQUEST);
             if (refundUrl == null) {
-                ErrorServlet.systemFail(response, "Selected payment method doesn't support refund!");
+                ErrorServlet.systemFail(response, 
+                                        "Selected payment method doesn't support refund!");
                 return;
             }
             

@@ -24,17 +24,16 @@ import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.util.ISODateTime;
 
-public class TransactionRequest implements BaseProperties {
+public class TransactionRequestDecoder implements BaseProperties {
     
-    public TransactionRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
+    public TransactionRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         root = Messages.TRANSACTION_REQUEST.parseBaseMessage(rd);
-        authorizationResponse = new AuthorizationResponse(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
+        authorizationResponse = new AuthorizationResponseDecoder(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         actualAmount = rd.getMoney(AMOUNT_JSON,
                                    authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
@@ -90,28 +89,9 @@ public class TransactionRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    AuthorizationResponse authorizationResponse;
-    public AuthorizationResponse getAuthorizationResponse() {
+    AuthorizationResponseDecoder authorizationResponse;
+    public AuthorizationResponseDecoder getAuthorizationResponse() {
         return authorizationResponse;
-    }
-
-    public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
-                                          String recipientUrl,
-                                          BigDecimal actualAmount,
-                                          String referenceId,
-                                          ServerAsymKeySigner signer) throws IOException {
-        return Messages.TRANSACTION_REQUEST.createBaseMessage()
-            .setString(RECIPIENT_URL_JSON, recipientUrl)
-            .setMoney(AMOUNT_JSON,
-                    actualAmount,
-                    authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr,
-                                                PaymentRequestEncoder.SOFTWARE_NAME, 
-                                                PaymentRequestEncoder.SOFTWARE_VERSION))
-            .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
-            .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 
     public void verifyPayerBank(JSONX509Verifier paymentRoot) throws IOException {

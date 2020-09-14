@@ -64,7 +64,10 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         byte[] cryptoRandom = new byte[16];
         new SecureRandom().nextBytes(cryptoRandom);
         String random = Base64URL.encode(cryptoRandom);
-        orderId = DataBaseOperations.createOrderId(random);
+        
+        // Note: running two Merchants like this is truly a demo solution :)
+        orderId = DataBaseOperations.createOrderId(
+                session.getAttribute(GAS_STATION_SESSION_ATTR) != null, random);
 
         // Create a payment request
         paymentRequest =

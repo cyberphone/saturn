@@ -27,8 +27,9 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.UrlHolder;
-import org.webpki.saturn.common.TransactionRequest;
-import org.webpki.saturn.common.TransactionResponse;
+import org.webpki.saturn.common.TransactionRequestDecoder;
+import org.webpki.saturn.common.TransactionResponseDecoder;
+import org.webpki.saturn.common.TransactionResponseEncoder;
 import org.webpki.saturn.common.PayeeCoreProperties;
 
 import com.supercard.SupercardAccountDataDecoder;
@@ -44,7 +45,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
 
         // Decode and finalize the cardpay request
-        TransactionRequest transactionRequest = new TransactionRequest(providerRequest, true);
+        TransactionRequestDecoder transactionRequest = new TransactionRequestDecoder(providerRequest, true);
         PaymentRequestDecoder paymentRequest = transactionRequest.getPaymentRequest();
         
         // Verify that we understand the payee payment method
@@ -75,7 +76,7 @@ public class TransactionServlet extends ProcessingBaseServlet {
                     " " + paymentRequest.getCurrency().toString());
         
         String optionalLogData = null;
-        TransactionResponse.ERROR transactionError = null;
+        TransactionResponseDecoder.ERROR transactionError = null;
         
         // Here we are supposed to talk to the card payment network....
         IBResponse ibResponse = 
@@ -96,11 +97,11 @@ public class TransactionServlet extends ProcessingBaseServlet {
 
         // It appears that we succeeded
         AcquirerService.transactionCount++;
-        return TransactionResponse.encode(transactionRequest,
-                                          transactionError,
-                                          getReferenceId(),
-                                          optionalLogData,
-                                          AcquirerService.acquirerKey);
+        return TransactionResponseEncoder.encode(transactionRequest,
+                                                 transactionError,
+                                                 getReferenceId(),
+                                                 optionalLogData,
+                                                 AcquirerService.acquirerKey);
         
     }
 }

@@ -20,10 +20,12 @@ import java.io.Serializable;
 
 import java.math.BigDecimal;
 
-import org.webpki.saturn.common.AuthorizationResponse;
+import java.util.GregorianCalendar;
+
+import org.webpki.saturn.common.AuthorizationResponseDecoder;
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.TransactionResponse.ERROR;
+import org.webpki.saturn.common.TransactionResponseDecoder;
 
 public class ResultData implements Serializable {
     
@@ -38,9 +40,15 @@ public class ResultData implements Serializable {
     public String accountReference;
 
     public PaymentMethods paymentMethod;
-
-    public ERROR transactionError;
     
-    public AuthorizationResponse optionalRefund;
+    public String providerAuthorityUrl;
+    
+    public String providerReferenceId;
+    
+    public GregorianCalendar providerTimeStamp;
+
+    public TransactionResponseDecoder.ERROR transactionError;
+    
+    public AuthorizationResponseDecoder optionalRefund;  // Not exactly how it would look in a real setting.
 
 }

@@ -18,29 +18,35 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+import java.util.GregorianCalendar;
+
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.util.ISODateTime;
 
 public class ReceiptEncoder implements BaseProperties {
     
-    public ReceiptEncoder(String receiptUrl,
-                          String clientPaymentMethodUrl, 
+    public ReceiptEncoder(String referenceId,
+                          BigDecimal amount,
+                          Currencies currency,
+                          String paymentMethodName, 
                           String providerAuthorityUrl,
                           String payeeAuthorityUrl,
-                          PaymentRequestDecoder paymentRequest) throws IOException {
+                          GregorianCalendar providerTimeStamp,
+                          String providerReferenceId) throws IOException {
         receiptDocument = Messages.RECEIPT.createBaseMessage()
-                .setString(RECEIPT_URL_JSON, receiptUrl)
-                .setString(PAYMENT_METHOD_JSON, clientPaymentMethodUrl)
+                .setString(REFERENCE_ID_JSON, referenceId)
+                .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
+                .setString(CURRENCY_JSON, currency.toString())
+                .setString(PAYMENT_METHOD_NAME_JSON, paymentMethodName)
                 .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
                 .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
-                .setMoney(AMOUNT_JSON, 
-                          paymentRequest.amount,
-                          paymentRequest.currency.getDecimals())
-                .setString(CURRENCY_JSON, paymentRequest.currency.toString())
-                .setDateTime(TIME_STAMP_JSON, 
-                             paymentRequest.timeStamp, 
-                             ISODateTime.UTC_NO_SUBSECONDS);
+                .setObject(PROVIDER_TRANSACTION_DATA_JSON, new JSONObjectWriter()
+                        .setDateTime(TIME_STAMP_JSON, 
+                                     providerTimeStamp, 
+                                     ISODateTime.UTC_NO_SUBSECONDS)
+                        .setString(REFERENCE_ID_JSON, providerReferenceId));
     }
 
     public ReceiptEncoder(int notAvailableStatus) throws IOException {

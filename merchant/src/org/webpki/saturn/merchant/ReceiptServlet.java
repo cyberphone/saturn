@@ -26,9 +26,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
+
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
 
@@ -58,7 +57,7 @@ public class ReceiptServlet extends HttpServlet {
             ReceiptEncoder receipt;
             // Receipt URL is valid but that doesn't mean that there is any receipt data...
             if (receiptStatus.status == ReceiptDecoder.AVAILABLE) {
-                receipt = null;
+                receipt = DataBaseOperations.getReceiptData(orderId, receiptStatus.gasStation ? "Gasa" : "Merch");
             } else {
                 receipt = new ReceiptEncoder(receiptStatus.status);
             }

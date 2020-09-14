@@ -22,21 +22,18 @@ import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.ISODateTime;
 
-public class TransactionResponse implements BaseProperties {
-    
-    public static final String SOFTWARE_NAME    = "WebPKI.org - Payment Provider";
-    public static final String SOFTWARE_VERSION = "1.00";
+public class TransactionResponseDecoder implements BaseProperties {
     
     public static enum ERROR {OUT_OF_FUNDS, DELETED_AUTHORIZATION}
 
-    public TransactionResponse(JSONObjectReader rd) throws IOException {
+    public TransactionResponseDecoder(JSONObjectReader rd) throws IOException {
         root = Messages.TRANSACTION_RESPONSE.parseBaseMessage(rd);
-        transactionRequest = new TransactionRequest(Messages.TRANSACTION_REQUEST.getEmbeddedMessage(rd), null);
+        transactionRequest = 
+                new TransactionRequestDecoder(Messages.TRANSACTION_REQUEST.getEmbeddedMessage(rd), null);
         if (rd.hasProperty(TRANSACTION_ERROR_JSON)) {
             transactionError = ERROR.valueOf(rd.getString(TRANSACTION_ERROR_JSON));
         }
@@ -78,23 +75,8 @@ public class TransactionResponse implements BaseProperties {
     }
 
 
-    TransactionRequest transactionRequest;
-    public TransactionRequest getTransactionRequest() {
+    TransactionRequestDecoder transactionRequest;
+    public TransactionRequestDecoder getTransactionRequest() {
         return transactionRequest;
-    }
-
-    public static JSONObjectWriter encode(TransactionRequest transactionRequest,
-                                          ERROR transactionError,
-                                          String referenceId,
-                                          String optionalLogData,
-                                          ServerX509Signer signer) throws IOException {
-        return Messages.TRANSACTION_RESPONSE.createBaseMessage()
-            .setDynamic((wr) -> transactionError == null ? wr : wr.setString(TRANSACTION_ERROR_JSON, transactionError.toString()))
-            .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr, SOFTWARE_NAME, SOFTWARE_VERSION))
-            .setObject(Messages.TRANSACTION_REQUEST.lowerCamelCase(), transactionRequest.root)
-            .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 }

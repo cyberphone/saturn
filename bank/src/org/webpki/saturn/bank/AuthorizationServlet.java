@@ -36,8 +36,8 @@ import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.UserAuthorizationMethods;
-import org.webpki.saturn.common.AuthorizationRequest;
-import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AuthorizationRequestDecoder;
+import org.webpki.saturn.common.AuthorizationResponseEncoder;
 import org.webpki.saturn.common.NonDirectPaymentDecoder;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.PayeeAuthority;
@@ -46,7 +46,6 @@ import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.HostingProvider;
 import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ISODateTime;
@@ -65,7 +64,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                  Connection connection) throws Exception {
  
         // Decode authorization request message
-        AuthorizationRequest authorizationRequest = new AuthorizationRequest(providerRequest);
+        AuthorizationRequestDecoder authorizationRequest = new AuthorizationRequestDecoder(providerRequest);
 
 // TODO for idempotent operation and replay protection
 //        byte[] authorizationHash = authorizationRequest.getHashOfAuthorization(HashAlgorithms.SHA256);
@@ -300,12 +299,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         // We did it!
         BankService.successfulTransactions++;
-        return AuthorizationResponse.encode(authorizationRequest,
-                                            providerAuthority.getEncryptionParameters()[0],
-                                            accountData,
-                                            accountData.getPartialAccountIdentifier(accountId),
-                                            formatReferenceId(transactionId),
-                                            optionalLogData,
-                                            BankService.bankKey);
+        return AuthorizationResponseEncoder.encode(authorizationRequest,
+                                                   providerAuthority.getEncryptionParameters()[0],
+                                                   accountData,
+                                                   accountData.getPartialAccountIdentifier(accountId),
+                                                   formatReferenceId(transactionId),
+                                                   optionalLogData,
+                                                   BankService.bankKey);
     }
 }

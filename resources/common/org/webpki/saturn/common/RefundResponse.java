@@ -79,8 +79,8 @@ public class RefundResponse implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDynamic((wr) -> Software.encode(wr,
-                                                TransactionResponse.SOFTWARE_NAME,
-                                                TransactionResponse.SOFTWARE_VERSION))
+                                                TransactionResponseEncoder.SOFTWARE_NAME,
+                                                TransactionResponseEncoder.SOFTWARE_VERSION))
             .setObject(Messages.REFUND_REQUEST.lowerCamelCase(), refundRequest.root)
             .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }

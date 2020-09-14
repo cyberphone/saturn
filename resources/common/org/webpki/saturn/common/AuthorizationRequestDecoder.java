@@ -28,7 +28,6 @@ import org.webpki.crypto.HashAlgorithms;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
@@ -37,9 +36,9 @@ import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.ISODateTime;
 
-public class AuthorizationRequest implements BaseProperties {
+public class AuthorizationRequestDecoder implements BaseProperties {
     
-    public AuthorizationRequest(JSONObjectReader rd) throws IOException {
+    public AuthorizationRequestDecoder(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
@@ -122,33 +121,6 @@ System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
     PaymentRequestDecoder paymentRequest;
     public PaymentRequestDecoder getPaymentRequest() {
         return paymentRequest;
-    }
-
-    public static JSONObjectWriter encode(Boolean testMode,
-                                          String recipientUrl,
-                                          String payeeAuthorityUrl,
-                                          PaymentMethods paymentMethod,
-                                          JSONObjectReader encryptedAuthorizationData,
-                                          String clientIpAddress,
-                                          PaymentRequestDecoder paymentRequest,
-                                          AccountDataEncoder payeeReceiveAccount,
-                                          String referenceId,
-                                          ServerAsymKeySigner signer) throws IOException {
-        return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
-            .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
-            .setString(RECIPIENT_URL_JSON, recipientUrl)
-            .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
-            .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
-            .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
-            .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
-            .setObject(PAYEE_RECEIVE_ACCOUNT_JSON, payeeReceiveAccount.writeObject())
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr, 
-                                                PaymentRequestEncoder.SOFTWARE_NAME,
-                                                PaymentRequestEncoder.SOFTWARE_VERSION))
-            .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 
     public AuthorizationDataDecoder getDecryptedAuthorizationData(

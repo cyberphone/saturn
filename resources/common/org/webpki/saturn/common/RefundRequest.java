@@ -35,7 +35,7 @@ public class RefundRequest implements BaseProperties {
     
     public RefundRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
-        authorizationResponse = new AuthorizationResponse(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
+        authorizationResponse = new AuthorizationResponseDecoder(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         amount = rd.getMoney(AMOUNT_JSON,
                              authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
@@ -100,12 +100,12 @@ public class RefundRequest implements BaseProperties {
         return signatureDecoder;
     }
 
-    AuthorizationResponse authorizationResponse;
-    public AuthorizationResponse getAuthorizationResponse() {
+    AuthorizationResponseDecoder authorizationResponse;
+    public AuthorizationResponseDecoder getAuthorizationResponse() {
         return authorizationResponse;
     }
 
-    public static JSONObjectWriter encode(AuthorizationResponse authorizationResponse,
+    public static JSONObjectWriter encode(AuthorizationResponseDecoder authorizationResponse,
                                           String recipientUrl,
                                           BigDecimal amount,
                                           AccountDataEncoder payeeSourceAccount,

@@ -18,10 +18,10 @@ package org.webpki.saturn.merchant;
 
 import org.webpki.json.JSONX509Verifier;
 
-import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AuthorizationResponseDecoder;
 
 public class TransactionOperation {
     String urlToCall;
     JSONX509Verifier verifier;
-    AuthorizationResponse authorizationResponse;
+    AuthorizationResponseDecoder authorizationResponse;
 }

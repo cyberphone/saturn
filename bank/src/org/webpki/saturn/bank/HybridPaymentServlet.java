@@ -31,14 +31,15 @@ import org.webpki.json.JSONCryptoHelper;
 
 import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
-import org.webpki.saturn.common.AuthorizationRequest;
-import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AuthorizationRequestDecoder;
+import org.webpki.saturn.common.AuthorizationResponseDecoder;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.PaymentRequestDecoder;
+import org.webpki.saturn.common.TransactionRequestDecoder;
 import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
-import org.webpki.saturn.common.TransactionRequest;
-import org.webpki.saturn.common.TransactionResponse;
+import org.webpki.saturn.common.TransactionResponseDecoder;
+import org.webpki.saturn.common.TransactionResponseEncoder;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // This is the Saturn "hybrid" mode decoder servlet                                           //
@@ -54,10 +55,12 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         // Decode and finalize the "emulated" card pay request which in 
         // hybrid mode actually is account-2-account
-        TransactionRequest transactionRequest = new TransactionRequest(providerRequest, false);
+        TransactionRequestDecoder transactionRequest =
+                new TransactionRequestDecoder(providerRequest, false);
  
         // Verify that it was actually we who created the original response
-        AuthorizationResponse authorizationResponse = transactionRequest.getAuthorizationResponse();
+        AuthorizationResponseDecoder authorizationResponse = 
+                transactionRequest.getAuthorizationResponse();
         if (!Arrays.equals(BankService.bankCertificatePath,
                            authorizationResponse.getSignatureDecoder().getCertificatePath())) {
             throw new IOException("\"" + JSONCryptoHelper.CERTIFICATE_PATH_JSON + "\" mismatch");
@@ -65,11 +68,14 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         // Although we have already verified the Payee (merchant) during the authorization phase
         // we should do it for this round as well...
-        AuthorizationRequest authorizationRequest = authorizationResponse.getAuthorizationRequest();
+        AuthorizationRequestDecoder authorizationRequest = 
+                authorizationResponse.getAuthorizationRequest();
         PayeeAuthority payeeAuthority =
-                BankService.externalCalls.getPayeeAuthority(urlHolder,
-                                                            authorizationRequest.getPayeeAuthorityUrl());
-            payeeAuthority.getPayeeCoreProperties().verify(transactionRequest.getSignatureDecoder());
+                BankService.externalCalls.getPayeeAuthority(
+                        urlHolder,
+                        authorizationRequest.getPayeeAuthorityUrl());
+            payeeAuthority.getPayeeCoreProperties()
+                .verify(transactionRequest.getSignatureDecoder());
 
         // Get the payment method (we already know that it is OK since it was dealt with in
         // the initial call).
@@ -86,7 +92,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
 
         boolean testMode = transactionRequest.getTestMode();
         String optionalLogData = null;
-        TransactionResponse.ERROR transactionError = null;
+        TransactionResponseDecoder.ERROR transactionError = null;
         int transactionId;
         if (testMode) {
             transactionId = BankService.testReferenceId++;
@@ -140,10 +146,10 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
                     "Charging for Account ID=" + authorizationData.getAccountId() + 
                     ", Amount=" + transactionRequest.getAmount().toString() +
                     " " + paymentRequest.getCurrency().toString());
-        return TransactionResponse.encode(transactionRequest,
-                                          transactionError,
-                                          formatReferenceId(transactionId),
-                                          optionalLogData,
-                                          BankService.bankKey);
+        return TransactionResponseEncoder.encode(transactionRequest,
+                                                 transactionError,
+                                                 formatReferenceId(transactionId),
+                                                 optionalLogData,
+                                                 BankService.bankKey);
     }
 }

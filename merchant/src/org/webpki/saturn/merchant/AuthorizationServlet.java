@@ -32,12 +32,10 @@ import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
-import org.webpki.saturn.common.AuthorizationRequest;
-import org.webpki.saturn.common.AuthorizationResponse;
+import org.webpki.saturn.common.AuthorizationRequestEncoder;
+import org.webpki.saturn.common.AuthorizationResponseDecoder;
 import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.TransactionRequest;
-import org.webpki.saturn.common.TransactionResponse;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
@@ -45,7 +43,8 @@ import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.ProviderUserResponse;
-import org.webpki.saturn.common.ReceiptEncoder;
+import org.webpki.saturn.common.TransactionResponseDecoder;
+import org.webpki.saturn.common.TransactionRequestEncoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
 
@@ -126,7 +125,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
-            AuthorizationRequest.encode(MerchantService.testMode,
+            AuthorizationRequestEncoder.encode(MerchantService.testMode,
                                         providerAuthority.getServiceUrl(),
                                         payeeAuthorityUrl,
                                         payerAuthorization.getPaymentMethod(),
@@ -172,7 +171,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
     
         // Additional consistency checking
-        AuthorizationResponse authorizationResponse = new AuthorizationResponse(resultMessage);
+        AuthorizationResponseDecoder authorizationResponse = new AuthorizationResponseDecoder(resultMessage);
 
         // No error return, then we can verify the response fully
         authorizationResponse.getSignatureDecoder().verify(MerchantService.paymentRoot);
@@ -240,24 +239,25 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return true;
     }
 
-    static TransactionResponse.ERROR processTransaction(MerchantDescriptor merchant,
-                                                        TransactionOperation transactionOperation,
+    static TransactionResponseDecoder.ERROR
+                    processTransaction(MerchantDescriptor merchant,
+                                       TransactionOperation transactionOperation,
                                                         BigDecimal actualAmount,
                                                         UrlHolder urlHolder,
                                                         DebugData debugData) throws IOException {
 
         JSONObjectWriter transactionRequest =
-            TransactionRequest.encode(transactionOperation.authorizationResponse,
-                                      transactionOperation.urlToCall,
-                                      actualAmount,
-                                      transactionOperation.authorizationResponse
-                                              .getAuthorizationRequest()
-                                                  .getPaymentRequest().getReferenceId() + "-2",
-                                      merchant.paymentMethods.get(
-                                              transactionOperation.authorizationResponse
-                                                  .getAuthorizationRequest()
-                                                      .getPaymentMethod()
-                                                          .getPaymentMethodUrl()).signer);
+            TransactionRequestEncoder.encode(transactionOperation.authorizationResponse,
+                                             transactionOperation.urlToCall,
+                                             actualAmount,
+                                             transactionOperation.authorizationResponse
+                                                 .getAuthorizationRequest()
+                                                     .getPaymentRequest().getReferenceId() + "-2",
+                                             merchant.paymentMethods.get(
+                                                 transactionOperation.authorizationResponse
+                                                     .getAuthorizationRequest()
+                                                         .getPaymentMethod()
+                                                             .getPaymentMethodUrl()).signer);
         // Acquirer or Hybrid call
         JSONObjectReader response =
             MerchantService.externalCalls.postJsonData(urlHolder, 
@@ -269,7 +269,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             debugData.transactionResponse = response;
         }
         
-        TransactionResponse transactionResponse = new TransactionResponse(response);
+        TransactionResponseDecoder transactionResponse = new TransactionResponseDecoder(response);
         transactionResponse.getSignatureDecoder().verify(transactionOperation.verifier);
 
         return transactionResponse.getTransactionError();

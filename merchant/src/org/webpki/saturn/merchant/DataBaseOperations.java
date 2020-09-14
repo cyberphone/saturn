@@ -17,17 +17,18 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
+import java.util.GregorianCalendar;
 import java.util.logging.Logger;
 
 import org.webpki.json.JSONOutputFormats;
-
+import org.webpki.saturn.common.Currencies;
+import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.ReceiptEncoder;
 
 public class DataBaseOperations {
@@ -38,12 +39,13 @@ public class DataBaseOperations {
         try (Connection connection = MerchantService.jdbcDataSource.getConnection();) { }
     }
     
-    static synchronized String createOrderId(String random) throws IOException {
+    static synchronized String createOrderId(boolean gasStation, String random) throws IOException {
         try {
             try (Connection connection = MerchantService.jdbcDataSource.getConnection();
-                 CallableStatement stmt = connection.prepareCall("{call CreateOrderIdSP(?,?)}");) {
+                 CallableStatement stmt = connection.prepareCall("{call CreateOrderIdSP(?,?,?)}");) {
                 stmt.registerOutParameter(1, java.sql.Types.CHAR);
-                stmt.setString(2, random);
+                stmt.setBoolean(2, gasStation);
+                stmt.setString(3, random);
                 stmt.execute();
                 return stmt.getString(1);
             }
@@ -66,23 +68,25 @@ public class DataBaseOperations {
     }
     
     static class ReceiptInfo {
+        boolean gasStation;  // Highly unusual solution...
         int status;
         String pathData;
     }
 
-    static final String RECEIPT_FETCH_SQL = 
-            "SELECT ReceiptStatus, ReceiptPathData FROM ORDERS WHERE Id=?";
+    static final String RECEIPT_STATUS_SQL = 
+            "SELECT GasStation, ReceiptStatus, ReceiptPathData FROM ORDERS WHERE Id=?";
 
     static ReceiptInfo getReceiptStatus(String orderId) 
     throws SQLException, IOException {
         try (Connection connection = MerchantService.jdbcDataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(RECEIPT_FETCH_SQL);) {
+             PreparedStatement stmt = connection.prepareStatement(RECEIPT_STATUS_SQL);) {
             stmt.setString(1, orderId);
             try (ResultSet rs = stmt.executeQuery();) {
                 if (rs.next()) {
                     ReceiptInfo receiptInfo = new ReceiptInfo();
-                    receiptInfo.status = rs.getInt(1);
-                    receiptInfo.pathData = rs.getString(2);
+                    receiptInfo.gasStation = rs.getBoolean(1);
+                    receiptInfo.status = rs.getInt(2);
+                    receiptInfo.pathData = rs.getString(3);
                     return receiptInfo;
                 }
                 return null;
@@ -90,17 +94,71 @@ public class DataBaseOperations {
         }
     }
 
+    /*
+        CREATE PROCEDURE CreateReceiptSP (IN p_Id CHAR(16) CHARACTER SET latin1,
+                                          IN p_Amount DECIMAL(8,2),
+                                          IN p_Currency CHAR(3),
+                                          IN p_PaymentMethodUrl VARCHAR(50),
+                                          IN p_ProviderAuthorityUrl VARCHAR(100),
+                                          IN p_ProviderTransactionId VARCHAR(50),
+                                          IN p_AccountReference VARCHAR(30))
+    */
+
     static void createReceipt(ResultData resultData) throws IOException {
         try {
             try (Connection connection = MerchantService.jdbcDataSource.getConnection();
-                 CallableStatement stmt = connection.prepareCall("{call CreateReceiptSP(?,?,?)}");) {
+                 CallableStatement stmt = connection.prepareCall("{call CreateReceiptSP(?,?,?,?,?,?,?)}");) {
                 stmt.setString(1, resultData.orderId);
                 stmt.setBigDecimal(2, resultData.amount);
                 stmt.setString(3, resultData.currency.toString());
+                stmt.setString(4, resultData.paymentMethod.getPaymentMethodUrl());
+                stmt.setString(5, "auth");
+                stmt.setString(6, "id");
+                stmt.setString(7, resultData.accountReference);
                 stmt.execute();
             }
         } catch (SQLException e) {
             throw new IOException(e);
+        }
+    }
+
+    static final String RECEIPT_FETCH_CORE_SQL = 
+            "SELECT Amount," + 
+                   "Currency," +
+                   "PaymentMethodUrl," +
+                   "ProviderAuthorityUrl," +
+                   "ProviderTransactionId FROM PAYMENTS WHERE Id=?";
+
+    static ReceiptEncoder getReceiptData(String orderId, String payeeAuthorityUrl) 
+    throws IOException, SQLException {
+        try (Connection connection = MerchantService.jdbcDataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(RECEIPT_FETCH_CORE_SQL);) {
+            stmt.setString(1, orderId);
+            try (ResultSet rs = stmt.executeQuery();) {
+                if (!rs.next()) {
+                    throw new IOException("Missing core data");
+                }
+/*
+    public ReceiptEncoder(String referenceId,
+                          BigDecimal amount,
+                          Currencies currency,
+                          String paymentMethodName, 
+                          String providerAuthorityUrl,
+                          String payeeAuthorityUrl,
+                          GregorianCalendar providerTimeStamp,
+                          String providerReferenceId) throws IOException {
+*/
+                ReceiptEncoder receiptEncoder = new ReceiptEncoder(
+                           orderId,
+                           rs.getBigDecimal(1),
+                           Currencies.valueOf(rs.getString(2)),
+                           PaymentMethods.fromTypeUrl(rs.getString(3)).getCommonName(),
+                           rs.getString(4),
+                           payeeAuthorityUrl,
+                           new GregorianCalendar(),
+                           rs.getString(5));
+                return receiptEncoder;
+            }
         }
     }
 }
