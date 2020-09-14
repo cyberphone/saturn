@@ -33,7 +33,7 @@ public class ResultData implements Serializable {
 
     public Currencies currency;
 
-    public String referenceId;
+    public String orderId;
 
     public String accountReference;
 
@@ -42,5 +42,5 @@ public class ResultData implements Serializable {
     public ERROR transactionError;
     
     public AuthorizationResponse optionalRefund;
-    
+
 }

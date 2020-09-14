@@ -63,7 +63,7 @@ public interface BaseProperties {
     String SUPPORTED_PAYMENT_METHODS_JSON   = "supportedPaymentMethods";    // List of accepted payment methods (URLs)
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)
     String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User and bank authorization signature
-    String AUTHORIZATION_HASH_JSON          = "authorizationHash";          // See Receipts
+    String NOT_AVAILABLE_STATUS_JSON        = "notAvailableStatus";         // See Receipts
     String USER_AUTHORIZATION_METHOD_JSON   = "userAuthorizationMethod";    // PIN, Fingerprint, etc.
     String REQUEST_SIGNATURE_JSON           = "requestSignature";           // Payee signature
     String SUB_TYPE_JSON                    = "subType";                    // For non-direct payments

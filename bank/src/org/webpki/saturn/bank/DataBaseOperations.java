@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.logging.Logger;
 
 import org.webpki.crypto.HashAlgorithms;
+
 import org.webpki.saturn.common.Currencies;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.TransactionTypes;

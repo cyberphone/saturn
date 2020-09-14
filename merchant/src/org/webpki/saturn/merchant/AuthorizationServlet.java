@@ -61,7 +61,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     boolean processCall(MerchantDescriptor merchant,
                         PaymentRequestDecoder paymentRequest, 
                         PayerAuthorization payerAuthorization,
-                        String receiptUrl,
+                        WalletRequest walletRequest,
                         HttpSession session,
                         HttpServletRequest request,
                         HttpServletResponse response,
@@ -134,7 +134,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         request.getRemoteAddr(),
                                         paymentRequest,
                                         paymentBackendMethodEncoder,
-                                        merchant.getReferenceId(),
+                                        paymentRequest.getReferenceId() + "-1",
                                         paymentNetwork.signer);
 
         // Call Payer bank
@@ -143,13 +143,15 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                                            providerAuthority.getServiceUrl(),
                                                            authorizationRequest);
         // Receipt handling
-        if (receiptUrl != null) {
-             DataBaseOperations.storeReceipt(
-                     new ReceiptEncoder(receiptUrl,
+        if (walletRequest.receiptUrl != null) {
+/*
+             DataBaseOperations.updateReceiptInformation(walletRequest.orderId,
+                     new ReceiptEncoder(walletRequest.receiptUrl,
                                         clientPaymentMethodUrl,
+                                        payerAuthorization.getProviderAuthorityUrl(),
                                         payeeAuthorityUrl,
-                                        paymentRequest,
-                                        payerAuthorization.getAuthorizationHash()));
+                                        paymentRequest));
+*/
         }
 
         if (debug) {
@@ -179,7 +181,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Create a viewable response
         ResultData resultData = new ResultData();
         resultData.amount = paymentRequest.getAmount();  // Gas Station will upgrade amount
-        resultData.referenceId = paymentRequest.getReferenceId();
+        resultData.orderId = paymentRequest.getReferenceId();
         resultData.currency = paymentRequest.getCurrency();
         resultData.paymentMethod = authorizationResponse.getAuthorizationRequest().getPaymentMethod();
         String accountReference = authorizationResponse.getOptionalAccountReference();
@@ -195,26 +197,31 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             resultData.optionalRefund = authorizationResponse;
         }
 
-        // Two-phase operation: perform the final step
-        if (cardPayment && session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
-            transactionOperation.urlToCall = ownProviderAuthority.getServiceUrl();
-            transactionOperation.verifier = MerchantService.acquirerRoot;
-            if (debugData != null) {
-                debugData.acquirerAuthority = ownProviderAuthority.getRoot();
-            }
-            resultData.transactionError =
-                processTransaction(merchant,
-                                   transactionOperation,
-                                   // Just a copy since we don't have a complete scenario 
-                                   paymentRequest.getAmount(),                                
-                                   urlHolder,
-                                   debugData);
-        }
-
         session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
-        
-        // Gas Station: Save reservation part for future fulfillment
-        if (session.getAttribute(GAS_STATION_SESSION_ATTR) != null) {
+
+        // Avoid the special treatments for gas station payments
+        if (session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
+
+            // Card operation: perform the final step
+            if (cardPayment) {
+                transactionOperation.urlToCall = ownProviderAuthority.getServiceUrl();
+                transactionOperation.verifier = MerchantService.acquirerRoot;
+                if (debugData != null) {
+                    debugData.acquirerAuthority = ownProviderAuthority.getRoot();
+                }
+                resultData.transactionError =
+                    processTransaction(merchant,
+                                       transactionOperation,
+                                       // Just a copy in this simple scenario 
+                                       paymentRequest.getAmount(),                                
+                                       urlHolder,
+                                       debugData);
+            }
+            DataBaseOperations.createReceipt(resultData);
+
+        } else {
+ 
+            // Gas Station: Save reservation part for future fulfillment
             if (cardPayment) {
                 transactionOperation.urlToCall = ownProviderAuthority.getServiceUrl();
                 transactionOperation.verifier = MerchantService.acquirerRoot;
@@ -243,7 +250,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             TransactionRequest.encode(transactionOperation.authorizationResponse,
                                       transactionOperation.urlToCall,
                                       actualAmount,
-                                      merchant.getReferenceId(),
+                                      transactionOperation.authorizationResponse
+                                              .getAuthorizationRequest()
+                                                  .getPaymentRequest().getReferenceId() + "-2",
                                       merchant.paymentMethods.get(
                                               transactionOperation.authorizationResponse
                                                   .getAuthorizationRequest()

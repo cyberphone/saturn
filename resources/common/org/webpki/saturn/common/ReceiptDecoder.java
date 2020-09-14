@@ -22,9 +22,13 @@ import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.util.ISODateTime;
 
-public class ReceiptEncoder implements BaseProperties {
+public class ReceiptDecoder implements BaseProperties {
     
-    public ReceiptEncoder(String receiptUrl,
+    public final static int PENDING     = 0;
+    public final static int AVAILABLE   = 1;
+    public final static int FAILED      = 2;
+    
+    public ReceiptDecoder(String receiptUrl,
                           String clientPaymentMethodUrl, 
                           String providerAuthorityUrl,
                           String payeeAuthorityUrl,
@@ -41,11 +45,6 @@ public class ReceiptEncoder implements BaseProperties {
                 .setDateTime(TIME_STAMP_JSON, 
                              paymentRequest.timeStamp, 
                              ISODateTime.UTC_NO_SUBSECONDS);
-    }
-
-    public ReceiptEncoder(int notAvailableStatus) throws IOException {
-        receiptDocument = Messages.RECEIPT.createBaseMessage()
-                .setInt(NOT_AVAILABLE_STATUS_JSON, notAvailableStatus);
     }
 
     JSONObjectWriter receiptDocument;

@@ -30,17 +30,14 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.KeyEncryptionAlgorithms;
 
-import org.webpki.crypto.HashAlgorithms;
-
-import org.webpki.util.Base64URL;
-
 public class PayerAuthorization implements BaseProperties {
     
     static final JSONCryptoHelper.Options options =
         new JSONCryptoHelper.Options()
                 .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY);
     
-    static JSONDecryptionDecoder getEncryptedAuthorization(JSONObjectReader rd) throws IOException {
+    static JSONDecryptionDecoder getEncryptedAuthorization(JSONObjectReader rd) 
+    throws IOException {
         return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options);
     }
 
@@ -59,12 +56,6 @@ public class PayerAuthorization implements BaseProperties {
         return encryptedAuthorization;
     }
 
-    public String getAuthorizationHash() throws IOException {
-        return Base64URL.encode(
-                HashAlgorithms.SHA256.digest(
-                        encryptedAuthorization.serializeToBytes(JSONOutputFormats.CANONICALIZED)));
-    }
-
     String providerAuthorityUrl;
     public String getProviderAuthorityUrl() {
         return providerAuthorityUrl;
@@ -81,8 +72,10 @@ public class PayerAuthorization implements BaseProperties {
                                           DataEncryptionAlgorithms dataEncryptionAlgorithm,
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                           PublicKey encryptionKey,
-                                          String optionalKeyId) throws IOException, GeneralSecurityException {
-        JSONAsymKeyEncrypter encrypter = new JSONAsymKeyEncrypter(encryptionKey, keyEncryptionAlgorithm);
+                                          String optionalKeyId)
+    throws IOException, GeneralSecurityException {
+        JSONAsymKeyEncrypter encrypter = new JSONAsymKeyEncrypter(encryptionKey, 
+                                                                  keyEncryptionAlgorithm);
         if (optionalKeyId != null) {
             encrypter.setKeyId(optionalKeyId).setOutputPublicKeyInfo(false);
         }
@@ -92,7 +85,8 @@ public class PayerAuthorization implements BaseProperties {
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, 
                        JSONObjectWriter
                           .createEncryptionObject(
-                              unencryptedAuthorizationData.serializeToBytes(JSONOutputFormats.NORMALIZED),
+                              unencryptedAuthorizationData.serializeToBytes(
+                                      JSONOutputFormats.NORMALIZED),
                               dataEncryptionAlgorithm,
                               encrypter));
     }

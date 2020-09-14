@@ -524,7 +524,7 @@ public class HTML implements MerchantSessionProperties {
             .append(" Type</th><th>")
             .append(resultData.paymentMethod.isCardPayment() ? "Card Reference" : "Account Number")   
             .append("</th></tr><tr><td style=\"text-align:center\">")  
-            .append(resultData.referenceId)
+            .append(resultData.orderId)
             .append("</td><td style=\"text-align:center\">")
             .append(resultData.currency.amountToDisplayString(resultData.amount, false))
             .append("</td><td style=\"text-align:center\">")

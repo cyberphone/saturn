@@ -18,6 +18,7 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -36,32 +37,70 @@ public class DataBaseOperations {
     static void testConnection() throws SQLException {
         try (Connection connection = MerchantService.jdbcDataSource.getConnection();) { }
     }
-
-    static final String RECEIPT_INSERT_SQL = 
-            "INSERT INTO RECEIPTS(SequenceId, Receipt) VALUES(?, ?)";
-
-    static void storeReceipt(ReceiptEncoder receiptEncoder) 
-    throws SQLException, IOException {
-        String receiptUrl = receiptEncoder.getReceiptUrl();
-        try (Connection connection = MerchantService.jdbcDataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(RECEIPT_INSERT_SQL);) {
-            stmt.setString(1, receiptUrl.substring(receiptUrl.lastIndexOf("/") + 1));
-            stmt.setString(2, receiptEncoder.getReceiptDocument()
-                                  .serializeToString(JSONOutputFormats.NORMALIZED));
-            stmt.executeUpdate();
+    
+    static synchronized String createOrderId(String random) throws IOException {
+        try {
+            try (Connection connection = MerchantService.jdbcDataSource.getConnection();
+                 CallableStatement stmt = connection.prepareCall("{call CreateOrderIdSP(?,?)}");) {
+                stmt.registerOutParameter(1, java.sql.Types.CHAR);
+                stmt.setString(2, random);
+                stmt.execute();
+                return stmt.getString(1);
+            }
+        } catch (SQLException e) {
+            throw new IOException(e);
         }
     }
 
-    static final String RECEIPT_FETCH_SQL = "SELECT Receipt FROM RECEIPTS WHERE SequenceId=?";
+    static final String RECEIPT_UPDATE_SQL = "UPDATE ORDERS SET Receipt=? WHERE ID=?";
 
-    static String fetchReceipt(String sequenceId) 
+    static void updateReceiptInformation(String orderId, ReceiptEncoder receiptEncoder) 
+    throws SQLException, IOException {
+        try (Connection connection = MerchantService.jdbcDataSource.getConnection();
+             PreparedStatement stmt = connection.prepareStatement(RECEIPT_UPDATE_SQL);) {
+            stmt.setString(1, receiptEncoder.getReceiptDocument()
+                    .serializeToString(JSONOutputFormats.NORMALIZED));
+            stmt.setString(2, orderId);
+            stmt.executeUpdate();
+        }
+    }
+    
+    static class ReceiptInfo {
+        int status;
+        String pathData;
+    }
+
+    static final String RECEIPT_FETCH_SQL = 
+            "SELECT ReceiptStatus, ReceiptPathData FROM ORDERS WHERE Id=?";
+
+    static ReceiptInfo getReceiptStatus(String orderId) 
     throws SQLException, IOException {
         try (Connection connection = MerchantService.jdbcDataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(RECEIPT_FETCH_SQL);) {
-            stmt.setString(1, sequenceId);
+            stmt.setString(1, orderId);
             try (ResultSet rs = stmt.executeQuery();) {
-                return rs.next() ? rs.getString(1) : null;
+                if (rs.next()) {
+                    ReceiptInfo receiptInfo = new ReceiptInfo();
+                    receiptInfo.status = rs.getInt(1);
+                    receiptInfo.pathData = rs.getString(2);
+                    return receiptInfo;
+                }
+                return null;
             }
+        }
+    }
+
+    static void createReceipt(ResultData resultData) throws IOException {
+        try {
+            try (Connection connection = MerchantService.jdbcDataSource.getConnection();
+                 CallableStatement stmt = connection.prepareCall("{call CreateReceiptSP(?,?,?)}");) {
+                stmt.setString(1, resultData.orderId);
+                stmt.setBigDecimal(2, resultData.amount);
+                stmt.setString(3, resultData.currency.toString());
+                stmt.execute();
+            }
+        } catch (SQLException e) {
+            throw new IOException(e);
         }
     }
 }

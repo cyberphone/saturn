@@ -96,6 +96,7 @@ public class ResultServlet extends HttpServlet implements MerchantSessionPropert
                                                             actualAmount,
                                                             urlHolder,
                                                             debugData);
+            DataBaseOperations.createReceipt(resultData);
             HTML.gasStationResultPage(response,
                                       fuelType,
                                       decilitres,

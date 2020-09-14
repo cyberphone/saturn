@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
+import org.webpki.saturn.common.ReceiptDecoder;
+import org.webpki.saturn.common.ReceiptEncoder;
 
 public class ReceiptServlet extends HttpServlet {
 
@@ -38,19 +40,30 @@ public class ReceiptServlet extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
-        String sequenceId = request.getPathInfo();
-        if (!sequenceId.isEmpty()) {
-            sequenceId = sequenceId.substring(1);
-        }
         try {
-            String receipt = DataBaseOperations.fetchReceipt(sequenceId);
-            if (receipt == null) {
+            String pathInfo = request.getPathInfo();
+            if (pathInfo.length() != 39) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.flushBuffer();
                 return;
             }
-            JSONObjectReader json = JSONParser.parse(receipt);
-            HTML.debugPage(response, json.serializeToString(JSONOutputFormats.PRETTY_HTML), false);
+            String orderId = pathInfo.substring(1, 17);
+            DataBaseOperations.ReceiptInfo receiptStatus = DataBaseOperations.getReceiptStatus(orderId);
+            if (receiptStatus == null || !receiptStatus.pathData.equals(pathInfo.substring(17))) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.flushBuffer();
+                return;
+            }
+
+            ReceiptEncoder receipt;
+            // Receipt URL is valid but that doesn't mean that there is any receipt data...
+            if (receiptStatus.status == ReceiptDecoder.AVAILABLE) {
+                receipt = null;
+            } else {
+                receipt = new ReceiptEncoder(receiptStatus.status);
+            }
+            HTML.debugPage(response, receipt.getReceiptDocument()
+                                         .serializeToString(JSONOutputFormats.PRETTY_HTML), false);
         } catch (Exception e) {
             HTML.debugPage(response, e.getMessage(), false);
         }

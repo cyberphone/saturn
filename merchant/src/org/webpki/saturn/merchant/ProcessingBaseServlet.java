@@ -66,7 +66,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     abstract boolean processCall(MerchantDescriptor merchant, 
                                  PaymentRequestDecoder paymentRequest, 
                                  PayerAuthorization payerAuthorization,
-                                 String receiptUrl,
+                                 WalletRequest walletRequest,
                                  HttpSession session,
                                  HttpServletRequest request,
                                  HttpServletResponse response,
@@ -133,7 +133,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             if (processCall(merchant,
                             paymentRequest, 
                             payerAuthorization,
-                            walletRequest.receiptUrl,
+                            walletRequest,
                             session,
                             request,
                             response,
@@ -146,7 +146,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                 QRSessions.optionalSessionSetReady(qrId);
     
                 logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
-                logger.info("Receipt path=" + payerAuthorization.getAuthorizationHash());
+                logger.info("Receipt path=" + walletRequest.receiptUrl);
                 /////////////////////////////////////////////////////////////////////////////////////////
                 // Normal return                                                                       //
                 /////////////////////////////////////////////////////////////////////////////////////////

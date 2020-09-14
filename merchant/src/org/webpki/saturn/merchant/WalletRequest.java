@@ -21,17 +21,18 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import java.text.SimpleDateFormat;
+import java.security.SecureRandom;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import javax.servlet.http.HttpSession;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
+
+import org.webpki.util.Base64URL;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.TimeUtils;
@@ -47,11 +48,9 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
     SavedShoppingCart savedShoppingCart;
     JSONObjectWriter requestObject;
     JSONObjectWriter paymentRequest;
+    String orderId;
     String receiptUrl;
     
-    private static int receiptNumber;
-    private static String currentDate = ""; 
-
     WalletRequest(HttpSession session,
                   NonDirectPaymentEncoder optionalNonDirectPayment) throws IOException {
         debugMode = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
@@ -62,6 +61,11 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         MerchantDescriptor merchant = MerchantService.getMerchant(session);
 
+        byte[] cryptoRandom = new byte[16];
+        new SecureRandom().nextBytes(cryptoRandom);
+        String random = Base64URL.encode(cryptoRandom);
+        orderId = DataBaseOperations.createOrderId(random);
+
         // Create a payment request
         paymentRequest =
             PaymentRequestEncoder.encode(merchant.commonName, 
@@ -71,7 +75,7 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
                                              MerchantService.currency.getDecimals()),
                                          MerchantService.currency,
                                          optionalNonDirectPayment,
-                                         merchant.getReferenceId(),
+                                         orderId,
                                          new GregorianCalendar(),
                                          TimeUtils.inMinutes(30));
         
@@ -84,23 +88,13 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
                                                paymentMethodDescriptor.authorityUrl));
         }
         if (true) {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            String yyyyMmDd = sdf.format(System.currentTimeMillis());
-            if (!yyyyMmDd.equals(currentDate)) {
-                currentDate = yyyyMmDd;
-                receiptNumber = 0;
-            }
-            receiptUrl = MerchantService.merchantBaseUrl + 
-                             "/receipts/" +
-                             yyyyMmDd +
-                             "." + (++receiptNumber);
+            receiptUrl = MerchantService.merchantBaseUrl + "/receipts/" + orderId + random;
         }
 
         requestObject = PaymentClientRequestEncoder.encode(supportedPaymentMethods,
                                                            receiptUrl,
                                                            paymentRequest,
-                                                           MerchantService.noMatchingMethodsUrl); 
+                                                           MerchantService.noMatchingMethodsUrl);
         
         if (debugMode) {
             debugData.InvokeWallet = new JSONObjectReader(requestObject);

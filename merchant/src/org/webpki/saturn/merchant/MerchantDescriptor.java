@@ -20,7 +20,6 @@ import java.util.LinkedHashMap;
 
 public class MerchantDescriptor {
     
-    int referenceId = 1000000;
     String commonName;
     String homePage;
     LinkedHashMap<String, PaymentMethodDescriptor> paymentMethods;
@@ -31,9 +30,5 @@ public class MerchantDescriptor {
         this.homePage = homePage;
         this.commonName = commonName;
         this.paymentMethods = paymentMethods;
-    }
-
-    String getReferenceId() {
-        return "#" + (referenceId++);
     }
 }
