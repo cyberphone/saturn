@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.security.GeneralSecurityException;
 
 import java.util.ArrayList;
@@ -31,7 +33,7 @@ import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.ISODateTime;
 
-public class AuthorizationResponseDecoder implements BaseProperties {
+public class AuthorizationResponseDecoder extends ProviderResponseDecoder {
     
     public AuthorizationResponseDecoder(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
@@ -45,7 +47,7 @@ public class AuthorizationResponseDecoder implements BaseProperties {
                         .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED));
         referenceId = rd.getString(REFERENCE_ID_JSON);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON, 
                 new JSONCryptoHelper.Options()
@@ -58,7 +60,7 @@ public class AuthorizationResponseDecoder implements BaseProperties {
 
     Software software;
 
-    GregorianCalendar dateTime;
+    GregorianCalendar timeStamp;
 
     String optionalLogData;
     public String getOptionalLogData() {
@@ -91,7 +93,27 @@ public class AuthorizationResponseDecoder implements BaseProperties {
             JSONDecoderCache knownAccountTypes, 
             ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
     throws IOException, GeneralSecurityException {
-         return (AccountDataDecoder) knownAccountTypes.parse(
+        return (AccountDataDecoder) knownAccountTypes.parse(
                  encryptedAccountData.getDecryptedData(decryptionKeys));
+    }
+
+    @Override
+    public BigDecimal getAmount() {
+        return authorizationRequest.paymentRequest.amount;
+    }
+
+    @Override
+    public AuthorizationResponseDecoder getAuthorizationResponse() {
+        return this;
+    }
+
+    @Override
+    JSONObjectReader getRoot() {
+        return root;
+    }
+
+    @Override
+    public GregorianCalendar getTimeStamp() {
+        return timeStamp;
     }
 }

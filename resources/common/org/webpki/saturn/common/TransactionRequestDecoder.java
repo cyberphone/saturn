@@ -31,12 +31,14 @@ import org.webpki.util.ISODateTime;
 
 public class TransactionRequestDecoder implements BaseProperties {
     
-    public TransactionRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
+    public TransactionRequestDecoder(JSONObjectReader rd, Boolean cardPayment) throws IOException {
         root = Messages.TRANSACTION_REQUEST.parseBaseMessage(rd);
-        authorizationResponse = new AuthorizationResponseDecoder(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
+        authorizationResponse = new AuthorizationResponseDecoder(
+                Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         actualAmount = rd.getMoney(AMOUNT_JSON,
-                                   authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
+                                   authorizationResponse
+                                       .authorizationRequest.paymentRequest.currency.decimals);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
@@ -44,8 +46,9 @@ public class TransactionRequestDecoder implements BaseProperties {
                 new JSONCryptoHelper.Options()
                     .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
                     .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN));
-        if (cardNetwork != null &&
-            authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ cardNetwork) {
+        if (cardPayment != null &&
+            authorizationResponse
+                .authorizationRequest.paymentMethod.isCardPayment() ^ cardPayment) {
             throw new IOException("Incompatible payment method: " + 
                 authorizationResponse.authorizationRequest.paymentMethod.getPaymentMethodUrl());
         }

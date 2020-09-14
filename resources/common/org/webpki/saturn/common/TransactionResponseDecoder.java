@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
@@ -26,7 +28,7 @@ import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.ISODateTime;
 
-public class TransactionResponseDecoder implements BaseProperties {
+public class TransactionResponseDecoder extends ProviderResponseDecoder {
     
     public static enum ERROR {OUT_OF_FUNDS, DELETED_AUTHORIZATION}
 
@@ -39,7 +41,7 @@ public class TransactionResponseDecoder implements BaseProperties {
         }
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
-        dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON,
                 new JSONCryptoHelper.Options()
@@ -52,7 +54,7 @@ public class TransactionResponseDecoder implements BaseProperties {
 
     Software software;
 
-    GregorianCalendar dateTime;
+    GregorianCalendar timeStamp;
 
     ERROR transactionError;
     public ERROR getTransactionError() {
@@ -78,5 +80,25 @@ public class TransactionResponseDecoder implements BaseProperties {
     TransactionRequestDecoder transactionRequest;
     public TransactionRequestDecoder getTransactionRequest() {
         return transactionRequest;
+    }
+
+    @Override
+    public BigDecimal getAmount() {
+        return transactionRequest.actualAmount;
+    }
+
+    @Override
+    public AuthorizationResponseDecoder getAuthorizationResponse() {
+        return transactionRequest.authorizationResponse;
+    }
+
+    @Override
+    JSONObjectReader getRoot() {
+        return root;
+    }
+
+    @Override
+    public GregorianCalendar getTimeStamp() {
+        return timeStamp;
     }
 }

@@ -106,7 +106,8 @@ public class AuthorizationDataDecoder implements BaseProperties {
         return dataEncryptionKey;
     }
 
-    LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = new LinkedHashMap<>();
+    LinkedHashMap<String,UserResponseItem> optionalUserResponseItems = 
+            new LinkedHashMap<>();
     public LinkedHashMap<String,UserResponseItem> getUserResponseItems() {
         return optionalUserResponseItems;
     }
