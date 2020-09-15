@@ -20,23 +20,15 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
-import java.util.GregorianCalendar;
-
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecryptionDecoder;
-import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 import org.webpki.json.DataEncryptionAlgorithms;
-import org.webpki.json.JSONSymKeyEncrypter;
 
-import org.webpki.util.ISODateTime;
-
-public class ProviderUserResponse implements BaseProperties {
+public class ProviderUserResponseDecoder implements BaseProperties {
  
-    public ProviderUserResponse(JSONObjectReader rd) throws IOException {
+    public ProviderUserResponseDecoder(JSONObjectReader rd) throws IOException {
         Messages.PROVIDER_USER_RESPONSE.parseBaseMessage(rd);
         encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON)
                 .getEncryptionObject(new JSONCryptoHelper.Options()
@@ -55,29 +47,5 @@ public class ProviderUserResponse implements BaseProperties {
                                   encryptedData.getDataEncryptionAlgorithm().toString());
         }
         return new EncryptedMessage(JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey))); 
-    }
-
-    public static JSONObjectWriter encode(String requester,
-                                          String text,
-                                          UserChallengeItem[] optionalUserChallengeItems,
-                                          byte[] dataEncryptionKey,
-                                          DataEncryptionAlgorithms dataEncryptionAlgorithm)
-    throws IOException, GeneralSecurityException {
-        JSONObjectWriter wr = new JSONObjectWriter()
-            .setString(REQUESTER_JSON, requester)
-            .setString(TEXT_JSON, text);
-        if (optionalUserChallengeItems != null && optionalUserChallengeItems.length > 0) {
-            JSONArrayWriter aw = wr.setArray(USER_CHALLENGE_ITEMS_JSON);
-            for (UserChallengeItem UserChallengeItem : optionalUserChallengeItems) {
-                aw.setObject(UserChallengeItem.writeObject());
-            }
-        }
-        wr.setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS);
-        return Messages.PROVIDER_USER_RESPONSE.createBaseMessage()
-            .setObject(ENCRYPTED_MESSAGE_JSON,
-                JSONObjectWriter
-                    .createEncryptionObject(wr.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                                                dataEncryptionAlgorithm,
-                                                                new JSONSymKeyEncrypter(dataEncryptionKey)));
     }
 }

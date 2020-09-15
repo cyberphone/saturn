@@ -22,20 +22,19 @@ import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.ISODateTime;
 
-public class RefundResponse implements BaseProperties {
+public class RefundResponseDecoder implements BaseProperties {
     
-    public RefundResponse(JSONObjectReader rd) throws IOException {
+    public RefundResponseDecoder(JSONObjectReader rd) throws IOException {
         root = Messages.REFUND_RESPONSE.parseBaseMessage(rd);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        refundRequest = new RefundRequest(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
+        refundRequest = new RefundRequestDecoder(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
         signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON,
                 new JSONCryptoHelper.Options()
                     .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
@@ -64,24 +63,8 @@ public class RefundResponse implements BaseProperties {
         return signatureDecoder;
     }
 
-
-    RefundRequest refundRequest;
-    public RefundRequest getRefundRequest() {
+    RefundRequestDecoder refundRequest;
+    public RefundRequestDecoder getRefundRequest() {
         return refundRequest;
-    }
-
-    public static JSONObjectWriter encode(RefundRequest refundRequest,
-                                          String referenceId,
-                                          String optionalLogData,
-                                          ServerX509Signer signer) throws IOException {
-        return Messages.REFUND_RESPONSE.createBaseMessage()
-            .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr,
-                                                TransactionResponseEncoder.SOFTWARE_NAME,
-                                                TransactionResponseEncoder.SOFTWARE_VERSION))
-            .setObject(Messages.REFUND_REQUEST.lowerCamelCase(), refundRequest.root)
-            .setSignature(AUTHORIZATION_SIGNATURE_JSON, signer);
     }
 }

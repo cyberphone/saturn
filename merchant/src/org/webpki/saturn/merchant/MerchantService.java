@@ -140,7 +140,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static String merchantBaseUrl;
 
-    static DataSource jdbcDataSource;
+    public static DataSource jdbcDataSource;
 
     static void slowOperationSimulator() throws InterruptedException {
         if (slowOperation) {

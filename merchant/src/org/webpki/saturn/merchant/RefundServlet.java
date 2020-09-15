@@ -36,8 +36,8 @@ import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
-import org.webpki.saturn.common.RefundRequest;
-import org.webpki.saturn.common.RefundResponse;
+import org.webpki.saturn.common.RefundRequestEncoder;
+import org.webpki.saturn.common.RefundResponseDecoder;
 import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
             PaymentMethodDescriptor pmd = merchant.paymentMethods.get(
                     authorizationRequest.getPaymentMethod().getPaymentMethodUrl());
             JSONObjectWriter refundRequestData =
-                RefundRequest.encode(resultData.authorization.getAuthorizationResponse(),
+                RefundRequestEncoder.encode(resultData.authorization.getAuthorizationResponse(),
                                      refundUrl,
                                      resultData.authorization.getAmount(),
                                      pmd.sourceAccounts.get(context),
@@ -112,7 +112,7 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
                 debugData.refundResponse = refundResponseData;
             }
 
-            RefundResponse refundResponse = new RefundResponse(refundResponseData);
+            RefundResponseDecoder refundResponse = new RefundResponseDecoder(refundResponseData);
             refundResponse.getSignatureDecoder().verify(
                authorizationRequest.getPaymentMethod().isCardPayment() ? 
                        MerchantService.acquirerRoot : MerchantService.paymentRoot);

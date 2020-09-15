@@ -25,15 +25,14 @@ import java.util.GregorianCalendar;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Verifier;
 
 import org.webpki.util.ISODateTime;
 
-public class RefundRequest implements BaseProperties {
+public class RefundRequestDecoder implements BaseProperties {
     
-    public RefundRequest(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
+    public RefundRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponseDecoder(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
@@ -103,27 +102,6 @@ public class RefundRequest implements BaseProperties {
     AuthorizationResponseDecoder authorizationResponse;
     public AuthorizationResponseDecoder getAuthorizationResponse() {
         return authorizationResponse;
-    }
-
-    public static JSONObjectWriter encode(AuthorizationResponseDecoder authorizationResponse,
-                                          String recipientUrl,
-                                          BigDecimal amount,
-                                          AccountDataEncoder payeeSourceAccount,
-                                          String referenceId,
-                                          ServerAsymKeySigner signer) throws IOException {
-        return Messages.REFUND_REQUEST.createBaseMessage()
-            .setString(RECIPIENT_URL_JSON, recipientUrl)
-            .setMoney(AMOUNT_JSON,
-                    amount,
-                    authorizationResponse.authorizationRequest.paymentRequest.currency.decimals)
-            .setObject(PAYEE_SOURCE_ACCOUNT_JSON, payeeSourceAccount.writeObject())
-            .setString(REFERENCE_ID_JSON, referenceId)
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr,
-                                                PaymentRequestEncoder.SOFTWARE_NAME, 
-                                                PaymentRequestEncoder.SOFTWARE_VERSION))
-            .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
-            .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 
     public void verifyPayerBank(JSONX509Verifier paymentRoot) throws IOException {

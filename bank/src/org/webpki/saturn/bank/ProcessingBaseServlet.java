@@ -42,7 +42,7 @@ import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.PaymentRequestDecoder;
-import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.ProviderUserResponseEncoder;
 import org.webpki.saturn.common.UrlHolder;
 
 //////////////////////////////////////////////////////////////////////////
@@ -59,10 +59,15 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     static final long MAX_CLIENT_AUTH_AGE          = 20 * 60 * 1000;
     
     // Just a few demo values
-    
+
+    // Standard limit requiring RBA
     static final BigDecimal DEMO_RBA_LIMIT          = new BigDecimal("1000.00");
-    static final BigDecimal DEMO_RBA_LIMIT_CT       = new BigDecimal("1668.00");  // Clear text UI test (3 cars + 5 ice-cream)
-    static final BigDecimal DEMO_FINGER_PRINT_TEST  = new BigDecimal("575.25");   // 1 car + 7 ice-creams
+    
+    // Clear text UI test (3 cars + 5 ice-cream)
+    static final BigDecimal DEMO_RBA_LIMIT_CT       = new BigDecimal("1668.00");
+
+    // 1 car + 7 ice-creams
+    static final BigDecimal DEMO_FINGER_PRINT_TEST  = new BigDecimal("575.25");
 
     static final String RBA_PARM_MOTHER             = "mother";
     static final String MOTHER_NAME                 = "smith";
@@ -79,21 +84,23 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         return r;
     }
 
-    static String amountInHtml(PaymentRequestDecoder paymentRequest, BigDecimal amount) throws IOException {
+    static String amountInHtml(PaymentRequestDecoder paymentRequest, BigDecimal amount) 
+    throws IOException {
         return "<span style=\"font-weight:bold;white-space:nowrap\">" + 
                paymentRequest.getCurrency().amountToDisplayString(amount, true) +
                "</span>";
     }
 
-    static JSONObjectWriter createProviderUserResponse(String text,
-                                                       UserChallengeItem[] optionalUserChallengeItems,
-                                                       AuthorizationDataDecoder authorizationData)
+    static JSONObjectWriter createProviderUserResponse(
+            String text,
+            UserChallengeItem[] optionalUserChallengeItems,
+            AuthorizationDataDecoder authorizationData)
     throws IOException, GeneralSecurityException {
-        return ProviderUserResponse.encode(BankService.bankCommonName,
-                                           text,
-                                           optionalUserChallengeItems,
-                                           authorizationData.getDataEncryptionKey(),
-                                           authorizationData.getDataEncryptionAlgorithm());
+        return ProviderUserResponseEncoder.encode(BankService.bankCommonName,
+                                                  text,
+                                                  optionalUserChallengeItems,
+                                                  authorizationData.getDataEncryptionKey(),
+                                                  authorizationData.getDataEncryptionAlgorithm());
     }
 
     abstract JSONObjectWriter processCall(UrlHolder urlHolder, 
@@ -101,7 +108,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                                           Connection connection) throws Exception;
     
 
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ServletException {
         UrlHolder urlHolder = null;
         Connection connection = null;
         try {
@@ -119,7 +127,10 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             // First control passed...                                                             //
             /////////////////////////////////////////////////////////////////////////////////////////
             if (BankService.logging) {
-                logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
+                logger.info("Call from" + 
+                            urlHolder.getCallerAddress() + 
+                            "with data:\n" +
+                            providerRequest);
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////
@@ -128,14 +139,17 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             if (BankService.jdbcDataSource != null) {
                 connection = BankService.jdbcDataSource.getConnection();
             }
-            JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest, connection);
+            JSONObjectWriter providerResponse = processCall(urlHolder, 
+                                                            providerRequest,
+                                                            connection);
             if (connection != null) {
                 connection.close();
                 connection = null;
             }
 
             if (BankService.logging) {
-                logger.info("Responded to caller"  + urlHolder.getCallerAddress() + "with data:\n" + providerResponse);
+                logger.info("Responded to caller"  + urlHolder.getCallerAddress() + 
+                            "with data:\n" + providerResponse);
             }
 
             /////////////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +166,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             /////////////////////////////////////////////////////////////////////////////////////////
             BankService.rejectedTransactions++;
             String message = (urlHolder == null ? "" : "From" + urlHolder.getCallerAddress() +
-                              (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl()) + "\n") + e.getMessage();
+                              (urlHolder.getUrl() == null ? 
+                                      "" : "URL=" + urlHolder.getUrl()) + "\n") + e.getMessage();
             if (!(e instanceof NormalException)) {
                 logger.log(Level.SEVERE, HttpSupport.getStackTrace(e, message));
             }

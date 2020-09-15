@@ -30,8 +30,8 @@ import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.UrlHolder;
-import org.webpki.saturn.common.RefundRequest;
-import org.webpki.saturn.common.RefundResponse;
+import org.webpki.saturn.common.RefundRequestDecoder;
+import org.webpki.saturn.common.RefundResponseEncoder;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // This is the Saturn "refund" decoder servlet                                           //
@@ -46,7 +46,7 @@ public class RefundServlet extends ProcessingBaseServlet {
                                  Connection connection) throws Exception {
 
         // Decode refund request which embeds the authorization response
-        RefundRequest refundRequest = new RefundRequest(providerRequest, false);
+        RefundRequestDecoder refundRequest = new RefundRequestDecoder(providerRequest, false);
         refundRequest.verifyPayerBank(BankService.paymentRoot);
         
         // Verify that the payee (merchant) is one of our customers
@@ -98,9 +98,9 @@ public class RefundServlet extends ProcessingBaseServlet {
 
 
         // It appears that we succeeded
-        return RefundResponse.encode(refundRequest,
-                                     transactionId,
-                                     optionalLogData,
-                                     BankService.bankKey);
+        return RefundResponseEncoder.encode(refundRequest,
+                                            transactionId,
+                                            optionalLogData,
+                                            BankService.bankKey);
     }
 }

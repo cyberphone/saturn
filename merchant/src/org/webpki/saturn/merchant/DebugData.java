@@ -43,7 +43,7 @@ import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.PaymentMethods;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PaymentRequestEncoder;
-import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.ProviderUserResponseEncoder;
 import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.UserAuthorizationMethods;
 import org.webpki.saturn.common.UserChallengeItem;
@@ -169,7 +169,7 @@ public class DebugData implements Serializable {
             AuthorizationDataDecoder authorizationData = 
                     new AuthorizationDataDecoder(userAuthzSample, new JSONCryptoHelper.Options());
             
-            providerUserResponseSample = new JSONObjectReader(ProviderUserResponse.encode(
+            providerUserResponseSample = new JSONObjectReader(ProviderUserResponseEncoder.encode(
                     "My Bank",
                     "Transaction requests exceeding " +
                       "<span style='font-weight:bold;white-space:nowrap'>&#x20ac;&#x2009;1,000</span>" +

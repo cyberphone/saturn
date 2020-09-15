@@ -39,10 +39,10 @@ import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayeeAuthority;
 import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.ProviderUserResponseDecoder;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.ProviderUserResponse;
 import org.webpki.saturn.common.TransactionResponseDecoder;
 import org.webpki.saturn.common.TransactionRequestEncoder;
 import org.webpki.saturn.common.UrlHolder;
@@ -165,7 +165,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 debugData.softAuthorizationError = true;
             }
             // Parse for syntax only
-            new ProviderUserResponse(resultMessage);
+            new ProviderUserResponseDecoder(resultMessage);
             HttpSupport.writeJsonData(response, new JSONObjectWriter(resultMessage));
             return false;
         }

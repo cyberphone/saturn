@@ -27,7 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.json.JSONOutputFormats;
-
+import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
 
@@ -61,10 +61,19 @@ public class ReceiptServlet extends HttpServlet {
             } else {
                 receipt = new ReceiptEncoder(receiptStatus.status);
             }
-            HTML.debugPage(response, receipt.getReceiptDocument()
+
+            // Are we rather called by a browser?
+            String accept = request.getHeader(HttpSupport.HTTP_ACCEPT_HEADER);
+            if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
+
+                HTML.debugPage(response, receipt.getReceiptDocument()
                                          .serializeToString(JSONOutputFormats.PRETTY_HTML), false);
+            } else {
+                HttpSupport.writeJsonData(response, receipt.getReceiptDocument());
+            }
         } catch (Exception e) {
-            HTML.debugPage(response, e.getMessage(), false);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.flushBuffer();
         }
     }
 }

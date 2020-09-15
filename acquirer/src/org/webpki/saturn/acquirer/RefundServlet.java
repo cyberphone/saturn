@@ -28,8 +28,8 @@ import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.UrlHolder;
-import org.webpki.saturn.common.RefundRequest;
-import org.webpki.saturn.common.RefundResponse;
+import org.webpki.saturn.common.RefundRequestDecoder;
+import org.webpki.saturn.common.RefundResponseEncoder;
 
 import com.supercard.SupercardAccountDataDecoder;
 
@@ -44,7 +44,7 @@ public class RefundServlet extends ProcessingBaseServlet {
     JSONObjectWriter processCall(UrlHolder urlHolder, JSONObjectReader providerRequest) throws Exception {
 
         // Decode refund request which embeds the authorization response
-        RefundRequest refundRequest = new RefundRequest(providerRequest, true);
+        RefundRequestDecoder refundRequest = new RefundRequestDecoder(providerRequest, true);
         refundRequest.verifyPayerBank(AcquirerService.paymentRoot);
         
         // Verify that the payee (merchant) is one of our customers
@@ -89,9 +89,9 @@ public class RefundServlet extends ProcessingBaseServlet {
                                   testMode,
                                   AcquirerService.acquirerKey);
         // It appears that we succeeded
-        return RefundResponse.encode(refundRequest,
-                                     getReferenceId(),
-                                     optionalLogData,
-                                     AcquirerService.acquirerKey);
+        return RefundResponseEncoder.encode(refundRequest,
+                                            getReferenceId(),
+                                            optionalLogData,
+                                            AcquirerService.acquirerKey);
     }
 }

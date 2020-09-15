@@ -105,7 +105,7 @@ import org.webpki.saturn.common.PaymentClientRequestDecoder;
 import org.webpki.saturn.common.AuthorizationDataEncoder;
 import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PaymentRequestDecoder;
-import org.webpki.saturn.common.ProviderUserResponse;
+import org.webpki.saturn.common.ProviderUserResponseDecoder;
 import org.webpki.saturn.common.UserAuthorizationMethods;
 import org.webpki.saturn.common.EncryptedMessage;
 import org.webpki.saturn.common.UserChallengeItem;
@@ -978,12 +978,16 @@ public class Wallet {
                         message.parseBaseMessage(optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
-                            EncryptedMessage encryptedMessage = new ProviderUserResponse(optionalMessage)
-                                .getEncryptedMessage(dataEncryptionKey, selectedCard.dataEncryptionAlgorithm);
-                            logger.info("Decrypted private message:\n" + encryptedMessage.getRoot());
+                            EncryptedMessage encryptedMessage = 
+                                    new ProviderUserResponseDecoder(optionalMessage)
+                                .getEncryptedMessage(dataEncryptionKey, 
+                                                     selectedCard.dataEncryptionAlgorithm);
+                            logger.info("Decrypted private message:\n" + 
+                                        encryptedMessage.getRoot());
                             showProviderDialog(encryptedMessage);
                         } else {
-                            terminatingError(processExternalHtml(new WalletAlertMessage(optionalMessage).getText()));
+                            terminatingError(processExternalHtml(
+                                    new WalletAlertMessage(optionalMessage).getText()));
                         }
                     } catch (Exception e) {
                         terminatingError(e.getMessage());
