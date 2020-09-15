@@ -57,6 +57,7 @@ public class ResultServlet extends HttpServlet implements MerchantSessionPropert
         }
         HTML.shopResultPage(response,
                             HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR),
+                            HomeServlet.getOption(session, REFUND_MODE_SESSION_ATTR),
                             resultData);
     }
 
@@ -87,20 +88,19 @@ public class ResultServlet extends HttpServlet implements MerchantSessionPropert
                 priceX1000 += GasStationServlet.ROUND_UP_FACTOR_X_10 - upround;
             }
             BigDecimal actualAmount = new BigDecimal(priceX1000).divide(new BigDecimal(1000));
-            resultData.amount = actualAmount;
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
             urlHolder.setUrl(reservation.urlToCall);
-            resultData.transactionError = 
-                    AuthorizationServlet.processTransaction(MerchantService.getMerchant(session),
-                                                            reservation,
-                                                            actualAmount,
-                                                            urlHolder,
-                                                            debugData);
-            DataBaseOperations.createReceipt(resultData);
-            HTML.gasStationResultPage(response,
+            AuthorizationServlet.processTransaction(MerchantService.getMerchant(session),
+                                                    reservation,
+                                                    actualAmount,
+                                                    urlHolder,
+                                                    resultData,
+                                                    debugData);
+             HTML.gasStationResultPage(response,
                                       fuelType,
                                       decilitres,
                                       debugData != null,
+                                      HomeServlet.getOption(session, REFUND_MODE_SESSION_ATTR),
                                       resultData);
         } catch (Exception e) {
             String message = (urlHolder.getUrl() == null ? "" : "URL=" + urlHolder.getUrl() + "\n") + e.getMessage();

@@ -519,27 +519,33 @@ public class HTML implements MerchantSessionProperties {
     }
 
     static StringBuilder receiptCore(ResultData resultData, boolean debugMode) throws IOException {
-        StringBuilder s = new StringBuilder("<tr><td><table class=\"tftable\"><tr><th>Our Reference</th><th>Amount</th><th>")
-            .append(resultData.paymentMethod.isCardPayment() ? "Card" : "Account")
+        StringBuilder s = new StringBuilder("<tr><td><table class=\"tftable\">"
+                + "<tr><th>Our Reference</th><th>Amount</th><th>")
+            .append(resultData.authorization.getPaymentMethod().isCardPayment() ? 
+                                                                         "Card" : "Account")
             .append(" Type</th><th>")
-            .append(resultData.paymentMethod.isCardPayment() ? "Card Reference" : "Account Number")   
+            .append(resultData.authorization.getPaymentMethod().isCardPayment() ?
+                                                               "Card Reference" : "Account Number")   
             .append("</th></tr><tr><td style=\"text-align:center\">")  
-            .append(resultData.orderId)
+            .append(resultData.authorization.getPayeeReferenceId())
             .append("</td><td style=\"text-align:center\">")
-            .append(resultData.currency.amountToDisplayString(resultData.amount, false))
+            .append(resultData.authorization.getCurrency().amountToDisplayString(
+                    resultData.authorization.getAmount(), false))
             .append("</td><td style=\"text-align:center\">")
-            .append(resultData.paymentMethod.getCommonName())
+            .append(resultData.authorization.getPaymentMethod().getCommonName())
             .append("</td><td style=\"text-align:center\">")
-            .append(resultData.accountReference)
+            .append(resultData.authorization.getAccountReference())
             .append("</td></tr></table></td></tr>");
         if (debugMode) {
-            s.append("<tr><td style=\"text-align:center;padding-top:20pt\"><a href=\"debug\">Show Debug Info</a></td></tr>");
+            s.append("<tr><td style=\"text-align:center;padding-top:20pt\">"
+                    + "<a href=\"debug\">Show Debug Info</a></td></tr>");
         }
         return s;
     }
 
     static void shopResultPage(HttpServletResponse response,
                                boolean debugMode,
+                               boolean pleaseRefund,
                                ResultData resultData) throws IOException, ServletException {
         StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
             .append("<table>" +
@@ -550,8 +556,8 @@ public class HTML implements MerchantSessionProperties {
             .append(resultData.transactionError == null ?
                     "<tr><td style=\"text-align:center\">" +
                     "Dear customer, your order has been successfully processed!<br>&nbsp;</td></tr>" : "")
-            .append(receiptCore(resultData, debugMode && resultData.optionalRefund == null))
-            .append(optionalRefund(resultData))
+            .append(receiptCore(resultData, debugMode && !pleaseRefund))
+            .append(optionalRefund(pleaseRefund))
             .append("</table></td></tr></table></td></tr>");
         HTML.output(response, HTML.getHTML(STICK_TO_HOME_URL, null, s.toString()));
     }
@@ -577,14 +583,15 @@ public class HTML implements MerchantSessionProperties {
                                      FuelTypes fuelType,
                                      int decilitres,
                                      boolean debugMode,
+                                     boolean pleaseRefund,
                                      ResultData resultData) throws IOException, ServletException {
         if (resultData.transactionError == null) {
             StringBuilder s = new StringBuilder()
                 .append(gasStation("Thank You - Welcome Back!", true))
                 .append(selectionButtons(new FuelTypes[]{fuelType}))
                 .append("<tr><td style=\"height:15pt\"></td></tr>")
-                .append(receiptCore(resultData, debugMode && resultData.optionalRefund == null))
-                .append(optionalRefund(resultData))
+                .append(receiptCore(resultData, debugMode && !pleaseRefund))
+                .append(optionalRefund(pleaseRefund))
                 .append("</table></td></tr>");
             HTML.output(response, 
                         HTML.getHTML(STICK_TO_HOME_URL + updatePumpDisplay(fuelType),
@@ -592,12 +599,12 @@ public class HTML implements MerchantSessionProperties {
                                      GAS_PUMP_LOGO,
                                      s.toString()));
         } else {
-            shopResultPage(response, debugMode, resultData);
+            shopResultPage(response, debugMode, pleaseRefund, resultData);
         }
     }
 
-    static String optionalRefund(ResultData resultData) {
-        return resultData.optionalRefund == null ? "" :
+    static String optionalRefund(boolean pleaseRefund) {
+        return !pleaseRefund ? "" :
             "<tr><td style=\"text-align:center;padding-top:20pt\">" +
             fancyButton("Please refund this transaction...", "Payback time has come...", "location.href='refund'") +
             "</td></tr>";

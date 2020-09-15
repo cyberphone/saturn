@@ -57,7 +57,7 @@ public class ReceiptServlet extends HttpServlet {
             ReceiptEncoder receipt;
             // Receipt URL is valid but that doesn't mean that there is any receipt data...
             if (receiptStatus.status == ReceiptDecoder.AVAILABLE) {
-                receipt = DataBaseOperations.getReceiptData(orderId, receiptStatus.gasStation ? "Gasa" : "Merch");
+                receipt = DataBaseOperations.getReceiptData(orderId);
             } else {
                 receipt = new ReceiptEncoder(receiptStatus.status);
             }

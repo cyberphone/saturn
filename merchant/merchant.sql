@@ -51,8 +51,6 @@ USE MERCHANT;
 CREATE TABLE ORDERS (
     Id                    CHAR(16)  CHARACTER SET latin1  NOT NULL UNIQUE, -- Unique Order Id
 
-    GasStation            BOOLEAN   NOT NULL,                            -- Special for this system        
-
     ReceiptPathData       CHAR(22)  CHARACTER SET latin1  NOT NULL,      -- Random path data for receipt URLs
     
     ReceiptStatus         INT       NOT NULL,                            -- 0: Pending, 1: Available
@@ -81,18 +79,11 @@ INSERT INTO ORDER_ID(IssueDate, Instance) VALUES('00000000', 0);
 CREATE TABLE PAYMENTS (
     Id                    CHAR(16)  CHARACTER SET latin1  NOT NULL UNIQUE, -- Unique Order Id
     
-    Amount                DECIMAL(8,2)  NOT NULL,                        -- Total
-
-    Currency              CHAR(3)       NOT NULL,                        -- "EUR", "USD", "SEK",..
-
-    PaymentMethodUrl      VARCHAR(50)   NOT NULL,                        -- like "https://bankdirect.org"
-
     ProviderAuthorityUrl  VARCHAR(100)  NOT NULL,                        -- Payer Bank
     
-    ProviderTransactionId VARCHAR(50)   NOT NULL,                        -- Representation in Payer Bank
-    
-    AccountReference      VARCHAR(20)   NOT NULL,                        -- Shortened form
-
+    Authorization         TEXT          NOT NULL,                        -- JSON string holding either
+                                                                         -- "AuthorizationResponse" or
+                                                                         -- "TransactionResponse"
     FOREIGN KEY (Id) REFERENCES ORDERS(Id)
 );
 
@@ -107,7 +98,6 @@ DELIMITER //
 -- ReceiptPathData format: {Base64Url(random(byte[16]))
 
 CREATE PROCEDURE CreateOrderIdSP (OUT p_Id CHAR(16),
-                                  IN p_GasStation BOOLEAN,
                                   IN p_ReceiptPathData CHAR(22))
   BEGIN
     DECLARE v_IssueDate CHAR(8);
@@ -122,40 +112,26 @@ CREATE PROCEDURE CreateOrderIdSP (OUT p_Id CHAR(16),
     UPDATE ORDER_ID SET Instance = LAST_INSERT_ID(Instance + 1) LIMIT 1;
     SET p_Id = CONCAT(v_CurrentIssueDate, LPAD(CONVERT(LAST_INSERT_ID(), CHAR), 8, '0'));
     INSERT INTO ORDERS(Id,
-                       GasStation,
                        ReceiptPathData, 
                        ReceiptStatus) 
         VALUES(p_Id,
-               p_GasStation,
                p_ReceiptPathData, 
                0);
   END
 //
 
 
-CREATE PROCEDURE CreateReceiptSP (IN p_Id CHAR(16) CHARACTER SET latin1,
-                                  IN p_Amount DECIMAL(8,2),
-                                  IN p_Currency CHAR(3),
-                                  IN p_PaymentMethodUrl VARCHAR(50),
-                                  IN p_ProviderAuthorityUrl VARCHAR(100),
-                                  IN p_ProviderTransactionId VARCHAR(50),
-                                  IN p_AccountReference VARCHAR(30))
+CREATE PROCEDURE SaveTransactionSP (IN p_Id CHAR(16) CHARACTER SET latin1,
+                                    IN p_ProviderAuthorityUrl VARCHAR(100),
+                                    IN p_Authorization TEXT)
   BEGIN
     UPDATE ORDERS SET ReceiptStatus = 1 WHERE Id = p_Id;
     INSERT INTO PAYMENTS(Id, 
-                         Amount, 
-                         Currency,
-                         PaymentMethodUrl,
                          ProviderAuthorityUrl,
-                         ProviderTransactionId,
-                         AccountReference)
+                         Authorization)
         VALUES(p_Id,
-               p_Amount, 
-               p_Currency,
-               p_PaymentMethodUrl,
                p_ProviderAuthorityUrl,
-               p_ProviderTransactionId,
-               p_AccountReference);
+               p_Authorization);
   END
 //
 

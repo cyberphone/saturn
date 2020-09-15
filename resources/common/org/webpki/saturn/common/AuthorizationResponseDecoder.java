@@ -116,4 +116,9 @@ public class AuthorizationResponseDecoder extends ProviderResponseDecoder {
     public GregorianCalendar getTimeStamp() {
         return timeStamp;
     }
+
+    @Override
+    public String getProviderReferenceId() {
+        return referenceId;
+    }
 }

@@ -101,4 +101,9 @@ public class TransactionResponseDecoder extends ProviderResponseDecoder {
     public GregorianCalendar getTimeStamp() {
         return timeStamp;
     }
+
+    @Override
+    public String getProviderReferenceId() {
+        return referenceId;
+    }
 }

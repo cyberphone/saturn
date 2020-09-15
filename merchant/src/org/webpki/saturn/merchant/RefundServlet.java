@@ -71,12 +71,12 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
             boolean debug = HomeServlet.getOption(session, DEBUG_MODE_SESSION_ATTR);
             
             AuthorizationRequestDecoder authorizationRequest = 
-                    resultData.optionalRefund.getAuthorizationRequest();
+                    resultData.authorization.getAuthorizationResponse().getAuthorizationRequest();
 
-            logger.info("Trying to refund Amount=" + resultData.amount.toString() +
-                          " " + resultData.currency.toString() + 
-                        ", Account=" + resultData.accountReference + 
-                        ", Method=" + resultData.paymentMethod.getPaymentMethodUrl());
+            logger.info("Trying to refund Amount=" + resultData.authorization.getAmount().toString() +
+                          " " + resultData.authorization.getCurrency().toString() + 
+                        ", Account=" + resultData.authorization.getAccountReference() + 
+                        ", Method=" + authorizationRequest.getPaymentMethod().getCommonName());
 
             PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(
                     urlHolder, authorizationRequest.getPayeeAuthorityUrl());
@@ -97,11 +97,11 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
             PaymentMethodDescriptor pmd = merchant.paymentMethods.get(
                     authorizationRequest.getPaymentMethod().getPaymentMethodUrl());
             JSONObjectWriter refundRequestData =
-                RefundRequest.encode(resultData.optionalRefund,
+                RefundRequest.encode(resultData.authorization.getAuthorizationResponse(),
                                      refundUrl,
-                                     resultData.amount,
+                                     resultData.authorization.getAmount(),
                                      pmd.sourceAccounts.get(context),
-                                     resultData.orderId + "-3",
+                                     resultData.authorization.getPayeeReferenceId() + "-3",
                                      pmd.signer);
             JSONObjectReader refundResponseData =
                 MerchantService.externalCalls.postJsonData(urlHolder, refundUrl, refundRequestData);

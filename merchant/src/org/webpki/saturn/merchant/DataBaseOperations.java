@@ -17,19 +17,24 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.GregorianCalendar;
+
 import java.util.logging.Logger;
 
-import org.webpki.json.JSONOutputFormats;
-import org.webpki.saturn.common.Currencies;
-import org.webpki.saturn.common.PaymentMethods;
+import org.webpki.json.JSONDecoderCache;
+import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONParser;
+
+import org.webpki.saturn.common.AuthorizationResponseDecoder;
+import org.webpki.saturn.common.Messages;
+import org.webpki.saturn.common.ProviderResponseDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
+import org.webpki.saturn.common.TransactionResponseDecoder;
 
 public class DataBaseOperations {
 
@@ -39,13 +44,12 @@ public class DataBaseOperations {
         try (Connection connection = MerchantService.jdbcDataSource.getConnection();) { }
     }
     
-    static synchronized String createOrderId(boolean gasStation, String random) throws IOException {
+    static synchronized String createOrderId(String random) throws IOException {
         try {
             try (Connection connection = MerchantService.jdbcDataSource.getConnection();
-                 CallableStatement stmt = connection.prepareCall("{call CreateOrderIdSP(?,?,?)}");) {
+                 CallableStatement stmt = connection.prepareCall("{call CreateOrderIdSP(?,?)}");) {
                 stmt.registerOutParameter(1, java.sql.Types.CHAR);
-                stmt.setBoolean(2, gasStation);
-                stmt.setString(3, random);
+                stmt.setString(2, random);
                 stmt.execute();
                 return stmt.getString(1);
             }
@@ -54,27 +58,13 @@ public class DataBaseOperations {
         }
     }
 
-    static final String RECEIPT_UPDATE_SQL = "UPDATE ORDERS SET Receipt=? WHERE ID=?";
-
-    static void updateReceiptInformation(String orderId, ReceiptEncoder receiptEncoder) 
-    throws SQLException, IOException {
-        try (Connection connection = MerchantService.jdbcDataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(RECEIPT_UPDATE_SQL);) {
-            stmt.setString(1, receiptEncoder.getReceiptDocument()
-                    .serializeToString(JSONOutputFormats.NORMALIZED));
-            stmt.setString(2, orderId);
-            stmt.executeUpdate();
-        }
-    }
-    
     static class ReceiptInfo {
-        boolean gasStation;  // Highly unusual solution...
         int status;
         String pathData;
     }
 
     static final String RECEIPT_STATUS_SQL = 
-            "SELECT GasStation, ReceiptStatus, ReceiptPathData FROM ORDERS WHERE Id=?";
+            "SELECT ReceiptStatus, ReceiptPathData FROM ORDERS WHERE Id=?";
 
     static ReceiptInfo getReceiptStatus(String orderId) 
     throws SQLException, IOException {
@@ -84,9 +74,8 @@ public class DataBaseOperations {
             try (ResultSet rs = stmt.executeQuery();) {
                 if (rs.next()) {
                     ReceiptInfo receiptInfo = new ReceiptInfo();
-                    receiptInfo.gasStation = rs.getBoolean(1);
-                    receiptInfo.status = rs.getInt(2);
-                    receiptInfo.pathData = rs.getString(3);
+                    receiptInfo.status = rs.getInt(1);
+                    receiptInfo.pathData = rs.getString(2);
                     return receiptInfo;
                 }
                 return null;
@@ -95,26 +84,18 @@ public class DataBaseOperations {
     }
 
     /*
-        CREATE PROCEDURE CreateReceiptSP (IN p_Id CHAR(16) CHARACTER SET latin1,
-                                          IN p_Amount DECIMAL(8,2),
-                                          IN p_Currency CHAR(3),
-                                          IN p_PaymentMethodUrl VARCHAR(50),
-                                          IN p_ProviderAuthorityUrl VARCHAR(100),
-                                          IN p_ProviderTransactionId VARCHAR(50),
-                                          IN p_AccountReference VARCHAR(30))
+        CREATE PROCEDURE SaveTransactionSP (IN p_Id CHAR(16) CHARACTER SET latin1,
+                                            IN p_ProviderAuthorityUrl VARCHAR(100),
+                                            IN p_Authorization TEXT)
     */
 
-    static void createReceipt(ResultData resultData) throws IOException {
+    static void saveTransaction(ResultData resultData) throws IOException {
         try {
             try (Connection connection = MerchantService.jdbcDataSource.getConnection();
-                 CallableStatement stmt = connection.prepareCall("{call CreateReceiptSP(?,?,?,?,?,?,?)}");) {
-                stmt.setString(1, resultData.orderId);
-                stmt.setBigDecimal(2, resultData.amount);
-                stmt.setString(3, resultData.currency.toString());
-                stmt.setString(4, resultData.paymentMethod.getPaymentMethodUrl());
-                stmt.setString(5, "auth");
-                stmt.setString(6, "id");
-                stmt.setString(7, resultData.accountReference);
+                 CallableStatement stmt = connection.prepareCall("{call SaveTransactionSP(?,?,?)}");) {
+                stmt.setString(1, resultData.authorization.getPayeeReferenceId());
+                stmt.setString(2, resultData.providerAuthorityUrl);
+                stmt.setString(3, resultData.authorization.getJsonString());
                 stmt.execute();
             }
         } catch (SQLException e) {
@@ -123,13 +104,10 @@ public class DataBaseOperations {
     }
 
     static final String RECEIPT_FETCH_CORE_SQL = 
-            "SELECT Amount," + 
-                   "Currency," +
-                   "PaymentMethodUrl," +
-                   "ProviderAuthorityUrl," +
-                   "ProviderTransactionId FROM PAYMENTS WHERE Id=?";
+            "SELECT ProviderAuthorityUrl," +
+                   "Authorization FROM PAYMENTS WHERE Id=?";
 
-    static ReceiptEncoder getReceiptData(String orderId, String payeeAuthorityUrl) 
+    static ReceiptEncoder getReceiptData(String orderId) 
     throws IOException, SQLException {
         try (Connection connection = MerchantService.jdbcDataSource.getConnection();
              PreparedStatement stmt = connection.prepareStatement(RECEIPT_FETCH_CORE_SQL);) {
@@ -138,25 +116,22 @@ public class DataBaseOperations {
                 if (!rs.next()) {
                     throw new IOException("Missing core data");
                 }
-/*
-    public ReceiptEncoder(String referenceId,
-                          BigDecimal amount,
-                          Currencies currency,
-                          String paymentMethodName, 
-                          String providerAuthorityUrl,
-                          String payeeAuthorityUrl,
-                          GregorianCalendar providerTimeStamp,
-                          String providerReferenceId) throws IOException {
-*/
-                ReceiptEncoder receiptEncoder = new ReceiptEncoder(
-                           orderId,
-                           rs.getBigDecimal(1),
-                           Currencies.valueOf(rs.getString(2)),
-                           PaymentMethods.fromTypeUrl(rs.getString(3)).getCommonName(),
-                           rs.getString(4),
-                           payeeAuthorityUrl,
-                           new GregorianCalendar(),
-                           rs.getString(5));
+                JSONObjectReader json = JSONParser.parse(rs.getString(2));
+                ProviderResponseDecoder prd = 
+                        json.getString(JSONDecoderCache.QUALIFIER_JSON)
+                            .equals(Messages.AUTHORIZATION_RESPONSE.toString()) ?
+                                    new AuthorizationResponseDecoder(json) :
+                                    new TransactionResponseDecoder(json);
+                ReceiptEncoder receiptEncoder = new ReceiptEncoder(orderId,
+                                                                   prd.getCommonName(),
+                                                                   prd.getAmount(),
+                                                                   prd.getCurrency(),
+                                                                   prd.getPaymentMethodName(),
+                                                                   prd.getAccountReference(),
+                                                                   rs.getString(1),
+                                                                   prd.getPayeeAuthorityUrl(),
+                                                                   prd.getTimeStamp(),
+                                                                   prd.getProviderReferenceId());
                 return receiptEncoder;
             }
         }

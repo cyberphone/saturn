@@ -18,8 +18,6 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 
-import java.security.GeneralSecurityException;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

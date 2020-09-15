@@ -18,37 +18,16 @@ package org.webpki.saturn.merchant;
 
 import java.io.Serializable;
 
-import java.math.BigDecimal;
-
-import java.util.GregorianCalendar;
-
-import org.webpki.saturn.common.AuthorizationResponseDecoder;
-import org.webpki.saturn.common.Currencies;
-import org.webpki.saturn.common.PaymentMethods;
+import org.webpki.saturn.common.ProviderResponseDecoder;
 import org.webpki.saturn.common.TransactionResponseDecoder;
 
 public class ResultData implements Serializable {
     
     private static final long serialVersionUID = 1L;
-
-    public BigDecimal amount;
-
-    public Currencies currency;
-
-    public String orderId;
-
-    public String accountReference;
-
-    public PaymentMethods paymentMethod;
     
+    ProviderResponseDecoder authorization;
+
     public String providerAuthorityUrl;
     
-    public String providerReferenceId;
-    
-    public GregorianCalendar providerTimeStamp;
-
     public TransactionResponseDecoder.ERROR transactionError;
-    
-    public AuthorizationResponseDecoder optionalRefund;  // Not exactly how it would look in a real setting.
-
 }

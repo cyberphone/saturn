@@ -43,11 +43,33 @@ public abstract class ProviderResponseDecoder implements BaseProperties {
         return getPaymentRequest().referenceId;
     }
     
+    public abstract String getProviderReferenceId();
+
+    public final String getPayeeAuthorityUrl() {
+        return getAuthorizationResponse().authorizationRequest.payeeAuthorityUrl;
+    }
+
+    public final String getPaymentMethodName() {
+        return getPaymentMethod().getCommonName();
+    }
+
+    public final PaymentMethods getPaymentMethod() {
+        return getAuthorizationResponse().authorizationRequest.getPaymentMethod();
+    }
+
+    public final String getAccountReference() {
+        return getAuthorizationResponse().optionalAccountReference;
+    }
+
     public abstract GregorianCalendar getTimeStamp();
     
     abstract JSONObjectReader getRoot();
     
     public final String getJsonString() throws IOException {
         return getRoot().serializeToString(JSONOutputFormats.NORMALIZED);
+    }
+
+    public final String getCommonName() {
+        return getPaymentRequest().payeeCommonName;
     }
 }

@@ -179,21 +179,13 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
    
         // Create a viewable response
         ResultData resultData = new ResultData();
-        resultData.amount = paymentRequest.getAmount();  // Gas Station will upgrade amount
-        resultData.orderId = paymentRequest.getReferenceId();
-        resultData.currency = paymentRequest.getCurrency();
-        resultData.paymentMethod = authorizationResponse.getAuthorizationRequest().getPaymentMethod();
+        resultData.authorization = authorizationResponse;
+        resultData.providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
         String accountReference = authorizationResponse.getOptionalAccountReference();
         if (accountReference == null) {
             accountReference = "N/A";
         } else if (cardPayment) {
             accountReference = AccountDataEncoder.visualFormattedAccountId(accountReference);
-        }
-        resultData.accountReference = accountReference;
-
-        // Special treatment of the refund mode
-        if (HomeServlet.getOption(session, REFUND_MODE_SESSION_ATTR)) {
-            resultData.optionalRefund = authorizationResponse;
         }
 
         session.setAttribute(RESULT_DATA_SESSION_ATTR, resultData);
@@ -208,15 +200,16 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 if (debugData != null) {
                     debugData.acquirerAuthority = ownProviderAuthority.getRoot();
                 }
-                resultData.transactionError =
-                    processTransaction(merchant,
-                                       transactionOperation,
-                                       // Just a copy in this simple scenario 
-                                       paymentRequest.getAmount(),                                
-                                       urlHolder,
-                                       debugData);
+                processTransaction(merchant,
+                                   transactionOperation,
+                                   // Just a copy in this simple scenario 
+                                   paymentRequest.getAmount(),                                
+                                   urlHolder,
+                                   resultData,
+                                   debugData);
+            } else {
+                DataBaseOperations.saveTransaction(resultData);
             }
-            DataBaseOperations.createReceipt(resultData);
 
         } else {
  
@@ -239,12 +232,12 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return true;
     }
 
-    static TransactionResponseDecoder.ERROR
-                    processTransaction(MerchantDescriptor merchant,
-                                       TransactionOperation transactionOperation,
-                                                        BigDecimal actualAmount,
-                                                        UrlHolder urlHolder,
-                                                        DebugData debugData) throws IOException {
+    static void processTransaction(MerchantDescriptor merchant,
+                                   TransactionOperation transactionOperation,
+                                   BigDecimal actualAmount,
+                                   UrlHolder urlHolder,
+                                   ResultData resultData, 
+                                   DebugData debugData) throws IOException {
 
         JSONObjectWriter transactionRequest =
             TransactionRequestEncoder.encode(transactionOperation.authorizationResponse,
@@ -271,8 +264,10 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         TransactionResponseDecoder transactionResponse = new TransactionResponseDecoder(response);
         transactionResponse.getSignatureDecoder().verify(transactionOperation.verifier);
-
-        return transactionResponse.getTransactionError();
+        
+        resultData.authorization = transactionResponse;
+        resultData.transactionError = transactionResponse.getTransactionError();
+        DataBaseOperations.saveTransaction(resultData);
     }
 
     @Override
