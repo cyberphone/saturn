@@ -18,7 +18,11 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import org.webpki.json.JSONObjectWriter;
+import java.math.BigDecimal;
+
+import java.util.GregorianCalendar;
+
+import org.webpki.json.JSONObjectReader;
 
 import org.webpki.util.ISODateTime;
 
@@ -27,28 +31,74 @@ public class ReceiptDecoder implements BaseProperties {
     public final static int PENDING     = 0;
     public final static int AVAILABLE   = 1;
     public final static int FAILED      = 2;
-    
-    public ReceiptDecoder(String receiptUrl,
-                          String clientPaymentMethodUrl, 
-                          String providerAuthorityUrl,
-                          String payeeAuthorityUrl,
-                          PaymentRequestDecoder paymentRequest) throws IOException {
-        receiptDocument = Messages.RECEIPT.createBaseMessage()
-                .setString(RECEIPT_URL_JSON, receiptUrl)
-                .setString(PAYMENT_METHOD_JSON, clientPaymentMethodUrl)
-                .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
-                .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
-                .setMoney(AMOUNT_JSON, 
-                          paymentRequest.amount,
-                          paymentRequest.currency.getDecimals())
-                .setString(CURRENCY_JSON, paymentRequest.currency.toString())
-                .setDateTime(TIME_STAMP_JSON, 
-                             paymentRequest.timeStamp, 
-                             ISODateTime.UTC_NO_SUBSECONDS);
+
+    public ReceiptDecoder(JSONObjectReader rd) throws IOException {
+        Messages.RECEIPT.parseBaseMessage(rd);
+        if (rd.hasProperty(NOT_AVAILABLE_STATUS_JSON)) {
+            return;
+        }
+        payeeReferenceId = rd.getString(REFERENCE_ID_JSON);
+        payeeCommonName = rd.getString(COMMON_NAME_JSON);
+        currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
+        amount = rd.getMoney(AMOUNT_JSON, currency.decimals);
+        paymentMethodName = rd.getString(PAYMENT_METHOD_NAME_JSON);
+        optionalAccountReference = rd.getStringConditional(ACCOUNT_REFERENCE_JSON);
+        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
+        payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
+        JSONObjectReader providerTransactionData = rd.getObject(PROVIDER_TRANSACTION_DATA_JSON);
+        providerTimeStamp = providerTransactionData.getDateTime(TIME_STAMP_JSON, 
+                                                                ISODateTime.COMPLETE);
+        providerReferenceId = providerTransactionData.getString(REFERENCE_ID_JSON);
+        rd.checkForUnread();
     }
 
-    JSONObjectWriter receiptDocument;
-    public JSONObjectWriter getReceiptDocument() {
-        return receiptDocument;
+    String payeeAuthorityUrl;
+    public String getPayeeAuthorityUrl() {
+        return payeeAuthorityUrl;
+    }
+    
+    String providerAuthorityUrl;
+    public String getProviderAuthorityUrl() {
+        return providerAuthorityUrl;
+    }
+
+    String payeeCommonName;
+    public String getPayeeCommonName() {
+        return payeeCommonName;
+    }
+    GregorianCalendar providerTimeStamp;
+    public GregorianCalendar getProviderTimeStamp() {
+        return providerTimeStamp;
+    }
+
+    String optionalAccountReference;
+    public String getOptionalAccountReference() {
+        return optionalAccountReference;
+
+    }
+
+    String providerReferenceId;
+    public String getProviderReferenceId() {
+        return providerReferenceId;
+    }
+
+    String payeeReferenceId;
+    public String getPayeeReferenceId() {
+        return payeeReferenceId;
+    }
+
+    BigDecimal amount;
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    Currencies currency;
+    public Currencies getCurrency() {
+        return currency;
+    }
+
+    String paymentMethodName;
+    public String getPaymentMethodName() {
+        return paymentMethodName;
     }
 }

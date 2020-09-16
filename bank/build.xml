@@ -86,7 +86,7 @@
            srcdir="${src.dir}:${@common.src.dir}:${@account-types.src.dir}:${@interbanking.src.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
-        <include name="org/webpki/saturn/bank/*.java"/>
+        <include name="org/webpki/saturn/bank/**/*.java"/>
         <classpath>
           <fileset dir="${@webpki.lib.dir}">
              <include name="${@webpki-libext.jar}"/>

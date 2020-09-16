@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -45,47 +44,14 @@ public class TransactionListingServlet extends HttpServlet {
     
     static final String MAX_ROWS = "50";
 
-    static final String SQL = "SELECT " +
-            "LASTTRANS.Created AS `Created`, " +
-            "LASTTRANS.Amount AS `Amount`, " +
-            "LASTTRANS.Balance AS `Balance`, " +
-            "ACCOUNTS.Id AS `Account`, " +
-            "IFNULL((SELECT AccountId FROM CREDENTIALS WHERE " +
-               "CREDENTIALS.Id = LASTTRANS.CredentialId),'') AS `Symbolic Account Id`, " +
-            "USERS.Name As `Account Holder`, " +
-            "LASTTRANS.PayeeAccount AS `Payee Account`, " +
-            "COALESCE(LASTTRANS.PayeeName,'') AS `Payee Name`, " +
-            "COALESCE(LASTTRANS.PayeeReference,'') AS `Payee Ref`, " +
-            "LASTTRANS.TId AS `Trans Id`, " +
-            "COALESCE(LASTTRANS.ReservationId,'') AS `Res Id`, " +
-            "TRANSACTION_TYPES.Name AS `Type` " +
-            "FROM (SELECT MAX(Id) AS TId, " +
-                    "Created, " + 
-                    "Amount, " +
-                    "TransactionTypeId, " +
-                    "Balance, " +
-                    "PayeeAccount, " +
-                    "PayeeName, " +
-                    "PayeeReference, " +
-                    "InternalAccountId, " +
-                    "ReservationId, " +
-                    "CredentialId FROM TRANSACTIONS " +
-                "GROUP BY Id DESC LIMIT " + MAX_ROWS + ") AS LASTTRANS  " +
-            "INNER JOIN ACCOUNTS ON " +
-            "LASTTRANS.InternalAccountId = ACCOUNTS.Id " +
-            "INNER JOIN TRANSACTION_TYPES ON " +
-            "LASTTRANS.TransactionTypeId = TRANSACTION_TYPES.Id " +
-            "INNER JOIN USERS ON " +
-            "ACCOUNTS.UserId = USERS.Id " +
-            "ORDER BY LASTTRANS.TId DESC";
+    static final String SQL = "SELECT Id, ReceiptStatus, ReceiptPathData FROM ORDERS "  +
+                              "ORDER BY Id DESC LIMIT " + MAX_ROWS;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         try {
             try (Connection connection = MerchantService.jdbcDataSource.getConnection();
                  PreparedStatement stmt = connection.prepareStatement(SQL);
                  ResultSet rs = stmt.executeQuery();) {
-                ResultSetMetaData rsmd = rs.getMetaData();
-                int numberOfColumns = rsmd.getColumnCount();
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
                         "<link rel='icon' href='../saturn.png' sizes='192x192'>"+
                         "<title>Transaction List</title>" +
@@ -95,22 +61,20 @@ public class TransactionListingServlet extends HttpServlet {
                         "<div style='padding-bottom:10pt'>This " +
                         AuthorityBaseServlet.SATURN_LINK +
                         " demo/debug service shows the last " + MAX_ROWS +
-                        " transactions in the payers' bank. " +
-                        "To make it possible start over a demo without enrolling again, " +
-                        "<i>a user account is restored (and associated transactions deleted) after 30 " +
-                        "minutes of inactivity</i>.</div><table class='tftable'><tr>");
-                for (int q = 1; q <= numberOfColumns; q++) {
-                    html.append("<th>").append(rsmd.getColumnLabel(q)).append("</th>");
-                }
-                html.append("</tr>");
+                        " merchant transactions.</div>" +
+                        "<table style='margin-left:auto;margin-right:auto' class='tftable'>" +
+                        "<tr><th>Id</th><th>Status</th></tr>");
                 while (rs.next()) {
-                    html.append("<tr>");
-                    for (int q = 1; q <= numberOfColumns; q++) {
-                         html.append(q == 2 || q == 3 ? "<td style='text-align:right'>" : "<td>")
-                             .append(rs.getString(q))
-                             .append("</td>");
-                    }
-                    html.append("</tr>");
+                    String orderId = rs.getString(1);
+                    html.append("<tr><td><a href='")
+                        .append(MerchantService.receiptBaseUrl)
+                        .append(orderId)
+                        .append(rs.getString(3))
+                        .append("'>")
+                        .append(orderId)
+                        .append("</a></td><td style='text-align:center'>")
+                        .append(rs.getString(2))
+                        .append("</td></tr>");
                 }
                 HttpSupport.writeHtml(response, html.append("</table></body></html>"));
             }

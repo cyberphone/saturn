@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.webpki.json.JSONOutputFormats;
+
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;

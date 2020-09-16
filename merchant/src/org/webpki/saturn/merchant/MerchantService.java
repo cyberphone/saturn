@@ -139,6 +139,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     static boolean desktopWallet;
 
     static String merchantBaseUrl;
+    
+    public static String receiptBaseUrl;
 
     public static DataSource jdbcDataSource;
 
@@ -216,6 +218,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             desktopWallet = getPropertyBoolean(DESKTOP_WALLET);
             
             merchantBaseUrl = getPropertyString(MERCHANT_BASE_URL);
+            receiptBaseUrl = merchantBaseUrl + "/receipts/";
 
             // The standard payment networks supported by the Saturn demo
             knownBackendAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);

@@ -58,6 +58,7 @@
            srcdir="${src.dir}:${@common.src.dir}"
            destdir="${temp.dir}"
            includeAntRuntime="false">
+      <include name="org/webpki/saturn/w3c/**/*.java"/>
 		<classpath>
 			  <fileset dir="${@webpki.lib.dir}">
 		         <include name="webpki.org-libext*.jar"/>
