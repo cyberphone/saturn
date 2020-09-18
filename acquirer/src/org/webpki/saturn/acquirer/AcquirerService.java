@@ -208,6 +208,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
 
             authorityObjectManager = new AuthorityObjectManager(
                 providerAuthorityUrl = acquirerBaseUrl + "/authority",
+                "Acquirer Corporation",
                 acquirerBaseUrl,
                 acquirerBaseUrl + "/service",
                 new ProviderAuthorityDecoder.PaymentMethodDeclarations()

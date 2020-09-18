@@ -34,6 +34,7 @@ public class AuthorityObjectManager extends Thread {
     HashMap<String,byte[]> payeeAuthorityBlobs = new HashMap<>();
 
     String providerAuthorityUrl;
+    String providerCommonName;
     String providerHomePage;
     String serviceUrl;
     JSONObjectReader optionalExtensions;
@@ -58,6 +59,7 @@ public class AuthorityObjectManager extends Thread {
             synchronized(this) {
                 providerAuthorityBlob = 
                         ProviderAuthorityEncoder.encode(providerAuthorityUrl,
+                                                        providerCommonName,
                                                         providerHomePage,
                                                         serviceUrl,
                                                         paymentMethods,
@@ -99,6 +101,7 @@ public class AuthorityObjectManager extends Thread {
                 String providerAuthorityUrl /* Both */,
 
                 // ProviderAuthority (may be null)
+                String providerCommonName,
                 String providerHomePage,
                 String serviceUrl,
                 ProviderAuthorityDecoder.PaymentMethodDeclarations paymentMethods,
@@ -115,6 +118,7 @@ public class AuthorityObjectManager extends Thread {
                 int expiryTimeInSeconds /* Both */,
                 boolean logging /* Both */) throws IOException {
         this.providerAuthorityUrl = providerAuthorityUrl;
+        this.providerCommonName = providerCommonName;
         this.providerHomePage = providerHomePage;
         this.serviceUrl = serviceUrl;
         this.paymentMethods = paymentMethods;

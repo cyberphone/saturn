@@ -149,6 +149,7 @@ public class ProviderAuthorityDecoder implements BaseProperties {
                                   providerAuthorityUrl +
                                   " expected=" + expectedAuthorityUrl);
         }
+        commonName = rd.getString(COMMON_NAME_JSON);
         homePage = rd.getString(HOME_PAGE_JSON);
         serviceUrl = rd.getString(SERVICE_URL_JSON);
         JSONObjectReader paymentMethodsObject = rd.getObject(SUPPORTED_PAYMENT_METHODS_JSON);
@@ -249,6 +250,11 @@ public class ProviderAuthorityDecoder implements BaseProperties {
     String providerAuthorityUrl;
     public String getProviderAuthorityUrl() {
         return providerAuthorityUrl;
+    }
+
+    String commonName;
+    public String getCommonName() {
+        return commonName;
     }
 
     String homePage;

@@ -30,6 +30,7 @@ public class ProviderAuthorityEncoder implements BaseProperties {
     
     public static JSONObjectWriter encode(
                     String providerAuthorityUrl,
+                    String commonName,
                     String homePage,
                     String serviceUrl,
                     ProviderAuthorityDecoder.PaymentMethodDeclarations paymentMethods,
@@ -42,6 +43,7 @@ public class ProviderAuthorityEncoder implements BaseProperties {
         return Messages.PROVIDER_AUTHORITY.createBaseMessage()
             .setStringArray(HTTP_VERSIONS_JSON, ProviderAuthorityDecoder.HTTP_VERSION_SUPPORT)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
+            .setString(COMMON_NAME_JSON, commonName)
             .setString(HOME_PAGE_JSON, homePage)
             .setString(SERVICE_URL_JSON, serviceUrl)
             .setObject(SUPPORTED_PAYMENT_METHODS_JSON, paymentMethods.toObject())

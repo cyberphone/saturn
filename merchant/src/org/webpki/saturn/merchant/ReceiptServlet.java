@@ -129,18 +129,22 @@ public class ReceiptServlet extends HttpServlet {
                         AuthorityBaseServlet.REST_ELEMENT +
                         "<body>")
                     .append(new HtmlTable("Core Receipt Data")
+                            .addHeader("Payee Name")
                             .addHeader("Order Id")
                             .addHeader("Time Stamp")
                             .addHeader("Total")
+                            .addCell(receiptDecoder.getPayeeCommonName())
                             .addCell(receiptDecoder.getPayeeReferenceId(), "text-align:right")
                             .addCell(ISODateTime.formatDateTime(receiptDecoder.getPayeeTimeStamp(),
                                                                 ISODateTime.UTC_NO_SUBSECONDS))
                             .addCell(receiptDecoder.getCurrency()
                                     .amountToDisplayString(receiptDecoder.getAmount(), false))
                             .render())
-                    .append(new HtmlTable("Bank Details")
+                    .append(new HtmlTable("Payment Provider Details")
+                            .addHeader("Provider Name")
                             .addHeader("Transaction Id")
                             .addHeader("Time Stamp")
+                            .addCell(receiptDecoder.getProviderCommonName())
                             .addCell(receiptDecoder.getProviderReferenceId(), "text-align:right")
                             .addCell(ISODateTime.formatDateTime(receiptDecoder.getProviderTimeStamp(),
                                                                 ISODateTime.UTC_NO_SUBSECONDS))

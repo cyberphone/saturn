@@ -182,7 +182,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         ResultData resultData = new ResultData();
         resultData.authorization = authorizationResponse;
         resultData.receiptUrl = walletRequest.receiptUrl;
-        resultData.providerCommonName = "blah";
+        resultData.providerCommonName = providerAuthority.getCommonName();
         resultData.providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
         String accountReference = authorizationResponse.getOptionalAccountReference();
         if (accountReference == null) {

@@ -51,8 +51,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         " .header {text-align:center;font-size:10pt;font-weight:bold;padding:15pt}" +
         " td {padding-bottom:8pt}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
-        " .tftable td {background-color:#FFFFE0;padding:3pt 4pt;" + BORDER + "}" +
-        " .tftable th {padding:4pt 3pt;background:linear-gradient(to bottom, " +
+        " .tftable td {white-space:nowrap;background-color:#FFFFE0;padding:3pt 4pt;" + BORDER + "}" +
+        " .tftable th {white-space:nowrap;padding:4pt 3pt;background:linear-gradient(to bottom, " +
           "#eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
         "text-align:center;" + BORDER +"}" +
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
@@ -132,6 +132,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(isProvider() ?
                             tableRow(rd, HTTP_VERSIONS_JSON, "Supported HTTP versions") +
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +
+                            tableRow(rd, COMMON_NAME_JSON, "Provider common name") +
                             tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
                             tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
                             tableRow(rd, SUPPORTED_PAYMENT_METHODS_JSON, "Supported client:[backend...] payment methods") +
