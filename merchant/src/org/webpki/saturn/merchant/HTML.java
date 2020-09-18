@@ -526,7 +526,10 @@ public class HTML implements MerchantSessionProperties {
             .append(" Type</th><th>")
             .append(resultData.authorization.getPaymentMethod().isCardPayment() ?
                                                                "Card Reference" : "Account Number")   
-            .append("</th></tr><tr><td style=\"text-align:center\">")  
+            .append("</th></tr><tr><td style='text-align:center;color:blue;cursor:pointer' " +
+                    "onclick=\"document.location.href='")
+            .append(resultData.receiptUrl)
+            .append("'\">")  
             .append(resultData.authorization.getPayeeReferenceId())
             .append("</td><td style=\"text-align:center\">")
             .append(resultData.authorization.getCurrency().amountToDisplayString(

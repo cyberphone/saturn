@@ -76,7 +76,7 @@ import org.webpki.saturn.common.KeyStoreEnumerator;
 import org.webpki.saturn.common.KnownExtensions;
 import org.webpki.saturn.common.PayeeCoreProperties;
 import org.webpki.saturn.common.PaymentMethods;
-import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.ServerX509Signer;
 import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.SignatureProfiles;
@@ -368,18 +368,18 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 providerAuthorityUrl = bankBaseUrl + "/authority",
                 bankBaseUrl,
                 serviceUrl = bankBaseUrl + "/service",
-                new ProviderAuthority.PaymentMethodDeclarations()
-                    .add(new ProviderAuthority.PaymentMethodDeclaration(
+                new ProviderAuthorityDecoder.PaymentMethodDeclarations()
+                    .add(new ProviderAuthorityDecoder.PaymentMethodDeclaration(
                             PaymentMethods.BANK_DIRECT.getPaymentMethodUrl())
                                 .add(org.payments.sepa.SEPAAccountDataDecoder.class)
                                 .add(se.bankgirot.BGAccountDataDecoder.class))
-                    .add(new ProviderAuthority.PaymentMethodDeclaration(
+                    .add(new ProviderAuthorityDecoder.PaymentMethodDeclaration(
                             PaymentMethods.SUPER_CARD.getPaymentMethodUrl())
                                 .add(org.payments.sepa.SEPAAccountDataDecoder.class)),
                 optionalProviderExtensions,
                 SignatureProfiles.values(),
-                new ProviderAuthority.EncryptionParameter[]{
-                    new ProviderAuthority.EncryptionParameter(
+                new ProviderAuthorityDecoder.EncryptionParameter[]{
+                    new ProviderAuthorityDecoder.EncryptionParameter(
                             DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
                             decryptionKeys.get(0).getKeyEncryptionAlgorithm(), 
                             decryptionKeys.get(0).getPublicKey())},

@@ -34,7 +34,7 @@ public class AuthorizationResponseEncoder implements BaseProperties {
     public static final String SOFTWARE_VERSION = "1.00";
 
     public static JSONObjectWriter encode(AuthorizationRequestDecoder authorizationRequest,
-                                          ProviderAuthority.EncryptionParameter encryptionParameter,
+                                          ProviderAuthorityDecoder.EncryptionParameter encryptionParameter,
                                           AccountDataEncoder accountData,
                                           String optionalAccountReference,
                                           String referenceId,

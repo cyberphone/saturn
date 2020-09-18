@@ -34,8 +34,8 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.AuthorizationRequestDecoder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.KnownExtensions;
-import org.webpki.saturn.common.PayeeAuthority;
-import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.PayeeAuthorityDecoder;
+import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.RefundRequestEncoder;
 import org.webpki.saturn.common.RefundResponseDecoder;
 import org.webpki.saturn.common.UrlHolder;
@@ -78,9 +78,9 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
                         ", Account=" + resultData.authorization.getAccountReference() + 
                         ", Method=" + authorizationRequest.getPaymentMethod().getCommonName());
 
-            PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(
+            PayeeAuthorityDecoder payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(
                     urlHolder, authorizationRequest.getPayeeAuthorityUrl());
-             ProviderAuthority providerAuthority = MerchantService.externalCalls
+             ProviderAuthorityDecoder providerAuthority = MerchantService.externalCalls
                      .getProviderAuthority(urlHolder, payeeAuthority.getProviderAuthorityUrl());
 
             String refundUrl = providerAuthority.getExtensions() == null ? null :

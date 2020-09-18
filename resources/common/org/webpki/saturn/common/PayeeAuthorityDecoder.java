@@ -24,26 +24,12 @@ import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.util.ISODateTime;
 
-public class PayeeAuthority implements BaseProperties {
+public class PayeeAuthorityDecoder implements BaseProperties {
     
-    public static JSONObjectWriter encode(String payeeAuthorityUrl,
-                                          String providerAuthorityUrl,
-                                          PayeeCoreProperties payeeCoreProperties,
-                                          GregorianCalendar expires,
-                                          ServerAsymKeySigner issuerSigner) throws IOException {
-        return payeeCoreProperties.writeObject(Messages.PAYEE_AUTHORITY.createBaseMessage()
-                                     .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
-                                     .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setSignature(ISSUER_SIGNATURE_JSON, issuerSigner);
-    }
-
-    public PayeeAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
+    public PayeeAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         root = Messages.PAYEE_AUTHORITY.parseBaseMessage(rd);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
         if (!payeeAuthorityUrl.equals(expectedAuthorityUrl)) {

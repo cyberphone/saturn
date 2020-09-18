@@ -28,7 +28,6 @@ import java.util.LinkedHashMap;
 import java.util.ArrayList;
 
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -40,7 +39,7 @@ import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
 
-public class ProviderAuthority implements BaseProperties {
+public class ProviderAuthorityDecoder implements BaseProperties {
     
     public static class EncryptionParameter {
         
@@ -128,59 +127,7 @@ public class ProviderAuthority implements BaseProperties {
         }
     }
 
-    public static JSONObjectWriter encode(String providerAuthorityUrl,
-                                          String homePage,
-                                          String serviceUrl,
-                                          PaymentMethodDeclarations paymentMethods,
-                                          JSONObjectReader optionalExtensions,
-                                          SignatureProfiles[] signatureProfiles,
-                                          EncryptionParameter[] encryptionParameters,
-                                          HostingProvider[] optionalHostingProviders,
-                                          GregorianCalendar expires,
-                                          ServerX509Signer issuerSigner) throws IOException {
-        return Messages.PROVIDER_AUTHORITY.createBaseMessage()
-            .setStringArray(HTTP_VERSIONS_JSON, HTTP_VERSION_SUPPORT)
-            .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
-            .setString(HOME_PAGE_JSON, homePage)
-            .setString(SERVICE_URL_JSON, serviceUrl)
-            .setObject(SUPPORTED_PAYMENT_METHODS_JSON, paymentMethods.toObject())
-            .setDynamic((wr) -> optionalExtensions == null ? wr : wr.setObject(EXTENSIONS_JSON, optionalExtensions))
-            .setDynamic((wr) -> {
-                JSONArrayWriter jsonArray = wr.setArray(SIGNATURE_PROFILES_JSON);
-                for (SignatureProfiles signatureProfile : signatureProfiles) {
-                    jsonArray.setString(signatureProfile.getId());
-                }
-                return wr;
-            })
-            .setDynamic((wr) -> {
-                JSONArrayWriter jsonArray = wr.setArray(ENCRYPTION_PARAMETERS_JSON);
-                for (EncryptionParameter encryptionParameter : encryptionParameters) {
-                    jsonArray.setObject()
-                        .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON,
-                                   encryptionParameter.dataEncryptionAlgorithm.toString())
-                        .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
-                                   encryptionParameter.keyEncryptionAlgorithm.toString())
-                        .setPublicKey(encryptionParameter.encryptionKey);
-                }
-                return wr;
-            })
-            .setDynamic((wr) -> {
-                    if (optionalHostingProviders == null) {
-                        return wr;
-                    } else {
-                        JSONArrayWriter aw = wr.setArray(HOSTING_PROVIDERS_JSON);
-                        for (HostingProvider hostingProvider : optionalHostingProviders) {
-                            aw.setObject(hostingProvider.writeObject());
-                        }
-                        return wr;
-                    }
-                })
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDateTime(BaseProperties.EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setSignature(ISSUER_SIGNATURE_JSON, issuerSigner);
-    }
-
-    public ProviderAuthority(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
+    public ProviderAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
         root = Messages.PROVIDER_AUTHORITY.parseBaseMessage(rd);
         httpVersions = rd.getStringArray(HTTP_VERSIONS_JSON);
         boolean notFound = true;
@@ -360,7 +307,7 @@ public class ProviderAuthority implements BaseProperties {
         return signatureDecoder;
     }
 
-    public boolean checkPayeeKey(PayeeAuthority payeeAuthority) throws IOException {
+    public boolean checkPayeeKey(PayeeAuthorityDecoder payeeAuthority) throws IOException {
         if (optionalHostingProviders == null) {
             // Direct attestation of Payee
             return payeeAuthority.attestationKey.equals(

@@ -35,7 +35,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.webutil.ServletUtil;
 
 import org.webpki.saturn.common.KnownExtensions;
-import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.BaseProperties;
@@ -53,7 +53,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
     static Logger logger = Logger.getLogger(ProcessingBaseServlet.class.getCanonicalName());
     
-    static String getHybridModeUrl(ProviderAuthority providerAuthority) throws IOException {
+    static String getHybridModeUrl(ProviderAuthorityDecoder providerAuthority) throws IOException {
         JSONObjectReader extensions = providerAuthority.getExtensions();
         if (extensions != null) {
             return extensions.getStringConditional(KnownExtensions.HYBRID_PAYMENT);

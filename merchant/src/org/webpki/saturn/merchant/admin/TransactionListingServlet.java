@@ -44,7 +44,7 @@ public class TransactionListingServlet extends HttpServlet {
     
     static final String MAX_ROWS = "50";
 
-    static final String SQL = "SELECT Id, ReceiptStatus, ReceiptPathData FROM ORDERS "  +
+    static final String SQL = "SELECT Id, Status, ReceiptPathData FROM ORDERS "  +
                               "ORDER BY Id DESC LIMIT " + MAX_ROWS;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

@@ -28,28 +28,38 @@ import org.webpki.util.ISODateTime;
 
 public class ReceiptDecoder implements BaseProperties {
     
-    public final static int PENDING     = 0;
-    public final static int AVAILABLE   = 1;
-    public final static int FAILED      = 2;
+    public enum Status {PENDING, AVAILABLE, FAILED, DELETED}
 
     public ReceiptDecoder(JSONObjectReader rd) throws IOException {
         Messages.RECEIPT.parseBaseMessage(rd);
-        if (rd.hasProperty(NOT_AVAILABLE_STATUS_JSON)) {
+        status = Status.valueOf(rd.getString(STATUS_JSON));
+        if (status != Status.AVAILABLE) {
             return;
         }
         payeeReferenceId = rd.getString(REFERENCE_ID_JSON);
+        payeeTimeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         payeeCommonName = rd.getString(COMMON_NAME_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         amount = rd.getMoney(AMOUNT_JSON, currency.decimals);
         paymentMethodName = rd.getString(PAYMENT_METHOD_NAME_JSON);
         optionalAccountReference = rd.getStringConditional(ACCOUNT_REFERENCE_JSON);
-        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
-        JSONObjectReader providerTransactionData = rd.getObject(PROVIDER_TRANSACTION_DATA_JSON);
-        providerTimeStamp = providerTransactionData.getDateTime(TIME_STAMP_JSON, 
-                                                                ISODateTime.COMPLETE);
-        providerReferenceId = providerTransactionData.getString(REFERENCE_ID_JSON);
+        JSONObjectReader providerData = rd.getObject(PROVIDER_DATA_JSON);
+        providerAuthorityUrl = providerData.getString(PROVIDER_AUTHORITY_URL_JSON);
+        providerCommonName = providerData.getString(COMMON_NAME_JSON);
+        providerTimeStamp = providerData.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        providerReferenceId = providerData.getString(REFERENCE_ID_JSON);
         rd.checkForUnread();
+    }
+    
+    Status status;
+    public Status getStatus() {
+        return status;
+    }
+
+    GregorianCalendar payeeTimeStamp;
+    public GregorianCalendar getPayeeTimeStamp() {
+        return payeeTimeStamp;
     }
 
     String payeeAuthorityUrl;
@@ -66,6 +76,12 @@ public class ReceiptDecoder implements BaseProperties {
     public String getPayeeCommonName() {
         return payeeCommonName;
     }
+
+    String providerCommonName;
+    public String getProviderCommonName() {
+        return providerCommonName;
+    }
+
     GregorianCalendar providerTimeStamp;
     public GregorianCalendar getProviderTimeStamp() {
         return providerTimeStamp;

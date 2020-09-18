@@ -55,10 +55,10 @@ public class ExternalCalls {
     
     // Authority object caches
 
-    Map<String,PayeeAuthority> payeeAuthorityObjects = 
+    Map<String,PayeeAuthorityDecoder> payeeAuthorityObjects = 
             Collections.synchronizedMap(new LinkedHashMap<>());
 
-    Map<String,ProviderAuthority> providerAuthorityObjects = 
+    Map<String,ProviderAuthorityDecoder> providerAuthorityObjects = 
             Collections.synchronizedMap(new LinkedHashMap<>());
 
     String portFilter(String url) throws IOException {
@@ -118,12 +118,12 @@ public class ExternalCalls {
         return fetchJsonReturnData(wrap, urlHolder);
     }
 
-    public ProviderAuthority getProviderAuthority(UrlHolder urlHolder, String url) throws IOException {
+    public ProviderAuthorityDecoder getProviderAuthority(UrlHolder urlHolder, String url) throws IOException {
         urlHolder.setUrl(url);
-        ProviderAuthority providerAuthority = providerAuthorityObjects.get(url);
+        ProviderAuthorityDecoder providerAuthority = providerAuthorityObjects.get(url);
         if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
                 providerAuthority == null || providerAuthority.expiresInMillis < System.currentTimeMillis()) {
-            providerAuthority = new ProviderAuthority(getJsonData(urlHolder), url);
+            providerAuthority = new ProviderAuthorityDecoder(getJsonData(urlHolder), url);
             providerAuthorityObjects.put(url, providerAuthority);
             if (logging) {
                 logger.info("Updated cache " + url);
@@ -138,12 +138,12 @@ public class ExternalCalls {
         return providerAuthority;
     }
 
-    public PayeeAuthority getPayeeAuthority(UrlHolder urlHolder, String url) throws IOException {
+    public PayeeAuthorityDecoder getPayeeAuthority(UrlHolder urlHolder, String url) throws IOException {
         urlHolder.setUrl(url);
-        PayeeAuthority payeeAuthority = payeeAuthorityObjects.get(url);
+        PayeeAuthorityDecoder payeeAuthority = payeeAuthorityObjects.get(url);
         if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
                 payeeAuthority == null || payeeAuthority.expiresInMillis < System.currentTimeMillis()) {
-            payeeAuthority = new PayeeAuthority(getJsonData(urlHolder), url);
+            payeeAuthority = new PayeeAuthorityDecoder(getJsonData(urlHolder), url);
             payeeAuthorityObjects.put(url, payeeAuthority);
             if (logging) {
                 logger.info("Updated cache " + url);

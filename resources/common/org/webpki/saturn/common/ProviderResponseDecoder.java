@@ -69,7 +69,7 @@ public abstract class ProviderResponseDecoder implements BaseProperties {
         return getRoot().serializeToString(JSONOutputFormats.NORMALIZED);
     }
 
-    public final String getCommonName() {
+    public final String getPayeeCommonName() {
         return getPaymentRequest().payeeCommonName;
     }
 }

@@ -40,12 +40,12 @@ import org.webpki.saturn.common.AuthorizationRequestDecoder;
 import org.webpki.saturn.common.AuthorizationResponseEncoder;
 import org.webpki.saturn.common.NonDirectPaymentDecoder;
 import org.webpki.saturn.common.UserChallengeItem;
-import org.webpki.saturn.common.PayeeAuthority;
+import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.PaymentRequestDecoder;
-import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ISODateTime;
@@ -84,8 +84,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         boolean cardPayment = authorizationRequest.getPaymentMethod().isCardPayment();
         
         // Get the providers. Note that caching could play tricks on you!
-        PayeeAuthority payeeAuthority;
-        ProviderAuthority providerAuthority;
+        PayeeAuthorityDecoder payeeAuthority;
+        ProviderAuthorityDecoder providerAuthority;
         boolean nonCached = false;
         while (true) {
             // Lookup of Payee

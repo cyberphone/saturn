@@ -37,8 +37,8 @@ import org.webpki.saturn.common.AuthorizationResponseDecoder;
 import org.webpki.saturn.common.AccountDataEncoder;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.Messages;
-import org.webpki.saturn.common.PayeeAuthority;
-import org.webpki.saturn.common.ProviderAuthority;
+import org.webpki.saturn.common.PayeeAuthorityDecoder;
+import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.ProviderUserResponseDecoder;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
@@ -74,15 +74,16 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         String payeeAuthorityUrl = merchant.paymentMethods.get(clientPaymentMethodUrl).authorityUrl;
         
         // Lookup of self (since it is provided by an external party)
-        PayeeAuthority payeeAuthority = MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
+        PayeeAuthorityDecoder payeeAuthority =
+                MerchantService.externalCalls.getPayeeAuthority(urlHolder, payeeAuthorityUrl);
 
         // Strictly put not entirely necessary (YET...)
-        ProviderAuthority ownProviderAuthority = 
+        ProviderAuthorityDecoder ownProviderAuthority = 
             MerchantService.externalCalls.getProviderAuthority(urlHolder,
                     payeeAuthority.getProviderAuthorityUrl());
         
          // Lookup of Payer's bank
-        ProviderAuthority providerAuthority = 
+        ProviderAuthorityDecoder providerAuthority = 
             MerchantService.externalCalls.getProviderAuthority(urlHolder, 
                     payerAuthorization.getProviderAuthorityUrl());
 
@@ -180,6 +181,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         // Create a viewable response
         ResultData resultData = new ResultData();
         resultData.authorization = authorizationResponse;
+        resultData.receiptUrl = walletRequest.receiptUrl;
+        resultData.providerCommonName = "blah";
         resultData.providerAuthorityUrl = payerAuthorization.getProviderAuthorityUrl();
         String accountReference = authorizationResponse.getOptionalAccountReference();
         if (accountReference == null) {

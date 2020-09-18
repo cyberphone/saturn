@@ -38,7 +38,7 @@ GRANT SELECT ON mysql.proc TO saturn_merchant@localhost;
 --
 -- #############################################################
 -- # This is the Merchant side of a PoC database holding data  #
--- # for TBD                                                   #
+-- # for creating Saturn receipts                              #
 -- #############################################################
 
 USE MERCHANT;
@@ -53,8 +53,10 @@ CREATE TABLE ORDERS (
 
     ReceiptPathData       CHAR(22)  CHARACTER SET latin1  NOT NULL,      -- Random path data for receipt URLs
     
-    ReceiptStatus         INT       NOT NULL,                            -- 0: Pending, 1: Available
-                                                                         -- see ReceiptDecoder.java for other values
+    Status                VARCHAR(10)                     NOT NULL,      -- see ReceiptDecoder.java for values
+    
+    Created               TIMESTAMP  NOT NULL  DEFAULT CURRENT_TIMESTAMP, -- Administrator data
+    
     PRIMARY KEY (Id)
 );
 
@@ -79,7 +81,9 @@ INSERT INTO ORDER_ID(IssueDate, Instance) VALUES('00000000', 0);
 CREATE TABLE PAYMENTS (
     Id                    CHAR(16)  CHARACTER SET latin1  NOT NULL UNIQUE, -- Unique Order Id
     
-    ProviderAuthorityUrl  VARCHAR(100)  NOT NULL,                        -- Payer Bank
+    CommonName            VARCHAR(30)   NOT NULL,                        -- Of Payer Bank
+
+    AuthorityUrl          VARCHAR(100)  NOT NULL,                        -- Of Payer Bank
     
     Authorization         TEXT          NOT NULL,                        -- JSON string holding either
                                                                          -- "AuthorizationResponse" or
@@ -113,24 +117,27 @@ CREATE PROCEDURE CreateOrderIdSP (OUT p_Id CHAR(16),
     SET p_Id = CONCAT(v_CurrentIssueDate, LPAD(CONVERT(LAST_INSERT_ID(), CHAR), 8, '0'));
     INSERT INTO ORDERS(Id,
                        ReceiptPathData, 
-                       ReceiptStatus) 
+                       Status) 
         VALUES(p_Id,
                p_ReceiptPathData, 
-               0);
+               'PENDING');
   END
 //
 
 
 CREATE PROCEDURE SaveTransactionSP (IN p_Id CHAR(16) CHARACTER SET latin1,
-                                    IN p_ProviderAuthorityUrl VARCHAR(100),
+                                    IN p_CommonName VARCHAR(30),
+                                    IN p_AuthorityUrl VARCHAR(100),
                                     IN p_Authorization TEXT)
   BEGIN
-    UPDATE ORDERS SET ReceiptStatus = 1 WHERE Id = p_Id;
+    UPDATE ORDERS SET Status = 'AVAILABLE' WHERE Id = p_Id;
     INSERT INTO PAYMENTS(Id, 
-                         ProviderAuthorityUrl,
+                         CommonName,
+                         AuthorityUrl,
                          Authorization)
         VALUES(p_Id,
-               p_ProviderAuthorityUrl,
+               p_CommonName,
+               p_AuthorityUrl,
                p_Authorization);
   END
 //

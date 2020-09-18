@@ -27,7 +27,11 @@ public class ResultData implements Serializable {
     
     ProviderResponseDecoder authorization;
 
-    public String providerAuthorityUrl;
+    String providerAuthorityUrl;
     
-    public TransactionResponseDecoder.ERROR transactionError;
+    TransactionResponseDecoder.ERROR transactionError;
+
+    String receiptUrl;
+
+    String providerCommonName;
 }

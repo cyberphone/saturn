@@ -33,7 +33,7 @@ import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.AuthorizationRequestDecoder;
 import org.webpki.saturn.common.AuthorizationResponseDecoder;
-import org.webpki.saturn.common.PayeeAuthority;
+import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.TransactionRequestDecoder;
 import org.webpki.saturn.common.TransactionTypes;
@@ -70,7 +70,7 @@ public class HybridPaymentServlet extends ProcessingBaseServlet {
         // we should do it for this round as well...
         AuthorizationRequestDecoder authorizationRequest = 
                 authorizationResponse.getAuthorizationRequest();
-        PayeeAuthority payeeAuthority =
+        PayeeAuthorityDecoder payeeAuthority =
                 BankService.externalCalls.getPayeeAuthority(
                         urlHolder,
                         authorizationRequest.getPayeeAuthorityUrl());

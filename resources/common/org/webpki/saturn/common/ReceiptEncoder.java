@@ -28,37 +28,42 @@ import org.webpki.util.ISODateTime;
 
 public class ReceiptEncoder implements BaseProperties {
     
-    public ReceiptEncoder(String referenceId,
-                          String commonName,
+    public ReceiptEncoder(String payeeReferenceId,
+                          GregorianCalendar payeeTimeStamp, 
+                          String payeeCommonName,
                           BigDecimal amount,
                           Currencies currency,
                           String paymentMethodName,
                           String optionalAccountReference, 
-                          String providerAuthorityUrl,
                           String payeeAuthorityUrl,
+                          String providerCommonName,
+                          String providerAuthorityUrl,
                           GregorianCalendar providerTimeStamp,
                           String providerReferenceId) throws IOException {
-        receiptDocument = Messages.RECEIPT.createBaseMessage()
-                .setString(REFERENCE_ID_JSON, referenceId)
-                .setString(COMMON_NAME_JSON, commonName)
-                .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
-                .setString(CURRENCY_JSON, currency.toString())
-                .setString(PAYMENT_METHOD_NAME_JSON, paymentMethodName)
-                .setDynamic((wr) -> optionalAccountReference == null ?
-                                wr : wr.setString(ACCOUNT_REFERENCE_JSON,
-                                                  optionalAccountReference))
-                .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
-                .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
-                .setObject(PROVIDER_TRANSACTION_DATA_JSON, new JSONObjectWriter()
-                        .setDateTime(TIME_STAMP_JSON, 
-                                     providerTimeStamp, 
-                                     ISODateTime.UTC_NO_SUBSECONDS)
-                        .setString(REFERENCE_ID_JSON, providerReferenceId));
+        this(ReceiptDecoder.Status.AVAILABLE);
+        receiptDocument
+            .setString(REFERENCE_ID_JSON, payeeReferenceId)
+            .setDateTime(TIME_STAMP_JSON, payeeTimeStamp, ISODateTime.UTC_NO_SUBSECONDS)
+            .setString(COMMON_NAME_JSON, payeeCommonName)
+            .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
+            .setString(CURRENCY_JSON, currency.toString())
+            .setString(PAYMENT_METHOD_NAME_JSON, paymentMethodName)
+            .setDynamic((wr) -> optionalAccountReference == null ?
+                            wr : wr.setString(ACCOUNT_REFERENCE_JSON,
+                                              optionalAccountReference))
+            .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
+            .setObject(PROVIDER_DATA_JSON, new JSONObjectWriter()
+                    .setString(COMMON_NAME_JSON, providerCommonName)
+                    .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
+                    .setDateTime(TIME_STAMP_JSON, 
+                                 providerTimeStamp, 
+                                 ISODateTime.UTC_NO_SUBSECONDS)
+                    .setString(REFERENCE_ID_JSON, providerReferenceId));
     }
 
-    public ReceiptEncoder(int notAvailableStatus) throws IOException {
+    public ReceiptEncoder(ReceiptDecoder.Status notAvailableStatus) throws IOException {
         receiptDocument = Messages.RECEIPT.createBaseMessage()
-                .setInt(NOT_AVAILABLE_STATUS_JSON, notAvailableStatus);
+                .setString(STATUS_JSON, notAvailableStatus.toString());
     }
 
     JSONObjectWriter receiptDocument;
