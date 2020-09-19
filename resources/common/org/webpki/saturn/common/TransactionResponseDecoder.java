@@ -34,8 +34,8 @@ public class TransactionResponseDecoder extends ProviderResponseDecoder {
 
     public TransactionResponseDecoder(JSONObjectReader rd) throws IOException {
         root = Messages.TRANSACTION_RESPONSE.parseBaseMessage(rd);
-        transactionRequest = 
-                new TransactionRequestDecoder(Messages.TRANSACTION_REQUEST.getEmbeddedMessage(rd), null);
+        transactionRequest = new TransactionRequestDecoder(
+                Messages.TRANSACTION_REQUEST.getEmbeddedMessage(rd), null);
         if (rd.hasProperty(TRANSACTION_ERROR_JSON)) {
             transactionError = ERROR.valueOf(rd.getString(TRANSACTION_ERROR_JSON));
         }

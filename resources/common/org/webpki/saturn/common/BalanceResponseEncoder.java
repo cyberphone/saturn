@@ -35,6 +35,8 @@ public class BalanceResponseEncoder implements BaseProperties {
             .setString(ACCOUNT_ID_JSON, accountId)
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
-            .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.LOCAL_NO_SUBSECONDS);
+            .setDateTime(TIME_STAMP_JSON, 
+                         new GregorianCalendar(), 
+                         ISODateTime.LOCAL_NO_SUBSECONDS);
     }
 }

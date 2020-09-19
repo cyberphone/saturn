@@ -33,25 +33,28 @@ public class AuthorizationResponseEncoder implements BaseProperties {
     public static final String SOFTWARE_NAME    = "WebPKI.org - Bank";
     public static final String SOFTWARE_VERSION = "1.00";
 
-    public static JSONObjectWriter encode(AuthorizationRequestDecoder authorizationRequest,
-                                          ProviderAuthorityDecoder.EncryptionParameter encryptionParameter,
-                                          AccountDataEncoder accountData,
-                                          String optionalAccountReference,
-                                          String referenceId,
-                                          String optionalLogData,
-                                          ServerX509Signer signer) throws IOException, GeneralSecurityException {
+    public static JSONObjectWriter encode(
+                AuthorizationRequestDecoder authorizationRequest,
+                ProviderAuthorityDecoder.EncryptionParameter encryptionParameter,
+                AccountDataEncoder accountData,
+                String optionalAccountReference,
+                String referenceId,
+                String optionalLogData,
+                ServerX509Signer signer) throws IOException, GeneralSecurityException {
         return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
             .setDynamic((wr) -> optionalAccountReference == null ?
                     wr :  wr.setString(ACCOUNT_REFERENCE_JSON, optionalAccountReference))
             .setObject(ENCRYPTED_ACCOUNT_DATA_JSON, 
                        JSONObjectWriter
                            .createEncryptionObject(
-                               accountData.writeObject().serializeToBytes(JSONOutputFormats.NORMALIZED),
+                               accountData.writeObject().serializeToBytes(
+                                       JSONOutputFormats.NORMALIZED),
                                encryptionParameter.getDataEncryptionAlgorithm(),
                                new JSONAsymKeyEncrypter(encryptionParameter.getEncryptionKey(),
                                encryptionParameter.getKeyEncryptionAlgorithm())))
             .setString(REFERENCE_ID_JSON, referenceId)
-            .setDynamic((wr) -> optionalLogData == null ? wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
+            .setDynamic((wr) -> optionalLogData == null ? 
+                    wr :  wr.setString(LOG_DATA_JSON, optionalLogData))
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDynamic((wr) -> Software.encode(wr, SOFTWARE_NAME, SOFTWARE_VERSION))
             .setObject(Messages.AUTHORIZATION_REQUEST.lowerCamelCase(), authorizationRequest.root)

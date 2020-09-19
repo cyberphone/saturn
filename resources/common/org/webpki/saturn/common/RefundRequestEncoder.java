@@ -45,7 +45,8 @@ public class RefundRequestEncoder implements BaseProperties {
             .setDynamic((wr) -> Software.encode(wr,
                                                 PaymentRequestEncoder.SOFTWARE_NAME, 
                                                 PaymentRequestEncoder.SOFTWARE_VERSION))
-            .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), authorizationResponse.root)
+            .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), 
+                       authorizationResponse.root)
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 }

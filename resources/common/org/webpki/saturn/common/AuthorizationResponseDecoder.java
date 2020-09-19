@@ -37,8 +37,8 @@ public class AuthorizationResponseDecoder extends ProviderResponseDecoder {
     
     public AuthorizationResponseDecoder(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
-        authorizationRequest = 
-                new AuthorizationRequestDecoder(Messages.AUTHORIZATION_REQUEST.getEmbeddedMessage(rd));
+        authorizationRequest = new AuthorizationRequestDecoder(
+                Messages.AUTHORIZATION_REQUEST.getEmbeddedMessage(rd));
         optionalAccountReference = rd.getStringConditional(ACCOUNT_REFERENCE_JSON);
         encryptedAccountData = 
                 rd.getObject(ENCRYPTED_ACCOUNT_DATA_JSON)

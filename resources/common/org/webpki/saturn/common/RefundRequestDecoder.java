@@ -34,10 +34,12 @@ public class RefundRequestDecoder implements BaseProperties {
     
     public RefundRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
         root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
-        authorizationResponse = new AuthorizationResponseDecoder(Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
+        authorizationResponse = new AuthorizationResponseDecoder(
+                Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         amount = rd.getMoney(AMOUNT_JSON,
-                             authorizationResponse.authorizationRequest.paymentRequest.currency.decimals);
+                             authorizationResponse
+                                 .authorizationRequest.paymentRequest.currency.decimals);
         undecodedAccountData = rd.getObject(PAYEE_SOURCE_ACCOUNT_JSON);
         rd.scanAway(PAYEE_SOURCE_ACCOUNT_JSON);  // Read all to not throw on checkForUnread()
         referenceId = rd.getString(REFERENCE_ID_JSON);
@@ -48,7 +50,8 @@ public class RefundRequestDecoder implements BaseProperties {
                     .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
                     .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN));
         if (cardNetwork != null &&
-            authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ cardNetwork) {
+            authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ 
+            cardNetwork) {
             throw new IOException("Incompatible payment method: " + 
                 authorizationResponse.authorizationRequest.paymentMethod.getPaymentMethodUrl());
         }

@@ -31,7 +31,8 @@ public class RefundResponseEncoder implements BaseProperties {
                                           String optionalLogData,
                                           ServerX509Signer signer) throws IOException {
         return Messages.REFUND_RESPONSE.createBaseMessage()
-            .setDynamic((wr) -> optionalLogData == null ? wr : wr.setString(LOG_DATA_JSON, optionalLogData))
+            .setDynamic((wr) -> optionalLogData == null ?
+                    wr : wr.setString(LOG_DATA_JSON, optionalLogData))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDynamic((wr) -> Software.encode(wr,

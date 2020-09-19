@@ -34,7 +34,8 @@ public class RefundResponseDecoder implements BaseProperties {
         referenceId = rd.getString(REFERENCE_ID_JSON);
         dateTime = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        refundRequest = new RefundRequestDecoder(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
+        refundRequest = 
+                new RefundRequestDecoder(Messages.REFUND_REQUEST.getEmbeddedMessage(rd), null);
         signatureDecoder = rd.getSignature(AUTHORIZATION_SIGNATURE_JSON,
                 new JSONCryptoHelper.Options()
                     .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
