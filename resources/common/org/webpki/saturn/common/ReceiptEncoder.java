@@ -38,8 +38,10 @@ public class ReceiptEncoder implements BaseProperties {
                           String payeeAuthorityUrl,
                           String providerCommonName,
                           String providerAuthorityUrl,
+                          String providerReferenceId,
+                          String payeeRequestId,
                           GregorianCalendar providerTimeStamp,
-                          String providerReferenceId) throws IOException {
+                          ServerAsymKeySigner signer) throws IOException {
         this(ReceiptDecoder.Status.AVAILABLE);
         receiptDocument
             .setString(REFERENCE_ID_JSON, payeeReferenceId)
@@ -55,10 +57,12 @@ public class ReceiptEncoder implements BaseProperties {
             .setObject(PROVIDER_DATA_JSON, new JSONObjectWriter()
                     .setString(COMMON_NAME_JSON, providerCommonName)
                     .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
+                    .setString(REFERENCE_ID_JSON, providerReferenceId)
+                    .setString(PAYEE_REQUEST_ID_JSON, payeeRequestId)
                     .setDateTime(TIME_STAMP_JSON, 
                                  providerTimeStamp, 
-                                 ISODateTime.UTC_NO_SUBSECONDS)
-                    .setString(REFERENCE_ID_JSON, providerReferenceId));
+                                 ISODateTime.UTC_NO_SUBSECONDS))
+            .setSignature(RECEIPT_SIGNATURE_JSON, signer);
     }
 
     public ReceiptEncoder(ReceiptDecoder.Status notAvailableStatus) throws IOException {
@@ -67,7 +71,7 @@ public class ReceiptEncoder implements BaseProperties {
     }
 
     JSONObjectWriter receiptDocument;
-    public JSONObjectWriter getReceiptDocument() {
+    public JSONObjectWriter getReceiptDocument() throws IOException {
         return receiptDocument;
     }
 }

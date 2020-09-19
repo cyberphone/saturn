@@ -22,13 +22,19 @@ import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
 
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.ISODateTime;
 
 public class ReceiptDecoder implements BaseProperties {
     
     public enum Status {PENDING, AVAILABLE, FAILED, DELETED}
+
+    static final JSONCryptoHelper.Options signatureOptions = new JSONCryptoHelper.Options()
+            .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
+            .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
 
     public ReceiptDecoder(JSONObjectReader rd) throws IOException {
         Messages.RECEIPT.parseBaseMessage(rd);
@@ -47,8 +53,10 @@ public class ReceiptDecoder implements BaseProperties {
         JSONObjectReader providerData = rd.getObject(PROVIDER_DATA_JSON);
         providerAuthorityUrl = providerData.getString(PROVIDER_AUTHORITY_URL_JSON);
         providerCommonName = providerData.getString(COMMON_NAME_JSON);
-        providerTimeStamp = providerData.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         providerReferenceId = providerData.getString(REFERENCE_ID_JSON);
+        payeeRequestId = providerData.getString(PAYEE_REQUEST_ID_JSON);
+        providerTimeStamp = providerData.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        signatureDecoder = rd.getSignature(RECEIPT_SIGNATURE_JSON, signatureOptions);
         rd.checkForUnread();
     }
     
@@ -98,6 +106,11 @@ public class ReceiptDecoder implements BaseProperties {
         return providerReferenceId;
     }
 
+    String payeeRequestId;
+    public String getPayeeRequestId() {
+        return payeeRequestId;
+    }
+
     String payeeReferenceId;
     public String getPayeeReferenceId() {
         return payeeReferenceId;
@@ -117,4 +130,10 @@ public class ReceiptDecoder implements BaseProperties {
     public String getPaymentMethodName() {
         return paymentMethodName;
     }
+
+    JSONSignatureDecoder signatureDecoder;
+    public JSONSignatureDecoder getSignatureDecoder() {
+        return signatureDecoder;
+    }
+    
 }

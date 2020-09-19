@@ -61,8 +61,14 @@ public abstract class ProviderResponseDecoder implements BaseProperties {
         return getAuthorizationResponse().optionalAccountReference;
     }
 
-    public abstract GregorianCalendar getTimeStamp();
+    public abstract GregorianCalendar getProviderTimeStamp();
     
+    public final GregorianCalendar getPayeeTimeStamp() {
+        return getAuthorizationResponse().authorizationRequest.timeStamp;
+    }
+
+    public abstract String getPayeeRequestId();
+
     abstract JSONObjectReader getRoot();
     
     public final String getJsonString() throws IOException {

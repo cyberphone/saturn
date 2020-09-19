@@ -51,11 +51,9 @@ USE MERCHANT;
 CREATE TABLE ORDERS (
     Id                    CHAR(16)  CHARACTER SET latin1  NOT NULL UNIQUE, -- Unique Order Id
 
-    ReceiptPathData       CHAR(22)  CHARACTER SET latin1  NOT NULL,      -- Random path data for receipt URLs
+    ReceiptPathData       CHAR(22)  CHARACTER SET latin1  NOT NULL,        -- Random path data for receipt URLs
     
-    Status                VARCHAR(10)                     NOT NULL,      -- see ReceiptDecoder.java for values
-    
-    Created               TIMESTAMP  NOT NULL  DEFAULT CURRENT_TIMESTAMP, -- Administrator data
+    Status                VARCHAR(10)                     NOT NULL,        -- see ReceiptDecoder.java for values
     
     PRIMARY KEY (Id)
 );
@@ -66,28 +64,23 @@ CREATE TABLE ORDERS (
 /*=============================================*/
 
 CREATE TABLE ORDER_ID (
-    IssueDate             CHAR(8)  NOT NULL,                             -- yyyymmdd
+    IssueDate             CHAR(8)  NOT NULL,                               -- yyyymmdd
     
-    Instance              INT      NOT NULL                              -- Instance for the actual day
+    Instance              INT      NOT NULL                                -- Instance for the actual day
 );
 
 INSERT INTO ORDER_ID(IssueDate, Instance) VALUES('00000000', 0);
 
 
 /*=============================================*/
-/*                  PAYMENTS                   */
+/*                  RECEIPTS                   */
 /*=============================================*/
 
-CREATE TABLE PAYMENTS (
+CREATE TABLE RECEIPTS (
     Id                    CHAR(16)  CHARACTER SET latin1  NOT NULL UNIQUE, -- Unique Order Id
     
-    CommonName            VARCHAR(30)   NOT NULL,                        -- Of Payer Bank
+    JsonData              BLOB      NOT NULL,                              -- Serialized receipt in JSON
 
-    AuthorityUrl          VARCHAR(100)  NOT NULL,                        -- Of Payer Bank
-    
-    Authorization         TEXT          NOT NULL,                        -- JSON string holding either
-                                                                         -- "AuthorizationResponse" or
-                                                                         -- "TransactionResponse"
     FOREIGN KEY (Id) REFERENCES ORDERS(Id)
 );
 
@@ -126,19 +119,10 @@ CREATE PROCEDURE CreateOrderIdSP (OUT p_Id CHAR(16),
 
 
 CREATE PROCEDURE SaveTransactionSP (IN p_Id CHAR(16) CHARACTER SET latin1,
-                                    IN p_CommonName VARCHAR(30),
-                                    IN p_AuthorityUrl VARCHAR(100),
-                                    IN p_Authorization TEXT)
+                                    IN p_JsonData BLOB)
   BEGIN
     UPDATE ORDERS SET Status = 'AVAILABLE' WHERE Id = p_Id;
-    INSERT INTO PAYMENTS(Id, 
-                         CommonName,
-                         AuthorityUrl,
-                         Authorization)
-        VALUES(p_Id,
-               p_CommonName,
-               p_AuthorityUrl,
-               p_Authorization);
+    INSERT INTO RECEIPTS(Id, JsonData) VALUES(p_Id, p_JsonData);
   END
 //
 

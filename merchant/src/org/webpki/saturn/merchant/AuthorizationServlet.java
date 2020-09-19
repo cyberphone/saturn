@@ -40,6 +40,7 @@ import org.webpki.saturn.common.Messages;
 import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.ProviderUserResponseDecoder;
+import org.webpki.saturn.common.ServerAsymKeySigner;
 import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.PaymentMethods;
@@ -126,7 +127,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
-            AuthorizationRequestEncoder.encode(MerchantService.testMode,
+            AuthorizationRequestEncoder.encode(
+                                        MerchantService.testMode,
                                         providerAuthority.getServiceUrl(),
                                         payeeAuthorityUrl,
                                         payerAuthorization.getPaymentMethod(),
@@ -134,7 +136,6 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                         request.getRemoteAddr(),
                                         paymentRequest,
                                         paymentBackendMethodEncoder,
-                                        paymentRequest.getReferenceId() + "-1",
                                         paymentNetwork.signer);
 
         // Call Payer bank
@@ -211,7 +212,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                    resultData,
                                    debugData);
             } else {
-                DataBaseOperations.saveTransaction(resultData);
+                DataBaseOperations.saveTransaction(resultData, paymentNetwork.signer);
             }
 
         } else {
@@ -242,18 +243,17 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                    ResultData resultData, 
                                    DebugData debugData) throws IOException {
 
+        ServerAsymKeySigner signer = merchant.paymentMethods.get(
+            transactionOperation.authorizationResponse
+                .getAuthorizationRequest().getPaymentMethod().getPaymentMethodUrl()).signer;
         JSONObjectWriter transactionRequest =
             TransactionRequestEncoder.encode(transactionOperation.authorizationResponse,
                                              transactionOperation.urlToCall,
                                              actualAmount,
                                              transactionOperation.authorizationResponse
                                                  .getAuthorizationRequest()
-                                                     .getPaymentRequest().getReferenceId() + "-2",
-                                             merchant.paymentMethods.get(
-                                                 transactionOperation.authorizationResponse
-                                                     .getAuthorizationRequest()
-                                                         .getPaymentMethod()
-                                                             .getPaymentMethodUrl()).signer);
+                                                     .getPaymentRequest().getReferenceId() + ".1",
+                                             signer);
         // Acquirer or Hybrid call
         JSONObjectReader response =
             MerchantService.externalCalls.postJsonData(urlHolder, 
@@ -270,7 +270,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         resultData.authorization = transactionResponse;
         resultData.transactionError = transactionResponse.getTransactionError();
-        DataBaseOperations.saveTransaction(resultData);
+        DataBaseOperations.saveTransaction(resultData, signer);
     }
 
     @Override

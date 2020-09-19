@@ -38,6 +38,10 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequestDecoder implements BaseProperties {
     
+    static final JSONCryptoHelper.Options signatureOptions = new JSONCryptoHelper.Options()
+            .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
+            .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
+    
     public AuthorizationRequestDecoder(JSONObjectReader rd) throws IOException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
@@ -48,14 +52,10 @@ public class AuthorizationRequestDecoder implements BaseProperties {
         encryptedAuthorizationData = PayerAuthorization.getEncryptedAuthorization(rd);
         undecodedAccountData = rd.getObject(PAYEE_RECEIVE_ACCOUNT_JSON);
         rd.scanAway(PAYEE_RECEIVE_ACCOUNT_JSON);  // Read all to not throw on checkForUnread()
-        referenceId = rd.getString(REFERENCE_ID_JSON);
         clientIpAddress = rd.getString(CLIENT_IP_ADDRESS_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
-        signatureDecoder = rd.getSignature(REQUEST_SIGNATURE_JSON, 
-                new JSONCryptoHelper.Options()
-                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
-                    .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN));
+        signatureDecoder = rd.getSignature(REQUEST_SIGNATURE_JSON, signatureOptions);
         rd.checkForUnread();
     }
 
@@ -108,9 +108,10 @@ System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
         return payeeAuthorityUrl;
     }
 
-    String referenceId;
+    // Note: we reuse the referenceId of PaymentRequest
+    // since these objects are "inseparable" anyway
     public String getReferenceId() {
-        return referenceId;
+        return paymentRequest.referenceId;
     }
 
     String clientIpAddress;

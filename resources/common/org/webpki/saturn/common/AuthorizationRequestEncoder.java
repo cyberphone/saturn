@@ -35,17 +35,17 @@ public class AuthorizationRequestEncoder implements BaseProperties {
                                           String clientIpAddress,
                                           PaymentRequestDecoder paymentRequest,
                                           AccountDataEncoder payeeReceiveAccount,
-                                          String referenceId,
                                           ServerAsymKeySigner signer) throws IOException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
             .setString(PAYMENT_METHOD_JSON, paymentMethod.getPaymentMethodUrl())
+            // Note: we reuse the referenceId of PaymentRequest
+            // since these objects are "inseparable" anyway
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest.root)
             .setObject(ENCRYPTED_AUTHORIZATION_JSON, encryptedAuthorizationData)
             .setObject(PAYEE_RECEIVE_ACCOUNT_JSON, payeeReceiveAccount.writeObject())
-            .setString(REFERENCE_ID_JSON, referenceId)
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDynamic((wr) -> Software.encode(wr, 

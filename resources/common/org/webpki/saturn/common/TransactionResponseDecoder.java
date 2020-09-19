@@ -98,12 +98,17 @@ public class TransactionResponseDecoder extends ProviderResponseDecoder {
     }
 
     @Override
-    public GregorianCalendar getTimeStamp() {
+    public GregorianCalendar getProviderTimeStamp() {
         return timeStamp;
     }
 
     @Override
     public String getProviderReferenceId() {
         return referenceId;
+    }
+
+    @Override
+    public String getPayeeRequestId() {
+        return transactionRequest.referenceId;
     }
 }

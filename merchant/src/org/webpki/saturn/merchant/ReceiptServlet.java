@@ -26,13 +26,14 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
+import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
+
 import org.webpki.util.ISODateTime;
 
 public class ReceiptServlet extends HttpServlet {
@@ -110,19 +111,19 @@ public class ReceiptServlet extends HttpServlet {
                 return;
             }
 
-            ReceiptEncoder receiptEncoder;
+            byte[] receipt;
             // Receipt URL is valid but that doesn't mean that there is any receipt data...
             if (orderInfo.status == ReceiptDecoder.Status.AVAILABLE) {
-                receiptEncoder = DataBaseOperations.getReceiptData(orderId, orderInfo.timeStamp);
+                receipt = DataBaseOperations.getReceiptData(orderId);
             } else {
-                receiptEncoder = new ReceiptEncoder(orderInfo.status);
+                receipt = new ReceiptEncoder(orderInfo.status).getReceiptDocument()
+                                .serializeToBytes(JSONOutputFormats.NORMALIZED);
             }
 
             // Are we rather called by a browser?
             String accept = request.getHeader(HttpSupport.HTTP_ACCEPT_HEADER);
             if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
-                ReceiptDecoder receiptDecoder = 
-                        new ReceiptDecoder(new JSONObjectReader(receiptEncoder.getReceiptDocument()));
+                ReceiptDecoder receiptDecoder = new ReceiptDecoder(JSONParser.parse(receipt));
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
                         "<link rel='icon' href='../saturn.png' sizes='192x192'>"+
                         "<title>Receipt</title>" +
@@ -130,7 +131,7 @@ public class ReceiptServlet extends HttpServlet {
                         "<body>")
                     .append(new HtmlTable("Core Receipt Data")
                             .addHeader("Payee Name")
-                            .addHeader("Order Id")
+                            .addHeader("Reference Id")
                             .addHeader("Total")
                             .addHeader("Time Stamp")
                             .addCell(receiptDecoder.getPayeeCommonName())
@@ -145,17 +146,19 @@ public class ReceiptServlet extends HttpServlet {
                             .addHeader("Account Type")
                             .addHeader("Account Id")
                             .addHeader("Transaction Id")
+                            .addHeader("Request Id")
                             .addHeader("Time Stamp")
                             .addCell(receiptDecoder.getProviderCommonName())
                             .addCell(receiptDecoder.getPaymentMethodName())
                             .addCell(receiptDecoder.getOptionalAccountReference())
-                           .addCell(receiptDecoder.getProviderReferenceId(), "text-align:right")
+                            .addCell(receiptDecoder.getProviderReferenceId())
+                            .addCell(receiptDecoder.getPayeeRequestId())
                             .addCell(ISODateTime.formatDateTime(receiptDecoder.getProviderTimeStamp(),
                                                                 ISODateTime.UTC_NO_SUBSECONDS))
                             .render());
                 HttpSupport.writeHtml(response, html.append("</body></html>"));
             } else {
-                HttpSupport.writeJsonData(response, receiptEncoder.getReceiptDocument());
+                HttpSupport.writeData(response, receipt, "");
             }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

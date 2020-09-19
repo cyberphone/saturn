@@ -22,7 +22,6 @@ import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
 
-import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONSignatureDecoder;
 import org.webpki.json.JSONX509Verifier;
@@ -43,9 +42,7 @@ public class TransactionRequestDecoder implements BaseProperties {
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         software = new Software(rd);
         signatureDecoder = rd.getSignature(REQUEST_SIGNATURE_JSON,
-                new JSONCryptoHelper.Options()
-                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
-                    .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN));
+                                           AuthorizationRequestDecoder.signatureOptions);
         if (cardPayment != null &&
             authorizationResponse
                 .authorizationRequest.paymentMethod.isCardPayment() ^ cardPayment) {

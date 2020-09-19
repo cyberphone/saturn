@@ -65,6 +65,8 @@ public interface BaseProperties {
     String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User and bank authorization signature
     String STATUS_JSON                      = "status";                     // See Receipts
     String PAYMENT_METHOD_NAME_JSON         = "paymentMethodName";          //    -"-
+    String PAYEE_REQUEST_ID_JSON            = "payeeRequestId";             //    -"-
+    String RECEIPT_SIGNATURE_JSON           = "receiptSignature";           //   -"-
     String PROVIDER_DATA_JSON               = "providerData";               //    -"-
     String TAX_JSON                         = "tax";                        //    -"-
     String TAX_PERCENTAGE_JSON              = "taxPercentage";              //    -"-

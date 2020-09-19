@@ -101,7 +101,7 @@ public class RefundServlet extends HttpServlet implements MerchantSessionPropert
                                      refundUrl,
                                      resultData.authorization.getAmount(),
                                      pmd.sourceAccounts.get(context),
-                                     resultData.authorization.getPayeeReferenceId() + "-3",
+                                     resultData.authorization.getPayeeReferenceId() + ".2",
                                      pmd.signer);
             JSONObjectReader refundResponseData =
                 MerchantService.externalCalls.postJsonData(urlHolder, refundUrl, refundRequestData);

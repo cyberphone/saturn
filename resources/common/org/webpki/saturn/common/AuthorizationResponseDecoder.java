@@ -113,12 +113,17 @@ public class AuthorizationResponseDecoder extends ProviderResponseDecoder {
     }
 
     @Override
-    public GregorianCalendar getTimeStamp() {
+    public GregorianCalendar getProviderTimeStamp() {
         return timeStamp;
     }
 
     @Override
     public String getProviderReferenceId() {
         return referenceId;
+    }
+
+    @Override
+    public String getPayeeRequestId() {
+        return authorizationRequest.paymentRequest.referenceId;
     }
 }
