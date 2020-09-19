@@ -61,7 +61,7 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
                 total += quantity * or.getInt53("priceX100");
             }
         }
-        savedShoppingCart.total = total;
+        savedShoppingCart.subTotal = total;
 
         // We add a fictitious 10% sales tax as well
         savedShoppingCart.tax = total / 10;

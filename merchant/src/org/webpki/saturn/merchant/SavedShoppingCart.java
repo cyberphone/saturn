@@ -24,7 +24,7 @@ public class SavedShoppingCart implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    long total;
+    long subTotal;
     long tax;
     long roundedPaymentAmount;
     LinkedHashMap<String, Integer> items = new LinkedHashMap<>();

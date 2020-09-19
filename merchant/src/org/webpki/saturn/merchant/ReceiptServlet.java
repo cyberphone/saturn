@@ -83,7 +83,7 @@ public class ReceiptServlet extends HttpServlet {
                 html.append("<tr>");
             }
             html.append(style == null  ? "<td>" : "<td style='" + style + "'>")
-                .append(data)
+                .append(data == null ? "N/A" : data)
                 .append("</td>");
             return this;
         }
@@ -131,21 +131,25 @@ public class ReceiptServlet extends HttpServlet {
                     .append(new HtmlTable("Core Receipt Data")
                             .addHeader("Payee Name")
                             .addHeader("Order Id")
-                            .addHeader("Time Stamp")
                             .addHeader("Total")
+                            .addHeader("Time Stamp")
                             .addCell(receiptDecoder.getPayeeCommonName())
                             .addCell(receiptDecoder.getPayeeReferenceId(), "text-align:right")
-                            .addCell(ISODateTime.formatDateTime(receiptDecoder.getPayeeTimeStamp(),
-                                                                ISODateTime.UTC_NO_SUBSECONDS))
                             .addCell(receiptDecoder.getCurrency()
                                     .amountToDisplayString(receiptDecoder.getAmount(), false))
-                            .render())
-                    .append(new HtmlTable("Payment Provider Details")
+                            .addCell(ISODateTime.formatDateTime(receiptDecoder.getPayeeTimeStamp(),
+                                    ISODateTime.UTC_NO_SUBSECONDS))
+                            .render());
+                html.append(new HtmlTable("Payment Provider Details")
                             .addHeader("Provider Name")
+                            .addHeader("Account Type")
+                            .addHeader("Account Id")
                             .addHeader("Transaction Id")
                             .addHeader("Time Stamp")
                             .addCell(receiptDecoder.getProviderCommonName())
-                            .addCell(receiptDecoder.getProviderReferenceId(), "text-align:right")
+                            .addCell(receiptDecoder.getPaymentMethodName())
+                            .addCell(receiptDecoder.getOptionalAccountReference())
+                           .addCell(receiptDecoder.getProviderReferenceId(), "text-align:right")
                             .addCell(ISODateTime.formatDateTime(receiptDecoder.getProviderTimeStamp(),
                                                                 ISODateTime.UTC_NO_SUBSECONDS))
                             .render());

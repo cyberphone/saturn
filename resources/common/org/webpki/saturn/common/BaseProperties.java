@@ -66,6 +66,13 @@ public interface BaseProperties {
     String STATUS_JSON                      = "status";                     // See Receipts
     String PAYMENT_METHOD_NAME_JSON         = "paymentMethodName";          //    -"-
     String PROVIDER_DATA_JSON               = "providerData";               //    -"-
+    String TAX_JSON                         = "tax";                        //    -"-
+    String TAX_PERCENTAGE_JSON              = "taxPercentage";              //    -"-
+    String SUBTOTAL_JSON                    = "subtotal";                   //    -"-
+    String LINE_ITEMS_JSON                  = "lineItems";                  //    -"-
+    String SKU_JSON                         = "sku";                        //    -"-
+    String QUANTITY_JSON                    = "quantity";                   //    -"-
+    String DESCRIPTION_JSON                 = "description";                //    -"-
     String USER_AUTHORIZATION_METHOD_JSON   = "userAuthorizationMethod";    // PIN, Fingerprint, etc.
     String REQUEST_SIGNATURE_JSON           = "requestSignature";           // Payee signature
     String SUB_TYPE_JSON                    = "subType";                    // For non-direct payments
