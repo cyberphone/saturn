@@ -40,8 +40,8 @@ public class ShoppingServlet extends HttpServlet implements MerchantSessionPrope
     static LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<>();
     
     static {
-        products.put("7d688", new ProductEntry("product-car.png", "Model Car", 49999)); 
-        products.put("90555", new ProductEntry("product-icecream.png", "Ice Cream", 325)); 
+        products.put("7d688", new ProductEntry("spacex-starship-heavy.png", "Model Rocket", 49999)); 
+        products.put("90555", new ProductEntry("t-shirt-nasa-grey.png", "Nasa T-Shirt", 1525)); 
     }
     
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

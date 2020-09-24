@@ -100,7 +100,8 @@ class DebugPrintout implements BaseProperties {
                 rewrittenUrl(value, "/webpay-acquirer/", "https://secure.cardprocessor.com") ||
                 rewrittenUrl(value, "/webpay-payerbank", "https://mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank", "https://bigbank.com") ||
-                rewrittenUrl(value, "/webpay-acquirer", "https://cardprocessor.com")) {
+                rewrittenUrl(value, "/webpay-acquirer", "https://cardprocessor.com") ||
+                rewrittenUrl(value, "/webpay-merchant", "https://demomerchant.com")) {
                 rewriter.setupForRewrite(target);
                 rewriter.setString(target, value.toString());
             }
@@ -158,12 +159,14 @@ class DebugPrintout implements BaseProperties {
         }
         updateUrls(jsonTree, rewriter, KnownExtensions.REFUND_REQUEST);
         updateUrls(jsonTree, rewriter, KnownExtensions.HYBRID_PAYMENT);
+        updateUrls(jsonTree, rewriter, KnownExtensions.BALANCE_REQUEST);
         updateUrls(jsonTree, rewriter, NO_MATCHING_METHODS_URL_JSON);
         updateUrls(jsonTree, rewriter, HOME_PAGE_JSON);
         updateUrls(jsonTree, rewriter, RECIPIENT_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, PAYEE_AUTHORITY_URL_JSON);
+        updateUrls(jsonTree, rewriter, RECEIPT_URL_JSON);
         updateSpecific(jsonTree, rewriter, PAYEE_HOST_JSON, "demomerchant.com");
         updateSpecific(jsonTree, rewriter, CLIENT_IP_ADDRESS_JSON, "220.13.198.144");
     }

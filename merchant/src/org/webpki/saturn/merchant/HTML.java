@@ -196,7 +196,7 @@ public class HTML implements MerchantSessionProperties {
         .append(")\"></td>" +
             "</tr>" +
             "<tr>" +
-            "<td style=\"border-width:0px;padding:0px;margin:0px\"><input max=\"6\" size=\"4\" type=\"text\" name=\"p")
+            "<td style=\"border-width:0px;padding:0px;margin:0px\"><input max=\"6\" style='width:2em' type=\"text\" name=\"p")
         .append(index)
         .append("\" value=\"")
         .append(quantity)

@@ -58,9 +58,9 @@ public class PaymentClientRequestEncoder implements BaseProperties {
                 }
                 return wr;
             })
-            .setDynamic((wr) -> optionalReceiptUrl == null ?
-                      wr : wr.setString(RECEIPT_URL_JSON, optionalReceiptUrl))
             .setObject(PAYMENT_REQUEST_JSON, paymentRequest)
+            .setDynamic((wr) -> optionalReceiptUrl == null ?
+                    wr : wr.setString(RECEIPT_URL_JSON, optionalReceiptUrl))
             .setDynamic((wr) -> noMatchingMethodsUrl == null ?
                     wr : wr.setString(NO_MATCHING_METHODS_URL_JSON, noMatchingMethodsUrl));
     }
