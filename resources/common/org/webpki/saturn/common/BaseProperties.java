@@ -52,7 +52,6 @@ public interface BaseProperties {
     String CLIENT_GEO_LOCATION_JSON         = "clientGeoLocation";          // Optional security data that client devices may supply
     String LOG_DATA_JSON                    = "logData";                    // Insertion of external log data
     String REFERENCE_ID_JSON                = "referenceId";                // Unique reference in a message
-    String PAYEE_JSON                       = "payee";                      // Payee object used in PaymentRequest
     String LOCAL_PAYEE_ID_JSON              = "localPayeeId";               // Provider's local ID of Payee
     String TEST_MODE_JSON                   = "testMode";                   // Test mode = no real money involved
     String ENCRYPTED_AUTHORIZATION_JSON     = "encryptedAuthorization";     // Encrypted Payer authorization data

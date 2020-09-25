@@ -129,7 +129,6 @@ public class DebugData implements Serializable {
         GregorianCalendar expires = TimeUtils.inMinutes(30);
         JSONObjectWriter paymentRequest = 
             PaymentRequestEncoder.encode("Demo Merchant",
-                                         "https://demomerchant.com",
                                          new BigDecimal("100.00"),
                                          Currencies.EUR,
                                          null,

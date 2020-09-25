@@ -28,11 +28,7 @@ import org.webpki.util.ISODateTime;
 
 public class PaymentRequestEncoder implements BaseProperties {
     
-    public static final String SOFTWARE_NAME    = "WebPKI.org - Payee";
-    public static final String SOFTWARE_VERSION = "1.00";
-
     public static JSONObjectWriter encode(String payeeCommonName,
-                                          String payeeHomePage,
                                           BigDecimal amount,
                                           Currencies currency,
                                           NonDirectPaymentEncoder optionalNonDirectPayment,
@@ -40,16 +36,13 @@ public class PaymentRequestEncoder implements BaseProperties {
                                           GregorianCalendar timeStamp,
                                           GregorianCalendar expires) throws IOException {
         return new JSONObjectWriter()
-            .setObject(PAYEE_JSON, new JSONObjectWriter()
-                                   .setString(COMMON_NAME_JSON, payeeCommonName)
-                                   .setString(HOME_PAGE_JSON, payeeHomePage))
+            .setString(COMMON_NAME_JSON, payeeCommonName)
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
             .setDynamic((wr) -> optionalNonDirectPayment == null ?
                     wr : wr.setObject(NON_DIRECT_PAYMENT_JSON, optionalNonDirectPayment.root))
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, timeStamp, ISODateTime.UTC_NO_SUBSECONDS)
-            .setDateTime(EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr, SOFTWARE_NAME, SOFTWARE_VERSION));
+            .setDateTime(EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS);
     }
 }

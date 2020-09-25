@@ -154,9 +154,7 @@ public class JCSPaper implements BaseProperties {
         JSONObjectWriter paymentRequest = new JSONObjectWriter();
         paymentRequest.setString(JSONDecoderCache.CONTEXT_JSON, CONTEXT);
         paymentRequest.setString(JSONDecoderCache.QUALIFIER_JSON, PAYMENT_REQUEST);
-        paymentRequest.setObject(PAYEE_JSON, new JSONObjectWriter()
-            .setString(COMMON_NAME_JSON, "Demo Merchant")
-            .setString(HOME_PAGE_JSON, "https://demomerchant.com"));
+        paymentRequest.setString(COMMON_NAME_JSON, "Demo Merchant");
         paymentRequest.setString(AMOUNT_JSON, "235.50");
         paymentRequest.setString(CURRENCY_JSON, "USD");
         paymentRequest.setString(REFERENCE_ID_JSON, "05630753");

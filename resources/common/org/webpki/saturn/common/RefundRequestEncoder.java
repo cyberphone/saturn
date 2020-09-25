@@ -43,8 +43,8 @@ public class RefundRequestEncoder implements BaseProperties {
             .setString(REFERENCE_ID_JSON, referenceId)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
             .setDynamic((wr) -> Software.encode(wr,
-                                                PaymentRequestEncoder.SOFTWARE_NAME, 
-                                                PaymentRequestEncoder.SOFTWARE_VERSION))
+                                                AuthorizationRequestEncoder.SOFTWARE_NAME, 
+                                                AuthorizationRequestEncoder.SOFTWARE_VERSION))
             .setObject(Messages.AUTHORIZATION_RESPONSE.lowerCamelCase(), 
                        authorizationResponse.root)
             .setSignature(REQUEST_SIGNATURE_JSON, signer);

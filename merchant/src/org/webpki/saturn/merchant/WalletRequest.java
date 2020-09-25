@@ -70,7 +70,6 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         // Create a payment request
         paymentRequest =
             PaymentRequestEncoder.encode(merchant.commonName, 
-                                         merchant.homePage,
                                          new BigDecimal(
                                              BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
                                              MerchantService.currency.getDecimals()),

@@ -27,6 +27,9 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequestEncoder implements BaseProperties {
     
+    public static final String SOFTWARE_NAME    = "WebPKI.org - Payee";
+    public static final String SOFTWARE_VERSION = "1.00";
+
     public static JSONObjectWriter encode(Boolean testMode,
                                           String recipientUrl,
                                           String payeeAuthorityUrl,
@@ -48,9 +51,7 @@ public class AuthorizationRequestEncoder implements BaseProperties {
             .setObject(PAYEE_RECEIVE_ACCOUNT_JSON, payeeReceiveAccount.writeObject())
             .setString(CLIENT_IP_ADDRESS_JSON, clientIpAddress)
             .setDateTime(TIME_STAMP_JSON, new GregorianCalendar(), ISODateTime.UTC_NO_SUBSECONDS)
-            .setDynamic((wr) -> Software.encode(wr, 
-                                                PaymentRequestEncoder.SOFTWARE_NAME,
-                                                PaymentRequestEncoder.SOFTWARE_VERSION))
+            .setDynamic((wr) -> Software.encode(wr, SOFTWARE_NAME, SOFTWARE_VERSION))
             .setSignature(REQUEST_SIGNATURE_JSON, signer);
     }
 }

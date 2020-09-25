@@ -689,7 +689,7 @@ class DebugPrintout implements BaseProperties {
                 keyWord(Messages.AUTHORIZATION_REQUEST) +
                 " and checking that the <b>User</b> actually has funds matching the request," +
                 " the <b>User&nbsp;Bank</b> <i>reserves</i> the specified amount including a reference to the " +
-                keyWord(PAYEE_JSON) + " and " +
+                "<b>Merchant</b> and " +
                 keyWord(REFERENCE_ID_JSON) + " of the " +
                 keyWord(PAYMENT_REQUEST_JSON) +
                 ".</p> ");

@@ -93,24 +93,21 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     private static final String WAITING_ID = "wait";
 
     static class PaymentType {
-        String commonName;
+        String payeeCommonName;
         BigDecimal amount;
         Currencies currency;
-        String homePage;
         NonDirectPaymentEncoder nonDirectPayments;
     }
     
     static LinkedHashMap<String, PaymentType> sampleTests = new LinkedHashMap<>();
     
     static void initMerchant(String typeOfPayment,
-                             String commonName, 
-                             String homePage, 
+                             String payeeCommonName, 
                              String amount,
                              Currencies currency,
                              NonDirectPaymentEncoder nonDirectPayments) {
         PaymentType o = new PaymentType();
-        o.commonName = commonName;
-        o.homePage = homePage;
+        o.payeeCommonName = payeeCommonName;
         o.amount = new BigDecimal(amount);
         o.currency = currency;
         o.nonDirectPayments = nonDirectPayments;
@@ -120,19 +117,16 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     static {
          try {
             initMerchant("Direct - EUR",  "Demo Merchant",
-                                          "demomerchant.com",
                                           "550",
                                           Currencies.EUR,
                                           null);
 
             initMerchant("Direct - USD",  "Demo Merchant",
-                                          "demomerchant.com",
                                           "550",
                                           Currencies.USD,
                                           null);
 
             initMerchant("Gas Station",   "Planet Gas",
-                                          "planetgas.com",
                                           "200",
                                           Currencies.EUR,
                                           NonDirectPaymentEncoder.reservation(
@@ -141,7 +135,6 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                                   true));
 
             initMerchant("Hotel Booking", "Best Lodging",
-                                          "bestlodging.com",
                                           "1200",
                                           Currencies.EUR,
                                           NonDirectPaymentEncoder.reservation(
@@ -149,7 +142,6 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                                   TimeUtils.inDays(10), 
                                                   true));
             initMerchant("Electricy",     "Power to You",
-                                          "power2u.com",
                                           "0",
                                           Currencies.EUR,
                                           NonDirectPaymentEncoder.recurring(
@@ -159,7 +151,6 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
 
             initMerchant("Phone Subscription", 
                                           "ET Phone Home",
-                                          "etphonehome.com",
                                           "129.99",
                                           Currencies.EUR,
                                           NonDirectPaymentEncoder.recurring(
@@ -168,7 +159,6 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                                   true));
             initMerchant("Multiple Paments", 
                                           "Amazon",
-                                          "amazon.com",
                                           "34.75",
                                           Currencies.EUR,
                                           NonDirectPaymentEncoder.recurring(
@@ -214,8 +204,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
         GregorianCalendar expires = TimeUtils.inMinutes(30);
         // Create a payment request
         JSONObjectWriter paymentRequest =
-            PaymentRequestEncoder.encode(paymentData.commonName, 
-                                         paymentData.homePage,
+            PaymentRequestEncoder.encode(paymentData.payeeCommonName, 
                                          paymentData.amount,
                                          paymentData.currency,
                                          paymentData.nonDirectPayments,

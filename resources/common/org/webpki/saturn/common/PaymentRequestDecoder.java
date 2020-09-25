@@ -33,15 +33,12 @@ public class PaymentRequestDecoder implements BaseProperties {
     
     public PaymentRequestDecoder(JSONObjectReader rd) throws IOException {
         root = rd;
-        JSONObjectReader payee = rd.getObject(PAYEE_JSON);
-        payeeCommonName = payee.getString(COMMON_NAME_JSON);
-        payeeHomePage = payee.getString(HOME_PAGE_JSON);
+        payeeCommonName = rd.getString(COMMON_NAME_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         amount = rd.getMoney(AMOUNT_JSON, currency.getDecimals());
         referenceId = rd.getString(REFERENCE_ID_JSON);
         timeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         expires = rd.getDateTime(EXPIRES_JSON, ISODateTime.COMPLETE);
-        software = new Software(rd);
         if (rd.hasProperty(NON_DIRECT_PAYMENT_JSON)) {
             nonDirectPayment = new NonDirectPaymentDecoder(rd.getObject(NON_DIRECT_PAYMENT_JSON),
                                                            timeStamp);
@@ -57,11 +54,6 @@ public class PaymentRequestDecoder implements BaseProperties {
     String payeeCommonName;
     public String getPayeeCommonName() {
         return payeeCommonName;
-    }
-
-    String payeeHomePage;
-    public String getPayeeHomePage() {
-        return payeeHomePage;
     }
 
     BigDecimal amount;
@@ -87,11 +79,6 @@ public class PaymentRequestDecoder implements BaseProperties {
     GregorianCalendar timeStamp;
     public GregorianCalendar getTimeStamp() {
         return timeStamp;
-    }
-
-    Software software;
-    public Software getSoftware() {
-        return software;
     }
 
     JSONObjectReader root;
