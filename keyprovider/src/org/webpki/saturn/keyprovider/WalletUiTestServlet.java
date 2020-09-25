@@ -223,8 +223,8 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                                            "https://payments.bigbank.com/payees/86344"));
         JSONObjectWriter requestObject = 
                 PaymentClientRequestEncoder.encode(supportedPaymentMethods,
-                                                   null, 
                                                    paymentRequest,
+                                                   null, 
                                                    null);
         session.setAttribute(REQUEST, requestObject);
         returnJson(response, requestObject);

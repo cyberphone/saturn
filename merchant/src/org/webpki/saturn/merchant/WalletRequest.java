@@ -92,8 +92,8 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         }
 
         requestObject = PaymentClientRequestEncoder.encode(supportedPaymentMethods,
-                                                           receiptUrl,
                                                            paymentRequest,
+                                                           receiptUrl,
                                                            MerchantService.noMatchingMethodsUrl);
         
         if (debugMode) {

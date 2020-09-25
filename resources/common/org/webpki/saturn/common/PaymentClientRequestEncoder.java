@@ -43,8 +43,8 @@ public class PaymentClientRequestEncoder implements BaseProperties {
     }
 
     public static JSONObjectWriter encode(List<SupportedPaymentMethod> supportedPaymentMethods,
-                                          String optionalReceiptUrl,
                                           JSONObjectWriter paymentRequest, 
+                                          String optionalReceiptUrl,
                                           String noMatchingMethodsUrl) throws IOException {
         return Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage()
             .setDynamic((wr) -> {
