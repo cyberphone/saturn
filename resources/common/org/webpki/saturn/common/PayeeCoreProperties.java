@@ -47,8 +47,9 @@ public class PayeeCoreProperties implements BaseProperties {
     ArrayList<byte[]> optionalAccountHashes;
     SignatureParameter[] signatureParameters;
     String payeeId;
-    String payeeHomePage;
-    String payeeCommonName;
+    String commonName;
+    String homePage;
+    String logotypeUrl;
     String urlSafeId;
     String payeeAuthorityUrl;
 
@@ -69,8 +70,9 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
         payeeId = rd.getString(LOCAL_PAYEE_ID_JSON);
-        payeeCommonName = rd.getString(COMMON_NAME_JSON);
-        payeeHomePage = rd.getString(HOME_PAGE_JSON);
+        commonName = rd.getString(COMMON_NAME_JSON);
+        homePage = rd.getString(HOME_PAGE_JSON);
+        logotypeUrl = rd.getString(LOGOTYPE_URL_JSON);
         if (rd.hasProperty(ACCOUNT_VERIFIER_JSON)) {
             optionalAccountHashes = new ArrayList<>();
             JSONObjectReader accountVerifier = rd.getObject(ACCOUNT_VERIFIER_JSON);
@@ -130,7 +132,15 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public String getCommonName() {
-        return payeeCommonName;
+        return commonName;
+    }
+
+    public String getLogotypeUrl() {
+        return logotypeUrl;
+    }
+
+    public String getHomePage() {
+        return homePage;
     }
 
     public SignatureParameter[] getSignatureParameters() {
@@ -147,8 +157,9 @@ public class PayeeCoreProperties implements BaseProperties {
 
     public JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
         wr.setString(LOCAL_PAYEE_ID_JSON, payeeId)
-          .setString(COMMON_NAME_JSON, payeeCommonName)
-          .setString(HOME_PAGE_JSON, payeeHomePage);
+          .setString(COMMON_NAME_JSON, commonName)
+          .setString(HOME_PAGE_JSON, homePage)
+          .setString(LOGOTYPE_URL_JSON, logotypeUrl);
         if (optionalAccountHashes != null) {
             wr.setObject(ACCOUNT_VERIFIER_JSON)
                   .setString(JSONCryptoHelper.ALGORITHM_JSON,

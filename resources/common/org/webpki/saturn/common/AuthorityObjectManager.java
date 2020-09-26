@@ -36,6 +36,7 @@ public class AuthorityObjectManager extends Thread {
     String providerAuthorityUrl;
     String providerCommonName;
     String providerHomePage;
+    String providerLogotypeUrl;
     String serviceUrl;
     JSONObjectReader optionalExtensions;
     ProviderAuthorityDecoder.PaymentMethodDeclarations paymentMethods;
@@ -53,7 +54,6 @@ public class AuthorityObjectManager extends Thread {
 
     boolean logging;
 
-    
     void update() throws IOException {
         if (providerSigner != null) {
             synchronized(this) {
@@ -61,6 +61,7 @@ public class AuthorityObjectManager extends Thread {
                         ProviderAuthorityEncoder.encode(providerAuthorityUrl,
                                                         providerCommonName,
                                                         providerHomePage,
+                                                        providerLogotypeUrl,
                                                         serviceUrl,
                                                         paymentMethods,
                                                         optionalExtensions,
@@ -103,6 +104,7 @@ public class AuthorityObjectManager extends Thread {
                 // ProviderAuthority (may be null)
                 String providerCommonName,
                 String providerHomePage,
+                String providerLogotypeUrl,
                 String serviceUrl,
                 ProviderAuthorityDecoder.PaymentMethodDeclarations paymentMethods,
                 JSONObjectReader optionalExtensions,
@@ -120,6 +122,7 @@ public class AuthorityObjectManager extends Thread {
         this.providerAuthorityUrl = providerAuthorityUrl;
         this.providerCommonName = providerCommonName;
         this.providerHomePage = providerHomePage;
+        this.providerLogotypeUrl = providerLogotypeUrl;
         this.serviceUrl = serviceUrl;
         this.paymentMethods = paymentMethods;
         this.optionalExtensions = optionalExtensions;

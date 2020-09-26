@@ -88,15 +88,22 @@ class DebugPrintout implements BaseProperties {
         }
         originalBuffer.delete(0, i + pattern.length());
         originalBuffer.insert(0, rewritten);
+        i = originalBuffer.toString().indexOf("demomerchant-logo.svg");
+        if (i > 0) {
+            originalBuffer.delete(i, i + 17);
+            originalBuffer.insert(i, "logotype");
+        }
         return true;
     }
     
     void updateUrls(JSONObjectReader jsonTree, JSONObjectWriter rewriter, String target) throws IOException {
         if (jsonTree.hasProperty(target)) {
             StringBuilder value = new StringBuilder(jsonTree.getString(target));
-            if (rewrittenUrl(value, "/webpay-payerbank/", "https://payments.mybank.com") ||
+            if ((!target.equals(LOGOTYPE_URL_JSON) && 
+                 rewrittenUrl(value, "/webpay-payerbank/", "https://payments.mybank.com")) ||
                 rewrittenUrl(value, "/webpay-keyprovider", "https://enroll.mybank.com") ||
-                rewrittenUrl(value, "/webpay-payeebank/", "https://payments.bigbank.com") ||
+                (!target.equals(LOGOTYPE_URL_JSON) && 
+                 rewrittenUrl(value, "/webpay-payeebank/", "https://payments.bigbank.com")) ||
                 rewrittenUrl(value, "/webpay-acquirer/", "https://secure.cardprocessor.com") ||
                 rewrittenUrl(value, "/webpay-payerbank", "https://mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank", "https://bigbank.com") ||
@@ -165,6 +172,7 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, RECIPIENT_URL_JSON);
         updateUrls(jsonTree, rewriter, SERVICE_URL_JSON);
         updateUrls(jsonTree, rewriter, PROVIDER_AUTHORITY_URL_JSON);
+        updateUrls(jsonTree, rewriter, LOGOTYPE_URL_JSON);
         updateUrls(jsonTree, rewriter, PAYEE_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, RECEIPT_URL_JSON);
         updateSpecific(jsonTree, rewriter, PAYEE_HOST_JSON, "demomerchant.com");

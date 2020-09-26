@@ -368,6 +368,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 providerAuthorityUrl = bankBaseUrl + "/authority",
                 bankCommonName,
                 bankBaseUrl,
+                bankBaseUrl + "/images/logotype.svg",
                 serviceUrl = bankBaseUrl + "/service",
                 new ProviderAuthorityDecoder.PaymentMethodDeclarations()
                     .add(new ProviderAuthorityDecoder.PaymentMethodDeclaration(

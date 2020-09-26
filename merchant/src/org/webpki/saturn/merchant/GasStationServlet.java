@@ -61,7 +61,7 @@ public class GasStationServlet extends HttpServlet implements MerchantSessionPro
                              NonDirectPaymentEncoder.reservation(ReservationSubTypes.GAS_STATION,
                                                                  TimeUtils.inMinutes(45),
                                                                  true));
-        session.setAttribute(MERCHANT_HOMEPAGE_ATTR, MerchantService.PLANET_GAS_COM);
+        session.setAttribute(MERCHANT_COMMON_NAME_ATTR, MerchantService.ID_PLANET_GAS);
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
         savedShoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;
         session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);

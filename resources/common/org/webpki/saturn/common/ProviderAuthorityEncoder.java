@@ -32,6 +32,7 @@ public class ProviderAuthorityEncoder implements BaseProperties {
                     String providerAuthorityUrl,
                     String commonName,
                     String homePage,
+                    String providerLogotypeUrl,
                     String serviceUrl,
                     ProviderAuthorityDecoder.PaymentMethodDeclarations paymentMethods,
                     JSONObjectReader optionalExtensions,
@@ -45,6 +46,7 @@ public class ProviderAuthorityEncoder implements BaseProperties {
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
             .setString(COMMON_NAME_JSON, commonName)
             .setString(HOME_PAGE_JSON, homePage)
+            .setString(LOGOTYPE_URL_JSON, providerLogotypeUrl)
             .setString(SERVICE_URL_JSON, serviceUrl)
             .setObject(SUPPORTED_PAYMENT_METHODS_JSON, paymentMethods.toObject())
             .setDynamic((wr) -> optionalExtensions == null ? wr : 

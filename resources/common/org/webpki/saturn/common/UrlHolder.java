@@ -45,8 +45,9 @@ public class UrlHolder {
         return temp;
     }
 
-    public void setUrl(String url) {
+    public UrlHolder setUrl(String url) {
         this.url = url;
+        return this;
     }
     
     public String getCallerAddress() {

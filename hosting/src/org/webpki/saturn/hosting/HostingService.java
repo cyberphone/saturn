@@ -140,6 +140,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
                                            null,
                                            null,
                                            null,
+                                           null,
 
                                            merchantAccountDb.values(), 
                                            new ServerAsymKeySigner(

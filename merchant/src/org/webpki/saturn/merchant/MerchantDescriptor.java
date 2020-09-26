@@ -21,13 +21,10 @@ import java.util.LinkedHashMap;
 public class MerchantDescriptor {
     
     String commonName;
-    String homePage;
     LinkedHashMap<String, PaymentMethodDescriptor> paymentMethods;
     
-    MerchantDescriptor(String homePage,
-                       String commonName,
+    MerchantDescriptor(String commonName,
                        LinkedHashMap<String, PaymentMethodDescriptor> paymentMethods) {
-        this.homePage = homePage;
         this.commonName = commonName;
         this.paymentMethods = paymentMethods;
     }

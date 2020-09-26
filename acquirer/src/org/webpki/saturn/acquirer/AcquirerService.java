@@ -210,6 +210,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 providerAuthorityUrl = acquirerBaseUrl + "/authority",
                 "Acquirer Corporation",
                 acquirerBaseUrl,
+                acquirerBaseUrl + "/images/logotype.svg",
                 acquirerBaseUrl + "/service",
                 new ProviderAuthorityDecoder.PaymentMethodDeclarations()
                     .add(new ProviderAuthorityDecoder.PaymentMethodDeclaration(

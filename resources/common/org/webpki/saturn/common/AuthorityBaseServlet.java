@@ -109,8 +109,9 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             "<tr><td class='header'>")
                     .append(isProvider() ? 
   Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
-                    .append("</td></tr>" +
-                            "<tr><td>This " +
+                    .append("</td></tr><tr><td><img src='")
+                    .append(rd.getString(LOGOTYPE_URL_JSON))
+                    .append("'></td></tr><tr><td>This " +
                             SATURN_LINK +
                             " <i>live object</i> is normally requested by service providers " + 
                             "for looking up partner core data. In this case " +
@@ -134,6 +135,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +
                             tableRow(rd, COMMON_NAME_JSON, "Provider common name") +
                             tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
+                            tableRow(rd, LOGOTYPE_URL_JSON, "Provider logotype (as shown above)") +
                             tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
                             tableRow(rd, SUPPORTED_PAYMENT_METHODS_JSON, "Supported client:[backend...] payment methods") +
                             tableRow(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
@@ -146,6 +148,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             tableRow(rd, LOCAL_PAYEE_ID_JSON, "Local payee id used by the payee provider") +
                             tableRow(rd, COMMON_NAME_JSON, "Payee common name") +
                             tableRow(rd, HOME_PAGE_JSON, "Payee public home page") +
+                            tableRow(rd, LOGOTYPE_URL_JSON, "Payee logotype (as shown above)") +
                             tableRow(rd, ACCOUNT_VERIFIER_JSON, "For verifying claimed payee account", true) +
                             tableRow(rd, SIGNATURE_PARAMETERS_JSON, "Holds one or more payee signature keys and associated algorithms")
                             )

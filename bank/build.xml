@@ -82,6 +82,7 @@
        eof="remove"
        includes="**/*.java, **/*.xml, **/*.json"/>
     <copy file="web.xml" todir="${temp.dir}"/>
+    <copy file="${@credentials.dir}/${merchants.db}" todir="${temp.dir}"/>
     <javac debug="${debug}"
            srcdir="${src.dir}:${@common.src.dir}:${@account-types.src.dir}:${@interbanking.src.dir}"
            destdir="${temp.dir}"
@@ -99,6 +100,12 @@
           </fileset>
         </classpath>
     </javac>
+    <!-- Merchant configuration is rather demo-ish... -->
+    <replace file="${temp.dir}/${merchants.db}">
+      <replacefilter token="https://demomerchant.com" value="${@merchanthost}/${@merchantpath}"/>
+      <replacefilter token="https://planetgas.com" value="${@merchanthost}/${@merchantpath}"/>
+      <replacefilter token="https://buyerzone.com" value="${@merchanthost}/${@merchantpath}"/>
+    </replace>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
@@ -123,6 +130,7 @@
     <war destfile="${dist.dir}/${appcorename}.war" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
+         <exclude name="${merchants.db}"/>
       </classes>
       <metainf dir=".">
         <include name="context.xml"/>
@@ -141,7 +149,7 @@
          <include name="${@acquirernetworkroot}.cer"/>
          <include name="${hosting.provider.key}"/>
       </zipfileset>
-      <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
+      <zipfileset dir="${temp.dir}" prefix="${class_war_path}">
          <include name="${merchants.db}"/>
       </zipfileset>
       <zipfileset dir="${conf.dir}" prefix="${class_war_path}">

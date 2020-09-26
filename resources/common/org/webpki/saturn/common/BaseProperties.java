@@ -43,6 +43,7 @@ public interface BaseProperties {
     String SERVICE_URL_JSON                 = "serviceUrl";                 // Saturn core
     String HOSTING_URL_JSON                 = "hostingUrl";                 // For hosting entities
     String RECEIPT_URL_JSON                 = "receiptUrl";                 // For fetching optional receipts
+    String LOGOTYPE_URL_JSON                = "logotypeUrl";                // For "authority" objects
     String AMOUNT_JSON                      = "amount";                     // Money
     String CURRENCY_JSON                    = "currency";                   // In this format
     String NON_DIRECT_PAYMENT_JSON          = "nonDirectPayment";           // Deposit, automated gas station, booking

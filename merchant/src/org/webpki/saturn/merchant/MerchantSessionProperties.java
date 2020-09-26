@@ -18,7 +18,7 @@ package org.webpki.saturn.merchant;
 
 public interface MerchantSessionProperties {
 
-    public String MERCHANT_HOMEPAGE_ATTR        = "MERHOME";  // Merchant database ID in this setup
+    public String MERCHANT_COMMON_NAME_ATTR     = "MERCHCN";  // Merchant database ID in this setup
     public String WALLET_REQUEST_SESSION_ATTR   = "WALLREQ";
     public String DEBUG_DATA_SESSION_ATTR       = "DBGDATA";
     public String SHOPPING_CART_SESSION_ATTR    = "SHOPCART";

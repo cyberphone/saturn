@@ -102,8 +102,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String TEST_MODE                    = "test-mode";
     
-    static final String DEMO_MERCHANT_COM            = "https://demomerchant.com";
-    static final String PLANET_GAS_COM               = "https://planetgas.com";
+    static final String ID_DEMO_MERCHANT             = "Demo Merchant";
+    static final String ID_PLANET_GAS                = "Planet Gas";
     
     static JSONX509Verifier paymentRoot;
     
@@ -169,7 +169,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     }
     
     void addMerchant(JSONObjectReader merchant) throws IOException {
-        String homePage = merchant.getString(BaseProperties.HOME_PAGE_JSON);
         String commonName = merchant.getString(BaseProperties.COMMON_NAME_JSON);
         LinkedHashMap<String,PaymentMethodDescriptor> pmd = new LinkedHashMap<>();
         JSONArrayReader paymentNetworks = merchant.getArray("paymentNetworks");
@@ -198,12 +197,12 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                                 receiveAccounts, 
                                                 sourceAccounts));
         } while (paymentNetworks.hasMore());
-        merchants.put(homePage, new MerchantDescriptor(homePage, commonName, pmd));
+        merchants.put(commonName, new MerchantDescriptor(commonName, pmd));
     }
 
     public static MerchantDescriptor getMerchant(HttpSession session) {
         return merchants.get((String)session.getAttribute(
-                MerchantSessionProperties.MERCHANT_HOMEPAGE_ATTR));
+                MerchantSessionProperties.MERCHANT_COMMON_NAME_ATTR));
     }
 
     @Override
@@ -228,8 +227,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             do {
                 addMerchant(merchantList.getObject());
             } while (merchantList.hasMore());
-            if (!merchants.containsKey(DEMO_MERCHANT_COM) ||
-                !merchants.containsKey(PLANET_GAS_COM)) {
+            if (!merchants.containsKey(ID_DEMO_MERCHANT) ||
+                !merchants.containsKey(ID_PLANET_GAS)) {
                 throw new IOException("Merchant id errors");
             }
 

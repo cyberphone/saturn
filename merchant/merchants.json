@@ -1,5 +1,4 @@
 [{
-  "homePage": "https://demomerchant.com",
   "commonName": "Demo Merchant",
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",
@@ -37,7 +36,6 @@
     }]
   }]
 },{
-  "homePage": "https://planetgas.com",
   "commonName": "Planet Gas",
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",

@@ -31,9 +31,10 @@ import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
 import org.webpki.saturn.common.HttpSupport;
+import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
-
+import org.webpki.saturn.common.UrlHolder;
 import org.webpki.util.ISODateTime;
 
 public class ReceiptServlet extends HttpServlet {
@@ -48,10 +49,10 @@ public class ReceiptServlet extends HttpServlet {
         
         
         HtmlTable(String headerText) {
-            html.append("<div style='text-align:center;font-weight:bold;margin:20pt auto 10pt auto'>")
+            html.append("<div style='font-weight:bold;margin:20pt auto 10pt auto'>")
                 .append(headerText)
                 .append("</div>" +
-            "<table style='margin-left:auto;margin-right:auto' class='tftable'>");
+            "<table class='tftable'>");
         }
         
         boolean header = true;
@@ -124,11 +125,17 @@ public class ReceiptServlet extends HttpServlet {
             String accept = request.getHeader(HttpSupport.HTTP_ACCEPT_HEADER);
             if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
                 ReceiptDecoder receiptDecoder = new ReceiptDecoder(JSONParser.parse(receipt));
+                PayeeAuthorityDecoder payeeAuthority = 
+                    MerchantService.externalCalls.getPayeeAuthority(
+                            new UrlHolder(request).setUrl(receiptDecoder.getPayeeAuthorityUrl()),
+                            receiptDecoder.getPayeeAuthorityUrl());
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
                         "<link rel='icon' href='../saturn.png' sizes='192x192'>"+
                         "<title>Receipt</title>" +
                         AuthorityBaseServlet.REST_ELEMENT +
-                        "<body>")
+                        "<body><img src='")
+                    .append(payeeAuthority.getPayeeCoreProperties().getLogotypeUrl())
+                    .append("'>")
                     .append(new HtmlTable("Core Receipt Data")
                             .addHeader("Payee Name")
                             .addHeader("Reference Id")
