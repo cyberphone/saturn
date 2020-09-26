@@ -64,6 +64,9 @@ public interface BaseProperties {
     String PAYMENT_METHOD_JSON              = "paymentMethod";              // Payment method (URL)
     String AUTHORIZATION_SIGNATURE_JSON     = "authorizationSignature";     // User and bank authorization signature
     String STATUS_JSON                      = "status";                     // See Receipts
+    String PHYSICAL_ADDRESS_JSON            = "physicalAddress";            //    -"-
+    String PHONE_NUMBER_JSON                = "phoneNumber";                //    -"-
+    String EMAIL_ADDRESS_JSON               = "emailAddress";               //    -"-
     String PAYMENT_METHOD_NAME_JSON         = "paymentMethodName";          //    -"-
     String PAYEE_REQUEST_ID_JSON            = "payeeRequestId";             //    -"-
     String RECEIPT_SIGNATURE_JSON           = "receiptSignature";           //    -"-

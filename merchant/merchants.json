@@ -1,5 +1,8 @@
 [{
   "commonName": "Demo Merchant",
+  "physicalAddress": ["2000 Champs-Élysées", "Paris", "France"],
+  "phoneNumber": "08.50.10.42.08",
+  "emailAddress": "support@demomerchant.com",
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",
     "localPayeeId": "86344",

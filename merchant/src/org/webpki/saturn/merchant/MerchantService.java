@@ -170,6 +170,10 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     void addMerchant(JSONObjectReader merchant) throws IOException {
         String commonName = merchant.getString(BaseProperties.COMMON_NAME_JSON);
+        String[] optionalPhysicalAddress = 
+                merchant.getStringArrayConditional(BaseProperties.PHYSICAL_ADDRESS_JSON);
+        String optionalPhoneNumber = merchant.getStringConditional(BaseProperties.PHONE_NUMBER_JSON);
+        String optionalEmailAddress = merchant.getStringConditional(BaseProperties.EMAIL_ADDRESS_JSON);
         LinkedHashMap<String,PaymentMethodDescriptor> pmd = new LinkedHashMap<>();
         JSONArrayReader paymentNetworks = merchant.getArray("paymentNetworks");
         do {
@@ -197,7 +201,11 @@ public class MerchantService extends InitPropertyReader implements ServletContex
                                                 receiveAccounts, 
                                                 sourceAccounts));
         } while (paymentNetworks.hasMore());
-        merchants.put(commonName, new MerchantDescriptor(commonName, pmd));
+        merchants.put(commonName, new MerchantDescriptor(commonName,
+                                                         optionalPhysicalAddress,
+                                                         optionalPhoneNumber,
+                                                         optionalEmailAddress,
+                                                         pmd));
     }
 
     public static MerchantDescriptor getMerchant(HttpSession session) {

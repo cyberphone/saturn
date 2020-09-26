@@ -84,7 +84,8 @@ public class DataBaseOperations {
                                             IN p_JsonData TEXT)
 */
 
-    static void saveTransaction(ResultData resultData, 
+    static void saveTransaction(ResultData resultData,
+                                MerchantDescriptor merchant,
                                 ServerAsymKeySigner signer) throws IOException {
         try {
             try (Connection connection = MerchantService.jdbcDataSource.getConnection();
@@ -112,7 +113,10 @@ public class DataBaseOperations {
                 stmt.setBytes(2, new ReceiptEncoder(
                                       orderId,
                                       authorization.getPayeeTimeStamp(),
-                                      authorization.getPayeeCommonName(),
+                                      merchant.commonName,
+                                      merchant.optionalPhysicalAddress,
+                                      merchant.optionalPhoneNumber,
+                                      merchant.optionalEmailAddress,
                                       authorization.getAmount(),
                                       authorization.getCurrency(),
                                       authorization.getPaymentMethodName(),

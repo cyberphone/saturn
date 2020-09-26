@@ -31,6 +31,9 @@ public class ReceiptEncoder implements BaseProperties {
     public ReceiptEncoder(String payeeReferenceId,
                           GregorianCalendar payeeTimeStamp, 
                           String payeeCommonName,
+                          String[] optionalPhysicalAddress, 
+                          String optionalPhoneNumber, 
+                          String optionalEmailAddress, 
                           BigDecimal amount,
                           Currencies currency,
                           String paymentMethodName,
@@ -47,6 +50,15 @@ public class ReceiptEncoder implements BaseProperties {
             .setString(REFERENCE_ID_JSON, payeeReferenceId)
             .setDateTime(TIME_STAMP_JSON, payeeTimeStamp, ISODateTime.UTC_NO_SUBSECONDS)
             .setString(COMMON_NAME_JSON, payeeCommonName)
+            .setDynamic((wr) -> optionalPhysicalAddress == null ?
+                            wr : wr.setStringArray(PHYSICAL_ADDRESS_JSON,
+                                                   optionalPhysicalAddress))
+            .setDynamic((wr) -> optionalPhoneNumber == null ?
+                            wr : wr.setString(PHONE_NUMBER_JSON,
+                                              optionalPhoneNumber))
+            .setDynamic((wr) -> optionalEmailAddress == null ?
+                            wr : wr.setString(EMAIL_ADDRESS_JSON,
+                                              optionalEmailAddress))
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
             .setString(PAYMENT_METHOD_NAME_JSON, paymentMethodName)

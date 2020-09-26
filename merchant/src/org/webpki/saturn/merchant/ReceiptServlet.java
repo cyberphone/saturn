@@ -35,6 +35,7 @@ import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
 import org.webpki.saturn.common.UrlHolder;
+
 import org.webpki.util.ISODateTime;
 
 public class ReceiptServlet extends HttpServlet {
@@ -124,6 +125,7 @@ public class ReceiptServlet extends HttpServlet {
             // Are we rather called by a browser?
             String accept = request.getHeader(HttpSupport.HTTP_ACCEPT_HEADER);
             if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
+//TODO HTML "cleaning"
                 ReceiptDecoder receiptDecoder = new ReceiptDecoder(JSONParser.parse(receipt));
                 PayeeAuthorityDecoder payeeAuthority = 
                     MerchantService.externalCalls.getPayeeAuthority(
@@ -135,8 +137,22 @@ public class ReceiptServlet extends HttpServlet {
                         AuthorityBaseServlet.REST_ELEMENT +
                         "<body><img src='")
                     .append(payeeAuthority.getPayeeCoreProperties().getLogotypeUrl())
-                    .append("'>")
-                    .append(new HtmlTable("Core Receipt Data")
+                    .append("' alt='logo'>");
+                if (receiptDecoder.getOptionalPhysicalAddress() != null) {
+                    for (String addressLine : receiptDecoder.getOptionalPhysicalAddress()) {
+                        html.append("<br>")
+                            .append(addressLine);
+                    }
+                }
+                if (receiptDecoder.getOptionalPhoneNumber() != null) {
+                    html.append("<br><i>Phone</i>: ")
+                        .append(receiptDecoder.getOptionalPhoneNumber());
+                }
+                if (receiptDecoder.getOptionalEmailAddress() != null) {
+                    html.append("<br><i>e-mail</i>: ")
+                        .append(receiptDecoder.getOptionalEmailAddress());
+                }
+                html.append(new HtmlTable("Core Receipt Data")
                             .addHeader("Payee Name")
                             .addHeader("Reference Id")
                             .addHeader("Total")

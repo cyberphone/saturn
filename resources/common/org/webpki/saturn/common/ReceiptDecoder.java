@@ -45,6 +45,9 @@ public class ReceiptDecoder implements BaseProperties {
         payeeReferenceId = rd.getString(REFERENCE_ID_JSON);
         payeeTimeStamp = rd.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         payeeCommonName = rd.getString(COMMON_NAME_JSON);
+        optionalPhysicalAddress = rd.getStringArrayConditional(PHYSICAL_ADDRESS_JSON);
+        optionalPhoneNumber = rd.getStringConditional(PHONE_NUMBER_JSON);
+        optionalEmailAddress = rd.getStringConditional(EMAIL_ADDRESS_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         amount = rd.getMoney(AMOUNT_JSON, currency.decimals);
         paymentMethodName = rd.getString(PAYMENT_METHOD_NAME_JSON);
@@ -83,6 +86,21 @@ public class ReceiptDecoder implements BaseProperties {
     String payeeCommonName;
     public String getPayeeCommonName() {
         return payeeCommonName;
+    }
+
+    String[] optionalPhysicalAddress;
+    public String[] getOptionalPhysicalAddress() {
+        return optionalPhysicalAddress;
+    }
+
+    String optionalPhoneNumber;
+    public String getOptionalPhoneNumber() {
+        return optionalPhoneNumber;
+    }
+
+    String optionalEmailAddress;
+    public String getOptionalEmailAddress() {
+        return optionalEmailAddress;
     }
 
     String providerCommonName;

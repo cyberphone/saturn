@@ -21,11 +21,20 @@ import java.util.LinkedHashMap;
 public class MerchantDescriptor {
     
     String commonName;
+    String[] optionalPhysicalAddress;
+    String optionalPhoneNumber;
+    String optionalEmailAddress;
     LinkedHashMap<String, PaymentMethodDescriptor> paymentMethods;
     
     MerchantDescriptor(String commonName,
+                       String[] optionalPhysicalAddress,
+                       String optionalPhoneNumber,
+                       String optionalEmailAddress,
                        LinkedHashMap<String, PaymentMethodDescriptor> paymentMethods) {
         this.commonName = commonName;
+        this.optionalPhysicalAddress = optionalPhysicalAddress;
+        this.optionalPhoneNumber = optionalPhoneNumber;
+        this.optionalEmailAddress = optionalEmailAddress;
         this.paymentMethods = paymentMethods;
     }
 }

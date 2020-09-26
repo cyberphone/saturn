@@ -58,7 +58,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    boolean processCall(MerchantDescriptor merchant,
+    boolean processCall(MerchantDescriptor merchantDescriptor,
                         PaymentRequestDecoder paymentRequest, 
                         PayerAuthorization payerAuthorization,
                         WalletRequest walletRequest,
@@ -72,7 +72,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         PaymentMethods paymentMethodEnum = payerAuthorization.getPaymentMethod();
         boolean cardPayment = paymentMethodEnum.isCardPayment();
         String clientPaymentMethodUrl = paymentMethodEnum.getPaymentMethodUrl();
-        String payeeAuthorityUrl = merchant.paymentMethods.get(clientPaymentMethodUrl).authorityUrl;
+        String payeeAuthorityUrl = 
+                merchantDescriptor.paymentMethods.get(clientPaymentMethodUrl).authorityUrl;
         
         // Lookup of self (since it is provided by an external party)
         PayeeAuthorityDecoder payeeAuthority =
@@ -106,7 +107,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
  
         TransactionOperation transactionOperation = new TransactionOperation();
         LinkedHashMap<String,AccountDataEncoder> receiveAccounts = 
-                merchant.paymentMethods.get(clientPaymentMethodUrl).receiverAccounts;
+                merchantDescriptor.paymentMethods.get(clientPaymentMethodUrl).receiverAccounts;
         AccountDataEncoder paymentBackendMethodEncoder = null;
         for (String backendDataContext : 
              providerAuthority.getPaymentBackendMethods(clientPaymentMethodUrl)) {
@@ -123,7 +124,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         }
 
         // Valid method. Find proper to request key and auhorityUrl
-        PaymentMethodDescriptor paymentNetwork = merchant.paymentMethods.get(clientPaymentMethodUrl);
+        PaymentMethodDescriptor paymentNetwork = merchantDescriptor.paymentMethods.get(clientPaymentMethodUrl);
         
         // Attest the user's encrypted authorization to show "intent"
         JSONObjectWriter authorizationRequest =
@@ -204,7 +205,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                 if (debugData != null) {
                     debugData.acquirerAuthority = ownProviderAuthority.getRoot();
                 }
-                processTransaction(merchant,
+                processTransaction(merchantDescriptor,
                                    transactionOperation,
                                    // Just a copy in this simple scenario 
                                    paymentRequest.getAmount(),                                
@@ -212,7 +213,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                    resultData,
                                    debugData);
             } else {
-                DataBaseOperations.saveTransaction(resultData, paymentNetwork.signer);
+                DataBaseOperations.saveTransaction(resultData, merchantDescriptor, paymentNetwork.signer);
             }
 
         } else {
@@ -236,14 +237,14 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         return true;
     }
 
-    static void processTransaction(MerchantDescriptor merchant,
+    static void processTransaction(MerchantDescriptor merchantDescriptor,
                                    TransactionOperation transactionOperation,
                                    BigDecimal actualAmount,
                                    UrlHolder urlHolder,
                                    ResultData resultData, 
                                    DebugData debugData) throws IOException {
 
-        ServerAsymKeySigner signer = merchant.paymentMethods.get(
+        ServerAsymKeySigner signer = merchantDescriptor.paymentMethods.get(
             transactionOperation.authorizationResponse
                 .getAuthorizationRequest().getPaymentMethod().getPaymentMethodUrl()).signer;
         JSONObjectWriter transactionRequest =
@@ -270,7 +271,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
         
         resultData.authorization = transactionResponse;
         resultData.transactionError = transactionResponse.getTransactionError();
-        DataBaseOperations.saveTransaction(resultData, signer);
+        DataBaseOperations.saveTransaction(resultData,
+                                           merchantDescriptor,
+                                           signer);
     }
 
     @Override
