@@ -58,7 +58,7 @@ public class HomeServlet extends HttpServlet {
            "<tr><td>Authority object: " +
            "<a href='")
          .append(authorityUrl)
-         .append("' target='_blank'>")
+         .append("'>")
          .append(authorityUrl)
          .append("</a>")
          .append("</td></tr><tr><td style='padding-bottom:4pt'>Registered merchants:");
@@ -75,7 +75,7 @@ public class HomeServlet extends HttpServlet {
                  .append(payeeCoreProperties.getCommonName())
                  .append("</td><td><a href='")
                  .append(payeeAuthorityUrl)
-                 .append("' target='_blank'>")
+                 .append("'>")
                  .append(payeeAuthorityUrl)
                  .append("</a></td></tr>");
             }

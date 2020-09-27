@@ -52,6 +52,7 @@
        eof="remove"
        includes="**/*.java, **/*.xml, **/*.json"/>
     <copy file="web.xml" todir="${temp.dir}"/>
+    <copy file="${@credentials.dir}/${merchants.db}" todir="${temp.dir}"/>
     <javac debug="${debug}"
            srcdir="${src.dir}:${@common.src.dir}:${@account-types.src.dir}:${@interbanking.src.dir}"
            destdir="${temp.dir}"
@@ -69,6 +70,12 @@
         </fileset>
       </classpath>
     </javac>
+    <!-- Merchant configuration is rather demo-ish... -->
+    <replace file="${temp.dir}/${merchants.db}">
+      <replacefilter token="https://demomerchant.com" value="${@merchanthost}/${@merchantpath}"/>
+      <replacefilter token="https://planetgas.com" value="${@merchanthost}/${@merchantpath}"/>
+      <replacefilter token="https://buyerzone.com" value="${@merchanthost}/${@merchantpath}"/>
+    </replace>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@provider-extensions@" value="${extensions.file}"/>
@@ -84,6 +91,7 @@
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
          <exclude name="web.xml"/>
+         <exclude name="${merchants.db}"/>
       </classes>
       <lib dir="${zip.webpki.lib.dir}">
          <include name="${@webpki-libext.jar}"/>
@@ -97,7 +105,7 @@
          <include name="${@acquirersignaturekey}.p12"/>
          <include name="${@banknetworkroot}.cer"/>
       </zipfileset>
-      <zipfileset dir="${@credentials.dir}" prefix="${class_war_path}">
+      <zipfileset dir="${temp.dir}" prefix="${class_war_path}">
          <include name="${merchants.db}"/>
       </zipfileset>
       <zipfileset dir="${conf.dir}" prefix="${class_war_path}">

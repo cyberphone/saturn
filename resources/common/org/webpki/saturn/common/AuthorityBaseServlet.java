@@ -40,7 +40,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     public static final String BORDER = 
         "border-width:1px;border-style:solid;border-color:#a9a9a9";
 
-    public static final String BOX_SHADDOW = "box-shadow:3pt 3pt 3pt #d0d0d0";
+    public static final String BOX_SHADDOW = "box-shadow:0.3em 0.3em 0.3em #d0d0d0";
 
     public static final String TOP_ELEMENT = 
         "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
@@ -48,11 +48,10 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
 
     public static final String REST_ELEMENT = 
         "<style type='text/css'>" +
-        " .header {text-align:center;font-size:10pt;font-weight:bold;padding:15pt}" +
-        " td {padding-bottom:8pt}" +
+        " .header {text-align:center;font-size:1.6em;padding-bottom:1em}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
-        " .tftable td {white-space:nowrap;background-color:#FFFFE0;padding:3pt 4pt;" + BORDER + "}" +
-        " .tftable th {white-space:nowrap;padding:4pt 3pt;background:linear-gradient(to bottom, " +
+        " .tftable td {white-space:nowrap;background-color:#FFFFE0;padding:0.3em 0.4em;" + BORDER + "}" +
+        " .tftable th {white-space:nowrap;padding:0.4em 0.3em;background:linear-gradient(to bottom, " +
           "#eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
         "text-align:center;" + BORDER +"}" +
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
@@ -62,7 +61,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         " a {color:blue;text-decoration:none}" +
         "</style></head>";
     public static final String SATURN_LINK = 
-            "<a href='https://cyberphone.github.io/doc/saturn/' target='_blank'>Saturn</a>";
+            "<a href='https://cyberphone.github.io/doc/saturn/'>Saturn</a>";
 
     String keyWord(String constant) {
         return "<code>&quot;" + constant + "&quot;</code>";
@@ -121,7 +120,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                             "This particular (payee) object was issued by the provider specified by the " +
                             keyWord(PROVIDER_AUTHORITY_URL_JSON) +
                             " property: <a href='" +
-                            rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "' target='_blank'>" + 
+                            rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "'>" + 
                             rd.getString(PROVIDER_AUTHORITY_URL_JSON) + 
                             "</a>.")
                     .append("</td></tr>" +

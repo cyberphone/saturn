@@ -1,7 +1,7 @@
 [{
   "commonName": "Demo Merchant",
-  "physicalAddress": ["2000 Champs-Élysées", "Paris", "France"],
-  "phoneNumber": "08.50.10.42.08",
+  "physicalAddress": ["2000 Avenue des Champs-Élysées", "75000 Paris", "France"],
+  "phoneNumber": "01.50.10.42.08",
   "emailAddress": "support@demomerchant.com",
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",
@@ -40,6 +40,9 @@
   }]
 },{
   "commonName": "Planet Gas",
+  "physicalAddress": ["171 Rue de Châteaugiron", "35000 Rennes", "France"],
+  "phoneNumber": "02 99 50 63 93", 
+  "emailAddress": "support@planetgas.com",
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",
     "localPayeeId": "973277",

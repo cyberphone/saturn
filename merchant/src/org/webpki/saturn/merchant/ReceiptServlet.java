@@ -50,7 +50,7 @@ public class ReceiptServlet extends HttpServlet {
         
         
         HtmlTable(String headerText) {
-            html.append("<div style='font-weight:bold;margin:20pt auto 10pt auto'>")
+            html.append("<div style='font-weight:bold;margin:1.2em auto 0.6em auto'>")
                 .append(headerText)
                 .append("</div>" +
             "<table class='tftable'>");
@@ -164,7 +164,7 @@ public class ReceiptServlet extends HttpServlet {
                             .addCell(ISODateTime.formatDateTime(receiptDecoder.getPayeeTimeStamp(),
                                     ISODateTime.UTC_NO_SUBSECONDS))
                             .render());
-                html.append(new HtmlTable("Payment Provider Details")
+                html.append(new HtmlTable("Payment Details")
                             .addHeader("Provider Name")
                             .addHeader("Account Type")
                             .addHeader("Account Id")
