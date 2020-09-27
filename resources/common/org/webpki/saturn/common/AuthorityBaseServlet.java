@@ -50,8 +50,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         "<style type='text/css'>" +
         " .header {text-align:center;font-size:1.6em;padding-bottom:1em}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
-        " .tftable td {white-space:nowrap;background-color:#FFFFE0;padding:0.3em 0.4em;" + BORDER + "}" +
-        " .tftable th {white-space:nowrap;padding:0.4em 0.3em;background:linear-gradient(to bottom, " +
+        " .tftable td {white-space:nowrap;background-color:#FFFFE0;padding:0.4em 0.5em;" + BORDER + "}" +
+        " .tftable th {white-space:nowrap;padding:0.4em 0.5em;background:linear-gradient(to bottom, " +
           "#eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
         "text-align:center;" + BORDER +"}" +
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +

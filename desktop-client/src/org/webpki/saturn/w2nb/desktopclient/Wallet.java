@@ -316,9 +316,6 @@ public class Wallet {
         JLabel selectedCardBalance;
         JButton authorizationCancelButton;  // Used as a master for creating unified button widths
         ImageIcon dummyCardIcon;
-        boolean macOS;
-        boolean retinaFlag;
-        boolean hiResImages;
 
         SecureKeyStore sks;
         int keyHandle;
@@ -331,23 +328,14 @@ public class Wallet {
             views = frame.getContentPane();
             views.setLayout(new CardLayout());
             int screenResolution = Toolkit.getDefaultToolkit().getScreenResolution();
-            fontSize = screenResolution / 7;
             Font font = new JLabel("Dummy").getFont();
-            macOS = System.getProperty("os.name").toLowerCase().contains("mac");
-            if (font.getSize() > fontSize || macOS) {
-                fontSize = font.getSize();
-            }
-            retinaFlag = isRetina ();
-            hiResImages = retinaFlag || fontSize >= 20;
+            fontSize = (font.getSize() * 3) / 2 ;
             standardFont = new Font(font.getFontName(), font.getStyle(), fontSize);
-            cardNumberFont = new Font("Courier", 
-                                      hiResImages ? Font.PLAIN : Font.BOLD,
-                                      (fontSize * 4) / 5);
+            cardNumberFont = new Font("Courier", Font.BOLD, (fontSize * 4) / 5);
             logger.info("Display Data: Screen resolution=" + screenResolution +
                         ", Screen size=" + screenDimension +
                         ", Font size=" + font.getSize() +
-                        ", Adjusted font size=" + fontSize +
-                        ", Retina=" + retinaFlag);
+                        ", Adjusted font size=" + fontSize);
             dummyCardIcon = getImageIcon("dummycard.png", false);
 
             // The initial card showing we are waiting
@@ -514,7 +502,7 @@ public class Wallet {
             authorizationView.setLayout(new GridBagLayout());
             GridBagConstraints c = new GridBagConstraints();
             Color fixedDataBackground = new Color(244, 253, 247);
-            int spaceAfterLabel = macOS ? fontSize / 4 : fontSize / 2;
+            int spaceAfterLabel = fontSize / 2;
             int marginBeforeLabel = fontSize;
             c.gridx = 0;
             c.gridy = 0;
@@ -815,33 +803,12 @@ public class Wallet {
             });
         }
 
-        boolean isRetina() {
-            if (macOS) {
-                GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                final GraphicsDevice device = env.getDefaultScreenDevice();
-                try {
-                    Field field = device.getClass().getDeclaredField("scale");
-                    if (field != null) {
-                        field.setAccessible(true);
-                        Object scale = field.get(device);
-                        if (scale instanceof Integer && ((Integer)scale).intValue() == 2) {
-                            return true;
-                        }
-                    }
-                } catch (Exception ignore) {}
-            }
-            return false;
-        }
-
         ImageIcon getImageIcon(byte[] byteIcon, boolean animated) {
             try {
-                if (retinaFlag || (!hiResImages && animated)) {
+                if (animated) {
                     return new ScalingIcon(byteIcon);
                 }
                 ImageIcon imageIcon = new ImageIcon(byteIcon);
-                if (hiResImages) {
-                    return imageIcon;
-                }
                 int width = imageIcon.getIconWidth() / 2;
                 int height = imageIcon.getIconHeight() / 2;
                 return new ImageIcon(imageIcon.getImage().getScaledInstance(

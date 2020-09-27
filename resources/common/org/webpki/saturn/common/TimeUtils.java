@@ -17,6 +17,7 @@
 package org.webpki.saturn.common;
 
 import java.text.SimpleDateFormat;
+
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -49,7 +50,7 @@ public class TimeUtils {
     }
 
     public static String displayUtcTime(GregorianCalendar dateTime) {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z", Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss 'GMT'", Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         return sdf.format(dateTime.getTime());
     }

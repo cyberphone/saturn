@@ -30,13 +30,14 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
+import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.PayeeAuthorityDecoder;
+import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
+import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.UrlHolder;
-
-import org.webpki.util.ISODateTime;
 
 public class ReceiptServlet extends HttpServlet {
 
@@ -95,6 +96,65 @@ public class ReceiptServlet extends HttpServlet {
             return addCell(data, null);
         }
     }
+    
+    void buildHtmlReceipt(StringBuilder html, 
+                          ReceiptDecoder receiptDecoder,
+                          HttpServletRequest request) throws IOException {
+        PayeeAuthorityDecoder payeeAuthority = 
+                MerchantService.externalCalls.getPayeeAuthority(
+                        new UrlHolder(request).setUrl(receiptDecoder.getPayeeAuthorityUrl()),
+                        receiptDecoder.getPayeeAuthorityUrl());
+            ProviderAuthorityDecoder providerAuthority = 
+                MerchantService.externalCalls.getProviderAuthority(
+                        new UrlHolder(request).setUrl(receiptDecoder.getProviderAuthorityUrl()),
+                        receiptDecoder.getProviderAuthorityUrl());
+            html.append("<img src='")
+                .append(payeeAuthority.getPayeeCoreProperties().getLogotypeUrl())
+                .append("' alt='logo'>");
+            if (receiptDecoder.getOptionalPhysicalAddress() != null) {
+                for (String addressLine : receiptDecoder.getOptionalPhysicalAddress()) {
+                    html.append("<br>")
+                        .append(addressLine);
+                }
+            }
+            if (receiptDecoder.getOptionalPhoneNumber() != null) {
+                html.append("<br><i>Phone</i>: ")
+                    .append(receiptDecoder.getOptionalPhoneNumber());
+            }
+            if (receiptDecoder.getOptionalEmailAddress() != null) {
+                html.append("<br><i>e-mail</i>: ")
+                    .append(receiptDecoder.getOptionalEmailAddress());
+            }
+            html.append(new HtmlTable("Core Receipt Data")
+                        .addHeader("Payee Name")
+                        .addHeader("Reference Id")
+                        .addHeader("Total")
+                        .addHeader("Time Stamp")
+                        .addCell("<a href='" + 
+                                 payeeAuthority.getPayeeCoreProperties().getHomePage() + 
+                                "'>" + receiptDecoder.getPayeeCommonName() + "</a>")
+                        .addCell(receiptDecoder.getPayeeReferenceId(), "text-align:right")
+                        .addCell(receiptDecoder.getCurrency()
+                                .amountToDisplayString(receiptDecoder.getAmount(), false))
+                        .addCell(TimeUtils.displayUtcTime(receiptDecoder.getPayeeTimeStamp()))
+                        .render());
+            html.append(new HtmlTable("Payment Details")
+                        .addHeader("Provider Name")
+                        .addHeader("Account Type")
+                        .addHeader("Account Id")
+                        .addHeader("Transaction Id")
+                        .addHeader("Request Id")
+                        .addHeader("Time Stamp")
+                        .addCell("<a href='" + 
+                                 providerAuthority.getHomePage() + 
+                                "'>" + receiptDecoder.getProviderCommonName() + "</a>")
+                        .addCell(receiptDecoder.getPaymentMethodName())
+                        .addCell(receiptDecoder.getOptionalAccountReference())
+                        .addCell(receiptDecoder.getProviderReferenceId())
+                        .addCell(receiptDecoder.getPayeeRequestId())
+                        .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
+                        .render());
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
@@ -126,62 +186,21 @@ public class ReceiptServlet extends HttpServlet {
             String accept = request.getHeader(HttpSupport.HTTP_ACCEPT_HEADER);
             if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
 //TODO HTML "cleaning"
-                ReceiptDecoder receiptDecoder = new ReceiptDecoder(JSONParser.parse(receipt));
-                PayeeAuthorityDecoder payeeAuthority = 
-                    MerchantService.externalCalls.getPayeeAuthority(
-                            new UrlHolder(request).setUrl(receiptDecoder.getPayeeAuthorityUrl()),
-                            receiptDecoder.getPayeeAuthorityUrl());
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
                         "<link rel='icon' href='../saturn.png' sizes='192x192'>"+
                         "<title>Receipt</title>" +
                         AuthorityBaseServlet.REST_ELEMENT +
-                        "<body><img src='")
-                    .append(payeeAuthority.getPayeeCoreProperties().getLogotypeUrl())
-                    .append("' alt='logo'>");
-                if (receiptDecoder.getOptionalPhysicalAddress() != null) {
-                    for (String addressLine : receiptDecoder.getOptionalPhysicalAddress()) {
-                        html.append("<br>")
-                            .append(addressLine);
-                    }
+                        "<body>");
+                ReceiptDecoder receiptDecoder = new ReceiptDecoder(JSONParser.parse(receipt));
+                if (receiptDecoder.getStatus() == ReceiptDecoder.Status.AVAILABLE) {
+                    buildHtmlReceipt(html, receiptDecoder, request);
+                } else {
+                    html.append("<i>Receipt status</i>: ")
+                        .append(receiptDecoder.getStatus().toString());
                 }
-                if (receiptDecoder.getOptionalPhoneNumber() != null) {
-                    html.append("<br><i>Phone</i>: ")
-                        .append(receiptDecoder.getOptionalPhoneNumber());
-                }
-                if (receiptDecoder.getOptionalEmailAddress() != null) {
-                    html.append("<br><i>e-mail</i>: ")
-                        .append(receiptDecoder.getOptionalEmailAddress());
-                }
-                html.append(new HtmlTable("Core Receipt Data")
-                            .addHeader("Payee Name")
-                            .addHeader("Reference Id")
-                            .addHeader("Total")
-                            .addHeader("Time Stamp")
-                            .addCell(receiptDecoder.getPayeeCommonName())
-                            .addCell(receiptDecoder.getPayeeReferenceId(), "text-align:right")
-                            .addCell(receiptDecoder.getCurrency()
-                                    .amountToDisplayString(receiptDecoder.getAmount(), false))
-                            .addCell(ISODateTime.formatDateTime(receiptDecoder.getPayeeTimeStamp(),
-                                    ISODateTime.UTC_NO_SUBSECONDS))
-                            .render());
-                html.append(new HtmlTable("Payment Details")
-                            .addHeader("Provider Name")
-                            .addHeader("Account Type")
-                            .addHeader("Account Id")
-                            .addHeader("Transaction Id")
-                            .addHeader("Request Id")
-                            .addHeader("Time Stamp")
-                            .addCell(receiptDecoder.getProviderCommonName())
-                            .addCell(receiptDecoder.getPaymentMethodName())
-                            .addCell(receiptDecoder.getOptionalAccountReference())
-                            .addCell(receiptDecoder.getProviderReferenceId())
-                            .addCell(receiptDecoder.getPayeeRequestId())
-                            .addCell(ISODateTime.formatDateTime(receiptDecoder.getProviderTimeStamp(),
-                                                                ISODateTime.UTC_NO_SUBSECONDS))
-                            .render());
                 HttpSupport.writeHtml(response, html.append("</body></html>"));
             } else {
-                HttpSupport.writeData(response, receipt, "");
+                HttpSupport.writeData(response, receipt, BaseProperties.JSON_CONTENT_TYPE);
             }
         } catch (Exception e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
