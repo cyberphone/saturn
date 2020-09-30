@@ -48,12 +48,18 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
 
     public static final String REST_ELEMENT = 
         "<style type='text/css'>" +
-        " .header {text-align:center;font-size:1.6em;padding-bottom:1em}" +
+        " .header {font-size:1.6em;padding-bottom:1em}" +
+        " .para {padding-bottom:0.4em}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
-        " .tftable td {white-space:nowrap;background-color:#FFFFE0;padding:0.4em 0.5em;" + BORDER + "}" +
+        " .tftable td {white-space:nowrap;background-color:#ffffe0;padding:0.4em 0.5em;" + BORDER + "}" +
         " .tftable th {white-space:nowrap;padding:0.4em 0.5em;background:linear-gradient(to bottom, " +
           "#eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
         "text-align:center;" + BORDER +"}" +
+        " .logodiv {max-width:90%;height:5em;margin-bottom:0.7em}" +
+        " .logoimg {width:100%;height: 100%;object-fit:contain;object-position:0 0}" +
+        " .tableheader {margin:1.2em 0 0.6em 0}" +
+        " .json {word-break:break-all;background-color:#f8f8f8;padding:1em;" +
+                            BORDER + ";" + BOX_SHADDOW + "}" +
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
         "'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans';background-color:white}" + 
         " code {font-size:9pt}" +
@@ -104,31 +110,28 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append("saturn.png' sizes='192x192'>"+
                             "<title>Saturn Authority Object</title>" +
                             REST_ELEMENT +
-                            "<body><table style='margin-left:auto;margin-right:auto'>" +
-                            "<tr><td class='header'>")
+                            "<body><div class='header'>")
                     .append(isProvider() ? 
   Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
-                    .append("</td></tr><tr><td><img src='")
+                    .append("</div><div class='logodiv'><img class='logoimg' src='")
                     .append(rd.getString(LOGOTYPE_URL_JSON))
-                    .append("'></td></tr><tr><td>This " +
+                    .append("'></div><div class='para'>This " +
                             SATURN_LINK +
                             " <i>live object</i> is normally requested by service providers " + 
                             "for looking up partner core data. In this case " +
                             "the requester seems to be a browser which is why a " +
                             "&quot;pretty-printed&quot; HTML page is returned instead of raw JSON.")
-                    .append(isProvider() ? "" : "</td></tr><tr><td>" +
+                    .append(isProvider() ? "" : "</div><div class='para'>" +
                             "This particular (payee) object was issued by the provider specified by the " +
                             keyWord(PROVIDER_AUTHORITY_URL_JSON) +
                             " property: <a href='" +
                             rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "'>" + 
                             rd.getString(PROVIDER_AUTHORITY_URL_JSON) + 
                             "</a>.")
-                    .append("</td></tr>" +
-                            "<tr><td><div style='word-break:break-all;background-color:#F8F8F8;padding:10pt;" +
-                            BORDER + ";" + BOX_SHADDOW + "'>")
+                    .append("</div><div class='json'>")
                     .append(rd.serializeToString(JSONOutputFormats.PRETTY_HTML))
-                    .append("</div></td></tr><tr><td style='padding:4pt 0pt 4pt 0pt'>Short reference:</td></tr>" +
-                            "<tr><td><table class='tftable'><tr><th>Property</th><th>Description</th></tr>")
+                    .append("</div><div class='tableheader'>&nbsp;<br>Quick Reference</div>" +
+                            "<table class='tftable'><tr><th>Property</th><th>Description</th></tr>")
                     .append(isProvider() ?
                             tableRow(rd, HTTP_VERSIONS_JSON, "Supported HTTP versions") +
                             tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +
@@ -155,7 +158,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                     .append(tableRow(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
                     .append(tableRow(rd, ISSUER_SIGNATURE_JSON, isProvider() ?
                                            "X.509 provider signature" : "Hosting provider signature"))
-                    .append("</table></td></tr></table><p>API Version: " + Version.PROTOCOL +
+                    .append("</table><p><i>API Version</i>: " + Version.PROTOCOL +
                             "</p></body></html>");
                 // Just to check that we didn't forgot anything...
                 rd.checkForUnread();

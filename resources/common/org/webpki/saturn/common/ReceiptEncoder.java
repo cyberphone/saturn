@@ -48,7 +48,7 @@ public class ReceiptEncoder implements BaseProperties {
         this(ReceiptDecoder.Status.AVAILABLE);
         receiptDocument
             .setString(REFERENCE_ID_JSON, payeeReferenceId)
-            .setDateTime(TIME_STAMP_JSON, payeeTimeStamp, ISODateTime.UTC_NO_SUBSECONDS)
+            .setDateTime(TIME_STAMP_JSON, payeeTimeStamp, ISODateTime.LOCAL_NO_SUBSECONDS)
             .setString(COMMON_NAME_JSON, payeeCommonName)
             .setDynamic((wr) -> optionalPhysicalAddress == null ?
                             wr : wr.setStringArray(PHYSICAL_ADDRESS_JSON,
@@ -73,7 +73,7 @@ public class ReceiptEncoder implements BaseProperties {
                     .setString(PAYEE_REQUEST_ID_JSON, payeeRequestId)
                     .setDateTime(TIME_STAMP_JSON, 
                                  providerTimeStamp, 
-                                 ISODateTime.UTC_NO_SUBSECONDS))
+                                 ISODateTime.LOCAL_NO_SUBSECONDS))
             .setSignature(RECEIPT_SIGNATURE_JSON, signer);
     }
 

@@ -156,6 +156,9 @@
          <include name="${extensions.file}"/>
       </zipfileset>
       <fileset dir="web"/>
+      <zipfileset dir="${conf.dir}" fullpath="images/logotype.svg">
+         <include name="logotype-${appcorename}.svg"/>
+      </zipfileset>
     </war>
   </target>
   

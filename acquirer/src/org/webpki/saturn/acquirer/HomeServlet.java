@@ -38,47 +38,46 @@ public class HomeServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String authorityUrl = AcquirerService.providerAuthorityUrl;
         StringBuilder html = new StringBuilder(
-           AuthorityBaseServlet.TOP_ELEMENT +
-           "<link rel='icon' href='saturn.png' sizes='192x192'><title>Saturn Acquirer</title>" +
-           AuthorityBaseServlet.REST_ELEMENT +
-           "<body><table>" +
-           "<tr><td class='header'>Acquirer Server</td></tr>" +
-           "<tr><td>This is a " +
-           AuthorityBaseServlet.SATURN_LINK +
-           " &quot;acquirer&quot; server.</td></tr>" +
-           "<tr><td>Started: ")
-         .append(TimeUtils.displayUtcTime(AcquirerService.started))
-         .append("</td></tr>" +
-           "<tr><td>Transactions: ")
-         .append(AcquirerService.transactionCount)
-         .append("</td></tr>" +
-           "<tr><td>Authority object: " +
+            AuthorityBaseServlet.TOP_ELEMENT +
+            "<link rel='icon' href='saturn.png' sizes='192x192'><title>Saturn Acquirer</title>" +
+            AuthorityBaseServlet.REST_ELEMENT +
+            "<body><div class='logodiv'>" +
+            "<img class='logoimg' src='images/logotype.svg' alt='logotype' title='Acquirer'>" +
+            "</div>" +
+            "<div class='para'>This is a " +
+            AuthorityBaseServlet.SATURN_LINK +
+            " &quot;acquirer&quot; server.</div>" +
+            "<div class='para'>Started: ")
+        .append(TimeUtils.displayUtcTime(AcquirerService.started))
+        .append("</div><div class='para'>Transactions: ")
+        .append(AcquirerService.transactionCount)
+        .append("</div><div class='para'>Authority object: " +
            "<a href='")
-         .append(authorityUrl)
-         .append("'>")
-         .append(authorityUrl)
-         .append("</a>")
-         .append("</td></tr><tr><td style='padding-bottom:4pt'>Registered merchants:");
+        .append(authorityUrl)
+        .append("'>")
+        .append(authorityUrl)
+        .append("</a>")
+        .append("</div><div class='tableheader'>Registered Merchants");
         if (AcquirerService.payeeAccountDb.isEmpty()) {
-            html.append(" <i>None</i></td></tr>");
+            html.append(": <i>None</i></div>");
         } else {
-            html.append("</td></tr>" +
-                "<tr><td><table class='tftable'><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
+            html.append("</div>" +
+                "<table class='tftable'><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : AcquirerService.payeeAccountDb.values()) {
                 String payeeAuthorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
                 html.append("<tr><td style='text-align:right'>")
-                 .append(payeeCoreProperties.getPayeeId())
-                 .append("</td><td>")
-                 .append(payeeCoreProperties.getCommonName())
-                 .append("</td><td><a href='")
-                 .append(payeeAuthorityUrl)
-                 .append("'>")
-                 .append(payeeAuthorityUrl)
-                 .append("</a></td></tr>");
+                    .append(payeeCoreProperties.getPayeeId())
+                    .append("</td><td>")
+                    .append(payeeCoreProperties.getCommonName())
+                    .append("</td><td><a href='")
+                    .append(payeeAuthorityUrl)
+                    .append("'>")
+                    .append(payeeAuthorityUrl)
+                    .append("</a></td></tr>");
             }
-            html.append("</table></td></tr>");
+            html.append("</table>");
         }
-        html.append("</table></body></html>");
+        html.append("</body></html>");
         HttpSupport.writeHtml(response, html);
     }
 }

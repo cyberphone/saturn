@@ -38,50 +38,53 @@ public class HomeServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String authorityUrl = BankService.providerAuthorityUrl;
         StringBuilder html = new StringBuilder(
-           AuthorityBaseServlet.TOP_ELEMENT +
-           "<link rel='icon' href='saturn.png' sizes='192x192'><title>Saturn Bank</title>" +
-           AuthorityBaseServlet.REST_ELEMENT +
-           "<body><table>" +
-           "<tr><td class='header'>Bank Server</td></tr>" +
-           "<tr><td>This is a " +
-           AuthorityBaseServlet.SATURN_LINK +
-           " &quot;bank&quot; server.</td></tr>" +
-           "<tr><td>Started: ")
-         .append(TimeUtils.displayUtcTime(BankService.started))
-         .append("</td></tr>" +
-           "<tr><td>Successful transactions: ")
-         .append(BankService.successfulTransactions)
-         .append("</td></tr>" +
-           "<tr><td>Rejected transactions: ")
-         .append(BankService.rejectedTransactions)
-         .append("</td></tr>" +
-           "<tr><td>Authority object: " +
-           "<a href='")
-         .append(authorityUrl)
-         .append("'>")
-         .append(authorityUrl)
-         .append("</a>")
-         .append("</td></tr><tr><td style='padding-bottom:4pt'>Registered merchants:");
+            AuthorityBaseServlet.TOP_ELEMENT +
+            "<link rel='icon' href='saturn.png' sizes='192x192'><title>Saturn Bank</title>" +
+            AuthorityBaseServlet.REST_ELEMENT +
+            "<body><div class='logodiv'>" +
+            "<img class='logoimg' src='images/logotype.svg' alt='logotype' title='")
+        .append(BankService.bankCommonName)
+        .append(" logotype'>" +
+            "</div>" +
+            "<div class='para'>This is a " +
+            AuthorityBaseServlet.SATURN_LINK +
+            " &quot;bank&quot; server.</div>" +
+            "<div class='para'>Started: ")
+        .append(TimeUtils.displayUtcTime(BankService.started))
+        .append("</div>" +
+            "<div class='para'>Successful transactions: ")
+        .append(BankService.successfulTransactions)
+        .append("</div>" +
+            "<div class='para'>Rejected transactions: ")
+        .append(BankService.rejectedTransactions)
+        .append("</div>" +
+            "<div class='para'>Authority object: " +
+            "<a href='")
+        .append(authorityUrl)
+        .append("'>")
+        .append(authorityUrl)
+        .append("</a>")
+        .append("</div><div class='tableheader'>Registered Merchants");
         if (BankService.PayeeAccountDb.isEmpty()) {
-            html.append(" <i>None</i></td></tr>");
+            html.append(": <i>None</i></div>");
         } else {
-            html.append("</td></tr>" +
-                "<tr><td><table class='tftable'><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
+            html.append("</div>" +
+                "<table class='tftable'><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : BankService.PayeeAccountDb.values()) {
                 String payeeAuthorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
                 html.append("<tr><td style='text-align:right'>")
-                 .append(payeeCoreProperties.getPayeeId())
-                 .append("</td><td>")
-                 .append(payeeCoreProperties.getCommonName())
-                 .append("</td><td><a href='")
-                 .append(payeeAuthorityUrl)
-                 .append("'>")
-                 .append(payeeAuthorityUrl)
-                 .append("</a></td></tr>");
+                    .append(payeeCoreProperties.getPayeeId())
+                    .append("</td><td>")
+                    .append(payeeCoreProperties.getCommonName())
+                    .append("</td><td><a href='")
+                    .append(payeeAuthorityUrl)
+                    .append("'>")
+                    .append(payeeAuthorityUrl)
+                    .append("</a></td></tr>");
             }
-            html.append("</table></td></tr>");
+            html.append("</table>");
         }
-        html.append("</table></body></html>");
+        html.append("</body></html>");
         HttpSupport.writeHtml(response, html);
     }
 }

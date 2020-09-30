@@ -42,6 +42,8 @@ import org.webpki.saturn.common.UrlHolder;
 public class ReceiptServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
+
+    private static final String VIEW_AS_JSON = "json";
     
     static Logger logger = Logger.getLogger(ReceiptServlet.class.getName());
     
@@ -51,7 +53,7 @@ public class ReceiptServlet extends HttpServlet {
         
         
         HtmlTable(String headerText) {
-            html.append("<div style='font-weight:bold;margin:1.2em auto 0.6em auto'>")
+            html.append("<div class='tableheader'>")
                 .append(headerText)
                 .append("</div>" +
             "<table class='tftable'>");
@@ -108,22 +110,38 @@ public class ReceiptServlet extends HttpServlet {
                 MerchantService.externalCalls.getProviderAuthority(
                         new UrlHolder(request).setUrl(receiptDecoder.getProviderAuthorityUrl()),
                         receiptDecoder.getProviderAuthorityUrl());
-            html.append("<img src='")
+            html.append("<div class='logodiv'><img class='logoimg' src='")
                 .append(payeeAuthority.getPayeeCoreProperties().getLogotypeUrl())
-                .append("' alt='logo'>");
+                .append("' alt='logo' title='")
+                .append(payeeAuthority.getPayeeCoreProperties().getCommonName())
+                .append(" logotype'></div>");
             if (receiptDecoder.getOptionalPhysicalAddress() != null) {
+                html.append("<div class='para'>");
+                boolean next = false;
                 for (String addressLine : receiptDecoder.getOptionalPhysicalAddress()) {
-                    html.append("<br>")
-                        .append(addressLine);
+                    if (next) {
+                        html.append("<br>");
+                    }
+                    next = true;
+                    html.append(addressLine);
                 }
+                html.append("</div>");
             }
-            if (receiptDecoder.getOptionalPhoneNumber() != null) {
-                html.append("<br><i>Phone</i>: ")
-                    .append(receiptDecoder.getOptionalPhoneNumber());
-            }
-            if (receiptDecoder.getOptionalEmailAddress() != null) {
-                html.append("<br><i>e-mail</i>: ")
-                    .append(receiptDecoder.getOptionalEmailAddress());
+            if (receiptDecoder.getOptionalPhoneNumber() != null ||
+                receiptDecoder.getOptionalEmailAddress() != null) {
+                html.append("<div class='para'>");
+                if (receiptDecoder.getOptionalPhoneNumber() != null) {
+                    html.append("<i>Phone</i>: ")
+                        .append(receiptDecoder.getOptionalPhoneNumber());
+                }
+                if (receiptDecoder.getOptionalEmailAddress() != null) {
+                    if (receiptDecoder.getOptionalPhoneNumber() != null) {
+                        html.append("<br>");
+                    }
+                    html.append("<i>e-mail</i>: ")
+                        .append(receiptDecoder.getOptionalEmailAddress());
+                }
+                html.append("</div>");
             }
             html.append(new HtmlTable("Core Receipt Data")
                         .addHeader("Payee Name")
@@ -192,11 +210,25 @@ public class ReceiptServlet extends HttpServlet {
                         AuthorityBaseServlet.REST_ELEMENT +
                         "<body>");
                 ReceiptDecoder receiptDecoder = new ReceiptDecoder(JSONParser.parse(receipt));
-                if (receiptDecoder.getStatus() == ReceiptDecoder.Status.AVAILABLE) {
-                    buildHtmlReceipt(html, receiptDecoder, request);
+                if (request.getParameter(VIEW_AS_JSON) == null) {
+                    html.append("<div class='header'>Customer Receipt</div>");
+                    if (receiptDecoder.getStatus() == ReceiptDecoder.Status.AVAILABLE) {
+                        buildHtmlReceipt(html, receiptDecoder, request);
+                    } else {
+                        html.append("<i>Status</i>: ")
+                            .append(receiptDecoder.getStatus().toString());
+                    }
+                    html.append("<div>&nbsp;<br><a href='")
+                        .append(pathInfo.substring(1))
+                        .append("?" + VIEW_AS_JSON)
+                        .append("'>Switch to JSON view</a></div>");
                 } else {
-                    html.append("<i>Receipt status</i>: ")
-                        .append(receiptDecoder.getStatus().toString());
+                    html.append("<div class='header'>Receipt in JSON format</div><div class='json'>")
+                        .append(JSONParser.parse(receipt)
+                                .serializeToString(JSONOutputFormats.PRETTY_HTML))
+                        .append("</div><div>&nbsp;<br><a href='")
+                        .append(pathInfo.substring(1))
+                        .append("'>Switch to normal view</a></div>");
                 }
                 HttpSupport.writeHtml(response, html.append("</body></html>"));
             } else {
