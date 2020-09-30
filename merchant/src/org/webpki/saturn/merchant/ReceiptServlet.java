@@ -110,11 +110,9 @@ public class ReceiptServlet extends HttpServlet {
                 MerchantService.externalCalls.getProviderAuthority(
                         new UrlHolder(request).setUrl(receiptDecoder.getProviderAuthorityUrl()),
                         receiptDecoder.getProviderAuthorityUrl());
-            html.append("<div class='logodiv'><img class='logoimg' src='")
-                .append(payeeAuthority.getPayeeCoreProperties().getLogotypeUrl())
-                .append("' alt='logo' title='")
-                .append(payeeAuthority.getPayeeCoreProperties().getCommonName())
-                .append(" logotype'></div>");
+            html.append(AuthorityBaseServlet.addLogotype(
+                    payeeAuthority.getPayeeCoreProperties().getLogotypeUrl(),
+                    payeeAuthority.getPayeeCoreProperties().getCommonName()));
             if (receiptDecoder.getOptionalPhysicalAddress() != null) {
                 html.append("<div class='para'>");
                 boolean next = false;

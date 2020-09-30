@@ -41,26 +41,28 @@ public class HomeServlet extends HttpServlet {
            AuthorityBaseServlet.TOP_ELEMENT +
            "<link rel='icon' href='saturn.png' sizes='192x192'><title>Saturn Hosting Service</title>" +
            AuthorityBaseServlet.REST_ELEMENT +
-           "<body><table>" +
-           "<tr><td class='header'>Saturn Hosting Service</td></tr>" +
-           "<tr><td>This is a " +
+           "<body>" +
+           "<div class='header'>Saturn Hosting Service</div>")
+       .append(AuthorityBaseServlet.addLogotype("images/logotype.svg", "Hosting service")) 
+       .append(
+           "<div class='para'>This is a " +
            AuthorityBaseServlet.SATURN_LINK +
-           " &quot;hosting&quot; server.</td></tr>" +
-           "<tr><td>Started: ")
+           " &quot;hosting&quot; server.</div>" +
+           "<div class='para'>Started: ")
          .append(TimeUtils.displayUtcTime(HostingService.started))
-         .append("</td></tr>" +
-           "<tr><td>Authority object: " +
+         .append("</div>" +
+           "<div class='para'>Hosting is performed under the supervison of: " +
            "<a href='")
          .append(authorityUrl)
          .append("'>")
          .append(authorityUrl)
          .append("</a>")
-         .append("</td></tr><tr><td style='padding-bottom:4pt'>Registered merchants:");
+         .append("</div><div class='tableheader'>Registered Merchants");
         if (HostingService.merchantAccountDb.isEmpty()) {
-            html.append(" <i>None</i></td></tr>");
+            html.append(": <i>None</i></div>");
         } else {
-            html.append("</td></tr>" +
-                "<tr><td><table class='tftable'><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
+            html.append("</div>" +
+                "<table class='tftable'><tr><th>ID</th><th>Common Name</th><th>Authority Object</th></tr>");
             for (PayeeCoreProperties payeeCoreProperties : HostingService.merchantAccountDb.values()) {
                 String payeeAuthorityUrl = payeeCoreProperties.getPayeeAuthorityUrl();
                 html.append("<tr><td style='text-align:right'>")
@@ -75,7 +77,7 @@ public class HomeServlet extends HttpServlet {
             }
             html.append("</table></td></tr>");
         }
-        html.append("</table></body></html>");
+        html.append("</body></html>");
         HttpSupport.writeHtml(response, html);
     }
 }

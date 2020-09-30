@@ -41,9 +41,9 @@ public class HomeServlet extends HttpServlet {
             AuthorityBaseServlet.TOP_ELEMENT +
             "<link rel='icon' href='saturn.png' sizes='192x192'><title>Saturn Acquirer</title>" +
             AuthorityBaseServlet.REST_ELEMENT +
-            "<body><div class='logodiv'>" +
-            "<img class='logoimg' src='images/logotype.svg' alt='logotype' title='Acquirer'>" +
-            "</div>" +
+            "<body>")
+        .append(AuthorityBaseServlet.addLogotype("images/logotype.svg", "Acquirer")) 
+        .append(
             "<div class='para'>This is a " +
             AuthorityBaseServlet.SATURN_LINK +
             " &quot;acquirer&quot; server.</div>" +

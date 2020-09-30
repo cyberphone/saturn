@@ -37,6 +37,11 @@ public class PayeeAuthorityServlet extends AuthorityBaseServlet {
                                 response,
                                 id == null ? null : HostingService.authorityObjectManager.getPayeeAuthorityBlob(id.substring(1)));
     }
+    
+    @Override
+    protected boolean isPayeeHosted() {
+        return true;
+    }
 
     @Override
     protected boolean isProvider() {

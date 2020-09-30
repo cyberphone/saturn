@@ -35,7 +35,13 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
 
     private static final long serialVersionUID = 1L;
     
-    protected abstract boolean isProvider();
+    protected abstract boolean isProvider();  // ProviderAuthorityObject
+    
+    protected boolean isPayeeHosted() {       // Payee is enabled through a hosting service?
+        return false;
+    }
+    
+    private static int LOGOTYPE_AREA = 75;  // We give logotypes the same area to play around in
     
     public static final String BORDER = 
         "border-width:1px;border-style:solid;border-color:#a9a9a9";
@@ -51,12 +57,11 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         " .header {font-size:1.6em;padding-bottom:1em}" +
         " .para {padding-bottom:0.4em}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
-        " .tftable td {white-space:nowrap;background-color:#ffffe0;padding:0.4em 0.5em;" + BORDER + "}" +
-        " .tftable th {white-space:nowrap;padding:0.4em 0.5em;background:linear-gradient(to bottom, " +
-          "#eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
+        " .tftable td {white-space:nowrap;background-color:#ffffe0;" +
+          "padding:0.4em 0.5em;" + BORDER + "}" +
+        " .tftable th {white-space:nowrap;padding:0.4em 0.5em;" +
+          "background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
         "text-align:center;" + BORDER +"}" +
-        " .logodiv {max-width:90%;height:5em;margin-bottom:0.7em}" +
-        " .logoimg {width:100%;height: 100%;object-fit:contain;object-position:0 0}" +
         " .tableheader {margin:1.2em 0 0.6em 0}" +
         " .json {word-break:break-all;background-color:#f8f8f8;padding:1em;" +
                             BORDER + ";" + BOX_SHADDOW + "}" +
@@ -89,6 +94,24 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         return "<tr><td><code>" + property + "</code></td><td>" + 
                (optional ? "<i>Optional</i>. " : "") + description + "</td></tr>";
     }
+    
+    public static StringBuilder addLogotype(String logotypeUrl,
+                                            String commonName) {
+        return new StringBuilder(
+            "<script>\n" +
+            "function adjustImage(image) {\n" +
+            "  image.style.height = " +
+               "Math.sqrt((" +
+               LOGOTYPE_AREA + 
+               " * image.offsetHeight) / image.offsetWidth) + 'em';\n" +
+            "}\n"+
+            "</script>" +
+            "<img style='margin-bottom:0.5em' src='")
+        .append(logotypeUrl)
+        .append("' alt='logo' title='")
+        .append(commonName)
+        .append(" logotype' onload=\"adjustImage(this)\">");
+    }
 
     public void processAuthorityRequest(HttpServletRequest request, 
                                         HttpServletResponse response,
@@ -105,61 +128,75 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 rd.getString(JSONDecoderCache.CONTEXT_JSON);
                 rd.getString(JSONDecoderCache.QUALIFIER_JSON);
                 StringBuilder html = new StringBuilder(TOP_ELEMENT +
-                            "<link rel='icon' href='")
-                    .append(isProvider() ? "" : "../")
-                    .append("saturn.png' sizes='192x192'>"+
-                            "<title>Saturn Authority Object</title>" +
-                            REST_ELEMENT +
-                            "<body><div class='header'>")
-                    .append(isProvider() ? 
+                        "<link rel='icon' href='")
+                .append(isProvider() ? "" : "../")
+                .append("saturn.png' sizes='192x192'>"+
+                        "<title>Saturn Authority Object</title>" +
+                        REST_ELEMENT +
+                        "<body><div class='header'>")
+                .append(isProvider() ? 
   Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
-                    .append("</div><div class='logodiv'><img class='logoimg' src='")
-                    .append(rd.getString(LOGOTYPE_URL_JSON))
-                    .append("'></div><div class='para'>This " +
-                            SATURN_LINK +
-                            " <i>live object</i> is normally requested by service providers " + 
-                            "for looking up partner core data. In this case " +
-                            "the requester seems to be a browser which is why a " +
-                            "&quot;pretty-printed&quot; HTML page is returned instead of raw JSON.")
-                    .append(isProvider() ? "" : "</div><div class='para'>" +
-                            "This particular (payee) object was issued by the provider specified by the " +
-                            keyWord(PROVIDER_AUTHORITY_URL_JSON) +
-                            " property: <a href='" +
-                            rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "'>" + 
-                            rd.getString(PROVIDER_AUTHORITY_URL_JSON) + 
-                            "</a>.")
-                    .append("</div><div class='json'>")
-                    .append(rd.serializeToString(JSONOutputFormats.PRETTY_HTML))
-                    .append("</div><div class='tableheader'>&nbsp;<br>Quick Reference</div>" +
-                            "<table class='tftable'><tr><th>Property</th><th>Description</th></tr>")
-                    .append(isProvider() ?
-                            tableRow(rd, HTTP_VERSIONS_JSON, "Supported HTTP versions") +
-                            tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +
-                            tableRow(rd, COMMON_NAME_JSON, "Provider common name") +
-                            tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
-                            tableRow(rd, LOGOTYPE_URL_JSON, "Provider logotype (as shown above)") +
-                            tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
-                            tableRow(rd, SUPPORTED_PAYMENT_METHODS_JSON, "Supported client:[backend...] payment methods") +
-                            tableRow(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
-                            tableRow(rd, SIGNATURE_PROFILES_JSON, "Signature key types and algorithms <i>recognized</i> by the provider") +
-                            tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more encryption keys <i>offered</i> by the provider") +
-                            tableRow(rd, HOSTING_PROVIDERS_JSON, "Holds core data of payee hosting providers", true)
-                               : 
-                            tableRow(rd, PAYEE_AUTHORITY_URL_JSON, "The address of this object (payee \"identity\")") +
-                            tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of the issuing provider's authority object") +
-                            tableRow(rd, LOCAL_PAYEE_ID_JSON, "Local payee id used by the payee provider") +
-                            tableRow(rd, COMMON_NAME_JSON, "Payee common name") +
-                            tableRow(rd, HOME_PAGE_JSON, "Payee public home page") +
-                            tableRow(rd, LOGOTYPE_URL_JSON, "Payee logotype (as shown above)") +
-                            tableRow(rd, ACCOUNT_VERIFIER_JSON, "For verifying claimed payee account", true) +
-                            tableRow(rd, SIGNATURE_PARAMETERS_JSON, "Holds one or more payee signature keys and associated algorithms")
-                            )
-                    .append(tableRow(rd, TIME_STAMP_JSON, "Object creation time"))
-                    .append(tableRow(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
-                    .append(tableRow(rd, ISSUER_SIGNATURE_JSON, isProvider() ?
-                                           "X.509 provider signature" : "Hosting provider signature"))
-                    .append("</table><p><i>API Version</i>: " + Version.PROTOCOL +
-                            "</p></body></html>");
+                .append("</div>")
+                .append(addLogotype(rd.getString(LOGOTYPE_URL_JSON),
+                                    rd.getString(COMMON_NAME_JSON)))
+                .append("<div class='para'>This " +
+                        SATURN_LINK +
+                        " <i>live object</i> is normally requested by service providers " + 
+                        "for looking up partner core data. In this case " +
+                        "the requester seems to be a browser which is why a " +
+                        "&quot;pretty-printed&quot; HTML page is returned instead of raw JSON.</div>" + 
+                        "<div class='para'>This particular (")
+                .append(isProvider() ? "provider" : "payee")
+                .append(") object was issued by " +
+                        (isPayeeHosted() ?
+                                "an external hosting provider under the supervision of " : ""))
+                .append("the provider specified by the " +
+                        keyWord(PROVIDER_AUTHORITY_URL_JSON) +
+                        " property: <a href='" +
+                        rd.getString(PROVIDER_AUTHORITY_URL_JSON) + "'>" + 
+                        rd.getString(PROVIDER_AUTHORITY_URL_JSON) + 
+                        "</a>.")
+                .append("</div><div class='json'>")
+                .append(rd.serializeToString(JSONOutputFormats.PRETTY_HTML))
+                .append("</div><div class='tableheader'>&nbsp;<br>Quick Reference</div>" +
+                        "<table class='tftable'><tr><th>Property</th><th>Description</th></tr>")
+                .append(isProvider() ?
+                        tableRow(rd, HTTP_VERSIONS_JSON, "Supported HTTP versions") +
+                        tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +
+                        tableRow(rd, COMMON_NAME_JSON, "Provider common name") +
+                        tableRow(rd, HOME_PAGE_JSON, "Provider public home page") +
+                        tableRow(rd, LOGOTYPE_URL_JSON, "Provider logotype (as shown above)") +
+                        tableRow(rd, SERVICE_URL_JSON, "Primary service end point") +
+                        tableRow(rd, SUPPORTED_PAYMENT_METHODS_JSON, 
+                                "Supported client:[backend...] payment methods") +
+                        tableRow(rd, EXTENSIONS_JSON, "Supported extension objects", true) +
+                        tableRow(rd, SIGNATURE_PROFILES_JSON, "Signature key types " + 
+                                 "and algorithms <i>recognized</i> by the provider") +
+                        tableRow(rd, ENCRYPTION_PARAMETERS_JSON, "Holds one or more " +
+                                "encryption keys <i>offered</i> by the provider") +
+                        tableRow(rd, HOSTING_PROVIDERS_JSON, 
+                                "Holds core data of payee hosting providers", true)
+                           : 
+                        tableRow(rd, PAYEE_AUTHORITY_URL_JSON, 
+                                "The address of this object (payee \"identity\")") +
+                        tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, 
+                                "The address of the issuing provider's authority object") +
+                        tableRow(rd, LOCAL_PAYEE_ID_JSON, 
+                                "Local payee id used by the payee provider") +
+                        tableRow(rd, COMMON_NAME_JSON, "Payee common name") +
+                        tableRow(rd, HOME_PAGE_JSON, "Payee public home page") +
+                        tableRow(rd, LOGOTYPE_URL_JSON, "Payee logotype (as shown above)") +
+                        tableRow(rd, ACCOUNT_VERIFIER_JSON, "For verifying claimed payee account", 
+                                true) +
+                        tableRow(rd, SIGNATURE_PARAMETERS_JSON, "Holds one or more payee " +
+                                "signature keys and associated algorithms")
+                        )
+                .append(tableRow(rd, TIME_STAMP_JSON, "Object creation time"))
+                .append(tableRow(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
+                .append(tableRow(rd, ISSUER_SIGNATURE_JSON, isProvider() ?
+                                       "X.509 provider signature" : "Hosting provider signature"))
+                .append("</table><p><i>API Version</i>: " + Version.PROTOCOL +
+                        "</p></body></html>");
                 // Just to check that we didn't forgot anything...
                 rd.checkForUnread();
                 HttpSupport.writeHtml(response, html);
