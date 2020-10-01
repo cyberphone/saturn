@@ -14,24 +14,24 @@
  *  limitations under the License.
  *
  */
-package org.webpki.saturn.merchant;
+package org.webpki.saturn.common;
 
-import java.io.Serializable;
+// Holds a barcode for the Saturn receipt system
 
-import org.webpki.saturn.common.ProviderResponseDecoder;
-import org.webpki.saturn.common.TransactionResponseDecoder;
+public class Barcode {
 
-public class ResultData implements Serializable {
-    
-    private static final long serialVersionUID = 1L;
-    
-    ProviderResponseDecoder authorization;
+    public enum BarcodeTypes {EAN, QR};  // Place-holder at this stage
 
-    String providerAuthorityUrl;
-    
-    TransactionResponseDecoder.ERROR transactionError;
+    String barcodeString;
+ 
+    BarcodeTypes barcodeType;
+        
+    public Barcode(String barcodeString, BarcodeTypes barcodeType) {
+        this.barcodeString = barcodeString;
+        this.barcodeType = barcodeType;
+    }
+        
+    Barcode() { // only used by the decoder
 
-    String providerCommonName;
-    
-    WalletRequest walletRequest;
+    }
 }

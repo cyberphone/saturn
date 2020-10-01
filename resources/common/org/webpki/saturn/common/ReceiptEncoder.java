@@ -21,10 +21,14 @@ import java.io.IOException;
 import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
+import java.util.List;
 
+import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectWriter;
 
 import org.webpki.util.ISODateTime;
+
+// Encodes receipts in the Saturn specific JSON format
 
 public class ReceiptEncoder implements BaseProperties {
     
@@ -36,6 +40,9 @@ public class ReceiptEncoder implements BaseProperties {
                           String optionalEmailAddress, 
                           BigDecimal amount,
                           Currencies currency,
+                          List<LineItem> lineItems,
+                          Barcode optionalBarcode,
+                          String optionalFreeText,
                           String paymentMethodName,
                           String optionalAccountReference, 
                           String payeeAuthorityUrl,
@@ -61,6 +68,29 @@ public class ReceiptEncoder implements BaseProperties {
                                               optionalEmailAddress))
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
+            .setDynamic((wr) -> {
+                JSONArrayWriter lineItemsArray = wr.setArray(LINE_ITEMS_JSON);
+                for (LineItem lineItem : lineItems) {
+                    lineItemsArray.setObject()
+                        .setBigDecimal(QUANTITY_JSON, lineItem.quantity)
+                        .setString(DESCRIPTION_JSON, lineItem.description)
+                        .setDynamic((li) -> lineItem.optionalSubtotal == null ? li :
+                            li.setMoney(SUBTOTAL_JSON, 
+                                        lineItem.optionalSubtotal, 
+                                        currency.getDecimals()))
+                        .setDynamic((li) -> lineItem.optionalUnit == null ? li :
+                            li.setString(UNIT_JSON, lineItem.optionalUnit))
+                        .setDynamic((li) -> lineItem.optionalSku == null ? li :
+                            li.setString(SKU_JSON, lineItem.optionalSku));
+                     
+                }
+                return wr;
+            })
+            .setDynamic((wr) -> optionalBarcode == null ? wr :
+                wr.setString(BARCODE_JSON, optionalBarcode.barcodeString)
+                  .setString(BARCODE_TYPE_JSON, optionalBarcode.barcodeType.toString()))
+            .setDynamic((wr) -> optionalFreeText == null ? wr : 
+                wr.setString(FREE_TEXT_JSON, optionalFreeText))
             .setString(PAYMENT_METHOD_NAME_JSON, paymentMethodName)
             .setDynamic((wr) -> optionalAccountReference == null ?
                             wr : wr.setString(ACCOUNT_REFERENCE_JSON,

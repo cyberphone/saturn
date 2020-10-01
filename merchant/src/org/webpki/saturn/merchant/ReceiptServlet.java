@@ -32,6 +32,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.saturn.common.AuthorityBaseServlet;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
+import org.webpki.saturn.common.LineItem;
 import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
@@ -47,6 +48,10 @@ public class ReceiptServlet extends HttpServlet {
     
     static Logger logger = Logger.getLogger(ReceiptServlet.class.getName());
     
+    String optional(Object o) {
+        return o == null ? "" : o.toString();
+    }
+    
     static class HtmlTable {
 
         StringBuilder html = new StringBuilder();
@@ -56,41 +61,41 @@ public class ReceiptServlet extends HttpServlet {
             html.append("<div class='tableheader'>")
                 .append(headerText)
                 .append("</div>" +
-            "<table class='tftable'>");
+            "<table class='tftable'><tr>");
         }
         
-        boolean header = true;
+        boolean headerMode = true;
         
-        boolean initial = true;
+        int headerCount;
+        
+        int cellCount;
         
         StringBuilder render() {
             return html.append("</table>");
         }
         
         HtmlTable addHeader(String name) {
-            if (initial) {
-                initial = false;
-                html.append("<tr>");
-            }
             html.append("<th>")
                 .append(name)
                 .append("</th>");
+            headerCount++;
             return this;
         }
         
         HtmlTable addCell(String data, String style) {
-            if (header) {
-                header = false;
-                initial = true;
+            if (headerMode) {
+                headerMode = false;
                 html.append("</tr>");
             }
-            if (initial) {
-                initial = false;
+            if (cellCount++ % headerCount == 0) {
                 html.append("<tr>");
             }
             html.append(style == null  ? "<td>" : "<td style='" + style + "'>")
                 .append(data == null ? "N/A" : data)
                 .append("</td>");
+            if (cellCount % headerCount == 0) {
+                html.append("</tr>");
+            }
             return this;
         }
         
@@ -170,7 +175,35 @@ public class ReceiptServlet extends HttpServlet {
                         .addCell(receiptDecoder.getPayeeRequestId())
                         .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
                         .render());
-    }
+            HtmlTable orderData = new HtmlTable("Order Data");
+            orderData.addHeader("Description");
+            if (receiptDecoder.getOptionalLineItemElements()
+                    .contains(LineItem.OptionalElements.SKU)) {
+                orderData.addHeader("SKU");
+            }
+            orderData.addHeader("Quantity");
+            if (receiptDecoder.getOptionalLineItemElements()
+                    .contains(LineItem.OptionalElements.SUBTOTAL)) {
+                orderData.addHeader("Subtotal");
+            }
+            for (LineItem lineItem : receiptDecoder.getLineItems()) {
+                String quantity = lineItem.getQuantity().toPlainString();
+                if (lineItem.getOptionalUnit() != null) {
+                    quantity += " " + lineItem.getOptionalUnit();
+                }
+                orderData.addCell(lineItem.getDescription());
+                if (receiptDecoder.getOptionalLineItemElements()
+                        .contains(LineItem.OptionalElements.SKU)) {
+                    orderData.addCell(optional(lineItem.getOptionalSku()));
+                }
+                orderData.addCell(quantity);
+                if (receiptDecoder.getOptionalLineItemElements()
+                        .contains(LineItem.OptionalElements.SUBTOTAL)) {
+                    orderData.addCell(optional(lineItem.getOptionalSubtotal()));
+                }
+            }
+            html.append(orderData.render());
+        }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {

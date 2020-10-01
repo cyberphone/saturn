@@ -173,10 +173,10 @@ public class HTML implements MerchantSessionProperties {
     }
 
     private static StringBuilder productEntry(StringBuilder temp_string,
-                                             ProductEntry product_entry,
-                                             String sku,
-                                             SavedShoppingCart savedShoppingCart,
-                                             int index) throws IOException {
+                                              ProductEntry product_entry,
+                                              String sku,
+                                              SavedShoppingCart savedShoppingCart,
+                                              int index) throws IOException {
         int quantity = savedShoppingCart.items.containsKey(sku) ? savedShoppingCart.items.get(sku): 0;
         StringBuilder s = new StringBuilder(
             "<tr style=\"text-align:center\"><td><img src=\"images/")
@@ -292,8 +292,8 @@ public class HTML implements MerchantSessionProperties {
             "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
             "<tr><th>Image</th><th>Description</th><th>Price</th><th>Quantity</th></tr>");
         int q = 0;
-        for (String sku : ShoppingServlet.products.keySet()) {
-            page_data.append(productEntry(temp_string, ShoppingServlet.products.get(sku), sku, savedShoppingCart, q++));
+        for (String sku : ShoppingServlet.demoMerchantProducts.keySet()) {
+            page_data.append(productEntry(temp_string, ShoppingServlet.demoMerchantProducts.get(sku), sku, savedShoppingCart, q++));
         }
         page_data.append(
             "</table></td></tr><tr><td style=\"padding-top:10pt\">" +
@@ -335,7 +335,7 @@ public class HTML implements MerchantSessionProperties {
                 "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
                 "<tr><th>Description</th><th>Price</th><th>Quantity</th><th>Sum</th></tr>");
             for (String sku : savedShoppingCart.items.keySet()) {
-                ProductEntry product_entry = ShoppingServlet.products.get(sku);
+                ProductEntry product_entry = ShoppingServlet.demoMerchantProducts.get(sku);
                 s.append("<tr style=\"text-align:center\"><td>")
                  .append(product_entry.name)
                  .append("</td><td style=\"text-align:right\">")
@@ -532,7 +532,7 @@ public class HTML implements MerchantSessionProperties {
                                                                "Card Reference" : "Account Number")   
             .append("</th></tr><tr><td style='text-align:center;color:blue;cursor:pointer' " +
                     "onclick=\"document.location.href='")
-            .append(resultData.receiptUrl)
+            .append(resultData.walletRequest.receiptUrl)
             .append("'\">")  
             .append(resultData.authorization.getPayeeReferenceId())
             .append("</td><td style=\"text-align:center\">")

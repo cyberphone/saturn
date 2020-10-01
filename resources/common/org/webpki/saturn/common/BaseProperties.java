@@ -73,11 +73,12 @@ public interface BaseProperties {
     String TAX_JSON                         = "tax";                        //    -"- [2] Top and/or Line item level (O)
     String TAX_PERCENTAGE_JSON              = "taxPercentage";              //    -"-           [2]
     String SUBTOTAL_JSON                    = "subtotal";                   //    -"- Line item (M), Top level (O)
-    String BAR_CODE_VALUE_JSON              = "barCodeValue";               //    -"- (O)
-    String BAR_CODE_TYPE_JSON               = "barCodeType";                //    -"- (O/M) depends on the former
+    String BARCODE_JSON                     = "barcode";                    //    -"- (O)
+    String BARCODE_TYPE_JSON                = "barcodeType";                //    -"- (O/M) depends on the former
     String DISCOUNT_JSON                    = "discount";                   //    -"-           [2]
     String LINE_ITEMS_JSON                  = "lineItems";                  //    -"- Header (M)
     String SKU_JSON                         = "sku";                        //    -"- Line item (O)
+    String UNIT_JSON                        = "unit";                       //    -"- Line item (O)  Example: Litre
     String QUANTITY_JSON                    = "quantity";                   //    -"- Line item (M)
     String DESCRIPTION_JSON                 = "description";                //    -"- Line item (M)
     String FREE_TEXT_JSON                   = "freeText";                   //    -"- Text (O)

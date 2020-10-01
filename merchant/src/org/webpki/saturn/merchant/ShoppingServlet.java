@@ -37,11 +37,17 @@ public class ShoppingServlet extends HttpServlet implements MerchantSessionPrope
     
     static Logger logger = Logger.getLogger(ShoppingServlet.class.getName ());
     
-    static LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<>();
+    static LinkedHashMap<String,ProductEntry> demoMerchantProducts = new LinkedHashMap<>();
     
     static {
-        products.put("7d688", new ProductEntry("spacex-starship-heavy.png", "Model Rocket", 49999)); 
-        products.put("90555", new ProductEntry("t-shirt-nasa-grey.png", "Nasa T-Shirt", 1525)); 
+        demoMerchantProducts.put("7d688", 
+                                 new ProductEntry("spacex-starship-heavy.png", 
+                                                  "Model Rocket", 
+                                                  49999)); 
+        demoMerchantProducts.put("90555", 
+                                 new ProductEntry("t-shirt-nasa-grey.png", 
+                                                  "Nasa T-Shirt", 
+                                                  1525)); 
     }
     
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

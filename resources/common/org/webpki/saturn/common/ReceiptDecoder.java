@@ -20,18 +20,24 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
+import java.util.List;
 
+import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.ISODateTime;
 
+// Decodes receipts in the Saturn specific JSON format
+
 public class ReceiptDecoder implements BaseProperties {
     
     public enum Status {PENDING, AVAILABLE, FAILED, DELETED}
-
+    
     static final JSONCryptoHelper.Options signatureOptions = new JSONCryptoHelper.Options()
             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
             .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
@@ -50,6 +56,35 @@ public class ReceiptDecoder implements BaseProperties {
         optionalEmailAddress = rd.getStringConditional(EMAIL_ADDRESS_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         amount = rd.getMoney(AMOUNT_JSON, currency.decimals);
+        JSONArrayReader lineItemsArray = rd.getArray(LINE_ITEMS_JSON);
+        lineItems = new ArrayList<>();
+        optionalLineItemElements = EnumSet.noneOf(LineItem.OptionalElements.class);
+        do {
+            JSONObjectReader lineItemObject = lineItemsArray.getObject();
+            LineItem lineItem = new LineItem();
+            lineItems.add(lineItem);
+            lineItem.quantity = lineItemObject.getBigDecimal(QUANTITY_JSON);
+            lineItem.description = lineItemObject.getString(DESCRIPTION_JSON);
+            if (lineItemObject.hasProperty(SKU_JSON)) {
+                optionalLineItemElements.add(LineItem.OptionalElements.SKU);
+                lineItem.optionalSku = lineItemObject.getString(SKU_JSON);
+            }
+            if (lineItemObject.hasProperty(UNIT_JSON)) {
+                optionalLineItemElements.add(LineItem.OptionalElements.UNIT);
+                lineItem.optionalUnit = lineItemObject.getString(UNIT_JSON);
+            }
+            if (lineItemObject.hasProperty(SUBTOTAL_JSON)) {
+                optionalLineItemElements.add(LineItem.OptionalElements.SUBTOTAL);
+                lineItem.optionalSubtotal = 
+                        lineItemObject.getMoney(SUBTOTAL_JSON, currency.decimals);
+            }
+        } while (lineItemsArray.hasMore());
+        if (rd.hasProperty(BARCODE_JSON)) {
+            barcode = new Barcode();
+            barcode.barcodeString = rd.getString(BARCODE_JSON);
+            barcode.barcodeType = Barcode.BarcodeTypes.valueOf(rd.getString(BARCODE_TYPE_JSON));
+        }
+        optionalFreeText = rd.getStringConditional(FREE_TEXT_JSON);
         paymentMethodName = rd.getString(PAYMENT_METHOD_NAME_JSON);
         optionalAccountReference = rd.getStringConditional(ACCOUNT_REFERENCE_JSON);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
@@ -143,6 +178,26 @@ public class ReceiptDecoder implements BaseProperties {
     public Currencies getCurrency() {
         return currency;
     }
+    
+    EnumSet<LineItem.OptionalElements> optionalLineItemElements;
+    public EnumSet<LineItem.OptionalElements> getOptionalLineItemElements() {
+        return optionalLineItemElements;
+    }
+
+    ArrayList<LineItem> lineItems;
+    public List<LineItem> getLineItems() {
+        return lineItems;
+    }
+
+    Barcode barcode;
+    public Barcode getOptionalBarcode() {
+        return barcode;
+    }
+
+    String optionalFreeText;
+    public String getOptionalFreeText() {
+        return optionalFreeText;
+    }
 
     String paymentMethodName;
     public String getPaymentMethodName() {
@@ -153,5 +208,4 @@ public class ReceiptDecoder implements BaseProperties {
     public JSONSignatureDecoder getSignatureDecoder() {
         return signatureDecoder;
     }
-    
 }

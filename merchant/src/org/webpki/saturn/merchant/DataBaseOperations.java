@@ -18,16 +18,22 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 
+import java.math.BigDecimal;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import java.util.ArrayList;
+
 import java.util.logging.Logger;
 
 import org.webpki.json.JSONOutputFormats;
 
+import org.webpki.saturn.common.Barcode;
+import org.webpki.saturn.common.LineItem;
 import org.webpki.saturn.common.ProviderResponseDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
@@ -88,11 +94,51 @@ public class DataBaseOperations {
                                 MerchantDescriptor merchant,
                                 ServerAsymKeySigner signer) throws IOException {
         try {
+            ProviderResponseDecoder authorization = resultData.authorization;
+            String orderId = authorization.getPayeeReferenceId();
+            ArrayList<LineItem> lineItems = new ArrayList<>();
+/*
+         public LineItem(String optionalSku,
+                        String description,
+                        BigDecimal optionalSubtotal,
+                        BigDecimal quantity,
+                        String optionalUnit) {
+
+ */
+            lineItems.add(new LineItem(null,
+                                       "Great product",
+                                       null,
+                                       BigDecimal.valueOf(3),
+                                       null));
+            lineItems.add(new LineItem(null,
+                                       "Petrol",
+                                       null,
+                                       new BigDecimal("30.5"),
+                                       "Litre"));
+            ReceiptEncoder receiptEncoder = new ReceiptEncoder(
+                    orderId,
+                    authorization.getPayeeTimeStamp(),
+                    merchant.commonName,
+                    merchant.optionalPhysicalAddress,
+                    merchant.optionalPhoneNumber,
+                    merchant.optionalEmailAddress,
+                    authorization.getAmount(),
+                    authorization.getCurrency(),
+                    lineItems,
+                    new Barcode(orderId, Barcode.BarcodeTypes.EAN),
+                    "Free text...",
+                    authorization.getPaymentMethodName(),
+                    authorization.getAccountReference(),
+                    authorization.getPayeeAuthorityUrl(),
+                    resultData.providerCommonName,
+                    resultData.providerAuthorityUrl,
+                    authorization.getProviderReferenceId(),
+                    authorization.getPayeeRequestId(),
+                    authorization.getProviderTimeStamp(),
+                    signer);
             try (Connection connection = MerchantService.jdbcDataSource.getConnection();
                  CallableStatement stmt = 
                          connection.prepareCall("{call SaveTransactionSP(?,?)}");) {
-                ProviderResponseDecoder authorization = resultData.authorization;
-                String orderId = authorization.getPayeeReferenceId();
                 stmt.setString(1, orderId);
 /*
         public ReceiptEncoder(String payeeReferenceId,
@@ -110,24 +156,7 @@ public class DataBaseOperations {
                               GregorianCalendar providerTimeStamp,
                               ServerAsymKeySigner signer) throws IOException {
  */
-                stmt.setBytes(2, new ReceiptEncoder(
-                                      orderId,
-                                      authorization.getPayeeTimeStamp(),
-                                      merchant.commonName,
-                                      merchant.optionalPhysicalAddress,
-                                      merchant.optionalPhoneNumber,
-                                      merchant.optionalEmailAddress,
-                                      authorization.getAmount(),
-                                      authorization.getCurrency(),
-                                      authorization.getPaymentMethodName(),
-                                      authorization.getAccountReference(),
-                                      authorization.getPayeeAuthorityUrl(),
-                                      resultData.providerCommonName,
-                                      resultData.providerAuthorityUrl,
-                                      authorization.getProviderReferenceId(),
-                                      authorization.getPayeeRequestId(),
-                                      authorization.getProviderTimeStamp(),
-                                      signer).getReceiptDocument()
+                stmt.setBytes(2, receiptEncoder.getReceiptDocument()
                                                  .serializeToBytes(JSONOutputFormats.NORMALIZED));
                 stmt.execute();
             }
