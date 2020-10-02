@@ -16,19 +16,21 @@
  */
 package org.webpki.saturn.merchant;
 
-import java.io.Serializable;
+import java.io.IOException;
+import java.math.BigDecimal;
 
-public class ProductEntry implements Serializable {
+import org.webpki.saturn.common.Currencies;
 
-    private static final long serialVersionUID = 1L;
+public interface ProductEntry {
 
-    String imageUrl;
-    String name;
-    long priceX100;
+    String getDescription();
     
-    public ProductEntry (String imageUrl, String name, long priceX100) {
-        this.imageUrl = imageUrl;
-        this.name = name;
-        this.priceX100 = priceX100;
+    String getOptionalUnit();
+    
+    long getPriceX100();
+    
+    default String displayPrice() throws IOException {
+        return Currencies.EUR.amountToDisplayString(
+                new BigDecimal(getPriceX100()).divide(new BigDecimal(100)), false);
     }
 }

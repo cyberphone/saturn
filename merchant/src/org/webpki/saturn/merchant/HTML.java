@@ -90,6 +90,7 @@ public class HTML implements MerchantSessionProperties {
     }
     
     static void output(HttpServletResponse response, String html) throws IOException, ServletException {
+//        System.out.println(html);
         response.setContentType("text/html; charset=utf-8");
         response.setHeader("Pragma", "No-Cache");
         response.setDateHeader("EXPIRES", 0);
@@ -173,18 +174,19 @@ public class HTML implements MerchantSessionProperties {
     }
 
     private static StringBuilder productEntry(StringBuilder temp_string,
-                                              ProductEntry product_entry,
+                                              SpaceProducts product_entry,
                                               String sku,
                                               SavedShoppingCart savedShoppingCart,
                                               int index) throws IOException {
-        int quantity = savedShoppingCart.items.containsKey(sku) ? savedShoppingCart.items.get(sku): 0;
+        int quantity = savedShoppingCart.items.containsKey(sku) ? 
+                    savedShoppingCart.items.get(sku).intValue() : 0;
         StringBuilder s = new StringBuilder(
             "<tr style=\"text-align:center\"><td><img src=\"images/")
         .append(product_entry.imageUrl)
         .append("\" class=\"product\"></td><td>")
         .append(product_entry.name)
         .append("</td><td style=\"text-align:right\">")
-        .append(price(product_entry.priceX100))
+        .append(price(product_entry.unitPriceX100))
         .append(
             "</td><td><form>" +
             "<table style=\"border-width:0px;padding:0px;margin:0px;border-spacing:2px;border-collapse:separate\">" +
@@ -212,8 +214,9 @@ public class HTML implements MerchantSessionProperties {
         .append(", -1, ")
         .append(index)
         .append(")\"></td></tr></table></form></td></tr>");
-        temp_string.insert(0, "shoppingCart[" + index + "] = new webpki.ShopEntry(" 
-                       + product_entry.priceX100 + ",'" + product_entry.name + "','" + sku + "'," + quantity + ");\n");        
+        temp_string.insert(0, "shoppingCart[" + index + "] = new webpki.ShopEntry(" +
+                       product_entry.unitPriceX100 + 
+                       ",'" + product_entry.name + "','" + sku + "'," + quantity + ");\n");        
         return s;
     }
 
@@ -292,8 +295,11 @@ public class HTML implements MerchantSessionProperties {
             "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
             "<tr><th>Image</th><th>Description</th><th>Price</th><th>Quantity</th></tr>");
         int q = 0;
-        for (String sku : ShoppingServlet.demoMerchantProducts.keySet()) {
-            page_data.append(productEntry(temp_string, ShoppingServlet.demoMerchantProducts.get(sku), sku, savedShoppingCart, q++));
+        for (String sku : SpaceProducts.products.keySet()) {
+            page_data.append(productEntry(temp_string,
+                                          (SpaceProducts) SpaceProducts.products.get(sku),
+                                          sku, 
+                                          savedShoppingCart, q++));
         }
         page_data.append(
             "</table></td></tr><tr><td style=\"padding-top:10pt\">" +
@@ -335,15 +341,15 @@ public class HTML implements MerchantSessionProperties {
                 "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
                 "<tr><th>Description</th><th>Price</th><th>Quantity</th><th>Sum</th></tr>");
             for (String sku : savedShoppingCart.items.keySet()) {
-                ProductEntry product_entry = ShoppingServlet.demoMerchantProducts.get(sku);
+                SpaceProducts product_entry = (SpaceProducts) SpaceProducts.products.get(sku);
                 s.append("<tr style=\"text-align:center\"><td>")
                  .append(product_entry.name)
                  .append("</td><td style=\"text-align:right\">")
-                 .append(price(product_entry.priceX100))
+                 .append(price(product_entry.unitPriceX100))
                  .append("</td><td>")
                  .append(savedShoppingCart.items.get(sku).intValue())
                  .append("</td><td style=\"text-align:right\">")
-                 .append(price(product_entry.priceX100 * savedShoppingCart.items.get(sku).intValue()))
+                 .append(price(product_entry.unitPriceX100 * savedShoppingCart.items.get(sku).intValue()))
                  .append("</td></tr>");                
             }
             s.append(
@@ -962,7 +968,7 @@ public class HTML implements MerchantSessionProperties {
                  .append("', this)");
             }
             s.append("\"><td style=\"font-size:11pt;font-family:" + FONT_ARIAL + ";padding:6pt;min-width:10em\">")
-             .append(fuelType.commonName)
+             .append(fuelType.description)
              .append("</td><td style=\"font-size:11pt;font-family:" + FONT_ARIAL + ";padding:6pt 12pt 6pt 12pt\">")
              .append(fuelType.displayPrice())
              .append("</td></tr>");
@@ -975,18 +981,18 @@ public class HTML implements MerchantSessionProperties {
                                        HttpServletRequest request,
                                        String id) throws IOException, ServletException {
         StringBuilder s = new StringBuilder("function selectFuel(fuelType, element) {\n");
-        for (FuelTypes fuelType : FuelTypes.values()) {
+        for (String fuelType : FuelTypes.products.keySet()) {
             s.append("  if (fuelType == '")
-             .append(fuelType.toString())
+             .append(fuelType)
              .append("') {\n" +
              "    document.getElementById('" + GasStationServlet.FUEL_TYPE_FIELD + "').value = fuelType;\n" +
              "    element.style.cursor = 'default';\n" +
              "   } else {\n" +
              "    document.getElementById('")
-             .append(fuelType.toString())
+             .append(fuelType)
              .append("').style.display = 'none';\n" +
              "    document.getElementById('")
-            .append(fuelType.toString())
+            .append(fuelType)
             .append(".').style.display = 'none';\n" +
             "}\n");
         }
@@ -1012,7 +1018,7 @@ public class HTML implements MerchantSessionProperties {
             " in the demo), while only the actual amount " +
             "needed is eventually withdrawn from the client's account. This should be reflected in the Wallet's " +
             "authorization display as well.</td></tr>" +
-            selectionButtons(FuelTypes.values()) +
+            selectionButtons(FuelTypes.products.values().toArray(new FuelTypes[0])) +
             bodyEndQR(qrImage, false)));
     }
 

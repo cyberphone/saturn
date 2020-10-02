@@ -17,7 +17,7 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
+import java.math.BigDecimal;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -51,13 +51,14 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
         }
         JSONArrayReader ar = JSONParser.parse(request.getParameter(SHOPPING_CART_FORM_ATTR)).getJSONArrayReader();
         SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
+        savedShoppingCart.products = SpaceProducts.products;  // Needed for receipts
         long total = 0;
         while (ar.hasMore()) {
             JSONObjectReader or = ar.getObject();
             int quantity = or.getInt("quantity");
             if (quantity != 0) {
                 String sku = or.getString("sku");
-                savedShoppingCart.items.put(sku, quantity);
+                savedShoppingCart.items.put(sku, BigDecimal.valueOf(quantity));
                 total += quantity * or.getInt53("priceX100");
             }
         }

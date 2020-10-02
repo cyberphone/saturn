@@ -18,48 +18,33 @@ package org.webpki.saturn.merchant;
 
 import java.util.LinkedHashMap;
 
-// Products sold by the Planet Gas merchant
+// Products currently sold by the Demo Merchant
 
-public class FuelTypes implements ProductEntry {
+public class SpaceProducts implements ProductEntry {
     
     static final LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<>();
-    
-    static void init(String name, String description, int pricePerLitreX100, String background) {
-        products.put(name, new FuelTypes(name, description, pricePerLitreX100, background));
+
+    static void init(String name, String description, int unitPriceX100, String imageUrl) {
+        products.put(name, new SpaceProducts(name, description, unitPriceX100, imageUrl));
     }
 
     static {
 
-        init("STD_95E",
-             "Standard 95E",
-             135, 
-             "linear-gradient(to bottom, #3ab6e8 0%,#8fd6e8 35%,#a7dfed 65%,#3ab6e8 100%)");
+        init("7d688", "Model Rocket", 49999, "spacex-starship-heavy.png"); 
 
-        init("BIO_DIESEL",
-             "Bio Diesel",
-             104, 
-             "linear-gradient(to bottom, #98e524 0%,#d2ff52 40%,#d2ff52 60%,#98e524 100%)");
-
-        init("NITRO",
-             "Nitro Racing Fuel", 
-             628, 
-            "linear-gradient(to bottom, #fb9d23 0%,#ffc578 35%,#ffc578 65%,#fb9d23 100%)");
+        init("90555", "Nasa T-Shirt", 1525,  "t-shirt-nasa-grey.png"); 
     }
-    
+
     String name;
     String description;
-    int pricePerLitreX100;
-    String background;
-        
-    FuelTypes(String name, String description, int pricePerLitreX100, String background) {
+    int unitPriceX100;
+    String imageUrl;
+
+    SpaceProducts(String name, String description, int unitPriceX100, String imageUrl) {
         this.name = name;
         this.description = description;
-        this.pricePerLitreX100 = pricePerLitreX100;
-        this.background = background;
-    }
-    
-    String getBackground() {
-        return background;
+        this.unitPriceX100 = unitPriceX100;
+        this.imageUrl = imageUrl;
     }
 
     @Override
@@ -69,9 +54,9 @@ public class FuelTypes implements ProductEntry {
 
     @Override
     public long getPriceX100() {
-        return pricePerLitreX100;
+        return unitPriceX100;
     }
-    
+
     @Override
     public String toString() {
         return name;
@@ -79,6 +64,6 @@ public class FuelTypes implements ProductEntry {
 
     @Override
     public String getOptionalUnit() {
-        return "Litre";
+        return null;
     }
 }

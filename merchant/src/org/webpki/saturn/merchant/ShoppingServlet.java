@@ -18,8 +18,6 @@ package org.webpki.saturn.merchant;
 
 import java.io.IOException;
 
-import java.util.LinkedHashMap;
-
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -36,19 +34,6 @@ public class ShoppingServlet extends HttpServlet implements MerchantSessionPrope
     static final String COMMON_NAME = "Demo Merchant";
     
     static Logger logger = Logger.getLogger(ShoppingServlet.class.getName ());
-    
-    static LinkedHashMap<String,ProductEntry> demoMerchantProducts = new LinkedHashMap<>();
-    
-    static {
-        demoMerchantProducts.put("7d688", 
-                                 new ProductEntry("spacex-starship-heavy.png", 
-                                                  "Model Rocket", 
-                                                  49999)); 
-        demoMerchantProducts.put("90555", 
-                                 new ProductEntry("t-shirt-nasa-grey.png", 
-                                                  "Nasa T-Shirt", 
-                                                  1525)); 
-    }
     
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);

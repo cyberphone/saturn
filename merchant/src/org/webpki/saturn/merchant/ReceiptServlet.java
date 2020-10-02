@@ -53,6 +53,8 @@ public class ReceiptServlet extends HttpServlet {
     }
     
     static class HtmlTable {
+        
+        static final String RIGHT_ALIGN = "text-align:right";
 
         StringBuilder html = new StringBuilder();
         
@@ -154,7 +156,7 @@ public class ReceiptServlet extends HttpServlet {
                         .addCell("<a href='" + 
                                  payeeAuthority.getPayeeCoreProperties().getHomePage() + 
                                 "'>" + receiptDecoder.getPayeeCommonName() + "</a>")
-                        .addCell(receiptDecoder.getPayeeReferenceId(), "text-align:right")
+                        .addCell(receiptDecoder.getPayeeReferenceId(), HtmlTable.RIGHT_ALIGN)
                         .addCell(receiptDecoder.getCurrency()
                                 .amountToDisplayString(receiptDecoder.getAmount(), false))
                         .addCell(TimeUtils.displayUtcTime(receiptDecoder.getPayeeTimeStamp()))
@@ -196,10 +198,11 @@ public class ReceiptServlet extends HttpServlet {
                         .contains(LineItem.OptionalElements.SKU)) {
                     orderData.addCell(optional(lineItem.getOptionalSku()));
                 }
-                orderData.addCell(quantity);
+                orderData.addCell(quantity, HtmlTable.RIGHT_ALIGN);
                 if (receiptDecoder.getOptionalLineItemElements()
                         .contains(LineItem.OptionalElements.SUBTOTAL)) {
-                    orderData.addCell(optional(lineItem.getOptionalSubtotal()));
+                    orderData.addCell(optional(lineItem.getOptionalSubtotal()), 
+                                      HtmlTable.RIGHT_ALIGN);
                 }
             }
             html.append(orderData.render());
@@ -266,6 +269,7 @@ public class ReceiptServlet extends HttpServlet {
                 HttpSupport.writeData(response, receipt, BaseProperties.JSON_CONTENT_TYPE);
             }
         } catch (Exception e) {
+            response.getWriter().append(e.getMessage()).flush();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.flushBuffer();
         }

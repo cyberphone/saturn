@@ -97,6 +97,15 @@ public class DataBaseOperations {
             ProviderResponseDecoder authorization = resultData.authorization;
             String orderId = authorization.getPayeeReferenceId();
             ArrayList<LineItem> lineItems = new ArrayList<>();
+            SavedShoppingCart savedShoppingCart = resultData.walletRequest.savedShoppingCart;
+            for (String sku : savedShoppingCart.items.keySet()) {
+                ProductEntry productEntry = savedShoppingCart.products.get(sku);
+                lineItems.add(new LineItem(null,
+                              productEntry.getDescription(),
+                              null,
+                              savedShoppingCart.items.get(sku),
+                              productEntry.getOptionalUnit()));
+            }
 /*
          public LineItem(String optionalSku,
                         String description,
@@ -104,7 +113,6 @@ public class DataBaseOperations {
                         BigDecimal quantity,
                         String optionalUnit) {
 
- */
             lineItems.add(new LineItem(null,
                                        "Great product",
                                        null,
@@ -115,6 +123,7 @@ public class DataBaseOperations {
                                        null,
                                        new BigDecimal("30.5"),
                                        "Litre"));
+ */
             ReceiptEncoder receiptEncoder = new ReceiptEncoder(
                     orderId,
                     authorization.getPayeeTimeStamp(),

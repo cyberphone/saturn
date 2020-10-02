@@ -18,15 +18,18 @@ package org.webpki.saturn.merchant;
 
 import java.io.Serializable;
 
+import java.math.BigDecimal;
+
 import java.util.LinkedHashMap;
 
 public class SavedShoppingCart implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    LinkedHashMap<String,ProductEntry> products;
     long subTotal;
     long tax;
     long roundedPaymentAmount;
-    LinkedHashMap<String, Integer> items = new LinkedHashMap<>();
+    LinkedHashMap<String, BigDecimal> items = new LinkedHashMap<>();
 }
 
