@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.merchant;
 
+import java.math.BigDecimal;
+
 import java.util.LinkedHashMap;
 
 // Products currently sold by the Demo Merchant
@@ -65,5 +67,10 @@ public class SpaceProducts implements ProductEntry {
     @Override
     public String getOptionalUnit() {
         return null;
+    }
+
+    @Override
+    public BigDecimal getOptionalSubtotal(BigDecimal quantity) {
+        return quantity.multiply(BigDecimal.valueOf(unitPriceX100)).divide(BigDecimal.valueOf(100));
     }
 }

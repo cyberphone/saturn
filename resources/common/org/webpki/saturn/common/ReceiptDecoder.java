@@ -41,6 +41,14 @@ public class ReceiptDecoder implements BaseProperties {
     static final JSONCryptoHelper.Options signatureOptions = new JSONCryptoHelper.Options()
             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
             .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
+    
+    TaxRecord taxRecordDecoder(JSONObjectReader rd, Currencies currency) throws IOException {
+        if (rd.hasProperty(TAX_JSON) || rd.hasProperty(TAX_PERCENTAGE_JSON)) {
+            return new TaxRecord(rd.getMoney(TAX_JSON, currency.decimals),
+                                 rd.getBigDecimal(TAX_PERCENTAGE_JSON));
+        }
+        return null;
+    }
 
     public ReceiptDecoder(JSONObjectReader rd) throws IOException {
         Messages.RECEIPT.parseBaseMessage(rd);
@@ -56,6 +64,25 @@ public class ReceiptDecoder implements BaseProperties {
         optionalEmailAddress = rd.getStringConditional(EMAIL_ADDRESS_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
         amount = rd.getMoney(AMOUNT_JSON, currency.decimals);
+
+        if (rd.hasProperty(SHIPPING_JSON)) {
+            JSONObjectReader shippingRecord = rd.getObject(SHIPPING_JSON);
+            optionalShippingRecord = new ShippingRecord(
+                    shippingRecord.getString(DESCRIPTION_JSON),
+                    shippingRecord.getMoney(AMOUNT_JSON, currency.decimals));
+        }
+        if (rd.hasProperty(SUBTOTAL_JSON)) {
+            optionalSubtotal = rd.getMoney(SUBTOTAL_JSON, currency.decimals);
+        }
+        optionalTaxRecord = taxRecordDecoder(rd, currency);
+
+        if (rd.hasProperty(BARCODE_JSON) || rd.hasProperty(BARCODE_TYPE_JSON)) {
+            barcode = new Barcode(rd.getString(BARCODE_JSON),
+                          Barcode.BarcodeTypes.valueOf(rd.getString(BARCODE_TYPE_JSON)));
+        }
+
+        optionalFreeText = rd.getStringConditional(FREE_TEXT_JSON);
+
         JSONArrayReader lineItemsArray = rd.getArray(LINE_ITEMS_JSON);
         lineItems = new ArrayList<>();
         optionalLineItemElements = EnumSet.noneOf(LineItem.OptionalElements.class);
@@ -63,12 +90,14 @@ public class ReceiptDecoder implements BaseProperties {
             JSONObjectReader lineItemObject = lineItemsArray.getObject();
             LineItem lineItem = new LineItem();
             lineItems.add(lineItem);
-            lineItem.quantity = lineItemObject.getBigDecimal(QUANTITY_JSON);
-            lineItem.description = lineItemObject.getString(DESCRIPTION_JSON);
             if (lineItemObject.hasProperty(SKU_JSON)) {
                 optionalLineItemElements.add(LineItem.OptionalElements.SKU);
                 lineItem.optionalSku = lineItemObject.getString(SKU_JSON);
             }
+
+            lineItem.description = lineItemObject.getString(DESCRIPTION_JSON);
+            lineItem.quantity = lineItemObject.getBigDecimal(QUANTITY_JSON);
+
             if (lineItemObject.hasProperty(UNIT_JSON)) {
                 optionalLineItemElements.add(LineItem.OptionalElements.UNIT);
                 lineItem.optionalUnit = lineItemObject.getString(UNIT_JSON);
@@ -78,13 +107,12 @@ public class ReceiptDecoder implements BaseProperties {
                 lineItem.optionalSubtotal = 
                         lineItemObject.getMoney(SUBTOTAL_JSON, currency.decimals);
             }
+            if (lineItemObject.hasProperty(TAX_JSON)) {
+                optionalLineItemElements.add(LineItem.OptionalElements.TAX);
+            }
+            lineItem.optionalTaxRecord = taxRecordDecoder(lineItemObject, currency);
         } while (lineItemsArray.hasMore());
-        if (rd.hasProperty(BARCODE_JSON)) {
-            barcode = new Barcode();
-            barcode.barcodeString = rd.getString(BARCODE_JSON);
-            barcode.barcodeType = Barcode.BarcodeTypes.valueOf(rd.getString(BARCODE_TYPE_JSON));
-        }
-        optionalFreeText = rd.getStringConditional(FREE_TEXT_JSON);
+
         paymentMethodName = rd.getString(PAYMENT_METHOD_NAME_JSON);
         optionalAccountReference = rd.getStringConditional(ACCOUNT_REFERENCE_JSON);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
@@ -178,7 +206,22 @@ public class ReceiptDecoder implements BaseProperties {
     public Currencies getCurrency() {
         return currency;
     }
-    
+
+    BigDecimal optionalSubtotal;
+    public BigDecimal getOptionalSubtotal() {
+        return optionalSubtotal;
+    }
+
+    ShippingRecord optionalShippingRecord;
+    public ShippingRecord getOptionalShippingRecord() {
+        return optionalShippingRecord;
+    }
+
+    TaxRecord optionalTaxRecord;
+    public TaxRecord getOptionalTaxRecord() {
+        return optionalTaxRecord;
+    }
+
     EnumSet<LineItem.OptionalElements> optionalLineItemElements;
     public EnumSet<LineItem.OptionalElements> getOptionalLineItemElements() {
         return optionalLineItemElements;

@@ -71,8 +71,10 @@ public interface BaseProperties {
     String PAYEE_REQUEST_ID_JSON            = "payeeRequestId";             //    -"-
     String PROVIDER_DATA_JSON               = "providerData";               //    -"-
     String TAX_JSON                         = "tax";                        //    -"- [2] Top and/or Line item level (O)
-    String TAX_PERCENTAGE_JSON              = "taxPercentage";              //    -"-           [2]
+    String TAX_PERCENTAGE_JSON              = "taxPercentage";              //    -"- [2] must alway be used with TAX_JSON
     String SUBTOTAL_JSON                    = "subtotal";                   //    -"- Line item (M), Top level (O)
+    String SHIPPING_JSON                    = "shipping";                   //    -"- Top level (O)   
+    String FREE_TEXT_JSON                   = "freeText";                   //    -"- Text (O)
     String BARCODE_JSON                     = "barcode";                    //    -"- (O)
     String BARCODE_TYPE_JSON                = "barcodeType";                //    -"- (O/M) depends on the former
     String DISCOUNT_JSON                    = "discount";                   //    -"-           [2]
@@ -81,7 +83,6 @@ public interface BaseProperties {
     String UNIT_JSON                        = "unit";                       //    -"- Line item (O)  Example: Litre
     String QUANTITY_JSON                    = "quantity";                   //    -"- Line item (M)
     String DESCRIPTION_JSON                 = "description";                //    -"- Line item (M)
-    String FREE_TEXT_JSON                   = "freeText";                   //    -"- Text (O)
     String RECEIPT_SIGNATURE_JSON           = "receiptSignature";           //    -"- (M)
     String USER_AUTHORIZATION_METHOD_JSON   = "userAuthorizationMethod";    // PIN, Fingerprint, etc.
     String REQUEST_SIGNATURE_JSON           = "requestSignature";           // Payee signature

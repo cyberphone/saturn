@@ -16,6 +16,8 @@
  */
 package org.webpki.saturn.merchant;
 
+import java.math.BigDecimal;
+
 import java.util.LinkedHashMap;
 
 // Products sold by the Planet Gas merchant
@@ -80,5 +82,10 @@ public class FuelTypes implements ProductEntry {
     @Override
     public String getOptionalUnit() {
         return "Litre";
+    }
+
+    @Override
+    public BigDecimal getOptionalSubtotal(BigDecimal quantity) {
+        return null;
     }
 }

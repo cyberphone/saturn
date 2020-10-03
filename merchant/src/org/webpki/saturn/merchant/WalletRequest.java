@@ -68,16 +68,14 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         orderId = DataBaseOperations.createOrderId(random);
 
         // Create a payment request
-        paymentRequest =
-            PaymentRequestEncoder.encode(merchant.commonName, 
-                                         new BigDecimal(
-                                             BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount),
-                                             MerchantService.currency.getDecimals()),
-                                         MerchantService.currency,
-                                         optionalNonDirectPayment,
-                                         orderId,
-                                         new GregorianCalendar(),
-                                         TimeUtils.inMinutes(30));
+        paymentRequest = PaymentRequestEncoder.encode(
+                merchant.commonName, 
+                new BigDecimal(BigInteger.valueOf(savedShoppingCart.roundedPaymentAmount), 2),
+                MerchantService.currency,
+                optionalNonDirectPayment,
+                orderId,
+                new GregorianCalendar(),
+                TimeUtils.inMinutes(30));
         
         List<SupportedPaymentMethod> supportedPaymentMethods = new ArrayList<>();
         for (String paymentMethod : merchant.paymentMethods.keySet()) {

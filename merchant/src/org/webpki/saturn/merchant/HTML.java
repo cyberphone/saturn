@@ -305,7 +305,7 @@ public class HTML implements MerchantSessionProperties {
             "</table></td></tr><tr><td style=\"padding-top:10pt\">" +
             "<table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
                     "<tr><th>Subtotal</th><td style=\"text-align:right\" id=\"total\">")
-        .append(price(savedShoppingCart.subTotal))
+        .append(price(savedShoppingCart.subtotal))
         .append("</td></tr>" +
             "</table></td></tr>" +
             "<tr><td style=\"text-align:center;padding-top:10pt\" id=\"pay\">")
@@ -355,7 +355,7 @@ public class HTML implements MerchantSessionProperties {
             s.append(
                  "<tr><td colspan=\"4\" style=\"height:1px;padding:0px\"></td></tr>" +
                  "<tr><td colspan=\"3\" style=\"text-align:right\">Subtotal</td><td style=\"text-align:right\">")
-             .append(price(savedShoppingCart.subTotal))
+             .append(price(savedShoppingCart.subtotal))
              .append("</td></tr>" +
                  "<tr><td colspan=\"3\" style=\"text-align:right\">Tax (10%)</td><td style=\"text-align:right\">")
              .append(price(savedShoppingCart.tax))

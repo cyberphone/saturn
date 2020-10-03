@@ -16,18 +16,27 @@
  */
 package org.webpki.saturn.common;
 
-// Holds a barcode for the Saturn receipt system
+import java.math.BigDecimal;
 
-public class Barcode {
+// Holds a Tax record for the Saturn receipt system
+// Note that this may be featured at the top level as well as per line
 
-    public enum BarcodeTypes {EAN, QR};  // Place-holder at this stage
+public class TaxRecord {
 
-    String barcodeString;
+    BigDecimal amount;
  
-    BarcodeTypes barcodeType;
+    BigDecimal percentage;
         
-    public Barcode(String barcodeString, BarcodeTypes barcodeType) {
-        this.barcodeString = barcodeString;
-        this.barcodeType = barcodeType;
+    public TaxRecord(BigDecimal amount, BigDecimal percentage) {
+        this.amount = amount;
+        this.percentage = percentage;
+    }
+    
+    public BigDecimal getAmount() {
+        return amount;
+    }
+    
+    public BigDecimal getPercentage() {
+        return percentage;
     }
 }

@@ -17,7 +17,7 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
-
+import java.math.BigDecimal;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -37,6 +37,8 @@ import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
+import org.webpki.saturn.common.ShippingRecord;
+import org.webpki.saturn.common.TaxRecord;
 import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.UrlHolder;
 
@@ -113,100 +115,136 @@ public class ReceiptServlet extends HttpServlet {
                 MerchantService.externalCalls.getPayeeAuthority(
                         new UrlHolder(request).setUrl(receiptDecoder.getPayeeAuthorityUrl()),
                         receiptDecoder.getPayeeAuthorityUrl());
-            ProviderAuthorityDecoder providerAuthority = 
-                MerchantService.externalCalls.getProviderAuthority(
-                        new UrlHolder(request).setUrl(receiptDecoder.getProviderAuthorityUrl()),
-                        receiptDecoder.getProviderAuthorityUrl());
-            html.append(AuthorityBaseServlet.addLogotype(
-                    payeeAuthority.getPayeeCoreProperties().getLogotypeUrl(),
-                    payeeAuthority.getPayeeCoreProperties().getCommonName()));
-            if (receiptDecoder.getOptionalPhysicalAddress() != null) {
-                html.append("<div class='para'>");
-                boolean next = false;
-                for (String addressLine : receiptDecoder.getOptionalPhysicalAddress()) {
-                    if (next) {
-                        html.append("<br>");
-                    }
-                    next = true;
-                    html.append(addressLine);
+        ProviderAuthorityDecoder providerAuthority = 
+            MerchantService.externalCalls.getProviderAuthority(
+                    new UrlHolder(request).setUrl(receiptDecoder.getProviderAuthorityUrl()),
+                    receiptDecoder.getProviderAuthorityUrl());
+        html.append(AuthorityBaseServlet.addLogotype(
+                payeeAuthority.getPayeeCoreProperties().getLogotypeUrl(),
+                payeeAuthority.getPayeeCoreProperties().getCommonName()));
+        if (receiptDecoder.getOptionalPhysicalAddress() != null) {
+            html.append("<div class='para'>");
+            boolean next = false;
+            for (String addressLine : receiptDecoder.getOptionalPhysicalAddress()) {
+                if (next) {
+                    html.append("<br>");
                 }
-                html.append("</div>");
+                next = true;
+                html.append(addressLine);
             }
-            if (receiptDecoder.getOptionalPhoneNumber() != null ||
-                receiptDecoder.getOptionalEmailAddress() != null) {
-                html.append("<div class='para'>");
+            html.append("</div>");
+        }
+        if (receiptDecoder.getOptionalPhoneNumber() != null ||
+            receiptDecoder.getOptionalEmailAddress() != null) {
+            html.append("<div class='para'>");
+            if (receiptDecoder.getOptionalPhoneNumber() != null) {
+                html.append("<i>Phone</i>: ")
+                    .append(receiptDecoder.getOptionalPhoneNumber());
+            }
+            if (receiptDecoder.getOptionalEmailAddress() != null) {
                 if (receiptDecoder.getOptionalPhoneNumber() != null) {
-                    html.append("<i>Phone</i>: ")
-                        .append(receiptDecoder.getOptionalPhoneNumber());
+                    html.append("<br>");
                 }
-                if (receiptDecoder.getOptionalEmailAddress() != null) {
-                    if (receiptDecoder.getOptionalPhoneNumber() != null) {
-                        html.append("<br>");
-                    }
-                    html.append("<i>e-mail</i>: ")
-                        .append(receiptDecoder.getOptionalEmailAddress());
-                }
-                html.append("</div>");
+                html.append("<i>e-mail</i>: ")
+                    .append(receiptDecoder.getOptionalEmailAddress());
             }
-            html.append(new HtmlTable("Core Receipt Data")
-                        .addHeader("Payee Name")
-                        .addHeader("Reference Id")
-                        .addHeader("Total")
-                        .addHeader("Time Stamp")
-                        .addCell("<a href='" + 
-                                 payeeAuthority.getPayeeCoreProperties().getHomePage() + 
-                                "'>" + receiptDecoder.getPayeeCommonName() + "</a>")
-                        .addCell(receiptDecoder.getPayeeReferenceId(), HtmlTable.RIGHT_ALIGN)
-                        .addCell(receiptDecoder.getCurrency()
-                                .amountToDisplayString(receiptDecoder.getAmount(), false))
-                        .addCell(TimeUtils.displayUtcTime(receiptDecoder.getPayeeTimeStamp()))
-                        .render());
-            html.append(new HtmlTable("Payment Details")
-                        .addHeader("Provider Name")
-                        .addHeader("Account Type")
-                        .addHeader("Account Id")
-                        .addHeader("Transaction Id")
-                        .addHeader("Request Id")
-                        .addHeader("Time Stamp")
-                        .addCell("<a href='" + 
-                                 providerAuthority.getHomePage() + 
-                                "'>" + receiptDecoder.getProviderCommonName() + "</a>")
-                        .addCell(receiptDecoder.getPaymentMethodName())
-                        .addCell(receiptDecoder.getOptionalAccountReference())
-                        .addCell(receiptDecoder.getProviderReferenceId())
-                        .addCell(receiptDecoder.getPayeeRequestId())
-                        .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
-                        .render());
-            HtmlTable orderData = new HtmlTable("Order Data");
-            orderData.addHeader("Description");
+            html.append("</div>");
+        }
+        TaxRecord optionalTaxRecord = receiptDecoder.getOptionalTaxRecord();
+        BigDecimal optionalSubtotal = receiptDecoder.getOptionalSubtotal();
+        HtmlTable coreData = 
+                new HtmlTable("Core Receipt Data")
+                    .addHeader("Payee Name")
+                    .addHeader("Reference Id")
+                    .addHeader("Total");
+        if (optionalSubtotal != null) {
+            coreData.addHeader("Subtotal");
+        }
+        if (optionalTaxRecord != null) {
+            coreData.addHeader("Tax");
+        }
+        coreData.addHeader("Time Stamp")
+                .addCell("<a href='" + 
+                         payeeAuthority.getPayeeCoreProperties().getHomePage() + 
+                        "'>" + receiptDecoder.getPayeeCommonName() + "</a>")
+                .addCell(receiptDecoder.getPayeeReferenceId(), HtmlTable.RIGHT_ALIGN)
+                .addCell(receiptDecoder.getCurrency()
+                            .amountToDisplayString(receiptDecoder.getAmount(), false));
+        if (optionalSubtotal != null) {
+            coreData.addCell(receiptDecoder.getCurrency()
+                                .amountToDisplayString(optionalSubtotal, false),
+                             HtmlTable.RIGHT_ALIGN);
+        }
+        if (optionalTaxRecord != null) {
+            coreData.addCell(receiptDecoder.getCurrency()
+                    .amountToDisplayString(optionalTaxRecord.getAmount(), false) +
+                    " (" +
+                    optionalTaxRecord.getPercentage().toPlainString() +
+                    "%)");
+        }
+        html.append(coreData.addCell(
+                        TimeUtils.displayUtcTime(receiptDecoder.getPayeeTimeStamp()))
+                            .render());
+        html.append(new HtmlTable("Payment Details")
+                    .addHeader("Provider Name")
+                    .addHeader("Account Type")
+                    .addHeader("Account Id")
+                    .addHeader("Transaction Id")
+                    .addHeader("Request Id")
+                    .addHeader("Time Stamp")
+                    .addCell("<a href='" + 
+                             providerAuthority.getHomePage() + 
+                            "'>" + receiptDecoder.getProviderCommonName() + "</a>")
+                    .addCell(receiptDecoder.getPaymentMethodName())
+                    .addCell(receiptDecoder.getOptionalAccountReference())
+                    .addCell(receiptDecoder.getProviderReferenceId())
+                    .addCell(receiptDecoder.getPayeeRequestId())
+                    .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
+                    .render());
+        HtmlTable orderData = new HtmlTable("Order Data");
+        orderData.addHeader("Description");
+        if (receiptDecoder.getOptionalLineItemElements()
+                .contains(LineItem.OptionalElements.SKU)) {
+            orderData.addHeader("SKU");
+        }
+        orderData.addHeader("Quantity");
+        if (receiptDecoder.getOptionalLineItemElements()
+                .contains(LineItem.OptionalElements.SUBTOTAL)) {
+            orderData.addHeader("Subtotal");
+        }
+        for (LineItem lineItem : receiptDecoder.getLineItems()) {
+            String quantity = lineItem.getQuantity().toPlainString();
+            if (lineItem.getOptionalUnit() != null) {
+                quantity += " " + lineItem.getOptionalUnit();
+            }
+            orderData.addCell(lineItem.getDescription());
             if (receiptDecoder.getOptionalLineItemElements()
                     .contains(LineItem.OptionalElements.SKU)) {
-                orderData.addHeader("SKU");
+                orderData.addCell(optional(lineItem.getOptionalSku()));
             }
-            orderData.addHeader("Quantity");
+            orderData.addCell(quantity, HtmlTable.RIGHT_ALIGN);
             if (receiptDecoder.getOptionalLineItemElements()
                     .contains(LineItem.OptionalElements.SUBTOTAL)) {
-                orderData.addHeader("Subtotal");
+                BigDecimal subtotal = lineItem.getOptionalSubtotal();
+                orderData.addCell(subtotal == null ? "" :
+                    receiptDecoder.getCurrency().amountToDisplayString(subtotal, false), 
+                                  HtmlTable.RIGHT_ALIGN);
             }
-            for (LineItem lineItem : receiptDecoder.getLineItems()) {
-                String quantity = lineItem.getQuantity().toPlainString();
-                if (lineItem.getOptionalUnit() != null) {
-                    quantity += " " + lineItem.getOptionalUnit();
-                }
-                orderData.addCell(lineItem.getDescription());
-                if (receiptDecoder.getOptionalLineItemElements()
-                        .contains(LineItem.OptionalElements.SKU)) {
-                    orderData.addCell(optional(lineItem.getOptionalSku()));
-                }
-                orderData.addCell(quantity, HtmlTable.RIGHT_ALIGN);
-                if (receiptDecoder.getOptionalLineItemElements()
-                        .contains(LineItem.OptionalElements.SUBTOTAL)) {
-                    orderData.addCell(optional(lineItem.getOptionalSubtotal()), 
-                                      HtmlTable.RIGHT_ALIGN);
-                }
-            }
-            html.append(orderData.render());
         }
+        html.append(orderData.render());
+
+        ShippingRecord optionalShippingRecord = receiptDecoder.getOptionalShippingRecord();
+        if (optionalShippingRecord != null) {
+            html.append(new HtmlTable("Shipping")
+                    .addHeader("Description")
+                    .addHeader("Cost")
+                    .addCell(optionalShippingRecord.getDescription())
+                    .addCell(receiptDecoder.getCurrency()
+                                .amountToDisplayString(optionalShippingRecord.getAmount(), false),
+                             HtmlTable.RIGHT_ALIGN)
+                    .render());
+        }
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {

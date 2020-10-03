@@ -32,6 +32,14 @@ import org.webpki.util.ISODateTime;
 
 public class ReceiptEncoder implements BaseProperties {
     
+    JSONObjectWriter setOptionalTaxRecord(JSONObjectWriter wr,
+                                          TaxRecord taxRecord,
+                                          Currencies currency) throws IOException {
+        return taxRecord == null ? wr :
+            wr.setMoney(TAX_JSON, taxRecord.amount, currency.decimals)
+              .setBigDecimal(TAX_PERCENTAGE_JSON,  taxRecord.percentage);
+    }
+    
     public ReceiptEncoder(String payeeReferenceId,
                           GregorianCalendar payeeTimeStamp, 
                           String payeeCommonName,
@@ -40,6 +48,9 @@ public class ReceiptEncoder implements BaseProperties {
                           String optionalEmailAddress, 
                           BigDecimal amount,
                           Currencies currency,
+                          ShippingRecord optionalShippingRecord,
+                          BigDecimal optionalSubtotal,
+                          TaxRecord optionalTaxRecord,
                           List<LineItem> lineItems,
                           Barcode optionalBarcode,
                           String optionalFreeText,
@@ -66,31 +77,52 @@ public class ReceiptEncoder implements BaseProperties {
             .setDynamic((wr) -> optionalEmailAddress == null ?
                             wr : wr.setString(EMAIL_ADDRESS_JSON,
                                               optionalEmailAddress))
+
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
             .setString(CURRENCY_JSON, currency.toString())
+            
+            .setDynamic((wr) -> optionalSubtotal == null ? wr :
+                wr.setMoney(SUBTOTAL_JSON, optionalSubtotal, currency.decimals))
+
+            .setDynamic((wr) -> optionalShippingRecord == null ? wr :
+                wr.setObject(SHIPPING_JSON, new JSONObjectWriter()
+                        .setString(DESCRIPTION_JSON, optionalShippingRecord.description)
+                        .setMoney(AMOUNT_JSON, optionalShippingRecord.amount, currency.decimals)))
+
+            .setDynamic((wr) -> setOptionalTaxRecord(wr, 
+                                                     optionalTaxRecord,
+                                                     currency))
+
+            .setDynamic((wr) -> optionalBarcode == null ? wr :
+                wr.setString(BARCODE_JSON, optionalBarcode.barcodeString)
+                  .setString(BARCODE_TYPE_JSON, optionalBarcode.barcodeType.toString()))
+
+            .setDynamic((wr) -> optionalFreeText == null ? wr : 
+                wr.setString(FREE_TEXT_JSON, optionalFreeText))
+
             .setDynamic((wr) -> {
                 JSONArrayWriter lineItemsArray = wr.setArray(LINE_ITEMS_JSON);
                 for (LineItem lineItem : lineItems) {
                     lineItemsArray.setObject()
-                        .setBigDecimal(QUANTITY_JSON, lineItem.quantity)
+                        .setDynamic((li) -> lineItem.optionalSku == null ? li :
+                            li.setString(SKU_JSON, lineItem.optionalSku))
                         .setString(DESCRIPTION_JSON, lineItem.description)
+                        .setBigDecimal(QUANTITY_JSON, lineItem.quantity)
+                        .setDynamic((li) -> lineItem.optionalUnit == null ? li :
+                            li.setString(UNIT_JSON, lineItem.optionalUnit))
                         .setDynamic((li) -> lineItem.optionalSubtotal == null ? li :
                             li.setMoney(SUBTOTAL_JSON, 
                                         lineItem.optionalSubtotal, 
                                         currency.getDecimals()))
-                        .setDynamic((li) -> lineItem.optionalUnit == null ? li :
-                            li.setString(UNIT_JSON, lineItem.optionalUnit))
-                        .setDynamic((li) -> lineItem.optionalSku == null ? li :
-                            li.setString(SKU_JSON, lineItem.optionalSku));
+
+                        .setDynamic((li) -> setOptionalTaxRecord(li, 
+                                                                 lineItem.optionalTaxRecord,
+                                                                 currency));
                      
                 }
                 return wr;
             })
-            .setDynamic((wr) -> optionalBarcode == null ? wr :
-                wr.setString(BARCODE_JSON, optionalBarcode.barcodeString)
-                  .setString(BARCODE_TYPE_JSON, optionalBarcode.barcodeType.toString()))
-            .setDynamic((wr) -> optionalFreeText == null ? wr : 
-                wr.setString(FREE_TEXT_JSON, optionalFreeText))
+
             .setString(PAYMENT_METHOD_NAME_JSON, paymentMethodName)
             .setDynamic((wr) -> optionalAccountReference == null ?
                             wr : wr.setString(ACCOUNT_REFERENCE_JSON,

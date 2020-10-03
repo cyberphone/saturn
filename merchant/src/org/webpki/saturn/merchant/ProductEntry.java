@@ -29,8 +29,14 @@ public interface ProductEntry {
     
     long getPriceX100();
     
-    default String displayPrice() throws IOException {
+    BigDecimal getOptionalSubtotal(BigDecimal quantity);
+    
+    default String renderPrice(long priceX100) throws IOException {
         return Currencies.EUR.amountToDisplayString(
-                new BigDecimal(getPriceX100()).divide(new BigDecimal(100)), false);
+                new BigDecimal(priceX100).divide(new BigDecimal(100)), false);
+    }
+    
+    default String displayPrice() throws IOException {
+        return renderPrice(getPriceX100());
     }
 }

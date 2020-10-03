@@ -16,18 +16,25 @@
  */
 package org.webpki.saturn.common;
 
-// Holds a barcode for the Saturn receipt system
+import java.math.BigDecimal;
 
-public class Barcode {
+// Holds a shipping record for the Saturn receipt system
 
-    public enum BarcodeTypes {EAN, QR};  // Place-holder at this stage
+public class ShippingRecord {
 
-    String barcodeString;
- 
-    BarcodeTypes barcodeType;
+    String description;
+    BigDecimal amount;
         
-    public Barcode(String barcodeString, BarcodeTypes barcodeType) {
-        this.barcodeString = barcodeString;
-        this.barcodeType = barcodeType;
+    public ShippingRecord(String description, BigDecimal amount) {
+        this.description = description;
+        this.amount = amount;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public BigDecimal getAmount() {
+        return amount;
     }
 }

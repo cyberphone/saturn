@@ -19,7 +19,7 @@ package org.webpki.saturn.merchant;
 import java.io.IOException;
 
 import java.math.BigDecimal;
-
+import java.math.BigInteger;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,6 +38,8 @@ import org.webpki.saturn.common.ProviderResponseDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
 import org.webpki.saturn.common.ServerAsymKeySigner;
+import org.webpki.saturn.common.ShippingRecord;
+import org.webpki.saturn.common.TaxRecord;
 
 public class DataBaseOperations {
 
@@ -100,30 +102,26 @@ public class DataBaseOperations {
             SavedShoppingCart savedShoppingCart = resultData.walletRequest.savedShoppingCart;
             for (String sku : savedShoppingCart.items.keySet()) {
                 ProductEntry productEntry = savedShoppingCart.products.get(sku);
+                BigDecimal quantity = savedShoppingCart.items.get(sku);
                 lineItems.add(new LineItem(null,
                               productEntry.getDescription(),
-                              null,
-                              savedShoppingCart.items.get(sku),
-                              productEntry.getOptionalUnit()));
+                              quantity,
+                              productEntry.getOptionalSubtotal(quantity))
+                        .setUnit(productEntry.getOptionalUnit()));
             }
-/*
-         public LineItem(String optionalSku,
-                        String description,
-                        BigDecimal optionalSubtotal,
-                        BigDecimal quantity,
-                        String optionalUnit) {
+            BigDecimal optionalSubtotal = null;
+            TaxRecord optionalTaxRecord = null;
+            if (savedShoppingCart.subtotal != 0) {
+                optionalSubtotal = new BigDecimal(BigInteger.valueOf(savedShoppingCart.subtotal), 2);
+                optionalTaxRecord = new TaxRecord(
+                        new BigDecimal(BigInteger.valueOf(savedShoppingCart.tax), 2),
+                        BigDecimal.TEN);
+            }
+            ShippingRecord optionalShippingRecord = null;
+            if (savedShoppingCart.products == SpaceProducts.products) {
+                optionalShippingRecord = new ShippingRecord("First class", new BigDecimal("8.30"));
+            }
 
-            lineItems.add(new LineItem(null,
-                                       "Great product",
-                                       null,
-                                       BigDecimal.valueOf(3),
-                                       null));
-            lineItems.add(new LineItem(null,
-                                       "Petrol",
-                                       null,
-                                       new BigDecimal("30.5"),
-                                       "Litre"));
- */
             ReceiptEncoder receiptEncoder = new ReceiptEncoder(
                     orderId,
                     authorization.getPayeeTimeStamp(),
@@ -133,6 +131,9 @@ public class DataBaseOperations {
                     merchant.optionalEmailAddress,
                     authorization.getAmount(),
                     authorization.getCurrency(),
+                    optionalShippingRecord,
+                    optionalSubtotal,
+                    optionalTaxRecord,
                     lineItems,
                     new Barcode(orderId, Barcode.BarcodeTypes.EAN),
                     "Free text...",

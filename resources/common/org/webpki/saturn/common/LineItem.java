@@ -22,22 +22,33 @@ import java.math.BigDecimal;
 
 public class LineItem {
 
-    public enum OptionalElements {SKU, UNIT, SUBTOTAL};
+    public enum OptionalElements {SKU, UNIT, SUBTOTAL, TAX};
 
     String optionalSku;
     String description;
     BigDecimal optionalSubtotal;
     BigDecimal quantity;
     String optionalUnit;
+    TaxRecord optionalTaxRecord;
 
-    public LineItem(String optionalSku, String description,
-            BigDecimal optionalSubtotal, BigDecimal quantity,
-            String optionalUnit) {
+    public LineItem(String optionalSku, 
+            String description,
+            BigDecimal quantity,
+            BigDecimal optionalSubtotal) {
         this.optionalSku = optionalSku;
         this.description = description;
-        this.optionalSubtotal = optionalSubtotal;
         this.quantity = quantity;
+        this.optionalSubtotal = optionalSubtotal;
+    }
+    
+    public LineItem setTaxRecord(TaxRecord optionalTaxRecord) {
+        this.optionalTaxRecord = optionalTaxRecord;
+        return this;
+    }
+
+    public LineItem setUnit(String optionalUnit) {
         this.optionalUnit = optionalUnit;
+        return this;
     }
 
     LineItem() { // Used by the decoder
