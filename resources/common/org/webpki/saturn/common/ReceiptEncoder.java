@@ -40,6 +40,14 @@ public class ReceiptEncoder implements BaseProperties {
               .setBigDecimal(TAX_PERCENTAGE_JSON,  taxRecord.percentage);
     }
     
+    JSONObjectWriter setOptionalAmount(JSONObjectWriter wr,
+                                       String jsonTag,
+                                       BigDecimal amount,
+                                       Currencies currency) throws IOException {
+        return amount == null ? wr :
+            wr.setMoney(jsonTag, amount, currency.decimals);
+    }
+    
     public ReceiptEncoder(String payeeReferenceId,
                           GregorianCalendar payeeTimeStamp, 
                           String payeeCommonName,
@@ -50,6 +58,7 @@ public class ReceiptEncoder implements BaseProperties {
                           Currencies currency,
                           ShippingRecord optionalShippingRecord,
                           BigDecimal optionalSubtotal,
+                          BigDecimal optionalDiscount,
                           TaxRecord optionalTaxRecord,
                           List<LineItem> lineItems,
                           Barcode optionalBarcode,
@@ -78,11 +87,18 @@ public class ReceiptEncoder implements BaseProperties {
                             wr : wr.setString(EMAIL_ADDRESS_JSON,
                                               optionalEmailAddress))
 
-            .setMoney(AMOUNT_JSON, amount, currency.getDecimals())
+            .setMoney(AMOUNT_JSON, amount, currency.decimals)
             .setString(CURRENCY_JSON, currency.toString())
             
-            .setDynamic((wr) -> optionalSubtotal == null ? wr :
-                wr.setMoney(SUBTOTAL_JSON, optionalSubtotal, currency.decimals))
+            .setDynamic((wr) -> setOptionalAmount(wr,
+                                                  SUBTOTAL_JSON,
+                                                  optionalSubtotal,
+                                                  currency))
+
+            .setDynamic((wr) -> setOptionalAmount(wr,
+                                                  DISCOUNT_JSON,
+                                                  optionalDiscount,
+                                                  currency))
 
             .setDynamic((wr) -> optionalShippingRecord == null ? wr :
                 wr.setObject(SHIPPING_JSON, new JSONObjectWriter()
@@ -110,15 +126,26 @@ public class ReceiptEncoder implements BaseProperties {
                         .setBigDecimal(QUANTITY_JSON, lineItem.quantity)
                         .setDynamic((li) -> lineItem.optionalUnit == null ? li :
                             li.setString(UNIT_JSON, lineItem.optionalUnit))
-                        .setDynamic((li) -> lineItem.optionalSubtotal == null ? li :
-                            li.setMoney(SUBTOTAL_JSON, 
-                                        lineItem.optionalSubtotal, 
-                                        currency.getDecimals()))
+
+                        .setDynamic((li) -> setOptionalAmount(li,
+                                                              PRICE_JSON,
+                                                              lineItem.optionalPrice,
+                                                              currency))
+
+                        .setDynamic((li) -> setOptionalAmount(li,
+                                                              SUBTOTAL_JSON,
+                                                              lineItem.optionalSubtotal,
+                                                              currency))
+
+                        .setDynamic((li) -> setOptionalAmount(li,
+                                                              DISCOUNT_JSON,
+                                                              lineItem.optionalDiscount,
+                                                              currency))
 
                         .setDynamic((li) -> setOptionalTaxRecord(li, 
                                                                  lineItem.optionalTaxRecord,
                                                                  currency));
-                     
+                    System.out.println("Disc=" + lineItem.optionalDiscount);
                 }
                 return wr;
             })

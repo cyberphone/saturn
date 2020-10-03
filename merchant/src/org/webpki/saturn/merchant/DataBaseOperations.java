@@ -107,7 +107,8 @@ public class DataBaseOperations {
                               productEntry.getDescription(),
                               quantity,
                               productEntry.getOptionalSubtotal(quantity))
-                        .setUnit(productEntry.getOptionalUnit()));
+                        .setUnit(productEntry.getOptionalUnit())
+                        .setPrice(productEntry.getOptionalPrice()));
             }
             BigDecimal optionalSubtotal = null;
             TaxRecord optionalTaxRecord = null;
@@ -120,6 +121,7 @@ public class DataBaseOperations {
             ShippingRecord optionalShippingRecord = null;
             if (savedShoppingCart.products == SpaceProducts.products) {
                 optionalShippingRecord = new ShippingRecord("First class", new BigDecimal("8.30"));
+                lineItems.get(0).setDiscount(new BigDecimal("-5"));
             }
 
             ReceiptEncoder receiptEncoder = new ReceiptEncoder(
@@ -133,6 +135,7 @@ public class DataBaseOperations {
                     authorization.getCurrency(),
                     optionalShippingRecord,
                     optionalSubtotal,
+                    (BigDecimal) null,
                     optionalTaxRecord,
                     lineItems,
                     new Barcode(orderId, Barcode.BarcodeTypes.EAN),

@@ -73,6 +73,7 @@ public enum Currencies implements Serializable {
         if (!skipTrailingZeroFraction || !ZERO_FRACTION_PATTERN.matcher(amountString).matches()) {
             amountString2.append(amountString.substring(dp));
         }
-        return sign + (symbolFirst ? symbol + amountString2.toString() : amountString2.toString() + symbol);
+        amountString2.insert(0, sign);
+        return symbolFirst ? symbol + amountString2.toString() : amountString2.toString() + symbol;
     }
 }

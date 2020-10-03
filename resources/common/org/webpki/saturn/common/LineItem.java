@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 
 public class LineItem {
 
-    public enum OptionalElements {SKU, UNIT, SUBTOTAL, TAX};
+    public enum OptionalElements {SKU, UNIT, SUBTOTAL, TAX, DISCOUNT, PRICE};
 
     String optionalSku;
     String description;
@@ -30,6 +30,8 @@ public class LineItem {
     BigDecimal quantity;
     String optionalUnit;
     TaxRecord optionalTaxRecord;
+    BigDecimal optionalPrice;
+    BigDecimal optionalDiscount;
 
     public LineItem(String optionalSku, 
             String description,
@@ -51,6 +53,16 @@ public class LineItem {
         return this;
     }
 
+    public LineItem setPrice(BigDecimal price) {
+        this.optionalPrice = price;
+        return this;
+    }
+    
+    public LineItem setDiscount(BigDecimal discount) {
+        this.optionalDiscount = discount;
+        return this;
+    }
+
     LineItem() { // Used by the decoder
 
     }
@@ -65,6 +77,14 @@ public class LineItem {
 
     public String getOptionalSku() {
         return optionalSku;
+    }
+    
+    public BigDecimal getOptionalPrice() {
+        return optionalPrice;
+    }
+
+    public BigDecimal getOptionalDiscount() {
+        return optionalDiscount;
     }
 
     public String getOptionalUnit() {

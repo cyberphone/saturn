@@ -17,7 +17,9 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -209,8 +211,16 @@ public class ReceiptServlet extends HttpServlet {
         }
         orderData.addHeader("Quantity");
         if (receiptDecoder.getOptionalLineItemElements()
+                .contains(LineItem.OptionalElements.PRICE)) {
+            orderData.addHeader("Price");
+        }
+        if (receiptDecoder.getOptionalLineItemElements()
                 .contains(LineItem.OptionalElements.SUBTOTAL)) {
             orderData.addHeader("Subtotal");
+        }
+        if (receiptDecoder.getOptionalLineItemElements()
+                .contains(LineItem.OptionalElements.DISCOUNT)) {
+            orderData.addHeader("Discount");
         }
         for (LineItem lineItem : receiptDecoder.getLineItems()) {
             String quantity = lineItem.getQuantity().toPlainString();
@@ -224,11 +234,30 @@ public class ReceiptServlet extends HttpServlet {
             }
             orderData.addCell(quantity, HtmlTable.RIGHT_ALIGN);
             if (receiptDecoder.getOptionalLineItemElements()
+                    .contains(LineItem.OptionalElements.PRICE)) {
+                BigDecimal price = lineItem.getOptionalPrice();
+                String priceText = "";
+                if (price != null) {
+                    priceText = receiptDecoder.getCurrency().amountToDisplayString(price, false);
+                    if (lineItem.getOptionalUnit() != null) {
+                        priceText += "/" + lineItem.getOptionalUnit();
+                    }
+                }
+                orderData.addCell(priceText, HtmlTable.RIGHT_ALIGN);
+            }
+            if (receiptDecoder.getOptionalLineItemElements()
                     .contains(LineItem.OptionalElements.SUBTOTAL)) {
                 BigDecimal subtotal = lineItem.getOptionalSubtotal();
                 orderData.addCell(subtotal == null ? "" :
                     receiptDecoder.getCurrency().amountToDisplayString(subtotal, false), 
                                   HtmlTable.RIGHT_ALIGN);
+            }
+            if (receiptDecoder.getOptionalLineItemElements()
+                    .contains(LineItem.OptionalElements.DISCOUNT)) {
+                BigDecimal discount = lineItem.getOptionalDiscount();
+                orderData.addCell(discount == null ? "" :
+                    receiptDecoder.getCurrency().amountToDisplayString(discount, false), 
+                                  HtmlTable.RIGHT_ALIGN + ";color:red");
             }
         }
         html.append(orderData.render());

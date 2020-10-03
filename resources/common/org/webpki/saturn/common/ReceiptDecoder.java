@@ -74,6 +74,9 @@ public class ReceiptDecoder implements BaseProperties {
         if (rd.hasProperty(SUBTOTAL_JSON)) {
             optionalSubtotal = rd.getMoney(SUBTOTAL_JSON, currency.decimals);
         }
+        if (rd.hasProperty(DISCOUNT_JSON)) {
+            optionalDiscount = rd.getMoney(DISCOUNT_JSON, currency.decimals);
+        }
         optionalTaxRecord = taxRecordDecoder(rd, currency);
 
         if (rd.hasProperty(BARCODE_JSON) || rd.hasProperty(BARCODE_TYPE_JSON)) {
@@ -102,15 +105,26 @@ public class ReceiptDecoder implements BaseProperties {
                 optionalLineItemElements.add(LineItem.OptionalElements.UNIT);
                 lineItem.optionalUnit = lineItemObject.getString(UNIT_JSON);
             }
+            if (lineItemObject.hasProperty(PRICE_JSON)) {
+                optionalLineItemElements.add(LineItem.OptionalElements.PRICE);
+                lineItem.optionalPrice = 
+                        lineItemObject.getMoney(PRICE_JSON, currency.decimals);
+            }
             if (lineItemObject.hasProperty(SUBTOTAL_JSON)) {
                 optionalLineItemElements.add(LineItem.OptionalElements.SUBTOTAL);
                 lineItem.optionalSubtotal = 
                         lineItemObject.getMoney(SUBTOTAL_JSON, currency.decimals);
             }
-            if (lineItemObject.hasProperty(TAX_JSON)) {
-                optionalLineItemElements.add(LineItem.OptionalElements.TAX);
+            if (lineItemObject.hasProperty(DISCOUNT_JSON)) {
+                optionalLineItemElements.add(LineItem.OptionalElements.DISCOUNT);
+                lineItem.optionalDiscount = 
+                        lineItemObject.getMoney(DISCOUNT_JSON, currency.decimals);
             }
             lineItem.optionalTaxRecord = taxRecordDecoder(lineItemObject, currency);
+            if (lineItem.optionalTaxRecord != null) {
+                optionalLineItemElements.add(LineItem.OptionalElements.TAX);
+            }
+            
         } while (lineItemsArray.hasMore());
 
         paymentMethodName = rd.getString(PAYMENT_METHOD_NAME_JSON);
@@ -205,6 +219,11 @@ public class ReceiptDecoder implements BaseProperties {
     Currencies currency;
     public Currencies getCurrency() {
         return currency;
+    }
+
+    private BigDecimal optionalDiscount;
+    public BigDecimal getOptionalDiscount() {
+        return optionalDiscount;
     }
 
     BigDecimal optionalSubtotal;

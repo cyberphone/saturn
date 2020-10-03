@@ -73,4 +73,9 @@ public class SpaceProducts implements ProductEntry {
     public BigDecimal getOptionalSubtotal(BigDecimal quantity) {
         return quantity.multiply(BigDecimal.valueOf(unitPriceX100)).divide(BigDecimal.valueOf(100));
     }
+
+    @Override
+    public BigDecimal getOptionalPrice() {
+        return null;
+    }
 }

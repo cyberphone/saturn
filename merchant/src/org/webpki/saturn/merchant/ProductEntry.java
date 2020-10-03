@@ -31,6 +31,8 @@ public interface ProductEntry {
     
     BigDecimal getOptionalSubtotal(BigDecimal quantity);
     
+    BigDecimal getOptionalPrice();
+    
     default String renderPrice(long priceX100) throws IOException {
         return Currencies.EUR.amountToDisplayString(
                 new BigDecimal(priceX100).divide(new BigDecimal(100)), false);

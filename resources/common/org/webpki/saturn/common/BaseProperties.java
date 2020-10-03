@@ -72,7 +72,7 @@ public interface BaseProperties {
     String PROVIDER_DATA_JSON               = "providerData";               //    -"-
     String TAX_JSON                         = "tax";                        //    -"- [2] Top and/or Line item level (O)
     String TAX_PERCENTAGE_JSON              = "taxPercentage";              //    -"- [2] must alway be used with TAX_JSON
-    String SUBTOTAL_JSON                    = "subtotal";                   //    -"- Line item (M), Top level (O)
+    String SUBTOTAL_JSON                    = "subtotal";                   //    -"- Line item (O), Top level (O)
     String SHIPPING_JSON                    = "shipping";                   //    -"- Top level (O)   
     String FREE_TEXT_JSON                   = "freeText";                   //    -"- Text (O)
     String BARCODE_JSON                     = "barcode";                    //    -"- (O)
@@ -81,6 +81,7 @@ public interface BaseProperties {
     String LINE_ITEMS_JSON                  = "lineItems";                  //    -"- Header (M)
     String SKU_JSON                         = "sku";                        //    -"- Line item (O)
     String UNIT_JSON                        = "unit";                       //    -"- Line item (O)  Example: Litre
+    String PRICE_JSON                       = "price";                      //    -"- Line item (O)
     String QUANTITY_JSON                    = "quantity";                   //    -"- Line item (M)
     String DESCRIPTION_JSON                 = "description";                //    -"- Line item (M)
     String RECEIPT_SIGNATURE_JSON           = "receiptSignature";           //    -"- (M)

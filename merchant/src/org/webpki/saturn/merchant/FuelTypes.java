@@ -88,4 +88,9 @@ public class FuelTypes implements ProductEntry {
     public BigDecimal getOptionalSubtotal(BigDecimal quantity) {
         return null;
     }
+
+    @Override
+    public BigDecimal getOptionalPrice() {
+        return BigDecimal.valueOf(pricePerLitreX100).divide(BigDecimal.valueOf(100l));
+    }
 }
