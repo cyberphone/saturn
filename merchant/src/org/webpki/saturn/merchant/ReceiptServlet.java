@@ -56,6 +56,10 @@ public class ReceiptServlet extends HttpServlet {
         return o == null ? "" : o.toString();
     }
     
+    static String money(ReceiptDecoder receiptDecoder, BigDecimal amount) throws IOException {
+        return receiptDecoder.getCurrency().amountToDisplayString(amount, false);
+    }
+    
     static class HtmlTable {
         
         static final String RIGHT_ALIGN = "text-align:right";
@@ -152,8 +156,10 @@ public class ReceiptServlet extends HttpServlet {
             }
             html.append("</div>");
         }
-        TaxRecord optionalTaxRecord = receiptDecoder.getOptionalTaxRecord();
         BigDecimal optionalSubtotal = receiptDecoder.getOptionalSubtotal();
+        BigDecimal optionalDiscount = receiptDecoder.getOptionalDiscount();
+        TaxRecord optionalTaxRecord = receiptDecoder.getOptionalTaxRecord();
+ 
         HtmlTable coreData = 
                 new HtmlTable("Core Receipt Data")
                     .addHeader("Payee Name")
@@ -161,6 +167,9 @@ public class ReceiptServlet extends HttpServlet {
                     .addHeader("Total");
         if (optionalSubtotal != null) {
             coreData.addHeader("Subtotal");
+        }
+        if (optionalDiscount != null) {
+            coreData.addHeader("Discount");
         }
         if (optionalTaxRecord != null) {
             coreData.addHeader("Tax");
@@ -170,16 +179,18 @@ public class ReceiptServlet extends HttpServlet {
                          payeeAuthority.getPayeeCoreProperties().getHomePage() + 
                         "'>" + receiptDecoder.getPayeeCommonName() + "</a>")
                 .addCell(receiptDecoder.getPayeeReferenceId(), HtmlTable.RIGHT_ALIGN)
-                .addCell(receiptDecoder.getCurrency()
-                            .amountToDisplayString(receiptDecoder.getAmount(), false));
+                .addCell(money(receiptDecoder, receiptDecoder.getAmount()),
+                         HtmlTable.RIGHT_ALIGN);
         if (optionalSubtotal != null) {
-            coreData.addCell(receiptDecoder.getCurrency()
-                                .amountToDisplayString(optionalSubtotal, false),
+            coreData.addCell(money(receiptDecoder, optionalSubtotal),
+                             HtmlTable.RIGHT_ALIGN);
+        }
+        if (optionalDiscount != null) {
+            coreData.addCell(money(receiptDecoder, optionalDiscount),
                              HtmlTable.RIGHT_ALIGN);
         }
         if (optionalTaxRecord != null) {
-            coreData.addCell(receiptDecoder.getCurrency()
-                    .amountToDisplayString(optionalTaxRecord.getAmount(), false) +
+            coreData.addCell(money(receiptDecoder,optionalTaxRecord.getAmount()) +
                     " (" +
                     optionalTaxRecord.getPercentage().toPlainString() +
                     "%)");
@@ -187,6 +198,7 @@ public class ReceiptServlet extends HttpServlet {
         html.append(coreData.addCell(
                         TimeUtils.displayUtcTime(receiptDecoder.getPayeeTimeStamp()))
                             .render());
+
         html.append(new HtmlTable("Payment Details")
                     .addHeader("Provider Name")
                     .addHeader("Account Type")
@@ -203,6 +215,7 @@ public class ReceiptServlet extends HttpServlet {
                     .addCell(receiptDecoder.getPayeeRequestId())
                     .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
                     .render());
+
         HtmlTable orderData = new HtmlTable("Order Data");
         orderData.addHeader("Description");
         if (receiptDecoder.getOptionalLineItemElements()
@@ -238,7 +251,7 @@ public class ReceiptServlet extends HttpServlet {
                 BigDecimal price = lineItem.getOptionalPrice();
                 String priceText = "";
                 if (price != null) {
-                    priceText = receiptDecoder.getCurrency().amountToDisplayString(price, false);
+                    priceText = money(receiptDecoder, price);
                     if (lineItem.getOptionalUnit() != null) {
                         priceText += "/" + lineItem.getOptionalUnit();
                     }
@@ -248,15 +261,13 @@ public class ReceiptServlet extends HttpServlet {
             if (receiptDecoder.getOptionalLineItemElements()
                     .contains(LineItem.OptionalElements.SUBTOTAL)) {
                 BigDecimal subtotal = lineItem.getOptionalSubtotal();
-                orderData.addCell(subtotal == null ? "" :
-                    receiptDecoder.getCurrency().amountToDisplayString(subtotal, false), 
+                orderData.addCell(subtotal == null ? "" : money(receiptDecoder, subtotal), 
                                   HtmlTable.RIGHT_ALIGN);
             }
             if (receiptDecoder.getOptionalLineItemElements()
                     .contains(LineItem.OptionalElements.DISCOUNT)) {
                 BigDecimal discount = lineItem.getOptionalDiscount();
-                orderData.addCell(discount == null ? "" :
-                    receiptDecoder.getCurrency().amountToDisplayString(discount, false), 
+                orderData.addCell(discount == null ? "" : money(receiptDecoder, discount), 
                                   HtmlTable.RIGHT_ALIGN + ";color:red");
             }
         }
@@ -268,8 +279,7 @@ public class ReceiptServlet extends HttpServlet {
                     .addHeader("Description")
                     .addHeader("Cost")
                     .addCell(optionalShippingRecord.getDescription())
-                    .addCell(receiptDecoder.getCurrency()
-                                .amountToDisplayString(optionalShippingRecord.getAmount(), false),
+                    .addCell(money(receiptDecoder, optionalShippingRecord.getAmount()),
                              HtmlTable.RIGHT_ALIGN)
                     .render());
         }
