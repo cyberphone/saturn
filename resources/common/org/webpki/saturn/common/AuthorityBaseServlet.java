@@ -104,9 +104,10 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                "Math.sqrt((" +
                LOGOTYPE_AREA + 
                " * image.offsetHeight) / image.offsetWidth) + 'em';\n" +
+               "  image.style.visibility = 'visible';\n" +
             "}\n"+
             "</script>" +
-            "<img style='margin-bottom:0.5em' src='")
+            "<img style='margin-bottom:0.5em;visibility:hidden' src='")
         .append(logotypeUrl)
         .append("' alt='logo' title='")
         .append(commonName)

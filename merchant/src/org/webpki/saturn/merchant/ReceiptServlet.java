@@ -163,7 +163,6 @@ public class ReceiptServlet extends HttpServlet {
         HtmlTable coreData = 
                 new HtmlTable("Core Receipt Data")
                     .addHeader("Payee Name")
-                    .addHeader("Reference Id")
                     .addHeader("Total");
         if (optionalSubtotal != null) {
             coreData.addHeader("Subtotal");
@@ -175,10 +174,10 @@ public class ReceiptServlet extends HttpServlet {
             coreData.addHeader("Tax");
         }
         coreData.addHeader("Time Stamp")
+                .addHeader("Reference Id")
                 .addCell("<a href='" + 
                          payeeAuthority.getPayeeCoreProperties().getHomePage() + 
                         "'>" + receiptDecoder.getPayeeCommonName() + "</a>")
-                .addCell(receiptDecoder.getPayeeReferenceId(), HtmlTable.RIGHT_ALIGN)
                 .addCell(money(receiptDecoder, receiptDecoder.getAmount()),
                          HtmlTable.RIGHT_ALIGN);
         if (optionalSubtotal != null) {
@@ -195,8 +194,8 @@ public class ReceiptServlet extends HttpServlet {
                     optionalTaxRecord.getPercentage().toPlainString() +
                     "%)");
         }
-        html.append(coreData.addCell(
-                        TimeUtils.displayUtcTime(receiptDecoder.getPayeeTimeStamp()))
+        html.append(coreData.addCell(TimeUtils.displayUtcTime(receiptDecoder.getPayeeTimeStamp()))
+                            .addCell(receiptDecoder.getPayeeReferenceId(), HtmlTable.RIGHT_ALIGN)
                             .render());
 
         html.append(new HtmlTable("Payment Details")
@@ -204,16 +203,16 @@ public class ReceiptServlet extends HttpServlet {
                     .addHeader("Account Type")
                     .addHeader("Account Id")
                     .addHeader("Transaction Id")
-                    .addHeader("Request Id")
                     .addHeader("Time Stamp")
+                    .addHeader("Request Id")
                     .addCell("<a href='" + 
                              providerAuthority.getHomePage() + 
                             "'>" + receiptDecoder.getProviderCommonName() + "</a>")
                     .addCell(receiptDecoder.getPaymentMethodName())
                     .addCell(receiptDecoder.getOptionalAccountReference())
                     .addCell(receiptDecoder.getProviderReferenceId())
-                    .addCell(receiptDecoder.getPayeeRequestId())
                     .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
+                    .addCell(receiptDecoder.getPayeeRequestId())
                     .render());
 
         HtmlTable orderData = new HtmlTable("Order Data");

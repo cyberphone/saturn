@@ -16,6 +16,7 @@
  */
 package org.webpki.saturn.merchant;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import java.net.URLEncoder;
@@ -31,10 +32,14 @@ import javax.servlet.http.HttpSession;
 
 import org.webpki.webutil.ServletUtil;
 
-import net.glxn.qrgen.QRCode;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
 
-import net.glxn.qrgen.image.ImageType;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
 
+import com.google.zxing.common.BitMatrix;
+
+import com.google.zxing.qrcode.QRCodeWriter;
 
 public class QRDisplayServlet extends HttpServlet implements MerchantSessionProperties {
 
@@ -82,7 +87,16 @@ public class QRDisplayServlet extends HttpServlet implements MerchantSessionProp
                                                          "/androidplugin?" + QRSessions.QR_SESSION_ID  + "=" + id,
                                                        "UTF-8");
         logger.info("URL=" + url + " SID=" + session.getId());
-        byte[] qrImage = QRCode.from(url).to(ImageType.PNG).withSize(200, 200).stream().toByteArray();
+        QRCodeWriter qrCodeWriter = new QRCodeWriter();
+        BitMatrix bitMatrix;
+        try {
+            bitMatrix = qrCodeWriter.encode(url, BarcodeFormat.QR_CODE, 200, 200);
+        } catch (WriterException e) {
+            throw new IOException(e);
+        }
+        ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+        MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+        byte[] qrImage = pngOutputStream.toByteArray(); 
 
         if (session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
             SavedShoppingCart savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
