@@ -20,7 +20,8 @@ package org.webpki.saturn.common;
 
 public class Barcode {
 
-    public enum BarcodeTypes {EAN, QR};  // Place-holder at this stage
+    public enum BarcodeTypes {UPC_A, UPC_E, EAN_8, EAN_13, UPC_EAN_EXTENSION, 
+                              CODE_39, CODE_93, CODE_128, CODABAR, ITF, QR_CODE};
 
     String barcodeString;
  
@@ -29,5 +30,13 @@ public class Barcode {
     public Barcode(String barcodeString, BarcodeTypes barcodeType) {
         this.barcodeString = barcodeString;
         this.barcodeType = barcodeType;
+    }
+    
+    public BarcodeTypes getBarcodeType() {
+        return barcodeType;
+    }
+    
+    public String getBarcodeString() {
+        return barcodeString;
     }
 }

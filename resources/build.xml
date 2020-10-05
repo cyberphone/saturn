@@ -6,7 +6,6 @@
   <property name="temp.dir" location=".tmp"/>
   <property name="w2nb.dir" value="../desktop-client/w2nb"/>
   <property name="testpage" location="../desktop-client/test/test.html"/>
-  <property name="jcspaper" location="../../doc/security/jsonsignatures.html"/>
   <property name="nodejscryptotest.dir" location="nodejscryptotest"/>
   <property name="bcprovider.jar" value="bcprov-jdk15on-151.jar"/>
   
@@ -34,47 +33,9 @@
   </path>
   
   <target name="help">
-      <echo message="createcerts initwallet jcspaper svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter] escaping"/>
+      <echo message="createcerts initwallet svg-test svg-pushmode svg-pullmode svg-play svg-pinkeyboard svg-saturnlogo -Dplayclass [-Dplayfilter] escaping"/>
   </target>
  
-  <target name="jcspaper">
-    <property name="logotype" location="${@logotype.dir}/${@webpki-logotype.file}"/>
-    <delete file="${jcspaper}"/>
-    <delete dir="${temp.dir}"/>
-    <mkdir dir="${temp.dir}"/>
-    <javac debug="${debug}"
-           srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"
-           destdir="${temp.dir}" 
-           classpathref="compile.classpath"
-           includeAntRuntime="false">
-    </javac>
-    <java fork="yes"
-          classname="org.webpki.saturn.resources.JCSPaper"
-          dir="${@key.dir}"
-          failonerror="true">
-        <classpath>
-          <fileset dir="${@webpki.lib.dir}">
-             <include name="${@webpki-libext.jar}"/>
-          </fileset>
-          <fileset dir="${@webpki.lib.dir}">
-             <include name="${@webpki-webutil.jar}"/>
-          </fileset>
-          <fileset dir="${@reference.lib.dir}">
-             <include name="${bcprovider.jar}"/>
-          </fileset>
-          <fileset dir="${@reference.lib.dir}">
-             <include name="servlet-api.jar"/>
-          </fileset>
-          <pathelement location="${temp.dir}"/>
-        </classpath>
-        <arg value="${jcspaper}"/>
-        <arg value="${logotype}"/>
-        <arg value="${@merchantBankNetworkKey}.p12"/>
-        <arg value="${@payeebankpath}-eecert.p12"/>
-        <arg value="${@keypassword}"/>
-    </java>
-  </target>
-
   <target name="escaping">
     <javac debug="${debug}"
            srcdir="${src.dir}:${@common.src.dir}:${w2nb.dir}"

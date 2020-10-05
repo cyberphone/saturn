@@ -16,9 +16,14 @@
  */
 package org.webpki.saturn.merchant;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import java.math.BigDecimal;
+import java.util.Base64;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import java.util.logging.Logger;
 
@@ -32,6 +37,7 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
+import org.webpki.saturn.common.Barcode;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.LineItem;
@@ -44,6 +50,17 @@ import org.webpki.saturn.common.TaxRecord;
 import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.UrlHolder;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.EncodeHintType;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.WriterException;
+
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+
+import com.google.zxing.common.BitMatrix;
+
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+
 public class ReceiptServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -55,7 +72,30 @@ public class ReceiptServlet extends HttpServlet {
     String optional(Object o) {
         return o == null ? "" : o.toString();
     }
+
+    static final HashMap<Barcode.BarcodeTypes, BarcodeFormat> saturn2Xzing = new HashMap<>();
     
+    static {
+        saturn2Xzing.put(Barcode.BarcodeTypes.UPC_A, BarcodeFormat.UPC_A);
+        saturn2Xzing.put(Barcode.BarcodeTypes.UPC_E, BarcodeFormat.UPC_E);
+        saturn2Xzing.put(Barcode.BarcodeTypes.EAN_8, BarcodeFormat.EAN_8);
+        saturn2Xzing.put(Barcode.BarcodeTypes.EAN_13, BarcodeFormat.EAN_13);
+        saturn2Xzing.put(Barcode.BarcodeTypes.UPC_EAN_EXTENSION, BarcodeFormat.UPC_EAN_EXTENSION);
+        saturn2Xzing.put(Barcode.BarcodeTypes.CODE_39, BarcodeFormat.CODE_39);
+        saturn2Xzing.put(Barcode.BarcodeTypes.CODE_93, BarcodeFormat.CODE_93);
+        saturn2Xzing.put(Barcode.BarcodeTypes.CODE_128, BarcodeFormat.CODE_128);
+        saturn2Xzing.put(Barcode.BarcodeTypes.CODABAR, BarcodeFormat.CODABAR);
+        saturn2Xzing.put(Barcode.BarcodeTypes.ITF, BarcodeFormat.ITF);
+        saturn2Xzing.put(Barcode.BarcodeTypes.QR_CODE, BarcodeFormat.QR_CODE);
+    }
+    
+    static final Map<EncodeHintType, Object> xzingHints = new EnumMap<>(EncodeHintType.class);
+    
+    static {
+        xzingHints.put(EncodeHintType.CHARACTER_SET, "utf-8");
+        xzingHints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
+     }
+
     static String money(ReceiptDecoder receiptDecoder, BigDecimal amount) throws IOException {
         return receiptDecoder.getCurrency().amountToDisplayString(amount, false);
     }
@@ -114,9 +154,32 @@ public class ReceiptServlet extends HttpServlet {
         }
     }
     
+    StringBuilder printBarcode(Barcode barcode) throws WriterException, IOException {
+        StringBuilder html = new StringBuilder("<div style='padding:2em 0 0 2em'>");
+        BarcodeFormat xzingFormat = saturn2Xzing.get(barcode.getBarcodeType());
+        if (xzingFormat == null) {
+            html.append("Barcode type '")
+                .append(barcode.getBarcodeType().toString())
+                .append("' not implemented");
+        } else {
+            BitMatrix bitMatrix = new MultiFormatWriter().encode(
+                    barcode.getBarcodeString(), 
+                    xzingFormat,
+                    400,
+                    xzingFormat == BarcodeFormat.QR_CODE ? 400 : 100,
+                    xzingHints);
+            ByteArrayOutputStream pngOutputStream = new ByteArrayOutputStream();
+            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
+            html.append("<img src='data:image/png;base64,")
+                .append(Base64.getEncoder().encodeToString(pngOutputStream.toByteArray()))
+                .append("' alt='barcode' style='width:20em'>");
+        }
+        return html.append("</div>");
+    }
+    
     void buildHtmlReceipt(StringBuilder html, 
                           ReceiptDecoder receiptDecoder,
-                          HttpServletRequest request) throws IOException {
+                          HttpServletRequest request) throws IOException, WriterException {
         PayeeAuthorityDecoder payeeAuthority = 
                 MerchantService.externalCalls.getPayeeAuthority(
                         new UrlHolder(request).setUrl(receiptDecoder.getPayeeAuthorityUrl()),
@@ -282,6 +345,10 @@ public class ReceiptServlet extends HttpServlet {
                              HtmlTable.RIGHT_ALIGN)
                     .render());
         }
+        
+        if (receiptDecoder.getOptionalBarcode() != null) {
+            html.append(printBarcode(receiptDecoder.getOptionalBarcode()));
+        }
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -328,7 +395,7 @@ public class ReceiptServlet extends HttpServlet {
                         html.append("<i>Status</i>: ")
                             .append(receiptDecoder.getStatus().toString());
                     }
-                    html.append("<div>&nbsp;<br><a href='")
+                    html.append("<div style='margin-top:2em'><a href='")
                         .append(pathInfo.substring(1))
                         .append("?" + VIEW_AS_JSON)
                         .append("'>Switch to JSON view</a></div>");

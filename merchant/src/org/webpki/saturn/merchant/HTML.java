@@ -19,6 +19,7 @@ package org.webpki.saturn.merchant;
 import java.io.IOException;
 
 import java.math.BigDecimal;
+import java.util.Base64;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -26,7 +27,6 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.webpki.util.Base64;
 import org.webpki.util.HTMLEncoder;
 
 import org.webpki.saturn.common.MobileProxyParameters;
@@ -929,7 +929,7 @@ public class HTML implements MerchantSessionProperties {
                 "<tr")
              .append(display)
              .append(" id=\"qr2\"><td style=\"cursor:none\" align=\"center\"><img src=\"data:image/png;base64,")
-             .append(new Base64(false).getBase64StringFromBinary(qrImage))
+             .append(Base64.getEncoder().encodeToString(qrImage))
              .append("\"></td></tr>"+
                      "<tr id=\"authhelp\" style=\"display:none\"><td style=\"padding-top:15pt;text-align:center\">"+
                      "Waiting for you to <i>authorize</i> the transaction in the mobile device...</td></tr>" +    

@@ -120,8 +120,7 @@ public class DataBaseOperations {
             }
             ShippingRecord optionalShippingRecord = null;
             if (savedShoppingCart.products == SpaceProducts.products) {
-                optionalShippingRecord = new ShippingRecord("First class", new BigDecimal("8.30"));
-                lineItems.get(0).setDiscount(new BigDecimal("-5"));
+                optionalShippingRecord = new ShippingRecord("Free shipping", new BigDecimal("0.00"));
             }
 
             ReceiptEncoder receiptEncoder = new ReceiptEncoder(
@@ -138,7 +137,7 @@ public class DataBaseOperations {
                     (BigDecimal) null,
                     optionalTaxRecord,
                     lineItems,
-                    new Barcode(orderId, Barcode.BarcodeTypes.EAN),
+                    new Barcode(orderId, Barcode.BarcodeTypes.CODE_128),
                     "Free text...",
                     authorization.getPaymentMethodName(),
                     authorization.getAccountReference(),
@@ -153,22 +152,7 @@ public class DataBaseOperations {
                  CallableStatement stmt = 
                          connection.prepareCall("{call SaveTransactionSP(?,?)}");) {
                 stmt.setString(1, orderId);
-/*
-        public ReceiptEncoder(String payeeReferenceId,
-                              GregorianCalendar payeeTimeStamp, 
-                              String payeeCommonName,
-                              BigDecimal amount,
-                              Currencies currency,
-                              String paymentMethodName,
-                              String optionalAccountReference, 
-                              String payeeAuthorityUrl,
-                              String providerCommonName,
-                              String providerAuthorityUrl,
-                              String providerReferenceId,
-                              String payeeRequestId,
-                              GregorianCalendar providerTimeStamp,
-                              ServerAsymKeySigner signer) throws IOException {
- */
+
                 stmt.setBytes(2, receiptEncoder.getReceiptDocument()
                                                  .serializeToBytes(JSONOutputFormats.NORMALIZED));
                 stmt.execute();

@@ -25,6 +25,7 @@ import java.net.URLEncoder;
 import java.security.KeyPair;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,7 +61,6 @@ import org.webpki.saturn.common.PaymentClientRequestEncoder;
 import org.webpki.saturn.common.PaymentClientRequestEncoder.SupportedPaymentMethod;
 
 import org.webpki.util.ArrayUtil;
-import org.webpki.util.Base64;
 import org.webpki.util.PEMDecoder;
 
 import org.webpki.webutil.ServletUtil;
@@ -251,7 +251,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                 (String)session.getAttribute(KEY_TEXT)
                             : 
                 "-----BEGIN PRIVATE KEY-----\n" +
-                    new Base64().getBase64StringFromBinary(
+                    Base64.getMimeEncoder().encodeToString(
                         KeyProviderService.keyManagementKey.getPrivateKey().getEncoded()) +
                         "\n-----END PRIVATE KEY-----";
         return new StringBuilder(
