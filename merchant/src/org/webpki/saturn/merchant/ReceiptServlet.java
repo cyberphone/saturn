@@ -155,7 +155,7 @@ public class ReceiptServlet extends HttpServlet {
     }
     
     StringBuilder printBarcode(Barcode barcode) throws WriterException, IOException {
-        StringBuilder html = new StringBuilder("<div style='padding:2em 0 0 2em'>");
+        StringBuilder html = new StringBuilder("<div style='padding:2em 0 0 2em;width:20em'>");
         BarcodeFormat xzingFormat = saturn2Xzing.get(barcode.getBarcodeType());
         if (xzingFormat == null) {
             html.append("Barcode type '")
@@ -172,7 +172,12 @@ public class ReceiptServlet extends HttpServlet {
             MatrixToImageWriter.writeToStream(bitMatrix, "PNG", pngOutputStream);
             html.append("<img src='data:image/png;base64,")
                 .append(Base64.getEncoder().encodeToString(pngOutputStream.toByteArray()))
-                .append("' alt='barcode' style='width:20em'>");
+                .append("' alt='barcode' style='width:100%'>");
+            if (xzingFormat != BarcodeFormat.QR_CODE) {
+                html.append("<div style='text-align:center'><code>")
+                    .append(barcode.getBarcodeString())
+                    .append("</code></div>");
+            }
         }
         return html.append("</div>");
     }
