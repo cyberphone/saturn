@@ -163,7 +163,7 @@ public class ReceiptServlet extends HttpServlet {
                 .append("' not implemented");
         } else {
             BitMatrix bitMatrix = new MultiFormatWriter().encode(
-                    barcode.getBarcodeString(), 
+                    barcode.getBarcodeValue(), 
                     xzingFormat,
                     400,
                     xzingFormat == BarcodeFormat.QR_CODE ? 400 : 100,
@@ -175,7 +175,7 @@ public class ReceiptServlet extends HttpServlet {
                 .append("' alt='barcode' style='width:100%'>");
             if (xzingFormat != BarcodeFormat.QR_CODE) {
                 html.append("<div style='text-align:center'><code>")
-                    .append(barcode.getBarcodeString())
+                    .append(barcode.getBarcodeValue())
                     .append("</code></div>");
             }
         }

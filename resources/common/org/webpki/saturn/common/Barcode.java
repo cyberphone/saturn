@@ -23,20 +23,20 @@ public class Barcode {
     public enum BarcodeTypes {UPC_A, UPC_E, EAN_8, EAN_13, UPC_EAN_EXTENSION, 
                               CODE_39, CODE_93, CODE_128, CODABAR, ITF, QR_CODE};
 
-    String barcodeString;
- 
     BarcodeTypes barcodeType;
         
-    public Barcode(String barcodeString, BarcodeTypes barcodeType) {
-        this.barcodeString = barcodeString;
+    String barcodeValue;
+    
+    public Barcode(String barcodeValue, BarcodeTypes barcodeType) {
         this.barcodeType = barcodeType;
+        this.barcodeValue = barcodeValue;
     }
     
     public BarcodeTypes getBarcodeType() {
         return barcodeType;
     }
     
-    public String getBarcodeString() {
-        return barcodeString;
+    public String getBarcodeValue() {
+        return barcodeValue;
     }
 }

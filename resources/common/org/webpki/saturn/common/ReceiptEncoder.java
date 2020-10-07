@@ -36,8 +36,9 @@ public class ReceiptEncoder implements BaseProperties {
                                           TaxRecord taxRecord,
                                           Currencies currency) throws IOException {
         return taxRecord == null ? wr :
-            wr.setMoney(TAX_JSON, taxRecord.amount, currency.decimals)
-              .setBigDecimal(TAX_PERCENTAGE_JSON,  taxRecord.percentage);
+            wr.setObject(TAX_JSON, new JSONObjectWriter()
+                .setMoney(AMOUNT_JSON, taxRecord.amount, currency.decimals)
+                .setBigDecimal(PERCENTAGE_JSON,  taxRecord.percentage));
     }
     
     JSONObjectWriter setOptionalAmount(JSONObjectWriter wr,
@@ -100,18 +101,19 @@ public class ReceiptEncoder implements BaseProperties {
                                                   optionalDiscount,
                                                   currency))
 
+            .setDynamic((wr) -> setOptionalTaxRecord(wr, 
+                                                     optionalTaxRecord,
+                                                     currency))
+
             .setDynamic((wr) -> optionalShippingRecord == null ? wr :
                 wr.setObject(SHIPPING_JSON, new JSONObjectWriter()
                         .setString(DESCRIPTION_JSON, optionalShippingRecord.description)
                         .setMoney(AMOUNT_JSON, optionalShippingRecord.amount, currency.decimals)))
 
-            .setDynamic((wr) -> setOptionalTaxRecord(wr, 
-                                                     optionalTaxRecord,
-                                                     currency))
-
             .setDynamic((wr) -> optionalBarcode == null ? wr :
-                wr.setString(BARCODE_JSON, optionalBarcode.barcodeString)
-                  .setString(BARCODE_TYPE_JSON, optionalBarcode.barcodeType.toString()))
+                wr.setObject(BARCODE_JSON, new JSONObjectWriter()
+                   .setString(TYPE_JSON, optionalBarcode.barcodeType.toString())
+                   .setString(VALUE_JSON, optionalBarcode.barcodeValue)))
 
             .setDynamic((wr) -> optionalFreeText == null ? wr : 
                 wr.setString(FREE_TEXT_JSON, optionalFreeText))

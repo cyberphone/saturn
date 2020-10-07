@@ -43,9 +43,10 @@ public class ReceiptDecoder implements BaseProperties {
             .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
     
     TaxRecord taxRecordDecoder(JSONObjectReader rd, Currencies currency) throws IOException {
-        if (rd.hasProperty(TAX_JSON) || rd.hasProperty(TAX_PERCENTAGE_JSON)) {
-            return new TaxRecord(rd.getMoney(TAX_JSON, currency.decimals),
-                                 rd.getBigDecimal(TAX_PERCENTAGE_JSON));
+        if (rd.hasProperty(TAX_JSON)) {
+            JSONObjectReader taxObject = rd.getObject(TAX_JSON);
+            return new TaxRecord(taxObject.getMoney(AMOUNT_JSON, currency.decimals),
+                                 taxObject.getBigDecimal(PERCENTAGE_JSON));
         }
         return null;
     }
@@ -79,9 +80,10 @@ public class ReceiptDecoder implements BaseProperties {
         }
         optionalTaxRecord = taxRecordDecoder(rd, currency);
 
-        if (rd.hasProperty(BARCODE_JSON) || rd.hasProperty(BARCODE_TYPE_JSON)) {
-            barcode = new Barcode(rd.getString(BARCODE_JSON),
-                          Barcode.BarcodeTypes.valueOf(rd.getString(BARCODE_TYPE_JSON)));
+        if (rd.hasProperty(BARCODE_JSON)) {
+            JSONObjectReader barcodeObject = rd.getObject(BARCODE_JSON);
+            barcode = new Barcode(barcodeObject.getString(VALUE_JSON),
+                          Barcode.BarcodeTypes.valueOf(barcodeObject.getString(TYPE_JSON)));
         }
 
         optionalFreeText = rd.getStringConditional(FREE_TEXT_JSON);

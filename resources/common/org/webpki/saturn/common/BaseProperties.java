@@ -26,8 +26,8 @@ public interface BaseProperties {
     String TEXT_JSON                        = "text";                       // ProviderUserResponse
     String USER_CHALLENGE_ITEMS_JSON        = "userChallengeItems";         // ProviderUserResponse
     String NAME_JSON                        = "name";                       // ProviderUserResponse & more
-    String VALUE_JSON                       = "value";                      // ProviderUserResponse
-    String TYPE_JSON                        = "type";                       // ProviderUserResponse
+    String VALUE_JSON                       = "value";                      // ProviderUserResponse & Barcode
+    String TYPE_JSON                        = "type";                       // ProviderUserResponse & Barcode
     String LABEL_JSON                       = "label";                      // ProviderUserResponse
     String ENCRYPTED_MESSAGE_JSON           = "encryptedMessage";           // ProviderUserResponse
 
@@ -71,12 +71,11 @@ public interface BaseProperties {
     String PAYEE_REQUEST_ID_JSON            = "payeeRequestId";             //    -"-
     String PROVIDER_DATA_JSON               = "providerData";               //    -"-
     String TAX_JSON                         = "tax";                        //    -"- [2] Top and/or Line item level (O)
-    String TAX_PERCENTAGE_JSON              = "taxPercentage";              //    -"- [2] must alway be used with TAX_JSON
+    String PERCENTAGE_JSON                  = "percentage";                 //    -"- [2] must always be used with TAX_JSON
     String SUBTOTAL_JSON                    = "subtotal";                   //    -"- Line item (O), Top level (O)
     String SHIPPING_JSON                    = "shipping";                   //    -"- Top level (O)   
     String FREE_TEXT_JSON                   = "freeText";                   //    -"- Text (O)
     String BARCODE_JSON                     = "barcode";                    //    -"- (O)
-    String BARCODE_TYPE_JSON                = "barcodeType";                //    -"- (O/M) depends on the former
     String DISCOUNT_JSON                    = "discount";                   //    -"-           [2]
     String LINE_ITEMS_JSON                  = "lineItems";                  //    -"- Header (M)
     String SKU_JSON                         = "sku";                        //    -"- Line item (O)
