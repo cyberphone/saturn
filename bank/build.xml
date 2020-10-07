@@ -102,7 +102,7 @@
     </javac>
     <!-- Merchant configuration is rather demo-ish... -->
     <replace file="${temp.dir}/${merchants.db}">
-      <replacefilter token="https://demomerchant.com" value="${@merchanthost}/${@merchantpath}"/>
+      <replacefilter token="https://spaceshop.com" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="https://planetgas.com" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="https://buyerzone.com" value="${@merchanthost}/${@merchantpath}"/>
     </replace>

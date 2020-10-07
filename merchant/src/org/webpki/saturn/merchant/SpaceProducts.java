@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 
 import java.util.LinkedHashMap;
 
-// Products currently sold by the Demo Merchant
+// Products currently sold by the Space Shop
 
 public class SpaceProducts implements ProductEntry {
     

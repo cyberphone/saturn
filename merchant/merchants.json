@@ -1,8 +1,8 @@
 [{
-  "commonName": "Demo Merchant",
+  "commonName": "Space Shop",
   "physicalAddress": ["2000 Avenue des Champs-Élysées", "75000 Paris", "France"],
   "phoneNumber": "01.50.10.42.08",
-  "emailAddress": "support@demomerchant.com",
+  "emailAddress": "support@spaceshop.com",
   "paymentNetworks": [{
     "paymentMethod": "https://bankdirect.net",
     "localPayeeId": "86344",

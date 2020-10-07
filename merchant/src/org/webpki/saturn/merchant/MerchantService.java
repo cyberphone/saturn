@@ -102,7 +102,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String TEST_MODE                    = "test-mode";
     
-    static final String ID_DEMO_MERCHANT             = "Demo Merchant";
+    static final String ID_DEMO_MERCHANT             = "Space Shop";
     static final String ID_PLANET_GAS                = "Planet Gas";
     
     static JSONX509Verifier paymentRoot;

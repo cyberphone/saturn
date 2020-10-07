@@ -88,7 +88,7 @@ class DebugPrintout implements BaseProperties {
         }
         originalBuffer.delete(0, i + pattern.length());
         originalBuffer.insert(0, rewritten);
-        i = originalBuffer.toString().indexOf("demomerchant-logo.svg");
+        i = originalBuffer.toString().indexOf("spaceshop-logo.svg");
         if (i > 0) {
             originalBuffer.delete(i, i + 17);
             originalBuffer.insert(i, "logotype");
@@ -108,7 +108,7 @@ class DebugPrintout implements BaseProperties {
                 rewrittenUrl(value, "/webpay-payerbank", "https://mybank.com") ||
                 rewrittenUrl(value, "/webpay-payeebank", "https://bigbank.com") ||
                 rewrittenUrl(value, "/webpay-acquirer", "https://cardprocessor.com") ||
-                rewrittenUrl(value, "/webpay-merchant", "https://demomerchant.com")) {
+                rewrittenUrl(value, "/webpay-merchant", "https://spaceshop.com")) {
                 rewriter.setupForRewrite(target);
                 rewriter.setString(target, value.toString());
             }
@@ -175,7 +175,7 @@ class DebugPrintout implements BaseProperties {
         updateUrls(jsonTree, rewriter, LOGOTYPE_URL_JSON);
         updateUrls(jsonTree, rewriter, PAYEE_AUTHORITY_URL_JSON);
         updateUrls(jsonTree, rewriter, RECEIPT_URL_JSON);
-        updateSpecific(jsonTree, rewriter, PAYEE_HOST_JSON, "demomerchant.com");
+        updateSpecific(jsonTree, rewriter, PAYEE_HOST_JSON, "spaceshop.com");
         updateSpecific(jsonTree, rewriter, CLIENT_IP_ADDRESS_JSON, "220.13.198.144");
     }
 

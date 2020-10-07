@@ -116,12 +116,12 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     
     static {
          try {
-            initMerchant("Direct - EUR",  "Demo Merchant",
+            initMerchant("Direct - EUR",  "Space Shop",
                                           "550",
                                           Currencies.EUR,
                                           null);
 
-            initMerchant("Direct - USD",  "Demo Merchant",
+            initMerchant("Direct - USD",  "Space Shop",
                                           "550",
                                           Currencies.USD,
                                           null);

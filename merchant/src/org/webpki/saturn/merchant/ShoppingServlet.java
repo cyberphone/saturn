@@ -31,7 +31,7 @@ public class ShoppingServlet extends HttpServlet implements MerchantSessionPrope
 
     private static final long serialVersionUID = 1L;
     
-    static final String COMMON_NAME = "Demo Merchant";
+    static final String COMMON_NAME = "Space Shop";
     
     static Logger logger = Logger.getLogger(ShoppingServlet.class.getName ());
     

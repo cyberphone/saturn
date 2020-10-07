@@ -128,7 +128,7 @@ public class DebugData implements Serializable {
         GregorianCalendar authTime = TimeUtils.inSeconds(23);
         GregorianCalendar expires = TimeUtils.inMinutes(30);
         JSONObjectWriter paymentRequest = 
-            PaymentRequestEncoder.encode("Demo Merchant",
+            PaymentRequestEncoder.encode("Space Shop",
                                          new BigDecimal("100.00"),
                                          Currencies.EUR,
                                          null,
@@ -139,7 +139,7 @@ public class DebugData implements Serializable {
                                  new PaymentRequestDecoder(new JSONObjectReader(paymentRequest)),
                                  HashAlgorithms.SHA256,
                                  "https://payments.bigbank.com/payees/86344",
-                                 "demomerchant.com", 
+                                 "spaceshop.com", 
                                  PaymentMethods.BANK_DIRECT.getPaymentMethodUrl(),
                                  "54674448", 
                                  "FR7630002111110020050012733", 

@@ -7,7 +7,7 @@
   <property name="w2nb.dir" value="../desktop-client/w2nb"/>
   <property name="testpage" location="../desktop-client/test/test.html"/>
   <property name="nodejscryptotest.dir" location="nodejscryptotest"/>
-  <property name="bcprovider.jar" value="bcprov-jdk15on-151.jar"/>
+  <property name="bcprovider.jar" value="bcprov-jdk15on-166.jar"/>
   
   <property file="../resources/common.properties"/>
   <property file="../resources/accounts.properties"/>
@@ -388,10 +388,10 @@
 
   <target name="_merchantkeys">
     <antcall target="_merchantkey">
-       <param name="merchant" value="demomerchant.com-banknet"/>
+       <param name="merchant" value="spaceshop.com-banknet"/>
     </antcall>
     <antcall target="_merchantkey">
-       <param name="merchant" value="demomerchant.com-cardnet"/>
+       <param name="merchant" value="spaceshop.com-cardnet"/>
     </antcall>
     <antcall target="_merchantkey">
        <param name="merchant" value="planetgas.com-banknet"/>
