@@ -23,7 +23,7 @@ import org.webpki.saturn.common.Currencies;
 
 public interface ProductEntry {
 
-    String getDescription();
+    String[] getDescription();
     
     String getOptionalUnit();
     

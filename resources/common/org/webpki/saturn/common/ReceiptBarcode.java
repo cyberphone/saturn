@@ -18,7 +18,7 @@ package org.webpki.saturn.common;
 
 // Holds a barcode for the Saturn receipt system
 
-public class Barcode {
+public class ReceiptBarcode {
 
     public enum BarcodeTypes {UPC_A, UPC_E, EAN_8, EAN_13, UPC_EAN_EXTENSION, 
                               CODE_39, CODE_93, CODE_128, CODABAR, ITF, QR_CODE};
@@ -27,7 +27,7 @@ public class Barcode {
         
     String barcodeValue;
     
-    public Barcode(String barcodeValue, BarcodeTypes barcodeType) {
+    public ReceiptBarcode(String barcodeValue, BarcodeTypes barcodeType) {
         this.barcodeType = barcodeType;
         this.barcodeValue = barcodeValue;
     }

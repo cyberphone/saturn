@@ -183,9 +183,9 @@ public class HTML implements MerchantSessionProperties {
         StringBuilder s = new StringBuilder(
             "<tr style=\"text-align:center\"><td><img src=\"images/")
         .append(product_entry.imageUrl)
-        .append("\" class=\"product\"></td><td>")
-        .append(product_entry.name)
-        .append("</td><td style=\"text-align:right\">")
+        .append("\" class=\"product\"></td><td style='text-align:center'><div style='display:inline-block;text-align:left'>")
+        .append(ReceiptServlet.showLines(product_entry.description))
+        .append("</div></td><td style=\"text-align:right\">")
         .append(price(product_entry.unitPriceX100))
         .append(
             "</td><td><form>" +
@@ -968,7 +968,7 @@ public class HTML implements MerchantSessionProperties {
                  .append("', this)");
             }
             s.append("\"><td style=\"font-size:11pt;font-family:" + FONT_ARIAL + ";padding:6pt;min-width:10em\">")
-             .append(fuelType.description)
+             .append(ReceiptServlet.showLines(fuelType.description))
              .append("</td><td style=\"font-size:11pt;font-family:" + FONT_ARIAL + ";padding:6pt 12pt 6pt 12pt\">")
              .append(fuelType.displayPrice())
              .append("</td></tr>");

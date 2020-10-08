@@ -26,34 +26,34 @@ public class FuelTypes implements ProductEntry {
     
     static final LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<>();
     
-    static void init(String name, String description, int pricePerLitreX100, String background) {
+    static void init(String name, String[] description, int pricePerLitreX100, String background) {
         products.put(name, new FuelTypes(name, description, pricePerLitreX100, background));
     }
 
     static {
 
         init("STD_95E",
-             "Standard 95E",
+             new String[]{"Standard 95E"},
              135, 
              "linear-gradient(to bottom, #3ab6e8 0%,#8fd6e8 35%,#a7dfed 65%,#3ab6e8 100%)");
 
         init("BIO_DIESEL",
-             "Bio Diesel",
+             new String[]{"Bio Diesel"},
              104, 
              "linear-gradient(to bottom, #98e524 0%,#d2ff52 40%,#d2ff52 60%,#98e524 100%)");
 
         init("NITRO",
-             "Nitro Racing Fuel", 
+             new String[]{"Nitro Racing Fuel"}, 
              628, 
             "linear-gradient(to bottom, #fb9d23 0%,#ffc578 35%,#ffc578 65%,#fb9d23 100%)");
     }
     
     String name;
-    String description;
+    String[] description;
     int pricePerLitreX100;
     String background;
         
-    FuelTypes(String name, String description, int pricePerLitreX100, String background) {
+    FuelTypes(String name, String[] description, int pricePerLitreX100, String background) {
         this.name = name;
         this.description = description;
         this.pricePerLitreX100 = pricePerLitreX100;
@@ -65,7 +65,7 @@ public class FuelTypes implements ProductEntry {
     }
 
     @Override
-    public String getDescription() {
+    public String[] getDescription() {
         return description;
     }
 

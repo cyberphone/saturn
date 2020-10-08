@@ -32,14 +32,14 @@ import java.util.logging.Logger;
 
 import org.webpki.json.JSONOutputFormats;
 
-import org.webpki.saturn.common.Barcode;
-import org.webpki.saturn.common.LineItem;
+import org.webpki.saturn.common.ReceiptBarcode;
+import org.webpki.saturn.common.ReceiptLineItem;
 import org.webpki.saturn.common.ProviderResponseDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
 import org.webpki.saturn.common.ServerAsymKeySigner;
-import org.webpki.saturn.common.ShippingRecord;
-import org.webpki.saturn.common.TaxRecord;
+import org.webpki.saturn.common.ReceiptShippingRecord;
+import org.webpki.saturn.common.ReceiptTaxRecord;
 
 public class DataBaseOperations {
 
@@ -98,29 +98,31 @@ public class DataBaseOperations {
         try {
             ProviderResponseDecoder authorization = resultData.authorization;
             String orderId = authorization.getPayeeReferenceId();
-            ArrayList<LineItem> lineItems = new ArrayList<>();
+            ArrayList<ReceiptLineItem> lineItems = new ArrayList<>();
             SavedShoppingCart savedShoppingCart = resultData.walletRequest.savedShoppingCart;
             for (String sku : savedShoppingCart.items.keySet()) {
                 ProductEntry productEntry = savedShoppingCart.products.get(sku);
                 BigDecimal quantity = savedShoppingCart.items.get(sku);
-                lineItems.add(new LineItem(null,
-                              productEntry.getDescription(),
-                              quantity,
-                              productEntry.getOptionalSubtotal(quantity))
+                lineItems.add(new ReceiptLineItem(null,
+                                                  productEntry.getDescription(),
+                                                  quantity,
+                                                  productEntry.getOptionalSubtotal(quantity))
                         .setUnit(productEntry.getOptionalUnit())
                         .setPrice(productEntry.getOptionalPrice()));
             }
             BigDecimal optionalSubtotal = null;
-            TaxRecord optionalTaxRecord = null;
+            ReceiptTaxRecord optionalTaxRecord = null;
             if (savedShoppingCart.subtotal != 0) {
                 optionalSubtotal = new BigDecimal(BigInteger.valueOf(savedShoppingCart.subtotal), 2);
-                optionalTaxRecord = new TaxRecord(
+                optionalTaxRecord = new ReceiptTaxRecord(
                         new BigDecimal(BigInteger.valueOf(savedShoppingCart.tax), 2),
                         BigDecimal.TEN);
             }
-            ShippingRecord optionalShippingRecord = null;
+            ReceiptShippingRecord optionalShippingRecord = null;
             if (savedShoppingCart.products == SpaceProducts.products) {
-                optionalShippingRecord = new ShippingRecord("Free shipping", new BigDecimal("0.00"));
+                optionalShippingRecord = 
+                        new ReceiptShippingRecord(new String[]{"Free shipping"}, 
+                                                  new BigDecimal("0.00"));
             }
 
             ReceiptEncoder receiptEncoder = new ReceiptEncoder(
@@ -137,8 +139,8 @@ public class DataBaseOperations {
                     (BigDecimal) null,
                     optionalTaxRecord,
                     lineItems,
-                    new Barcode(orderId, Barcode.BarcodeTypes.CODE_128),
-                    "Free text...",
+                    new ReceiptBarcode(orderId, ReceiptBarcode.BarcodeTypes.CODE_128),
+                    new String[]{"Free text..."},
                     authorization.getPaymentMethodName(),
                     authorization.getAccountReference(),
                     authorization.getPayeeAuthorityUrl(),

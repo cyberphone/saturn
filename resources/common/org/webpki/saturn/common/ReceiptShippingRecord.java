@@ -18,25 +18,23 @@ package org.webpki.saturn.common;
 
 import java.math.BigDecimal;
 
-// Holds a Tax record for the Saturn receipt system
-// Note that this may be featured at the top level as well as per line
+// Holds a shipping record for the Saturn receipt system
 
-public class TaxRecord {
+public class ReceiptShippingRecord {
 
+    String[] description;
     BigDecimal amount;
- 
-    BigDecimal percentage;
         
-    public TaxRecord(BigDecimal amount, BigDecimal percentage) {
+    public ReceiptShippingRecord(String[] description, BigDecimal amount) {
+        this.description = description;
         this.amount = amount;
-        this.percentage = percentage;
+    }
+    
+    public String[] getDescription() {
+        return description;
     }
     
     public BigDecimal getAmount() {
         return amount;
-    }
-    
-    public BigDecimal getPercentage() {
-        return percentage;
     }
 }

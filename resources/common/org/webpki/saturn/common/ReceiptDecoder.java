@@ -42,10 +42,11 @@ public class ReceiptDecoder implements BaseProperties {
             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
             .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
     
-    TaxRecord taxRecordDecoder(JSONObjectReader rd, Currencies currency) throws IOException {
+    ReceiptTaxRecord taxRecordDecoder(JSONObjectReader rd, 
+                                      Currencies currency) throws IOException {
         if (rd.hasProperty(TAX_JSON)) {
             JSONObjectReader taxObject = rd.getObject(TAX_JSON);
-            return new TaxRecord(taxObject.getMoney(AMOUNT_JSON, currency.decimals),
+            return new ReceiptTaxRecord(taxObject.getMoney(AMOUNT_JSON, currency.decimals),
                                  taxObject.getBigDecimal(PERCENTAGE_JSON));
         }
         return null;
@@ -68,8 +69,8 @@ public class ReceiptDecoder implements BaseProperties {
 
         if (rd.hasProperty(SHIPPING_JSON)) {
             JSONObjectReader shippingRecord = rd.getObject(SHIPPING_JSON);
-            optionalShippingRecord = new ShippingRecord(
-                    shippingRecord.getString(DESCRIPTION_JSON),
+            optionalShippingRecord = new ReceiptShippingRecord(
+                    shippingRecord.getStringArray(DESCRIPTION_JSON),
                     shippingRecord.getMoney(AMOUNT_JSON, currency.decimals));
         }
         if (rd.hasProperty(SUBTOTAL_JSON)) {
@@ -82,49 +83,50 @@ public class ReceiptDecoder implements BaseProperties {
 
         if (rd.hasProperty(BARCODE_JSON)) {
             JSONObjectReader barcodeObject = rd.getObject(BARCODE_JSON);
-            barcode = new Barcode(barcodeObject.getString(VALUE_JSON),
-                          Barcode.BarcodeTypes.valueOf(barcodeObject.getString(TYPE_JSON)));
+            barcode = new ReceiptBarcode(
+                    barcodeObject.getString(VALUE_JSON),
+                    ReceiptBarcode.BarcodeTypes.valueOf(barcodeObject.getString(TYPE_JSON)));
         }
 
-        optionalFreeText = rd.getStringConditional(FREE_TEXT_JSON);
+        optionalFreeText = rd.getStringArrayConditional(FREE_TEXT_JSON);
 
         JSONArrayReader lineItemsArray = rd.getArray(LINE_ITEMS_JSON);
         lineItems = new ArrayList<>();
-        optionalLineItemElements = EnumSet.noneOf(LineItem.OptionalElements.class);
+        optionalLineItemElements = EnumSet.noneOf(ReceiptLineItem.OptionalElements.class);
         do {
             JSONObjectReader lineItemObject = lineItemsArray.getObject();
-            LineItem lineItem = new LineItem();
+            ReceiptLineItem lineItem = new ReceiptLineItem();
             lineItems.add(lineItem);
             if (lineItemObject.hasProperty(SKU_JSON)) {
-                optionalLineItemElements.add(LineItem.OptionalElements.SKU);
+                optionalLineItemElements.add(ReceiptLineItem.OptionalElements.SKU);
                 lineItem.optionalSku = lineItemObject.getString(SKU_JSON);
             }
 
-            lineItem.description = lineItemObject.getString(DESCRIPTION_JSON);
+            lineItem.description = lineItemObject.getStringArray(DESCRIPTION_JSON);
             lineItem.quantity = lineItemObject.getBigDecimal(QUANTITY_JSON);
 
             if (lineItemObject.hasProperty(UNIT_JSON)) {
-                optionalLineItemElements.add(LineItem.OptionalElements.UNIT);
+                optionalLineItemElements.add(ReceiptLineItem.OptionalElements.UNIT);
                 lineItem.optionalUnit = lineItemObject.getString(UNIT_JSON);
             }
             if (lineItemObject.hasProperty(PRICE_JSON)) {
-                optionalLineItemElements.add(LineItem.OptionalElements.PRICE);
+                optionalLineItemElements.add(ReceiptLineItem.OptionalElements.PRICE);
                 lineItem.optionalPrice = 
                         lineItemObject.getMoney(PRICE_JSON, currency.decimals);
             }
             if (lineItemObject.hasProperty(SUBTOTAL_JSON)) {
-                optionalLineItemElements.add(LineItem.OptionalElements.SUBTOTAL);
+                optionalLineItemElements.add(ReceiptLineItem.OptionalElements.SUBTOTAL);
                 lineItem.optionalSubtotal = 
                         lineItemObject.getMoney(SUBTOTAL_JSON, currency.decimals);
             }
             if (lineItemObject.hasProperty(DISCOUNT_JSON)) {
-                optionalLineItemElements.add(LineItem.OptionalElements.DISCOUNT);
+                optionalLineItemElements.add(ReceiptLineItem.OptionalElements.DISCOUNT);
                 lineItem.optionalDiscount = 
                         lineItemObject.getMoney(DISCOUNT_JSON, currency.decimals);
             }
             lineItem.optionalTaxRecord = taxRecordDecoder(lineItemObject, currency);
             if (lineItem.optionalTaxRecord != null) {
-                optionalLineItemElements.add(LineItem.OptionalElements.TAX);
+                optionalLineItemElements.add(ReceiptLineItem.OptionalElements.TAX);
             }
             
         } while (lineItemsArray.hasMore());
@@ -233,33 +235,33 @@ public class ReceiptDecoder implements BaseProperties {
         return optionalSubtotal;
     }
 
-    ShippingRecord optionalShippingRecord;
-    public ShippingRecord getOptionalShippingRecord() {
+    ReceiptShippingRecord optionalShippingRecord;
+    public ReceiptShippingRecord getOptionalShippingRecord() {
         return optionalShippingRecord;
     }
 
-    TaxRecord optionalTaxRecord;
-    public TaxRecord getOptionalTaxRecord() {
+    ReceiptTaxRecord optionalTaxRecord;
+    public ReceiptTaxRecord getOptionalTaxRecord() {
         return optionalTaxRecord;
     }
 
-    EnumSet<LineItem.OptionalElements> optionalLineItemElements;
-    public EnumSet<LineItem.OptionalElements> getOptionalLineItemElements() {
+    EnumSet<ReceiptLineItem.OptionalElements> optionalLineItemElements;
+    public EnumSet<ReceiptLineItem.OptionalElements> getOptionalLineItemElements() {
         return optionalLineItemElements;
     }
 
-    ArrayList<LineItem> lineItems;
-    public List<LineItem> getLineItems() {
+    ArrayList<ReceiptLineItem> lineItems;
+    public List<ReceiptLineItem> getLineItems() {
         return lineItems;
     }
 
-    Barcode barcode;
-    public Barcode getOptionalBarcode() {
+    ReceiptBarcode barcode;
+    public ReceiptBarcode getOptionalBarcode() {
         return barcode;
     }
 
-    String optionalFreeText;
-    public String getOptionalFreeText() {
+    String[] optionalFreeText;
+    public String[] getOptionalFreeText() {
         return optionalFreeText;
     }
 

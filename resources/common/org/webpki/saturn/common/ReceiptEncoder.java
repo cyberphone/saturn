@@ -33,7 +33,7 @@ import org.webpki.util.ISODateTime;
 public class ReceiptEncoder implements BaseProperties {
     
     JSONObjectWriter setOptionalTaxRecord(JSONObjectWriter wr,
-                                          TaxRecord taxRecord,
+                                          ReceiptTaxRecord taxRecord,
                                           Currencies currency) throws IOException {
         return taxRecord == null ? wr :
             wr.setObject(TAX_JSON, new JSONObjectWriter()
@@ -57,13 +57,13 @@ public class ReceiptEncoder implements BaseProperties {
                           String optionalEmailAddress, 
                           BigDecimal amount,
                           Currencies currency,
-                          ShippingRecord optionalShippingRecord,
+                          ReceiptShippingRecord optionalShippingRecord,
                           BigDecimal optionalSubtotal,
                           BigDecimal optionalDiscount,
-                          TaxRecord optionalTaxRecord,
-                          List<LineItem> lineItems,
-                          Barcode optionalBarcode,
-                          String optionalFreeText,
+                          ReceiptTaxRecord optionalTaxRecord,
+                          List<ReceiptLineItem> lineItems,
+                          ReceiptBarcode optionalBarcode,
+                          String[] optionalFreeText,
                           String paymentMethodName,
                           String optionalAccountReference, 
                           String payeeAuthorityUrl,
@@ -107,7 +107,7 @@ public class ReceiptEncoder implements BaseProperties {
 
             .setDynamic((wr) -> optionalShippingRecord == null ? wr :
                 wr.setObject(SHIPPING_JSON, new JSONObjectWriter()
-                        .setString(DESCRIPTION_JSON, optionalShippingRecord.description)
+                        .setStringArray(DESCRIPTION_JSON, optionalShippingRecord.description)
                         .setMoney(AMOUNT_JSON, optionalShippingRecord.amount, currency.decimals)))
 
             .setDynamic((wr) -> optionalBarcode == null ? wr :
@@ -116,15 +116,15 @@ public class ReceiptEncoder implements BaseProperties {
                    .setString(VALUE_JSON, optionalBarcode.barcodeValue)))
 
             .setDynamic((wr) -> optionalFreeText == null ? wr : 
-                wr.setString(FREE_TEXT_JSON, optionalFreeText))
+                wr.setStringArray(FREE_TEXT_JSON, optionalFreeText))
 
             .setDynamic((wr) -> {
                 JSONArrayWriter lineItemsArray = wr.setArray(LINE_ITEMS_JSON);
-                for (LineItem lineItem : lineItems) {
+                for (ReceiptLineItem lineItem : lineItems) {
                     lineItemsArray.setObject()
                         .setDynamic((li) -> lineItem.optionalSku == null ? li :
                             li.setString(SKU_JSON, lineItem.optionalSku))
-                        .setString(DESCRIPTION_JSON, lineItem.description)
+                        .setStringArray(DESCRIPTION_JSON, lineItem.description)
                         .setBigDecimal(QUANTITY_JSON, lineItem.quantity)
                         .setDynamic((li) -> lineItem.optionalUnit == null ? li :
                             li.setString(UNIT_JSON, lineItem.optionalUnit))

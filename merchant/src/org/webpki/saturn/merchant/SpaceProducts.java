@@ -26,23 +26,29 @@ public class SpaceProducts implements ProductEntry {
     
     static final LinkedHashMap<String,ProductEntry> products = new LinkedHashMap<>();
 
-    static void init(String name, String description, int unitPriceX100, String imageUrl) {
+    static void init(String name, String[] description, int unitPriceX100, String imageUrl) {
         products.put(name, new SpaceProducts(name, description, unitPriceX100, imageUrl));
     }
 
     static {
 
-        init("7d688", "Model Rocket", 49999, "spacex-starship-heavy.png"); 
+        init("7d688", 
+             new String[]{"Model Rocket", "SpaceX Falcon Heavy", "Scale 1:200"}, 
+             49999, 
+             "spacex-starship-heavy.png"); 
 
-        init("90555", "Nasa T-Shirt", 1525,  "t-shirt-nasa-grey.png"); 
+        init("90555", 
+             new String[]{"Nasa T-Shirt", "Grey, Size: L"}, 
+             1525,  
+             "t-shirt-nasa-grey.png"); 
     }
 
     String name;
-    String description;
+    String[] description;
     int unitPriceX100;
     String imageUrl;
 
-    SpaceProducts(String name, String description, int unitPriceX100, String imageUrl) {
+    SpaceProducts(String name, String[] description, int unitPriceX100, String imageUrl) {
         this.name = name;
         this.description = description;
         this.unitPriceX100 = unitPriceX100;
@@ -50,7 +56,7 @@ public class SpaceProducts implements ProductEntry {
     }
 
     @Override
-    public String getDescription() {
+    public String[] getDescription() {
         return description;
     }
 

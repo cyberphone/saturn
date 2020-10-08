@@ -20,50 +20,50 @@ import java.math.BigDecimal;
 
 // Line item holder for the Saturn receipt system
 
-public class LineItem {
+public class ReceiptLineItem {
 
     public enum OptionalElements {SKU, UNIT, SUBTOTAL, TAX, DISCOUNT, PRICE};
 
     String optionalSku;
-    String description;
+    String[] description;
     BigDecimal optionalSubtotal;
     BigDecimal quantity;
     String optionalUnit;
-    TaxRecord optionalTaxRecord;
+    ReceiptTaxRecord optionalTaxRecord;
     BigDecimal optionalPrice;
     BigDecimal optionalDiscount;
 
-    public LineItem(String optionalSku, 
-            String description,
-            BigDecimal quantity,
-            BigDecimal optionalSubtotal) {
+    public ReceiptLineItem(String optionalSku, 
+                           String[] description,
+                           BigDecimal quantity,
+                           BigDecimal optionalSubtotal) {
         this.optionalSku = optionalSku;
         this.description = description;
         this.quantity = quantity;
         this.optionalSubtotal = optionalSubtotal;
     }
     
-    public LineItem setTaxRecord(TaxRecord optionalTaxRecord) {
+    public ReceiptLineItem setTaxRecord(ReceiptTaxRecord optionalTaxRecord) {
         this.optionalTaxRecord = optionalTaxRecord;
         return this;
     }
 
-    public LineItem setUnit(String optionalUnit) {
+    public ReceiptLineItem setUnit(String optionalUnit) {
         this.optionalUnit = optionalUnit;
         return this;
     }
 
-    public LineItem setPrice(BigDecimal price) {
+    public ReceiptLineItem setPrice(BigDecimal price) {
         this.optionalPrice = price;
         return this;
     }
     
-    public LineItem setDiscount(BigDecimal discount) {
+    public ReceiptLineItem setDiscount(BigDecimal discount) {
         this.optionalDiscount = discount;
         return this;
     }
 
-    LineItem() { // Used by the decoder
+    ReceiptLineItem() { // Used by the decoder
 
     }
 
@@ -71,7 +71,7 @@ public class LineItem {
         return quantity;
     }
 
-    public String getDescription() {
+    public String[] getDescription() {
         return description;
     }
 

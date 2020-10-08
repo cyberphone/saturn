@@ -37,16 +37,16 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
-import org.webpki.saturn.common.Barcode;
+import org.webpki.saturn.common.ReceiptBarcode;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.LineItem;
+import org.webpki.saturn.common.ReceiptLineItem;
 import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.ProviderAuthorityDecoder;
 import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
-import org.webpki.saturn.common.ShippingRecord;
-import org.webpki.saturn.common.TaxRecord;
+import org.webpki.saturn.common.ReceiptShippingRecord;
+import org.webpki.saturn.common.ReceiptTaxRecord;
 import org.webpki.saturn.common.TimeUtils;
 import org.webpki.saturn.common.UrlHolder;
 
@@ -73,20 +73,20 @@ public class ReceiptServlet extends HttpServlet {
         return o == null ? "" : o.toString();
     }
 
-    static final HashMap<Barcode.BarcodeTypes, BarcodeFormat> saturn2Xzing = new HashMap<>();
+    static final HashMap<ReceiptBarcode.BarcodeTypes, BarcodeFormat> saturn2Xzing = new HashMap<>();
     
     static {
-        saturn2Xzing.put(Barcode.BarcodeTypes.UPC_A, BarcodeFormat.UPC_A);
-        saturn2Xzing.put(Barcode.BarcodeTypes.UPC_E, BarcodeFormat.UPC_E);
-        saturn2Xzing.put(Barcode.BarcodeTypes.EAN_8, BarcodeFormat.EAN_8);
-        saturn2Xzing.put(Barcode.BarcodeTypes.EAN_13, BarcodeFormat.EAN_13);
-        saturn2Xzing.put(Barcode.BarcodeTypes.UPC_EAN_EXTENSION, BarcodeFormat.UPC_EAN_EXTENSION);
-        saturn2Xzing.put(Barcode.BarcodeTypes.CODE_39, BarcodeFormat.CODE_39);
-        saturn2Xzing.put(Barcode.BarcodeTypes.CODE_93, BarcodeFormat.CODE_93);
-        saturn2Xzing.put(Barcode.BarcodeTypes.CODE_128, BarcodeFormat.CODE_128);
-        saturn2Xzing.put(Barcode.BarcodeTypes.CODABAR, BarcodeFormat.CODABAR);
-        saturn2Xzing.put(Barcode.BarcodeTypes.ITF, BarcodeFormat.ITF);
-        saturn2Xzing.put(Barcode.BarcodeTypes.QR_CODE, BarcodeFormat.QR_CODE);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.UPC_A, BarcodeFormat.UPC_A);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.UPC_E, BarcodeFormat.UPC_E);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.EAN_8, BarcodeFormat.EAN_8);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.EAN_13, BarcodeFormat.EAN_13);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.UPC_EAN_EXTENSION, BarcodeFormat.UPC_EAN_EXTENSION);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.CODE_39, BarcodeFormat.CODE_39);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.CODE_93, BarcodeFormat.CODE_93);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.CODE_128, BarcodeFormat.CODE_128);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.CODABAR, BarcodeFormat.CODABAR);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.ITF, BarcodeFormat.ITF);
+        saturn2Xzing.put(ReceiptBarcode.BarcodeTypes.QR_CODE, BarcodeFormat.QR_CODE);
     }
     
     static final Map<EncodeHintType, Object> xzingHints = new EnumMap<>(EncodeHintType.class);
@@ -96,10 +96,24 @@ public class ReceiptServlet extends HttpServlet {
         xzingHints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.M);
      }
 
-    static String money(ReceiptDecoder receiptDecoder, BigDecimal amount) throws IOException {
+    static String showMoney(ReceiptDecoder receiptDecoder, BigDecimal amount) throws IOException {
         return receiptDecoder.getCurrency().amountToDisplayString(amount, false);
     }
     
+    static String showLines(String[] description) {
+        StringBuilder lines = new StringBuilder();
+        boolean next = false;
+        for (String line : description) {
+            if (next) {
+                lines.append("<br>");
+            } else {
+                next = true;
+            }
+            lines.append(line);
+        }
+        return lines.toString();
+    }
+
     static class HtmlTable {
         
         static final String RIGHT_ALIGN = "text-align:right";
@@ -154,7 +168,7 @@ public class ReceiptServlet extends HttpServlet {
         }
     }
     
-    StringBuilder printBarcode(Barcode barcode) throws WriterException, IOException {
+    StringBuilder printBarcode(ReceiptBarcode barcode) throws WriterException, IOException {
         StringBuilder html = new StringBuilder("<div style='padding:2em 0 0 2em;width:20em'>");
         BarcodeFormat xzingFormat = saturn2Xzing.get(barcode.getBarcodeType());
         if (xzingFormat == null) {
@@ -197,16 +211,9 @@ public class ReceiptServlet extends HttpServlet {
                 payeeAuthority.getPayeeCoreProperties().getLogotypeUrl(),
                 payeeAuthority.getPayeeCoreProperties().getCommonName()));
         if (receiptDecoder.getOptionalPhysicalAddress() != null) {
-            html.append("<div class='para'>");
-            boolean next = false;
-            for (String addressLine : receiptDecoder.getOptionalPhysicalAddress()) {
-                if (next) {
-                    html.append("<br>");
-                }
-                next = true;
-                html.append(addressLine);
-            }
-            html.append("</div>");
+            html.append("<div class='para'>")
+                .append(showLines(receiptDecoder.getOptionalPhysicalAddress()))
+                .append("</div>");
         }
         if (receiptDecoder.getOptionalPhoneNumber() != null ||
             receiptDecoder.getOptionalEmailAddress() != null) {
@@ -226,7 +233,7 @@ public class ReceiptServlet extends HttpServlet {
         }
         BigDecimal optionalSubtotal = receiptDecoder.getOptionalSubtotal();
         BigDecimal optionalDiscount = receiptDecoder.getOptionalDiscount();
-        TaxRecord optionalTaxRecord = receiptDecoder.getOptionalTaxRecord();
+        ReceiptTaxRecord optionalTaxRecord = receiptDecoder.getOptionalTaxRecord();
  
         HtmlTable coreData = 
                 new HtmlTable("Core Receipt Data")
@@ -246,18 +253,18 @@ public class ReceiptServlet extends HttpServlet {
                 .addCell("<a href='" + 
                          payeeAuthority.getPayeeCoreProperties().getHomePage() + 
                         "'>" + receiptDecoder.getPayeeCommonName() + "</a>")
-                .addCell(money(receiptDecoder, receiptDecoder.getAmount()),
+                .addCell(showMoney(receiptDecoder, receiptDecoder.getAmount()),
                          HtmlTable.RIGHT_ALIGN);
         if (optionalSubtotal != null) {
-            coreData.addCell(money(receiptDecoder, optionalSubtotal),
+            coreData.addCell(showMoney(receiptDecoder, optionalSubtotal),
                              HtmlTable.RIGHT_ALIGN);
         }
         if (optionalDiscount != null) {
-            coreData.addCell(money(receiptDecoder, optionalDiscount),
+            coreData.addCell(showMoney(receiptDecoder, optionalDiscount),
                              HtmlTable.RIGHT_ALIGN);
         }
         if (optionalTaxRecord != null) {
-            coreData.addCell(money(receiptDecoder,optionalTaxRecord.getAmount()) +
+            coreData.addCell(showMoney(receiptDecoder,optionalTaxRecord.getAmount()) +
                     " (" +
                     optionalTaxRecord.getPercentage().toPlainString() +
                     "%)");
@@ -286,39 +293,39 @@ public class ReceiptServlet extends HttpServlet {
         HtmlTable orderData = new HtmlTable("Order Data");
         orderData.addHeader("Description");
         if (receiptDecoder.getOptionalLineItemElements()
-                .contains(LineItem.OptionalElements.SKU)) {
+                .contains(ReceiptLineItem.OptionalElements.SKU)) {
             orderData.addHeader("SKU");
         }
         orderData.addHeader("Quantity");
         if (receiptDecoder.getOptionalLineItemElements()
-                .contains(LineItem.OptionalElements.PRICE)) {
+                .contains(ReceiptLineItem.OptionalElements.PRICE)) {
             orderData.addHeader("Price");
         }
         if (receiptDecoder.getOptionalLineItemElements()
-                .contains(LineItem.OptionalElements.SUBTOTAL)) {
+                .contains(ReceiptLineItem.OptionalElements.SUBTOTAL)) {
             orderData.addHeader("Subtotal");
         }
         if (receiptDecoder.getOptionalLineItemElements()
-                .contains(LineItem.OptionalElements.DISCOUNT)) {
+                .contains(ReceiptLineItem.OptionalElements.DISCOUNT)) {
             orderData.addHeader("Discount");
         }
-        for (LineItem lineItem : receiptDecoder.getLineItems()) {
+        for (ReceiptLineItem lineItem : receiptDecoder.getLineItems()) {
             String quantity = lineItem.getQuantity().toPlainString();
             if (lineItem.getOptionalUnit() != null) {
                 quantity += " " + lineItem.getOptionalUnit();
             }
-            orderData.addCell(lineItem.getDescription());
+            orderData.addCell(showLines(lineItem.getDescription()));
             if (receiptDecoder.getOptionalLineItemElements()
-                    .contains(LineItem.OptionalElements.SKU)) {
+                    .contains(ReceiptLineItem.OptionalElements.SKU)) {
                 orderData.addCell(optional(lineItem.getOptionalSku()));
             }
             orderData.addCell(quantity, HtmlTable.RIGHT_ALIGN);
             if (receiptDecoder.getOptionalLineItemElements()
-                    .contains(LineItem.OptionalElements.PRICE)) {
+                    .contains(ReceiptLineItem.OptionalElements.PRICE)) {
                 BigDecimal price = lineItem.getOptionalPrice();
                 String priceText = "";
                 if (price != null) {
-                    priceText = money(receiptDecoder, price);
+                    priceText = showMoney(receiptDecoder, price);
                     if (lineItem.getOptionalUnit() != null) {
                         priceText += "/" + lineItem.getOptionalUnit();
                     }
@@ -326,33 +333,39 @@ public class ReceiptServlet extends HttpServlet {
                 orderData.addCell(priceText, HtmlTable.RIGHT_ALIGN);
             }
             if (receiptDecoder.getOptionalLineItemElements()
-                    .contains(LineItem.OptionalElements.SUBTOTAL)) {
+                    .contains(ReceiptLineItem.OptionalElements.SUBTOTAL)) {
                 BigDecimal subtotal = lineItem.getOptionalSubtotal();
-                orderData.addCell(subtotal == null ? "" : money(receiptDecoder, subtotal), 
+                orderData.addCell(subtotal == null ? "" : showMoney(receiptDecoder, subtotal), 
                                   HtmlTable.RIGHT_ALIGN);
             }
             if (receiptDecoder.getOptionalLineItemElements()
-                    .contains(LineItem.OptionalElements.DISCOUNT)) {
+                    .contains(ReceiptLineItem.OptionalElements.DISCOUNT)) {
                 BigDecimal discount = lineItem.getOptionalDiscount();
-                orderData.addCell(discount == null ? "" : money(receiptDecoder, discount), 
+                orderData.addCell(discount == null ? "" : showMoney(receiptDecoder, discount), 
                                   HtmlTable.RIGHT_ALIGN + ";color:red");
             }
         }
         html.append(orderData.render());
 
-        ShippingRecord optionalShippingRecord = receiptDecoder.getOptionalShippingRecord();
+        ReceiptShippingRecord optionalShippingRecord = receiptDecoder.getOptionalShippingRecord();
         if (optionalShippingRecord != null) {
             html.append(new HtmlTable("Shipping")
                     .addHeader("Description")
                     .addHeader("Cost")
-                    .addCell(optionalShippingRecord.getDescription())
-                    .addCell(money(receiptDecoder, optionalShippingRecord.getAmount()),
+                    .addCell(showLines(optionalShippingRecord.getDescription()))
+                    .addCell(showMoney(receiptDecoder, optionalShippingRecord.getAmount()),
                              HtmlTable.RIGHT_ALIGN)
                     .render());
         }
         
         if (receiptDecoder.getOptionalBarcode() != null) {
             html.append(printBarcode(receiptDecoder.getOptionalBarcode()));
+        }
+        
+        if (receiptDecoder.getOptionalFreeText() != null) {
+            html.append("<div style='para'>")
+                .append(showLines(receiptDecoder.getOptionalFreeText()))
+                .append("</div>");
         }
     }
 
