@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 
 import java.util.LinkedHashMap;
 
-public class SavedShoppingCart implements Serializable {
+public class ShoppingCart implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

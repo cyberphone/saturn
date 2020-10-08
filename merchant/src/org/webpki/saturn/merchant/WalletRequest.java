@@ -45,7 +45,7 @@ import org.webpki.saturn.common.PaymentClientRequestEncoder.SupportedPaymentMeth
 public class WalletRequest implements BaseProperties, MerchantSessionProperties {
 
     boolean debugMode;
-    SavedShoppingCart savedShoppingCart;
+    ShoppingCart savedShoppingCart;
     JSONObjectWriter requestObject;
     JSONObjectWriter paymentRequest;
     String orderId;
@@ -58,7 +58,7 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
         if (debugMode) {
             session.setAttribute(DEBUG_DATA_SESSION_ATTR, debugData = new DebugData());
         }
-        savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+        savedShoppingCart = (ShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         MerchantDescriptor merchant = MerchantService.getMerchant(session);
 
         byte[] cryptoRandom = new byte[16];

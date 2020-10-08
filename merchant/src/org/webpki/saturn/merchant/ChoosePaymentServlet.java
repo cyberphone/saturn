@@ -17,7 +17,9 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -50,28 +52,28 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
             return;
         }
         JSONArrayReader ar = JSONParser.parse(request.getParameter(SHOPPING_CART_FORM_ATTR)).getJSONArrayReader();
-        SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
-        savedShoppingCart.products = SpaceProducts.products;  // Needed for receipts
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.products = SpaceProducts.products;  // Needed for receipts
         long total = 0;
         while (ar.hasMore()) {
             JSONObjectReader or = ar.getObject();
             int quantity = or.getInt("quantity");
             if (quantity != 0) {
                 String sku = or.getString("sku");
-                savedShoppingCart.items.put(sku, BigDecimal.valueOf(quantity));
+                shoppingCart.items.put(sku, BigDecimal.valueOf(quantity));
                 total += quantity * or.getInt53("priceX100");
             }
         }
-        savedShoppingCart.subtotal = total;
+        shoppingCart.subtotal = total;
 
         // We add a fictitious 10% sales tax as well
-        savedShoppingCart.tax = total / 10;
+        shoppingCart.tax = total / 10;
 
         // Then we round up to the nearest 25 centimes, cents, or pennies
-        savedShoppingCart.roundedPaymentAmount = ((savedShoppingCart.tax + total + 24) / 25) * 25;
-        session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
+        shoppingCart.roundedPaymentAmount = ((shoppingCart.tax + total + 24) / 25) * 25;
+        session.setAttribute(SHOPPING_CART_SESSION_ATTR, shoppingCart);
 
-        HTML.userChoosePage(request, response, savedShoppingCart);
+        HTML.userChoosePage(request, response, shoppingCart);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

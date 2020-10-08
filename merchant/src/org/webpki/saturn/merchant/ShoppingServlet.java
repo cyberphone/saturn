@@ -41,13 +41,13 @@ public class ShoppingServlet extends HttpServlet implements MerchantSessionPrope
             ErrorServlet.sessionTimeout(response);
             return;
          }
-        SavedShoppingCart saved_shopping_cart =
+        ShoppingCart savedShoppingCart =
             (session.getAttribute(W2NBWalletServlet.SHOPPING_CART_SESSION_ATTR) != null) ?
-                (SavedShoppingCart)session.getAttribute(W2NBWalletServlet.SHOPPING_CART_SESSION_ATTR)
+                (ShoppingCart)session.getAttribute(W2NBWalletServlet.SHOPPING_CART_SESSION_ATTR)
                                        :
-                new SavedShoppingCart();
+                new ShoppingCart();
         session.removeAttribute(W2NBWalletServlet.SHOPPING_CART_SESSION_ATTR);
-        HTML.merchantPage(response, saved_shopping_cart);
+        HTML.merchantPage(response, savedShoppingCart);
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -60,6 +60,6 @@ public class ShoppingServlet extends HttpServlet implements MerchantSessionPrope
             return;
         }
         session.setAttribute(MERCHANT_COMMON_NAME_ATTR, MerchantService.ID_DEMO_MERCHANT);
-        HTML.merchantPage(response, new SavedShoppingCart());
+        HTML.merchantPage(response, new ShoppingCart());
     }
 }

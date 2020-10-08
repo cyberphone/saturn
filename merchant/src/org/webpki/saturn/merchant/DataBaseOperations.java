@@ -99,7 +99,7 @@ public class DataBaseOperations {
             ProviderResponseDecoder authorization = resultData.authorization;
             String orderId = authorization.getPayeeReferenceId();
             ArrayList<ReceiptLineItem> lineItems = new ArrayList<>();
-            SavedShoppingCart savedShoppingCart = resultData.walletRequest.savedShoppingCart;
+            ShoppingCart savedShoppingCart = resultData.walletRequest.savedShoppingCart;
             for (String sku : savedShoppingCart.items.keySet()) {
                 ProductEntry productEntry = savedShoppingCart.products.get(sku);
                 BigDecimal quantity = savedShoppingCart.items.get(sku);
@@ -119,10 +119,19 @@ public class DataBaseOperations {
                         BigDecimal.TEN);
             }
             ReceiptShippingRecord optionalShippingRecord = null;
+            String[] optionalAfterText = null;
             if (savedShoppingCart.products == SpaceProducts.products) {
                 optionalShippingRecord = 
                         new ReceiptShippingRecord(new String[]{"Free shipping"}, 
                                                   new BigDecimal("0.00"));
+                optionalAfterText = new String[] {
+                    "Return Policy:",
+                    "Items can be returned within 30 days of receipt " +
+                    "of delivery using the Online Returns Center. " +
+                    "Once the item is received at our Customer Support Center, " +
+                    "it takes 2 business days for the refund to be processed " +
+                    "and 3-5 business days for the refund amount to show up " +
+                    "in your account."};
             }
 
             ReceiptEncoder receiptEncoder = new ReceiptEncoder(
@@ -140,7 +149,7 @@ public class DataBaseOperations {
                     optionalTaxRecord,
                     lineItems,
                     new ReceiptBarcode(orderId, ReceiptBarcode.BarcodeTypes.CODE_128),
-                    new String[]{"Free text..."},
+                    optionalAfterText,
                     authorization.getPaymentMethodName(),
                     authorization.getAccountReference(),
                     authorization.getPayeeAuthorityUrl(),

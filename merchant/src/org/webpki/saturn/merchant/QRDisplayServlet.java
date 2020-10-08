@@ -99,7 +99,7 @@ public class QRDisplayServlet extends HttpServlet implements MerchantSessionProp
         byte[] qrImage = pngOutputStream.toByteArray(); 
 
         if (session.getAttribute(GAS_STATION_SESSION_ATTR) == null) {
-            SavedShoppingCart savedShoppingCart = (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+            ShoppingCart savedShoppingCart = (ShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
             if (savedShoppingCart == null) {
                 ErrorServlet.systemFail(response, "Missing shopping cart");
                 return;

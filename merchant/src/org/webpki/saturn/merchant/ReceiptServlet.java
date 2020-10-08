@@ -363,7 +363,7 @@ public class ReceiptServlet extends HttpServlet {
         }
         
         if (receiptDecoder.getOptionalFreeText() != null) {
-            html.append("<div style='para'>")
+            html.append("<div style='margin-top:1.5em'>")
                 .append(showLines(receiptDecoder.getOptionalFreeText()))
                 .append("</div>");
         }

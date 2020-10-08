@@ -17,7 +17,9 @@
 package org.webpki.saturn.merchant;
 
 import java.io.IOException;
+
 import java.math.BigDecimal;
+
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -62,10 +64,10 @@ public class GasStationServlet extends HttpServlet implements MerchantSessionPro
                                                                  TimeUtils.inMinutes(45),
                                                                  true));
         session.setAttribute(MERCHANT_COMMON_NAME_ATTR, MerchantService.ID_PLANET_GAS);
-        SavedShoppingCart savedShoppingCart = new SavedShoppingCart();
-        savedShoppingCart.products = FuelTypes.products;  // Needed for receipts
-        savedShoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;
-        session.setAttribute(SHOPPING_CART_SESSION_ATTR, savedShoppingCart);
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.products = FuelTypes.products;  // Needed for receipts
+        shoppingCart.roundedPaymentAmount = STANDARD_RESERVATION_AMOUNT_X_100;
+        session.setAttribute(SHOPPING_CART_SESSION_ATTR, shoppingCart);
         response.sendRedirect("qrdisplay");
     }
 
@@ -82,8 +84,8 @@ public class GasStationServlet extends HttpServlet implements MerchantSessionPro
         if (priceX1000 % GasStationServlet.ROUND_UP_FACTOR_X_10 != 0) {
             maxVolumeInDecilitres--;
         }
-        SavedShoppingCart savedShoppingCart = 
-                (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+        ShoppingCart savedShoppingCart = 
+                (ShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
         savedShoppingCart.items.put(fuelType.toString(), BigDecimal.ZERO);
         HTML.gasFillingPage(response, fuelType, maxVolumeInDecilitres);
     }

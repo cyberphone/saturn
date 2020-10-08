@@ -176,16 +176,16 @@ public class HTML implements MerchantSessionProperties {
     private static StringBuilder productEntry(StringBuilder temp_string,
                                               SpaceProducts product_entry,
                                               String sku,
-                                              SavedShoppingCart savedShoppingCart,
+                                              ShoppingCart savedShoppingCart,
                                               int index) throws IOException {
         int quantity = savedShoppingCart.items.containsKey(sku) ? 
                     savedShoppingCart.items.get(sku).intValue() : 0;
         StringBuilder s = new StringBuilder(
             "<tr style=\"text-align:center\"><td><img src=\"images/")
         .append(product_entry.imageUrl)
-        .append("\" class=\"product\"></td><td style='text-align:center'><div style='display:inline-block;text-align:left'>")
+        .append("\" class=\"product\"></td><td style='text-align:left'>")
         .append(ReceiptServlet.showLines(product_entry.description))
-        .append("</div></td><td style=\"text-align:right\">")
+        .append("</td><td style=\"text-align:right\">")
         .append(price(product_entry.unitPriceX100))
         .append(
             "</td><td><form>" +
@@ -226,7 +226,7 @@ public class HTML implements MerchantSessionProperties {
     }
     
     static void merchantPage(HttpServletResponse response,
-                             SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
+                             ShoppingCart savedShoppingCart) throws IOException, ServletException {
         StringBuilder temp_string = new StringBuilder(
             "function userPay() {\n" +
             "    if (getTotal()) {\n" +
@@ -332,21 +332,21 @@ public class HTML implements MerchantSessionProperties {
             page_data.toString()));
     }
 
-    static StringBuilder currentOrder(SavedShoppingCart savedShoppingCart) throws IOException {
+    static StringBuilder currentOrder(ShoppingCart savedShoppingCart) throws IOException {
         StringBuilder s = new StringBuilder(
                 "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
                 "<table>" +
                 "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:"
                 + FONT_ARIAL + "\">Current Order<br>&nbsp;</td></tr>" +
                 "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
-                "<tr><th>Description</th><th>Price</th><th>Quantity</th><th>Sum</th></tr>");
+                "<tr><th>Description</th><th>Price</th><th>Quantity</th><th>Subtotal</th></tr>");
             for (String sku : savedShoppingCart.items.keySet()) {
                 SpaceProducts product_entry = (SpaceProducts) SpaceProducts.products.get(sku);
-                s.append("<tr style=\"text-align:center\"><td>")
-                 .append(product_entry.name)
+                s.append("<tr><td>")
+                 .append(ReceiptServlet.showLines(product_entry.description))
                  .append("</td><td style=\"text-align:right\">")
                  .append(price(product_entry.unitPriceX100))
-                 .append("</td><td>")
+                 .append("</td><td style=\"text-align:right\">")
                  .append(savedShoppingCart.items.get(sku).intValue())
                  .append("</td><td style=\"text-align:right\">")
                  .append(price(product_entry.unitPriceX100 * savedShoppingCart.items.get(sku).intValue()))
@@ -370,7 +370,7 @@ public class HTML implements MerchantSessionProperties {
 
     static void w2nbWalletPay(HttpServletResponse response,
                               boolean firefox,
-                              SavedShoppingCart savedShoppingCart, 
+                              ShoppingCart savedShoppingCart, 
                               boolean tapConnectMode,
                               boolean debugMode,
                               String walletRequest) throws IOException, ServletException {
@@ -669,7 +669,7 @@ public class HTML implements MerchantSessionProperties {
 
     static void userChoosePage(HttpServletRequest request,
                                HttpServletResponse response,
-                               SavedShoppingCart savedShoppingCart) throws IOException, ServletException {
+                               ShoppingCart savedShoppingCart) throws IOException, ServletException {
         boolean android = HomeServlet.isAndroid(request);
         StringBuilder s = currentOrder(savedShoppingCart)
             .append("<tr><td style=\"padding-top:15pt\"><table style=\"margin-left:auto;margin-right:auto\">" +
@@ -938,7 +938,7 @@ public class HTML implements MerchantSessionProperties {
     }
 
     static void printQRCode4Shop(HttpServletResponse response,
-                                 SavedShoppingCart savedShoppingCart,
+                                 ShoppingCart savedShoppingCart,
                                  byte[] qrImage,
                                  HttpServletRequest request,
                                  String id) throws IOException, ServletException {

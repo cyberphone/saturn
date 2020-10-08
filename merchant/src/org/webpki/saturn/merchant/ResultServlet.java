@@ -91,8 +91,8 @@ public class ResultServlet extends HttpServlet implements MerchantSessionPropert
             BigDecimal actualAmount = new BigDecimal(priceX1000).divide(new BigDecimal(1000));
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
             urlHolder.setUrl(reservation.urlToCall);
-            SavedShoppingCart savedShoppingCart = 
-                    (SavedShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+            ShoppingCart savedShoppingCart = 
+                    (ShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
             savedShoppingCart.items.put(fuelType.toString(),
                                         BigDecimal.valueOf(decilitres).divide(BigDecimal.TEN));
             AuthorizationServlet.processTransaction(MerchantService.getMerchant(session),
