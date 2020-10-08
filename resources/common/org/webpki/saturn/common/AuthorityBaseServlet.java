@@ -96,7 +96,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     }
     
     public static StringBuilder addLogotype(String logotypeUrl,
-                                            String commonName) {
+                                            String commonName,
+                                            boolean centered) {
         return new StringBuilder(
             "<script>\n" +
             "function adjustImage(image) {\n" +
@@ -107,7 +108,9 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                "  image.style.visibility = 'visible';\n" +
             "}\n"+
             "</script>" +
-            "<img style='margin-bottom:0.5em;visibility:hidden' src='")
+            "<img style='")
+        .append(centered ? "margin:0 auto 0.5em auto;display:block;" : "")
+        .append("visibility:hidden' src='")
         .append(logotypeUrl)
         .append("' alt='logo' title='")
         .append(commonName)
@@ -139,7 +142,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
   Messages.PROVIDER_AUTHORITY.toString() : Messages.PAYEE_AUTHORITY.toString())
                 .append("</div>")
                 .append(addLogotype(rd.getString(LOGOTYPE_URL_JSON),
-                                    rd.getString(COMMON_NAME_JSON)))
+                                    rd.getString(COMMON_NAME_JSON),
+                                    false))
                 .append("<div class='para'>This " +
                         SATURN_LINK +
                         " <i>live object</i> is normally requested by service providers " + 

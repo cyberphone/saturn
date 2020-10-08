@@ -122,10 +122,10 @@ public class ReceiptServlet extends HttpServlet {
         
         
         HtmlTable(String headerText) {
-            html.append("<div class='tableheader'>")
+            html.append("<div style='text-align:center' class='tableheader'>")
                 .append(headerText)
                 .append("</div>" +
-            "<table class='tftable'><tr>");
+            "<div style='overflow-x:auto'><table style='margin:0 auto' class='tftable'><tr>");
         }
         
         boolean headerMode = true;
@@ -135,7 +135,7 @@ public class ReceiptServlet extends HttpServlet {
         int cellCount;
         
         StringBuilder render() {
-            return html.append("</table>");
+            return html.append("</table></div>");
         }
         
         HtmlTable addHeader(String name) {
@@ -169,7 +169,7 @@ public class ReceiptServlet extends HttpServlet {
     }
     
     StringBuilder printBarcode(ReceiptBarcode barcode) throws WriterException, IOException {
-        StringBuilder html = new StringBuilder("<div style='padding:2em 0 0 2em;width:20em'>");
+        StringBuilder html = new StringBuilder("<div style='margin:2em auto 0 auto;width:20em'>");
         BarcodeFormat xzingFormat = saturn2Xzing.get(barcode.getBarcodeType());
         if (xzingFormat == null) {
             html.append("Barcode type '")
@@ -209,27 +209,34 @@ public class ReceiptServlet extends HttpServlet {
                     receiptDecoder.getProviderAuthorityUrl());
         html.append(AuthorityBaseServlet.addLogotype(
                 payeeAuthority.getPayeeCoreProperties().getLogotypeUrl(),
-                payeeAuthority.getPayeeCoreProperties().getCommonName()));
-        if (receiptDecoder.getOptionalPhysicalAddress() != null) {
-            html.append("<div class='para'>")
-                .append(showLines(receiptDecoder.getOptionalPhysicalAddress()))
-                .append("</div>");
-        }
-        if (receiptDecoder.getOptionalPhoneNumber() != null ||
+                payeeAuthority.getPayeeCoreProperties().getCommonName(),
+                true));
+        if (receiptDecoder.getOptionalPhysicalAddress() != null ||
+            receiptDecoder.getOptionalPhoneNumber() != null ||
             receiptDecoder.getOptionalEmailAddress() != null) {
-            html.append("<div class='para'>");
-            if (receiptDecoder.getOptionalPhoneNumber() != null) {
-                html.append("<i>Phone</i>: ")
-                    .append(receiptDecoder.getOptionalPhoneNumber());
+            html.append("<div style='overflow-x:auto'><table style='margin:0.5em auto 0 auto'>");
+            if (receiptDecoder.getOptionalPhysicalAddress() != null) {
+                html.append("<tr><td>")
+                    .append(showLines(receiptDecoder.getOptionalPhysicalAddress()))
+                    .append("</td></tr>");
             }
-            if (receiptDecoder.getOptionalEmailAddress() != null) {
+            if (receiptDecoder.getOptionalPhoneNumber() != null ||
+                receiptDecoder.getOptionalEmailAddress() != null) {
+                html.append("<tr><td>");
                 if (receiptDecoder.getOptionalPhoneNumber() != null) {
-                    html.append("<br>");
+                    html.append("<i>Phone</i>: ")
+                        .append(receiptDecoder.getOptionalPhoneNumber());
                 }
-                html.append("<i>e-mail</i>: ")
-                    .append(receiptDecoder.getOptionalEmailAddress());
+                if (receiptDecoder.getOptionalEmailAddress() != null) {
+                    if (receiptDecoder.getOptionalPhoneNumber() != null) {
+                        html.append("<br>");
+                    }
+                    html.append("<i>e-mail</i>: ")
+                        .append(receiptDecoder.getOptionalEmailAddress());
+                }
+                html.append("</td></tr>");
             }
-            html.append("</div>");
+            html.append("</table></div>");
         }
         BigDecimal optionalSubtotal = receiptDecoder.getOptionalSubtotal();
         BigDecimal optionalDiscount = receiptDecoder.getOptionalDiscount();
@@ -363,9 +370,9 @@ public class ReceiptServlet extends HttpServlet {
         }
         
         if (receiptDecoder.getOptionalFreeText() != null) {
-            html.append("<div style='margin-top:1.5em'>")
+            html.append("<table style='margin-top:1.5em auto 0 auto'><tr><td>")
                 .append(showLines(receiptDecoder.getOptionalFreeText()))
-                .append("</div>");
+                .append("</td></tr></table>");
         }
     }
 
