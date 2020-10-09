@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -103,21 +104,22 @@ public class DataBaseOperations {
             for (String sku : savedShoppingCart.items.keySet()) {
                 ProductEntry productEntry = savedShoppingCart.products.get(sku);
                 BigDecimal quantity = savedShoppingCart.items.get(sku);
+                String[] description = productEntry.getDescription();
+                if (productEntry instanceof FuelTypes) {
+                    description = new String[] {description[0] + "/Pump 8"};
+                }
                 lineItems.add(new ReceiptLineItem(null,
-                                                  productEntry.getDescription(),
+                                                  description,
                                                   quantity,
                                                   productEntry.getOptionalSubtotal(quantity))
                         .setUnit(productEntry.getOptionalUnit())
                         .setPrice(productEntry.getOptionalPrice()));
             }
-            BigDecimal optionalSubtotal = null;
-            ReceiptTaxRecord optionalTaxRecord = null;
-            if (savedShoppingCart.subtotal != 0) {
-                optionalSubtotal = new BigDecimal(BigInteger.valueOf(savedShoppingCart.subtotal), 2);
-                optionalTaxRecord = new ReceiptTaxRecord(
-                        new BigDecimal(BigInteger.valueOf(savedShoppingCart.tax), 2),
-                        BigDecimal.TEN);
-            }
+            BigDecimal optionalSubtotal =
+                    new BigDecimal(BigInteger.valueOf(savedShoppingCart.subtotal), 2);
+            ReceiptTaxRecord optionalTaxRecord = new ReceiptTaxRecord(
+                    new BigDecimal(BigInteger.valueOf(savedShoppingCart.tax), 2),
+                    BigDecimal.valueOf(ShoppingCart.TAX));
             ReceiptShippingRecord optionalShippingRecord = null;
             String[] optionalAfterText = null;
             if (savedShoppingCart.products == SpaceProducts.products) {

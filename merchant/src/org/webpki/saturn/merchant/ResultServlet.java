@@ -80,10 +80,15 @@ public class ResultServlet extends HttpServlet implements MerchantSessionPropert
             return;
         }
         try {
-            int decilitres = Integer.parseInt(request.getParameter(GasStationServlet.FUEL_DECILITRE_FIELD));
+            ShoppingCart savedShoppingCart = 
+                    (ShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
+            int decilitres = 
+                    Integer.parseInt(request.getParameter(GasStationServlet.FUEL_DECILITRE_FIELD));
             FuelTypes fuelType = (FuelTypes) FuelTypes.products
                     .get(request.getParameter(GasStationServlet.FUEL_TYPE_FIELD));
             int priceX1000 = fuelType.pricePerLitreX100 * decilitres;
+            savedShoppingCart.subtotal = (priceX1000 + 5) / 12;
+            savedShoppingCart.tax = (priceX1000 + 5) / 10 - savedShoppingCart.subtotal;
             int upround = priceX1000 % GasStationServlet.ROUND_UP_FACTOR_X_10;
             if (upround != 0) {
                 priceX1000 += GasStationServlet.ROUND_UP_FACTOR_X_10 - upround;
@@ -91,8 +96,6 @@ public class ResultServlet extends HttpServlet implements MerchantSessionPropert
             BigDecimal actualAmount = new BigDecimal(priceX1000).divide(new BigDecimal(1000));
             DebugData debugData = (DebugData) session.getAttribute(DEBUG_DATA_SESSION_ATTR);
             urlHolder.setUrl(reservation.urlToCall);
-            ShoppingCart savedShoppingCart = 
-                    (ShoppingCart) session.getAttribute(SHOPPING_CART_SESSION_ATTR);
             savedShoppingCart.items.put(fuelType.toString(),
                                         BigDecimal.valueOf(decilitres).divide(BigDecimal.TEN));
             AuthorizationServlet.processTransaction(MerchantService.getMerchant(session),

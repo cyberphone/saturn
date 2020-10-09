@@ -66,8 +66,8 @@ public class ChoosePaymentServlet extends HttpServlet implements BaseProperties,
         }
         shoppingCart.subtotal = total;
 
-        // We add a fictitious 10% sales tax as well
-        shoppingCart.tax = total / 10;
+        // We add sales tax as well
+        shoppingCart.tax = (total * ShoppingCart.TAX) / 100;
 
         // Then we round up to the nearest 25 centimes, cents, or pennies
         shoppingCart.roundedPaymentAmount = ((shoppingCart.tax + total + 24) / 25) * 25;

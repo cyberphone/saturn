@@ -23,6 +23,8 @@ import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 
 public class ShoppingCart implements Serializable {
+    
+    static final int TAX = 20;
 
     private static final long serialVersionUID = 1L;
 

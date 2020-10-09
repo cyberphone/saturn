@@ -357,7 +357,8 @@ public class HTML implements MerchantSessionProperties {
                  "<tr><td colspan=\"3\" style=\"text-align:right\">Subtotal</td><td style=\"text-align:right\">")
              .append(price(savedShoppingCart.subtotal))
              .append("</td></tr>" +
-                 "<tr><td colspan=\"3\" style=\"text-align:right\">Tax (10%)</td><td style=\"text-align:right\">")
+                 "<tr><td colspan=\"3\" style=\"text-align:right\">Tax (" +
+                     ShoppingCart.TAX + "%)</td><td style=\"text-align:right\">")
              .append(price(savedShoppingCart.tax))
              .append("</td></tr>" +
                 "</table></td></tr><tr><td style=\"padding-top:10pt\">" +
