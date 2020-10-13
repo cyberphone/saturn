@@ -37,14 +37,14 @@ import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONParser;
 
 import org.webpki.saturn.common.AuthorityBaseServlet;
-import org.webpki.saturn.common.ReceiptBarcode;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.HttpSupport;
-import org.webpki.saturn.common.ReceiptLineItem;
 import org.webpki.saturn.common.PayeeAuthorityDecoder;
 import org.webpki.saturn.common.ProviderAuthorityDecoder;
-import org.webpki.saturn.common.ReceiptDecoder;
 import org.webpki.saturn.common.ReceiptEncoder;
+import org.webpki.saturn.common.ReceiptDecoder;
+import org.webpki.saturn.common.ReceiptLineItem;
+import org.webpki.saturn.common.ReceiptBarcode;
 import org.webpki.saturn.common.ReceiptShippingRecord;
 import org.webpki.saturn.common.ReceiptTaxRecord;
 import org.webpki.saturn.common.TimeUtils;
