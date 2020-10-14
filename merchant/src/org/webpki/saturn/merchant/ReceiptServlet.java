@@ -434,6 +434,7 @@ public class ReceiptServlet extends HttpServlet {
                 }
                 HttpSupport.writeHtml(response, html.append("</body></html>"));
             } else {
+                logger.info("Receipt request from: " + request.getRemoteAddr());
                 HttpSupport.writeData(response, receipt, BaseProperties.JSON_CONTENT_TYPE);
             }
         } catch (Exception e) {

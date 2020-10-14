@@ -39,13 +39,18 @@
             <include name="**/UserResponseItem.java"/>
             <include name="**/UserAuthorizationMethods.java"/>
             <include name="**/MobileProxyParameters.java"/>
+            <include name="**/ReceiptDecoder.java"/>
+            <include name="**/ReceiptLineItem.java"/>
+            <include name="**/ReceiptBarcode.java"/>
+            <include name="**/ReceiptShippingRecord.java"/>
+            <include name="**/ReceiptTaxRecord.java"/>
           </fileset>
         </copy>
         <replace dir="${temp.dir}" value="org.webpki.mobile.android.saturn.common">
           <include name="**/*.java"/>
           <replacetoken>org.webpki.saturn.common</replacetoken>
         </replace>
-         <zip destfile="${dist.file}">
+        <zip destfile="${dist.file}">
           <zipfileset dir="${temp.dir}"/>
         </zip>
     </target>

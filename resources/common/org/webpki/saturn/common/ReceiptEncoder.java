@@ -147,7 +147,6 @@ public class ReceiptEncoder implements BaseProperties {
                         .setDynamic((li) -> setOptionalTaxRecord(li, 
                                                                  lineItem.optionalTaxRecord,
                                                                  currency));
-                    System.out.println("Disc=" + lineItem.optionalDiscount);
                 }
                 return wr;
             })
