@@ -101,16 +101,16 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         return new StringBuilder(
             "<script>\n" +
             "function adjustImage(image) {\n" +
-            "  image.style.height = " +
+            "  image.style.width = " +
                "Math.sqrt((" +
                LOGOTYPE_AREA + 
-               " * image.offsetHeight) / image.offsetWidth) + 'em';\n" +
+               " * image.offsetWidth) / image.offsetHeight) + 'em';\n" +
                "  image.style.visibility = 'visible';\n" +
             "}\n"+
             "</script>" +
             "<img style='")
         .append(centered ? "margin:0 auto 0.5em auto;display:block;" : "")
-        .append("visibility:hidden' src='")
+        .append("max-width:90%;visibility:hidden' src='")
         .append(logotypeUrl)
         .append("' alt='logo' title='")
         .append(commonName)
