@@ -212,7 +212,7 @@ public class KeyProviderInitServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         String userAgent = request.getHeader("User-Agent");
         boolean notOk = true;
-        if (userAgent.contains("Android ")) {
+        if (userAgent.contains("Android ") && !userAgent.contains("; wv)")) {
             int i = userAgent.indexOf(" Chrome/");
             if (i > 0) {
                 String chromeVersion = userAgent.substring(i + 8, userAgent.indexOf('.', i));
