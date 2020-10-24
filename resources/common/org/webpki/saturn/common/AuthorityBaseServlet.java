@@ -41,7 +41,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         return false;
     }
     
-    private static int LOGOTYPE_AREA = 80;  // We give logotypes the same area to play around in
+    private static int LOGOTYPE_AREA = 100;  // We give logotypes the same area to play around in
     
     public static final String BORDER = 
         "border-width:1px;border-style:solid;border-color:#a9a9a9";

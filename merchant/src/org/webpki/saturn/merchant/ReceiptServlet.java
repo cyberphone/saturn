@@ -414,7 +414,6 @@ public class ReceiptServlet extends HttpServlet {
                         "<body>");
                 ReceiptDecoder receiptDecoder = new ReceiptDecoder(JSONParser.parse(receipt));
                 if (request.getParameter(VIEW_AS_JSON) == null) {
-                    html.append("<div class='header'>Customer Receipt</div>");
                     if (receiptDecoder.getStatus() == ReceiptDecoder.Status.AVAILABLE) {
                         buildHtmlReceipt(html, receiptDecoder, request);
                     } else {
