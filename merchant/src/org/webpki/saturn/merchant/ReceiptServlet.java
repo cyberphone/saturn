@@ -125,7 +125,8 @@ public class ReceiptServlet extends HttpServlet {
             html.append("<div style='text-align:center' class='tableheader'>")
                 .append(headerText)
                 .append("</div>" +
-            "<div style='overflow-x:auto'><table style='margin:0 auto 3pt auto' class='tftable'><tr>");
+            "<div style='overflow-x:auto'>" + 
+            "<table style='margin-left:auto;margin-right:auto' class='tftable'><tr>");
         }
         
         boolean headerMode = true;

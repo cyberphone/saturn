@@ -194,6 +194,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         (ProvisioningInitializationResponseDecoder) jsonObject;
                     keygen2State.update(provisioningInitResponse);
 
+//TODO Here is the place where TEE attestations should/could be verified
+
                     logger.info("Device Certificate=" +
                             certificateData(keygen2State.getDeviceCertificate()));
 

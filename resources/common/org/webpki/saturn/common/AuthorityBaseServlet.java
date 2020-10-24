@@ -45,8 +45,14 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     
     public static final String BORDER = 
         "border-width:1px;border-style:solid;border-color:#a9a9a9";
+    
+    public static final String BOX_SHADOW_OFFSET = "0.3em";
 
-    public static final String BOX_SHADDOW = "box-shadow:0.3em 0.3em 0.3em #d0d0d0";
+    public static final String BOX_SHADOW = "box-shadow:" +
+        BOX_SHADOW_OFFSET + " " +
+        BOX_SHADOW_OFFSET + " " +
+        BOX_SHADOW_OFFSET + " " +
+        "#d0d0d0";
 
     public static final String TOP_ELEMENT = 
         "<!DOCTYPE html><html><head><meta charset='utf-8'>" +
@@ -56,7 +62,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         "<style type='text/css'>" +
         " .header {font-size:1.6em;padding-bottom:1em}" +
         " .para {padding-bottom:0.4em}" +
-        " .tftable {border-collapse:collapse;" + BOX_SHADDOW + "}" +
+        " .tftable {border-collapse:collapse;" + BOX_SHADOW + ";" +
+           "margin-bottom:" + BOX_SHADOW_OFFSET + "}" +
         " .tftable td {white-space:nowrap;background-color:#ffffe0;" +
           "padding:0.4em 0.5em;" + BORDER + "}" +
         " .tftable th {white-space:nowrap;padding:0.4em 0.5em;" +
@@ -64,7 +71,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         "text-align:center;" + BORDER +"}" +
         " .tableheader {margin:1.2em 0 0.6em 0}" +
         " .json {word-break:break-all;background-color:#f8f8f8;padding:1em;" +
-                            BORDER + ";" + BOX_SHADDOW + "}" +
+                            BORDER + ";" + BOX_SHADOW + "}" +
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
         "'Bitstream Vera Sans','DejaVu Sans',Arial,'Liberation Sans';background-color:white}" + 
         " code {font-size:9pt}" +
@@ -164,7 +171,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 .append("</div><div class='json'>")
                 .append(rd.serializeToString(JSONOutputFormats.PRETTY_HTML))
                 .append("</div><div class='tableheader'>&nbsp;<br>Quick Reference</div>" +
-                        "<table class='tftable'><tr><th>Property</th><th>Description</th></tr>")
+                        "<div style='overflow-x:auto'><table class='tftable'>" +
+                        "<tr><th>Property</th><th>Description</th></tr>")
                 .append(isProvider() ?
                         tableRow(rd, HTTP_VERSIONS_JSON, "Supported HTTP versions") +
                         tableRow(rd, PROVIDER_AUTHORITY_URL_JSON, "The address of this object") +
@@ -200,7 +208,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 .append(tableRow(rd, EXPIRES_JSON, "When the object becomes stale/invalid"))
                 .append(tableRow(rd, ISSUER_SIGNATURE_JSON, isProvider() ?
                                        "X.509 provider signature" : "Hosting provider signature"))
-                .append("</table><p><i>API Version</i>: " + Version.PROTOCOL +
+                .append("</table></div><p><i>API Version</i>: " + Version.PROTOCOL +
                         "</p></body></html>");
                 // Just to check that we didn't forgot anything...
                 rd.checkForUnread();
