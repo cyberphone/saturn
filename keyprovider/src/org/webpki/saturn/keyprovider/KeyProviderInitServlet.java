@@ -209,20 +209,19 @@ public class KeyProviderInitServlet extends HttpServlet {
    }
     
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+    throws IOException, ServletException {
         String userAgent = request.getHeader("User-Agent");
-        boolean notOk = true;
-        // Chrome for Android yes, WebView no
-        if (userAgent.contains("Android ") && !userAgent.contains("; wv)")) {
-            int i = userAgent.indexOf(" Chrome/");
-            if (i > 0) {
-                String chromeVersion = userAgent.substring(i + 8, userAgent.indexOf('.', i));
-                if (Integer.parseInt(chromeVersion) >= KeyProviderService.androidChromeVersion) {
-                    notOk = false;
-                }
-            }
-        }
-        if (notOk) {
+        int i;
+            // Android YES
+        if (!userAgent.contains("Android ") ||
+            // WebView NO
+            userAgent.contains("; wv)") ||
+            // Chrome YES
+            (i = userAgent.indexOf(" Chrome/")) < 0 ||
+            // However, dismiss (for the purpose) outdated versions
+            Integer.parseInt(userAgent.substring(i + 8, userAgent.indexOf('.', i))) <
+               KeyProviderService.androidChromeVersion) {
             output(response, 
                     getHTML(null,
                             null,
@@ -407,7 +406,8 @@ public class KeyProviderInitServlet extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) 
+    throws IOException, ServletException {
         request.setCharacterEncoding("utf-8");
         HttpSession session = request.getSession(false);
         String userName = request.getParameter(USERNAME_SESSION_ATTR);
