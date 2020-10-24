@@ -281,23 +281,6 @@ public class ReceiptServlet extends HttpServlet {
                             .addCell(receiptDecoder.getPayeeReferenceId(), HtmlTable.RIGHT_ALIGN)
                             .render());
 
-        html.append(new HtmlTable("Payment Details")
-                    .addHeader("Provider Name")
-                    .addHeader("Account Type")
-                    .addHeader("Account Id")
-                    .addHeader("Transaction Id")
-                    .addHeader("Time Stamp")
-                    .addHeader("Request Id")
-                    .addCell("<a href='" + 
-                             providerAuthority.getHomePage() + 
-                            "'>" + receiptDecoder.getProviderCommonName() + "</a>")
-                    .addCell(receiptDecoder.getPaymentMethodName())
-                    .addCell(receiptDecoder.getOptionalAccountReference())
-                    .addCell(receiptDecoder.getProviderReferenceId())
-                    .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
-                    .addCell(receiptDecoder.getPayeeRequestId())
-                    .render());
-
         HtmlTable orderData = new HtmlTable("Order Data");
         orderData.addHeader("Description");
         if (receiptDecoder.getOptionalLineItemElements()
@@ -365,16 +348,33 @@ public class ReceiptServlet extends HttpServlet {
                              HtmlTable.RIGHT_ALIGN)
                     .render());
         }
-        
+
         if (receiptDecoder.getOptionalBarcode() != null) {
             html.append(printBarcode(receiptDecoder.getOptionalBarcode()));
         }
         
         if (receiptDecoder.getOptionalFreeText() != null) {
-            html.append("<table style='margin-top:1.5em auto 0 auto'><tr><td>")
+            html.append("<table style='margin:1.5em auto 0 auto'><tr><td>")
                 .append(showLines(receiptDecoder.getOptionalFreeText()))
                 .append("</td></tr></table>");
         }
+        
+        html.append(new HtmlTable("Payment Details")
+                .addHeader("Provider Name")
+                .addHeader("Account Type")
+                .addHeader("Account Id")
+                .addHeader("Transaction Id")
+                .addHeader("Time Stamp")
+                .addHeader("Request Id")
+                .addCell("<a href='" + 
+                         providerAuthority.getHomePage() + 
+                        "'>" + receiptDecoder.getProviderCommonName() + "</a>")
+                .addCell(receiptDecoder.getPaymentMethodName())
+                .addCell(receiptDecoder.getOptionalAccountReference())
+                .addCell(receiptDecoder.getProviderReferenceId())
+                .addCell(TimeUtils.displayUtcTime(receiptDecoder.getProviderTimeStamp()))
+                .addCell(receiptDecoder.getPayeeRequestId())
+                .render());
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
