@@ -82,11 +82,11 @@ public class KeyProviderInitServlet extends HttpServlet {
     static final String HTML_INIT = 
             "<!DOCTYPE html><html>" + 
             "<head>" + 
-            "<link rel=\"icon\" href=\"saturn.png\" sizes=\"192x192\">" + 
+            "<link rel='icon' href='saturn.png' sizes='192x192'>" + 
             "<title>Payment Credential Enrollment</title>" + 
-            "<meta charset=\"utf-8\">" + 
-            "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">" + 
-            "<style type=\"text/css\">" + 
+            "<meta charset='utf-8'>" + 
+            "<meta name='viewport' content='width=device-width, initial-scale=1'>" + 
+            "<style type='text/css'>" + 
             ".displayContainer {" + 
             "  display:block;" + 
             "  height:100%;" + 
@@ -168,17 +168,17 @@ public class KeyProviderInitServlet extends HttpServlet {
     static String getHTML(String javascript, String bodyscript, String box) {
         StringBuilder s = new StringBuilder(HTML_INIT);
         if (javascript != null) {
-            s.append("<script>\n\"use strict\";\n").append(javascript).append("</script>");
+            s.append("<script>\n'use strict';\n").append(javascript).append("</script>");
         }
         s.append("</head><body");
         if (bodyscript != null) {
             s.append(' ').append(bodyscript);
         }
         s.append(
-                "><div style=\"cursor:pointer;position:absolute;top:15pt;left:15pt;z-index:5;width:100pt\"" +
-                " onclick=\"document.location.href='http://cyberphone.github.io/doc/saturn'\" title=\"Home of Saturn\">")
+                "><div style='cursor:pointer;position:absolute;top:15pt;left:15pt;z-index:5;width:100pt'" +
+                " onclick=\"document.location.href='http://cyberphone.github.io/doc/saturn'\" title='Home of Saturn'>")
          .append (KeyProviderService.saturnLogotype)
-         .append ("</div><div class=\"displayContainer\">")
+         .append ("</div><div class='displayContainer'>")
                 .append(box).append("</div></body></html>");
         return s.toString();
     }
@@ -225,7 +225,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             output(response, 
                     getHTML(null,
                             null,
-                "<div class=\"label\">This proof-of-concept system only supports " +
+                "<div class='label'>This proof-of-concept system only supports " +
                   "Android and using the \"Chrome\" browser (min version: " + 
                   KeyProviderService.androidChromeVersion + ")" +
                 "</div>"));
