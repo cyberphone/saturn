@@ -80,7 +80,7 @@ public interface BaseProperties {
     String LINE_ITEMS_JSON                  = "lineItems";                  //    -"- Header (M)
     String SKU_JSON                         = "sku";                        //    -"- Line item (O)
     String UNIT_JSON                        = "unit";                       //    -"- Line item (O)  Example: Litre
-    String PRICE_JSON                       = "price";                      //    -"- Line item (O)
+    String PRICE_JSON                       = "price";                      //    -"- Line item (O)  Note: per unit
     String QUANTITY_JSON                    = "quantity";                   //    -"- Line item (M)
     String DESCRIPTION_JSON                 = "description";                //    -"- Line item (M)
     String RECEIPT_SIGNATURE_JSON           = "receiptSignature";           //    -"- (M)

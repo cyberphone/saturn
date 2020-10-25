@@ -97,7 +97,9 @@ public class ReceiptServlet extends HttpServlet {
      }
 
     static String showMoney(ReceiptDecoder receiptDecoder, BigDecimal amount) throws IOException {
-        return receiptDecoder.getCurrency().amountToDisplayString(amount, false);
+        return amount == null ? "N/A" : receiptDecoder.getCurrency().plainAmountString(amount) +
+                                            " " +
+                                            receiptDecoder.getCurrency().toString();
     }
     
     static String showLines(String[] description) {
@@ -290,7 +292,7 @@ public class ReceiptServlet extends HttpServlet {
         orderData.addHeader("Quantity");
         if (receiptDecoder.getOptionalLineItemElements()
                 .contains(ReceiptLineItem.OptionalElements.PRICE)) {
-            orderData.addHeader("Price");
+            orderData.addHeader("Price/Unit");
         }
         if (receiptDecoder.getOptionalLineItemElements()
                 .contains(ReceiptLineItem.OptionalElements.SUBTOTAL)) {
@@ -314,25 +316,17 @@ public class ReceiptServlet extends HttpServlet {
             if (receiptDecoder.getOptionalLineItemElements()
                     .contains(ReceiptLineItem.OptionalElements.PRICE)) {
                 BigDecimal price = lineItem.getOptionalPrice();
-                String priceText = "";
-                if (price != null) {
-                    priceText = showMoney(receiptDecoder, price);
-                    if (lineItem.getOptionalUnit() != null) {
-                        priceText += "/" + lineItem.getOptionalUnit();
-                    }
-                }
-                orderData.addCell(priceText, HtmlTable.RIGHT_ALIGN);
+                orderData.addCell(showMoney(receiptDecoder, price), HtmlTable.RIGHT_ALIGN);
             }
             if (receiptDecoder.getOptionalLineItemElements()
                     .contains(ReceiptLineItem.OptionalElements.SUBTOTAL)) {
                 BigDecimal subtotal = lineItem.getOptionalSubtotal();
-                orderData.addCell(subtotal == null ? "" : showMoney(receiptDecoder, subtotal), 
-                                  HtmlTable.RIGHT_ALIGN);
+                orderData.addCell(showMoney(receiptDecoder, subtotal), HtmlTable.RIGHT_ALIGN);
             }
             if (receiptDecoder.getOptionalLineItemElements()
                     .contains(ReceiptLineItem.OptionalElements.DISCOUNT)) {
                 BigDecimal discount = lineItem.getOptionalDiscount();
-                orderData.addCell(discount == null ? "" : showMoney(receiptDecoder, discount), 
+                orderData.addCell(showMoney(receiptDecoder, discount), 
                                   HtmlTable.RIGHT_ALIGN + ";color:red");
             }
         }

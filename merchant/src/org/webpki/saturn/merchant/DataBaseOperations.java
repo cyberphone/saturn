@@ -106,7 +106,7 @@ public class DataBaseOperations {
                 BigDecimal quantity = savedShoppingCart.items.get(sku);
                 String[] description = productEntry.getDescription();
                 if (productEntry instanceof FuelTypes) {
-                    description = new String[] {description[0] + "/Pump 8"};
+                    description = new String[] {description[0], "Pump #8"};
                 }
                 lineItems.add(new ReceiptLineItem(null,
                                                   description,
@@ -122,7 +122,10 @@ public class DataBaseOperations {
                     BigDecimal.valueOf(ShoppingCart.TAX));
             ReceiptShippingRecord optionalShippingRecord = null;
             String[] optionalAfterText = null;
+            ReceiptBarcode optionalBarcode = null;
             if (savedShoppingCart.products == SpaceProducts.products) {
+                optionalBarcode = 
+                        new ReceiptBarcode(orderId, ReceiptBarcode.BarcodeTypes.CODE_128);
                 optionalShippingRecord = 
                         new ReceiptShippingRecord(new String[]{"Free shipping"}, 
                                                   new BigDecimal("0.00"));
@@ -150,7 +153,7 @@ public class DataBaseOperations {
                     (BigDecimal) null,
                     optionalTaxRecord,
                     lineItems,
-                    new ReceiptBarcode(orderId, ReceiptBarcode.BarcodeTypes.CODE_128),
+                    optionalBarcode,
                     optionalAfterText,
                     authorization.getPaymentMethodName(),
                     authorization.getAccountReference(),
