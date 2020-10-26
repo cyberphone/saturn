@@ -134,12 +134,12 @@ public class ReceiptDecoder implements BaseProperties {
         paymentMethodName = rd.getString(PAYMENT_METHOD_NAME_JSON);
         optionalAccountReference = rd.getStringConditional(ACCOUNT_REFERENCE_JSON);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
-        JSONObjectReader providerData = rd.getObject(PROVIDER_DATA_JSON);
-        providerAuthorityUrl = providerData.getString(PROVIDER_AUTHORITY_URL_JSON);
-        providerCommonName = providerData.getString(COMMON_NAME_JSON);
-        providerReferenceId = providerData.getString(REFERENCE_ID_JSON);
-        payeeRequestId = providerData.getString(PAYEE_REQUEST_ID_JSON);
-        providerTimeStamp = providerData.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
+        JSONObjectReader payerProviderData = rd.getObject(PAYER_PROVIDER_DATA_JSON);
+        providerAuthorityUrl = payerProviderData.getString(PROVIDER_AUTHORITY_URL_JSON);
+        providerCommonName = payerProviderData.getString(COMMON_NAME_JSON);
+        providerReferenceId = payerProviderData.getString(REFERENCE_ID_JSON);
+        payeeRequestId = payerProviderData.getString(PAYEE_REQUEST_ID_JSON);
+        providerTimeStamp = payerProviderData.getDateTime(TIME_STAMP_JSON, ISODateTime.COMPLETE);
         signatureDecoder = rd.getSignature(RECEIPT_SIGNATURE_JSON, signatureOptions);
         rd.checkForUnread();
     }

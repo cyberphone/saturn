@@ -69,7 +69,7 @@ public interface BaseProperties {
     String EMAIL_ADDRESS_JSON               = "emailAddress";               //    -"-
     String PAYMENT_METHOD_NAME_JSON         = "paymentMethodName";          //    -"-
     String PAYEE_REQUEST_ID_JSON            = "payeeRequestId";             //    -"-
-    String PROVIDER_DATA_JSON               = "providerData";               //    -"-
+    String PAYER_PROVIDER_DATA_JSON         = "payerProviderData";          //    -"-
     String TAX_JSON                         = "tax";                        //    -"- [2] Top and/or Line item level (O)
     String PERCENTAGE_JSON                  = "percentage";                 //    -"- [2] must always be used with TAX_JSON
     String SUBTOTAL_JSON                    = "subtotal";                   //    -"- Line item (O), Top level (O)

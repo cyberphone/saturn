@@ -156,7 +156,7 @@ public class ReceiptEncoder implements BaseProperties {
                             wr : wr.setString(ACCOUNT_REFERENCE_JSON,
                                               optionalAccountReference))
             .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
-            .setObject(PROVIDER_DATA_JSON, new JSONObjectWriter()
+            .setObject(PAYER_PROVIDER_DATA_JSON, new JSONObjectWriter()
                     .setString(COMMON_NAME_JSON, providerCommonName)
                     .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)
                     .setString(REFERENCE_ID_JSON, providerReferenceId)
