@@ -61,7 +61,8 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
     public static final String REST_ELEMENT = 
         "<style type='text/css'>" +
         " .header {font-size:1.6em;padding-bottom:1em}" +
-        " .para {padding-bottom:0.4em}" +
+        " .spacepara {padding:1.2em 0 0.6em 0}" +
+        " .para {padding-bottom:0.6em}" +
         " .tftable {border-collapse:collapse;" + BOX_SHADOW + ";" +
            "margin-bottom:" + BOX_SHADOW_OFFSET + "}" +
         " .tftable td {white-space:nowrap;background-color:#ffffe0;" +
@@ -69,7 +70,6 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
         " .tftable th {white-space:nowrap;padding:0.4em 0.5em;" +
           "background:linear-gradient(to bottom, #eaeaea 14%,#fcfcfc 52%,#e5e5e5 89%);" +
         "text-align:center;" + BORDER +"}" +
-        " .tableheader {margin:1.2em 0 0.6em 0}" +
         " .json {word-break:break-all;background-color:#f8f8f8;padding:1em;" +
                             BORDER + ";" + BOX_SHADOW + "}" +
         " body {margin:10pt;font-size:8pt;color:#000000;font-family:Verdana," +
@@ -151,7 +151,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                 .append(addLogotype(rd.getString(LOGOTYPE_URL_JSON),
                                     rd.getString(COMMON_NAME_JSON),
                                     false))
-                .append("<div class='para'>This " +
+                .append("<div class='spacepara'>This " +
                         SATURN_LINK +
                         " <i>live object</i> is normally requested by service providers " + 
                         "for looking up partner core data. In this case " +
@@ -170,7 +170,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
                         "</a>.")
                 .append("</div><div class='json'>")
                 .append(rd.serializeToString(JSONOutputFormats.PRETTY_HTML))
-                .append("</div><div class='tableheader'>&nbsp;<br>Quick Reference</div>" +
+                .append("</div><div class='spacepara'>Quick Reference</div>" +
                         "<div style='overflow-x:auto'><table class='tftable'>" +
                         "<tr><th>Property</th><th>Description</th></tr>")
                 .append(isProvider() ?

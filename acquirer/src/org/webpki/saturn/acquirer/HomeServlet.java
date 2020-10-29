@@ -44,7 +44,7 @@ public class HomeServlet extends HttpServlet {
             "<body>")
         .append(AuthorityBaseServlet.addLogotype("images/logotype.svg", "Acquirer", false)) 
         .append(
-            "<div class='para'>This is a " +
+            "<div class='spacepara'>This is a " +
             AuthorityBaseServlet.SATURN_LINK +
             " &quot;acquirer&quot; server.</div>" +
             "<div class='para'>Started: ")
@@ -57,7 +57,7 @@ public class HomeServlet extends HttpServlet {
         .append("'>")
         .append(authorityUrl)
         .append("</a>")
-        .append("</div><div class='tableheader'>Registered Merchants");
+        .append("</div><div class='spacepara'>Registered Merchants");
         if (AcquirerService.payeeAccountDb.isEmpty()) {
             html.append(": <i>None</i></div>");
         } else {

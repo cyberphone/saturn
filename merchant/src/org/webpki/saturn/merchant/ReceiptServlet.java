@@ -124,7 +124,7 @@ public class ReceiptServlet extends HttpServlet {
         
         
         HtmlTable(String headerText) {
-            html.append("<div style='text-align:center' class='tableheader'>")
+            html.append("<div style='text-align:center' class='spacepara'>")
                 .append(headerText)
                 .append("</div>" +
             "<div style='overflow-x:auto'>" + 

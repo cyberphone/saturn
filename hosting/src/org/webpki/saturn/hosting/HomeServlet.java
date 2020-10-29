@@ -47,7 +47,7 @@ public class HomeServlet extends HttpServlet {
                                                 "Hosting service",
                                                 false)) 
        .append(
-           "<div class='para'>This is a " +
+           "<div class='spacepara'>This is a " +
            AuthorityBaseServlet.SATURN_LINK +
            " &quot;hosting&quot; server.</div>" +
            "<div class='para'>Started: ")
@@ -59,7 +59,7 @@ public class HomeServlet extends HttpServlet {
          .append("'>")
          .append(authorityUrl)
          .append("</a>")
-         .append("</div><div class='tableheader'>Registered Merchants");
+         .append("</div><div class='spacepara'>Registered Merchants");
         if (HostingService.merchantAccountDb.isEmpty()) {
             html.append(": <i>None</i></div>");
         } else {
