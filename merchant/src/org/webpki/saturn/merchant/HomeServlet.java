@@ -48,7 +48,9 @@ public class HomeServlet extends HttpServlet implements MerchantSessionPropertie
             if (i > 0) {
                 String chromeVersion = userAgent.substring(i + 8, userAgent.indexOf('.', i));
                 if (Integer.parseInt(chromeVersion) >= MerchantService.androidChromeVersion) {
-                    notOk = false;
+                    if (!userAgent.contains("; wv)")) {
+                        notOk = false;
+                    }
                 }
             }
         }
