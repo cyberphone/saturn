@@ -44,7 +44,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.webpki.crypto.KeyAlgorithms;
-import org.webpki.crypto.MACAlgorithms;
+import org.webpki.crypto.HmacAlgorithms;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.SignatureWrapper;
 
@@ -103,7 +103,7 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
             byte[] Z = keyAgreement.generateSecret();
       
             // The custom KDF
-            Mac mac = Mac.getInstance(MACAlgorithms.HMAC_SHA256.getJceName ());
+            Mac mac = Mac.getInstance(HmacAlgorithms.HMAC_SHA256.getJceName ());
             mac.init (new SecretKeySpec(Z, "RAW"));
             sessionKey = mac.doFinal(kdfData);
 
@@ -128,7 +128,7 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
     @Override
     public byte[] mac(byte[] data, byte[] keyModifier) throws IOException {
         try {
-            Mac mac = Mac.getInstance(MACAlgorithms.HMAC_SHA256.getJceName ());
+            Mac mac = Mac.getInstance(HmacAlgorithms.HMAC_SHA256.getJceName ());
             mac.init(new SecretKeySpec(ArrayUtil.add(sessionKey, keyModifier), "RAW"));
             return mac.doFinal(data);
         } catch (GeneralSecurityException e) {
