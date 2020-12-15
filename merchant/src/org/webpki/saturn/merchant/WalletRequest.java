@@ -86,7 +86,7 @@ public class WalletRequest implements BaseProperties, MerchantSessionProperties 
                                                paymentMethodDescriptor.authorityUrl));
         }
         if (true) {
-            receiptUrl = MerchantService.receiptBaseUrl + orderId + random;
+            receiptUrl = MerchantService.receiptBaseUrl + orderId + '/' + random;
         }
 
         requestObject = PaymentClientRequestEncoder.encode(supportedPaymentMethods,

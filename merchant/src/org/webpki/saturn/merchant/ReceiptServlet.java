@@ -375,14 +375,17 @@ public class ReceiptServlet extends HttpServlet {
     throws IOException, ServletException {
         try {
             String pathInfo = request.getPathInfo();
-            if (pathInfo.length() != 39) {
+            System.out.println(pathInfo);
+            int endOrderId = pathInfo.lastIndexOf('/');
+            if (endOrderId < 5) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.flushBuffer();
                 return;
             }
-            String orderId = pathInfo.substring(1, 17);
+            String orderId = pathInfo.substring(1, endOrderId);
             DataBaseOperations.OrderInfo orderInfo = DataBaseOperations.getOrderStatus(orderId);
-            if (orderInfo == null || !orderInfo.pathData.equals(pathInfo.substring(17))) {
+            if (orderInfo == null ||
+                !orderInfo.pathData.equals(pathInfo.substring(endOrderId + 1))) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
                 response.flushBuffer();
                 return;
