@@ -25,8 +25,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -40,8 +38,6 @@ import java.awt.event.WindowAdapter;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-
-import java.lang.reflect.Field;
 
 import java.net.URL;
 
@@ -1085,7 +1081,7 @@ public class Wallet {
                     // The Wallet finishes by sending the encrypted authorization message through the
                     // Web2Native Bridge interface to the invoking Merchant (Payee) web page which in
                     // turn posts it to the Merchant server.  The latter should return JSON response
-                    // which either is {} meaning success, or message that is interpreted by the
+                    // which either is {} meaning success, or a message that is interpreted by the
                     // Wallet.
                     stdout.writeJSONObject(resultMessage);
                 } catch (Exception e) {
