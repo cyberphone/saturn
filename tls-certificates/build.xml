@@ -89,7 +89,7 @@
              <include name="*.jar"/>
           </fileset>
         </classpath>
-        <arg line="${cert.file}.p12 ${@keypassword} ${cert.file}.cert.pem certificate"/>
+        <arg line="${cert.file}.p12 ${@keypassword} ${cert.file}.cert.pem certpath"/>
     </java>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2PEMConverter"
@@ -114,7 +114,7 @@
   </target>
 <!-- 
 keystore-file password PEM-file qualifier
-qualifier = [public private certificate trust]
+qualifier = [public private certpath trust]
  -->  
   <target name="createroot">
     <delete dir="${root.dir}"/>
@@ -145,7 +145,7 @@ qualifier = [public private certificate trust]
              <include name="*.jar"/>
           </fileset>
         </classpath>
-        <arg line="${rootfile}.p12 ${@keypassword} ${rootfile}.pem certificate"/>
+        <arg line="${rootfile}.p12 ${@keypassword} ${rootfile}.pem certpath"/>
     </java>
   </target>
 
