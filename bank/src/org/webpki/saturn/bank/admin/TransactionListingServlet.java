@@ -70,7 +70,7 @@ public class TransactionListingServlet extends HttpServlet {
                     "InternalAccountId, " +
                     "ReservationId, " +
                     "CredentialId FROM TRANSACTIONS " +
-                "GROUP BY Id DESC LIMIT " + MAX_ROWS + ") AS LASTTRANS  " +
+                "GROUP BY Id ORDER BY Id DESC LIMIT " + MAX_ROWS + ") AS LASTTRANS  " +
             "INNER JOIN ACCOUNTS ON " +
             "LASTTRANS.InternalAccountId = ACCOUNTS.Id " +
             "INNER JOIN TRANSACTION_TYPES ON " +
