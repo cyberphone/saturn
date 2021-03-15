@@ -405,7 +405,7 @@ public class ReceiptServlet extends HttpServlet {
             if (accept != null && accept.contains(HttpSupport.HTML_CONTENT_TYPE)) {
 //TODO HTML "cleaning"
                 StringBuilder html = new StringBuilder(AuthorityBaseServlet.TOP_ELEMENT +
-                        "<link rel='icon' href='../saturn.png' sizes='192x192'>"+
+                        "<link rel='icon' href='../../saturn.png' sizes='192x192'>"+
                         "<title>Receipt</title>" +
                         AuthorityBaseServlet.REST_ELEMENT +
                         "<body>");
