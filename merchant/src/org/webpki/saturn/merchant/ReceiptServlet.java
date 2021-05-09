@@ -421,7 +421,7 @@ public class ReceiptServlet extends HttpServlet {
                         html.append("<i>Status</i>: ")
                             .append(receiptDecoder.getStatus().toString());
                     }
-                    html.append("<div style='margin-top:2em'><a href='")
+                    html.append("<div style='margin-top:2em'><a href='../")
                         .append(pathInfo.substring(1))
                         .append("?" + VIEW_AS_JSON)
                         .append("'>Switch to JSON view</a></div>");
@@ -429,7 +429,7 @@ public class ReceiptServlet extends HttpServlet {
                     html.append("<div class='header'>Receipt in JSON format</div><div class='json'>")
                         .append(JSONParser.parse(receipt)
                                 .serializeToString(JSONOutputFormats.PRETTY_HTML))
-                        .append("</div><div>&nbsp;<br><a href='")
+                        .append("</div><div>&nbsp;<br><a href='../")
                         .append(pathInfo.substring(1))
                         .append("'>Switch to normal view</a></div>");
                 }
