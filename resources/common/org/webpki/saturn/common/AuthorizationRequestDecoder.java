@@ -42,7 +42,8 @@ public class AuthorizationRequestDecoder implements BaseProperties {
             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
             .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
     
-    public AuthorizationRequestDecoder(JSONObjectReader rd) throws IOException {
+    public AuthorizationRequestDecoder(JSONObjectReader rd) throws IOException,
+                                                                   GeneralSecurityException {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
@@ -77,7 +78,8 @@ public class AuthorizationRequestDecoder implements BaseProperties {
         return paymentMethod;
     }
 
-    public byte[] getHashOfAuthorization(HashAlgorithms hashAlgorithm) throws IOException {
+    public byte[] getHashOfAuthorization(HashAlgorithms hashAlgorithm) 
+            throws IOException, GeneralSecurityException {
 System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
         return hashAlgorithm.digest(encryptedAuthorizationData
                 .getEncryptionObject().serializeToBytes(JSONOutputFormats.CANONICALIZED));
@@ -89,7 +91,7 @@ System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
     }
 
     public AccountDataDecoder getPayeeReceiveAccount(JSONDecoderCache knownAccountTypes)
-    throws IOException {
+    throws IOException, GeneralSecurityException {
         return (AccountDataDecoder) knownAccountTypes.parse(undecodedAccountData);
     }
 

@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.security.GeneralSecurityException;
+
 import java.util.LinkedHashMap;
 
 import javax.servlet.ServletException;
@@ -242,7 +244,8 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                    BigDecimal actualAmount,
                                    UrlHolder urlHolder,
                                    ResultData resultData, 
-                                   DebugData debugData) throws IOException {
+                                   DebugData debugData)
+            throws IOException, GeneralSecurityException {
 
         ServerAsymKeySigner signer = merchantDescriptor.paymentMethods.get(
             transactionOperation.authorizationResponse

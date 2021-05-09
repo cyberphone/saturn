@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
@@ -127,7 +128,8 @@ public class ProviderAuthorityDecoder implements BaseProperties {
         }
     }
 
-    public ProviderAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
+    public ProviderAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl)
+            throws IOException, GeneralSecurityException {
         root = Messages.PROVIDER_AUTHORITY.parseBaseMessage(rd);
         httpVersions = rd.getStringArray(HTTP_VERSIONS_JSON);
         boolean notFound = true;

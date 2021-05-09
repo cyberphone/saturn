@@ -20,32 +20,12 @@ import java.io.IOException;
 
 import java.security.GeneralSecurityException;
 
-import java.security.cert.X509Certificate;
-
-import org.webpki.crypto.AsymSignatureAlgorithms;
-import org.webpki.crypto.SignatureWrapper;
-import org.webpki.crypto.SignerInterface;
-
 import org.webpki.json.JSONX509Signer;
 
 public class ServerX509Signer extends JSONX509Signer {
     
-    private static final long serialVersionUID = 1L;
-
-    public ServerX509Signer(final KeyStoreEnumerator key) throws IOException {
-        super(new SignerInterface() {
-            @Override
-            public X509Certificate[] getCertificatePath() throws IOException {
-                return key.getCertificatePath();
-            }
-            @Override
-            public byte[] signData(byte[] data, AsymSignatureAlgorithms algorithm) throws IOException {
-                try {
-                    return new SignatureWrapper(algorithm, key.getPrivateKey()).update(data).sign();
-                } catch (GeneralSecurityException e) {
-                    throw new IOException (e);
-                }
-            }
-        });
+    public ServerX509Signer(final KeyStoreEnumerator key)
+            throws IOException, GeneralSecurityException {
+        super(key.getPrivateKey(), key.getCertificatePath());
     }
 }

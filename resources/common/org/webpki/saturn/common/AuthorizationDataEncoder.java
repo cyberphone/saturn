@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.HashAlgorithms;
@@ -47,7 +49,8 @@ public class AuthorizationDataEncoder implements BaseProperties {
                                           String applicationName,
                                           String applicationVersion,
                                           ClientPlatform clientPlatform,
-                                          JSONSigner signer) throws IOException {
+                                          JSONSigner signer) throws IOException,
+                                                                    GeneralSecurityException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setObject(REQUEST_HASH_JSON, new JSONObjectWriter()
                 .setString(JSONCryptoHelper.ALGORITHM_JSON, 

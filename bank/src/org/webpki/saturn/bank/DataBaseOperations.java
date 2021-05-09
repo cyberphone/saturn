@@ -20,6 +20,7 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.sql.CallableStatement;
@@ -57,7 +58,7 @@ public class DataBaseOperations {
                                             PaymentMethods paymentMethod,
                                             PublicKey authorizationKey,
                                             Connection connection) 
-    throws SQLException, IOException, NormalException {
+    throws SQLException, IOException, NormalException, GeneralSecurityException {
 /*
         CREATE PROCEDURE AuthenticatePayReqSP (OUT p_Error INT,
                                                OUT p_UserName VARCHAR(50),
@@ -185,7 +186,7 @@ public class DataBaseOperations {
                                             PublicKey balanceKey,
                                             Currencies currency,
                                             Connection connection) 
-    throws SQLException, IOException, NormalException {
+    throws SQLException, IOException, NormalException, GeneralSecurityException {
 /*
         CREATE PROCEDURE RequestAccountBalanceSP (OUT p_Error INT,
                                                   OUT p_Balance DECIMAL(8,2),
@@ -243,7 +244,7 @@ public class DataBaseOperations {
         }
     }
 
-    private static byte[] s256(PublicKey publicKey) throws IOException {
+    private static byte[] s256(PublicKey publicKey) throws IOException, GeneralSecurityException {
         return publicKey == null ? null : HashAlgorithms.SHA256.digest(publicKey.getEncoded());
     }
     

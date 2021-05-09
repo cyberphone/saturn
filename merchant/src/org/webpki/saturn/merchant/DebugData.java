@@ -21,6 +21,8 @@ import java.io.Serializable;
 
 import java.math.BigDecimal;
 
+import java.security.GeneralSecurityException;
+
 import java.security.KeyPair;
 
 import java.util.GregorianCalendar;
@@ -123,7 +125,8 @@ public class DebugData implements Serializable {
           (byte) 0x36, (byte) 0x14, (byte) 0x10, (byte) 0x20,
           (byte) 0x74, (byte) 0x34, (byte) 0x69, (byte) 0x09 };
     
-    static JSONObjectReader createUserAuthorizationSample() throws IOException {
+    static JSONObjectReader createUserAuthorizationSample() 
+            throws IOException, GeneralSecurityException {
         GregorianCalendar then = TimeUtils.inSeconds(-27);
         GregorianCalendar authTime = TimeUtils.inSeconds(23);
         GregorianCalendar expires = TimeUtils.inMinutes(30);
@@ -152,7 +155,8 @@ public class DebugData implements Serializable {
                                  MerchantService.androidWebPkiVersions.substring(0, 
                                                          MerchantService.androidWebPkiVersions.indexOf('-')),
                                  new ClientPlatform("Android", "10", "Huawei"),
-                                 new JSONAsymKeySigner(keyPair.getPrivate(), keyPair.getPublic(), null)));
+                                 new JSONAsymKeySigner(keyPair.getPrivate())
+                                     .setPublicKey(keyPair.getPublic())));
     }
 
     static {

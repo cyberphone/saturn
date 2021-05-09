@@ -28,7 +28,8 @@ import org.webpki.json.DataEncryptionAlgorithms;
 
 public class ProviderUserResponseDecoder implements BaseProperties {
  
-    public ProviderUserResponseDecoder(JSONObjectReader rd) throws IOException {
+    public ProviderUserResponseDecoder(JSONObjectReader rd)
+            throws IOException, GeneralSecurityException {
         Messages.PROVIDER_USER_RESPONSE.parseBaseMessage(rd);
         encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON)
                 .getEncryptionObject(new JSONCryptoHelper.Options()

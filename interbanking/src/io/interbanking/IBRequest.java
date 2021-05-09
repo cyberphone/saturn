@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import java.util.logging.Logger;
@@ -84,7 +86,7 @@ public class IBRequest extends IBCommon {
                             CREDIT_TRANSFER,
                             REVERSE_CREDIT_TRANSFER}
 
-    public IBRequest(JSONObjectReader rd) throws IOException {
+    public IBRequest(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         check(rd, INTERBANKING_REQUEST);
         operation = Operations.valueOf(rd.getString(OPERATION_JSON));
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
@@ -173,7 +175,8 @@ public class IBRequest extends IBCommon {
                                      String payeeReference,
                                      String payeeAccount,
                                      boolean testMode,
-                                     ServerX509Signer signer) throws IOException {
+                                     ServerX509Signer signer)
+            throws IOException, GeneralSecurityException {
         JSONObjectWriter request = new JSONObjectWriter()
             .setString(JSONDecoderCache.CONTEXT_JSON, INTERBANKING_CONTEXT_URI)
             .setString(JSONDecoderCache.QUALIFIER_JSON, INTERBANKING_REQUEST)
@@ -220,7 +223,8 @@ public class IBRequest extends IBCommon {
         return new IBResponse(result);
     }
 
-    public void verifyCallerAuthenticity(JSONX509Verifier paymentRoot) throws IOException {
+    public void verifyCallerAuthenticity(JSONX509Verifier paymentRoot)
+            throws IOException, GeneralSecurityException {
         signatureDecoder.verify(paymentRoot);
     }
 }

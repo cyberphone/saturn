@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import org.webpki.crypto.HashAlgorithms;
@@ -35,7 +36,8 @@ import org.webpki.util.ISODateTime;
 public class AuthorizationDataDecoder implements BaseProperties {
 
     public AuthorizationDataDecoder(JSONObjectReader rd, 
-                                    JSONCryptoHelper.Options signatureOptions) throws IOException {
+                                    JSONCryptoHelper.Options signatureOptions) 
+            throws IOException, GeneralSecurityException {
         root = rd;
         JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
         requestHashAlgorithm = CryptoUtils.getHashAlgorithm(requestHashObject, 

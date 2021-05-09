@@ -40,6 +40,7 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServlet;
 
 import org.webpki.crypto.CertificateUtil;
+import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
@@ -169,6 +170,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         initProperties(sce);
+        CustomCryptoProvider.forcedLoad(false);
         try {
             logging = getPropertyBoolean(LOGGING);
 

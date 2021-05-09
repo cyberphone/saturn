@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONAsymKeySigner;
@@ -31,7 +33,8 @@ public class BalanceRequestEncoder implements BaseProperties {
                                           Currencies currency,
                                           String accountId,
                                           String credentialId,
-                                          JSONAsymKeySigner signer) throws IOException {
+                                          JSONAsymKeySigner signer) 
+            throws IOException, GeneralSecurityException {
         return Messages.BALANCE_REQUEST.createBaseMessage()
             .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setString(ACCOUNT_ID_JSON, accountId)

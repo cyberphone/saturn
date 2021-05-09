@@ -18,9 +18,12 @@ package org.webpki.tools.svg;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import java.util.LinkedHashMap;
 
 import org.webpki.tools.svg.SVGPathValues.SubCommand;
+
 import org.webpki.xml.DOMAttributeReaderHelper;
 import org.webpki.xml.DOMReaderHelper;
 import org.webpki.xml.DOMWriterHelper;
@@ -181,7 +184,7 @@ public class SVGEmbeddedText {
         } catch (IllegalAccessException e) {
             throw new IllegalArgumentException("Class " + customGlyphs.getName () + 
                                                " is not a valid xml wrapper (IllegalAccessException instantiating).");
-        } catch (IOException e) {
+        } catch (IOException | GeneralSecurityException e) {
             throw new RuntimeException(e);
         }
     }

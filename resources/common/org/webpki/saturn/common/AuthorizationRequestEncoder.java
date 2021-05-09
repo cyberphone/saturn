@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;
@@ -38,7 +40,8 @@ public class AuthorizationRequestEncoder implements BaseProperties {
                                           String clientIpAddress,
                                           PaymentRequestDecoder paymentRequest,
                                           AccountDataEncoder payeeReceiveAccount,
-                                          ServerAsymKeySigner signer) throws IOException {
+                                          ServerAsymKeySigner signer)
+            throws IOException, GeneralSecurityException {
         return Messages.AUTHORIZATION_REQUEST.createBaseMessage()
             .setDynamic((wr) -> testMode == null ? wr : wr.setBoolean(TEST_MODE_JSON, testMode))
             .setString(RECIPIENT_URL_JSON, recipientUrl)

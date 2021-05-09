@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectWriter;
@@ -34,7 +36,8 @@ public class TransactionResponseEncoder implements BaseProperties {
                                           TransactionResponseDecoder.ERROR transactionError,
                                           String referenceId,
                                           String optionalLogData,
-                                          ServerX509Signer signer) throws IOException {
+                                          ServerX509Signer signer)
+            throws IOException, GeneralSecurityException {
         return Messages.TRANSACTION_RESPONSE.createBaseMessage()
             .setDynamic((wr) -> transactionError == null ?
                     wr : wr.setString(TRANSACTION_ERROR_JSON, transactionError.toString()))

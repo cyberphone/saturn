@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.net.URL;
 
+import java.security.GeneralSecurityException;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -118,7 +120,8 @@ public class ExternalCalls {
         return fetchJsonReturnData(wrap, urlHolder);
     }
 
-    public ProviderAuthorityDecoder getProviderAuthority(UrlHolder urlHolder, String url) throws IOException {
+    public ProviderAuthorityDecoder getProviderAuthority(UrlHolder urlHolder, String url) 
+            throws IOException, GeneralSecurityException {
         urlHolder.setUrl(url);
         ProviderAuthorityDecoder providerAuthority = providerAuthorityObjects.get(url);
         if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well
@@ -138,7 +141,8 @@ public class ExternalCalls {
         return providerAuthority;
     }
 
-    public PayeeAuthorityDecoder getPayeeAuthority(UrlHolder urlHolder, String url) throws IOException {
+    public PayeeAuthorityDecoder getPayeeAuthority(UrlHolder urlHolder, String url) 
+            throws IOException, GeneralSecurityException {
         urlHolder.setUrl(url);
         PayeeAuthorityDecoder payeeAuthority = payeeAuthorityObjects.get(url);
         if (urlHolder.nonCachedMode() || // Note: clears nonCached flag as well

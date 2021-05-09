@@ -39,6 +39,7 @@ import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.webpki.crypto.CertificateUtil;
+import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONObjectReader;
@@ -168,7 +169,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
-    void addMerchant(JSONObjectReader merchant) throws IOException {
+    void addMerchant(JSONObjectReader merchant) throws IOException, GeneralSecurityException {
         String commonName = merchant.getString(BaseProperties.COMMON_NAME_JSON);
         String[] optionalPhysicalAddress = 
                 merchant.getStringArrayConditional(BaseProperties.PHYSICAL_ADDRESS_JSON);
@@ -220,6 +221,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         initProperties (sce);
+        CustomCryptoProvider.forcedLoad(false);
         try {
 
             desktopWallet = getPropertyBoolean(DESKTOP_WALLET);

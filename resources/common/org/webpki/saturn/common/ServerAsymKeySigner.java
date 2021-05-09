@@ -18,19 +18,28 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 import org.webpki.json.JSONAsymKeySigner;
 
 public class ServerAsymKeySigner extends JSONAsymKeySigner {
     
-    private static final long serialVersionUID = 1L;
-
-    public ServerAsymKeySigner(KeyPair keyPair) throws IOException {
-        super(keyPair.getPrivate(), keyPair.getPublic(), null);
+    ServerAsymKeySigner(PrivateKey privateKey, PublicKey publicKey)
+            throws IOException, GeneralSecurityException {
+        super(privateKey);
+        setPublicKey(publicKey);
+    }
+    
+    public ServerAsymKeySigner(KeyPair keyPair)
+            throws IOException, GeneralSecurityException {
+        this(keyPair.getPrivate(), keyPair.getPublic());
     }
 
-    public ServerAsymKeySigner(KeyStoreEnumerator kse) throws IOException {
-        super(kse.getPrivateKey(), kse.getPublicKey(), null);
+    public ServerAsymKeySigner(KeyStoreEnumerator kse)
+            throws IOException, GeneralSecurityException {
+        this(kse.getPrivateKey(), kse.getPublicKey());
     }
 }

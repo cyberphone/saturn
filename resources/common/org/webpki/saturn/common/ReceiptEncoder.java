@@ -19,7 +19,7 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import java.math.BigDecimal;
-
+import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -72,7 +72,8 @@ public class ReceiptEncoder implements BaseProperties {
                           String providerReferenceId,
                           String payeeRequestId,
                           GregorianCalendar providerTimeStamp,
-                          ServerAsymKeySigner signer) throws IOException {
+                          ServerAsymKeySigner signer) 
+            throws IOException, GeneralSecurityException {
         this(ReceiptDecoder.Status.AVAILABLE);
         receiptDocument
             .setString(REFERENCE_ID_JSON, payeeReferenceId)

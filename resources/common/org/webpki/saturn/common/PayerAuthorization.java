@@ -37,11 +37,11 @@ public class PayerAuthorization implements BaseProperties {
                 .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY);
     
     static JSONDecryptionDecoder getEncryptedAuthorization(JSONObjectReader rd) 
-    throws IOException {
+    throws IOException, GeneralSecurityException {
         return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options);
     }
 
-    public PayerAuthorization(JSONObjectReader rd) throws IOException {
+    public PayerAuthorization(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         Messages.PAYER_AUTHORIZATION.parseBaseMessage(rd);
         encryptedAuthorization = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON);
         // Only syntax checking for intermediaries

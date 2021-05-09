@@ -18,6 +18,7 @@ package org.webpki.saturn.keyprovider;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.sql.CallableStatement;
@@ -68,7 +69,7 @@ public class DataBaseOperations {
                                                            String paymentMethodUrl,
                                                            PublicKey payReq,
                                                            PublicKey optionalBalReq) 
-    throws SQLException, IOException {
+    throws SQLException, IOException, GeneralSecurityException {
         try {
 /*
         CREATE PROCEDURE CreateAccountAndCredentialSP (OUT p_AccountId VARCHAR(30),
@@ -104,7 +105,7 @@ public class DataBaseOperations {
         }            
     }
 
-    private static byte[] s256(PublicKey publicKey) throws IOException {
+    private static byte[] s256(PublicKey publicKey) throws IOException, GeneralSecurityException {
         return publicKey == null ? null : HashAlgorithms.SHA256.digest(publicKey.getEncoded());
     }
 

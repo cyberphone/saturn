@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
@@ -32,7 +34,8 @@ import org.webpki.util.ISODateTime;
 
 public class RefundRequestDecoder implements BaseProperties {
     
-    public RefundRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) throws IOException {
+    public RefundRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) 
+            throws IOException, GeneralSecurityException {
         root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponseDecoder(
                 Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
@@ -80,7 +83,7 @@ public class RefundRequestDecoder implements BaseProperties {
     }
 
     public AccountDataDecoder getPayeeSourceAccount(JSONDecoderCache knownAccountTypes)
-    throws IOException {
+    throws IOException, GeneralSecurityException {
         return (AccountDataDecoder) knownAccountTypes.parse(undecodedAccountData);
     }
 
@@ -107,7 +110,8 @@ public class RefundRequestDecoder implements BaseProperties {
         return authorizationResponse;
     }
 
-    public void verifyPayerBank(JSONX509Verifier paymentRoot) throws IOException {
+    public void verifyPayerBank(JSONX509Verifier paymentRoot)
+            throws IOException, GeneralSecurityException {
         authorizationResponse.signatureDecoder.verify(paymentRoot);
     }
 }

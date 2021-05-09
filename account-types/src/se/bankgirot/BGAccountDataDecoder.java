@@ -25,8 +25,6 @@ import org.webpki.saturn.common.AccountDataDecoder;
 
 public final class BGAccountDataDecoder extends AccountDataDecoder {
 
-    private static final long serialVersionUID = 1L;
-
     static final String CONTEXT = "https://bankgirot.se/saturn/v3#account";
 
     static final String BG_NUMBER_JSON = "bgNumber";

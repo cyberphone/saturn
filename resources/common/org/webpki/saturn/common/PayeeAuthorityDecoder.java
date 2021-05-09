@@ -18,6 +18,7 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
@@ -29,7 +30,8 @@ import org.webpki.util.ISODateTime;
 
 public class PayeeAuthorityDecoder implements BaseProperties {
     
-    public PayeeAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl) throws IOException {
+    public PayeeAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl) 
+            throws IOException, GeneralSecurityException {
         root = Messages.PAYEE_AUTHORITY.parseBaseMessage(rd);
         payeeAuthorityUrl = rd.getString(PAYEE_AUTHORITY_URL_JSON);
         if (!payeeAuthorityUrl.equals(expectedAuthorityUrl)) {

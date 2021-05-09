@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.JSONDecoder;
@@ -26,8 +28,6 @@ import org.webpki.json.JSONOutputFormats;
 
 public abstract class AccountDataDecoder extends JSONDecoder {
 
-    private static final long serialVersionUID = 1L;
-    
     private byte[] optionalNonce;
     
     protected String accountId;
@@ -36,7 +36,8 @@ public abstract class AccountDataDecoder extends JSONDecoder {
         return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
     }
 
-    public final byte[] getAccountHash(HashAlgorithms accountHashAlgorithm) throws IOException {
+    public final byte[] getAccountHash(HashAlgorithms accountHashAlgorithm) throws IOException,
+                                                                                   GeneralSecurityException {
         return optionalNonce == null ? null : accountHashAlgorithm.digest(getAccountObject());
     }
 

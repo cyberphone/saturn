@@ -18,6 +18,8 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
+import java.security.GeneralSecurityException;
+
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
@@ -32,7 +34,8 @@ public class CryptoUtils {
     private CryptoUtils() {}
   
     public static byte[] getJsonHash(JSONObjectWriter request, 
-                                     HashAlgorithms hashAlgorithm) throws IOException {
+                                     HashAlgorithms hashAlgorithm)
+            throws IOException, GeneralSecurityException {
         return hashAlgorithm.digest(request.serializeToBytes(JSONOutputFormats.CANONICALIZED));
     }
 

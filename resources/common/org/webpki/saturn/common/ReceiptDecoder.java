@@ -19,7 +19,7 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 
 import java.math.BigDecimal;
-
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.GregorianCalendar;
@@ -52,7 +52,7 @@ public class ReceiptDecoder implements BaseProperties {
         return null;
     }
 
-    public ReceiptDecoder(JSONObjectReader rd) throws IOException {
+    public ReceiptDecoder(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         Messages.RECEIPT.parseBaseMessage(rd);
         status = Status.valueOf(rd.getString(STATUS_JSON));
         if (status != Status.AVAILABLE) {

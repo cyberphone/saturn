@@ -304,13 +304,13 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                 fancyPrint(html, "Wallet Request", walletRequest);
                 JSONObjectReader walletResponse = JSONParser.parse(jsonBlob);
                 fancyPrint(html, "Wallet Response", walletResponse);
-                JSONDecryptionDecoder decoder =
-                    walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON)
-                        .getEncryptionObject(new JSONCryptoHelper.Options()
-                             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_XOR_PUBLIC_KEY)
-                             .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.OPTIONAL));
                 try {
-                    KeyPair keyPair = (KeyPair)session.getAttribute(KEY);
+                    JSONDecryptionDecoder decoder =
+            walletResponse.getObject(ENCRYPTED_AUTHORIZATION_JSON)
+                .getEncryptionObject(new JSONCryptoHelper.Options()
+                     .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_XOR_PUBLIC_KEY)
+                     .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.OPTIONAL));
+                   KeyPair keyPair = (KeyPair)session.getAttribute(KEY);
                     if (!decoder.getPublicKey().equals(keyPair.getPublic())) {
                         throw new IOException("Non-matching public key");
                     }

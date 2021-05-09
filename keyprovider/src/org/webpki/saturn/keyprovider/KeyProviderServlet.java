@@ -110,7 +110,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                               URLEncoder.encode(errorMessage, "UTF-8"));
     }
     
-    void keygen2JSONBody(HttpServletResponse response, JSONEncoder object) throws IOException {
+    void keygen2JSONBody(HttpServletResponse response, JSONEncoder object)
+            throws IOException, GeneralSecurityException {
         byte[] jsonData = object.serializeJSONDocument(JSONOutputFormats.PRETTY_PRINT);
         if (KeyProviderService.logging) {
             logger.info("Sent message\n" + new String(jsonData, "UTF-8"));
@@ -443,7 +444,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     void createCarrierCerificate(ServerState.Key key, 
                                  String userName, 
                                  DataBaseOperations.AccountAndCredential accountAndCredential)
-    throws IOException {
+    throws IOException, GeneralSecurityException {
         CertSpec certSpec = new CertSpec();
         certSpec.setKeyUsageBit(KeyUsageBits.DIGITAL_SIGNATURE);
         certSpec.setSubject("CN=" + userName + ", serialNumber=" + accountAndCredential.accountId);
@@ -456,32 +457,24 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             new BigInteger(accountAndCredential.credentialId),
             new Date(startTime),
             new Date(startTime + (20 * 365 * 24 * 3600 * 1000l)),
-            AsymSignatureAlgorithms.ECDSA_SHA256,
             new AsymKeySignerInterface() {
 
                 @Override
-                public PublicKey getPublicKey() throws IOException {
-                    return KeyProviderService
-                               .carrierCaKeyPair.getPublic();
+                public byte[] signData(byte[] data) throws IOException, GeneralSecurityException {
+                    return new SignatureWrapper(getAlgorithm(),
+                                                KeyProviderService.carrierCaKeyPair.getPrivate())
+                        .setEcdsaSignatureEncoding(true)
+                        .update(data)
+                        .sign();
                 }
 
                 @Override
-                public byte[] signData(
-                        byte[] data,
-                        AsymSignatureAlgorithms algorithm)
-                        throws IOException {
-                    try {
-                        return new SignatureWrapper(algorithm,
-                                                    KeyProviderService
-                                         .carrierCaKeyPair.getPrivate())
-                            .setEcdsaSignatureEncoding(true)
-                            .update(data)
-                            .sign();
-                    } catch (GeneralSecurityException e) {
-                        throw new IOException(e);
-                    }
+                public AsymSignatureAlgorithms getAlgorithm() {
+                    return AsymSignatureAlgorithms.ECDSA_SHA256;
                 }
+
             },
+            KeyProviderService.carrierCaKeyPair.getPublic(),
             key.getPublicKey())
         });
     }

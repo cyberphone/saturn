@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;
@@ -30,7 +32,8 @@ import org.webpki.util.ISODateTime;
 
 public class TransactionRequestDecoder implements BaseProperties {
     
-    public TransactionRequestDecoder(JSONObjectReader rd, Boolean cardPayment) throws IOException {
+    public TransactionRequestDecoder(JSONObjectReader rd, Boolean cardPayment)
+            throws IOException, GeneralSecurityException {
         root = Messages.TRANSACTION_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponseDecoder(
                 Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
@@ -94,7 +97,8 @@ public class TransactionRequestDecoder implements BaseProperties {
         return authorizationResponse;
     }
 
-    public void verifyPayerBank(JSONX509Verifier paymentRoot) throws IOException {
+    public void verifyPayerBank(JSONX509Verifier paymentRoot)
+            throws IOException, GeneralSecurityException {
         authorizationResponse.signatureDecoder.verify(paymentRoot);
     }
 }

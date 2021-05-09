@@ -32,6 +32,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.webpki.crypto.CertificateUtil;
+import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
@@ -109,6 +110,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         initProperties(sce);
+        CustomCryptoProvider.forcedLoad(false);
         try {
             logging = getPropertyBoolean(LOGGING);
              

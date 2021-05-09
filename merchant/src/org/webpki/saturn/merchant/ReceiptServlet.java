@@ -20,6 +20,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import java.math.BigDecimal;
+
+import java.security.GeneralSecurityException;
+
 import java.util.Base64;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -201,7 +204,8 @@ public class ReceiptServlet extends HttpServlet {
     
     void buildHtmlReceipt(StringBuilder html, 
                           ReceiptDecoder receiptDecoder,
-                          HttpServletRequest request) throws IOException, WriterException {
+                          HttpServletRequest request) 
+            throws IOException, WriterException, GeneralSecurityException {
         PayeeAuthorityDecoder payeeAuthority = 
                 MerchantService.externalCalls.getPayeeAuthority(
                         new UrlHolder(request).setUrl(receiptDecoder.getPayeeAuthorityUrl()),

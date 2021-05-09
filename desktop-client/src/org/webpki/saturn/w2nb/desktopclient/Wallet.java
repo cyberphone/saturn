@@ -41,6 +41,7 @@ import java.io.ObjectInputStream;
 
 import java.net.URL;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.LinkedHashMap;
@@ -1025,20 +1026,26 @@ public class Wallet {
                         "1.0",
                         new ClientPlatform("Java","8","W10"),
                         new JSONAsymKeySigner(new AsymKeySignerInterface () {
+                            
                             @Override
-                            public PublicKey getPublicKey() throws IOException {
-                                return sks.getKeyAttributes(keyHandle).getCertificatePath()[0].getPublicKey();
+                            public AsymSignatureAlgorithms getAlgorithm() {
+                                return selectedCard.signatureAlgorithm;
                             }
+
                             @Override
-                            public byte[] signData(byte[] data, AsymSignatureAlgorithms algorithm) throws IOException {
-                                return sks.signHashedData(keyHandle,
-                                                          algorithm.getAlgorithmId(AlgorithmPreferences.SKS),
-                                                          null,
-                                                          false,
-                                                          new String(pinText.getPassword()).getBytes("UTF-8"),
-                                                          algorithm.getDigestAlgorithm().digest(data));
+                            public byte[] signData(byte[] data) 
+                                    throws IOException, GeneralSecurityException {
+                                return sks.signHashedData(
+                                        keyHandle,
+                                        getAlgorithm().getAlgorithmId(AlgorithmPreferences.SKS),
+                                        null,
+                                        false,
+                                        new String(pinText.getPassword()).getBytes("UTF-8"),
+                                        getAlgorithm().getDigestAlgorithm().digest(data));
                             }
-                        }).setSignatureAlgorithm(selectedCard.signatureAlgorithm));
+
+                        }).setPublicKey(sks.getKeyAttributes(keyHandle)
+                                .getCertificatePath()[0].getPublicKey()));
                     logger.info("Authorization before encryption:\n" + authorizationData);
 
                     // Since user authorizations are pushed through the Payees they must be encrypted in order

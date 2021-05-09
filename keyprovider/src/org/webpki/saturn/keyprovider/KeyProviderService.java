@@ -44,6 +44,7 @@ import javax.servlet.ServletContextListener;
 import javax.sql.DataSource;
 
 import org.webpki.crypto.CertificateUtil;
+import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
@@ -203,6 +204,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         initProperties (sce);
+        CustomCryptoProvider.forcedLoad(false);
         try {
 
             ////////////////////////////////////////////////////////////////////////////////////////////

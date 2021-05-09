@@ -20,6 +20,8 @@ import java.io.IOException;
 
 import java.math.BigDecimal;
 
+import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
@@ -32,7 +34,8 @@ public class TransactionResponseDecoder extends ProviderResponseDecoder {
     
     public static enum ERROR {OUT_OF_FUNDS, DELETED_AUTHORIZATION}
 
-    public TransactionResponseDecoder(JSONObjectReader rd) throws IOException {
+    public TransactionResponseDecoder(JSONObjectReader rd)
+            throws IOException, GeneralSecurityException {
         root = Messages.TRANSACTION_RESPONSE.parseBaseMessage(rd);
         transactionRequest = new TransactionRequestDecoder(
                 Messages.TRANSACTION_REQUEST.getEmbeddedMessage(rd), null);

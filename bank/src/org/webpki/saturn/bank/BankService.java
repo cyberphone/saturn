@@ -52,6 +52,7 @@ import javax.naming.InitialContext;
 
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CertificateUtil;
+import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyStoreVerifier;
 
@@ -288,6 +289,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         initProperties(sce);
+        CustomCryptoProvider.forcedLoad(false);
         try {
             logging = getPropertyBoolean(LOGGING);
 

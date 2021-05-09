@@ -21,6 +21,7 @@ import java.io.IOException;
 
 import java.net.URLEncoder;
 
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.ArrayList;
@@ -106,7 +107,8 @@ public class PayeeCoreProperties implements BaseProperties {
     public static PayeeCoreProperties init(JSONObjectReader rd,
                                            String payeeBaseAuthorityUrl,
                                            HashAlgorithms accountHashAlgorithm,
-                                           JSONDecoderCache knownPaymentMethods) throws IOException {
+                                           JSONDecoderCache knownPaymentMethods)
+            throws IOException, GeneralSecurityException {
         ArrayList<byte[]> optionalAccountHashes = new ArrayList<>();
         JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
         do {
@@ -193,7 +195,7 @@ public class PayeeCoreProperties implements BaseProperties {
     }
 
     public void verifyAccount(AccountDataDecoder backendAccountDataDecoder)
-    throws IOException {
+    throws IOException, GeneralSecurityException {
         byte[] accountHash = backendAccountDataDecoder.getAccountHash(accountHashAlgorithm);
         if (getAccountHashes() == null) {
             if (accountHash != null) {

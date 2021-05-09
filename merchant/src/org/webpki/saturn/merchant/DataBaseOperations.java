@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
+import java.security.GeneralSecurityException;
+
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -95,7 +97,8 @@ public class DataBaseOperations {
 
     static void saveTransaction(ResultData resultData,
                                 MerchantDescriptor merchant,
-                                ServerAsymKeySigner signer) throws IOException {
+                                ServerAsymKeySigner signer) 
+            throws IOException, GeneralSecurityException {
         try {
             ProviderResponseDecoder authorization = resultData.authorization;
             String orderId = authorization.getPayeeReferenceId();

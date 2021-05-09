@@ -35,7 +35,8 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationResponseDecoder extends ProviderResponseDecoder {
     
-    public AuthorizationResponseDecoder(JSONObjectReader rd) throws IOException {
+    public AuthorizationResponseDecoder(JSONObjectReader rd) throws IOException,
+                                                                    GeneralSecurityException {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
         authorizationRequest = new AuthorizationRequestDecoder(
                 Messages.AUTHORIZATION_REQUEST.getEmbeddedMessage(rd));
