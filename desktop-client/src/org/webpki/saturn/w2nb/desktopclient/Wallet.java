@@ -184,7 +184,7 @@ public class Wallet {
         AsymSignatureAlgorithms signatureAlgorithm;
         String providerAuthorityUrl;
         String optionalKeyId;
-        ContentEncryptionAlgorithms dataEncryptionAlgorithm;
+        ContentEncryptionAlgorithms contentEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey encryptionKey;
         
@@ -209,7 +209,7 @@ public class Wallet {
 
     static LinkedHashMap<Integer,Account> cardCollection = new LinkedHashMap<>();
 
-    static byte[] dataEncryptionKey;
+    static byte[] contentEncryptionKey;
     
     static class ScalingIcon extends ImageIcon {
  
@@ -946,8 +946,8 @@ public class Wallet {
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
                             EncryptedMessage encryptedMessage = 
                                     new ProviderUserResponseDecoder(optionalMessage)
-                                .getEncryptedMessage(dataEncryptionKey, 
-                                                     selectedCard.dataEncryptionAlgorithm);
+                                .getEncryptedMessage(contentEncryptionKey, 
+                                                     selectedCard.contentEncryptionAlgorithm);
                             logger.info("Decrypted private message:\n" + 
                                         encryptedMessage.getRoot());
                             showProviderDialog(encryptedMessage);
@@ -984,7 +984,7 @@ public class Wallet {
                                     cardProperties.getAuthorityUrl());
                     card.optionalKeyId = cardProperties.getOptionalKeyId();
                     card.keyEncryptionAlgorithm = cardProperties.getKeyEncryptionAlgorithm();
-                    card.dataEncryptionAlgorithm = cardProperties.getContentEncryptionAlgorithm();
+                    card.contentEncryptionAlgorithm = cardProperties.getContentEncryptionAlgorithm();
                     card.encryptionKey = cardProperties.getEncryptionKey();
 
                     // We found a useful card!
@@ -1010,7 +1010,7 @@ public class Wallet {
                 try {
                     // User authorizations are always signed by a key that only needs to be
                     // understood by the issuing Payment Provider (bank).
-                    dataEncryptionKey = CryptoRandom.generateRandom(selectedCard.dataEncryptionAlgorithm.getKeyLength());
+                    contentEncryptionKey = CryptoRandom.generateRandom(selectedCard.contentEncryptionAlgorithm.getKeyLength());
                     JSONObjectWriter authorizationData = AuthorizationDataEncoder.encode(
                         paymentRequest,
                         selectedCard.requestHashAlgorithm,
@@ -1019,8 +1019,8 @@ public class Wallet {
                         selectedCard.paymentMethod,
                         selectedCard.credentialId,
                         selectedCard.accountId,
-                        dataEncryptionKey,
-                        selectedCard.dataEncryptionAlgorithm,
+                        contentEncryptionKey,
+                        selectedCard.contentEncryptionAlgorithm,
                         challengeResults,
                         UserAuthorizationMethods.PIN,
                         new GregorianCalendar(),
@@ -1056,7 +1056,7 @@ public class Wallet {
                     resultMessage = PayerAuthorization.encode(authorizationData,
                                                               selectedCard.providerAuthorityUrl,
                                                               selectedCard.paymentMethod,
-                                                              selectedCard.dataEncryptionAlgorithm,
+                                                              selectedCard.contentEncryptionAlgorithm,
                                                               selectedCard.keyEncryptionAlgorithm,
                                                               selectedCard.encryptionKey,
                                                               selectedCard.optionalKeyId);

@@ -64,7 +64,8 @@ public class AuthorizationDataEncoder implements BaseProperties {
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(JSONCryptoHelper.ALGORITHM_JSON, contentEncryptionAlgorithm.toString())
+                .setString(JSONCryptoHelper.ALGORITHM_JSON, 
+                           contentEncryptionAlgorithm.getJoseAlgorithmId())
                 .setBinary(ENCRYPTION_KEY_JSON, dataEncryptionKey));
         if (optionalUserResponseItems != null && optionalUserResponseItems.length > 0) {
             JSONArrayWriter aw = wr.setArray(USER_RESPONSE_ITEMS_JSON);

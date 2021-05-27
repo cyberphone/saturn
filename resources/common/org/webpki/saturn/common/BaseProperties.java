@@ -107,7 +107,7 @@ public interface BaseProperties {
     String SIGNATURE_ALGORITHM_JSON         = "signatureAlgorithm";
     String SIGNATURE_PROFILES_JSON          = "signatureProfiles";          // For "ProviderAuthority".  Accepts these
     String KEY_ENCRYPTION_ALGORITHM_JSON    = "keyEncryptionAlgorithm";     // For "ProviderAuthority" encryption key
-    String DATA_ENCRYPTION_ALGORITHM_JSON   = "contentEncryptionAlgorithm";    //    -"-
+    String DATA_ENCRYPTION_ALGORITHM_JSON   = "dataEncryptionAlgorithm";    //    -"-
     String ENCRYPTION_PARAMETERS_JSON       = "encryptionParameters";       //    -"-
     String REQUEST_HASH_ALGORITHM_JSON      = "requestHashAlgorithm";       // Used by virtual cards
     String SIGNATURE_PARAMETERS_JSON        = "signatureParameters";        // For "PayeeAuthority" signature key(s)
