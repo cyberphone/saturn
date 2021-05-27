@@ -23,11 +23,13 @@ import java.security.PublicKey;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
 
-import org.webpki.json.DataEncryptionAlgorithms;
-import org.webpki.json.KeyEncryptionAlgorithms;
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
+
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
+
 
 // This class holds the data associated with a virtual card (modulo the logotype).
 // The data is embedded in an SKS (Secure Key Store) extension object belonging to the signature key.
@@ -56,7 +58,7 @@ public class CardDataDecoder implements BaseProperties {
             signatureAlgorithm = 
                     CryptoUtils.getSignatureAlgorithm(rd, SIGNATURE_ALGORITHM_JSON);
             JSONObjectReader ep = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-            dataEncryptionAlgorithm = DataEncryptionAlgorithms
+            contentEncryptionAlgorithm = ContentEncryptionAlgorithms
                     .getAlgorithmFromId(ep.getString(DATA_ENCRYPTION_ALGORITHM_JSON));
             keyEncryptionAlgorithm = KeyEncryptionAlgorithms
                     .getAlgorithmFromId(ep.getString(KEY_ENCRYPTION_ALGORITHM_JSON));
@@ -115,9 +117,9 @@ public class CardDataDecoder implements BaseProperties {
         return signatureAlgorithm;
     }
 
-    DataEncryptionAlgorithms dataEncryptionAlgorithm;
-    public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
-        return dataEncryptionAlgorithm;
+    ContentEncryptionAlgorithms contentEncryptionAlgorithm;
+    public ContentEncryptionAlgorithms getContentEncryptionAlgorithm() {
+        return contentEncryptionAlgorithm;
     }
     
     KeyEncryptionAlgorithms keyEncryptionAlgorithm;

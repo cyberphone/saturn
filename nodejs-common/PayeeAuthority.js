@@ -48,7 +48,7 @@ PayeeAuthority.encode = function(payeeAuthorityUrl,
     .setDynamic((wr) => {
       if (payeeCoreProperties[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON]) {
         let hashedPayeeAccounts = wr.setObject(BaseProperties.ACCOUNT_VERIFIER_JSON);
-        hashedPayeeAccounts.setString(Jsf.ALGORITHM_JSON, RequestHash.JOSE_SHA_256_ALG_ID);
+        hashedPayeeAccounts.setString(Jsf.ALGORITHM_JSON, RequestHash.SHA_256_ALG_ID);
         let array = hashedPayeeAccounts.setArray(BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON);
         payeeCoreProperties[BaseProperties.HASHED_PAYEE_ACCOUNTS_JSON].forEach((entry) => {
           array.setBinary(entry);

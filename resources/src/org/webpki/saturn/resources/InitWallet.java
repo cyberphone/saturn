@@ -34,20 +34,20 @@ import java.security.interfaces.RSAKey;
 
 import java.util.EnumSet;
 
+import org.webpki.json.JSONArrayReader;
+import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONObjectWriter;
+import org.webpki.json.JSONOutputFormats;
+import org.webpki.json.JSONParser;
+
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
-import org.webpki.json.DataEncryptionAlgorithms;
-
-import org.webpki.json.JSONArrayReader;
-import org.webpki.json.JSONObjectReader;
-import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.JSONParser;
-import org.webpki.json.KeyEncryptionAlgorithms;
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
@@ -98,7 +98,7 @@ public class InitWallet {
         PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[7])).getPublicKey();
         String imageFile = args[8];
         HashAlgorithms requestHashAgorithm = HashAlgorithms.getAlgorithmFromId(args[9], AlgorithmPreferences.JOSE);
-        DataEncryptionAlgorithms dataEncryptionAlgorithm = DataEncryptionAlgorithms.getAlgorithmFromId(args[10]);
+        ContentEncryptionAlgorithms dataEncryptionAlgorithm = ContentEncryptionAlgorithms.getAlgorithmFromId(args[10]);
         KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[11]);
   
         // Read importedKey/certificate to be imported

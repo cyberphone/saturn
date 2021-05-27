@@ -49,7 +49,7 @@ public class AuthorizationResponseEncoder implements BaseProperties {
                            .createEncryptionObject(
                                accountData.writeObject().serializeToBytes(
                                        JSONOutputFormats.NORMALIZED),
-                               encryptionParameter.getDataEncryptionAlgorithm(),
+                               encryptionParameter.getContentEncryptionAlgorithm(),
                                new JSONAsymKeyEncrypter(encryptionParameter.getEncryptionKey(),
                                encryptionParameter.getKeyEncryptionAlgorithm())))
             .setString(REFERENCE_ID_JSON, referenceId)

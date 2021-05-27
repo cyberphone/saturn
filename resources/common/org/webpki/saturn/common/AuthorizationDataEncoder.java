@@ -24,11 +24,12 @@ import java.util.GregorianCalendar;
 
 import org.webpki.crypto.HashAlgorithms;
 
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSigner;
-import org.webpki.json.DataEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
 
@@ -42,7 +43,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
                                           String credentialId,
                                           String accountId,
                                           byte[] dataEncryptionKey,
-                                          DataEncryptionAlgorithms dataEncryptionAlgorithm,
+                                          ContentEncryptionAlgorithms contentEncryptionAlgorithm,
                                           UserResponseItem[] optionalUserResponseItems,
                                           UserAuthorizationMethods userAuthorizationMethod,
                                           GregorianCalendar timeStamp,
@@ -63,7 +64,7 @@ public class AuthorizationDataEncoder implements BaseProperties {
             .setString(CREDENTIAL_ID_JSON, credentialId)
             .setString(ACCOUNT_ID_JSON, accountId)
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
-                .setString(JSONCryptoHelper.ALGORITHM_JSON, dataEncryptionAlgorithm.toString())
+                .setString(JSONCryptoHelper.ALGORITHM_JSON, contentEncryptionAlgorithm.toString())
                 .setBinary(ENCRYPTION_KEY_JSON, dataEncryptionKey));
         if (optionalUserResponseItems != null && optionalUserResponseItems.length > 0) {
             JSONArrayWriter aw = wr.setArray(USER_RESPONSE_ITEMS_JSON);

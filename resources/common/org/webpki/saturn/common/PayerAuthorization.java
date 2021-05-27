@@ -27,8 +27,9 @@ import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.DataEncryptionAlgorithms;
-import org.webpki.json.KeyEncryptionAlgorithms;
+
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
 
 public class PayerAuthorization implements BaseProperties {
     
@@ -69,7 +70,7 @@ public class PayerAuthorization implements BaseProperties {
     public static JSONObjectWriter encode(JSONObjectWriter unencryptedAuthorizationData,
                                           String providerAuthorityUrl,
                                           String paymentMethod,
-                                          DataEncryptionAlgorithms dataEncryptionAlgorithm,
+                                          ContentEncryptionAlgorithms contentEncryptionAlgorithm,
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                           PublicKey encryptionKey,
                                           String optionalKeyId)
@@ -87,7 +88,7 @@ public class PayerAuthorization implements BaseProperties {
                           .createEncryptionObject(
                               unencryptedAuthorizationData.serializeToBytes(
                                       JSONOutputFormats.NORMALIZED),
-                              dataEncryptionAlgorithm,
+                              contentEncryptionAlgorithm,
                               encrypter));
     }
 }

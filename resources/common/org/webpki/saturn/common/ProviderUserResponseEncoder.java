@@ -25,8 +25,9 @@ import java.util.GregorianCalendar;
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
-import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONSymKeyEncrypter;
+
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
 
@@ -36,7 +37,7 @@ public class ProviderUserResponseEncoder implements BaseProperties {
                                           String text,
                                           UserChallengeItem[] optionalUserChallengeItems,
                                           byte[] dataEncryptionKey,
-                                          DataEncryptionAlgorithms dataEncryptionAlgorithm)
+                                          ContentEncryptionAlgorithms contentEncryptionAlgorithm)
     throws IOException, GeneralSecurityException {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setString(REQUESTER_JSON, requester)
@@ -52,7 +53,7 @@ public class ProviderUserResponseEncoder implements BaseProperties {
             .setObject(ENCRYPTED_MESSAGE_JSON,
                 JSONObjectWriter
                     .createEncryptionObject(wr.serializeToBytes(JSONOutputFormats.NORMALIZED),
-                                                                dataEncryptionAlgorithm,
+                                                                contentEncryptionAlgorithm,
                                                                 new JSONSymKeyEncrypter(dataEncryptionKey)));
     }
 }

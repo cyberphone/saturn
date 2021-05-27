@@ -49,11 +49,12 @@ import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
+
 import org.webpki.json.JSONArrayReader;
-import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
-import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
@@ -128,7 +129,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         String svgCardImage;
         PublicKey encryptionKey;
         HashAlgorithms requestHashAlgorithm;
-        DataEncryptionAlgorithms dataEncryptionAlgorithm;
+        ContentEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         boolean biometricOption;
         boolean balanceService;
@@ -157,7 +158,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             JSONObjectReader encryptionParameters = rd.getObject("encryptionParameters");
             encryptionKey = encryptionParameters.getPublicKey();
             dataEncryptionAlgorithm = 
-                    DataEncryptionAlgorithms
+                    ContentEncryptionAlgorithms
                         .getAlgorithmFromId(encryptionParameters
                                 .getString("dataEncryptionAlgorithm"));
             keyEncryptionAlgorithm = 

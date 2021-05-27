@@ -61,10 +61,10 @@ ProviderAuthority.encode = function(providerAuthorityUrl,
               new JsonUtil.ArrayWriter().setString(SIGNATURE_PROFILE))
     .setArray(BaseProperties.ENCRYPTION_PARAMETERS_JSON, 
               new JsonUtil.ArrayWriter().setObject(new JsonUtil.ObjectWriter()
-        .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Jef.JOSE_A128CBC_HS256_ALG_ID)
+        .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON, Jef.A128CBC_HS256_ALG_ID)
         .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON, 
                           publicKey.jwk.kty == 'RSA' ?
-                        Jef.JOSE_RSA_OAEP_256_ALG_ID : Jef.JOSE_ECDH_ES_ALG_ID)
+                        Jef.RSA_OAEP_256_ALG_ID : Jef.ECDH_ES_ALG_ID)
         .setPublicKey(publicKey)))
     .setDateTime(BaseProperties.TIME_STAMP_JSON, now)
     .setDateTime(BaseProperties.EXPIRES_JSON, expires)

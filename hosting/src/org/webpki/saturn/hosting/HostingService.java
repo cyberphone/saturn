@@ -34,7 +34,8 @@ import javax.servlet.ServletContextListener;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
-import org.webpki.crypto.KeyStoreVerifier;
+
+import org.webpki.crypto.signatures.KeyStoreVerifier;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONParser;

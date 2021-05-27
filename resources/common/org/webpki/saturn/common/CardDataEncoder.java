@@ -23,10 +23,12 @@ import java.security.PublicKey;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
 
-import org.webpki.json.DataEncryptionAlgorithms;
-import org.webpki.json.KeyEncryptionAlgorithms;
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
+
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectWriter;
+
 
 // This class holds the data associated with a virtual card (modulo the logotype).
 // The data is embedded in an SKS (Secure Key Store) extension object belonging to the signature key.
@@ -40,7 +42,7 @@ public class CardDataEncoder implements BaseProperties {
                                           String authorityUrl,
                                           HashAlgorithms reguestHashAlgorithm,
                                           AsymSignatureAlgorithms signatureAlgorithm,
-                                          DataEncryptionAlgorithms dataEncryptionAlgorithm,
+                                          ContentEncryptionAlgorithms contentEncryptionAlgorithm,
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                           PublicKey encryptionKey,
                                           String optionalKeyId,
@@ -56,9 +58,9 @@ public class CardDataEncoder implements BaseProperties {
             .setString(SIGNATURE_ALGORITHM_JSON, signatureAlgorithm.getJoseAlgorithmId())
             .setObject(ENCRYPTION_PARAMETERS_JSON, new JSONObjectWriter()
                 .setString(DATA_ENCRYPTION_ALGORITHM_JSON, 
-                           dataEncryptionAlgorithm.toString())
+                           contentEncryptionAlgorithm.getJoseAlgorithmId())
                 .setString(KEY_ENCRYPTION_ALGORITHM_JSON, 
-                           keyEncryptionAlgorithm.toString())
+                           keyEncryptionAlgorithm.getJoseAlgorithmId())
                 .setPublicKey(encryptionKey)
                 .setDynamic((wr)-> optionalKeyId == null ?
                         wr : wr.setString(JSONCryptoHelper.KEY_ID_JSON, optionalKeyId)))

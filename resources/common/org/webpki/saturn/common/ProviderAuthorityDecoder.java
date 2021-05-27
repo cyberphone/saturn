@@ -34,9 +34,8 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
-import org.webpki.json.DataEncryptionAlgorithms;
-
-import org.webpki.json.KeyEncryptionAlgorithms;
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
 
@@ -44,14 +43,14 @@ public class ProviderAuthorityDecoder implements BaseProperties {
     
     public static class EncryptionParameter {
         
-        DataEncryptionAlgorithms dataEncryptionAlgorithm;
+        ContentEncryptionAlgorithms contentEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey encryptionKey;
 
-        public EncryptionParameter(DataEncryptionAlgorithms dataEncryptionAlgorithm,
+        public EncryptionParameter(ContentEncryptionAlgorithms contentEncryptionAlgorithm,
                                    KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                    PublicKey encryptionKey) {
-            this.dataEncryptionAlgorithm = dataEncryptionAlgorithm;
+            this.contentEncryptionAlgorithm = contentEncryptionAlgorithm;
             this.keyEncryptionAlgorithm = keyEncryptionAlgorithm;
             this.encryptionKey = encryptionKey;
         }
@@ -60,8 +59,8 @@ public class ProviderAuthorityDecoder implements BaseProperties {
             return encryptionKey;
         }
 
-        public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
-            return dataEncryptionAlgorithm;
+        public ContentEncryptionAlgorithms getContentEncryptionAlgorithm() {
+            return contentEncryptionAlgorithm;
         }
 
         public KeyEncryptionAlgorithms getKeyEncryptionAlgorithm() {
@@ -192,13 +191,13 @@ public class ProviderAuthorityDecoder implements BaseProperties {
             JSONObjectReader encryptionParameter = jsonParameterArray.getObject();
             String algorithm = encryptionParameter.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
             boolean notRecognized = true;
-            for (DataEncryptionAlgorithms dataEncryptionAlgorithm : DataEncryptionAlgorithms.values()) {
-                if (dataEncryptionAlgorithm.toString().equals(algorithm)) {
+            for (ContentEncryptionAlgorithms contentEncryptionAlgorithm : ContentEncryptionAlgorithms.values()) {
+                if (contentEncryptionAlgorithm.toString().equals(algorithm)) {
                     algorithm = encryptionParameter.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
                     for (KeyEncryptionAlgorithms keyEncryptionAlgorithm : KeyEncryptionAlgorithms.values()) {
                         if (keyEncryptionAlgorithm.toString().equals(algorithm)) {
                             parameterArray.add(
-                                    new EncryptionParameter(dataEncryptionAlgorithm,
+                                    new EncryptionParameter(contentEncryptionAlgorithm,
                                                             keyEncryptionAlgorithm,
                                                             encryptionParameter.getPublicKey()));
                             notRecognized = false;

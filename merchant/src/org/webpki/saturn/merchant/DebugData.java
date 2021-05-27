@@ -29,12 +29,13 @@ import java.util.GregorianCalendar;
 
 import org.webpki.crypto.HashAlgorithms;
 
-import org.webpki.json.DataEncryptionAlgorithms;
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
+
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
 
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.AuthorizationDataEncoder;
@@ -147,7 +148,7 @@ public class DebugData implements Serializable {
                                  "54674448", 
                                  "FR7630002111110020050012733", 
                                   WALLET_SESSION_ENCRYPTION_KEY, 
-                                 DataEncryptionAlgorithms.JOSE_A256GCM_ALG_ID, 
+                                 ContentEncryptionAlgorithms.A256GCM_ALG_ID, 
                                  userResponseItems,
                                  UserAuthorizationMethods.PIN,
                                  userResponseItems == null ? then : authTime,
@@ -184,7 +185,7 @@ public class DebugData implements Serializable {
                                               UserChallengeItem.TYPE.ALPHANUMERIC,
                                               null)},
                     authorizationData.getDataEncryptionKey(),
-                    authorizationData.getDataEncryptionAlgorithm()));
+                    authorizationData.getContentEncryptionAlgorithm()));
 
             encryptedMessageSample = new EncryptedMessage(JSONParser.parse(
                 providerUserResponseSample.getObject(BaseProperties.ENCRYPTED_MESSAGE_JSON)

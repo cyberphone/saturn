@@ -100,7 +100,7 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                                                   text,
                                                   optionalUserChallengeItems,
                                                   authorizationData.getDataEncryptionKey(),
-                                                  authorizationData.getDataEncryptionAlgorithm());
+                                                  authorizationData.getContentEncryptionAlgorithm());
     }
 
     abstract JSONObjectWriter processCall(UrlHolder urlHolder, 

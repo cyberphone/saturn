@@ -24,7 +24,8 @@ import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
-import org.webpki.json.DataEncryptionAlgorithms;
+
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
 
 public class ProviderUserResponseDecoder implements BaseProperties {
  
@@ -41,11 +42,11 @@ public class ProviderUserResponseDecoder implements BaseProperties {
     JSONDecryptionDecoder encryptedData;
     
     public EncryptedMessage getEncryptedMessage(byte[] dataEncryptionKey,
-                                                DataEncryptionAlgorithms dataEncryptionAlgorithm)
+                                                ContentEncryptionAlgorithms contentEncryptionAlgorithm)
     throws IOException, GeneralSecurityException {
-        if (encryptedData.getDataEncryptionAlgorithm() != dataEncryptionAlgorithm) {
+        if (encryptedData.getContentEncryptionAlgorithm() != contentEncryptionAlgorithm) {
             throw new IOException("Unexpected data encryption algorithm:" + 
-                                  encryptedData.getDataEncryptionAlgorithm().toString());
+                                  encryptedData.getContentEncryptionAlgorithm().toString());
         }
         return new EncryptedMessage(JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey))); 
     }

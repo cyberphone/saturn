@@ -26,10 +26,11 @@ import java.security.PublicKey;
 
 import org.webpki.crypto.HashAlgorithms;
 
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
-import org.webpki.json.DataEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
 
@@ -52,7 +53,7 @@ public class AuthorizationDataDecoder implements BaseProperties {
         accountId = rd.getString(ACCOUNT_ID_JSON);
 
         JSONObjectReader encryptionParameters = rd.getObject(ENCRYPTION_PARAMETERS_JSON);
-        dataEncryptionAlgorithm = DataEncryptionAlgorithms
+        contentEncryptionAlgorithm = ContentEncryptionAlgorithms
             .getAlgorithmFromId(encryptionParameters.getString(JSONCryptoHelper.ALGORITHM_JSON));
         dataEncryptionKey = encryptionParameters.getBinary(ENCRYPTION_KEY_JSON);
 
@@ -98,9 +99,9 @@ public class AuthorizationDataDecoder implements BaseProperties {
         return payeeAuthorityUrl;
     }
 
-    DataEncryptionAlgorithms dataEncryptionAlgorithm;
-    public DataEncryptionAlgorithms getDataEncryptionAlgorithm() {
-        return dataEncryptionAlgorithm;
+    ContentEncryptionAlgorithms contentEncryptionAlgorithm;
+    public ContentEncryptionAlgorithms getContentEncryptionAlgorithm() {
+        return contentEncryptionAlgorithm;
     }
 
     byte[] dataEncryptionKey;

@@ -75,12 +75,14 @@ import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.CryptoRandom;
 import org.webpki.crypto.HashAlgorithms;
 
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
+
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
-import org.webpki.json.DataEncryptionAlgorithms;
+
 import org.webpki.json.JSONAsymKeySigner;
-import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.keygen2.KeyGen2URIs;
 
@@ -182,7 +184,7 @@ public class Wallet {
         AsymSignatureAlgorithms signatureAlgorithm;
         String providerAuthorityUrl;
         String optionalKeyId;
-        DataEncryptionAlgorithms dataEncryptionAlgorithm;
+        ContentEncryptionAlgorithms dataEncryptionAlgorithm;
         KeyEncryptionAlgorithms keyEncryptionAlgorithm;
         PublicKey encryptionKey;
         
@@ -982,7 +984,7 @@ public class Wallet {
                                     cardProperties.getAuthorityUrl());
                     card.optionalKeyId = cardProperties.getOptionalKeyId();
                     card.keyEncryptionAlgorithm = cardProperties.getKeyEncryptionAlgorithm();
-                    card.dataEncryptionAlgorithm = cardProperties.getDataEncryptionAlgorithm();
+                    card.dataEncryptionAlgorithm = cardProperties.getContentEncryptionAlgorithm();
                     card.encryptionKey = cardProperties.getEncryptionKey();
 
                     // We found a useful card!

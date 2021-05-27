@@ -37,8 +37,8 @@ const RequestHash = {
 
   parse : function(rd) {
     rd = rd.getObject(BaseProperties.REQUEST_HASH_JSON);
-    if (rd.getString(Jsf.ALGORITHM_JSON) != RequestHash.JOSE_SHA_256_ALG_ID) {
-      throw new TypeError('Expected algorithm: ' + RequestHash.JOSE_SHA_256_ALG_ID);
+    if (rd.getString(Jsf.ALGORITHM_JSON) != RequestHash.SHA_256_ALG_ID) {
+      throw new TypeError('Expected algorithm: ' + RequestHash.SHA_256_ALG_ID);
     }
     return rd.getBinary(Jsf.VALUE_JSON);
   }

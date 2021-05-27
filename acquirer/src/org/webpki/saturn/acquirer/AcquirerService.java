@@ -42,7 +42,11 @@ import javax.servlet.http.HttpServlet;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
-import org.webpki.crypto.KeyStoreVerifier;
+
+import org.webpki.crypto.signatures.KeyStoreVerifier;
+
+import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONDecryptionDecoder;
@@ -50,8 +54,6 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecoderCache;
-import org.webpki.json.DataEncryptionAlgorithms;
-import org.webpki.json.KeyEncryptionAlgorithms;
 
 import org.webpki.util.ArrayUtil;
 
@@ -128,8 +130,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                    keyStoreEnumerator.getPublicKey(),
                                                    keyStoreEnumerator.getPrivateKey(),
                                                    keyStoreEnumerator.getPublicKey() instanceof RSAKey ?
-                                                            KeyEncryptionAlgorithms.JOSE_RSA_OAEP_256_ALG_ID : 
-                                                            KeyEncryptionAlgorithms.JOSE_ECDH_ES_ALG_ID,
+                                                            KeyEncryptionAlgorithms.RSA_OAEP_256_ALG_ID : 
+                                                            KeyEncryptionAlgorithms.ECDH_ES_ALG_ID,
                                                    keyStoreEnumerator.getKeyId()));
     }
 
@@ -222,7 +224,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 SignatureProfiles.values(),
                 new ProviderAuthorityDecoder.EncryptionParameter[]{
                     new ProviderAuthorityDecoder.EncryptionParameter(
-                            DataEncryptionAlgorithms.JOSE_A128CBC_HS256_ALG_ID,
+                            ContentEncryptionAlgorithms.A128CBC_HS256_ALG_ID,
                             decryptionKeys.get(0).getKeyEncryptionAlgorithm(), 
                             decryptionKeys.get(0).getPublicKey())},
                 null,

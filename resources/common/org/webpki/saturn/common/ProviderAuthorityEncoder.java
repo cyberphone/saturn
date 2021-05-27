@@ -66,7 +66,7 @@ public class ProviderAuthorityEncoder implements BaseProperties {
                         : encryptionParameters) {
                     jsonArray.setObject()
                         .setString(BaseProperties.DATA_ENCRYPTION_ALGORITHM_JSON,
-                                   encryptionParameter.dataEncryptionAlgorithm.toString())
+                                   encryptionParameter.contentEncryptionAlgorithm.toString())
                         .setString(BaseProperties.KEY_ENCRYPTION_ALGORITHM_JSON,
                                    encryptionParameter.keyEncryptionAlgorithm.toString())
                         .setPublicKey(encryptionParameter.encryptionKey);
