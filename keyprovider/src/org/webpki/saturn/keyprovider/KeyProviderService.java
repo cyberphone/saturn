@@ -21,6 +21,7 @@ import java.io.InputStream;
 
 import java.net.URL;
 
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PublicKey;
@@ -134,7 +135,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         boolean biometricOption;
         boolean balanceService;
         
-        public CredentialTemplate(JSONObjectReader rd) throws IOException {
+        public CredentialTemplate(JSONObjectReader rd) throws IOException,
+                                                              GeneralSecurityException {
             paymentMethod = rd.getString("paymentMethod");
             signatureAlgorithm = CryptoUtils.getSignatureAlgorithm(rd, "signatureAlgorithm");
             accountType = rd.getString("accountType");

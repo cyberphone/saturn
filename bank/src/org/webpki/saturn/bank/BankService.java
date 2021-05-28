@@ -239,12 +239,12 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                                        getPropertyString(KEYSTORE_PASSWORD));
         if (keyStoreEnumerator.getPublicKey() instanceof RSAKey) {
             addDecryptioKey(keyStoreEnumerator, 
-                            KeyEncryptionAlgorithms.RSA_OAEP_256_ALG_ID);
+                            KeyEncryptionAlgorithms.RSA_OAEP_256);
         } else {
             addDecryptioKey(keyStoreEnumerator, 
-                            KeyEncryptionAlgorithms.ECDH_ES_ALG_ID);
+                            KeyEncryptionAlgorithms.ECDH_ES);
             addDecryptioKey(keyStoreEnumerator,
-                            KeyEncryptionAlgorithms.ECDH_ES_A128KW_ALG_ID);
+                            KeyEncryptionAlgorithms.ECDH_ES_A128KW);
         }
     }
 
@@ -386,7 +386,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                 SignatureProfiles.values(),
                 new ProviderAuthorityDecoder.EncryptionParameter[]{
                     new ProviderAuthorityDecoder.EncryptionParameter(
-                            ContentEncryptionAlgorithms.A128CBC_HS256_ALG_ID,
+                            ContentEncryptionAlgorithms.A128CBC_HS256,
                             decryptionKeys.get(0).getKeyEncryptionAlgorithm(), 
                             decryptionKeys.get(0).getPublicKey())},
                 hostingProviders == null ? null : hostingProviders.toArray(new HostingProvider[0]),

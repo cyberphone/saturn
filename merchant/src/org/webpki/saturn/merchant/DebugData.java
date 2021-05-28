@@ -148,7 +148,7 @@ public class DebugData implements Serializable {
                                  "54674448", 
                                  "FR7630002111110020050012733", 
                                   WALLET_SESSION_ENCRYPTION_KEY, 
-                                 ContentEncryptionAlgorithms.A256GCM_ALG_ID, 
+                                 ContentEncryptionAlgorithms.A256GCM, 
                                  userResponseItems,
                                  UserAuthorizationMethods.PIN,
                                  userResponseItems == null ? then : authTime,

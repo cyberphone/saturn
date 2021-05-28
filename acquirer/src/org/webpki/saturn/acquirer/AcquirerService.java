@@ -23,6 +23,7 @@ import java.io.InputStream;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+
 import java.security.interfaces.RSAKey;
 
 import java.util.ArrayList;
@@ -130,8 +131,8 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                                                    keyStoreEnumerator.getPublicKey(),
                                                    keyStoreEnumerator.getPrivateKey(),
                                                    keyStoreEnumerator.getPublicKey() instanceof RSAKey ?
-                                                            KeyEncryptionAlgorithms.RSA_OAEP_256_ALG_ID : 
-                                                            KeyEncryptionAlgorithms.ECDH_ES_ALG_ID,
+                                                            KeyEncryptionAlgorithms.RSA_OAEP_256 : 
+                                                            KeyEncryptionAlgorithms.ECDH_ES,
                                                    keyStoreEnumerator.getKeyId()));
     }
 
@@ -224,7 +225,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
                 SignatureProfiles.values(),
                 new ProviderAuthorityDecoder.EncryptionParameter[]{
                     new ProviderAuthorityDecoder.EncryptionParameter(
-                            ContentEncryptionAlgorithms.A128CBC_HS256_ALG_ID,
+                            ContentEncryptionAlgorithms.A128CBC_HS256,
                             decryptionKeys.get(0).getKeyEncryptionAlgorithm(), 
                             decryptionKeys.get(0).getPublicKey())},
                 null,
