@@ -1,0 +1,3 @@
+encryptedAuthorization should be in CBOR.
+No hashing of PaymentRequest, verbatim is OK since it is small.
+"expires" in PaymentRequest should be moved out.
