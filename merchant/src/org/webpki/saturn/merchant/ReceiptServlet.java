@@ -379,7 +379,7 @@ public class ReceiptServlet extends HttpServlet {
     throws IOException, ServletException {
         try {
             String pathInfo = request.getPathInfo();
-            System.out.println(pathInfo);
+//            System.out.println(pathInfo);
             int endOrderId = pathInfo.lastIndexOf('/');
             if (endOrderId < 5) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
