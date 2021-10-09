@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg width='237' height='100' xmlns='http://www.w3.org/2000/svg'>
+  <title>Saturn payment symbol</title>
+  <!-- Anders Rundgren 2021-->
+  <svg x="10" y="8" width="210" height="85" viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg">
+<g>
+<circle cx="85" cy="85" r="60" fill="#6e9e3f"/>
+<text x="85" y="128" font-family="Roboto" font-size="116" text-anchor="middle" fill="#ffffff">S</text>
+<text x="153" y="128" font-family="Roboto" font-size="116" text-anchor="start" fill="#a0a0a0">aturn</text>
+</g>
+  <path fill="#dd5454"
+     d="M 145.52755,10.175092 A 34,100 45 0 0 101.7463,27.276656 c 3.89961,1.160858 7.67805,2.717299 11.27344,4.648438 a 26,78 45 0 1 27.21289,-2.248047 26,78 45 0 1 -36.76953,73.539093 26,78 45 0 1 -73.539065,36.76953 26,78 45 0 1 2.042969,-26.75196 c -1.949276,-3.60827 -3.519446,-7.40197 -4.691406,-11.31836 A 34,100 45 0 0 14.367395,155.54231 34,100 45 0 0 109.1213,108.87239 34,100 45 0 0 155.78927,14.120406 34,100 45 0 0 145.52755,10.175092 Z"/>
+</svg>
+  <rect x='1' y='1' width='234' height='98' stroke='grey' stroke-width='2' fill='none'/>
+
+</svg>

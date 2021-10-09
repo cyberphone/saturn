@@ -289,9 +289,8 @@ public class HTML implements MerchantSessionProperties {
         StringBuilder page_data = new StringBuilder(
             "<tr><td width=\"100%\" align=\"center\" valign=\"middle\">" +
             "<table>" +
-            "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL + "\">" +
-            ShoppingServlet.COMMON_NAME +
-            "<br>&nbsp;</td></tr>" +
+            "<tr><td style='text-align:center;padding-bottom:2em'>" +
+            "<img src='images/spaceshop-logo.svg'></td></tr>" +
             "<tr><td id=\"result\"><table style=\"margin-left:auto;margin-right:auto\" class=\"tftable\">" +
             "<tr><th>Image</th><th>Description</th><th>Price</th><th>Quantity</th></tr>");
         int q = 0;
@@ -563,6 +562,7 @@ public class HTML implements MerchantSessionProperties {
                                ResultData resultData) throws IOException, ServletException {
         StringBuilder s = new StringBuilder("<tr><td width=\"100%\" align=\"center\" valign=\"middle\">")
             .append("<table>" +
+                    "<tr><td style='text-align:center;padding-bottom:1em'><img src='images/spaceshop-logo.svg'></td></tr>" +
                     "<tr><td style=\"text-align:center;font-weight:bolder;font-size:10pt;font-family:" + FONT_ARIAL)
             .append(resultData.transactionError == null ?
                       "\">Order Status" : ";color:red\">Failed = " + resultData.transactionError.toString())
@@ -678,19 +678,19 @@ public class HTML implements MerchantSessionProperties {
                     FONT_ARIAL + "\">Select Payment Method</td></tr>")
             .append(MerchantService.desktopWallet || android ?
                       "<tr><td id=\"" + SATURN_PAY_BUTTON + 
-                      "\"><img title=\"Saturn\" style=\"cursor:pointer\" src=\"images/paywith-saturn.png\" onclick=\"goSaturnGo()\"></td></tr>" +
+                      "\" style='text-align:center'><img title=\"Saturn\" style=\"cursor:pointer;height:4em\" src=\"images/saturn-pay.svg\" onclick=\"goSaturnGo()\"></td></tr>" +
                       "<tr><td id=\"" + SATURN_PAY_WAIT + 
                       "\" style=\"display:none\"><img title=\"Wait\" src=\"images/waiting.gif\"></td></tr>" 
                                                                 :
                       "")
             .append(MerchantService.desktopWallet || !android ?
-                      "<tr><td style=\"padding-top:10pt\"><img title=\"Saturn QR\" style=\"cursor:pointer\" src=\"images/paywith-saturn" +
-                            (MerchantService.desktopWallet ? "qr" : "") +
-                      ".png\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
+                      "<tr><td style=\"padding-top:10pt\"><img title=\"Saturn QR\" style=\"cursor:pointer;height:4em\" src=\"images/saturn-pay" +
+                            (MerchantService.desktopWallet ? "-qr" : "") +
+                      ".svg\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
                                                                :
                       "")
-            .append("<tr><td style=\"padding: 10pt 0 10pt 0\"><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer\" src=\"images/paywith-visa-mc.png\" onclick=\"noSuchMethod(this)\"></td></tr>" +
-                    "<tr><td><img title=\"PayPal\" style=\"cursor:pointer\" src=\"images/paywith-paypal.png\" onclick=\"noSuchMethod(this)\"></td></tr>" +
+            .append("<tr><td style='padding:10pt 0;text-align:center'><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer;height:4em\" src=\"images/legacy-visamc-pay.svg\" onclick=\"noSuchMethod(this)\"></td></tr>" +
+                    "<tr><td style='text-align:center'><img title=\"PayPal\" style=\"cursor:pointer;height:4em\" src=\"images/paypal-pay.svg\" onclick=\"noSuchMethod(this)\"></td></tr>" +
                     "<tr><td style=\"text-align:center;padding:15pt\">")
             .append(fancyButton("Return to shop..", "Changed your mind?", "document.forms.restore.submit()"))
             .append("</td></tr></table></td></tr></table></td></tr>");

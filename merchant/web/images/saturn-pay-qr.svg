@@ -1,0 +1,254 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg width='331' height='100' xmlns='http://www.w3.org/2000/svg'>
+  <title>Saturn payment symbol</title>
+  <!-- Anders Rundgren 2021-->
+  <svg x="10" y="8" width="210" height="85" viewBox="0 0 420 170" xmlns="http://www.w3.org/2000/svg">
+<g>
+<circle cx="85" cy="85" r="60" fill="#6e9e3f"/>
+<text x="85" y="128" font-family="Roboto" font-size="116" text-anchor="middle" fill="#ffffff">S</text>
+<text x="153" y="128" font-family="Roboto" font-size="116" text-anchor="start" fill="#a0a0a0">aturn</text>
+</g>
+  <path fill="#dd5454"
+     d="M 145.52755,10.175092 A 34,100 45 0 0 101.7463,27.276656 c 3.89961,1.160858 7.67805,2.717299 11.27344,4.648438 a 26,78 45 0 1 27.21289,-2.248047 26,78 45 0 1 -36.76953,73.539093 26,78 45 0 1 -73.539065,36.76953 26,78 45 0 1 2.042969,-26.75196 c -1.949276,-3.60827 -3.519446,-7.40197 -4.691406,-11.31836 A 34,100 45 0 0 14.367395,155.54231 34,100 45 0 0 109.1213,108.87239 34,100 45 0 0 155.78927,14.120406 34,100 45 0 0 145.52755,10.175092 Z"/>
+</svg>
+<svg x="236" y="10" width="80" height="80" viewBox="32 32 168 168" xmlns="http://www.w3.org/2000/svg">
+<rect x="32" y="32" width="168" height="168" fill="white"/>
+<defs>
+<rect id="p" width="8" height="8"/>
+</defs>
+<g fill="#a0a0a0">
+<use href="#p" x="32" y="32"/>
+<use href="#p" x="32" y="40"/>
+<use href="#p" x="32" y="48"/>
+<use href="#p" x="32" y="56"/>
+<use href="#p" x="32" y="64"/>
+<use href="#p" x="32" y="72"/>
+<use href="#p" x="32" y="80"/>
+<use href="#p" x="32" y="96"/>
+<use href="#p" x="32" y="104"/>
+<use href="#p" x="32" y="144"/>
+<use href="#p" x="32" y="152"/>
+<use href="#p" x="32" y="160"/>
+<use href="#p" x="32" y="168"/>
+<use href="#p" x="32" y="176"/>
+<use href="#p" x="32" y="184"/>
+<use href="#p" x="32" y="192"/>
+<use href="#p" x="40" y="32"/>
+<use href="#p" x="40" y="80"/>
+<use href="#p" x="40" y="96"/>
+<use href="#p" x="40" y="120"/>
+<use href="#p" x="40" y="128"/>
+<use href="#p" x="40" y="144"/>
+<use href="#p" x="40" y="192"/>
+<use href="#p" x="48" y="32"/>
+<use href="#p" x="48" y="48"/>
+<use href="#p" x="48" y="56"/>
+<use href="#p" x="48" y="64"/>
+<use href="#p" x="48" y="80"/>
+<use href="#p" x="48" y="96"/>
+<use href="#p" x="48" y="112"/>
+<use href="#p" x="48" y="120"/>
+<use href="#p" x="48" y="144"/>
+<use href="#p" x="48" y="160"/>
+<use href="#p" x="48" y="168"/>
+<use href="#p" x="48" y="176"/>
+<use href="#p" x="48" y="192"/>
+<use href="#p" x="56" y="32"/>
+<use href="#p" x="56" y="48"/>
+<use href="#p" x="56" y="56"/>
+<use href="#p" x="56" y="64"/>
+<use href="#p" x="56" y="80"/>
+<use href="#p" x="56" y="96"/>
+<use href="#p" x="56" y="104"/>
+<use href="#p" x="56" y="120"/>
+<use href="#p" x="56" y="128"/>
+<use href="#p" x="56" y="144"/>
+<use href="#p" x="56" y="160"/>
+<use href="#p" x="56" y="168"/>
+<use href="#p" x="56" y="176"/>
+<use href="#p" x="56" y="192"/>
+<use href="#p" x="64" y="32"/>
+<use href="#p" x="64" y="48"/>
+<use href="#p" x="64" y="56"/>
+<use href="#p" x="64" y="64"/>
+<use href="#p" x="64" y="80"/>
+<use href="#p" x="64" y="128"/>
+<use href="#p" x="64" y="144"/>
+<use href="#p" x="64" y="160"/>
+<use href="#p" x="64" y="168"/>
+<use href="#p" x="64" y="176"/>
+<use href="#p" x="64" y="192"/>
+<use href="#p" x="72" y="32"/>
+<use href="#p" x="72" y="80"/>
+<use href="#p" x="72" y="104"/>
+<use href="#p" x="72" y="120"/>
+<use href="#p" x="72" y="144"/>
+<use href="#p" x="72" y="192"/>
+<use href="#p" x="80" y="32"/>
+<use href="#p" x="80" y="40"/>
+<use href="#p" x="80" y="48"/>
+<use href="#p" x="80" y="56"/>
+<use href="#p" x="80" y="64"/>
+<use href="#p" x="80" y="72"/>
+<use href="#p" x="80" y="80"/>
+<use href="#p" x="80" y="96"/>
+<use href="#p" x="80" y="112"/>
+<use href="#p" x="80" y="128"/>
+<use href="#p" x="80" y="144"/>
+<use href="#p" x="80" y="152"/>
+<use href="#p" x="80" y="160"/>
+<use href="#p" x="80" y="168"/>
+<use href="#p" x="80" y="176"/>
+<use href="#p" x="80" y="184"/>
+<use href="#p" x="80" y="192"/>
+<use href="#p" x="88" y="104"/>
+<use href="#p" x="88" y="120"/>
+<use href="#p" x="96" y="32"/>
+<use href="#p" x="96" y="48"/>
+<use href="#p" x="96" y="56"/>
+<use href="#p" x="96" y="64"/>
+<use href="#p" x="96" y="80"/>
+<use href="#p" x="96" y="96"/>
+<use href="#p" x="96" y="104"/>
+<use href="#p" x="96" y="120"/>
+<use href="#p" x="96" y="136"/>
+<use href="#p" x="96" y="168"/>
+<use href="#p" x="96" y="176"/>
+<use href="#p" x="96" y="184"/>
+<use href="#p" x="96" y="192"/>
+<use href="#p" x="104" y="32"/>
+<use href="#p" x="104" y="40"/>
+<use href="#p" x="104" y="56"/>
+<use href="#p" x="104" y="64"/>
+<use href="#p" x="104" y="88"/>
+<use href="#p" x="104" y="104"/>
+<use href="#p" x="104" y="120"/>
+<use href="#p" x="104" y="136"/>
+<use href="#p" x="104" y="152"/>
+<use href="#p" x="104" y="160"/>
+<use href="#p" x="104" y="168"/>
+<use href="#p" x="104" y="176"/>
+<use href="#p" x="104" y="192"/>
+<use href="#p" x="112" y="48"/>
+<use href="#p" x="112" y="64"/>
+<use href="#p" x="112" y="80"/>
+<use href="#p" x="112" y="88"/>
+<use href="#p" x="112" y="96"/>
+<use href="#p" x="112" y="104"/>
+<use href="#p" x="112" y="120"/>
+<use href="#p" x="112" y="128"/>
+<use href="#p" x="112" y="152"/>
+<use href="#p" x="112" y="160"/>
+<use href="#p" x="112" y="176"/>
+<use href="#p" x="120" y="40"/>
+<use href="#p" x="120" y="56"/>
+<use href="#p" x="120" y="72"/>
+<use href="#p" x="120" y="120"/>
+<use href="#p" x="120" y="128"/>
+<use href="#p" x="120" y="136"/>
+<use href="#p" x="120" y="144"/>
+<use href="#p" x="120" y="160"/>
+<use href="#p" x="120" y="168"/>
+<use href="#p" x="120" y="176"/>
+<use href="#p" x="120" y="192"/>
+<use href="#p" x="128" y="56"/>
+<use href="#p" x="128" y="64"/>
+<use href="#p" x="128" y="80"/>
+<use href="#p" x="128" y="128"/>
+<use href="#p" x="128" y="136"/>
+<use href="#p" x="128" y="168"/>
+<use href="#p" x="128" y="176"/>
+<use href="#p" x="128" y="184"/>
+<use href="#p" x="136" y="96"/>
+<use href="#p" x="136" y="112"/>
+<use href="#p" x="136" y="128"/>
+<use href="#p" x="136" y="168"/>
+<use href="#p" x="136" y="184"/>
+<use href="#p" x="136" y="192"/>
+<use href="#p" x="144" y="32"/>
+<use href="#p" x="144" y="40"/>
+<use href="#p" x="144" y="48"/>
+<use href="#p" x="144" y="56"/>
+<use href="#p" x="144" y="64"/>
+<use href="#p" x="144" y="72"/>
+<use href="#p" x="144" y="80"/>
+<use href="#p" x="144" y="104"/>
+<use href="#p" x="144" y="112"/>
+<use href="#p" x="144" y="128"/>
+<use href="#p" x="144" y="136"/>
+<use href="#p" x="144" y="144"/>
+<use href="#p" x="144" y="184"/>
+<use href="#p" x="144" y="192"/>
+<use href="#p" x="152" y="32"/>
+<use href="#p" x="152" y="80"/>
+<use href="#p" x="152" y="104"/>
+<use href="#p" x="152" y="112"/>
+<use href="#p" x="152" y="128"/>
+<use href="#p" x="152" y="152"/>
+<use href="#p" x="152" y="160"/>
+<use href="#p" x="160" y="32"/>
+<use href="#p" x="160" y="48"/>
+<use href="#p" x="160" y="56"/>
+<use href="#p" x="160" y="64"/>
+<use href="#p" x="160" y="80"/>
+<use href="#p" x="160" y="96"/>
+<use href="#p" x="160" y="104"/>
+<use href="#p" x="160" y="120"/>
+<use href="#p" x="160" y="136"/>
+<use href="#p" x="160" y="144"/>
+<use href="#p" x="160" y="152"/>
+<use href="#p" x="160" y="160"/>
+<use href="#p" x="160" y="184"/>
+<use href="#p" x="160" y="192"/>
+<use href="#p" x="168" y="32"/>
+<use href="#p" x="168" y="48"/>
+<use href="#p" x="168" y="56"/>
+<use href="#p" x="168" y="64"/>
+<use href="#p" x="168" y="80"/>
+<use href="#p" x="168" y="96"/>
+<use href="#p" x="168" y="120"/>
+<use href="#p" x="168" y="128"/>
+<use href="#p" x="168" y="152"/>
+<use href="#p" x="168" y="168"/>
+<use href="#p" x="168" y="176"/>
+<use href="#p" x="168" y="192"/>
+<use href="#p" x="176" y="32"/>
+<use href="#p" x="176" y="48"/>
+<use href="#p" x="176" y="56"/>
+<use href="#p" x="176" y="64"/>
+<use href="#p" x="176" y="80"/>
+<use href="#p" x="176" y="96"/>
+<use href="#p" x="176" y="104"/>
+<use href="#p" x="176" y="152"/>
+<use href="#p" x="176" y="160"/>
+<use href="#p" x="176" y="176"/>
+<use href="#p" x="176" y="192"/>
+<use href="#p" x="184" y="32"/>
+<use href="#p" x="184" y="80"/>
+<use href="#p" x="184" y="112"/>
+<use href="#p" x="184" y="136"/>
+<use href="#p" x="192" y="32"/>
+<use href="#p" x="192" y="40"/>
+<use href="#p" x="192" y="48"/>
+<use href="#p" x="192" y="56"/>
+<use href="#p" x="192" y="64"/>
+<use href="#p" x="192" y="72"/>
+<use href="#p" x="192" y="80"/>
+<use href="#p" x="192" y="96"/>
+<use href="#p" x="192" y="104"/>
+<use href="#p" x="192" y="112"/>
+<use href="#p" x="192" y="120"/>
+<use href="#p" x="192" y="136"/>
+<use href="#p" x="192" y="160"/>
+<use href="#p" x="192" y="184"/>
+</g>
+</svg>
+  <g fill="#ff0000" stroke="#000000" stroke-width="2.2">
+    <path
+       d="m 242.36157,28.247177 h 21.25 v 6.03125 h -1.9375 q -1.6875,0 -2.25,0.3125 -0.53125,0.28125 -0.8125,0.9375 -0.25,0.625 -0.25,2.4375 v 24.125 q 0,1.96875 0.21875,2.53125 0.21875,0.5625 0.75,0.8125 0.65625,0.375 1.96875,0.375 h 2.3125 v 6.03125 h -21.25 v -6.03125 h 1.71875 q 1.84375,0 2.40625,-0.25 0.5625,-0.28125 0.8125,-0.84375 0.28125,-0.59375 0.28125,-2.3125 v -24.21875 q 0,-2.03125 -0.28125,-2.65625 -0.25,-0.65625 -0.875,-1 -0.4375,-0.25 -2.125,-0.25 h -1.9375 z"/>
+    <path
+       d="m 268.14282,28.247177 h 22.84375 q 7.78125,0 12.375,2.46875 4.59375,2.46875 7.3125,7.3125 2.75,4.84375 2.75,11.625 0,4.71875 -1.40625,8.4375 -1.375,3.71875 -4.125,6.71875 -2.75,2.96875 -5.90625,4.46875 -2.375,1.125 -6.75,1.84375 -4.34375,0.71875 -6.96875,0.71875 h -20.125 v -6.03125 h 1.5 q 1.90625,0 2.5,-0.3125 0.59375,-0.3125 0.96875,-1.0625 0.25,-0.59375 0.25,-2.59375 v -23.8125 q 0,-2 -0.28125,-2.5625 -0.25,-0.59375 -0.875,-0.875 -0.59375,-0.3125 -2.5625,-0.3125 h -1.5 z m 15.9375,7 v 27.09375 q 0,1.375 0.15625,1.6875 0.25,0.46875 0.71875,0.65625 0.5,0.15625 2.34375,0.15625 5.125,0 8,-1.5625 2.90625,-1.59375 4.6875,-5.0625 1.78125,-3.5 1.78125,-8.3125 0,-4.75 -1.6875,-8.25 -1.65625,-3.53125 -4.125,-4.96875 -2.46875,-1.4375 -7.0625,-1.4375 z"/>
+  </g>
+  <rect x='1' y='1' width='328' height='98' stroke='grey' stroke-width='2' fill='none'/>
+
+</svg>

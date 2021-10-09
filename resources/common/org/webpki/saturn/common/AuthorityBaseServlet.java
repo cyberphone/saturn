@@ -116,7 +116,7 @@ public abstract class AuthorityBaseServlet extends HttpServlet implements BasePr
             "}\n"+
             "</script>" +
             "<img style='")
-        .append(centered ? "margin:0 auto 0.5em auto;display:block;" : "")
+        .append(centered ? "margin:0 auto;display:block;" : "")
         .append("max-width:90%;visibility:hidden' src='")
         .append(logotypeUrl)
         .append("' alt='logo' title='")
