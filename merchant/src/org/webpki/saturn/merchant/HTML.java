@@ -684,9 +684,9 @@ public class HTML implements MerchantSessionProperties {
                                                                 :
                       "")
             .append(MerchantService.desktopWallet || !android ?
-                      "<tr><td style=\"padding-top:10pt\"><img title=\"Saturn QR\" style=\"cursor:pointer;height:4em\" src=\"images/saturn-pay" +
-                            (MerchantService.desktopWallet ? "-qr" : "") +
-                      ".svg\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
+                      "<tr><td style=\"padding-top:10pt;text-align:center\">" +
+                      "<img title=\"Saturn QR\" style=\"cursor:pointer;height:4em\" " +
+                      "src=\"images/saturn-pay-qr.svg\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
                                                                :
                       "")
             .append("<tr><td style='padding:10pt 0;text-align:center'><img title=\"VISA &amp; MasterCard\" style=\"cursor:pointer;height:4em\" src=\"images/legacy-visamc-pay.svg\" onclick=\"noSuchMethod(this)\"></td></tr>" +
