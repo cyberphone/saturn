@@ -1,28 +1,35 @@
 This document is for my own use only :-)
 
-Login as "anders" and use "sudo" when needed.
+===============================================================================
+Note: replace "apache-tomcat-9.X" with proper version throughout this document!
+Note: replace "TheUser" with the actual user throughout this document!
+===============================================================================
 
-Server Ubuntu 16.04.x LTS
+Login as "TheUser" and use "sudo" when needed.
+
+Server Ubuntu 20.04 LTS
 
 Additional Software
 ===================
 
-Install JDK 8
--------------
-$ sudo apt-get install openjdk-8-jdk-headless
+Install JDK 17
+--------------
+$ sudo apt install openjdk-17-jdk-headless
 
 # Make it bind below 1000
-$ sudo setcap 'cap_net_bind_service=ep' /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
-$ getcap /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+$ sudo setcap 'cap_net_bind_service=ep' /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+$ sudo getcap /usr/lib/jvm/java-17-openjdk-amd64/bin/java
 should list as:
-/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java = cap_net_bind_service+ep
+/usr/lib/jvm/java-17-openjdk-amd64/bin/java = cap_net_bind_service+ep
 
 
-Install Tomcat 8.5.X
+Install Tomcat 9.0.X
 --------------------
-Download zip to /home/anders
-$ unzip apache-tomcat-8.5.X.zip
-$ chmod +x `ls /home/anders/apache-tomcat-8.5.X/bin/*.sh`
+Note: replace "apache-tomcat-9.X" with proper version throught this document!
+
+Download zip to /home/TheUser
+$ unzip apache-tomcat-9.0.X.zip
+$ chmod +x `ls /home/TheUser/apache-tomcat-9.0.X/bin/*.sh`
 
 In "conf/server.xml":
 
@@ -36,7 +43,7 @@ In "conf/server.xml":
     <Connector port="443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" address="213.115.30.180">
         <SSLHostConfig>
-            <Certificate certificateKeystoreFile="/home/anders/sslcertificates/mobilepki.org.p12"
+            <Certificate certificateKeystoreFile="/home/TheUser/sslcertificates/mobilepki.org.p12"
                          certificateKeystoreType="pkcs12"
                          certificateKeystorePassword="*********" />
         </SSLHostConfig>
@@ -45,7 +52,7 @@ In "conf/server.xml":
     <Connector port="443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                maxThreads="150" SSLEnabled="true" address="213.115.30.181">
         <SSLHostConfig>
-            <Certificate certificateKeystoreFile="/home/anders/sslcertificates/test.webpki.org.p12"
+            <Certificate certificateKeystoreFile="/home/TheUser/sslcertificates/test.webpki.org.p12"
                          certificateKeystoreType="pkcs12"
                          certificateKeystorePassword="**********" />
         </SSLHostConfig>
@@ -58,7 +65,7 @@ In "conf/context.xml":
 
 In ".bashrc":
 - Add the following lines
-CATALINA_HOME=/home/anders/apache-tomcat-8.5.X
+CATALINA_HOME=/home/TheUser/apache-tomcat-9.0.56
 export CATALINA_HOME
 
 
@@ -74,7 +81,7 @@ Download as ZIP from GitHub "saturn" and UNZIP it on "home" => home/saturn-maste
 
 Download as ZIP from GitHub "openkeystore" and UNZIP it on "home" => home/openkeystore-master
 
-Create a file "/home/anders/build-saturn.xml" with the following content:
+Create a file "/home/TheUser/build-saturn.xml" with the following content:
 
 <project name="Master Build Saturn" default="build" basedir=".">
 
@@ -160,7 +167,7 @@ $ sudo ufw allow proto tcp from any to any port 8443
 
 Simple Test
 ===========
-$ ./apache-tomcat-8.5.X/bin/catalina.sh run
+$ ./apache-tomcat-9.0.56/bin/catalina.sh run
 
 
 Automatic Start At Boot
@@ -174,18 +181,18 @@ After=network.target
 [Service]
 Type=forking
 
-Environment=JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64/jre
-Environment=CATALINA_PID=/home/anders/apache-tomcat-8.5.X/temp/tomcat.pid
-Environment=CATALINA_HOME=/home/anders/apache-tomcat-8.5.X
-Environment=CATALINA_BASE=/home/anders/apache-tomcat-8.5.X
+Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+Environment=CATALINA_PID=/home/TheUser/apache-tomcat-9.0.56/temp/tomcat.pid
+Environment=CATALINA_HOME=/home/TheUser/apache-tomcat-9.0.56
+Environment=CATALINA_BASE=/home/TheUser/apache-tomcat-9.0.56
 Environment='CATALINA_OPTS=-Xms512M -Xmx1024M -server -XX:+UseParallelGC'
 Environment='JAVA_OPTS=-Djava.awt.headless=true -Djava.security.egd=file:/dev/./urandom'
 
-ExecStart=/home/anders/apache-tomcat-8.5.X/bin/startup.sh
-ExecStop=/home/anders/apache-tomcat-8.5.X/bin/shutdown.sh
+ExecStart=/home/TheUser/apache-tomcat-9.0.56/bin/startup.sh
+ExecStop=/home/TheUser/apache-tomcat-9.0.56/bin/shutdown.sh
 
-User=anders
-Group=anders
+User=TheUser
+Group=TheUser
 UMask=0007
 RestartSec=10
 Restart=always
