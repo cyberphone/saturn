@@ -192,10 +192,10 @@ public class ProviderAuthorityDecoder implements BaseProperties {
             String algorithm = encryptionParameter.getString(DATA_ENCRYPTION_ALGORITHM_JSON);
             boolean notRecognized = true;
             for (ContentEncryptionAlgorithms contentEncryptionAlgorithm : ContentEncryptionAlgorithms.values()) {
-                if (contentEncryptionAlgorithm.toString().equals(algorithm)) {
+                if (contentEncryptionAlgorithm.getJoseAlgorithmId().equals(algorithm)) {
                     algorithm = encryptionParameter.getString(KEY_ENCRYPTION_ALGORITHM_JSON);
                     for (KeyEncryptionAlgorithms keyEncryptionAlgorithm : KeyEncryptionAlgorithms.values()) {
-                        if (keyEncryptionAlgorithm.toString().equals(algorithm)) {
+                        if (keyEncryptionAlgorithm.getJoseAlgorithmId().equals(algorithm)) {
                             parameterArray.add(
                                     new EncryptionParameter(contentEncryptionAlgorithm,
                                                             keyEncryptionAlgorithm,
