@@ -683,7 +683,7 @@ public class HTML implements MerchantSessionProperties {
                       "\" style=\"display:none\"><img title=\"Wait\" src=\"images/waiting.gif\"></td></tr>" 
                                                                 :
                       "")
-            .append(MerchantService.desktopWallet && !android ?
+            .append(!android ?
                       "<tr><td style=\"padding-top:10pt;text-align:center\">" +
                       "<img title=\"Saturn QR\" style=\"cursor:pointer;height:4em\" " +
                       "src=\"images/saturn-pay-qr.svg\" onclick=\"document.location.href='qrdisplay'\"></td></tr>"
