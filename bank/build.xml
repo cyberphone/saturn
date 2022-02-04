@@ -32,6 +32,8 @@
     </and>
   </condition>
 
+  <property name="webroot" value="webapps"/>
+
   <!-- Useful ommand line variables --> 
   <property name="logging" value="false"/>
   <property name="balancefail" value=""/>
@@ -176,7 +178,7 @@
   <target name="tomcat">
     <fail message="CATALINA_HOME must be set to environment!" unless="catalina.home"/>
     <antcall target="build"/>
-    <copy file="${dist.dir}/${appcorename}.war" todir="${catalina.home}/webapps" overwrite="true" preservelastmodified="true"/>
+    <copy file="${dist.dir}/${appcorename}.war" todir="${catalina.home}/${webroot}" overwrite="true" preservelastmodified="true"/>
   </target>
    
 </project>

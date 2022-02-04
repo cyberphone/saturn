@@ -11,6 +11,8 @@
   <property file="../resources/accounts.properties"/>
   <property name="class_war_path" value="WEB-INF/classes/org/webpki/saturn/keyprovider"/>
 
+  <property name="webroot" value="webapps"/>
+
   <!-- Ant command line overridables -->
   <property name="logging" value="false"/>
   <property name="biometricsupport" value="true"/>
@@ -123,7 +125,7 @@
   <target name="tomcat">
     <fail message="CATALINA_HOME must be set to environment!" unless="catalina.home"/>
     <antcall target="build"/>
-    <copy file="${dist.dir}/${application}" todir="${catalina.home}/webapps" overwrite="true" preservelastmodified="true"/>
+    <copy file="${dist.dir}/${application}" todir="${catalina.home}/${webroot}" overwrite="true" preservelastmodified="true"/>
   </target>
   
 </project>
