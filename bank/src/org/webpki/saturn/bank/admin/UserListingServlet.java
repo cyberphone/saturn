@@ -18,8 +18,6 @@ package org.webpki.saturn.bank.admin;
 
 import java.io.IOException;
 
-import java.net.InetAddress;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,7 +44,8 @@ public class UserListingServlet extends HttpServlet {
     
     static final String MAX_ROWS = "100";
 
-    static final String SQL = "SELECT DISTINCT IpAddress, Name, Id, Created, AccessCount, " + 
+    static final String SQL = "SELECT DISTINCT ClientIpAddress, ClientHost, Name, " +
+                              "Id, Created, AccessCount, " + 
                               "COALESCE(LastAccess,'') FROM USERS " +
                               "ORDER BY Created DESC LIMIT " + MAX_ROWS;
 
@@ -76,18 +75,12 @@ public class UserListingServlet extends HttpServlet {
                         "</tr>");
                while (rs.next()) {
                     html.append("<tr>");
-                    for (int q = 1; q <= 6; q++) {
+                    for (int q = 1; q <= 7; q++) {
                         String value = rs.getString(q);
-                        html.append("<td>")
-                            .append(value)
-                            .append("</td>");
-                        if (q == 1) {
-                            InetAddress addr = InetAddress.getByName(value);
-                            String host = addr.getHostName();
-                            html.append("<td>")
-                                .append(host)
-                                .append("</td>");
+                        if (q == 2 && value == null) {
+                            value = "<div style='text-align:center'>-</div>";
                         }
+                        html.append("<td>").append(value).append("</td>");
                     }
                     html.append("</tr>");
                 }

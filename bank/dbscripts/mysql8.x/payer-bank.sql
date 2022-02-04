@@ -58,7 +58,9 @@ GRANT SELECT ON v_routines TO saturn_bank@localhost;
 CREATE TABLE USERS (
     Id          INT           NOT NULL  AUTO_INCREMENT,                  -- Unique User ID
     
-    IpAddress   VARCHAR(50)   NOT NULL,                                  -- "Statistics"
+    ClientIpAddress VARCHAR(50)  NOT NULL,                               -- From where?
+
+    ClientHost  VARCHAR(100)  NULL,                                      -- Host of client (may not be available)
 
     Created     TIMESTAMP     NOT NULL  DEFAULT CURRENT_TIMESTAMP,       -- Administrator data
 
@@ -225,9 +227,9 @@ DELIMITER //
 
 CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
                                IN p_UserName VARCHAR(50),
-                               IN p_IpAddress VARCHAR(50))
+                               IN p_ClientIpAddress VARCHAR(50))
   BEGIN
-    INSERT INTO USERS(Name, IpAddress) VALUES(p_UserName, p_IpAddress);
+    INSERT INTO USERS(Name, ClientIpAddress) VALUES(p_UserName, p_ClientIpAddress);
     SET p_UserId = LAST_INSERT_ID();
   END
 //
@@ -783,7 +785,7 @@ CALL _CreatePaymentMethodSP("https://unusualcard.com",   -- DISCOVER
 
 -- Transaction Types:
 
-CALL _CreateTransactionTypeSP("DIRECT_DEBIT",
+CALL _CreateTransactionTypeSP("INSTANT",
                               "Single step payment operation");
 
 CALL _CreateTransactionTypeSP("RESERVE",
@@ -795,7 +797,7 @@ CALL _CreateTransactionTypeSP("RESERVE_MULTI",
 CALL _CreateTransactionTypeSP("TRANSACT",
                               "Phase two or more of a multi-step payment operation");
 
-CALL _CreateTransactionTypeSP("CREDIT_ACCOUNT",
+CALL _CreateTransactionTypeSP("REFUND",
                               "Money sent to the account");
 
 -- Internal (database) use only
@@ -955,7 +957,7 @@ CALL ExternalWithDrawSP(@error,
                         "Payee100",
                         "Demo Merchant",
                         "#1064",
-                        GetTransactionTypeId("DIRECT_DEBIT"),
+                        GetTransactionTypeId("INSTANT"),
                         NULL,
                         @sepaAccountBalance + 1.00,
                         @accountId);
@@ -977,11 +979,11 @@ CALL ExternalWithDrawSP(@error,
                         "Payee100",
                         "Demo Merchant",
                         "#1064",
-                        GetTransactionTypeId("DIRECT_DEBIT"),
+                        GetTransactionTypeId("INSTANT"),
                         NULL,
                         100.25,
                         @accountId);
-CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance - 100.25, "DIRECT_DEBIT");
+CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance - 100.25, "INSTANT");
 
 CALL ExternalWithDrawSP(@error,
                         @transactionId,
@@ -1013,14 +1015,14 @@ CALL CreditAccountSP(@error,
                      "#1064",
                      200.25,
                      @accountId);
-CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance, "CREDIT_ACCOUNT");
+CALL ASSERT_TRANSACTION(@error, @transactionId, null, @sepaAccountBalance, "REFUND");
 
 CALL ExternalWithDrawSP(@error,
                         @transactionId,
                         "Payee100",
                         "Demo Merchant",
                         "#1064",
-                        GetTransactionTypeId("DIRECT_DEBIT"),
+                        GetTransactionTypeId("INSTANT"),
                         NULL,
                         500.00,
                         @accountId);

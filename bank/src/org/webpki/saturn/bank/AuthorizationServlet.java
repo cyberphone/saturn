@@ -212,7 +212,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
 
         TransactionTypes transactionType = 
                 !cardPayment && nonDirectPayment == null ? 
-                           TransactionTypes.DIRECT_DEBIT : TransactionTypes.RESERVE;
+                           TransactionTypes.INSTANT : TransactionTypes.RESERVE;
         int transactionId;
         boolean testMode = authorizationRequest.getTestMode();
         String optionalLogData = null;

@@ -1059,7 +1059,7 @@ public class HTML implements MerchantSessionProperties {
               "<tr><td>Unlike the desktop (Windows, Linux, and OS/X-based) Wallet, " +
               "the Android version also supports remote operation using QR codes.  This mode is " +
               "indicated by the following image in the Merchant Web application:</td></tr>" +
-              "<tr><td align=\"center\"><img src=\"images/paywith-saturnqr.png\"></td></tr>" : "") +
+              "<tr><td align=\"center\"><img src=\"images/qr_launcher.png\"></td></tr>" : "") +
             "</table></td></tr>"));       
     }
 

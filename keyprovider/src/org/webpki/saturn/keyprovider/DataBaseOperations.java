@@ -23,6 +23,7 @@ import java.security.PublicKey;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import java.util.logging.Level;
@@ -32,25 +33,54 @@ import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.saturn.common.Currencies;
 
+import org.webpki.webutil.DNSReverseLookup;
+
 public class DataBaseOperations {
 
     static Logger logger = Logger.getLogger(DataBaseOperations.class.getCanonicalName());
     
-    static int createUser(String userName, String ipAddress) throws SQLException {
+    static int createUser(String userName, String clientIpAddress) throws SQLException {
         try {
 /*
             CREATE PROCEDURE CreateUserSP (OUT p_UserId INT,
                                            IN p_UserName VARCHAR(50),
-                                           IN p_IpAddress VARCHAR(50))
+                                           IN p_ClientIpAddress VARCHAR(50))
 */
             try (Connection connection = KeyProviderService.jdbcDataSource.getConnection();
                  CallableStatement stmt = 
                     connection.prepareCall("{call CreateUserSP(?,?,?)}");) {
                 stmt.registerOutParameter(1, java.sql.Types.INTEGER);
                 stmt.setString(2, userName);
-                stmt.setString(3, ipAddress);
+                stmt.setString(3, clientIpAddress);
                 stmt.execute();
-                return stmt.getInt(1);
+                int userId = stmt.getInt(1);
+                
+                // Potentially very slow operation, perform it in the background!
+                new Thread(new Runnable() {
+            
+                    @Override
+                    public void run() {
+                        try {
+                            String host = DNSReverseLookup.getHostName(clientIpAddress);
+                            if (host.equals(clientIpAddress)) {
+                                return;
+                            }
+                            try (PreparedStatement stmt = 
+                                    KeyProviderService.jdbcDataSource.getConnection().prepareStatement(
+                                        "UPDATE USERS SET ClientHost = ? WHERE Id = ?;");) {
+                                stmt.setString(1, host);
+                                stmt.setInt(2, userId);
+                                stmt.executeUpdate();
+                            }
+                        } catch (SQLException | IOException | InterruptedException e) {
+                            logger.log(Level.SEVERE, "Database problem", e);
+                            throw new RuntimeException(e);
+                        }
+                    }
+                   
+                }).start(); 
+
+                return userId;
             }
         } catch (SQLException e) {
             logger.log(Level.SEVERE, "Database problem", e);

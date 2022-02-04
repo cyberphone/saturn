@@ -18,9 +18,9 @@ package org.webpki.saturn.common;
 
 public enum TransactionTypes { 
 
-    DIRECT_DEBIT,     // Direct purchase
+    INSTANT,          // Direct payment
     RESERVE,          // Reserve fund
     TRANSACT,         // Resolving reservation
-    CREDIT_ACCOUNT;   // Refunding
+    REFUND;           // Refunding
 
 }
