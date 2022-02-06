@@ -45,8 +45,8 @@
       <isset property="@include.webpki.in.war"/>
     </condition>
     <delete dir="${temp.dir}"/>
-    <property name="extensions.file" value="extensions-${appcorename}.json"/>
-    <property name="merchants.db" value="merchants.${appcorename}.json"/>
+    <property name="extensions.file" value="extensions-acquirer.json"/>
+    <property name="merchants.db" value="merchants-acquirer.json"/>
     <fixcrlf srcdir="."
        tab="remove"
        tablength="4"

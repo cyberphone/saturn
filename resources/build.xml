@@ -216,7 +216,7 @@
     <property name="card.path" location="${@cardimage.dir}/${card.image}"/>
     <property name="sks.path" location="${@credentials.dir}/${@credentials_store}"/>
     <property name="bank.path" value="${@payerbankhost}/${@payerbankpath}/authority"/>
-    <property name="key.encryption.key" value="${@payerbankpath}-enc-key-ec.cer"/>
+    <property name="key.encryption.key" value="payerbank-enc-key-ec.cer"/>
     <java fork="yes"
           classname="org.webpki.saturn.resources.InitWallet"
           dir="${@key.dir}"

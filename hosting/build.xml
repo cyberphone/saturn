@@ -45,7 +45,7 @@
       <isset property="@include.webpki.in.war"/>
     </condition>
     <delete dir="${temp.dir}"/>
-    <property name="merchants.db" value="merchants.${@payeebankpath}.json"/>
+    <property name="merchants.db" value="merchants-payeebank.json"/>
     <fixcrlf srcdir="."
        tab="remove"
        tablength="4"

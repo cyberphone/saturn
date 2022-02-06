@@ -14,7 +14,7 @@
   <property file="../resources/w3c.properties"/>
   <property file="../resources/merchants.properties"/>
   
-  <property name="application" value="webpay-merchant.war"/>
+  <property name="application" value="${@merchantpath}.war"/>
 
   <property name="webroot" value="webapps"/>
 

@@ -25,6 +25,14 @@
     <isset property="payeebank"/>
   </condition>
 
+  <condition property="internal.name" value="payeebank" else="payerbank">
+    <isset property="payeebank"/>
+  </condition>
+
+  <property name="merchants.db" value="merchants-${internal.name}.json"/>
+
+  <property name="extensions.file" value="extensions-${internal.name}.json"/>
+
   <condition property="hosting.provider.key" value="${@hostingattestationkey}.p12" else="">
     <and>
       <isset property="payeebank"/>
@@ -71,12 +79,10 @@
     </condition>
     <delete dir="${temp.dir}"/>
     <property name="bank.path" value="${appcorename}"/>
-    <property name="extensions.file" value="extensions-${appcorename}.json"/>
     <property name="server.port.map" value=""/>
-    <property name="merchants.db" value="merchants.${appcorename}.json"/>
-    <property name="enc.key.rsa" value="${appcorename}-enc-key-rsa.p12"/>
-    <property name="enc.key.ec" value="${appcorename}-enc-key-ec.p12"/>
-    <property name="cert.key" value="${appcorename}-eecert.p12"/>
+    <property name="enc.key.rsa" value="${internal.name}-enc-key-rsa.p12"/>
+    <property name="enc.key.ec" value="${internal.name}-enc-key-ec.p12"/>
+    <property name="cert.key" value="${internal.name}-eecert.p12"/>
     <fixcrlf srcdir="."
        tab="remove"
        tablength="4"
@@ -159,7 +165,7 @@
       </zipfileset>
       <fileset dir="web"/>
       <zipfileset dir="${conf.dir}" fullpath="images/logotype.svg">
-         <include name="logotype-${appcorename}.svg"/>
+         <include name="logotype-${internal.name}.svg"/>
       </zipfileset>
     </war>
   </target>
