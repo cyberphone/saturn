@@ -27,7 +27,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 import org.webpki.json.JSONSymKeyEncrypter;
 
-import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.ContentEncryptionAlgorithms;
 
 import org.webpki.util.ISODateTime;
 

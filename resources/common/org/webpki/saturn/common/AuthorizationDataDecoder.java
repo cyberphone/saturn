@@ -25,8 +25,7 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import org.webpki.crypto.HashAlgorithms;
-
-import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.ContentEncryptionAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONCryptoHelper;

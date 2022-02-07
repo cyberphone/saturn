@@ -54,11 +54,9 @@ import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
 import org.webpki.crypto.HashAlgorithms;
-
-import org.webpki.crypto.signatures.KeyStoreVerifier;
-
-import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
-import org.webpki.crypto.encryption.KeyEncryptionAlgorithms;
+import org.webpki.crypto.KeyStoreVerifier;
+import org.webpki.crypto.ContentEncryptionAlgorithms;
+import org.webpki.crypto.KeyEncryptionAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONCryptoHelper;

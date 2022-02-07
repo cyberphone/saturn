@@ -28,14 +28,13 @@ import java.security.KeyPair;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.HashAlgorithms;
+import org.webpki.crypto.ContentEncryptionAlgorithms;
 
 import org.webpki.json.JSONAsymKeySigner;
 import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONParser;
-
-import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
 
 import org.webpki.saturn.common.AuthorizationDataDecoder;
 import org.webpki.saturn.common.AuthorizationDataEncoder;

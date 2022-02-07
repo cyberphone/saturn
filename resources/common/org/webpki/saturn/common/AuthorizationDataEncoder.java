@@ -23,8 +23,7 @@ import java.security.GeneralSecurityException;
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.HashAlgorithms;
-
-import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.ContentEncryptionAlgorithms;
 
 import org.webpki.json.JSONArrayWriter;
 import org.webpki.json.JSONCryptoHelper;

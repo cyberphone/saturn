@@ -40,8 +40,7 @@ import javax.sql.DataSource;
 
 import org.webpki.crypto.CertificateUtil;
 import org.webpki.crypto.CustomCryptoProvider;
-
-import org.webpki.crypto.signatures.KeyStoreVerifier;
+import org.webpki.crypto.KeyStoreVerifier;
 
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;

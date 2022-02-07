@@ -25,7 +25,7 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
 
-import org.webpki.crypto.encryption.ContentEncryptionAlgorithms;
+import org.webpki.crypto.ContentEncryptionAlgorithms;
 
 public class ProviderUserResponseDecoder implements BaseProperties {
  
