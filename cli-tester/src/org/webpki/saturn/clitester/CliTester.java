@@ -50,7 +50,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64;
 import org.webpki.util.Base64URL;
-import org.webpki.util.DebugFormatter;
+import org.webpki.util.HexaDecimal;
 import org.webpki.saturn.common.DecryptionKeyHolder;
 import org.webpki.saturn.common.EncryptedData;
 import org.webpki.saturn.common.Encryption;

@@ -73,7 +73,7 @@ import org.webpki.sks.ProvSess;
 import org.webpki.sks.SKSReferenceImplementation;
 
 import org.webpki.util.ArrayUtil;
-import org.webpki.util.DebugFormatter;
+import org.webpki.util.HexaDecimal;
 
 public class InitWallet {
 
@@ -193,6 +193,6 @@ public class InitWallet {
                 "\nID=#" + surrogateKey.keyHandle + ", " + (rsa_flag ? "RSA" : "EC") +
                 ", Card=\n" + ow +
                 "\n\nSha256=" +
-                DebugFormatter.getHexString(HashAlgorithms.SHA256.digest(certPath[0].getPublicKey().getEncoded())));
+                HexaDecimal.encode(HashAlgorithms.SHA256.digest(certPath[0].getPublicKey().getEncoded())));
     }
 }
