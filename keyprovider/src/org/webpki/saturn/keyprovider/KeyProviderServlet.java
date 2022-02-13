@@ -463,7 +463,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 public byte[] signData(byte[] data) throws IOException, GeneralSecurityException {
                     return new SignatureWrapper(getAlgorithm(),
                                                 KeyProviderService.carrierCaKeyPair.getPrivate())
-                        .setEcdsaSignatureEncoding(true)
+                        .ecdsaAsn1SignatureEncoding(true)
                         .update(data)
                         .sign();
                 }
