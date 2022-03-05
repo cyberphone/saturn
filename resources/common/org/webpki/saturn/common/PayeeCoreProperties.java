@@ -69,7 +69,7 @@ public class PayeeCoreProperties implements BaseProperties {
     
     
 
-    public PayeeCoreProperties(JSONObjectReader rd) throws IOException {
+    public PayeeCoreProperties(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         payeeId = rd.getString(LOCAL_PAYEE_ID_JSON);
         commonName = rd.getString(COMMON_NAME_JSON);
         homePage = rd.getString(HOME_PAGE_JSON);

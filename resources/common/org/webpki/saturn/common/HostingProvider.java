@@ -17,7 +17,7 @@
 package org.webpki.saturn.common;
 
 import java.io.IOException;
-
+import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import org.webpki.json.JSONObjectReader;
@@ -25,7 +25,7 @@ import org.webpki.json.JSONObjectWriter;
 
 public class HostingProvider implements BaseProperties {
 
-    public HostingProvider(JSONObjectReader rd) throws IOException {
+    public HostingProvider(JSONObjectReader rd) throws IOException, GeneralSecurityException {
         homePage = rd.getString(HOME_PAGE_JSON);
         hostingUrl = rd.getString(HOSTING_URL_JSON);
         publicKey = rd.getPublicKey();
