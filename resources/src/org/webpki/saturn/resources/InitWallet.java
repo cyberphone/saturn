@@ -153,7 +153,7 @@ public class InitWallet {
                                              false /* enable_pin_caching */,
                                              AppUsage.SIGNATURE,
                                              "" /* friendly_name */, 
-                                             new KeySpecifier(KeyAlgorithms.NIST_P_256), endorsed_algs);
+                                             new KeySpecifier(KeyAlgorithms.P_256), endorsed_algs);
 
         surrogateKey.setCertificatePath(certPath);
         surrogateKey.setPrivateKey(new KeyPair(keyPair.getPublic(), keyPair.getPrivate()));

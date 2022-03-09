@@ -272,7 +272,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             // Create a CA keys.  Note Saturn payment credentials do not use PKI
             ////////////////////////////////////////////////////////////////////////////////////////////
             KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
-            ECGenParameterSpec eccgen = new ECGenParameterSpec(KeyAlgorithms.NIST_P_256.getJceName());
+            ECGenParameterSpec eccgen = new ECGenParameterSpec(KeyAlgorithms.P_256.getJceName());
             generator.initialize(eccgen, new SecureRandom());
             carrierCaKeyPair = generator.generateKeyPair();
 

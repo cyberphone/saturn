@@ -328,13 +328,13 @@
        <param name="rootfile" value="${@banknetworkroot}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@banknetworkroot}.p12 -entity/ca -subject &quot;CN=Payment Network Sub CA3, C=EU&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@banknetworksubca}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg RSA_SHA512 -serial 3"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@banknetworkroot}.p12 -entity/ca -subject &quot;CN=Payment Network Sub CA3, C=EU&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@banknetworksubca}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg RSA_SHA512 -serial 3"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@banknetworksubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=mybank.com, serialNumber=4501, C=FR&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payerbankpath}-eecert.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@banknetworksubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=mybank.com, serialNumber=4501, C=FR&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payerbankpath}-eecert.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@banknetworksubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=Big Bank, serialNumber=896640, C=DE&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payeebankpath}-eecert.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@banknetworksubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=Big Bank, serialNumber=896640, C=DE&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payeebankpath}-eecert.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     </target>
 
@@ -346,13 +346,13 @@
        <param name="rootfile" value="${@acquirernetworkroot}"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@acquirernetworkroot}.p12 -entity/ca -subject &quot;CN=Acquirer Network Sub CA5, C=US&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirernetworksubca}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg RSA_SHA512 -serial 3"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@acquirernetworkroot}.p12 -entity/ca -subject &quot;CN=Acquirer Network Sub CA5, C=US&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirernetworksubca}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg RSA_SHA512 -serial 3"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@acquirernetworksubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=cardprocessor.com, serialNumber=809956, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirersignaturekey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -ca/addpath all -ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${@acquirernetworksubca}.p12 -entity/ee -extension/ku digitalSignature -subject &quot;CN=cardprocessor.com, serialNumber=809956, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirersignaturekey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:ec -selfsigned -entity/ee -extension/ku keyAgreement -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirerencryptionkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:ec -selfsigned -entity/ee -extension/ku keyAgreement -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirerencryptionkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
        <param name="cmd" value="-out/keyalias 20170101:cardprocessor.com:rsa -selfsigned -entity/ee -extension/ku keyEncipherment -subject &quot;CN=cardprocessor.com, serialNumber=809956, OU=Encryption, C=US&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2020-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@acquirerencryptionkey_rsa}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA256"/>
@@ -361,7 +361,7 @@
   
   <target name="_merchantkey">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=${merchant}&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${merchant}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -subject &quot;CN=${merchant}&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${merchant}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2JWKConverter"
@@ -403,13 +403,13 @@
 
   <target name="_clientkeys">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_bankdir}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_bankdir}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_super}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_super}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_unusual}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -extension/ku digitalSignature -subject &quot;CN=Luke Skywalker, serialNumber=95673522&quot; -validity/start 2012-07-10T10:00:00 -validity/end 2025-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@clientkey_unusual}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256"/>
     </antcall>
   </target>
 
@@ -421,7 +421,7 @@
        <param name="rootfile" value="${@payerbankpath}-enc-key-rsa"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payerbankpath}-enc-key-ec.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payerbankpath}-enc-key-ec.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
        <param name="rootfile" value="${@payerbankpath}-enc-key-ec"/>
@@ -433,7 +433,7 @@
        <param name="rootfile" value="${@payeebankpath}-enc-key-rsa"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payeebankpath}-enc-key-ec.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Payee Bank Encryption Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@payeebankpath}-enc-key-ec.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_getroot">
        <param name="rootfile" value="${@payeebankpath}-enc-key-ec"/>
@@ -442,16 +442,16 @@
   
   <target name="_kg2kmkey">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Key Management Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@kg2kmkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Key Management Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@kg2kmkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Key Management Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore inhouse-${@kg2kmkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias mykey -selfsigned -entity/ee -subject &quot;CN=Mybank Key Management Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore inhouse-${@kg2kmkey_ec}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
   </target>
 
   <target name="_hostingkey">
     <antcall target="_createcert">
-       <param name="cmd" value="-out/keyalias 20170101:hosting.com:ec -selfsigned -entity/ee -subject &quot;CN=Hosting Attestation Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@hostingattestationkey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve NIST_P_256 -sigalg ECDSA_SHA256 -serial 1"/>
+       <param name="cmd" value="-out/keyalias 20170101:hosting.com:ec -selfsigned -entity/ee -subject &quot;CN=Hosting Attestation Key1&quot; -validity/start 2010-07-10T10:00:00 -validity/end 2030-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${@hostingattestationkey}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -ecccurve P_256 -sigalg ECDSA_SHA256 -serial 1"/>
     </antcall>
   </target>
 
