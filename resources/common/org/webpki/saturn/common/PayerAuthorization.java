@@ -28,6 +28,8 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONOutputFormats;
 
+import org.webpki.net.HTTPSWrapper;
+
 import org.webpki.crypto.ContentEncryptionAlgorithms;
 import org.webpki.crypto.KeyEncryptionAlgorithms;
 
@@ -42,12 +44,19 @@ public class PayerAuthorization implements BaseProperties {
         return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options);
     }
 
-    public PayerAuthorization(JSONObjectReader rd) throws IOException, GeneralSecurityException {
+    public PayerAuthorization(JSONObjectReader rd, String wellKnownUrl) throws IOException, GeneralSecurityException {
         Messages.PAYER_AUTHORIZATION.parseBaseMessage(rd);
         encryptedAuthorization = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON);
         // Only syntax checking for intermediaries
         encryptedAuthorization.getEncryptionObject(options);
-        providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
+        String urlOrHost = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
+        if (urlOrHost.startsWith("https://")) {
+            providerAuthorityUrl = urlOrHost;
+        } else {
+            HTTPSWrapper wrap = new HTTPSWrapper();
+            wrap.makeGetRequest("https://" + urlOrHost + "/.well-known/" + wellKnownUrl);
+            providerAuthorityUrl = wrap.getDataUTF8();
+        }
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         rd.checkForUnread();
     }

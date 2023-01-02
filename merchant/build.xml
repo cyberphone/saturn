@@ -109,6 +109,7 @@
       <replacefilter token="@desktop-wallet@" value="${desktop.wallet}"/>
       <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@merchant-base-url@" value="${@merchanthost}/${@merchantpath}"/>
+      <replacefilter token="@well-known-url@" value="${@wellknownurl}"/>
       <replacefilter token="@payment-root@" value="${@banknetworkroot}.cer"/>
       <replacefilter token="@acquirer-root@" value="${@acquirernetworkroot}.cer"/>
       <replacefilter token="@payee-acquirer-authority-url@" value="${payee_acquirer.url}"/>

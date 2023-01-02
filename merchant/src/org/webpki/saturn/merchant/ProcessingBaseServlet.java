@@ -108,7 +108,8 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
             }
 
             // Decode the user's authorization.  The encrypted data is only parsed for correctness
-            PayerAuthorization payerAuthorization = new PayerAuthorization(walletResponse);
+            PayerAuthorization payerAuthorization = 
+                    new PayerAuthorization(walletResponse, MerchantService.wellKnownUrl);
             
             // Get merchant
             MerchantDescriptor merchant = MerchantService.getMerchant(session);

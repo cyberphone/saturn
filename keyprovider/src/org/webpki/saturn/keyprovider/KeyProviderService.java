@@ -79,6 +79,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static final String AUTHORITY_URL               = "authority_url";
 
+    static final String WELL_KNOWN_URL              = "well_known_url";
+
     static final String KEYSTORE_PASSWORD           = "key_password";
 
     static final String KEYPROV_KMK                 = "keyprov_kmk";
@@ -124,6 +126,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         KeyAlgorithms keyAlgorithm;
         String paymentMethod;
         boolean cardFormatted;
+        boolean providerWellKnownFlag;
         byte[] optionalServerPin;
         String friendlyName;
         String svgCardImage;
@@ -137,6 +140,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         public CredentialTemplate(JSONObjectReader rd) throws IOException,
                                                               GeneralSecurityException {
             paymentMethod = rd.getString("paymentMethod");
+            providerWellKnownFlag = rd.getBoolean("providerWellKnownFlag");
             signatureAlgorithm = CryptoUtils.getSignatureAlgorithm(rd, "signatureAlgorithm");
             accountType = rd.getString("accountType");
             requestHashAlgorithm = CryptoUtils.getHashAlgorithm(rd, "requestHashAlgorithm");

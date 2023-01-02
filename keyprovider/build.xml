@@ -13,6 +13,8 @@
 
   <property name="webroot" value="webapps"/>
 
+  <property name="authorityurl" value="${@payerbankhost}/${@payerbankpath}/authority"/>
+
   <!-- Ant command line overridables -->
   <property name="logging" value="false"/>
   <property name="biometricsupport" value="true"/>
@@ -56,7 +58,6 @@
       <isset property="@include.webpki.in.war"/>
     </condition>
     <property name="zip.qr.lib.dir" value="${@qr.lib.dir}"/>
-    <property name="authorityurl" value="${@payerbankhost}/${@payerbankpath}/authority"/>
     <delete dir="${temp.dir}"/>
     <fixcrlf srcdir="."
        tab="remove"
@@ -126,6 +127,9 @@
     <fail message="CATALINA_HOME must be set to environment!" unless="catalina.home"/>
     <antcall target="build"/>
     <copy file="${dist.dir}/${application}" todir="${catalina.home}/${webroot}" overwrite="true" preservelastmodified="true"/>
+    <mkdir dir="${catalina.home}/${webroot}/.well-known"/>
+    <echo message="${authorityurl}" 
+          file="${catalina.home}/${webroot}/.well-known/${@wellknownurl}"/>
   </target>
   
 </project>

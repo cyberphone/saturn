@@ -67,6 +67,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
     
     static final String MERCHANT_BASE_URL            = "merchant_base_url";
 
+    static final String WELL_KNOWN_URL               = "well_known_url";
+
     static final String PAYMENT_ROOT                 = "payment_root";
     
     static final String ACQUIRER_ROOT                = "acquirer_root";
@@ -141,6 +143,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static String merchantBaseUrl;
     
+    static String wellKnownUrl;
+
     public static String receiptBaseUrl;
 
     public static DataSource jdbcDataSource;
@@ -228,6 +232,8 @@ public class MerchantService extends InitPropertyReader implements ServletContex
             
             merchantBaseUrl = getPropertyString(MERCHANT_BASE_URL);
             receiptBaseUrl = merchantBaseUrl + "/receipts/";
+            
+            wellKnownUrl = getPropertyString(WELL_KNOWN_URL);
 
             // The standard payment networks supported by the Saturn demo
             knownBackendAccountTypes.addToCache(org.payments.sepa.SEPAAccountDataDecoder.class);
