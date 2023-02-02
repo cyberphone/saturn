@@ -48,9 +48,11 @@ import org.webpki.asn1.cert.DistinguishedName;
 import org.webpki.ca.CA;
 import org.webpki.ca.CertSpec;
 
+import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
+import org.webpki.crypto.KeyAlgorithms;
 import org.webpki.crypto.KeyUsageBits;
 import org.webpki.crypto.SignatureWrapper;
 
@@ -98,6 +100,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     static Logger logger = Logger.getLogger(KeyProviderServlet.class.getCanonicalName());
     
     static String success_image_and_message;
+    
+    static String ED25519 = KeyAlgorithms.ED25519.getAlgorithmId(AlgorithmPreferences.SKS);
     
     void returnKeyGen2Error(HttpServletResponse response, String errorMessage) throws IOException, ServletException {
         ////////////////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +162,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 if (KeyProviderService.biometricSupport) {
                     keygen2State.addFeatureQuery(KeyGen2URIs.CLIENT_FEATURES.BIOMETRIC_SUPPORT);
                 }
+                keygen2State.addFeatureQuery(ED25519);
                 keygen2JSONBody(response, invocationRequest);
                 return;
               }
@@ -257,19 +262,23 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     // Create the signature keys first
                     for (KeyProviderService.CredentialTemplate credentialTemplate 
                             : KeyProviderService.credentialTemplates) {
+                        KeyAlgorithms keyAlgorithm =
+                                keygen2State.isFeatureSupported(ED25519) ? 
+                                KeyAlgorithms.ED25519 : credentialTemplate.keyAlgorithm;
                         ServerState.Key key = credentialTemplate.optionalServerPin == null ?
                                 keygen2State.createKey(AppUsage.SIGNATURE,
-                                                       new KeySpecifier(credentialTemplate
-                                                               .keyAlgorithm),
+                                                       new KeySpecifier(keyAlgorithm),
                                                        standardPinPolicy) 
                                               :
                                 keygen2State
                                     .createKeyWithPresetPIN(AppUsage.SIGNATURE,
-                                                            new KeySpecifier(
-                                                          credentialTemplate.keyAlgorithm),
+                                                            new KeySpecifier(keyAlgorithm),
                                                             serverPinPolicy,
                                                             credentialTemplate.optionalServerPin);                           
-                        key.addEndorsedAlgorithm(credentialTemplate.signatureAlgorithm)
+                        key.addEndorsedAlgorithm(keygen2State.isFeatureSupported(ED25519) ? 
+                                    AsymSignatureAlgorithms.ED25519 
+                                            :
+                                    credentialTemplate.signatureAlgorithm)
                            .setFriendlyName(credentialTemplate.friendlyName)
                            .setUserObject(credentialTemplate);
                         if (keygen2State.isFeatureSupported(
@@ -285,7 +294,8 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         if (credentialTemplate.balanceService) {
                             keygen2State.createKey(AppUsage.SIGNATURE,
                                                    new KeySpecifier(
-                                                           credentialTemplate.keyAlgorithm),
+             keygen2State.isFeatureSupported(ED25519) ? 
+                                KeyAlgorithms.ED25519 : credentialTemplate.keyAlgorithm),
                                                    null)
                             .setFriendlyName(credentialTemplate.friendlyName + " balance key");
                         }
@@ -365,7 +375,10 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     :
               KeyProviderService.authorityUrl,
                                     credentialTemplate.requestHashAlgorithm,
-                                    credentialTemplate.signatureAlgorithm, 
+                                    keygen2State.isFeatureSupported(ED25519) ? 
+                                                AsymSignatureAlgorithms.ED25519 
+                                                                : 
+                                                credentialTemplate.signatureAlgorithm, 
                                     credentialTemplate.dataEncryptionAlgorithm, 
                                     credentialTemplate.keyEncryptionAlgorithm, 
                                     testMode ?
