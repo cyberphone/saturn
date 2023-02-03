@@ -18,8 +18,7 @@
 <text x="226" y="73" font-family="Serif" font-size="28" text-anchor="middle" fill="#558ed5" font-weight="bold">MyBank</text>
 <rect x="14" y="14" width="138" height="98" stroke="#000000" stroke-width="1.2" fill="#ffffff"/>
 <ellipse cx="83" cy="63" rx="60" ry="40" stroke="#f20707" stroke-width="2" fill="none"/>
-<text x="83" y="59" font-family="Sans-serif" font-size="18" text-anchor="middle">BANK</text>
-<text x="83" y="77" font-family="Sans-serif" font-size="18" text-anchor="middle">DIRECT</text>
+<text x="83" y="69" font-family="Sans-serif" font-size="20" text-anchor="middle">BankNet2</text>
 <rect x="25.08" y="30" width="25.84" height="10.47" fill="#ffffff"/>
 <rect x="25.08" y="30" width="3.74" height="10.47" fill="url(#bankPillar)"/>
 <rect x="32.44" y="30" width="3.74" height="10.47" fill="url(#bankPillar)"/>

@@ -22,7 +22,7 @@ import java.io.Serializable;
 public enum PaymentMethods implements Serializable {
 
     SUPER_CARD   (true,  "https://supercard.com",   "SuperCard"), 
-    BANK_DIRECT  (false, "https://bankdirect.net",  "Bank Direct"),
+    BANK_DIRECT  (false, "https://banknet2.org",    "BankNet2"),
     UNUSUAL_CARD (false, "https://unusualcard.com", "UnusualCard");
 
     boolean cardPayment;      // True => card processor model, false = > 3 or 4 corner distributed model

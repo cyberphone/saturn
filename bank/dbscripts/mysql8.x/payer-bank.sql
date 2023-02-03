@@ -776,7 +776,7 @@ CALL _CreateAccountTypeSP("NEW_USER_ACCOUNT",
 CALL _CreatePaymentMethodSP("https://supercard.com",     -- VISA
                             "CREDIT_CARD('453256', @accountNumber, 9)");
 
-CALL _CreatePaymentMethodSP("https://bankdirect.net",    -- LCL 
+CALL _CreatePaymentMethodSP("https://banknet2.org",      -- LCL 
                             "FRENCH_IBAN(@accountNumber)");
 
 CALL _CreatePaymentMethodSP("https://unusualcard.com",   -- DISCOVER
@@ -823,7 +823,7 @@ CALL _CreateAccountSP(@internalAccountId, @currency, @userid, GetAccountTypeId("
 CALL _CreateDemoCredentialSP(@credentialid,
                              @accountId,
                              @internalAccountId, 
-                             "https://bankdirect.net",
+                             "https://banknet2.org",
                              x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
                              x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
 SELECT @credentialid, @accountId, @internalAccountId;
@@ -857,7 +857,7 @@ CALL CreateAccountAndCredentialSP(@accountId,
                                   @currency,
                                   @userid,
                                   "STANDARD_ACCOUNT",
-                                  "https://bankdirect.net",
+                                  "https://banknet2.org",
                                   x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd',
                                   x'b3b76a196ced26e7e5578346b25018c0e86d04e52e5786fdc2810a2a10bd104a');
 SELECT @credentialid, @accountId, @currency;
@@ -866,7 +866,7 @@ CALL AuthenticatePayReqSP(@error,
                           @userName,
                           @credentialId + 1,
                           @accountId,
-                          GetPaymentMethodId("https://bankdirect.net"),
+                          GetPaymentMethodId("https://banknet2.org"),
                           x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd');
 CALL ASSERT_TRUE(@error = 1, "Auth");
 
@@ -874,7 +874,7 @@ CALL AuthenticatePayReqSP(@error,
                           @userName,
                           @credentialId,
                           "BLAH",
-                          GetPaymentMethodId("https://bankdirect.net"),
+                          GetPaymentMethodId("https://banknet2.org"),
                           x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd');
 CALL ASSERT_TRUE(@error = 2, "Auth");
 
@@ -882,7 +882,7 @@ CALL AuthenticatePayReqSP(@error,
                           @userName,
                           @credentialId,
                           @accountId,
-                          GetPaymentMethodId("https://bankdirect.net"),
+                          GetPaymentMethodId("https://banknet2.org"),
                           x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cade');
 CALL ASSERT_TRUE(@error = 3, "Auth");
 
@@ -906,7 +906,7 @@ CALL AuthenticatePayReqSP(@error,
                           @userName,
                           @credentialId,
                           @accountId,
-                          GetPaymentMethodId("https://bankdirect.net"),
+                          GetPaymentMethodId("https://banknet2.org"),
                           x'892225decf3038bdbe3a7bd91315930e9c5fc608dd71ab10d0fb21583ab8cadd');
 CALL ASSERT_TRUE(@error = 0, "Auth");
 CALL ASSERT_TRUE(@userName = "Chewbacca", "UserName");

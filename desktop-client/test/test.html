@@ -24,7 +24,7 @@ var nativePort = null;
 var normalRequest = {
   "@context": "https://webpki.github.io/saturn/v3",
   "@qualifier": "PaymentClientRequest",
-  paymentMethods: ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net"],
+  paymentMethods: ["https://nosuchcard.com", "https://supercard.com", "https://banknet2.org"],
   paymentRequest: {
     payee: {
       commonName: "Demo Merchant",
@@ -44,7 +44,7 @@ var normalRequest = {
 
 // All our cards/accounts should match during the discovery phase...
 var scrollMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone
-scrollMatchingRequest.paymentMethods = ["https://nosuchcard.com", "https://supercard.com", "https://bankdirect.net", "https://unusualcard.com"];
+scrollMatchingRequest.paymentMethods = ["https://nosuchcard.com", "https://supercard.com", "https://banknet2.org", "https://unusualcard.com"];
 
 // No card/account should match during the discovery phase...
 var nonMatchingRequest = JSON.parse(JSON.stringify(normalRequest)); // Deep clone

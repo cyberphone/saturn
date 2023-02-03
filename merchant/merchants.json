@@ -4,7 +4,7 @@
   "phoneNumber": "01.50.10.42.08",
   "emailAddress": "support@spaceshop.com",
   "paymentNetworks": [{
-    "paymentMethod": "https://bankdirect.net",
+    "paymentMethod": "https://banknet2.org",
     "localPayeeId": "86344",
     "key": {
       "kty": "EC",
@@ -44,7 +44,7 @@
   "phoneNumber": "02 99 50 63 93", 
   "emailAddress": "support@planetgas.com",
   "paymentNetworks": [{
-    "paymentMethod": "https://bankdirect.net",
+    "paymentMethod": "https://banknet2.org",
     "localPayeeId": "973277",
     "key": {
       "kty": "EC",
