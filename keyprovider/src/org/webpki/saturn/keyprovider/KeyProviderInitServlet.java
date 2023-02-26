@@ -236,7 +236,7 @@ public class KeyProviderInitServlet extends HttpServlet {
         session.setAttribute(KEYGEN2_SESSION_ATTR,
                 new ServerState(new KeyGen2SoftHSM(KeyProviderService.keyManagementKey), 
                                 KeyProviderService.keygen2RunUrl,
-                                KeyProviderService.serverCertificate,
+                                KeyProviderService.getServerCertificate(),
                                 null));
         if (request.getParameter(TESTMODE_SESSION_ATTR) == null) {
             session.removeAttribute(TESTMODE_SESSION_ATTR);

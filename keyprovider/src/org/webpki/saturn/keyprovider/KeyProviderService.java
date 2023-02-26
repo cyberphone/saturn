@@ -103,7 +103,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     
     static Integer serverPortMapping;
 
-    static X509Certificate serverCertificate;
+    static String serverCertificatePath;
 
     static KeyPair carrierCaKeyPair;
 
@@ -118,6 +118,15 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static boolean biometricSupport;
 
     static boolean logging;
+    
+    static X509Certificate getServerCertificate() throws IOException {
+        try {
+            return CertificateUtil.getCertificateFromBlob(
+                    ArrayUtil.readFile(serverCertificatePath));
+        } catch (GeneralSecurityException e) {
+            throw new IOException(e);
+        }
+    }
 
     class CredentialTemplate {
 
@@ -267,10 +276,9 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             androidChromeVersion = getPropertyInt(ANDROID_CHROME_VERSION);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
-            // Get TLS server certificate
+            // Get path to TLS server certificate
             ////////////////////////////////////////////////////////////////////////////////////////////
-            serverCertificate = CertificateUtil.getCertificateFromBlob(
-                    ArrayUtil.readFile(getPropertyString(TLS_CERTIFICATE)));
+            serverCertificatePath = getPropertyString(TLS_CERTIFICATE);
             
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Create a CA keys.  Note Saturn payment credentials do not use PKI
@@ -314,7 +322,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             jdbcDataSource = (DataSource)envContext.lookup("jdbc/PAYER_BANK");
             DataBaseOperations.testConnection();
 
-            logger.info("Saturn KeyProvider-server initiated: " + serverCertificate.getSubjectX500Principal().getName());
+            logger.info("Saturn KeyProvider-server initiated: " + 
+                        getServerCertificate().getSubjectX500Principal().getName());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);
         }
