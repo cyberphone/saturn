@@ -1036,13 +1036,13 @@ public class Wallet {
                             @Override
                             public byte[] signData(byte[] data) 
                                     throws IOException, GeneralSecurityException {
-                                return sks.signHashedData(
+                                return sks.signData(
                                         keyHandle,
                                         getAlgorithm().getAlgorithmId(AlgorithmPreferences.SKS),
                                         null,
                                         false,
                                         new String(pinText.getPassword()).getBytes("UTF-8"),
-                                        getAlgorithm().getDigestAlgorithm().digest(data));
+                                        data);
                             }
 
                         }).setPublicKey(sks.getKeyAttributes(keyHandle)
