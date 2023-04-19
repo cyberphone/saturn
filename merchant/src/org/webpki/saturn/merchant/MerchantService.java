@@ -48,7 +48,7 @@ import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONDecoderCache;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 import org.webpki.saturn.common.AccountDataDecoder;
 import org.webpki.saturn.common.AccountDataEncoder;
@@ -161,7 +161,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     JSONObjectReader readJSONFile(String name) throws IOException {
         return JSONParser.parse(
-                ArrayUtil.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name)));        
+                IO.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name)));        
     }
 
     JSONX509Verifier getRoot(String name) throws IOException, GeneralSecurityException {
@@ -169,7 +169,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
         keyStore.load (null, null);
         keyStore.setCertificateEntry ("mykey",
                                       CertificateUtil.getCertificateFromBlob (
-                                           ArrayUtil.getByteArrayFromInputStream (getResource(name))));        
+                                           IO.getByteArrayFromInputStream (getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     

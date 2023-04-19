@@ -25,6 +25,7 @@ import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
@@ -37,7 +38,6 @@ import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
-import org.webpki.util.ArrayUtil;
 import org.webpki.util.Base64URL;
 
 public class PayeeCoreProperties implements BaseProperties {
@@ -208,7 +208,7 @@ public class PayeeCoreProperties implements BaseProperties {
             }
             boolean notFound = true;
             for (byte[] hash : getAccountHashes()) {
-                if (ArrayUtil.compare(accountHash, hash)) {
+                if (Arrays.equals(accountHash, hash)) {
                     notFound = false;
                     break;
                 }

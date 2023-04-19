@@ -25,6 +25,7 @@ import java.net.URLEncoder;
 import java.security.KeyPair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
@@ -60,7 +61,6 @@ import org.webpki.saturn.common.PaymentClientRequestEncoder;
 
 import org.webpki.saturn.common.PaymentClientRequestEncoder.SupportedPaymentMethod;
 
-import org.webpki.util.ArrayUtil;
 import org.webpki.util.PEMDecoder;
 
 import org.webpki.webutil.ServletUtil;
@@ -330,7 +330,7 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
                         html.append("<div>Signature was not verified (public key " +
                                     "is associated with \"" + CREDENTIAL_ID_JSON + "\").</div>");
                     }
-                    if (!ArrayUtil.compare(authorizationData.getRequestHashAlgorithm().digest(
+                    if (!Arrays.equals(authorizationData.getRequestHashAlgorithm().digest(
                             walletRequest.getObject(PAYMENT_REQUEST_JSON)
                                 .serializeToBytes(JSONOutputFormats.CANONICALIZED)), 
                                            authorizationData.getRequestHash())) {

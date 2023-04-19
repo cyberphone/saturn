@@ -17,7 +17,7 @@
 
 package org.webpki.saturn.resources;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 /**
  * Convert XML, HTML or SVG resources into strings
@@ -54,7 +54,7 @@ public class Escaping {
         }
         boolean quoting = false;
         int lineLength = 0;
-        for (char c : new String(ArrayUtil.readFile(args[0]), "utf-8").toCharArray()) {
+        for (char c : new String(IO.readFile(args[0]), "utf-8").toCharArray()) {
             if (c == '"') {
                 if (java) {
                     lineLength++;
@@ -92,6 +92,6 @@ public class Escaping {
                 result.append(c);
             }
         }
-        ArrayUtil.writeFile(args[1], result.toString().getBytes("utf-8"));
+        IO.writeFile(args[1], result.toString().getBytes("utf-8"));
     }
 }

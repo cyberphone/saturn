@@ -54,7 +54,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecoderCache;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.KnownExtensions;
@@ -139,7 +139,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
         keyStore.load (null, null);
         keyStore.setCertificateEntry ("mykey",
                                       CertificateUtil.getCertificateFromBlob (
-                                           ArrayUtil.getByteArrayFromInputStream (getResource(name))));        
+                                           IO.getByteArrayFromInputStream(getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
@@ -186,7 +186,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             paymentRoot = getRoot(PAYMENT_ROOT);
 
             JSONArrayReader accounts = JSONParser.parse(
-                    ArrayUtil.getByteArrayFromInputStream (getResource(PAYEE_ACCOUNT_DB))
+                    IO.getByteArrayFromInputStream(getResource(PAYEE_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
             String acquirerBaseUrl = getPropertyString(ACQUIRER_BASE_URL);
 
@@ -202,7 +202,7 @@ public class AcquirerService extends InitPropertyReader implements ServletContex
             addDecryptionKey(DECRYPTION_KEY2);
 
             String extensions =
-                    new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
+                    new String(IO.getByteArrayFromInputStream(getResource(EXTENSIONS)), "UTF-8").trim();
 
             if (extensions.length() > 0) {
                 extensions = extensions.replace("${host}", acquirerBaseUrl);

@@ -22,6 +22,7 @@ import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.webpki.crypto.HashAlgorithms;
 
@@ -33,7 +34,6 @@ import org.webpki.json.JSONDecryptionDecoder;
 import org.webpki.json.JSONParser;
 import org.webpki.json.JSONSignatureDecoder;
 
-import org.webpki.util.ArrayUtil;
 import org.webpki.util.ISODateTime;
 
 public class AuthorizationRequestDecoder implements BaseProperties {
@@ -134,7 +134,7 @@ System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
             new AuthorizationDataDecoder(
                     JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)),
                                      option);
-        if (!ArrayUtil.compare(authorizationData.requestHash, 
+        if (!Arrays.equals(authorizationData.requestHash, 
                                paymentRequest.getRequestHash(authorizationData.requestHashAlgorithm))) {
             throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
         }

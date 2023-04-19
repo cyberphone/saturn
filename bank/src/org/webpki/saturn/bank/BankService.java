@@ -66,7 +66,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecryptionDecoder;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 import org.webpki.saturn.bank.admin.TransactionListingServlet;
 import org.webpki.saturn.bank.admin.UserListingServlet;
@@ -251,7 +251,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
         keyStore.load (null, null);
         keyStore.setCertificateEntry("mykey",
                                      CertificateUtil.getCertificateFromBlob(
-                                         ArrayUtil.getByteArrayFromInputStream(getResource(name))));        
+                                         IO.getByteArrayFromInputStream(getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
@@ -339,8 +339,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             
             if (hostingProviders == null) {
                 JSONArrayReader accounts = 
-                    JSONParser.parse(ArrayUtil
-                        .getByteArrayFromInputStream(getResource(PAYEE_ACCOUNT_DB)))
+                    JSONParser.parse(IO.getByteArrayFromInputStream(getResource(PAYEE_ACCOUNT_DB)))
                             .getJSONArrayReader();
                 while (accounts.hasMore()) {
                     PayeeCoreProperties account = 
@@ -358,7 +357,7 @@ public class BankService extends InitPropertyReader implements ServletContextLis
             testReferenceId = 10000;
             
             String extensions =
-                new String(ArrayUtil.getByteArrayFromInputStream(getResource(EXTENSIONS)), 
+                new String(IO.getByteArrayFromInputStream(getResource(EXTENSIONS)), 
                            "UTF-8").trim();
 
             if (!extensions.isEmpty()) {

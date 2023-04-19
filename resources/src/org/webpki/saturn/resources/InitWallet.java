@@ -72,8 +72,8 @@ import org.webpki.sks.PINPol;
 import org.webpki.sks.ProvSess;
 import org.webpki.sks.SKSReferenceImplementation;
 
-import org.webpki.util.ArrayUtil;
 import org.webpki.util.HexaDecimal;
+import org.webpki.util.IO;
 
 public class InitWallet {
 
@@ -94,15 +94,15 @@ public class InitWallet {
         String credentialId = args[4];
         String accountId = args[5];
         String authorityUrl = args[6];
-        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(ArrayUtil.readFile(args[7])).getPublicKey();
+        PublicKey encryptionKey = CertificateUtil.getCertificateFromBlob(IO.readFile(args[7])).getPublicKey();
         String imageFile = args[8];
         HashAlgorithms requestHashAgorithm = HashAlgorithms.getAlgorithmFromId(args[9], AlgorithmPreferences.JOSE);
         ContentEncryptionAlgorithms dataEncryptionAlgorithm = ContentEncryptionAlgorithms.getAlgorithmFromId(args[10]);
         KeyEncryptionAlgorithms keyEncryptionAlgorithm = KeyEncryptionAlgorithms.getAlgorithmFromId(args[11]);
   
         // Read importedKey/certificate to be imported
-        JSONObjectReader privateKeyJWK = JSONParser.parse(ArrayUtil.readFile(clientKeyCore + ".jwk"));
-        JSONArrayReader certPathJSON = JSONParser.parse(ArrayUtil.readFile(clientKeyCore + ".certpath")).getJSONArrayReader();
+        JSONObjectReader privateKeyJWK = JSONParser.parse(IO.readFile(clientKeyCore + ".jwk"));
+        JSONArrayReader certPathJSON = JSONParser.parse(IO.readFile(clientKeyCore + ".certpath")).getJSONArrayReader();
         X509Certificate[] certPath = certPathJSON.getCertificatePath();
         KeyPair keyPair = privateKeyJWK.getKeyPair();
         boolean rsa_flag = keyPair.getPublic() instanceof RSAKey;
@@ -180,7 +180,7 @@ public class InitWallet {
         surrogateKey.addExtension(KeyGen2URIs.LOGOTYPES.CARD,
                                   SecureKeyStore.SUB_TYPE_LOGOTYPE,
                                   "image/png",
-                                  ArrayUtil.readFile(imageFile));
+                                  IO.readFile(imageFile));
         sess.closeSession();
         // Serialize the updated SKS
         ObjectOutputStream oos = new ObjectOutputStream (new FileOutputStream(sksFile));

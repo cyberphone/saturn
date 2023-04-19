@@ -51,7 +51,7 @@ import org.webpki.saturn.common.UserAuthorizationMethods;
 import org.webpki.saturn.common.UserChallengeItem;
 import org.webpki.saturn.common.UserResponseItem;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 public class DebugData implements Serializable {
 
@@ -161,7 +161,7 @@ public class DebugData implements Serializable {
 
     static {
         try {
-            keyPair = JSONParser.parse(ArrayUtil.getByteArrayFromInputStream(
+            keyPair = JSONParser.parse(IO.getByteArrayFromInputStream(
                     DebugData.class.getResourceAsStream("sampleauthorizationkey.jwk"))).getKeyPair();
             userAuthzSample = createUserAuthorizationSample();
             

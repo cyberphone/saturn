@@ -92,7 +92,7 @@ import org.webpki.sks.SKSException;
 import org.webpki.sks.SecureKeyStore;
 import org.webpki.sks.SKSReferenceImplementation;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataDecoder;
@@ -822,7 +822,7 @@ public class Wallet {
 
         ImageIcon getImageIcon(String name, boolean animated) {
             try {
-                return getImageIcon(ArrayUtil.getByteArrayFromInputStream(
+                return getImageIcon(IO.getByteArrayFromInputStream(
                         getClass().getResourceAsStream (name)), animated);
             } catch (Exception e) {
                 logger.log(Level.SEVERE, "Failed reading image", e);

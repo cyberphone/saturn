@@ -41,7 +41,7 @@ import org.webpki.json.JSONParser;
 import org.webpki.json.JSONX509Verifier;
 import org.webpki.json.JSONDecoderCache;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 import org.webpki.saturn.common.AuthorityObjectManager;
 import org.webpki.saturn.common.PayeeCoreProperties;
@@ -92,7 +92,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
         keyStore.load (null, null);
         keyStore.setCertificateEntry ("mykey",
                                       CertificateUtil.getCertificateFromBlob (
-                                           ArrayUtil.getByteArrayFromInputStream(getResource(name))));        
+                                           IO.getByteArrayFromInputStream(getResource(name))));        
         return new JSONX509Verifier(new KeyStoreVerifier(keyStore));
     }
     
@@ -118,7 +118,7 @@ public class HostingService extends InitPropertyReader implements ServletContext
             knownPayeeMethods.addToCache(se.bankgirot.BGAccountDataDecoder.class);
 
             JSONArrayReader accounts = JSONParser.parse(
-                    ArrayUtil.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
+                    IO.getByteArrayFromInputStream (getResource(MERCHANT_ACCOUNT_DB))
                                                        ).getJSONArrayReader();
 
             while (accounts.hasMore()) {

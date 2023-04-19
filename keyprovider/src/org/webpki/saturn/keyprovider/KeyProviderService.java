@@ -56,7 +56,7 @@ import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 import org.webpki.saturn.common.CryptoUtils;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -122,7 +122,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     static X509Certificate getServerCertificate() throws IOException {
         try {
             return CertificateUtil.getCertificateFromBlob(
-                    ArrayUtil.readFile(serverCertificatePath));
+                    IO.readFile(serverCertificatePath));
         } catch (GeneralSecurityException e) {
             throw new IOException(e);
         }
@@ -208,7 +208,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
     }
 
     String getResourceAsString(String name) throws IOException {
-        return new String(ArrayUtil.getByteArrayFromInputStream(getResource(name)),
+        return new String(IO.getByteArrayFromInputStream(getResource(name)),
                           "UTF-8");
     }
 

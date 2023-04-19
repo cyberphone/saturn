@@ -16,7 +16,7 @@
  */
 package org.webpki.tools.svg;
 
-import org.webpki.util.ArrayUtil;
+import org.webpki.util.IO;
 
 public class SVG {
     
@@ -96,7 +96,7 @@ public class SVG {
             doc = (SVGDocument) Class.forName(args[1]).newInstance();
             String filters = "";
             if (args.length == 3) {
-                filters = new String(ArrayUtil.readFile(args[2]), "UTF-8");
+                filters = new String(IO.readFile(args[2]), "UTF-8");
             }
             doc.generate();
             filters += doc.getFilters();
@@ -121,7 +121,7 @@ public class SVG {
                  .append(">\n")
                  .append(filters)
                  .append(svgText);
-            ArrayUtil.writeFile(args[0], total.toString().getBytes("UTF-8"));
+            IO.writeFile(args[0], total.toString().getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
