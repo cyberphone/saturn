@@ -56,7 +56,10 @@ import org.webpki.json.JSONArrayReader;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONParser;
 
+import org.webpki.keygen2.KeyGen2Exception;
+
 import org.webpki.util.IO;
+import org.webpki.util.UTF8;
 
 import org.webpki.saturn.common.CryptoUtils;
 import org.webpki.saturn.common.KeyStoreEnumerator;
@@ -119,13 +122,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static boolean logging;
     
-    static X509Certificate getServerCertificate() throws IOException {
-        try {
-            return CertificateUtil.getCertificateFromBlob(
-                    IO.readFile(serverCertificatePath));
-        } catch (GeneralSecurityException e) {
-            throw new IOException(e);
-        }
+    static X509Certificate getServerCertificate() {
+            return CertificateUtil.getCertificateFromBlob(IO.readFile(serverCertificatePath));
     }
 
     class CredentialTemplate {
@@ -199,17 +197,16 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
 
     static String successMessage;
 
-    InputStream getResource(String name) throws IOException {
+    InputStream getResource(String name) {
         InputStream is = this.getClass().getResourceAsStream(name);
         if (is == null) {
-            throw new IOException("Resource fail for: " + name);
+            throw new KeyGen2Exception("Resource fail for: " + name);
         }
         return is;
     }
 
-    String getResourceAsString(String name) throws IOException {
-        return new String(IO.getByteArrayFromInputStream(getResource(name)),
-                          "UTF-8");
+    String getResourceAsString(String name) {
+        return UTF8.decode(IO.getByteArrayFromInputStream(getResource(name)));
     }
 
     @Override

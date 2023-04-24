@@ -284,7 +284,7 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
             new com.supercard.SupercardAccountDataEncoder(
                     accountId, 
                     userName,
-                    ISODateTime.parseDateTime("2022-12-31T00:00:00Z", ISODateTime.COMPLETE))
+                    ISODateTime.decode("2022-12-31T00:00:00Z", ISODateTime.COMPLETE))
                                                      :
             new org.payments.sepa.SEPAAccountDataEncoder(accountId);
 

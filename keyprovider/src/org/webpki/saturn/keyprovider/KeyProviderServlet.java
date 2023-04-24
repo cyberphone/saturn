@@ -51,6 +51,7 @@ import org.webpki.ca.CertSpec;
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymKeySignerInterface;
 import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.CryptoException;
 import org.webpki.crypto.HashAlgorithms;
 import org.webpki.crypto.KeyAlgorithms;
 import org.webpki.crypto.KeyUsageBits;
@@ -460,8 +461,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
 
     void createCarrierCerificate(ServerState.Key key, 
                                  String userName, 
-                                 DataBaseOperations.AccountAndCredential accountAndCredential)
-    throws IOException, GeneralSecurityException {
+                                 DataBaseOperations.AccountAndCredential accountAndCredential) {
         CertSpec certSpec = new CertSpec();
         certSpec.setKeyUsageBit(KeyUsageBits.DIGITAL_SIGNATURE);
         certSpec.setSubject("CN=" + userName + ", serialNumber=" + accountAndCredential.accountId);
@@ -477,12 +477,16 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             new AsymKeySignerInterface() {
 
                 @Override
-                public byte[] signData(byte[] data) throws IOException, GeneralSecurityException {
-                    return new SignatureWrapper(getAlgorithm(),
-                                                KeyProviderService.carrierCaKeyPair.getPrivate())
-                        .ecdsaAsn1SignatureEncoding(true)
-                        .update(data)
-                        .sign();
+                public byte[] signData(byte[] data) {
+                    try {
+                        return new SignatureWrapper(getAlgorithm(),
+                                                    KeyProviderService.carrierCaKeyPair.getPrivate())
+                            .ecdsaAsn1SignatureEncoding(true)
+                            .update(data)
+                            .sign();
+                    } catch (GeneralSecurityException e) {
+                        throw new CryptoException(e);
+                    }
                 }
 
                 @Override

@@ -93,7 +93,7 @@ import org.webpki.sks.SecureKeyStore;
 import org.webpki.sks.SKSReferenceImplementation;
 
 import org.webpki.util.IO;
-
+import org.webpki.util.UTF8;
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataDecoder;
 import org.webpki.saturn.common.ClientPlatform;
@@ -1034,14 +1034,13 @@ public class Wallet {
                             }
 
                             @Override
-                            public byte[] signData(byte[] data) 
-                                    throws IOException, GeneralSecurityException {
+                            public byte[] signData(byte[] data) {
                                 return sks.signData(
                                         keyHandle,
                                         getAlgorithm().getAlgorithmId(AlgorithmPreferences.SKS),
                                         null,
                                         false,
-                                        new String(pinText.getPassword()).getBytes("UTF-8"),
+                                        UTF8.encode(new String(pinText.getPassword())),
                                         data);
                             }
 

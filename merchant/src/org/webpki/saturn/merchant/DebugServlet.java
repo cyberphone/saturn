@@ -617,8 +617,8 @@ class DebugPrintout implements BaseProperties {
             debugData.acquirerMode ?
                 new com.supercard.SupercardAccountDataEncoder("4532562005001506",
                                                               "Luke Skywalker", 
-                                                              ISODateTime.parseDateTime("2024-03-14T00:00:00Z",
-                                                                                        ISODateTime.COMPLETE))
+                                                              ISODateTime.decode("2024-03-14T00:00:00Z",
+                                                                                 ISODateTime.COMPLETE))
                                    :
                 new org.payments.sepa.SEPAAccountDataEncoder("FR7630002111110020050015158")).writeObject();
         description(point.sub() +
