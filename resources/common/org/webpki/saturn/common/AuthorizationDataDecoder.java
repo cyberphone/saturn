@@ -16,12 +16,9 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import org.webpki.crypto.HashAlgorithms;
@@ -36,8 +33,7 @@ import org.webpki.util.ISODateTime;
 public class AuthorizationDataDecoder implements BaseProperties {
 
     public AuthorizationDataDecoder(JSONObjectReader rd, 
-                                    JSONCryptoHelper.Options signatureOptions) 
-            throws IOException, GeneralSecurityException {
+                                    JSONCryptoHelper.Options signatureOptions) {
         root = rd;
         JSONObjectReader requestHashObject = rd.getObject(REQUEST_HASH_JSON);
         requestHashAlgorithm = CryptoUtils.getHashAlgorithm(requestHashObject, 
@@ -62,7 +58,7 @@ public class AuthorizationDataDecoder implements BaseProperties {
                  UserResponseItem challengeResult = new UserResponseItem(ar.getObject());
                 if (optionalUserResponseItems.put(challengeResult.getName(), 
                                                   challengeResult) != null) {
-                    throw new IOException("Duplicate: " + challengeResult.getName());
+                    throw new SaturnException("Duplicate: " + challengeResult.getName());
                 }
             } while (ar.hasMore());
         }

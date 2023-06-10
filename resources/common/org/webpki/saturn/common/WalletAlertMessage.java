@@ -16,14 +16,12 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
 public class WalletAlertMessage implements BaseProperties {
     
-    public WalletAlertMessage(JSONObjectReader rd) throws IOException {
+    public WalletAlertMessage(JSONObjectReader rd) {
         root = Messages.PAYMENT_CLIENT_ALERT.parseBaseMessage(rd);
         text = rd.getString(TEXT_JSON);
         rd.checkForUnread();
@@ -39,7 +37,7 @@ public class WalletAlertMessage implements BaseProperties {
         return text;
     }
 
-    public static JSONObjectWriter encode(String text) throws IOException {
+    public static JSONObjectWriter encode(String text) {
         return Messages.PAYMENT_CLIENT_ALERT.createBaseMessage()
             .setString(TEXT_JSON, text);
     }

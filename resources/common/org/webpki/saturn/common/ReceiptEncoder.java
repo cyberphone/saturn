@@ -16,11 +16,7 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
-
-import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
 
@@ -37,7 +33,7 @@ public class ReceiptEncoder implements BaseProperties {
     
     JSONObjectWriter setOptionalTaxRecord(JSONObjectWriter wr,
                                           ReceiptTaxRecord taxRecord,
-                                          Currencies currency) throws IOException {
+                                          Currencies currency) {
         return taxRecord == null ? wr :
             wr.setObject(TAX_JSON, new JSONObjectWriter()
                 .setMoney(AMOUNT_JSON, taxRecord.amount, currency.decimals)
@@ -47,7 +43,7 @@ public class ReceiptEncoder implements BaseProperties {
     JSONObjectWriter setOptionalAmount(JSONObjectWriter wr,
                                        String jsonTag,
                                        BigDecimal amount,
-                                       Currencies currency) throws IOException {
+                                       Currencies currency) {
         return amount == null ? wr :
             wr.setMoney(jsonTag, amount, currency.decimals);
     }
@@ -75,8 +71,7 @@ public class ReceiptEncoder implements BaseProperties {
                           String providerReferenceId,
                           String payeeRequestId,
                           GregorianCalendar providerTimeStamp,
-                          ServerAsymKeySigner signer) 
-            throws IOException, GeneralSecurityException {
+                          ServerAsymKeySigner signer) {
         this(ReceiptDecoder.Status.AVAILABLE);
         receiptDocument
             .setString(REFERENCE_ID_JSON, payeeReferenceId)
@@ -171,13 +166,13 @@ public class ReceiptEncoder implements BaseProperties {
             .setSignature(RECEIPT_SIGNATURE_JSON, signer);
     }
 
-    public ReceiptEncoder(ReceiptDecoder.Status notAvailableStatus) throws IOException {
+    public ReceiptEncoder(ReceiptDecoder.Status notAvailableStatus) {
         receiptDocument = Messages.RECEIPT.createBaseMessage()
                 .setString(STATUS_JSON, notAvailableStatus.toString());
     }
 
     JSONObjectWriter receiptDocument;
-    public JSONObjectWriter getReceiptDocument() throws IOException {
+    public JSONObjectWriter getReceiptDocument() {
         return receiptDocument;
     }
 }

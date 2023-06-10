@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.security.PublicKey;
 
 import org.webpki.crypto.AsymSignatureAlgorithms;
@@ -45,7 +43,7 @@ public class CardDataEncoder implements BaseProperties {
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                           PublicKey encryptionKey,
                                           String optionalKeyId,
-                                          byte[] optionalAccountStatusKeyHash) throws IOException {
+                                          byte[] optionalAccountStatusKeyHash) {
         return new JSONObjectWriter()
             .setString(CardDataDecoder.VERSION_JSON, CardDataDecoder.ACTUAL_VERSION)
             .setString(PAYMENT_METHOD_JSON, paymentMethod)

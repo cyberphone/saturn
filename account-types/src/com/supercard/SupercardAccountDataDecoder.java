@@ -46,7 +46,7 @@ public final class SupercardAccountDataDecoder extends AccountDataDecoder {
     }
 
     @Override
-    protected void readJSONData(JSONObjectReader rd) throws IOException {
+    protected void readJSONData(JSONObjectReader rd) {
         readOptionalNonce(rd);
         accountId = rd.getString(CARD_NUMBER_JSON);
         cardHolder = rd.getString(CARD_HOLDER_JSON);
@@ -54,7 +54,7 @@ public final class SupercardAccountDataDecoder extends AccountDataDecoder {
     }
 
     @Override
-    protected byte[] getAccountObject() throws IOException {
+    protected byte[] getAccountObject() {
         return getWriter().serializeToBytes(JSONOutputFormats.CANONICALIZED);
     }
 

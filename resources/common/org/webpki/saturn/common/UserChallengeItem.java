@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
@@ -41,7 +39,7 @@ public class UserChallengeItem implements BaseProperties {
         this.optionalLabel = optionalLabel;
     }
  
-    public JSONObjectWriter writeObject() throws IOException {
+    public JSONObjectWriter writeObject() {
         return new JSONObjectWriter()
             .setString(NAME_JSON, name)
             .setString(TYPE_JSON, type.toString())
@@ -63,7 +61,7 @@ public class UserChallengeItem implements BaseProperties {
         return optionalLabel;
     }
 
-    public UserChallengeItem(JSONObjectReader rd) throws IOException {
+    public UserChallengeItem(JSONObjectReader rd) {
         name = rd.getString(NAME_JSON);
         type = TYPE.valueOf(rd.getString(TYPE_JSON));
         optionalLabel = rd.getStringConditional(LABEL_JSON);

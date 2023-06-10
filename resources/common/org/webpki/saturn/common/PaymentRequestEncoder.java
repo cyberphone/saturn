@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
@@ -34,7 +32,7 @@ public class PaymentRequestEncoder implements BaseProperties {
                                           NonDirectPaymentEncoder optionalNonDirectPayment,
                                           String referenceId,
                                           GregorianCalendar timeStamp,
-                                          GregorianCalendar expires) throws IOException {
+                                          GregorianCalendar expires) {
         return new JSONObjectWriter()
             .setString(COMMON_NAME_JSON, payeeCommonName)
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())

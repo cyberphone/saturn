@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectWriter;
@@ -34,8 +32,7 @@ public class NonDirectPaymentEncoder implements BaseProperties {
         return root;
     }
 
-    private static NonDirectPaymentEncoder common(NonDirectPaymentTypes type)
-    throws IOException {
+    private static NonDirectPaymentEncoder common(NonDirectPaymentTypes type) {
         NonDirectPaymentEncoder nonDirectPaymentEncoder = new NonDirectPaymentEncoder();
         nonDirectPaymentEncoder.root = new JSONObjectWriter().setString(TYPE_JSON, type.toString());
         return nonDirectPaymentEncoder;
@@ -43,7 +40,7 @@ public class NonDirectPaymentEncoder implements BaseProperties {
 
     public static NonDirectPaymentEncoder reservation(ReservationSubTypes subType,
                                                       GregorianCalendar expires,
-                                                      boolean fixed) throws IOException {
+                                                      boolean fixed) {
        return common(NonDirectPaymentTypes.RESERVATION)
            .subTypeAttribute(subType)
            .fixedAttribute(fixed)
@@ -52,9 +49,9 @@ public class NonDirectPaymentEncoder implements BaseProperties {
 
     public static NonDirectPaymentEncoder recurring(RecurringPaymentIntervals interval,
                                                     Integer optionalInstallments,
-                                                    boolean fixed) throws IOException {
+                                                    boolean fixed) {
         if (optionalInstallments == null ^ interval == RecurringPaymentIntervals.UNSPECIFIED) {
-            throw new IOException("Invalid combination");
+            throw new SaturnException("Invalid combination");
         }
         return common(NonDirectPaymentTypes.RECURRING)
             .intervalAttribute(interval)
@@ -62,7 +59,7 @@ public class NonDirectPaymentEncoder implements BaseProperties {
             .fixedAttribute(fixed);
     }
 
-    private NonDirectPaymentEncoder installmentsAttribute(Integer optionalInstallments) throws IOException {
+    private NonDirectPaymentEncoder installmentsAttribute(Integer optionalInstallments) {
         if (optionalInstallments != null && optionalInstallments != 0) {
             root.setInt(INSTALLMENTS_JSON, optionalInstallments);
         }
@@ -70,23 +67,23 @@ public class NonDirectPaymentEncoder implements BaseProperties {
     }
 
     private NonDirectPaymentEncoder subTypeAttribute(ReservationSubTypes subType)
-    throws IOException {
+    {
         root.setString(SUB_TYPE_JSON, subType.toString());
         return this;
     }
 
     private NonDirectPaymentEncoder intervalAttribute(RecurringPaymentIntervals interval)
-    throws IOException {
+    {
         root.setString(INTERVAL_JSON, interval.toString());
         return this;
     }
 
-    private NonDirectPaymentEncoder fixedAttribute(boolean fixed) throws IOException {
+    private NonDirectPaymentEncoder fixedAttribute(boolean fixed) {
         root.setBoolean(FIXED_JSON, fixed);
         return this;
     }
 
-    private NonDirectPaymentEncoder expireAttribute(GregorianCalendar expires) throws IOException {
+    private NonDirectPaymentEncoder expireAttribute(GregorianCalendar expires) {
         root.setDateTime(EXPIRES_JSON, expires, ISODateTime.UTC_NO_SUBSECONDS);
         return this;
     }

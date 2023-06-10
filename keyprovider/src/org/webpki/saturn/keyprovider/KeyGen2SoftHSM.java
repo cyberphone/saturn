@@ -17,8 +17,6 @@
 
 package org.webpki.saturn.keyprovider;
 
-import java.io.IOException;
-
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -46,6 +44,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.webpki.crypto.KeyAlgorithms;
 import org.webpki.crypto.HmacAlgorithms;
 import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.CryptoException;
 import org.webpki.crypto.SignatureWrapper;
 
 import org.webpki.keygen2.ServerCryptoInterface;
@@ -63,7 +62,7 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
     ////////////////////////////////////////////////////////////////////////////////////////
     LinkedHashMap<PublicKey,PrivateKey> keyManagementKeys = new LinkedHashMap<>();
     
-    public KeyGen2SoftHSM(KeyStoreEnumerator keyStoreEnumerator) throws IOException {
+    public KeyGen2SoftHSM(KeyStoreEnumerator keyStoreEnumerator) {
         keyManagementKeys.put(keyStoreEnumerator.getPublicKey(), 
                               keyStoreEnumerator.getPrivateKey());
     }
@@ -73,14 +72,17 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
     byte[] sessionKey;
   
     @Override
-    public ECPublicKey generateEphemeralKey(KeyAlgorithms ephemeralKeyAlgorithm)
-    throws IOException, GeneralSecurityException {
+    public ECPublicKey generateEphemeralKey(KeyAlgorithms ephemeralKeyAlgorithm) {
+        try {
         KeyPairGenerator generator = KeyPairGenerator.getInstance("EC");
         ECGenParameterSpec eccgen = new ECGenParameterSpec(ephemeralKeyAlgorithm.getJceName());
         generator.initialize (eccgen, new SecureRandom());
         KeyPair kp = generator.generateKeyPair();
         serverEcPrivateKey = (ECPrivateKey) kp.getPrivate();
         return (ECPublicKey) kp.getPublic();
+        } catch (GeneralSecurityException e) {
+            throw new CryptoException(e);
+        }
     }
   
     @Override
@@ -88,43 +90,45 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
                                             byte[] kdfData,
                                             byte[] attestationArguments,
                                             X509Certificate deviceCertificate,
-                                            byte[] sessionAttestation)
-            throws IOException, GeneralSecurityException {
-        // SP800-56A C(2, 0, ECC CDH)
-        KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH");
-        keyAgreement.init(serverEcPrivateKey);
-        keyAgreement.doPhase(clientEphemeralKey, true);
-        byte[] Z = keyAgreement.generateSecret();
-  
-        // The custom KDF
-        Mac mac = Mac.getInstance(HmacAlgorithms.HMAC_SHA256.getJceName ());
-        mac.init (new SecretKeySpec(Z, "RAW"));
-        sessionKey = mac.doFinal(kdfData);
-
-        // E2ES mode only
-            PublicKey devicePublicKey = deviceCertificate.getPublicKey();
-  
-            // Verify that attestation was signed by the device key
-        if (!new SignatureWrapper(devicePublicKey instanceof RSAPublicKey ?
-                                        AsymSignatureAlgorithms.RSA_SHA256 
-                                                                          :
-                                        AsymSignatureAlgorithms.ECDSA_SHA256, 
-                                  devicePublicKey)
-                  .update(attestationArguments)
-                  .verify(sessionAttestation)) {
-            throw new IOException("Verify provisioning signature failed");
+                                            byte[] sessionAttestation) {
+        try {
+            // SP800-56A C(2, 0, ECC CDH)
+            KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH");
+            keyAgreement.init(serverEcPrivateKey);
+            keyAgreement.doPhase(clientEphemeralKey, true);
+            byte[] Z = keyAgreement.generateSecret();
+      
+            // The custom KDF
+            Mac mac = Mac.getInstance(HmacAlgorithms.HMAC_SHA256.getJceName ());
+            mac.init (new SecretKeySpec(Z, "RAW"));
+            sessionKey = mac.doFinal(kdfData);
+    
+            // E2ES mode only
+                PublicKey devicePublicKey = deviceCertificate.getPublicKey();
+      
+                // Verify that attestation was signed by the device key
+            if (!new SignatureWrapper(devicePublicKey instanceof RSAPublicKey ?
+                                            AsymSignatureAlgorithms.RSA_SHA256 
+                                                                              :
+                                            AsymSignatureAlgorithms.ECDSA_SHA256, 
+                                      devicePublicKey)
+                      .update(attestationArguments)
+                      .verify(sessionAttestation)) {
+                throw new CryptoException("Verify provisioning signature failed");
+            }
+        } catch (GeneralSecurityException e) {
+            throw new CryptoException(e);
         }
     }
   
     @Override
-    public byte[] mac(byte[] data, byte[] keyModifier) throws IOException, GeneralSecurityException {
-        Mac mac = Mac.getInstance(HmacAlgorithms.HMAC_SHA256.getJceName ());
-        mac.init(new SecretKeySpec(ArrayUtil.add(sessionKey, keyModifier), "RAW"));
-        return mac.doFinal(data);
+    public byte[] mac(byte[] data, byte[] keyModifier) {
+        return HmacAlgorithms.HMAC_SHA256.digest(ArrayUtil.add(sessionKey, keyModifier), data);
     }
   
     @Override
-    public byte[] encrypt(byte[] data) throws IOException, GeneralSecurityException {
+    public byte[] encrypt(byte[] data) {
+        try {
         byte[] key = mac(SecureKeyStore.KDF_ENCRYPTION_KEY, new byte[0]);
         Cipher crypt = Cipher.getInstance("AES/CBC/PKCS5Padding");
         byte[] iv = new byte[16];
@@ -133,29 +137,35 @@ public class KeyGen2SoftHSM implements ServerCryptoInterface {
                    new SecretKeySpec(key, "AES"), 
                    new IvParameterSpec(iv));
         return ArrayUtil.add(iv, crypt.doFinal(data));
+        } catch (GeneralSecurityException e) {
+            throw new CryptoException(e);
+        }
     }
   
     @Override
-    public byte[] generateNonce() throws IOException {
+    public byte[] generateNonce() {
         byte[] rnd = new byte[32];
         new SecureRandom().nextBytes(rnd);
         return rnd;
     }
   
     @Override
-    public byte[] generateKeyManagementAuthorization(PublicKey keyManagementKey, byte[] data)
-            throws IOException, GeneralSecurityException {
-        return new SignatureWrapper(keyManagementKey instanceof RSAPublicKey ?
-                                           AsymSignatureAlgorithms.RSA_SHA256 
-                                                                             :
-                                           AsymSignatureAlgorithms.ECDSA_SHA256,
-                                    keyManagementKeys.get(keyManagementKey))
-            .update(data)
-            .sign();
+    public byte[] generateKeyManagementAuthorization(PublicKey keyManagementKey, byte[] data) {
+        try {
+            return new SignatureWrapper(keyManagementKey instanceof RSAPublicKey ?
+                                               AsymSignatureAlgorithms.RSA_SHA256 
+                                                                                 :
+                                               AsymSignatureAlgorithms.ECDSA_SHA256,
+                                        keyManagementKeys.get(keyManagementKey))
+                .update(data)
+                .sign();
+        } catch (GeneralSecurityException e) {
+            throw new CryptoException(e);
+        }
     }
   
     @Override
-    public PublicKey[] enumerateKeyManagementKeys() throws IOException {
+    public PublicKey[] enumerateKeyManagementKeys() {
         return keyManagementKeys.keySet().toArray(new PublicKey[0]);
     }
 }

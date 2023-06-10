@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectWriter;
@@ -32,8 +28,7 @@ public class PayeeAuthorityEncoder implements BaseProperties {
                                           String providerAuthorityUrl,
                                           PayeeCoreProperties payeeCoreProperties,
                                           GregorianCalendar expires,
-                                          ServerAsymKeySigner issuerSigner)
-            throws IOException, GeneralSecurityException {
+                                          ServerAsymKeySigner issuerSigner) {
         return payeeCoreProperties.writeObject(Messages.PAYEE_AUTHORITY.createBaseMessage()
                                      .setString(PAYEE_AUTHORITY_URL_JSON, payeeAuthorityUrl)
                                      .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl))

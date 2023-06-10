@@ -16,7 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 public enum PaymentMethods implements Serializable {
@@ -47,12 +46,12 @@ public enum PaymentMethods implements Serializable {
         return commonName;
     }
 
-    public static PaymentMethods fromTypeUrl(String paymentMethodUrl) throws IOException {
+    public static PaymentMethods fromTypeUrl(String paymentMethodUrl) {
         for (PaymentMethods accountType : PaymentMethods.values()) {
             if (accountType.paymentMethodUrl.equals(paymentMethodUrl)) {
                 return accountType;
             }
         }
-        throw new IOException("No such payment method: " + paymentMethodUrl);
+        throw new SaturnException("No such payment method: " + paymentMethodUrl);
     }
 }

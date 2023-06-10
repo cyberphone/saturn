@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import org.webpki.crypto.AlgorithmPreferences;
 import org.webpki.crypto.AsymSignatureAlgorithms;
 import org.webpki.crypto.HashAlgorithms;
@@ -34,25 +30,21 @@ public class CryptoUtils {
     private CryptoUtils() {}
   
     public static byte[] getJsonHash(JSONObjectWriter request, 
-                                     HashAlgorithms hashAlgorithm)
-            throws IOException, GeneralSecurityException {
+                                     HashAlgorithms hashAlgorithm) {
         return hashAlgorithm.digest(request.serializeToBytes(JSONOutputFormats.CANONICALIZED));
     }
 
-    public static HashAlgorithms getHashAlgorithm(JSONObjectReader rd, String keyWord) 
-    throws IOException {
+    public static HashAlgorithms getHashAlgorithm(JSONObjectReader rd, String keyWord) {
         return HashAlgorithms.getAlgorithmFromId(rd.getString(keyWord), AlgorithmPreferences.JOSE);
     }
 
     public static AsymSignatureAlgorithms getSignatureAlgorithm(JSONObjectReader rd,
-                                                                String keyWord) 
-    throws IOException {
+                                                                String keyWord) {
         return AsymSignatureAlgorithms.getAlgorithmFromId(rd.getString(keyWord), 
                                                           AlgorithmPreferences.JOSE);
     }
 
-    public static KeyAlgorithms getKeyAlgorithm(JSONObjectReader rd, String keyWord) 
-    throws IOException {
+    public static KeyAlgorithms getKeyAlgorithm(JSONObjectReader rd, String keyWord) {
         return KeyAlgorithms.getKeyAlgorithmFromId(rd.getString(keyWord), 
                                                    AlgorithmPreferences.JOSE);
 

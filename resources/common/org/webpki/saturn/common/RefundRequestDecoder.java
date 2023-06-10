@@ -16,11 +16,7 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
-
-import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
 
@@ -34,8 +30,7 @@ import org.webpki.util.ISODateTime;
 
 public class RefundRequestDecoder implements BaseProperties {
     
-    public RefundRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) 
-            throws IOException, GeneralSecurityException {
+    public RefundRequestDecoder(JSONObjectReader rd, Boolean cardNetwork) {
         root = Messages.REFUND_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponseDecoder(
                 Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
@@ -55,7 +50,7 @@ public class RefundRequestDecoder implements BaseProperties {
         if (cardNetwork != null &&
             authorizationResponse.authorizationRequest.paymentMethod.isCardPayment() ^ 
             cardNetwork) {
-            throw new IOException("Incompatible payment method: " + 
+            throw new SaturnException("Incompatible payment method: " + 
                 authorizationResponse.authorizationRequest.paymentMethod.getPaymentMethodUrl());
         }
         rd.checkForUnread();
@@ -82,8 +77,7 @@ public class RefundRequestDecoder implements BaseProperties {
         return amount;
     }
 
-    public AccountDataDecoder getPayeeSourceAccount(JSONDecoderCache knownAccountTypes)
-    throws IOException, GeneralSecurityException {
+    public AccountDataDecoder getPayeeSourceAccount(JSONDecoderCache knownAccountTypes) {
         return (AccountDataDecoder) knownAccountTypes.parse(undecodedAccountData);
     }
 
@@ -110,8 +104,7 @@ public class RefundRequestDecoder implements BaseProperties {
         return authorizationResponse;
     }
 
-    public void verifyPayerBank(JSONX509Verifier paymentRoot)
-            throws IOException, GeneralSecurityException {
+    public void verifyPayerBank(JSONX509Verifier paymentRoot) {
         authorizationResponse.signatureDecoder.verify(paymentRoot);
     }
 }

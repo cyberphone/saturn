@@ -18,9 +18,6 @@ package org.webpki.saturn.common;
 
 import java.lang.reflect.InvocationTargetException;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
@@ -106,7 +103,7 @@ public class ProviderAuthorityDecoder implements BaseProperties {
             return this;
         }
 
-        public JSONObjectWriter toObject() throws IOException {
+        public JSONObjectWriter toObject() {
             JSONObjectWriter pmdObject = new JSONObjectWriter();
             for (String clientPaymentMethod : paymentMethodDeclarations.keySet()) {
                 pmdObject.setStringArray(clientPaymentMethod, 
@@ -127,8 +124,7 @@ public class ProviderAuthorityDecoder implements BaseProperties {
         }
     }
 
-    public ProviderAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl)
-            throws IOException, GeneralSecurityException {
+    public ProviderAuthorityDecoder(JSONObjectReader rd, String expectedAuthorityUrl) {
         root = Messages.PROVIDER_AUTHORITY.parseBaseMessage(rd);
         httpVersions = rd.getStringArray(HTTP_VERSIONS_JSON);
         boolean notFound = true;
@@ -139,16 +135,16 @@ public class ProviderAuthorityDecoder implements BaseProperties {
             }
         }
         if (notFound) {
-            throw new IOException("\"" + HTTP_VERSIONS_JSON + 
-                                 "\" is currently limited to " + 
-                                 HTTP_VERSION_SUPPORT);
+            throw new SaturnException("\"" + HTTP_VERSIONS_JSON + 
+                                      "\" is currently limited to " + 
+                                      HTTP_VERSION_SUPPORT);
         }
         providerAuthorityUrl = rd.getString(PROVIDER_AUTHORITY_URL_JSON);
         if (!providerAuthorityUrl.equals(expectedAuthorityUrl)) {
-            throw new IOException("\"" + PROVIDER_AUTHORITY_URL_JSON +
-                                  "\" mismatch, read=" + 
-                                  providerAuthorityUrl +
-                                  " expected=" + expectedAuthorityUrl);
+            throw new SaturnException("\"" + PROVIDER_AUTHORITY_URL_JSON +
+                                      "\" mismatch, read=" + 
+                                      providerAuthorityUrl +
+                                      " expected=" + expectedAuthorityUrl);
         }
         commonName = rd.getString(COMMON_NAME_JSON);
         homePage = rd.getString(HOME_PAGE_JSON);
@@ -163,7 +159,7 @@ public class ProviderAuthorityDecoder implements BaseProperties {
         if (rd.hasProperty(EXTENSIONS_JSON)) {
             optionalExtensions = rd.getObject(EXTENSIONS_JSON);
             if (optionalExtensions.getProperties().length == 0) {
-                throw new IOException("Empty \"" + EXTENSIONS_JSON + "\" not allowed");
+                throw new SaturnException("Empty \"" + EXTENSIONS_JSON + "\" not allowed");
             }
             rd.scanAway(EXTENSIONS_JSON);
         }
@@ -179,7 +175,7 @@ public class ProviderAuthorityDecoder implements BaseProperties {
             }
         } while (jsonProfileArray.hasMore());
         if (profileArray.isEmpty()) {
-            throw new IOException("No \"" + SIGNATURE_PROFILES_JSON + "\" were recognized");
+            throw new SaturnException("No \"" + SIGNATURE_PROFILES_JSON + "\" were recognized");
         }
         signatureProfiles = profileArray.toArray(new SignatureProfiles[0]);
 
@@ -216,7 +212,7 @@ public class ProviderAuthorityDecoder implements BaseProperties {
             }
         } while (jsonParameterArray.hasMore());
         if (parameterArray.isEmpty()) {
-            throw new IOException("No \"" + ENCRYPTION_PARAMETERS_JSON + "\" were recognized");
+            throw new SaturnException("No \"" + ENCRYPTION_PARAMETERS_JSON + "\" were recognized");
         }
         encryptionParameters = parameterArray.toArray(new EncryptionParameter[0]);
 
@@ -285,12 +281,11 @@ public class ProviderAuthorityDecoder implements BaseProperties {
     }
 
     PaymentMethodDeclarations paymentMethods;
-    public String[] getPaymentBackendMethods(String clientPaymentMethod)
-            throws IOException {
+    public String[] getPaymentBackendMethods(String clientPaymentMethod) {
         PaymentMethodDeclaration pmd = 
                 paymentMethods.paymentMethodDeclarations.get(clientPaymentMethod);
         if (pmd == null) {
-            throw new IOException("Unknown method: " + clientPaymentMethod);
+            throw new SaturnException("Unknown method: " + clientPaymentMethod);
         }
         return pmd.getBackendPaymentDatas();
     }
@@ -320,7 +315,7 @@ public class ProviderAuthorityDecoder implements BaseProperties {
         return signatureDecoder;
     }
 
-    public boolean checkPayeeKey(PayeeAuthorityDecoder payeeAuthority) throws IOException {
+    public boolean checkPayeeKey(PayeeAuthorityDecoder payeeAuthority) {
         if (optionalHostingProviders == null) {
             // Direct attestation of Payee
             return payeeAuthority.attestationKey.equals(

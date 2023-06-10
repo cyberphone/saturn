@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONDecoderCache;
@@ -30,11 +28,11 @@ public abstract class AccountDataEncoder {
     }
 
     protected JSONObjectWriter writer;
-    public final JSONObjectWriter writeObject() throws IOException {
+    public final JSONObjectWriter writeObject() {
         return writer;
     }
     
-    protected final JSONObjectWriter setInternal(String context) throws IOException {
+    protected final JSONObjectWriter setInternal(String context) {
         return writer = new JSONObjectWriter().setString(JSONDecoderCache.CONTEXT_JSON, 
                                                          this.context = context);
     }
@@ -42,7 +40,7 @@ public abstract class AccountDataEncoder {
     public abstract String getPartialAccountIdentifier(String accountId);  // Like ************4567
     
     public final static AccountDataEncoder create(AccountDataDecoder accountDataDecoder, 
-                                                  boolean keepNonce) throws IOException {
+                                                  boolean keepNonce) {
         AccountDataEncoder accountDataEncoder = accountDataDecoder.createEncoder();
         accountDataEncoder.context = accountDataDecoder.getContext();
         JSONObjectReader reader = new JSONObjectReader(accountDataDecoder.getWriter()).clone();

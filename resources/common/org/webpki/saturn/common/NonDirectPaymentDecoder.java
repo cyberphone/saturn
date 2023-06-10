@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;
@@ -55,7 +53,7 @@ public class NonDirectPaymentDecoder implements BaseProperties {
     }
     
     Integer installments;
-    public int getInstallments() throws IOException {
+    public int getInstallments() {
         nullCheck(installments);
         return installments;
     }
@@ -67,8 +65,7 @@ public class NonDirectPaymentDecoder implements BaseProperties {
         }
     }
 
-    public NonDirectPaymentDecoder (JSONObjectReader rd, GregorianCalendar timeStamp)
-    throws IOException {
+    public NonDirectPaymentDecoder (JSONObjectReader rd, GregorianCalendar timeStamp) {
         switch (type = NonDirectPaymentTypes.valueOf(rd.getString(TYPE_JSON))) {
             case RESERVATION:
                 subType = ReservationSubTypes.valueOf(rd.getString(SUB_TYPE_JSON));

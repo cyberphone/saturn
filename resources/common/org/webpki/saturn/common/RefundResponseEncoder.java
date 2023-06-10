@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectWriter;
@@ -31,8 +27,7 @@ public class RefundResponseEncoder implements BaseProperties {
     public static JSONObjectWriter encode(RefundRequestDecoder refundRequest,
                                           String referenceId,
                                           String optionalLogData,
-                                          ServerX509Signer signer)
-            throws IOException, GeneralSecurityException {
+                                          ServerX509Signer signer) {
         return Messages.REFUND_RESPONSE.createBaseMessage()
             .setDynamic((wr) -> optionalLogData == null ?
                     wr : wr.setString(LOG_DATA_JSON, optionalLogData))

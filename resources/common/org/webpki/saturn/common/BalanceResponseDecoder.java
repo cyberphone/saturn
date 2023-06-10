@@ -16,19 +16,18 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;
+
 import org.webpki.util.ISODateTime;
 
 
 public class BalanceResponseDecoder implements BaseProperties {
     
-    public BalanceResponseDecoder(JSONObjectReader rd) throws IOException {
+    public BalanceResponseDecoder(JSONObjectReader rd) {
         Messages.BALANCE_RESPONSE.parseBaseMessage(rd);
         accountId = rd.getString(ACCOUNT_ID_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));

@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectWriter;
@@ -40,7 +36,7 @@ public class AuthorizationResponseEncoder implements BaseProperties {
                 String optionalAccountReference,
                 String referenceId,
                 String optionalLogData,
-                ServerX509Signer signer) throws IOException, GeneralSecurityException {
+                ServerX509Signer signer) {
         return Messages.AUTHORIZATION_RESPONSE.createBaseMessage()
             .setDynamic((wr) -> optionalAccountReference == null ?
                     wr :  wr.setString(ACCOUNT_REFERENCE_JSON, optionalAccountReference))

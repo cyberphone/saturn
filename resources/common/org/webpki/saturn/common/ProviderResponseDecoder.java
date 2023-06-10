@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
@@ -71,7 +69,7 @@ public abstract class ProviderResponseDecoder implements BaseProperties {
 
     abstract JSONObjectReader getRoot();
     
-    public final String getJsonString() throws IOException {
+    public final String getJsonString() {
         return getRoot().serializeToString(JSONOutputFormats.NORMALIZED);
     }
 

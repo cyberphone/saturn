@@ -16,9 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import org.webpki.json.JSONAsymKeyEncrypter;
@@ -39,12 +36,11 @@ public class PayerAuthorization implements BaseProperties {
         new JSONCryptoHelper.Options()
                 .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.KEY_ID_OR_PUBLIC_KEY);
     
-    static JSONDecryptionDecoder getEncryptedAuthorization(JSONObjectReader rd) 
-    throws IOException, GeneralSecurityException {
+    static JSONDecryptionDecoder getEncryptedAuthorization(JSONObjectReader rd) {
         return rd.getObject(ENCRYPTED_AUTHORIZATION_JSON).getEncryptionObject(options);
     }
 
-    public PayerAuthorization(JSONObjectReader rd, String wellKnownUrl) throws IOException, GeneralSecurityException {
+    public PayerAuthorization(JSONObjectReader rd, String wellKnownUrl) {
         Messages.PAYER_AUTHORIZATION.parseBaseMessage(rd);
         encryptedAuthorization = rd.getObject(ENCRYPTED_AUTHORIZATION_JSON);
         // Only syntax checking for intermediaries
@@ -53,9 +49,13 @@ public class PayerAuthorization implements BaseProperties {
         if (urlOrHost.startsWith("https://")) {
             providerAuthorityUrl = urlOrHost;
         } else {
-            HTTPSWrapper wrap = new HTTPSWrapper();
-            wrap.makeGetRequest("https://" + urlOrHost + "/.well-known/" + wellKnownUrl);
-            providerAuthorityUrl = wrap.getDataUTF8();
+            try {
+                HTTPSWrapper wrap = new HTTPSWrapper();
+                wrap.makeGetRequest("https://" + urlOrHost + "/.well-known/" + wellKnownUrl);
+                providerAuthorityUrl = wrap.getDataUTF8();
+            } catch (java.io.IOException e) {
+                throw new SaturnException(e);
+            }
         }
         paymentMethod = PaymentMethods.fromTypeUrl(rd.getString(PAYMENT_METHOD_JSON));
         rd.checkForUnread();
@@ -82,8 +82,7 @@ public class PayerAuthorization implements BaseProperties {
                                           ContentEncryptionAlgorithms contentEncryptionAlgorithm,
                                           KeyEncryptionAlgorithms keyEncryptionAlgorithm,
                                           PublicKey encryptionKey,
-                                          String optionalKeyId)
-    throws IOException, GeneralSecurityException {
+                                          String optionalKeyId) {
         JSONAsymKeyEncrypter encrypter = new JSONAsymKeyEncrypter(encryptionKey, 
                                                                   keyEncryptionAlgorithm);
         if (optionalKeyId != null) {

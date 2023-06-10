@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.HashMap;
 import java.util.Collection;
 
@@ -56,7 +52,7 @@ public class AuthorityObjectManager extends Thread {
 
     boolean logging;
 
-    void update() throws IOException, GeneralSecurityException {
+    void update() {
         if (providerSigner != null) {
             synchronized(this) {
                 providerAuthorityBlob = 
@@ -120,7 +116,7 @@ public class AuthorityObjectManager extends Thread {
                 ServerAsymKeySigner attestationSigner,
 
                 int expiryTimeInSeconds /* Both */,
-                boolean logging /* Both */) throws IOException, GeneralSecurityException {
+                boolean logging /* Both */) {
         this.providerAuthorityUrl = providerAuthorityUrl;
         this.providerCommonName = providerCommonName;
         this.providerHomePage = providerHomePage;
@@ -151,8 +147,7 @@ public class AuthorityObjectManager extends Thread {
         return payeeAuthorityBlobs.get(id);
     }
 
-    public synchronized void updateProviderSigner(ServerX509Signer providerSigner)
-    throws IOException, GeneralSecurityException {
+    public synchronized void updateProviderSigner(ServerX509Signer providerSigner) {
         this.providerSigner = providerSigner;
         update();
     }

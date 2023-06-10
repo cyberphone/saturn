@@ -115,59 +115,55 @@ public class WalletUiTestServlet extends HttpServlet implements BaseProperties {
     }
     
     static {
-         try {
-            initMerchant("Direct - EUR",  "Space Shop",
-                                          "550",
-                                          Currencies.EUR,
-                                          null);
+        initMerchant("Direct - EUR",  "Space Shop",
+                                      "550",
+                                      Currencies.EUR,
+                                      null);
 
-            initMerchant("Direct - USD",  "Space Shop",
-                                          "550",
-                                          Currencies.USD,
-                                          null);
+        initMerchant("Direct - USD",  "Space Shop",
+                                      "550",
+                                      Currencies.USD,
+                                      null);
 
-            initMerchant("Gas Station",   "Planet Gas",
-                                          "200",
-                                          Currencies.EUR,
-                                          NonDirectPaymentEncoder.reservation(
-                                                  ReservationSubTypes.GAS_STATION,
-                                                  TimeUtils.inMinutes(45),
-                                                  true));
+        initMerchant("Gas Station",   "Planet Gas",
+                                      "200",
+                                      Currencies.EUR,
+                                      NonDirectPaymentEncoder.reservation(
+                                              ReservationSubTypes.GAS_STATION,
+                                              TimeUtils.inMinutes(45),
+                                              true));
 
-            initMerchant("Hotel Booking", "Best Lodging",
-                                          "1200",
-                                          Currencies.EUR,
-                                          NonDirectPaymentEncoder.reservation(
-                                                  ReservationSubTypes.BOOKING,
-                                                  TimeUtils.inDays(10), 
-                                                  true));
-            initMerchant("Electricy",     "Power to You",
-                                          "0",
-                                          Currencies.EUR,
-                                          NonDirectPaymentEncoder.recurring(
-                                                  RecurringPaymentIntervals.MONTHLY,                                           
-                                                  12, 
-                                                  false));
+        initMerchant("Hotel Booking", "Best Lodging",
+                                      "1200",
+                                      Currencies.EUR,
+                                      NonDirectPaymentEncoder.reservation(
+                                              ReservationSubTypes.BOOKING,
+                                              TimeUtils.inDays(10), 
+                                              true));
+        initMerchant("Electricy",     "Power to You",
+                                      "0",
+                                      Currencies.EUR,
+                                      NonDirectPaymentEncoder.recurring(
+                                              RecurringPaymentIntervals.MONTHLY,                                           
+                                              12, 
+                                              false));
 
-            initMerchant("Phone Subscription", 
-                                          "ET Phone Home",
-                                          "129.99",
-                                          Currencies.EUR,
-                                          NonDirectPaymentEncoder.recurring(
-                                                  RecurringPaymentIntervals.MONTHLY,                                             
-                                                  24, 
-                                                  true));
-            initMerchant("Multiple Paments", 
-                                          "Amazon",
-                                          "34.75",
-                                          Currencies.EUR,
-                                          NonDirectPaymentEncoder.recurring(
-                                                  RecurringPaymentIntervals.UNSPECIFIED,                                             
-                                                  null, 
-                                                  false));
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
-        }
+        initMerchant("Phone Subscription", 
+                                      "ET Phone Home",
+                                      "129.99",
+                                      Currencies.EUR,
+                                      NonDirectPaymentEncoder.recurring(
+                                              RecurringPaymentIntervals.MONTHLY,                                             
+                                              24, 
+                                              true));
+        initMerchant("Multiple Paments", 
+                                      "Amazon",
+                                      "34.75",
+                                      Currencies.EUR,
+                                      NonDirectPaymentEncoder.recurring(
+                                              RecurringPaymentIntervals.UNSPECIFIED,                                             
+                                              null, 
+                                              false));
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

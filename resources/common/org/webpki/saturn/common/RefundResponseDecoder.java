@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONCryptoHelper;
@@ -30,8 +26,7 @@ import org.webpki.util.ISODateTime;
 
 public class RefundResponseDecoder implements BaseProperties {
     
-    public RefundResponseDecoder(JSONObjectReader rd)
-            throws IOException, GeneralSecurityException {
+    public RefundResponseDecoder(JSONObjectReader rd) {
         root = Messages.REFUND_RESPONSE.parseBaseMessage(rd);
         optionalLogData = rd.getStringConditional(LOG_DATA_JSON);
         referenceId = rd.getString(REFERENCE_ID_JSON);

@@ -16,38 +16,45 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
+import org.webpki.crypto.ContentEncryptionAlgorithms;
+import org.webpki.crypto.CryptoException;
 
-import java.security.GeneralSecurityException;
-
-import org.webpki.json.JSONCryptoHelper;
-import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONDecoder;
 import org.webpki.json.JSONDecryptionDecoder;
+import org.webpki.json.JSONObjectReader;
+import org.webpki.json.JSONCryptoHelper;
 import org.webpki.json.JSONParser;
 
-import org.webpki.crypto.ContentEncryptionAlgorithms;
-
-public class ProviderUserResponseDecoder implements BaseProperties {
- 
-    public ProviderUserResponseDecoder(JSONObjectReader rd)
-            throws IOException, GeneralSecurityException {
-        Messages.PROVIDER_USER_RESPONSE.parseBaseMessage(rd);
-        encryptedData = rd.getObject(ENCRYPTED_MESSAGE_JSON)
-                .getEncryptionObject(new JSONCryptoHelper.Options()
-                    .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN)
-                    .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.PLAIN_ENCRYPTION));
-        rd.checkForUnread();
-    }
+public class ProviderUserResponseDecoder extends JSONDecoder implements BaseProperties {
 
     JSONDecryptionDecoder encryptedData;
     
     public EncryptedMessage getEncryptedMessage(byte[] dataEncryptionKey,
-                                                ContentEncryptionAlgorithms contentEncryptionAlgorithm)
-    throws IOException, GeneralSecurityException {
-        if (encryptedData.getContentEncryptionAlgorithm() != contentEncryptionAlgorithm) {
-            throw new IOException("Unexpected data encryption algorithm:" + 
-                                  encryptedData.getContentEncryptionAlgorithm().toString());
+                                                ContentEncryptionAlgorithms dataEncryptionAlgorithm)
+    {
+        if (encryptedData.getContentEncryptionAlgorithm() != dataEncryptionAlgorithm) {
+            throw new CryptoException("Unexpected data encryption algorithm:" +
+                                       encryptedData.getContentEncryptionAlgorithm().toString());
         }
-        return new EncryptedMessage(JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey))); 
+        return new EncryptedMessage(JSONParser.parse(encryptedData.getDecryptedData(dataEncryptionKey)));
+    }
+
+    @Override
+    protected void readJSONData(JSONObjectReader rd) {
+        encryptedData =
+                rd.getObject(ENCRYPTED_MESSAGE_JSON)
+                        .getEncryptionObject(new JSONCryptoHelper.Options()
+                            .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.PLAIN_ENCRYPTION)
+                            .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN));
+    }
+
+    @Override
+    public String getContext() {
+        return SATURN_WEB_PAY_CONTEXT_URI;
+    }
+
+    @Override
+    public String getQualifier() {
+        return Messages.PROVIDER_USER_RESPONSE.toString();
     }
 }

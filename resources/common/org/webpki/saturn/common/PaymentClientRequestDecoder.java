@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +32,7 @@ public class PaymentClientRequestDecoder implements BaseProperties {
         public String payeeAuthorityUrl;
     }
     
-    public PaymentClientRequestDecoder(JSONObjectReader rd) throws IOException {
+    public PaymentClientRequestDecoder(JSONObjectReader rd) {
         Messages.PAYMENT_CLIENT_REQUEST.parseBaseMessage(rd);
         JSONArrayReader ar = rd.getArray(SUPPORTED_PAYMENT_METHODS_JSON);
         supportedPaymentMethods = new ArrayList<>();

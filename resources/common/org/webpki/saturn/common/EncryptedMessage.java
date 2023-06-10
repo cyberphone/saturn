@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 
@@ -28,7 +26,7 @@ import org.webpki.util.ISODateTime;
 
 public class EncryptedMessage implements BaseProperties {
      
-    public EncryptedMessage(JSONObjectReader rd) throws IOException {
+    public EncryptedMessage(JSONObjectReader rd) {
         this.root = rd;
         requester = rd.getString(REQUESTER_JSON);
         text = rd.getString(TEXT_JSON);
@@ -38,7 +36,7 @@ public class EncryptedMessage implements BaseProperties {
              do {
                 UserChallengeItem userChallengeItem = new UserChallengeItem(ar.getObject());
                 if (items.put(userChallengeItem.getName(), userChallengeItem) != null) {
-                    throw new IOException("Duplicate: " + userChallengeItem.getName());
+                    throw new SaturnException("Duplicate: " + userChallengeItem.getName());
                 }
             } while (ar.hasMore());
             optionalUserChallengeItems = items.values().toArray(new UserChallengeItem[0]);

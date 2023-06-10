@@ -19,6 +19,7 @@ package org.webpki.saturn.common;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -29,6 +30,7 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.ArrayList;
 
+import org.webpki.crypto.CryptoException;
 import org.webpki.crypto.KeyStoreReader;
 
 public class KeyStoreEnumerator {
@@ -37,7 +39,7 @@ public class KeyStoreEnumerator {
     PrivateKey privateKey = null;
     String keyId;
     
-    public KeyStoreEnumerator(InputStream is, String password) throws IOException {
+    public KeyStoreEnumerator(InputStream is, String password) {
         try {
             KeyStore ks = KeyStoreReader.loadKeyStore(is, password);
             Enumeration<String> aliases = ks.aliases();
@@ -51,11 +53,11 @@ public class KeyStoreEnumerator {
                     break;
                 }
             }
-        } catch (Exception e) {
-            throw new IOException(e);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new CryptoException(e);
         }
         if (privateKey == null) {
-            throw new IOException("No private key found!");
+            throw new CryptoException("No private key found!");
         }
     }
 

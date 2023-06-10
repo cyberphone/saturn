@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
 
 import java.util.GregorianCalendar;
@@ -30,7 +28,7 @@ public class BalanceResponseEncoder implements BaseProperties {
     
     public static JSONObjectWriter encode(String accountId,
                                           BigDecimal amount,
-                                          Currencies currency) throws IOException {
+                                          Currencies currency) {
         return Messages.BALANCE_RESPONSE.createBaseMessage()
             .setString(ACCOUNT_ID_JSON, accountId)
             .setMoney(AMOUNT_JSON, amount, currency.getDecimals())

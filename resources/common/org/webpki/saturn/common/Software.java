@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
 
@@ -26,7 +24,7 @@ public class Software implements BaseProperties {
     String name;
     String version;
     
-    public Software(JSONObjectReader rd) throws IOException {
+    public Software(JSONObjectReader rd) {
         rd = rd.getObject(SOFTWARE_JSON);
         name = rd.getString(NAME_JSON);
         version = rd.getString(VERSION_JSON);
@@ -40,7 +38,7 @@ public class Software implements BaseProperties {
         return version;
     }
 
-    public static JSONObjectWriter encode(JSONObjectWriter wr, String name, String version) throws IOException {
+    public static JSONObjectWriter encode(JSONObjectWriter wr, String name, String version) {
         return wr.setObject(SOFTWARE_JSON, new JSONObjectWriter()
             .setString(NAME_JSON, name)
             .setString(VERSION_JSON, version));

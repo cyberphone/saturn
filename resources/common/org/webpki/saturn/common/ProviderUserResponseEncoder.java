@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONArrayWriter;
@@ -37,8 +33,7 @@ public class ProviderUserResponseEncoder implements BaseProperties {
                                           String text,
                                           UserChallengeItem[] optionalUserChallengeItems,
                                           byte[] dataEncryptionKey,
-                                          ContentEncryptionAlgorithms contentEncryptionAlgorithm)
-    throws IOException, GeneralSecurityException {
+                                          ContentEncryptionAlgorithms contentEncryptionAlgorithm) {
         JSONObjectWriter wr = new JSONObjectWriter()
             .setString(REQUESTER_JSON, requester)
             .setString(TEXT_JSON, text);

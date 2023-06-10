@@ -16,11 +16,7 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
-
-import java.security.GeneralSecurityException;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -35,8 +31,7 @@ import org.webpki.util.ISODateTime;
 
 public class AuthorizationResponseDecoder extends ProviderResponseDecoder {
     
-    public AuthorizationResponseDecoder(JSONObjectReader rd) throws IOException,
-                                                                    GeneralSecurityException {
+    public AuthorizationResponseDecoder(JSONObjectReader rd) {
         root = Messages.AUTHORIZATION_RESPONSE.parseBaseMessage(rd);
         authorizationRequest = new AuthorizationRequestDecoder(
                 Messages.AUTHORIZATION_REQUEST.getEmbeddedMessage(rd));
@@ -92,8 +87,7 @@ public class AuthorizationResponseDecoder extends ProviderResponseDecoder {
 
     public AccountDataDecoder getProtectedAccountData(
             JSONDecoderCache knownAccountTypes, 
-            ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys)
-    throws IOException, GeneralSecurityException {
+            ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys) {
         return (AccountDataDecoder) knownAccountTypes.parse(
                  encryptedAccountData.getDecryptedData(decryptionKeys));
     }

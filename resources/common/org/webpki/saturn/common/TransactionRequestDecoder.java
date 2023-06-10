@@ -16,11 +16,7 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
-
-import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
 
@@ -32,8 +28,7 @@ import org.webpki.util.ISODateTime;
 
 public class TransactionRequestDecoder implements BaseProperties {
     
-    public TransactionRequestDecoder(JSONObjectReader rd, Boolean cardPayment)
-            throws IOException, GeneralSecurityException {
+    public TransactionRequestDecoder(JSONObjectReader rd, Boolean cardPayment) {
         root = Messages.TRANSACTION_REQUEST.parseBaseMessage(rd);
         authorizationResponse = new AuthorizationResponseDecoder(
                 Messages.AUTHORIZATION_RESPONSE.getEmbeddedMessage(rd));
@@ -49,7 +44,7 @@ public class TransactionRequestDecoder implements BaseProperties {
         if (cardPayment != null &&
             authorizationResponse
                 .authorizationRequest.paymentMethod.isCardPayment() ^ cardPayment) {
-            throw new IOException("Incompatible payment method: " + 
+            throw new SaturnException("Incompatible payment method: " + 
                 authorizationResponse.authorizationRequest.paymentMethod.getPaymentMethodUrl());
         }
         rd.checkForUnread();
@@ -97,8 +92,7 @@ public class TransactionRequestDecoder implements BaseProperties {
         return authorizationResponse;
     }
 
-    public void verifyPayerBank(JSONX509Verifier paymentRoot)
-            throws IOException, GeneralSecurityException {
+    public void verifyPayerBank(JSONX509Verifier paymentRoot) {
         authorizationResponse.signatureDecoder.verify(paymentRoot);
     }
 }

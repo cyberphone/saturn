@@ -82,6 +82,7 @@ import org.webpki.saturn.common.CardDataEncoder;
 import org.webpki.saturn.common.CardImageData;
 
 import org.webpki.util.MIMETypedObject;
+import org.webpki.util.UTF8;
 
 import org.webpki.webutil.ServletUtil;
 
@@ -392,7 +393,7 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         signatureKey.addLogotype(KeyGen2URIs.LOGOTYPES.CARD, new MIMETypedObject() {
 
                             @Override
-                            public byte[] getData() throws IOException {
+                            public byte[] getData() {
                                 String cardImage = new String(credentialTemplate.svgCardImage);
                                 if (testMode && KeyProviderService.inHouseLogo) {
                                     cardImage = cardImage.substring(0, cardImage.lastIndexOf("<g ")) + "</svg>";
@@ -410,17 +411,17 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                                                 "\">" + 
                                                 CardImageData.STANDARD_NAME);
                                 }
-                                return cardImage
+                                return UTF8.encode(cardImage
                                     .replace(CardImageData.STANDARD_NAME, cardUserName)
                                     .replace(CardImageData.STANDARD_ACCOUNT,
                                              credentialTemplate.cardFormatted ?
                                 AccountDataEncoder.visualFormattedAccountId(accountAndCredential.accountId) 
                                                                               :
-                                accountAndCredential.accountId).getBytes("utf-8");
+                                accountAndCredential.accountId));
                             }
 
                             @Override
-                            public String getMimeType() throws IOException {
+                            public String getMimeType() {
                                 return "image/svg+xml";
                             }
                            

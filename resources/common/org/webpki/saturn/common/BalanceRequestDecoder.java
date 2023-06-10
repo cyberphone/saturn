@@ -16,9 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.GregorianCalendar;
@@ -31,8 +28,7 @@ import org.webpki.util.ISODateTime;
 public class BalanceRequestDecoder implements BaseProperties {
     
     public BalanceRequestDecoder(JSONObjectReader rd, 
-                                 JSONCryptoHelper.Options signatureOptions) 
-            throws IOException, GeneralSecurityException {
+                                 JSONCryptoHelper.Options signatureOptions) {
         Messages.BALANCE_REQUEST.parseBaseMessage(rd);
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
         accountId = rd.getString(ACCOUNT_ID_JSON);

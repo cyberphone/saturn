@@ -16,8 +16,6 @@
  */
 package se.bankgirot;
 
-import java.io.IOException;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 
@@ -30,13 +28,13 @@ public final class BGAccountDataDecoder extends AccountDataDecoder {
     static final String BG_NUMBER_JSON = "bgNumber";
 
     @Override
-    protected void readJSONData(JSONObjectReader rd) throws IOException {
+    protected void readJSONData(JSONObjectReader rd) {
         readOptionalNonce(rd);
         accountId = rd.getString(BG_NUMBER_JSON);
     }
 
     @Override
-    protected byte[] getAccountObject() throws IOException {
+    protected byte[] getAccountObject() {
         return getWriter().serializeToBytes(JSONOutputFormats.CANONICALIZED);
     }
 

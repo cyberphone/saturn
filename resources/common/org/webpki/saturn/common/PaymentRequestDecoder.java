@@ -16,10 +16,8 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
-import java.security.GeneralSecurityException;
+
 import java.util.GregorianCalendar;
 
 import org.webpki.crypto.HashAlgorithms;
@@ -31,7 +29,7 @@ import org.webpki.util.ISODateTime;
 
 public class PaymentRequestDecoder implements BaseProperties {
     
-    public PaymentRequestDecoder(JSONObjectReader rd) throws IOException {
+    public PaymentRequestDecoder(JSONObjectReader rd) {
         root = rd;
         payeeCommonName = rd.getString(COMMON_NAME_JSON);
         currency = Currencies.valueOf(rd.getString(CURRENCY_JSON));
@@ -83,8 +81,7 @@ public class PaymentRequestDecoder implements BaseProperties {
 
     JSONObjectReader root;
 
-    public byte[] getRequestHash(HashAlgorithms requestHashAlgorithm)
-            throws IOException, GeneralSecurityException {
+    public byte[] getRequestHash(HashAlgorithms requestHashAlgorithm) {
         return CryptoUtils.getJsonHash(new JSONObjectWriter(root), requestHashAlgorithm);
     }
 }

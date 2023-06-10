@@ -16,11 +16,7 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
-
-import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
 
@@ -35,8 +31,7 @@ public class RefundRequestEncoder implements BaseProperties {
                                           BigDecimal amount,
                                           AccountDataEncoder payeeSourceAccount,
                                           String referenceId,
-                                          ServerAsymKeySigner signer) 
-            throws IOException, GeneralSecurityException {
+                                          ServerAsymKeySigner signer) {
         return Messages.REFUND_REQUEST.createBaseMessage()
             .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setMoney(AMOUNT_JSON,

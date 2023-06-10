@@ -16,8 +16,6 @@
  */
 package org.payments.sepa;
 
-import java.io.IOException;
-
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONOutputFormats;
 
@@ -30,7 +28,7 @@ public final class SEPAAccountDataDecoder extends AccountDataDecoder {
     static final String IBAN_JSON = "iban";
 
     @Override
-    protected void readJSONData(JSONObjectReader rd) throws IOException {
+    protected void readJSONData(JSONObjectReader rd) {
         readOptionalNonce(rd);
         accountId = rd.getString(IBAN_JSON);
     }
@@ -41,7 +39,7 @@ public final class SEPAAccountDataDecoder extends AccountDataDecoder {
     }
 
     @Override
-    protected byte[] getAccountObject() throws IOException {
+    protected byte[] getAccountObject() {
         return getWriter().serializeToBytes(JSONOutputFormats.CANONICALIZED);
     }
 

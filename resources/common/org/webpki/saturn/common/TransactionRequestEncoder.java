@@ -16,11 +16,7 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.math.BigDecimal;
-
-import java.security.GeneralSecurityException;
 
 import java.util.GregorianCalendar;
 
@@ -34,8 +30,7 @@ public class TransactionRequestEncoder implements BaseProperties {
                                           String recipientUrl,
                                           BigDecimal actualAmount,
                                           String referenceId,
-                                          ServerAsymKeySigner signer)
-            throws IOException, GeneralSecurityException {
+                                          ServerAsymKeySigner signer) {
         return Messages.TRANSACTION_REQUEST.createBaseMessage()
             .setString(RECIPIENT_URL_JSON, recipientUrl)
             .setMoney(AMOUNT_JSON,

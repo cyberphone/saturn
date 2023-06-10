@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONArrayWriter;
@@ -42,7 +38,7 @@ public class ProviderAuthorityEncoder implements BaseProperties {
                     ProviderAuthorityDecoder.EncryptionParameter[] encryptionParameters,
                     HostingProvider[] optionalHostingProviders,
                     GregorianCalendar expires,
-                    ServerX509Signer issuerSigner) throws IOException, GeneralSecurityException {
+                    ServerX509Signer issuerSigner) {
         return Messages.PROVIDER_AUTHORITY.createBaseMessage()
             .setStringArray(HTTP_VERSIONS_JSON, ProviderAuthorityDecoder.HTTP_VERSION_SUPPORT)
             .setString(PROVIDER_AUTHORITY_URL_JSON, providerAuthorityUrl)

@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.util.List;
 
 import org.webpki.json.JSONArrayWriter;
@@ -45,7 +43,7 @@ public class PaymentClientRequestEncoder implements BaseProperties {
     public static JSONObjectWriter encode(List<SupportedPaymentMethod> supportedPaymentMethods,
                                           JSONObjectWriter paymentRequest, 
                                           String optionalReceiptUrl,
-                                          String noMatchingMethodsUrl) throws IOException {
+                                          String noMatchingMethodsUrl) {
         return Messages.PAYMENT_CLIENT_REQUEST.createBaseMessage()
             .setDynamic((wr) -> {
                 JSONArrayWriter aw = wr.setArray(SUPPORTED_PAYMENT_METHODS_JSON);

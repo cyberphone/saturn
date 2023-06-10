@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import org.webpki.json.JSONObjectReader;
@@ -25,7 +23,7 @@ import org.webpki.json.JSONObjectWriter;
 
 public class HostingProvider implements BaseProperties {
 
-    public HostingProvider(JSONObjectReader rd) throws IOException, GeneralSecurityException {
+    public HostingProvider(JSONObjectReader rd) {
         homePage = rd.getString(HOME_PAGE_JSON);
         hostingUrl = rd.getString(HOSTING_URL_JSON);
         publicKey = rd.getPublicKey();
@@ -54,7 +52,7 @@ public class HostingProvider implements BaseProperties {
         return hostingUrl;
     }
 
-    public JSONObjectWriter writeObject() throws IOException {
+    public JSONObjectWriter writeObject() {
         return new JSONObjectWriter()
                        .setString(HOME_PAGE_JSON, homePage)
                        .setString(HOSTING_URL_JSON, hostingUrl)

@@ -16,9 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import org.webpki.crypto.AsymSignatureAlgorithms;
@@ -44,8 +41,7 @@ public class CardDataDecoder implements BaseProperties {
     // SKS specific solution for linking related keys
     static final String ACCOUNT_STATUS_KEY_HASH_JSON = "accountStatusKeyHash";
     
-    public CardDataDecoder(String expectedVersion, byte[] cardDataBlob) throws IOException,
-                                                                               GeneralSecurityException {
+    public CardDataDecoder(String expectedVersion, byte[] cardDataBlob) {
         JSONObjectReader rd = JSONParser.parse(cardDataBlob);
         version = rd.getString(VERSION_JSON);
         if (version.equals(expectedVersion)) {
@@ -70,7 +66,7 @@ public class CardDataDecoder implements BaseProperties {
         }
     }
 
-    public CardDataDecoder(byte[] cardDataBlob) throws IOException, GeneralSecurityException {
+    public CardDataDecoder(byte[] cardDataBlob) {
         this(ACTUAL_VERSION, cardDataBlob);
     }
 

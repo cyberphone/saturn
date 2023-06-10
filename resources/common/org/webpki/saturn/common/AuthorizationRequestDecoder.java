@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import java.util.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,8 +38,7 @@ public class AuthorizationRequestDecoder implements BaseProperties {
             .setPublicKeyOption(JSONCryptoHelper.PUBLIC_KEY_OPTIONS.REQUIRED)
             .setKeyIdOption(JSONCryptoHelper.KEY_ID_OPTIONS.FORBIDDEN);
     
-    public AuthorizationRequestDecoder(JSONObjectReader rd) throws IOException,
-                                                                   GeneralSecurityException {
+    public AuthorizationRequestDecoder(JSONObjectReader rd) {
         root = Messages.AUTHORIZATION_REQUEST.parseBaseMessage(rd);
         testMode = rd.getBooleanConditional(TEST_MODE_JSON);
         recipientUrl = rd.getString(RECIPIENT_URL_JSON);
@@ -78,8 +73,7 @@ public class AuthorizationRequestDecoder implements BaseProperties {
         return paymentMethod;
     }
 
-    public byte[] getHashOfAuthorization(HashAlgorithms hashAlgorithm) 
-            throws IOException, GeneralSecurityException {
+    public byte[] getHashOfAuthorization(HashAlgorithms hashAlgorithm) {
 System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
         return hashAlgorithm.digest(encryptedAuthorizationData
                 .getEncryptionObject().serializeToBytes(JSONOutputFormats.CANONICALIZED));
@@ -90,8 +84,7 @@ System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
         return signatureDecoder;
     }
 
-    public AccountDataDecoder getPayeeReceiveAccount(JSONDecoderCache knownAccountTypes)
-    throws IOException, GeneralSecurityException {
+    public AccountDataDecoder getPayeeReceiveAccount(JSONDecoderCache knownAccountTypes) {
         return (AccountDataDecoder) knownAccountTypes.parse(undecodedAccountData);
     }
 
@@ -128,21 +121,20 @@ System.out.println("Auth" + encryptedAuthorizationData.getEncryptionObject());
 
     public AuthorizationDataDecoder getDecryptedAuthorizationData(
             ArrayList<JSONDecryptionDecoder.DecryptionKeyHolder> decryptionKeys,
-            JSONCryptoHelper.Options option)
-    throws IOException, GeneralSecurityException {
+            JSONCryptoHelper.Options option) {
         AuthorizationDataDecoder authorizationData =
             new AuthorizationDataDecoder(
                     JSONParser.parse(encryptedAuthorizationData.getDecryptedData(decryptionKeys)),
                                      option);
         if (!Arrays.equals(authorizationData.requestHash, 
                                paymentRequest.getRequestHash(authorizationData.requestHashAlgorithm))) {
-            throw new IOException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
+            throw new SaturnException("Non-matching \"" + REQUEST_HASH_JSON + "\"");
         }
         if (!authorizationData.paymentMethodUrl.equals(paymentMethod.paymentMethodUrl)) {
-            throw new IOException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
+            throw new SaturnException("Non-matching \"" + PAYMENT_METHOD_JSON + "\"");
         }
         if (!authorizationData.payeeAuthorityUrl.equals(payeeAuthorityUrl)) {
-            throw new IOException("Non-matching \"" + PAYEE_AUTHORITY_URL_JSON + "\"");
+            throw new SaturnException("Non-matching \"" + PAYEE_AUTHORITY_URL_JSON + "\"");
         }
         return authorizationData;
     }

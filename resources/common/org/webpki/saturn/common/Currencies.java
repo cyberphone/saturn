@@ -16,7 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 import java.math.BigDecimal;
@@ -55,7 +54,7 @@ public enum Currencies implements Serializable {
         return amount.setScale(decimals).toPlainString();
     }
 
-    public String amountToDisplayString(BigDecimal amount, boolean skipTrailingZeroFraction) throws IOException {
+    public String amountToDisplayString(BigDecimal amount, boolean skipTrailingZeroFraction) {
         String sign = "";
         if (amount.signum() < 0) {
             amount = amount.negate();

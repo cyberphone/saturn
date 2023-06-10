@@ -16,8 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import org.webpki.json.JSONDecoderCache;
 import org.webpki.json.JSONObjectReader;
 import org.webpki.json.JSONObjectWriter;
@@ -69,19 +67,19 @@ public enum Messages {
         return qualifier;
     }
 
-    public JSONObjectWriter createBaseMessage() throws IOException {
+    public JSONObjectWriter createBaseMessage() {
         return new JSONObjectWriter()
           .setString(JSONDecoderCache.CONTEXT_JSON, BaseProperties.SATURN_WEB_PAY_CONTEXT_URI)  
           .setString(JSONDecoderCache.QUALIFIER_JSON, qualifier);
     }
 
-    public JSONObjectReader parseBaseMessage(JSONObjectReader requestObject) throws IOException {
+    public JSONObjectReader parseBaseMessage(JSONObjectReader requestObject) {
         if (!requestObject.getString(JSONDecoderCache.CONTEXT_JSON).equals(BaseProperties.SATURN_WEB_PAY_CONTEXT_URI)) {
-            throw new IOException("Unknown context: " + requestObject.getString(JSONDecoderCache.CONTEXT_JSON));
+            throw new SaturnException("Unknown context: " + requestObject.getString(JSONDecoderCache.CONTEXT_JSON));
         }
         String qualifier = requestObject.getString(JSONDecoderCache.QUALIFIER_JSON);
         if (!qualifier.equals(this.qualifier)) {
-            throw new IOException("Unexpected qualifier: " + qualifier);
+            throw new SaturnException("Unexpected qualifier: " + qualifier);
         }
         return requestObject;
     }
@@ -92,7 +90,7 @@ public enum Messages {
         return String.valueOf(lowerCamelCasedMessage);
     }
 
-    public JSONObjectReader getEmbeddedMessage(JSONObjectReader reader) throws IOException {
+    public JSONObjectReader getEmbeddedMessage(JSONObjectReader reader) {
         return reader.getObject(lowerCamelCase());
     }
 }

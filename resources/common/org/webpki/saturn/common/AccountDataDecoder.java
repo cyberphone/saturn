@@ -16,10 +16,6 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
-import java.security.GeneralSecurityException;
-
 import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.JSONDecoder;
@@ -32,12 +28,11 @@ public abstract class AccountDataDecoder extends JSONDecoder {
     
     protected String accountId;
 
-    public final String logLine() throws IOException {
+    public final String logLine() {
         return getWriter().serializeToString(JSONOutputFormats.NORMALIZED);
     }
 
-    public final byte[] getAccountHash(HashAlgorithms accountHashAlgorithm) throws IOException,
-                                                                                   GeneralSecurityException {
+    public final byte[] getAccountHash(HashAlgorithms accountHashAlgorithm) {
         return optionalNonce == null ? null : accountHashAlgorithm.digest(getAccountObject());
     }
 
@@ -48,7 +43,7 @@ public abstract class AccountDataDecoder extends JSONDecoder {
 
     // All invariant backend payment data (minimally: account number + context)
     // returned as a canonical binary
-    protected abstract byte[] getAccountObject() throws IOException;
+    protected abstract byte[] getAccountObject();
     
     // Core account number
     public final String getAccountId() {
@@ -56,7 +51,7 @@ public abstract class AccountDataDecoder extends JSONDecoder {
     }
 
     // Must be called in every BackendPaymentDataDecoder.readJSONData()
-    protected final void readOptionalNonce(JSONObjectReader rd) throws IOException {
+    protected final void readOptionalNonce(JSONObjectReader rd) {
         optionalNonce = rd.getBinaryConditional(BaseProperties.NONCE_JSON);
     }
     

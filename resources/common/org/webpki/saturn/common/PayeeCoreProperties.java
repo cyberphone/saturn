@@ -17,17 +17,15 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.IOException;
-
 import java.net.URLEncoder;
 
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.webpki.crypto.AsymSignatureAlgorithms;
+import org.webpki.crypto.CryptoException;
 import org.webpki.crypto.HashAlgorithms;
 
 import org.webpki.json.JSONArrayReader;
@@ -39,6 +37,7 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.json.JSONSignatureDecoder;
 
 import org.webpki.util.Base64URL;
+import org.webpki.util.UTF8;
 
 public class PayeeCoreProperties implements BaseProperties {
     
@@ -69,7 +68,7 @@ public class PayeeCoreProperties implements BaseProperties {
     
     
 
-    public PayeeCoreProperties(JSONObjectReader rd) throws IOException, GeneralSecurityException {
+    public PayeeCoreProperties(JSONObjectReader rd) {
         payeeId = rd.getString(LOCAL_PAYEE_ID_JSON);
         commonName = rd.getString(COMMON_NAME_JSON);
         homePage = rd.getString(HOME_PAGE_JSON);
@@ -97,18 +96,21 @@ public class PayeeCoreProperties implements BaseProperties {
         signatureParameters = parameterArray.toArray(new SignatureParameter[0]);
     }
     
-    public static String createUrlSafeId(String payeeId) throws IOException {
+    public static String createUrlSafeId(String payeeId) {
+        try {
         if (URLEncoder.encode(payeeId, "utf-8").equals(payeeId)) {
             return payeeId;
         }
-        return Base64URL.encode(payeeId.getBytes("utf-8"));
+        return Base64URL.encode(UTF8.encode(payeeId));
+        } catch (java.io.IOException e) {
+            throw new SaturnException(e);
+        }
     }
 
     public static PayeeCoreProperties init(JSONObjectReader rd,
                                            String payeeBaseAuthorityUrl,
                                            HashAlgorithms accountHashAlgorithm,
-                                           JSONDecoderCache knownPaymentMethods)
-            throws IOException, GeneralSecurityException {
+                                           JSONDecoderCache knownPaymentMethods) {
         ArrayList<byte[]> optionalAccountHashes = new ArrayList<>();
         JSONArrayReader payeeAccounts = rd.getArray(PAYEE_ACCOUNTS_JSON);
         do {
@@ -157,7 +159,7 @@ public class PayeeCoreProperties implements BaseProperties {
         return payeeAuthorityUrl;
     }
 
-    public JSONObjectWriter writeObject(JSONObjectWriter wr) throws IOException {
+    public JSONObjectWriter writeObject(JSONObjectWriter wr) {
         wr.setString(LOCAL_PAYEE_ID_JSON, payeeId)
           .setString(COMMON_NAME_JSON, commonName)
           .setString(HOME_PAGE_JSON, homePage)
@@ -179,7 +181,7 @@ public class PayeeCoreProperties implements BaseProperties {
         return wr;
     }
 
-    public void verify(JSONSignatureDecoder signatureDecoder) throws IOException {
+    public void verify(JSONSignatureDecoder signatureDecoder) {
         boolean publicKeyMismatch = true;
         for (SignatureParameter signatureParameter : signatureParameters) {
             if (signatureParameter.publicKey.equals(signatureDecoder.getPublicKey())) {
@@ -190,21 +192,20 @@ public class PayeeCoreProperties implements BaseProperties {
                 }
             }
         }
-        throw new IOException((publicKeyMismatch ? "Public key" : "Signature algorithm") + 
+        throw new CryptoException((publicKeyMismatch ? "Public key" : "Signature algorithm") + 
                               " mismatch for payee: " + payeeId);
     }
 
-    public void verifyAccount(AccountDataDecoder backendAccountDataDecoder)
-    throws IOException, GeneralSecurityException {
+    public void verifyAccount(AccountDataDecoder backendAccountDataDecoder) {
         byte[] accountHash = backendAccountDataDecoder.getAccountHash(accountHashAlgorithm);
         if (getAccountHashes() == null) {
             if (accountHash != null) {
-                throw new IOException("Missing \"" + ACCOUNT_VERIFIER_JSON + 
+                throw new SaturnException("Missing \"" + ACCOUNT_VERIFIER_JSON + 
                                       "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
             }
         } else {
             if (accountHash == null) {
-                throw new IOException("Missing verifiable payee account");
+                throw new SaturnException("Missing verifiable payee account");
             }
             boolean notFound = true;
             for (byte[] hash : getAccountHashes()) {
@@ -214,8 +215,8 @@ public class PayeeCoreProperties implements BaseProperties {
                 }
             }
             if (notFound) {
-                throw new IOException("Payee account does not match \"" + ACCOUNT_VERIFIER_JSON + 
-                                      "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
+                throw new SaturnException("Payee account does not match \"" + ACCOUNT_VERIFIER_JSON + 
+                                          "\" in \"" + Messages.PAYEE_AUTHORITY.toString() + "\"");
             }
         }
     }
