@@ -59,7 +59,6 @@
       <isset property="hostingoption"/>
     </condition>
     <property name="payee_acquirer.url" value="${@acquirerhost}/${@acquirerpath}/payees/"/>
-    <property name="server.port.map" value=""/>
     <property name="unusual.card" value="false"/>
     <property name="currency" value="EUR"/>
     <property name="other.key" value=""/>
@@ -107,7 +106,6 @@
     </javac>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@desktop-wallet@" value="${desktop.wallet}"/>
-      <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@merchant-base-url@" value="${@merchanthost}/${@merchantpath}"/>
       <replacefilter token="@well-known-url@" value="${@wellknownurl}"/>
       <replacefilter token="@payment-root@" value="${@banknetworkroot}.cer"/>

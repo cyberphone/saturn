@@ -18,8 +18,6 @@ package org.webpki.saturn.common;
 
 import java.io.IOException;
 
-import java.net.URL;
-
 import java.security.GeneralSecurityException;
 
 import java.util.Collections;
@@ -45,12 +43,10 @@ public class ExternalCalls {
     
     boolean logging;
     Logger logger;
-    Integer portMapper;
     
-    public ExternalCalls(boolean logging, Logger logger, Integer portMapper) {
+    public ExternalCalls(boolean logging, Logger logger) {
         this.logging = logging;
         this.logger = logger;
-        this.portMapper = portMapper;
     }
 
     static final int TIMEOUT_FOR_REQUEST           = 10000;
@@ -62,18 +58,6 @@ public class ExternalCalls {
 
     Map<String,ProviderAuthorityDecoder> providerAuthorityObjects = 
             Collections.synchronizedMap(new LinkedHashMap<>());
-
-    String portFilter(String url) throws IOException {
-        // Our JBoss installation has some port mapping issues...
-        if (portMapper == null) {
-            return url;
-        }
-        URL url2 = new URL(url);
-        return new URL(url2.getProtocol(),
-                       url2.getHost(),
-                       portMapper,
-                       url2.getFile()).toExternalForm(); 
-    }
 
     JSONObjectReader fetchJsonReturnData(HTTPSWrapper wrap, UrlHolder urlHolder) throws IOException {
         if (wrap.getResponseCode() != HttpServletResponse.SC_OK) {
@@ -104,7 +88,7 @@ public class ExternalCalls {
         wrap.setHeader(HttpSupport.HTTP_CONTENT_TYPE_HEADER, BaseProperties.JSON_CONTENT_TYPE);
         wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, BaseProperties.JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
-        wrap.makePostRequest(portFilter(url), request.serializeToBytes(JSONOutputFormats.NORMALIZED));
+        wrap.makePostRequest(url, request.serializeToBytes(JSONOutputFormats.NORMALIZED));
         return fetchJsonReturnData(wrap, urlHolder);
     }
 
@@ -116,7 +100,7 @@ public class ExternalCalls {
         wrap.setTimeout(TIMEOUT_FOR_REQUEST);
         wrap.setHeader(HttpSupport.HTTP_ACCEPT_HEADER, BaseProperties.JSON_CONTENT_TYPE);
         wrap.setRequireSuccess(false);
-        wrap.makeGetRequest(portFilter(urlHolder.getUrl()));
+        wrap.makeGetRequest(urlHolder.getUrl());
         return fetchJsonReturnData(wrap, urlHolder);
     }
 

@@ -16,8 +16,6 @@
  */
 package com.supercard;
 
-import java.io.IOException;
-
 import java.util.GregorianCalendar;
 
 import org.webpki.json.JSONObjectReader;

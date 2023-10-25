@@ -79,7 +79,6 @@
     </condition>
     <delete dir="${temp.dir}"/>
     <property name="bank.path" value="${appcorename}"/>
-    <property name="server.port.map" value=""/>
     <property name="enc.key.rsa" value="${internal.name}-enc-key-rsa.p12"/>
     <property name="enc.key.ec" value="${internal.name}-enc-key-ec.p12"/>
     <property name="cert.key" value="${internal.name}-eecert.p12"/>
@@ -115,7 +114,6 @@
       <replacefilter token="https://buyerzone.com" value="${@merchanthost}/${@merchantpath}"/>
     </replace>
     <replace file="${temp.dir}/web.xml">
-      <replacefilter token="@server-port-map@" value="${server.port.map}"/>
       <replacefilter token="@key-password@" value="${@keypassword}"/>
       <replacefilter token="@bank-name@" value="${common.name}"/>
       <replacefilter token="@hosting-provider-key@" value="${hosting.provider.key}"/>

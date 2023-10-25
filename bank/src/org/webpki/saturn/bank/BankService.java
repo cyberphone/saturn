@@ -111,8 +111,6 @@ public class BankService extends InitPropertyReader implements ServletContextLis
     
     static final String PAYEE_ACCOUNT_DB      = "payee_account_db";
     
-    static final String SERVER_PORT_MAP       = "server_port_map";
-    
     static final String PAYER_INTERBANK_URL   = "payer_interbank_url";
 
     static final String PAYEE_INTERBANK_URL   = "payee_interbank_url";
@@ -408,11 +406,8 @@ public class BankService extends InitPropertyReader implements ServletContextLis
                            KnownExtensions.BALANCE_REQUEST,
                            BalanceRequestServlet.class,
                            "Balance Servlet");
-            externalCalls = 
-                    new ExternalCalls(logging,
-                                      logger,
-                                      getPropertyString(SERVER_PORT_MAP).length () > 0 ?
-                                                       getPropertyInt(SERVER_PORT_MAP) : null);
+
+            externalCalls = new ExternalCalls(logging, logger);
             
             String userDataBase = getPropertyString(USER_ACCOUNT_DB);
             if (!userDataBase.isEmpty()) {

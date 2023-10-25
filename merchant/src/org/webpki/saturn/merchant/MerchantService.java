@@ -79,8 +79,6 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
     static final String NO_MATCHING_METHODS_URL      = "no_matching_methods_url";
 
-    static final String SERVER_PORT_MAP              = "server_port_map";
-    
     static final String DESKTOP_WALLET               = "desktop_wallet";
 
     static final String CURRENCY                     = "currency";
@@ -273,10 +271,7 @@ public class MerchantService extends InitPropertyReader implements ServletContex
 
             slowOperation = getPropertyBoolean(SLOW_OPERATION);
             
-            externalCalls = new ExternalCalls(logging, 
-                                              logger,
-                                              getPropertyString(SERVER_PORT_MAP).length () > 0 ?
-                                                               getPropertyInt(SERVER_PORT_MAP) : null);
+            externalCalls = new ExternalCalls(logging, logger);
 
             ////////////////////////////////////////////////////////////////////////////////////////////
             // Android WebPKI version check
