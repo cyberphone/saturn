@@ -24,12 +24,6 @@ import java.util.LinkedHashMap;
 
 import org.webpki.tools.svg.SVGPathValues.SubCommand;
 
-import org.webpki.xml.DOMAttributeReaderHelper;
-import org.webpki.xml.DOMReaderHelper;
-import org.webpki.xml.DOMWriterHelper;
-import org.webpki.xml.XMLObjectWrapper;
-import org.webpki.xml.XMLSchemaCache;
-
 public class SVGEmbeddedText {
     
     public static class DecodedGlyph {

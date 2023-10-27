@@ -94,6 +94,7 @@ import org.webpki.sks.SKSReferenceImplementation;
 
 import org.webpki.util.IO;
 import org.webpki.util.UTF8;
+
 import org.webpki.saturn.common.BaseProperties;
 import org.webpki.saturn.common.CardDataDecoder;
 import org.webpki.saturn.common.ClientPlatform;
@@ -944,7 +945,7 @@ public class Wallet {
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
                             EncryptedMessage encryptedMessage = 
-                                    new ProviderUserResponseDecoder(optionalMessage)
+                                    new ProviderUserResponseDecoder().readJSONData(optionalMessage)
                                 .getEncryptedMessage(contentEncryptionKey, 
                                                      selectedCard.contentEncryptionAlgorithm);
                             logger.info("Decrypted private message:\n" + 
