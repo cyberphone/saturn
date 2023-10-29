@@ -41,7 +41,6 @@ import java.io.ObjectInputStream;
 
 import java.net.URL;
 
-import java.security.GeneralSecurityException;
 import java.security.PublicKey;
 
 import java.util.LinkedHashMap;
@@ -944,10 +943,13 @@ public class Wallet {
                         message.parseBaseMessage(optionalMessage);
                         ((CardLayout)views.getLayout()).show(views, VIEW_AUTHORIZE);
                         if (message == Messages.PROVIDER_USER_RESPONSE) {
+                            JSONDecoderCache jdc = new JSONDecoderCache();
+                            jdc.addToCache(ProviderUserResponseDecoder.class);
+                            ProviderUserResponseDecoder ur =
+                                    (ProviderUserResponseDecoder)jdc.parse(optionalMessage);
                             EncryptedMessage encryptedMessage = 
-                                    new ProviderUserResponseDecoder().readJSONData(optionalMessage)
-                                .getEncryptedMessage(contentEncryptionKey, 
-                                                     selectedCard.contentEncryptionAlgorithm);
+                                ur.getEncryptedMessage(contentEncryptionKey, 
+                                                       selectedCard.contentEncryptionAlgorithm);
                             logger.info("Decrypted private message:\n" + 
                                         encryptedMessage.getRoot());
                             showProviderDialog(encryptedMessage);
