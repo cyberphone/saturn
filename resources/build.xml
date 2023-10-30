@@ -137,10 +137,10 @@
     </antcall>
   </target>
 
-  <target name="svg-bankdirect-square">
+  <target name="svg-banknet2-square">
     <antcall target="_svg">
-       <param name="svgfile" value="svg-gen/bankdirect-square.svg"/>
-       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.BankDirectSquare"/>
+       <param name="svgfile" value="svg-gen/banknet2-square.svg"/>
+       <param name="svgclass" value="org.webpki.saturn.svg.diagrams.BankNet2Square"/>
     </antcall>
   </target>
   

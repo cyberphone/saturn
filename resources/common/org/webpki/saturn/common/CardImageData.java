@@ -18,14 +18,15 @@ package org.webpki.saturn.common;
 
 public interface CardImageData {
     
-    public double STANDARD_WIDTH          = 300;
-    public double STANDARD_HEIGHT         = 180;
-    public String STANDARD_NAME           = "Your Name";
-    public String STANDARD_ACCOUNT        = "ACCOUNT NUMBER";
-    public double STANDARD_TEXT_LEFT      = 30;
-    public double STANDARD_TEXT_Y_OFFSET  = 22;
-    public int STANDARD_NAME_FONT_SIZE    = 20;
-    public int STANDARD_ACCOUNT_FONT_SIZE = 14;
+    double STANDARD_WIDTH             = 300;
+    double STANDARD_HEIGHT            = 180;
+    String STANDARD_NAME              = "Your Name";
+    String STANDARD_ACCOUNT           = "ACCOUNT NUMBER";
+    double STANDARD_TEXT_LEFT         = 30;
+    double STANDARD_NAME_Y_COORDINATE = 141.3;
+    double STANDARD_TEXT_Y_OFFSET     = 23.7;
+    int STANDARD_NAME_FONT_SIZE       = 20;
+    int STANDARD_ACCOUNT_FONT_SIZE    = 15;
     
     static StringBuilder viewableFormat(String rawCardImage, String htmlWidth) {
         return new StringBuilder("<svg style='width:")

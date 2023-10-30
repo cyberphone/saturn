@@ -23,10 +23,9 @@ import org.webpki.tools.svg.SVGDoubleValue;
 import org.webpki.tools.svg.SVGEllipse;
 import org.webpki.tools.svg.SVGRect;
 import org.webpki.tools.svg.SVGText;
-import org.webpki.tools.svg.SVGText.FONT_WEIGHTS;
 
-public class BankDirectSquare extends SVGDocument implements CardImageData {
-    public BankDirectSquare() {
+public class BankNet2Square extends SVGDocument implements CardImageData {
+    public BankNet2Square() {
         super(0, 0);
     }
     
@@ -40,8 +39,6 @@ public class BankDirectSquare extends SVGDocument implements CardImageData {
     
     final static double BANK_SIZE           = 0.34;
     
-    final static double NAME_Y_COORDINATE   = STANDARD_HEIGHT * 0.785;
-
     @Override
     public String getFilters() {
         return 
@@ -66,22 +63,6 @@ public class BankDirectSquare extends SVGDocument implements CardImageData {
                 null,
                 null,
                 "url(#bankdirectGradient)"));
-
-        add(new SVGText(
-                new SVGDoubleValue(STANDARD_TEXT_LEFT),
-                new SVGDoubleValue(NAME_Y_COORDINATE),
-                "Sans-serif",
-                STANDARD_NAME_FONT_SIZE,
-                null,
-                STANDARD_NAME));
-
-        add(new SVGText(
-                new SVGDoubleValue(STANDARD_TEXT_LEFT),
-                new SVGDoubleValue(NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
-                "Noto Sans",
-                STANDARD_ACCOUNT_FONT_SIZE,
-                null,
-                STANDARD_ACCOUNT).setFontWeight(SVGText.FONT_WEIGHTS.W500));
 
         add(new SVGText(
                 new SVGDoubleValue((STANDARD_WIDTH + WHITE_SQUARE_WIDTH + WHITE_SQUARE_PAD) / 2),
@@ -111,24 +92,33 @@ public class BankDirectSquare extends SVGDocument implements CardImageData {
 
         add(new SVGText(
                 new SVGDoubleValue(WHITE_SQUARE_WIDTH / 2 + WHITE_SQUARE_PAD),
-                new SVGDoubleValue(WHITE_SQUARE_HEIGHT / 2  + WHITE_SQUARE_PAD - 4),
+                new SVGDoubleValue(WHITE_SQUARE_HEIGHT / 2  + WHITE_SQUARE_PAD + 6),
                 "Sans-serif",
-                18,
+                20,
                 SVGText.TEXT_ANCHOR.MIDDLE,
-                "BANK"));
-
-        add(new SVGText(
-                new SVGDoubleValue(WHITE_SQUARE_WIDTH / 2 + WHITE_SQUARE_PAD),
-                new SVGDoubleValue(WHITE_SQUARE_HEIGHT / 2  + WHITE_SQUARE_PAD + 14),
-                "Sans-serif",
-                18,
-                SVGText.TEXT_ANCHOR.MIDDLE,
-                "DIRECT"));
+                "BankNet2"));
 
         bank(BANK_PAD, BANK_PAD);
         bank(BANK_PAD, WHITE_SQUARE_HEIGHT - BANK_PAD);
         bank(WHITE_SQUARE_WIDTH - BANK_PAD, BANK_PAD);
         bank(WHITE_SQUARE_WIDTH - BANK_PAD, WHITE_SQUARE_HEIGHT - BANK_PAD);
+        
+        add(new SVGText(
+                new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                new SVGDoubleValue(STANDARD_NAME_Y_COORDINATE),
+                "Sans-serif",
+                STANDARD_NAME_FONT_SIZE,
+                null,
+                STANDARD_NAME));
+
+        add(new SVGText(
+                new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                new SVGDoubleValue(STANDARD_NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
+                "Noto Sans",
+                STANDARD_ACCOUNT_FONT_SIZE,
+                null,
+                STANDARD_ACCOUNT).setFontWeight(SVGText.FONT_WEIGHTS.W500));
+
     }
 
     void bank(double x, double y) {
@@ -136,7 +126,8 @@ public class BankDirectSquare extends SVGDocument implements CardImageData {
         if (x > BANK_PAD) x_offset = -x_offset;
         double y_offset = Bank.BANK_HEIGHT * BANK_SIZE / 2;
         if (y > BANK_PAD) y_offset = - y_offset;
-        new Bank.SubBank(WHITE_SQUARE_PAD + x + x_offset, WHITE_SQUARE_PAD + y + y_offset, BANK_SIZE, true)
+        new Bank.SubBank(WHITE_SQUARE_PAD + x + x_offset, 
+                         WHITE_SQUARE_PAD + y + y_offset, BANK_SIZE, true)
             .setShaddow(false)
             .setStrokeWeight(0.5)
             .generate(this);
