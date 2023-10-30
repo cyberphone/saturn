@@ -114,7 +114,7 @@ public class BankNet2Square extends SVGDocument implements CardImageData {
         add(new SVGText(
                 new SVGDoubleValue(STANDARD_TEXT_LEFT),
                 new SVGDoubleValue(STANDARD_NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
-                "Noto Sans",
+                "Sans-serif",
                 STANDARD_ACCOUNT_FONT_SIZE,
                 null,
                 STANDARD_ACCOUNT).setFontWeight(SVGText.FONT_WEIGHTS.W500));
