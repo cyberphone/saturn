@@ -24,7 +24,6 @@ import org.webpki.tools.svg.SVGEmbeddedText;
 import org.webpki.tools.svg.SVGPath;
 import org.webpki.tools.svg.SVGRect;
 import org.webpki.tools.svg.SVGText;
-import org.webpki.tools.svg.SVGText.FONT_WEIGHTS;
 
 public class SuperCardSquare extends SVGDocument implements CardImageData {
     public SuperCardSquare() {
@@ -34,8 +33,7 @@ public class SuperCardSquare extends SVGDocument implements CardImageData {
     final static String CORE_COLOR = "#6d8838";
     final static String S_COLOR    = "#9e0a11";
     
-    final static double NAME_Y_COORDINATE = STANDARD_HEIGHT * 0.76;
-    
+  
     @Override
     public String getFilters() {
         return 
@@ -56,30 +54,16 @@ public class SuperCardSquare extends SVGDocument implements CardImageData {
         null,
         "url(#supercardGradient)"));
         
-        add(new SVGText(new SVGDoubleValue(STANDARD_TEXT_LEFT),
-                        new SVGDoubleValue(NAME_Y_COORDINATE),
-                        "Sans-serif",
-                        STANDARD_NAME_FONT_SIZE,
-                        null,
-                        STANDARD_NAME));
-
-        add(new SVGText(new SVGDoubleValue(STANDARD_TEXT_LEFT),
-                        new SVGDoubleValue(NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
-                        "Noto Sans",
-                        STANDARD_ACCOUNT_FONT_SIZE,
-                        null,
-                        STANDARD_ACCOUNT).setFontWeight(SVGText.FONT_WEIGHTS.W500));
-
         SVGEmbeddedText et = new SVGEmbeddedText(org.webpki.saturn.svg.diagrams.SupercardGlyphs.class);
 
         String superCardString = "SuperCard";
 
-        double x = STANDARD_WIDTH / 12;
+        double x = STANDARD_WIDTH / 9.5;
         
         String color = S_COLOR;
         
         double transformation = STANDARD_HEIGHT / 5;
-        double y = STANDARD_HEIGHT / 2.5;
+        double y = STANDARD_HEIGHT / 2.37;
         double gutter = STANDARD_WIDTH / 16;
         boolean first = true;
         double lineWidth = STANDARD_HEIGHT / 80;
@@ -106,16 +90,31 @@ public class SuperCardSquare extends SVGDocument implements CardImageData {
             x += dg.getXAdvance() + gutter;
             color = CORE_COLOR;
             transformation = STANDARD_HEIGHT / 3.6;
-            y = STANDARD_HEIGHT / 2.6;
+            y = STANDARD_HEIGHT / 2.45;
             gutter = STANDARD_WIDTH / 70;
         }
+
         add(new SVGText(new SVGDoubleValue(x),
-                new SVGDoubleValue(y - STANDARD_HEIGHT / 10),
+                new SVGDoubleValue(y - STANDARD_HEIGHT / 7),
                 "Sans-serif",
-                STANDARD_HEIGHT / 10,
+                12,
                 SVGText.TEXT_ANCHOR.START,
                 "TM").setFontWeight(SVGText.FONT_WEIGHTS.BOLD)
                      .setFontColor(CORE_COLOR)
                      .setLetterSpacing(2));
+
+        add(new SVGText(new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                new SVGDoubleValue(STANDARD_NAME_Y_COORDINATE),
+                "Sans-serif",
+                STANDARD_NAME_FONT_SIZE,
+                null,
+                STANDARD_NAME));
+
+        add(new SVGText(new SVGDoubleValue(STANDARD_TEXT_LEFT),
+                new SVGDoubleValue(STANDARD_NAME_Y_COORDINATE + STANDARD_TEXT_Y_OFFSET),
+                "Noto Sans",
+                STANDARD_ACCOUNT_FONT_SIZE,
+                null,
+                STANDARD_ACCOUNT).setFontWeight(SVGText.FONT_WEIGHTS.W500));
     }
  }
