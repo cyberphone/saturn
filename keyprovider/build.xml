@@ -64,7 +64,7 @@
        tablength="4"
        eol="lf"
        eof="remove"
-       includes="**/*.java, **/*.xml, **/*.svg, **/*.json"/>
+       includes="**/*.java, **/*.xml, **/*.json"/>
     <copy file="web.xml" todir="${temp.dir}"/>
     <javac debug="${debug}"
            srcdir="${src.dir}:${@common.src.dir}"
