@@ -44,6 +44,6 @@ public class PaymentManifestServlet extends HttpServlet {
     public void doHead(HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {
         if (PaymentAppMethodService.logging) logger.info("HEAD");
-        response.setHeader("Link", "<payment-manifest.json>; rel=\"payment-method-manifest\"");
+        response.setHeader("Link", PaymentAppMethodService.linkArgument);
     }
 }

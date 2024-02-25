@@ -51,6 +51,8 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
 
     static boolean logging;
     
+    static String linkArgument;
+    
     byte[] getBinary(String name) throws IOException {
         return IO.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name));
     }
@@ -64,6 +66,9 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
         initProperties (sce);
         try {
             logging = getPropertyBoolean(LOGGING);
+            
+            linkArgument = "<" + getPropertyString(HOST_PATH) + ">" +
+                    "; rel=\"payment-method-manifest\"";
 
             byte[] certificate = getBinary(SIGNER_CERTIFICATE);
 
