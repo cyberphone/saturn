@@ -10,6 +10,8 @@
   
   <property name="application" value="w3cpay.war"/>
   
+  <property name="webroot" value="webapps"/>
+
   <property name="debug" value="on"/>
 
   <property name="javaversion" value="${ant.java.version}"/>
@@ -36,7 +38,7 @@
   <target name="tomcat">
     <fail message="CATALINA_HOME must be set to environment!" unless="catalina.home"/>
     <antcall target="build"/>
-    <copy file="${dist.dir}/${application}" todir="${catalina.home}/webapps" overwrite="true" preservelastmodified="true"/>
+    <copy file="${dist.dir}/${application}" todir="${catalina.home}/${webroot}" overwrite="true" preservelastmodified="true"/>
   </target>
 
   <target name="build">
