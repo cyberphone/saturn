@@ -73,8 +73,8 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
             byte[] certificate = getBinary(SIGNER_CERTIFICATE);
 
             JSONObjectWriter temp = new JSONObjectWriter();
-//            temp.setArray("default_applications")
-//                .setString(getPropertyString(HOST_PATH));
+// Removed due to https://issues.chromium.org/issues/325593948
+//            temp.setArray("default_applications").setString(getPropertyString(HOST_PATH));
             JSONObjectWriter oneApp = new JSONObjectWriter();
             oneApp.setString("platform", "play")
                   .setString("id", MobileProxyParameters.ANDROID_PACKAGE_NAME)
