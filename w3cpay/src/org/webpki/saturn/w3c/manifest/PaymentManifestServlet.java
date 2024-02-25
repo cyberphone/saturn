@@ -32,15 +32,10 @@ public class PaymentManifestServlet extends HttpServlet {
     
     static Logger logger = Logger.getLogger(PaymentManifestServlet.class.getCanonicalName());
 
-    void putLink(HttpServletResponse response) {
-        response.setHeader("Link", "<payment-manifest.json>; rel=\"payment-method-manifest\"");
-    }
-    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) 
     throws IOException, ServletException {
-        logger.info("GET");
-        putLink(response);
+        if (PaymentAppMethodService.logging) logger.info("GET");
         response.setContentType("application/json");
         response.getOutputStream().write(PaymentAppMethodService.paymentManifest);
     }
@@ -48,7 +43,7 @@ public class PaymentManifestServlet extends HttpServlet {
     @Override
     public void doHead(HttpServletRequest request, HttpServletResponse response) 
             throws IOException, ServletException {
-        logger.info("HEAD");
-        putLink(response);
+        if (PaymentAppMethodService.logging) logger.info("HEAD");
+        response.setHeader("Link", "<payment-manifest.json>; rel=\"payment-method-manifest\"");
     }
 }

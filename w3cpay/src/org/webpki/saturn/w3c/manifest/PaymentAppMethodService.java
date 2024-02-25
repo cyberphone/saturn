@@ -45,7 +45,11 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
     
     static final String HOST_PATH                    = "host_path";
 
+    static final String LOGGING                      = "logging";
+
     static byte[] paymentManifest;
+
+    static boolean logging;
     
     byte[] getBinary(String name) throws IOException {
         return IO.getByteArrayFromInputStream(this.getClass().getResourceAsStream(name));
@@ -59,11 +63,13 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
     public void contextInitialized(ServletContextEvent sce) {
         initProperties (sce);
         try {
+            logging = getPropertyBoolean(LOGGING);
+
             byte[] certificate = getBinary(SIGNER_CERTIFICATE);
 
             JSONObjectWriter temp = new JSONObjectWriter();
-            temp.setArray("default_applications")
-                .setString(getPropertyString(HOST_PATH));
+//            temp.setArray("default_applications")
+//                .setString(getPropertyString(HOST_PATH));
             JSONObjectWriter oneApp = new JSONObjectWriter();
             oneApp.setString("platform", "play")
                   .setString("id", MobileProxyParameters.ANDROID_PACKAGE_NAME)
@@ -84,7 +90,7 @@ public class PaymentAppMethodService extends InitPropertyReader implements Servl
 //            temp.setString("supported_origins", "*");
             paymentManifest = temp.serializeToBytes(JSONOutputFormats.NORMALIZED);
             
-            logger.info("W3C/Android Payment App Method initiated\nSubject=" +
+            logger.info("W3C/Android Payment App Method=" + getPropertyString(HOST_PATH) + ", Subject=" +
                     CertificateUtil.getCertificateFromBlob(certificate).getSubjectX500Principal());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "********\n" + e.getMessage() + "\n********", e);

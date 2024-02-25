@@ -44,6 +44,7 @@
     <condition property="zip.webpki.lib.dir" value="${@webpki.lib.dir}" else="empty.lib">
       <isset property="@include.webpki.in.war"/>
     </condition>
+    <property name="logging" value="false"/>
     <mkdir dir="${dist.dir}"/>
     <delete dir="${temp.dir}"/>
     <mkdir dir="${temp.dir}"/>
@@ -72,6 +73,7 @@
     </javac>
     <replace file="${temp.dir}/web.xml">
       <replacefilter token="@host-path@" value="${@w3c.manifesturl}"/>
+      <replacefilter token="@logging@" value="${logging}"/>
     </replace>
     <war destfile="${dist.dir}/${application}" webxml="${temp.dir}/web.xml">
       <classes dir="${temp.dir}">
