@@ -18,7 +18,8 @@ package org.webpki.saturn.keyprovider;
 
 import java.io.IOException;
 import java.io.InputStream;
-
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.security.GeneralSecurityException;
@@ -145,7 +146,8 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
         boolean balanceService;
         
         public CredentialTemplate(JSONObjectReader rd) throws IOException,
-                                                              GeneralSecurityException {
+                                                              GeneralSecurityException, 
+                                                              URISyntaxException {
             paymentMethod = rd.getString("paymentMethod");
             providerWellKnownFlag = rd.getBoolean("providerWellKnownFlag");
             signatureAlgorithm = CryptoUtils.getSignatureAlgorithm(rd, "signatureAlgorithm");
@@ -161,7 +163,7 @@ public class KeyProviderService extends InitPropertyReader implements ServletCon
             friendlyName = rd.getString("friendlyName");
             svgCardImage = getResourceAsString(rd.getString("cardImage"));
             if (inHouseLogo) {
-                URL hostUrl = new URL(authorityUrl);
+                URL hostUrl = new URI(authorityUrl).toURL();
                 String host = hostUrl.getHost() + (hostUrl.getPort() < 0 ? "" : ":" +  hostUrl.getPort());
                 svgCardImage = svgCardImage.substring(0, svgCardImage.lastIndexOf("</svg>")) +
                         getResourceAsString("inhouse-flag.txt").replace("HOST", host);
