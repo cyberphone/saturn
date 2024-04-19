@@ -19,7 +19,7 @@
 		<link>
 			<name>w2nb</name>
 			<type>2</type>
-			<location>/Users/anders/github.repositories/saturn/C::/github.repositories/saturn/desktop-client/w2nb</location>
+			<location>copy_PARENT/desktop-client/w2nb</location>
 		</link>
 	</linkedResources>
 	<filteredResources>
