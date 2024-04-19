@@ -16,13 +16,11 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.Serializable;
-
 import java.math.BigDecimal;
 
 import java.util.regex.Pattern;
 
-public enum Currencies implements Serializable {
+public enum Currencies {
 
     DKK ("\u2009Kr",      false, 2),
 /*

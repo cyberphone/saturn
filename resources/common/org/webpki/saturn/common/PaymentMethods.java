@@ -16,9 +16,7 @@
  */
 package org.webpki.saturn.common;
 
-import java.io.Serializable;
-
-public enum PaymentMethods implements Serializable {
+public enum PaymentMethods {
 
     SUPER_CARD   (true,  "https://supercard.com",   "SuperCard"), 
     BANK_DIRECT  (false, "https://banknet2.org",    "BankNet2"),
