@@ -46,7 +46,7 @@
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>
-			<value>$%7BPARENT-1-PROJECT_LOC%7D</value>
+			<value>${PROJECT_LOC}/..</value>
 		</variable>
 	</variableList>
 </projectDescription>
