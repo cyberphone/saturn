@@ -28,9 +28,8 @@ import java.math.BigDecimal;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
+import org.webpki.asn1.StringUtil;
 import org.webpki.util.Base64;
-import org.webpki.util.StringUtil;
 import org.webpki.util.ISODateTime;
 
 /**

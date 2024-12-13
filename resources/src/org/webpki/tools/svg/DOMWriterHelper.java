@@ -31,9 +31,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Document;
 import org.w3c.dom.Text;
 import org.w3c.dom.CDATASection;
-
+import org.webpki.asn1.StringUtil;
 import org.webpki.util.Base64;
-import org.webpki.util.StringUtil;
 import org.webpki.util.ISODateTime;
 
 /**

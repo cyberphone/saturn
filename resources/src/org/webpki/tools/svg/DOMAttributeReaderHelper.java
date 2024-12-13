@@ -25,8 +25,8 @@ import java.util.EnumSet;
 import java.util.NoSuchElementException;
 import java.util.GregorianCalendar;
 
+import org.webpki.asn1.StringUtil;
 import org.webpki.util.Base64;
-import org.webpki.util.StringUtil;
 import org.webpki.util.ISODateTime;
 
 /**

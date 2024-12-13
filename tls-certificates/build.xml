@@ -69,7 +69,7 @@
     <echo message="File: ${cert.file}"/>
     <antcall target="_createcert">
        <param name="target.dir" value="${server.dir}"/>
-       <param name="cmd" value="-ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} ${opt.san.host} -subject &quot;CN=TLS certificate for ${cert.file}&quot; -validity/start 2014-01-01T00:00:00 -validity/end 2024-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${cert.file}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
+       <param name="cmd" value="-ca/keypass ${@keypassword} -ca/storetype PKCS12 -ca/storepass ${@keypassword} -ca/keystore ${the.ca.file} -entity/ee -extension/ku digitalSignature -extension/ku keyEncipherment -extension/eku serverAuth ${san.ext} ${server} ${opt.san.host} -subject &quot;CN=TLS certificate for ${cert.file}&quot; -validity/start 2024-01-01T00:00:00 -validity/end 2028-07-10T09:59:59 -out/storetype PKCS12 -out/keystore ${cert.file}.p12 -out/storepass ${@keypassword} -out/keypass ${@keypassword} -keysize 2048 -sigalg RSA_SHA512"/>
     </antcall>
     <java fork="yes"
           classname="org.webpki.tools.KeyStore2PEMConverter"
