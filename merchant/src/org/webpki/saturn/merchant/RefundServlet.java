@@ -40,11 +40,11 @@ import org.webpki.saturn.common.RefundRequestEncoder;
 import org.webpki.saturn.common.RefundResponseDecoder;
 import org.webpki.saturn.common.UrlHolder;
 
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 // This servlet initiates a refund and shows the result.                //
 // Note: authorization of refunds are supposed to be carried out by the //
 // Payee. This would typically involve user authentication and logging. //
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 
 public class RefundServlet extends HttpServlet implements MerchantSessionProperties {
 

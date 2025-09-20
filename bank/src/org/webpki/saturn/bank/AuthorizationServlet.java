@@ -50,9 +50,9 @@ import org.webpki.saturn.common.UserResponseItem;
 
 import org.webpki.util.ISODateTime;
 
-/////////////////////////////////////////////////////////////////////////////////
+//=============================================================================//
 // This is the Saturn core Payment Provider (Bank) authorization servlet       //
-/////////////////////////////////////////////////////////////////////////////////
+//=============================================================================//
 
 public class AuthorizationServlet extends ProcessingBaseServlet {
   
@@ -166,9 +166,9 @@ public class AuthorizationServlet extends ProcessingBaseServlet {
                                               authorizationData);
         }
             
-        ////////////////////////////////////////////////////////////////////////////
+        //========================================================================//
         // We got an authentic request.  Now we need to check available funds etc.//
-        ////////////////////////////////////////////////////////////////////////////
+        //========================================================================//
         BigDecimal amount = paymentRequest.getAmount();
 
         // First we apply RBA v0.001...

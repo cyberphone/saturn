@@ -106,9 +106,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
     static String ED25519 = KeyAlgorithms.ED25519.getAlgorithmId(AlgorithmPreferences.SKS);
     
     void returnKeyGen2Error(HttpServletResponse response, String errorMessage) throws IOException, ServletException {
-        ////////////////////////////////////////////////////////////////////////////////////////////
+        //========================================================================================//
         // Server errors are returned as HTTP redirects taking the client out of its KeyGen2 mode
-        ////////////////////////////////////////////////////////////////////////////////////////////
+        //========================================================================================//
         response.sendRedirect(KeyProviderService.keygen2RunUrl + 
                               "?" +
                               KeyProviderInitServlet.ERROR_TAG +
@@ -143,9 +143,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
          throws IOException, ServletException {
         HttpSession session = request.getSession(false);
         try {
-            ////////////////////////////////////////////////////////////////////////////////////////////
+            //========================================================================================//
             // Check that the request is properly authenticated
-            ////////////////////////////////////////////////////////////////////////////////////////////
+            //========================================================================================//
             if (session == null) {
                 returnKeyGen2Error(response, "Session timed out");
                 return;
@@ -155,9 +155,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
             if (keygen2State == null) {
                 throw new IOException("Server state missing");
             }
-            ////////////////////////////////////////////////////////////////////////////////////////////
+            //========================================================================================//
             // Check if it is the first (trigger) message from the client
-            ////////////////////////////////////////////////////////////////////////////////////////////
+            //========================================================================================//
             if (init) {
                 InvocationRequestEncoder invocationRequest = new InvocationRequestEncoder(keygen2State);
                 keygen2State.addImageAttributesQuery(KeyGen2URIs.LOGOTYPES.LIST);
@@ -169,9 +169,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                 return;
               }
 
-            ////////////////////////////////////////////////////////////////////////////////////////////
+            //========================================================================================//
             // It should be a genuine KeyGen2 response.  Note that the order is verified!
-            ////////////////////////////////////////////////////////////////////////////////////////////
+            //========================================================================================//
             byte[] jsonData = ServletUtil.getData(request);
             if (!request.getContentType().equals(JSON_CONTENT_TYPE)) {
                 throw new IOException("Wrong \"Content-Type\": " + request.getContentType());
@@ -207,10 +207,10 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     logger.info("Device Certificate=" +
                             certificateData(keygen2State.getDeviceCertificate()));
 
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     // Finding out keys that should be deleted.  We don't want duplicate 
                     // payment credentials 
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     CredentialDiscoveryRequestEncoder credentialDiscoveryRequest =
                             new CredentialDiscoveryRequestEncoder(keygen2State);
                     credentialDiscoveryRequest.addLookupDescriptor(
@@ -223,9 +223,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         (CredentialDiscoveryResponseDecoder) jsonObject;
                     keygen2State.update(credentiaDiscoveryResponse);
 
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     // Mark keys for deletion
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     for (CredentialDiscoveryResponseDecoder.LookupResult lookupResult 
                            : 
                          credentiaDiscoveryResponse.getLookupResults()) {
@@ -244,9 +244,9 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         }
                     }
 
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     // Now order a set of new keys including suitable protection objects
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     ServerState.PINPolicy standardPinPolicy = 
                             keygen2State.createPINPolicy(PassphraseFormat.NUMERIC,
                                                          4,
@@ -311,10 +311,10 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                         (KeyCreationResponseDecoder) jsonObject;
                     keygen2State.update(keyCreationResponse);
 
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     // Keys have been created, now add the data needed in order to make 
                     // them usable in Saturn as well
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     
                     // However, since this is a demo without KYC and login we need to
                     // first create a user since even demo users are supposed to be
@@ -437,10 +437,10 @@ public class KeyProviderServlet extends HttpServlet implements BaseProperties {
                     keygen2State.update(provisioningFinalResponse);
                     logger.info("Successful KeyGen2 run");
 
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     // We are done, return an HTTP redirect taking 
                     // the client out of its KeyGen2 mode
-                    ////////////////////////////////////////////////////////////////////////
+                    //====================================================================//
                     response.sendRedirect(KeyProviderService.keygen2RunUrl);
                     return;
 

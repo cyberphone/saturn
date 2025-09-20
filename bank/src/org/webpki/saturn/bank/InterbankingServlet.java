@@ -29,10 +29,10 @@ import org.webpki.json.JSONObjectWriter;
 import org.webpki.saturn.common.TransactionTypes;
 import org.webpki.saturn.common.UrlHolder;
 
-/////////////////////////////////////////////////////////////////////////////////
+//=============================================================================//
 // This is a servlet that serves a hypothetical interbanking payment network.  //
 // It is entirely independent of Saturn but there is some minor code reuse.    //
-/////////////////////////////////////////////////////////////////////////////////
+//=============================================================================//
 
 public class InterbankingServlet extends ProcessingBaseServlet {
   

@@ -41,9 +41,9 @@ import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.TransactionResponseDecoder;
 import org.webpki.saturn.common.TransactionResponseEncoder;
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 // This is the Saturn "hybrid" mode decoder servlet                                           //
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 
 public class HybridPaymentServlet extends ProcessingBaseServlet {
 

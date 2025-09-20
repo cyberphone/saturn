@@ -57,9 +57,9 @@ import org.webpki.saturn.common.KeyStoreEnumerator;
 
 public class KeyGen2SoftHSM implements ServerCryptoInterface {
 
-    ////////////////////////////////////////////////////////////////////////////////////////
+    //====================================================================================//
     // Private and secret keys would in a HSM implementation be represented as handles
-    ////////////////////////////////////////////////////////////////////////////////////////
+    //====================================================================================//
     LinkedHashMap<PublicKey,PrivateKey> keyManagementKeys = new LinkedHashMap<>();
     
     public KeyGen2SoftHSM(KeyStoreEnumerator keyStoreEnumerator) {

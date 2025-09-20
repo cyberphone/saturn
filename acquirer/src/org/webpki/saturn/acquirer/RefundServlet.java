@@ -33,9 +33,9 @@ import org.webpki.saturn.common.RefundResponseEncoder;
 
 import com.supercard.SupercardAccountDataDecoder;
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 // This is the Saturn "refund" decoder servlet                                           //
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 
 public class RefundServlet extends ProcessingBaseServlet {
 

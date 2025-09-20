@@ -43,9 +43,9 @@ import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.PayerAuthorization;
 import org.webpki.saturn.common.WalletAlertMessage;
 
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 // This servlet holds core methods used by Saturn and Saturn "Native"   //
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 
 public abstract class ProcessingBaseServlet extends HttpServlet implements BaseProperties, MerchantSessionProperties {
 
@@ -146,9 +146,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
     
                 logger.info("Successful authorization of request: " + paymentRequest.getReferenceId());
                 logger.info("Receipt path=" + walletRequest.receiptUrl);
-                /////////////////////////////////////////////////////////////////////////////////////////
+                //=====================================================================================//
                 // Normal return                                                                       //
-                /////////////////////////////////////////////////////////////////////////////////////////
+                //=====================================================================================//
                 response.sendRedirect(qrId == null ? 
                         MerchantService.merchantBaseUrl + "/result" : SATURN_LOCAL_SUCCESS_URI);
             }

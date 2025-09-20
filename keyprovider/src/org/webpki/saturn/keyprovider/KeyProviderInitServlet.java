@@ -195,10 +195,10 @@ public class KeyProviderInitServlet extends HttpServlet {
     }
     
     static String getInvocationUrl(String scheme, HttpSession session) throws IOException {
-        ////////////////////////////////////////////////////////////////////////////////////////////
+        //========================================================================================//
         // The following is the actual contract between an issuing server and a KeyGen2 client.
         // The PUP_INIT_URL argument bootstraps the protocol via an HTTP GET
-        ////////////////////////////////////////////////////////////////////////////////////////////
+        //========================================================================================//
         String urlEncoded = URLEncoder.encode(KeyProviderService.keygen2RunUrl, "utf-8");
         return scheme + "://" + MobileProxyParameters.HOST_KEYGEN2 + 
                "?" + MobileProxyParameters.PUP_COOKIE     + "=" + "JSESSIONID%3D" + session.getId() +
@@ -323,7 +323,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             "  });\n" +
             "}\n" +
             "async function enroll() {\n" +
-            //////////////////////////////////////////////////////////////////////
+            //==================================================================//
             // PaymentRequest for key enrollment?  Right, there is currently no //
             // better way combining the Web and Android applications. You get:  //
             //  - Return value to the invoking Web page                         //
@@ -331,7 +331,7 @@ public class KeyProviderInitServlet extends HttpServlet {
             //  - UI wise almost perfect Web2App integration                    //
             //  - Away from having to select browser for App invoked pages      //
             //  - Security beating URL handlers without adding vulnerabilities  //
-            //////////////////////////////////////////////////////////////////////
+            //==================================================================//
             "  if (w3cPaymentRequest) {\n" +
             //==================================================================//
             // It may take a second or two to get PaymentRequest up and         //

@@ -33,9 +33,9 @@ import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.RefundRequestDecoder;
 import org.webpki.saturn.common.RefundResponseEncoder;
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 // This is the Saturn "refund" decoder servlet                                           //
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 
 public class RefundServlet extends ProcessingBaseServlet {
 

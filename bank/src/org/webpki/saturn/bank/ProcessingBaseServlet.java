@@ -45,9 +45,9 @@ import org.webpki.saturn.common.PaymentRequestDecoder;
 import org.webpki.saturn.common.ProviderUserResponseEncoder;
 import org.webpki.saturn.common.UrlHolder;
 
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 // This is the core Payment Provider (Bank) processing servlet          //
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 
 public abstract class ProcessingBaseServlet extends HttpServlet implements BaseProperties {
 
@@ -118,14 +118,14 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
 
             urlHolder = new UrlHolder(request);
 
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Must be tagged as JSON content and parse as well                                    //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             JSONObjectReader providerRequest = HttpSupport.readJsonData(request);
 
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // First control passed...                                                             //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             if (BankService.logging) {
                 logger.info("Call from" + 
                             urlHolder.getCallerAddress() + 
@@ -133,9 +133,9 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                             providerRequest);
             }
 
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Each method has its own servlet in this setup but that is just an option            //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             if (BankService.jdbcDataSource != null) {
                 connection = BankService.jdbcDataSource.getConnection();
             }
@@ -152,18 +152,18 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
                             "with data:\n" + providerResponse);
             }
 
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Normal return                                                                       //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             HttpSupport.writeJsonData(response, providerResponse);
             
         } catch (Exception e) {
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Hard error return. Note that we return a clear-text message in the response body.   //
             // Having specific error message syntax for hard errors only complicates things since  //
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             BankService.rejectedTransactions++;
             String message = (urlHolder == null ? "" : "From" + urlHolder.getCallerAddress() +
                               (urlHolder.getUrl() == null ? 

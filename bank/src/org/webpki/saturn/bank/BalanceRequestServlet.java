@@ -30,9 +30,9 @@ import org.webpki.saturn.common.BalanceResponseEncoder;
 import org.webpki.saturn.common.UrlHolder;
 
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 // This is the Saturn balance request decoder servlet                                           //
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 
 public class BalanceRequestServlet extends ProcessingBaseServlet {
 

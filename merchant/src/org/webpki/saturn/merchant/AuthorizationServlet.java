@@ -50,9 +50,9 @@ import org.webpki.saturn.common.TransactionRequestEncoder;
 import org.webpki.saturn.common.UrlHolder;
 import org.webpki.saturn.common.WalletAlertMessage;
 
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 // This servlet does all Merchant backend payment transaction work      //
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 
 public class AuthorizationServlet extends ProcessingBaseServlet {
 

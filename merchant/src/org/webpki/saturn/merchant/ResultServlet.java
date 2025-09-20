@@ -33,9 +33,9 @@ import javax.servlet.http.HttpSession;
 import org.webpki.saturn.common.HttpSupport;
 import org.webpki.saturn.common.UrlHolder;
 
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 // This servlet shows the result of a transaction to the user           //
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 
 public class ResultServlet extends HttpServlet implements MerchantSessionProperties {
 

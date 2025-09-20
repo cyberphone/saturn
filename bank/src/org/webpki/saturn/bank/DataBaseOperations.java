@@ -50,9 +50,9 @@ public class DataBaseOperations {
     
     private static HashMap<TransactionTypes,Integer> transactionType2DbInt = new HashMap<>();
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     // Authenticate user authorization using a stored procedure                                   //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     static String authenticateAuthorization(String credentialId,
                                             String accountId,
                                             PaymentMethods paymentMethod,
@@ -100,9 +100,9 @@ public class DataBaseOperations {
     }
 
     
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     // Withdraw an amount from the account using a stored procedure                               //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     static int externalWithDraw(BigDecimal amount,
                                 String accountId,
                                 TransactionTypes transactionType,
@@ -157,9 +157,9 @@ public class DataBaseOperations {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     // Something bad happened on the way so we must restore the balance to its previous state     //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     static void nullifyTransaction(int failedTransactionId, 
                                    Connection connection) throws SQLException {
 /*
@@ -178,9 +178,9 @@ public class DataBaseOperations {
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     // Authenticate and perform a balance request using a stored procedure                                   //
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //============================================================================================//
     static BigDecimal requestAccountBalance(String credentialId,
                                             String accountId,
                                             PublicKey balanceKey,

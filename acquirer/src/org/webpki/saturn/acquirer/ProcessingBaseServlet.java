@@ -41,9 +41,9 @@ import org.webpki.saturn.common.HttpSupport;
 
 import com.supercard.SupercardAccountDataDecoder;
 
-////////////////////////////////////////////////////////////////////////////
+//========================================================================//
 // This is the core Acquirer (Card-Processor) payment transaction servlet //
-////////////////////////////////////////////////////////////////////////////
+//========================================================================//
 
 public abstract class ProcessingBaseServlet extends HttpServlet implements BaseProperties {
 
@@ -72,39 +72,39 @@ public abstract class ProcessingBaseServlet extends HttpServlet implements BaseP
         try {
             urlHolder = new UrlHolder(request);
 
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Must be tagged as JSON content and parse as well                                    //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             JSONObjectReader providerRequest = HttpSupport.readJsonData(request);
 
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // First control passed...                                                             //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
              if (AcquirerService.logging) {
                 logger.info("Call from" + urlHolder.getCallerAddress() + "with data:\n" + providerRequest);
             }
             
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Each method has its own servlet in this setup but that is just an option            //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             JSONObjectWriter providerResponse = processCall(urlHolder, providerRequest);
 
             if (AcquirerService.logging) {
                 logger.info("Responded to caller"  + urlHolder.getCallerAddress() + "with data:\n" + providerResponse);
             }
 
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Normal return                                                                       //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             HttpSupport.writeJsonData(response, providerResponse);
 
         } catch (Exception e) {
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             // Hard error return. Note that we return a clear-text message in the response body.   //
             // Having specific error message syntax for hard errors only complicates things since  //
             // there will always be the dreadful "internal server error" to deal with as well as   //
             // general connectivity problems.                                                      //
-            /////////////////////////////////////////////////////////////////////////////////////////
+            //=====================================================================================//
             String message = (urlHolder == null ? "" : "Source" + urlHolder.getCallerAddress()) + e.getMessage();
             logger.log(Level.SEVERE, HttpSupport.getStackTrace(e, message));
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

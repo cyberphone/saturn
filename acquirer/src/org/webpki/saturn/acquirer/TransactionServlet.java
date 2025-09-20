@@ -34,9 +34,9 @@ import org.webpki.saturn.common.PayeeCoreProperties;
 
 import com.supercard.SupercardAccountDataDecoder;
 
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 // This is the core Acquirer (Card-Processor) Saturn basic mode payment authorization servlet //
-////////////////////////////////////////////////////////////////////////////////////////////////
+//============================================================================================//
 
 public class TransactionServlet extends ProcessingBaseServlet {
 

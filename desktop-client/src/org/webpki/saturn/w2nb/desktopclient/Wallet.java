@@ -119,7 +119,7 @@ import org.webpki.w2nbproxy.StdinJSONPipe;
 import org.webpki.w2nbproxy.StdoutJSONPipe;
 import org.webpki.w2nbproxy.LoggerConfiguration;
 
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 // Web2Native Bridge emulator Payment Agent (a.k.a. Wallet) application //
 //                                                                      //
 // Note: This is not a product. It is an advanced prototype intended    //
@@ -137,7 +137,7 @@ import org.webpki.w2nbproxy.LoggerConfiguration;
 // set of JSON-based message components. In fact, the Wallet part of    //
 // this scheme (including UI) is identical for these use-cases.         //                  
 //                                                                      //
-//////////////////////////////////////////////////////////////////////////
+//======================================================================//
 
 public class Wallet {
 
@@ -1139,14 +1139,14 @@ public class Wallet {
         double extWidth = 0;
         double extHeight = 0;
         if (browserWindow.screenHeight == 0) {
-            ////////////////////////////////////////////////////////////////
+            //============================================================//
             // No positioning information: Probably tapConnect invocation
-            ////////////////////////////////////////////////////////////////
+            //============================================================//
             frame.setLocationRelativeTo(null);
         } else {
-            ////////////////////////////////////////////////////////////////
+            //============================================================//
             // Positioning: Calculate coordinates in Browser resolution
-            ////////////////////////////////////////////////////////////////
+            //============================================================//
     
             // Note that Swing returns native precision
             Dimension extensionWindow = frame.getSize();

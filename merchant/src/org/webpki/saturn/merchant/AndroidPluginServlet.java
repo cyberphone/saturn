@@ -44,10 +44,10 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
     static final String ANDROID_CANCEL                = "qric";
     static final String QR_SUCCESS_URL                = "local";
 
-    ////////////////////////////////////////////////////////////////////////////////////////////
+    //========================================================================================//
     // The following is the actual contract between an issuing server and a Saturn client.
     // The PUP_INIT_URL argument bootstraps the protocol via an HTTP GET
-    ////////////////////////////////////////////////////////////////////////////////////////////
+    //========================================================================================//
     static String getInvocationUrl(String scheme, String httpSessionId, String qrSessionId)
     throws IOException {
         String encodedUrl = URLEncoder.encode(MerchantService.merchantBaseUrl, "utf-8");
@@ -63,9 +63,9 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
                "&" + MobileProxyParameters.PUP_VERSIONS   + "=" + MerchantService.androidWebPkiVersions;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
+    //===============================================================================//
     // The POST method is only called by Saturn Web pay for Android using URLhandler //
-    ///////////////////////////////////////////////////////////////////////////////////
+    //===============================================================================//
     @Override
     public void doPost (HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession(false);
@@ -80,12 +80,12 @@ public class AndroidPluginServlet extends HttpServlet implements MerchantSession
                                        ";end");
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////
+    //===============================================================================//
     // The GET method used for multiple purposes                                     //
     //                                                                               //
     // Note: Most of this slimy and error-prone code is redundant when Android is    //
     // using the W3C PaymentRequest API.                                             //
-    ///////////////////////////////////////////////////////////////////////////////////
+    //===============================================================================//
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (MerchantService.logging) {
